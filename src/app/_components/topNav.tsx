@@ -1,6 +1,7 @@
 "use client";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { SignedOut, SignedIn, SignInButton, UserButton } from "@clerk/nextjs";
 
 type NavRoute = '/' | '/season' | '/league';
 interface NavItemProps {
@@ -26,7 +27,14 @@ export default function TopNav() {
                 <NavItem href="/league" label="Leagues" isActive={selected === '/league'}
                     onMouseEnter={() => setSelected('/league')} />
             </ul>
-            <div>Sign In</div>
+            <div>
+                <SignedOut>
+                    <SignInButton />
+                </SignedOut>
+                <SignedIn>
+                    <UserButton />
+                </SignedIn>
+            </div>
         </nav >
     );
 };
