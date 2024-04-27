@@ -4,7 +4,6 @@ export default async function HomePage() {
     const posts = await db.query.posts.findMany();
 
     console.log(posts);
-
     return (
         <main>
             <img src="https://i.imgur.com/b6cHcaG.png" alt="Header Image" className="w-full" />
