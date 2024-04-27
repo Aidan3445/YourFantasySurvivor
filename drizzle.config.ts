@@ -3,10 +3,10 @@ import { type Config } from "drizzle-kit";
 import { env } from "~/env";
 
 export default {
-  schema: "./src/server/db/schema.ts",
-  driver: "pg",
-  dbCredentials: {
-    connectionString: env.DATABASE_URL,
-  },
-  tablesFilter: ["your-survivor-fantasy_*"],
+    schema: "./src/server/db/schema.ts",
+    driver: "pg",
+    dbCredentials: {
+        connectionString: env.POSTGRES_URL,
+    },
+    tablesFilter: ["your-survivor-fantasy_*"],
 } satisfies Config;
