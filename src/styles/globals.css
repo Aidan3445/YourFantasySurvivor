@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Body styles */
+body {
+    @apply bg-gradient-to-b from-[#CAA785] to-[#7F553E] flex flex-col min-h-screen;
+}
+
+/* Responsive padding and margin */
+@media (min-width: 640px) { /* Adjust numbers based on your design preferences */
+    body {
+        @apply px-10; /* Horizontal padding for small screens */
+    }
+}
+
+@media (min-width: 1024px) {
+    body {
+        @apply px-40; /* Increased horizontal padding for larger screens */
+    }
+}
+
+@media (min-width: 1280px) {
+    body {
+        @apply px-60; /* Even more padding for extra large screens */
+    }
+}
+
+/* Main container styles */
+main {
+   @apply flex flex-col items-center text-white gap-12;
+}

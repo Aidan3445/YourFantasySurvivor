@@ -1,28 +1,7 @@
 export default function HomePage() {
-    // buttons to navigate to other pages
     return (
         <main>
-            <img src="https://i.imgur.com/b6cHcaG.png" alt="Header Image" className="w-full" />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-                <a
-                    className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-                    href="/season"
-                >
-                    <h3 className="text-2xl font-bold">Season →</h3>
-                    <div className="text-lg">
-                        View the current season of Survivor
-                    </div>
-                </a>
-                <a
-                    className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-                    href="/league"
-                >
-                    <h3 className="text-2xl font-bold">League →</h3>
-                    <div className="text-lg">
-                        View the current league of Survivor
-                    </div>
-                </a>
-            </div>
+            League Page
         </main>
     );
 }
@@ -52,6 +31,7 @@ export default function HomePage() {
             <h3 className="text-2xl font-bold">Documentation →</h3>
             <div className="text-lg">
               Learn more about Create T3 App, the libraries it uses, and how to
+            HELLO!
               deploy it.
             </div>
           </Link>
