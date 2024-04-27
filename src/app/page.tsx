@@ -1,5 +1,10 @@
-export default function HomePage() {
-    // buttons to navigate to other pages
+import { db } from "~/server/db";
+
+export default async function HomePage() {
+    const posts = await db.query.posts.findMany();
+
+    console.log(posts);
+
     return (
         <main>
             <img src="https://i.imgur.com/b6cHcaG.png" alt="Header Image" className="w-full" />
@@ -23,6 +28,12 @@ export default function HomePage() {
                     </div>
                 </a>
             </div>
+            {posts.map((post) => (
+                <div key={post.id}>
+                    <h1>{post.name}</h1>
+                    <p>{post.createdAt.toString()}</p>
+                </div>
+            ))}
         </main>
     );
 }
