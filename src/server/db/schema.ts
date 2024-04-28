@@ -7,6 +7,7 @@ import {
     pgTableCreator,
     serial,
     timestamp,
+    date,
     varchar,
     smallint,
     integer,
@@ -26,8 +27,8 @@ export const seasons = createTable(
     {
         id: serial("id").primaryKey(),
         name: varchar("name", { length: 64 }).notNull(),
-        premierDate: timestamp("premier_date").notNull(),
-        finaleDate: timestamp("finale_date"),
+        premierDate: date("premier_date").notNull(),
+        finaleDate: date("finale_date"),
         mergeEpisode: integer("merge_episode"),
     },
     (table) => ({
