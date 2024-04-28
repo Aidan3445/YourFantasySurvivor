@@ -16,14 +16,12 @@ export default async function HomePage() {
             </SignedOut>
             <SignedIn>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-                    <a
-                        className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
+                    <a className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
                         href="/season" >
                         <h3 className="text-2xl font-bold">Season →</h3>
                         <div className="text-lg"> View the current season of Survivor </div>
                     </a>
-                    <a
-                        className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
+                    <a className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
                         href="/league" >
                         <h3 className="text-2xl font-bold">League →</h3>
                         <div className="text-lg"> View the current league of Survivor </div>
