@@ -14,6 +14,7 @@ import {
     boolean,
     primaryKey,
     foreignKey,
+    uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -27,7 +28,6 @@ export const createTable = pgTableCreator((name) => `yfs_${name}`);
 export const seasons = createTable(
     "season",
     {
-        id: integer("id"),
         name: varchar("name", { length: 64 }).notNull().primaryKey(),
         premierDate: date("premier_date").notNull(),
         finaleDate: date("finale_date"),
@@ -38,14 +38,14 @@ export const seasons = createTable(
 export const tribes = createTable(
     "tribe",
     {
-        id: integer("id"),
         name: varchar("name", { length: 16 }).notNull(),
         color: varchar("color", { length: 7 }).notNull(),
         mergeTribe: boolean("merge_tribe").notNull().default(false),
         season: varchar("season").references(() => seasons.name).notNull(),
     },
     (table) => ({
-        pk: primaryKey({ columns: [table.season, table.name] }),
+        pk: primaryKey({ columns: [table.name, table.season] }),
+        nameIndex: uniqueIndex("tribe_name_idx").on(table.name),
         seasonIndex: index("tribe_season_idx").on(table.season),
     })
 );
@@ -53,23 +53,21 @@ export const tribes = createTable(
 export const castaways = createTable(
     "castaway",
     {
-        id: integer("id"),
         name: varchar("name", { length: 64 }).notNull(),
         age: smallint("age").notNull(),
         hometown: varchar("hometown", { length: 128 }).notNull().default("Unknown"),
         residence: varchar("residence", { length: 128 }).notNull().default("Unknown"),
         job: varchar("job", { length: 128 }).notNull().default("Unknown"),
         photo: varchar("photo", { length: 1024 }).notNull().default("https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=612x612&w=0&k=20&c=ZBE3NqfzIeHGDPkyvulUw14SaWfDj2rZtyiKv3toItk="),
-        tribe: varchar("tribe", { length: 16 }).notNull(),
-        season: varchar("season").notNull(),
+        tribe: varchar("tribe", { length: 16 }).references(() => tribes.name).notNull(),
+        season: varchar("season").references(() => seasons.name).notNull(),
     },
     (table) => ({
-        pk: primaryKey({ columns: [table.season, table.name] }),
+        pk: primaryKey({ columns: [table.name, table.season] }),
         seasonIndex: index("castaway_season_idx").on(table.season),
-        seasonTribeIndex: index("castaway_season_tribe_idx").on(table.season, table.tribe),
         tribeFK: foreignKey({
-            columns: [table.season, table.tribe],
-            foreignColumns: [tribes.season, tribes.name],
+            columns: [table.tribe, table.season],
+            foreignColumns: [tribes.name, tribes.season],
             name: "castaway_tribe_fk",
         }),
     })
@@ -83,7 +81,6 @@ type NoteModel = {
 export const episodes = createTable(
     "episode",
     {
-        id: integer("id"),
         number: smallint("number").notNull(),
         name: varchar("name", { length: 64 }).notNull(),
         airDate: timestamp("air_date").notNull(),
@@ -136,7 +133,6 @@ type CustomEpisode = {
 export const leagues = createTable(
     "league",
     {
-        id: integer("id"),
         name: varchar("name", { length: 64 }).notNull().primaryKey(),
         password: varchar("password", { length: 64 }).notNull(),
         season: varchar("season_id").references(() => seasons.name).notNull(),
@@ -161,7 +157,6 @@ type SurvivorUpdate = {
 export const leagueMembers = createTable(
     "league_member",
     {
-        id: integer("id"),
         league: varchar("league_id").references(() => leagues.name).notNull().primaryKey(),
         userId: varchar("user_id", { length: 64 }).notNull(),
         color: varchar("color", { length: 7 }).notNull(),
