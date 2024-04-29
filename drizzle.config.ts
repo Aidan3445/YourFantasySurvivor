@@ -8,5 +8,5 @@ export default {
     dbCredentials: {
         connectionString: env.POSTGRES_URL,
     },
-    tablesFilter: ["your-survivor-fantasy_*"],
+    tablesFilter: ["yfs_*"],
 } satisfies Config;

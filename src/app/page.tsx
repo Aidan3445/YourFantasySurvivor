@@ -1,72 +1,33 @@
 import { db } from "~/server/db";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-    const posts = await db.query.posts.findMany();
-
-    console.log(posts);
     return (
         <main>
             <img src="https://i.imgur.com/b6cHcaG.png" alt="Header Image" className="w-full" />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-                <a
-                    className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-                    href="/season"
-                >
-                    <h3 className="text-2xl font-bold">Season →</h3>
-                    <div className="text-lg">
-                        View the current season of Survivor
-                    </div>
-                </a>
-                <a
-                    className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-                    href="/league"
-                >
-                    <h3 className="text-2xl font-bold">League →</h3>
-                    <div className="text-lg">
-                        View the current league of Survivor
-                    </div>
-                </a>
-            </div>
-            {posts.map((post) => (
-                <div key={post.id}>
-                    <h1>{post.name}</h1>
-                    <p>{post.createdAt.toString()}</p>
+            <SignedOut>
+                <div>
+                    <h1>Home Page</h1>
+                    <p>Welcome to the Survivor Fantasy League</p>
+                    <p> Please sign in: <SignInButton /> </p>
                 </div>
-            ))}
-        </main>
+            </SignedOut>
+            <SignedIn>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
+                    <a className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
+                        href="/season" >
+                        <h3 className="text-2xl font-bold">Season →</h3>
+                        <div className="text-lg"> View the current season of Survivor </div>
+                    </a>
+                    <a className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
+                        href="/league" >
+                        <h3 className="text-2xl font-bold">League →</h3>
+                        <div className="text-lg"> View the current league of Survivor </div>
+                    </a>
+                </div>
+            </SignedIn>
+        </main >
     );
 }
-
-/*
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
-        <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-          Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-            >
-             className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-              k
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/usage/first-steps"
-              rget="_blank"
-          >
-            <h3 className="text-2xl font-bold">First Steps →</h3>
-            <div className="text-lg">
-              Just the basics - Everything you need to know to set up your
-              database and authentication.
-            </div>
-          </Link>
-          <Link
-            className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 text-white hover:bg-white/20"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Documentation →</h3>
-            <div className="text-lg">
-              Learn more about Create T3 App, the libraries it uses, and how to
-              deploy it.
-            </div>
-          </Link>
-        </div>
-      </div>
-*/
