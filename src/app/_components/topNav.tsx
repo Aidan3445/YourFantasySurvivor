@@ -17,7 +17,7 @@ export default function TopNav() {
     const [selected, setSelected] = useState<NavRoute>(mainPath);
 
     return (
-        <nav className="flex w-fill items-center justify-between font-semibold pt-4" >
+        <nav className="flex justify-between items-center pt-4 font-semibold w-fill min-h-14" >
             <ul className="flex gap-4"
                 onMouseLeave={() => setSelected(mainPath)}>
                 <NavItem href="/" label="Home" isActive={selected === '/'}

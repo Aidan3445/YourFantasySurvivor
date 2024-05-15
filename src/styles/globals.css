@@ -4,7 +4,7 @@
 
 /* Body styles */
 body {
-    @apply bg-gradient-to-b from-[#CAA785] to-[#7F553E] flex flex-col min-h-screen;
+    @apply bg-gradient-to-b from-b3 to-b1 flex flex-col min-h-screen;
 }
 
 /* Responsive padding and margin */
@@ -29,4 +29,25 @@ body {
 /* Main container styles */
 main {
    @apply flex flex-col items-center text-white gap-12;
+}
+
+#advTable::-webkit-scrollbar {
+    width: 5px;
+}
+ 
+/* Track */
+::-webkit-scrollbar-track {
+    background: #888;
+    border-radius: 0 0 5px 0;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 0 0 5px 5px;
+}
+ 
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #000;
 }
