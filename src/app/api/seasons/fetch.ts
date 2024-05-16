@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { basicGet } from "../fetchFunctions";
 
-
 export default async function getSeasons() {
     const origin = headers().get("host");
     const url = new URL(`http://${origin}/api/seasons`);

@@ -23,9 +23,9 @@ function Table(props: AdvantagesTableProps) {
     }
 
     return (
-        <figure className="flex overflow-y-auto flex-col max-h-32" id="advTable">
+        <figure className="flex overflow-y-auto flex-col max-h-32 divide-y divide-y-1" id="advTable">
             {advantages.map((adv, index) => (
-                <span key={index} className={`grid grid-cols-4 text-center ${index > 0 ? "border-t" : ""} border-black text-sm`}>
+                <span key={index} className={`grid grid-cols-4 text-center divide-x-1 border-black text-sm`}>
                     <h3 className="col-span-2 px-1 font-medium border-black text-md truncate">{adv.castaway}</h3>
                     <h4 className="font-normal border-black border-solid border-x">{adv.name}</h4>
                     <h4 className="font-normal border-black border-solid">{adv.status}</h4>

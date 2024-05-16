@@ -33,15 +33,16 @@ export default function SeasonStats() {
     }, [season]);
 
     return (
-        <article className="flex flex-col w-full rounded-2xl border-4 border-black border-solid">
-            <div className="flex flex-col gap-1 p-4 text-black rounded-xl border-8 border-solid shadow-inner bg-b4/80 border-b1 shadow-b2">
-                <span className="flex flex-row gap-4">
-                    <h2 className="m-auto text-xl font-bold">Stats:</h2>
-                    <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
-                </span>
-                <ChallengesPodium challenges={stats.challenges} />
-                <AdvantagesTable advantages={stats.advantages} />
-            </div>
+        <article className="flex flex-col gap-2 p-1 w-full text-black rounded-xl border-2 border-black ring-4 outline-black corner-frame outline outline-4 outline-offset-4 bg-b4/40 ring-b1">
+            <div className="tl-corner" />
+            <div className="tr-corner" />
+            <span className="flex flex-row gap-4 px-8">
+                <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
+            </span>
+            <ChallengesPodium challenges={stats.challenges} />
+            <AdvantagesTable advantages={stats.advantages} />
+            <div className="bl-corner" />
+            <div className="br-corner" />
         </article>
     );
 }

@@ -3,7 +3,7 @@ import { basicGet } from "../fetchFunctions";
 import { Episode } from "~/server/db/schema";
 
 export default async function getEpisodes(season?: string) {
-    const origin = headers.get("host");
+    const origin = headers().get("host");
     const url = new URL(`http://${origin}/api/episodes`);
 
     if (season) {
