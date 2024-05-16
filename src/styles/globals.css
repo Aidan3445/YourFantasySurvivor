@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 /* Body styles */
-body {
+.page {
     @apply bg-gradient-to-b from-b3 to-b1 flex flex-col min-h-screen;
 }
 
 /* Responsive padding and margin */
 @media (min-width: 640px) { /* Adjust numbers based on your design preferences */
-    body {
+    .page {
         @apply px-10; /* Horizontal padding for small screens */
     }
 }
 
 @media (min-width: 1024px) {
-    body {
+    .page {
         @apply px-40; /* Increased horizontal padding for larger screens */
     }
 }
 
 @media (min-width: 1280px) {
-    body {
+    .page {
         @apply px-60; /* Even more padding for extra large screens */
     }
 }

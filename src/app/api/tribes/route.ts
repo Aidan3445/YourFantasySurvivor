@@ -1,4 +1,5 @@
-import { NextRequest } from "next/server";
+import "server-only";
+import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import { tribes } from "~/server/db/schema";
@@ -20,6 +21,6 @@ export async function GET(req: NextRequest) {
         const res = await db.select({ name: tribes.name })
             .from(tribes)
             .where(eq(tribes.season, searchParams.get("season")));
-        return Response.json(res);
+        return NextResponse.json(res);
     }
 }

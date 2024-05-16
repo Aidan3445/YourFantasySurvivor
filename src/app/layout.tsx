@@ -24,8 +24,10 @@ export default function RootLayout({
         <ClerkProvider>
             <html lang="en">
                 <body className={`font-sans ${inter.variable}`}>
-                    <TopNav />
-                    {children}
+                    <div className="page">
+                        <TopNav />
+                        {children}
+                    </div>
                 </body>
             </html>
         </ClerkProvider>

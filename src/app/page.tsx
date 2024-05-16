@@ -6,7 +6,7 @@ export default async function HomePage() {
     return (
         <main>
             <img src="https://i.imgur.com/b6cHcaG.png" alt="Header Image" className="w-full" />
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8 pb-4">
+            <div className="grid grid-cols-1 gap-4 pb-4 w-full sm:grid-cols-2 md:gap-8">
                 <SignedOut>
                     <SignInCard />
                 </SignedOut>

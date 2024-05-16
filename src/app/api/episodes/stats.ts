@@ -15,7 +15,7 @@ export type FireWinStat = string | null;
 export type SoleSurvivorStat = string | null;
 export type EliminationStat = { castaway: string, episode: number, votes: string[] };
 
-type SeasonStats = {
+export type SeasonStats = {
     advantages: AdvantageStat[],
     titles: TitleStat[],
     challenges: ChallengeStat[],
@@ -24,6 +24,15 @@ type SeasonStats = {
     soleSurvivor: SoleSurvivorStat,
     eliminations: EliminationStat[]
 }
+export const emptyStats = (): SeasonStats => ({
+    advantages: [],
+    titles: [],
+    challenges: [],
+    final: null,
+    fireWin: null,
+    soleSurvivor: null,
+    eliminations: [],
+});
 
 export default function compileStats(episodes: Episode[]): SeasonStats {
     const stats: SeasonStats = {

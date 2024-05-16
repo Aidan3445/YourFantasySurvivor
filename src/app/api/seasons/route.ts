@@ -1,3 +1,5 @@
+import "server-only";
+import { NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
 import { db } from "~/server/db";
 import { seasons } from "~/server/db/schema";
@@ -9,5 +11,6 @@ export async function GET() {
         return { status: 404, json: { message: "Seasons not found" } };
     }
 
-    return Response.json(res);
+    // Return list of season names
+    return NextResponse.json(res.map((s) => s.name));
 }

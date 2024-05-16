@@ -11,7 +11,7 @@ export default function ChallengesPodium(props: ChallengesPodiumProps) {
 
     return (
         <section className="rounded-lg border-2 border-black border-solid">
-            <h3 className="text-xl font-semibold border-b-2 border-black">Challenges</h3>
+            <h3 className="text-xl font-semibold border-b-2 border-black indent-1">Challenges</h3>
             <figure className="grid grid-flow-col auto-cols-fr gap-1 px-1 pt-2">
                 <Podium stats={challenges[1]} color="bg-zinc-400" height="h-24" />
                 <Podium stats={challenges[0]} color="bg-amber-400" height="h-32" />
@@ -33,7 +33,7 @@ function Podium(props: PodiumProps) {
 
     if (!stats) {
         stats = {
-            castaway: "Not Available",
+            castaway: "Loading...",
             indivWin: 0,
             indivReward: 0,
             tribe1st: 0,
@@ -58,7 +58,7 @@ function Podium(props: PodiumProps) {
                         </span>
                     </div>
                 </HoverCardTrigger>
-                <HoverCardContent className="gap-2 bg-b2 w-50 text-nowrap border-black" side="top">
+                <HoverCardContent className="gap-2 border-black bg-b2 w-50 text-nowrap" side="top">
                     <div className="flex gap-2 justify-between">
                         <h3>Tribe 1st places:</h3>
                         <h3 className="font-mono">{stats.tribe1st}</h3>

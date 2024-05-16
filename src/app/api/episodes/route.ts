@@ -1,4 +1,5 @@
-import { NextRequest } from "next/server";
+import "server-only";
+import { NextRequest, NextResponse } from "next/server";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import { episodes, seasons } from "~/server/db/schema";
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
         const res = await db.select()
             .from(episodes)
             .where(eq(episodes.season, season[0]?.name ?? "Failed to get season"));
-        return Response.json(res);
+        return NextResponse.json(res);
     } else if (searchParams.has("number")) {
         const res = await db.select()
             .from(episodes)
@@ -20,11 +21,11 @@ export async function GET(req: NextRequest) {
                 eq(episodes.season, searchParams.get("season") as string),
                 eq(episodes.number, parseInt(searchParams.get("number") ?? "-1"))
             ));
-        return Response.json(res);
+        return NextResponse.json(res);
     } else {
         const res = await db.select()
             .from(episodes)
             .where(eq(episodes.season, searchParams.get("season") as string));
-        return Response.json(res);
+        return NextResponse.json(res);
     }
 }
