@@ -35,15 +35,7 @@ export const emptyStats = (): SeasonStats => ({
 });
 
 export default function compileStats(episodes: Episode[]): SeasonStats {
-    const stats: SeasonStats = {
-        advantages: [],
-        titles: [],
-        challenges: [],
-        final: null,
-        fireWin: null,
-        soleSurvivor: null,
-        eliminations: [],
-    };
+    const stats: SeasonStats = emptyStats();
 
     episodes.forEach((episode) => {
         // advantages - broken to separate function for readability

@@ -65,7 +65,7 @@ main {
     @apply w-16 h-8;
 }
 .bl-corner, .br-corner {
-    @apply w-16 h-7;
+    @apply w-14 h-6;
 }
 
 .tl-corner {
@@ -86,4 +86,7 @@ main {
     background-size: 200% 200%;
 }
 
-
+/* Scale in effect */
+.scale-in {
+  transform-origin: var(--radix-hover-card-content-transform-origin);
+}

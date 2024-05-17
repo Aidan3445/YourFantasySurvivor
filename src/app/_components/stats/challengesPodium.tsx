@@ -1,3 +1,4 @@
+import { HoverCardArrow } from "@radix-ui/react-hover-card";
 import { HoverCardContent } from "~/app/_components/commonUI/hover";
 import { HoverCard, HoverCardTrigger } from "~/app/_components/commonUI/hover";
 import { ChallengeStat } from "~/app/api/episodes/stats";
@@ -43,7 +44,7 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
 
     return (
         <div className="self-end">
-            <HoverCard openDelay={200} closeDelay={0}>
+            <HoverCard openDelay={200} closeDelay={100}>
                 <HoverCardTrigger>
                     <h3 className="p-0 m-0 w-full font-medium sm:text-lg text-md truncate">{stats.castaway}</h3>
                     <div className={`shimmer flex flex-col ${height} gap-1 p-1 justify-center items-center 
@@ -59,6 +60,7 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                     </div>
                 </HoverCardTrigger>
                 <HoverCardContent className="gap-2 border-black bg-b2 w-50 text-nowrap" side="bottom">
+                    <HoverCardArrow />
                     <div className="flex gap-2 justify-between">
                         <h3>Tribe 1st places:</h3>
                         <h3 className="font-mono">{stats.tribe1st}</h3>

@@ -41,14 +41,19 @@ const config = {
                     "0%": { backgroundPosition: "0% 0%" },
                     "50%": { backgroundPosition: "100% 100%" },
                     "100%": { backgroundPosition: "0% 0%" },
-                }
+                },
+                "scale-in": {
+                    "0%": { transform: "scale(0)" },
+                    "100%": { transform: "scale(1)" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
                 "shimmer": "shimmer 12s ease infinite",
                 "shimmer-delay-1": "shimmer 12s ease 0.75s infinite",
-                "shimmer-delay-2": "shimmer 12s ease 1.5s infinite",
+                "shimmer-delay-2": "shimmer 12s ease 2s infinite",
+                "scale-in": "scale-in 2s ease-out",
             },
             rotate: {
                 "30": "30deg",
