@@ -20,6 +20,7 @@ const config = {
         extend: {
             colors: {
                 'b1': '#684528',
+                'b1-light': '#8C6D4D',
                 'b2': '#B09472',
                 'b3': '#E5BC8F',
                 'b4': '#EED9BF',
@@ -40,6 +41,9 @@ const config = {
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
+            },
+            rotate: {
+                "30": "30deg",
             },
         },
     },

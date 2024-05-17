@@ -13,9 +13,9 @@ export default function ChallengesPodium(props: ChallengesPodiumProps) {
         <section className="rounded-lg border-2 border-black border-solid">
             <h3 className="text-xl font-semibold border-b-2 border-black indent-1">Challenges</h3>
             <figure className="grid grid-flow-col auto-cols-fr gap-1 px-1 pt-2">
-                <Podium stats={challenges[1]} color="bg-zinc-400" height="h-24" />
-                <Podium stats={challenges[0]} color="bg-amber-400" height="h-32" />
-                <Podium stats={challenges[2]} color="bg-amber-700" height="h-20" />
+                <Podium stats={challenges[1]} color="bg-gradient-to-r from-zinc-400 via-zinc-300 to-zinc-400" height="h-24" />
+                <Podium stats={challenges[0]} color="bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400" height="h-32" />
+                <Podium stats={challenges[2]} color="bg-gradient-to-r from-amber-700 via-amber-500 to-amber-700" height="h-20" />
             </figure>
         </section>
 
@@ -49,11 +49,11 @@ function Podium(props: PodiumProps) {
                     <div className={`flex flex-col ${height} gap-1 p-1 justify-center items-center 
                         rounded-t-md border-2 border-b-0 border-black border-solid ${color} text-center`}>
                         <span className="flex gap-2 items-center">
-                            <div className="w-5 h-5 bg-white rounded-full sm:w-6 sm:h-6">I</div>
+                            <div className="w-5 h-5 bg-white rounded-full border border-black sm:w-6 sm:h-6">I</div>
                             <h4 className="font-medium">{stats.indivWin + stats.indivReward}</h4>
                         </span>
                         <span className="flex gap-2 items-center">
-                            <div className="w-5 h-5 bg-white rounded-full sm:w-6 sm:h-6">T</div>
+                            <div className="w-5 h-5 bg-white rounded-full border border-black sm:w-6 sm:h-6">T</div>
                             <h4 className="font-medium">{stats.tribe1st + stats.tribe2nd}</h4>
                         </span>
                     </div>

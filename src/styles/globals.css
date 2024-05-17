@@ -58,23 +58,18 @@ main {
 }
 
 .tl-corner, .tr-corner, .bl-corner, .br-corner {
-    @apply bg-b1 w-16 h-1.5 border-y-2 border-black;
+    @apply bg-b1-light w-16 h-8 border-y-2 border-black;
 }
 
 .tl-corner {
-    @apply absolute top-0 left-0 translate-y-3 -translate-x-4 -rotate-45;
+    @apply absolute top-0 left-0 -translate-y-2 -translate-x-6 -rotate-45;
 }
-.tl-corner::before {
-    @apply absolute w-4 h-4 rounded-full bg-black;
-    content: '';
-}
-
 .tr-corner {
-    @apply absolute top-0 right-0 translate-y-3 translate-x-4 rotate-45;
+    @apply absolute top-0 right-0 -translate-y-2 translate-x-6 rotate-45;
 }
 .bl-corner {
-    @apply absolute bottom-0 left-0 -translate-y-3 -translate-x-4 rotate-45;
+    @apply absolute bottom-0 left-0 translate-y-4 -translate-x-6 rotate-30;
 }
 .br-corner {
-    @apply absolute bottom-0 right-0 -translate-y-3 translate-x-4 -rotate-45;
+    @apply absolute bottom-0 right-0 translate-y-4 translate-x-6 -rotate-30;
 }
