@@ -58,7 +58,14 @@ main {
 }
 
 .tl-corner, .tr-corner, .bl-corner, .br-corner {
-    @apply bg-b1-light w-16 h-8 border-y-2 border-black;
+    @apply bg-gradient-to-b from-b1 from-50% to-b1-light border-y-2 border-black;
+}
+
+.tl-corner, .tr-corner {
+    @apply w-16 h-8;
+}
+.bl-corner, .br-corner {
+    @apply w-16 h-7;
 }
 
 .tl-corner {
@@ -68,8 +75,15 @@ main {
     @apply absolute top-0 right-0 -translate-y-2 translate-x-6 rotate-45;
 }
 .bl-corner {
-    @apply absolute bottom-0 left-0 translate-y-4 -translate-x-6 rotate-30;
+    @apply absolute bottom-0 left-0 rotate-210 translate-y-3 -translate-x-3;
 }
 .br-corner {
-    @apply absolute bottom-0 right-0 translate-y-4 translate-x-6 -rotate-30;
+    @apply absolute bottom-0 right-0 -rotate-210 translate-y-3 translate-x-3;
 }
+
+/* Shimmer effect */
+.shimmer {
+    background-size: 200% 200%;
+}
+
+

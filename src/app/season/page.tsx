@@ -1,6 +1,6 @@
 import AddCastaway from "./add";
 
-export default function HomePage() {
+export default function SeasonPage() {
     return (
         <main>
             Season Page

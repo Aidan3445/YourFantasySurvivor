@@ -37,13 +37,22 @@ const config = {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: "0" },
                 },
+                "shimmer": {
+                    "0%": { backgroundPosition: "0% 0%" },
+                    "50%": { backgroundPosition: "100% 100%" },
+                    "100%": { backgroundPosition: "0% 0%" },
+                }
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
+                "shimmer": "shimmer 12s ease infinite",
+                "shimmer-delay-1": "shimmer 12s ease 0.75s infinite",
+                "shimmer-delay-2": "shimmer 12s ease 1.5s infinite",
             },
             rotate: {
                 "30": "30deg",
+                "210": "210deg",
             },
         },
     },
