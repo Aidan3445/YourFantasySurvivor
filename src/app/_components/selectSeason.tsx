@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect } from "react";
 import {
     Select,
     SelectContent,
@@ -9,22 +6,17 @@ import {
     SelectValue,
 } from "~/app/_components/commonUI/select";
 
-type SelectSeasonProps = {
+interface SelectSeasonProps {
     seasons: string[];
     season: string;
     setSeason: (season: string) => void;
 };
 
-export default function SelectSeason(props: SelectSeasonProps) {
-    const { seasons, season, setSeason } = props;
-
-    useEffect(() => { }, [season]);
+export default function SelectSeason({ seasons, season, setSeason }: SelectSeasonProps) {
 
     return (
         <Select defaultValue={season} value={season} onValueChange={setSeason}>
-            <SelectTrigger
-                className="font-semibold border-black hover:border-2 hover:shadow-inner bg-b4 aria-expanded:border-2 aria-expanded:shadow-inner aria-expanded:shadow-b1 hover:shadow-b1"
-                style={{ "transition": "border-width 0.1s ease-in-out" }}>
+            <SelectTrigger className="self-center font-semibold m-2 w-2/3 hs-in">
                 <br />
                 <SelectValue />
             </SelectTrigger>

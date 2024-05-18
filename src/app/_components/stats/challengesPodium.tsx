@@ -1,4 +1,4 @@
-import { HoverCardArrow } from "@radix-ui/react-hover-card";
+import { HoverCardArrow, HoverCardPortal } from "@radix-ui/react-hover-card";
 import { HoverCardContent } from "~/app/_components/commonUI/hover";
 import { HoverCard, HoverCardTrigger } from "~/app/_components/commonUI/hover";
 import { ChallengeStat } from "~/app/api/episodes/stats";
@@ -11,7 +11,7 @@ export default function ChallengesPodium({ challenges }: ChallengesPodiumProps) 
 
 
     return (
-        <section className="rounded-lg border-2 border-black border-solid">
+        <section className="rounded-lg border-2 border-black border-solid m-1">
             <h3 className="text-xl font-semibold border-b-2 border-black indent-1">Challenges</h3>
             <figure className="grid grid-flow-col auto-cols-fr gap-1 px-1 pt-2">
                 <Podium stats={challenges[1]} gradient="from-zinc-400 via-zinc-300 to-zinc-400" height="h-24" animation="animate-shimmer" />
@@ -43,10 +43,10 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
     }
 
     return (
-        <div className="self-end">
+        <div className="self-end text-center">
             <HoverCard openDelay={200} closeDelay={100}>
                 <HoverCardTrigger>
-                    <h3 className="p-0 m-0 w-full font-medium sm:text-lg text-md truncate">{stats.castaway}</h3>
+                    <h3 className="p-0 m-0 w-full font-medium md:text-base text-sm truncate">{stats.castaway}</h3>
                     <div className={`shimmer flex flex-col ${height} gap-1 p-1 justify-center items-center 
                         rounded-t-md border-2 border-b-0 border-black border-solid bg-gradient-to-br ${gradient} text-center ${animation}`}>
                         <span className="flex gap-2 items-center">
@@ -59,26 +59,47 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                         </span>
                     </div>
                 </HoverCardTrigger>
-                <HoverCardContent className="gap-2 border-black bg-b2 w-50 text-nowrap" side="bottom">
-                    <HoverCardArrow />
-                    <div className="flex gap-2 justify-between">
-                        <h3>Tribe 1st places:</h3>
-                        <h3 className="font-mono">{stats.tribe1st}</h3>
-                    </div>
-                    <div className="flex gap-2 justify-between">
-                        <h3>Tribe 2nd places:</h3>
-                        <h3 className="font-mono">{stats.tribe2nd}</h3>
-                    </div>
-                    <div className="flex gap-2 justify-between">
-                        <h3>Individual wins:</h3>
-                        <h3 className="font-mono">{stats.indivWin}</h3>
-                    </div>
-                    <div className="flex gap-2 justify-between">
-                        <h3>Individual rewards:</h3>
-                        <h3 className="font-mono">{stats.indivReward}</h3>
-                    </div>
-                </HoverCardContent>
+                <HoverCardPortal>
+                    <HoverCardContent className="border-black bg-b2 w-50 text-nowrap shadow-md shadow-zinc-700">
+                        <HoverCardArrow />
+                        <div className="grid grid-cols-3 grid-rows-2 gap-2 text-center">
+                            <div className="grid grid-cols-subgrid col-span-3 items-center">
+                                <h3>Tribe</h3>
+                                <div className="flex flex-col">
+                                    <h3 className="border-b border-black">1st</h3>
+                                    <h3 className="font-mono">{stats.tribe1st}</h3>
+                                </div>
+                                <div className="flex flex-col">
+                                    <h3 className="border-b border-black relative">
+                                        2nd
+                                        <HoverCard openDelay={100} closeDelay={0}>
+                                            <HoverCardTrigger>
+                                                <span className="text-xs border-black rounded-full absolute -translate-y-1">?</span>
+                                            </HoverCardTrigger>
+                                            <HoverCardContent className="bg-b2 border-black text-xs text-center shadow-md shadow-zinc-700" side="top">
+                                                <HoverCardArrow />
+                                                <p className="text-wrap">Applies only to seasons with 3-tribe challenges</p>
+                                            </HoverCardContent>
+                                        </HoverCard>
+                                    </h3>
+                                    <h3 className="font-mono">{stats.tribe2nd}</h3>
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-subgrid col-span-3 items-center">
+                                <h3>Individual</h3>
+                                <div className="flex flex-col">
+                                    <h3 className="border-b border-black">Wins</h3>
+                                    <h3 className="font-mono">{stats.indivWin}</h3>
+                                </div>
+                                <div className="flex flex-col">
+                                    <h3 className="border-b border-black">Rewards</h3>
+                                    <h3 className="font-mono">{stats.indivReward}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </HoverCardContent>
+                </HoverCardPortal>
             </HoverCard>
-        </div>
+        </div >
     );
 }

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /* styles */
-.page {
-    @apply bg-gradient-to-b from-b3 to-b1 flex flex-col min-h-screen;
+body {
+    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen;
 }
 
 /* Responsive padding and margin */
@@ -28,7 +28,7 @@
 
 /* Main container styles */
 main {
-   @apply flex flex-col items-center text-white gap-8;
+   @apply flex flex-col items-center text-white gap-4;
 }
 
 #advTable::-webkit-scrollbar {
@@ -52,20 +52,26 @@ main {
     background: #000;
 }
 
+/* on hover and selected indent */
+.hs-in {
+    @apply border-black hover:border-2 hover:shadow-inner bg-b4 aria-expanded:border-2 aria-expanded:shadow-inner aria-expanded:shadow-b1 hover:shadow-b1;
+    transition: all 0.1s ease-out;
+}
+
 /* Corner frame for cards */
 .corner-frame {
     @apply relative overflow-clip;
 }
 
 .tl-corner, .tr-corner, .bl-corner, .br-corner {
-    @apply bg-gradient-to-b from-b1 from-50% to-b1-light border-y-2 border-black;
+    @apply bg-gradient-to-b from-b1 from-50% to-b1-light;
 }
 
 .tl-corner, .tr-corner {
-    @apply w-16 h-8;
+    @apply w-16 h-8 shadow-md shadow-zinc-800;
 }
 .bl-corner, .br-corner {
-    @apply w-14 h-6;
+    @apply w-14 h-6 shadow-sm shadow-black;
 }
 
 .tl-corner {
@@ -84,9 +90,4 @@ main {
 /* Shimmer effect */
 .shimmer {
     background-size: 200% 200%;
-}
-
-/* Scale in effect */
-.scale-in {
-  transform-origin: var(--radix-hover-card-content-transform-origin);
 }

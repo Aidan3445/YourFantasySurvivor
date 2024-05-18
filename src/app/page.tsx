@@ -1,8 +1,12 @@
 import { SignedIn, SignedOut } from "@clerk/nextjs";
 import SignInCard from "./_components/signInCard";
 import SeasonStats from "./_components/stats/seasonStats";
+import getSeasons from "./api/seasons/fetch";
 
 export default async function HomePage() {
+
+    const seasons = await getSeasons();
+
     return (
         <main>
             <img src="https://i.imgur.com/b6cHcaG.png" alt="Header Image" className="w-full" />
@@ -13,7 +17,7 @@ export default async function HomePage() {
                 <SignedIn>
                     <div> You are signed in! </div>
                 </SignedIn>
-                <SeasonStats />
+                <SeasonStats seasons={seasons} />
             </div>
         </main >
     );
