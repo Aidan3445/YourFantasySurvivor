@@ -4,8 +4,9 @@ import compileStats, { SeasonStats as SS, emptyStats } from "~/app/api/episodes/
 import { useEffect, useState } from "react";
 import ChallengesPodium from "./challengesPodium";
 import AdvantagesTable from "./advantagesTable";
-import SelectSeason from "../selectSeason";
+import SelectSeason from "./selectSeason";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../commonUI/carousel";
+import EliminationsTable from "./eliminationsTable";
 
 interface SeasonStatsProps {
     seasons: string[];
@@ -23,6 +24,8 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                 .then((episodes) => setStats(compileStats(episodes)));
         }
     }, [season]);
+
+    console.log(stats);
 
     return (
         <article className="flex flex-col gap-2 mx-4 sm:m-2 text-black rounded-xl border-2 border-black ring-4 outline-black corner-frame outline outline-4 outline-offset-4 bg-b4/40 ring-b1">
@@ -43,7 +46,7 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                         <AdvantagesTable advantages={stats.advantages} />
                     </CarouselItem>
                     <CarouselItem>
-                        Eliminations
+                        <EliminationsTable eliminations={stats.eliminations} />
                     </CarouselItem>
                     <CarouselItem>
                         Other

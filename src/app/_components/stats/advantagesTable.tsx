@@ -1,6 +1,6 @@
 import { AdvantageStat } from "~/app/api/episodes/stats";
 
-type AdvantagesTableProps = {
+interface AdvantagesTableProps {
     advantages: AdvantageStat[];
 }
 
