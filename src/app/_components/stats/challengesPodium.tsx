@@ -1,4 +1,5 @@
 import { HoverCardArrow, HoverCardPortal } from "@radix-ui/react-hover-card";
+import { User, Users } from "lucide-react";
 import { HoverCardContent } from "~/app/_components/commonUI/hover";
 import { HoverCard, HoverCardTrigger } from "~/app/_components/commonUI/hover";
 import { ChallengeStat } from "~/app/api/episodes/stats";
@@ -50,17 +51,17 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                     <div className={`shimmer flex flex-col ${height} gap-1 p-1 justify-center items-center 
                         rounded-t-md border-2 border-b-0 border-black border-solid bg-gradient-to-br ${gradient} text-center ${animation}`}>
                         <span className="flex gap-2 items-center">
-                            <div className="w-5 h-5 bg-white rounded-full border border-black sm:w-6 sm:h-6">I</div>
+                            <User className="bg-white rounded-full border border-black" />
                             <h4 className="font-medium">{stats.indivWin + stats.indivReward}</h4>
                         </span>
                         <span className="flex gap-2 items-center">
-                            <div className="w-5 h-5 bg-white rounded-full border border-black sm:w-6 sm:h-6">T</div>
+                            <Users className="bg-white rounded-full border border-black" />
                             <h4 className="font-medium">{stats.tribe1st + stats.tribe2nd}</h4>
                         </span>
                     </div>
                 </HoverCardTrigger>
                 <HoverCardPortal>
-                    <HoverCardContent className="border-black bg-b2 w-50 text-nowrap shadow-md shadow-zinc-700">
+                    <HoverCardContent className="cursor-default border-black bg-b2 w-50 text-nowrap shadow-md shadow-zinc-700">
                         <HoverCardArrow />
                         <div className="grid grid-cols-3 grid-rows-2 gap-2 text-center">
                             <div className="grid grid-cols-subgrid col-span-3 items-center">
@@ -74,10 +75,10 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                                         2nd
                                         <HoverCard openDelay={100} closeDelay={0}>
                                             <HoverCardTrigger>
-                                                <span className="text-xs border-black rounded-full absolute -translate-y-1">?</span>
+                                                <span className="text-xs cursor-help border-black rounded-full absolute -translate-y-1">?</span>
                                             </HoverCardTrigger>
-                                            <HoverCardContent className="bg-b2 border-black text-xs text-center shadow-md shadow-zinc-700" side="top">
-                                                <HoverCardArrow />
+                                            <HoverCardContent className="bg-b2 border-black text-xs text-center shadow-md shadow-zinc-700" sideOffset={10} side="top">
+                                                <HoverCardArrow className="absolute translate-x-0.25" />
                                                 <p className="text-wrap">Applies only to seasons with 3-tribe challenges</p>
                                             </HoverCardContent>
                                         </HoverCard>

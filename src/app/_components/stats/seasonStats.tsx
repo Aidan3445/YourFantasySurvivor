@@ -7,6 +7,7 @@ import AdvantagesTable from "./advantagesTable";
 import SelectSeason from "./selectSeason";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../commonUI/carousel";
 import EliminationsTable from "./eliminationsTable";
+import OtherStats from "./otherStats";
 
 interface SeasonStatsProps {
     seasons: string[];
@@ -49,7 +50,7 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                         <EliminationsTable eliminations={stats.eliminations} />
                     </CarouselItem>
                     <CarouselItem>
-                        Other
+                        <OtherStats titles={stats.titles} final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} />
                     </CarouselItem>
                 </CarouselContent>
             </Carousel>

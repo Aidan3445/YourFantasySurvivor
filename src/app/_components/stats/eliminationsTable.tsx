@@ -15,13 +15,6 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
 }
 
 function Table({ eliminations }: EliminationsTableProps) {
-    eliminations = [
-        { episode: 1, castaway: "A", votes: ["B", "C", "D"] },
-        { episode: 2, castaway: "B", votes: ["A", "C", "D"] },
-        { episode: 3, castaway: "C", votes: ["A", "B", "D"] },
-        { episode: 4, castaway: "D", votes: ["A", "B", "C"] },
-    ];
-
     if (eliminations.length === 0) {
         return <h2 className="text-lg text-center">No eliminations in this season.</h2>;
     }
