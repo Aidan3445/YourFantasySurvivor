@@ -6,15 +6,6 @@ type EliminationsTableProps = {
 }
 
 export default function EliminationsTable({ eliminations }: EliminationsTableProps) {
-    return (
-        <section className="rounded-lg border-2 border-black border-collapse flex-1 m-1">
-            <h3 className="text-xl font-semibold border-b-2 border-black indent-1">Eliminations</h3>
-            <Table eliminations={eliminations} />
-        </section>
-    );
-}
-
-function Table({ eliminations }: EliminationsTableProps) {
     if (eliminations.length === 0) {
         return <h2 className="text-lg text-center">No eliminations in this season.</h2>;
     }

@@ -31,7 +31,7 @@ main {
    @apply flex flex-col items-center text-white gap-4;
 }
 
-#advTable::-webkit-scrollbar {
+#advTable::-webkit-scrollbar, #titlesChart::-webkit-scrollbar {
     width: 5px;
 }
  

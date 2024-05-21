@@ -46,6 +46,10 @@ const config = {
                     "0%": { transform: "scale(0)" },
                     "100%": { transform: "scale(1)" },
                 },
+                "scale-out": {
+                    "0%": { transform: "scale(1)" },
+                    "100%": { transform: "scale(0)" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
@@ -54,6 +58,9 @@ const config = {
                 "shimmer-delay-1": "shimmer 12s ease 0.75s infinite",
                 "shimmer-delay-2": "shimmer 12s ease 2s infinite",
                 "scale-in": "scale-in 2s ease-out",
+                "scale-in-fast": "scale-in 0.1s ease-out",
+                "scale-out": "scale-out 2s ease-out",
+                "scale-out-fast": "scale-out 0.1s ease-out",
             },
             rotate: {
                 "30": "30deg",

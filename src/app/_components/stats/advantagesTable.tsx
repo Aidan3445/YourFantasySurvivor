@@ -7,17 +7,6 @@ interface AdvantagesTableProps {
 export default function AdvantagesTable(props: AdvantagesTableProps) {
     const { advantages } = props;
 
-    return (
-        <section className="rounded-lg border-2 border-black border-collapse flex-1 m-1">
-            <h3 className="text-xl font-semibold border-b-2 border-black indent-1">Advantages</h3>
-            <Table advantages={advantages} />
-        </section>
-    );
-}
-
-function Table(props: AdvantagesTableProps) {
-    const { advantages } = props;
-
     if (advantages.length === 0) {
         return <h2 className="text-lg text-center">No advantages in this season.</h2>;
     }

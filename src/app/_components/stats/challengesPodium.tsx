@@ -12,15 +12,11 @@ export default function ChallengesPodium({ challenges }: ChallengesPodiumProps) 
 
 
     return (
-        <section className="rounded-lg border-2 border-black border-solid m-1">
-            <h3 className="text-xl font-semibold border-b-2 border-black indent-1">Challenges</h3>
-            <figure className="grid grid-flow-col auto-cols-fr gap-1 px-1 pt-2">
-                <Podium stats={challenges[1]} gradient="from-zinc-400 via-zinc-300 to-zinc-400" height="h-24" animation="animate-shimmer" />
-                <Podium stats={challenges[0]} gradient="from-amber-400 from-40% via-amber-300 via-50% to-amber-400 to-60%" height="h-32" animation="animate-shimmer-delay-1" />
-                <Podium stats={challenges[2]} gradient="from-amber-700 via-amber-500 to-amber-700" height="h-20" animation="animate-shimmer-delay-2" />
-            </figure>
-        </section>
-
+        <figure className="grid grid-flow-col auto-cols-fr gap-1 px-1 pt-2">
+            <Podium stats={challenges[1]} gradient="from-zinc-500 via-zinc-200 to-zinc-500" height="h-24" animation="animate-shimmer" />
+            <Podium stats={challenges[0]} gradient="from-amber-400 from-40% via-amber-300 via-50% to-amber-400 to-60%" height="h-32" animation="animate-shimmer-delay-1" />
+            <Podium stats={challenges[2]} gradient="from-amber-700 via-amber-500 to-amber-700" height="h-20" animation="animate-shimmer-delay-2" />
+        </figure>
     );
 }
 
@@ -51,11 +47,11 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                     <div className={`shimmer flex flex-col ${height} gap-1 p-1 justify-center items-center 
                         rounded-t-md border-2 border-b-0 border-black border-solid bg-gradient-to-br ${gradient} text-center ${animation}`}>
                         <span className="flex gap-2 items-center">
-                            <User className="bg-white rounded-full border border-black" />
+                            <User className="bg-b4 rounded-full border border-black" />
                             <h4 className="font-medium">{stats.indivWin + stats.indivReward}</h4>
                         </span>
                         <span className="flex gap-2 items-center">
-                            <Users className="bg-white rounded-full border border-black" />
+                            <Users className="bg-b4 rounded-full border border-black" />
                             <h4 className="font-medium">{stats.tribe1st + stats.tribe2nd}</h4>
                         </span>
                     </div>
