@@ -44,7 +44,7 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
             <HoverCard openDelay={200} closeDelay={100}>
                 <HoverCardTrigger>
                     <h3 className="p-0 m-0 w-full font-medium md:text-base text-sm truncate">{stats.castaway}</h3>
-                    <div className={`shimmer flex flex-col ${height} gap-1 p-1 justify-center items-center 
+                    <div className={`flex flex-col ${height} gap-1 p-1 justify-center items-center 
                         rounded-t-md border-2 border-b-0 border-black border-solid bg-gradient-to-br ${gradient} text-center ${animation}`}>
                         <span className="flex gap-2 items-center">
                             <User className="bg-b4 rounded-full border border-black" />
@@ -63,11 +63,11 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                             <div className="grid grid-cols-subgrid col-span-3 items-center">
                                 <h3>Tribe</h3>
                                 <div className="flex flex-col">
-                                    <h3 className="border-b border-black">1st</h3>
-                                    <h3 className="font-mono">{stats.tribe1st}</h3>
+                                    <h3 className="border-b border-black ordinal">1st</h3>
+                                    <h3 className="tabular-nums">{stats.tribe1st}</h3>
                                 </div>
                                 <div className="flex flex-col">
-                                    <h3 className="border-b border-black relative">
+                                    <h3 className="border-b border-black relative ordinal">
                                         2nd
                                         <HoverCard openDelay={100} closeDelay={0}>
                                             <HoverCardTrigger>
@@ -75,22 +75,22 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                                             </HoverCardTrigger>
                                             <HoverCardContent className="bg-b2 border-black text-xs text-center shadow-md shadow-zinc-700" sideOffset={10} side="top">
                                                 <HoverCardArrow className="absolute translate-x-0.25" />
-                                                <p className="text-wrap">Applies only to seasons with 3-tribe challenges</p>
+                                                <p className="text-wrap normal-nums">Applies only to seasons with 3-tribe challenges</p>
                                             </HoverCardContent>
                                         </HoverCard>
                                     </h3>
-                                    <h3 className="font-mono">{stats.tribe2nd}</h3>
+                                    <h3 className="tabular-nums">{stats.tribe2nd}</h3>
                                 </div>
                             </div>
                             <div className="grid grid-cols-subgrid col-span-3 items-center">
                                 <h3>Individual</h3>
                                 <div className="flex flex-col">
                                     <h3 className="border-b border-black">Wins</h3>
-                                    <h3 className="font-mono">{stats.indivWin}</h3>
+                                    <h3 className="tabular-nums">{stats.indivWin}</h3>
                                 </div>
                                 <div className="flex flex-col">
                                     <h3 className="border-b border-black">Rewards</h3>
-                                    <h3 className="font-mono">{stats.indivReward}</h3>
+                                    <h3 className="tabular-nums">{stats.indivReward}</h3>
                                 </div>
                             </div>
                         </div>

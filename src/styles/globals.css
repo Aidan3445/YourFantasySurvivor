@@ -86,8 +86,3 @@ main {
 .br-corner {
     @apply absolute bottom-0 right-0 -rotate-210 translate-y-3 translate-x-3;
 }
-
-/* Shimmer effect */
-.shimmer {
-    background-size: 200% 200%;
-}

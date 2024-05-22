@@ -1,4 +1,5 @@
-import { SignedOut, SignedIn, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedOut, SignedIn, SignInButton, UserButton, ClerkLoading, ClerkLoaded } from "@clerk/nextjs";
+import { LoaderCircle } from "lucide-react";
 
 type NavRoute = '/' | '/season' | '/league';
 interface NavItemProps {
@@ -16,12 +17,17 @@ export default function TopNav() {
                 <NavItem path="/league" label="Leagues" />
             </ul>
             <div>
-                <SignedOut>
-                    <SignInButton />
-                </SignedOut>
-                <SignedIn>
-                    <UserButton />
-                </SignedIn>
+                <ClerkLoading>
+                    <LoaderCircle className="animate-spin" size={24} />
+                </ClerkLoading>
+                <ClerkLoaded>
+                    <SignedOut>
+                        <SignInButton />
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton />
+                    </SignedIn>
+                </ClerkLoaded>
             </div>
         </nav >
     );

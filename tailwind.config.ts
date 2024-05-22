@@ -38,6 +38,8 @@ const config = {
                     to: { height: "0" },
                 },
                 "shimmer": {
+                    "from": { backgroundSize: "200% 200%" },
+                    "to": { backgroundSize: "200% 200%" },
                     "0%": { backgroundPosition: "0% 0%" },
                     "50%": { backgroundPosition: "100% 100%" },
                     "100%": { backgroundPosition: "0% 0%" },

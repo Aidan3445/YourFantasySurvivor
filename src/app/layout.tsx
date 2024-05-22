@@ -21,7 +21,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <ClerkProvider>
+        <ClerkProvider
+            appearance={{
+                variables: { colorPrimary: "#684528", colorBackground: "#EED9BF" },
+            }}>
             <html lang="en">
                 <body className={`font-sans ${inter.variable}`}>
                     <div className="page">

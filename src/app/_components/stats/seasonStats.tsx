@@ -10,6 +10,7 @@ import EliminationsTable from "./eliminationsTable";
 import TitlesChart from "./titlesChart";
 import FinalsStats from "./finalsStats";
 import StatsSection from "./statsSection";
+import CardContainer from "../cardContainer";
 
 interface SeasonStatsProps {
     seasons: string[];
@@ -36,9 +37,7 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     ];
 
     return (
-        <article className="flex flex-col gap-2 mx-4 sm:m-2 text-black rounded-xl border-2 border-black ring-4 outline-black corner-frame outline outline-4 outline-offset-4 bg-b4/40 ring-b1">
-            <div className="tl-corner" />
-            <div className="tr-corner" />
+        <CardContainer>
             <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
             <Carousel>
                 <span className="flex justify-around pb-2">
@@ -57,8 +56,6 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                     </CarouselItem>
                 </CarouselContent>
             </Carousel>
-            <div className="bl-corner" />
-            <div className="br-corner" />
-        </article>
+        </CardContainer>
     );
 }
