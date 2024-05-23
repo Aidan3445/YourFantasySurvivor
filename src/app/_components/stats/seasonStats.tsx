@@ -25,7 +25,11 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
         if (season) {
             fetch(`/api/episodes?season=${season}`)
                 .then((res) => res.json())
-                .then((episodes) => setStats(compileStats(episodes)));
+                .then((episodes) => setStats(compileStats(episodes)))
+                .catch(() => {
+                    setSeason("");
+                    setStats(emptyStats());
+                });
         }
     }, [season]);
 

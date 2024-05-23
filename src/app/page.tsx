@@ -1,9 +1,9 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import SeasonStats from "./_components/stats/seasonStats";
 import SignInCard from "./_components/signInCard";
 import getSeasons from "./api/seasons/fetch";
 import CardContainer from "./_components/cardContainer";
 import LeaguesCard from "./_components/leaguesCard";
+import SeasonStats from "./_components/stats/seasonStats";
 
 export default async function HomePage() {
 

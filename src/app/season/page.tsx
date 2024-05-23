@@ -1,10 +1,12 @@
-import AddCastaway from "./add";
+import InsertCastaways from "./insertCastaways";
+import InsertEpisodes from "./insertEpisodes";
 
 export default function SeasonPage() {
     return (
         <main>
             Season Page
-            <AddCastaway />
+            <InsertCastaways />
+            <InsertEpisodes />
         </main>
     );
 }
