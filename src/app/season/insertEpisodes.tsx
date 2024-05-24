@@ -1,7 +1,7 @@
 import { db } from "~/server/db";
 import { Button } from "../_components/commonUI/button";
 import { basicGet } from "../api/fetchFunctions";
-import { castaways, tribes, seasons, Episode, NoteModel } from "~/server/db/schema";
+import { castaways, tribes, seasons, episodes, Episode, NoteModel } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 export default async function InsertEpisodes() {
     return (
@@ -51,36 +51,60 @@ async function insert(data: { id: number, name: string }[]) {
                     return (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, survivor.name)))[0]?.id ?? 0;
                 }));
                 return {
-                    ids: castawayids,
-                    keywords: [tribeId.toString()],
-                    notes: ["????"]
+                    castawayIDs: castawayids,
+                    tribeIDs: [tribeId],
+                    keywords: [],
+                    notes: []
                 };
             }));
             newEp.e_tribe1st = [];
-            newEp.e_teamWin = [];
             await Promise.all(episode.tribe1sts.map(async (tribe1st: { name: { name: string }, onModel: "Tribes" | "Survivors" }) => {
                 if (tribe1st.onModel === "Tribes") {
                     const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, tribe1st.name.name)))[0]?.id ?? 0;
                     newEp.e_tribe1st?.push({
-                        ids: [tribeId],
+                        castawayIDs: [],
+                        tribeIDs: [tribeId],
                         keywords: [],
                         notes: []
                     });
                 } else {
+                    if (newEp.e_tribe1st?.length === 0) {
+                        newEp.e_tribe1st = [{
+                            castawayIDs: [],
+                            tribeIDs: [],
+                            keywords: [],
+                            notes: []
+                        }];
+                    }
+                    newEp.e_tribe1st[0]?.castawayIDs.push((await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, tribe1st.name.name)))[0]?.id ?? 0);
                 }
             }));
-            /*const newCastaways = fetchCastaways.map((castaway) => {
-                castaway.season = id;
-                if (castaway.photo.length > 512) {
-                    castaway.photo = "https://via.placeholder.com/150";
+            newEp.e_tribe2nd = [];
+            await Promise.all(episode.tribe2nds.map(async (tribe2nd: { name: { name: string }, onModel: "Tribes" | "Survivors" }) => {
+                if (tribe2nd.onModel === "Tribes") {
+                    const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, tribe2nd.name.name)))[0]?.id ?? 0;
+                    newEp.e_tribe2nd?.push({
+                        castawayIDs: [],
+                        tribeIDs: [tribeId],
+                        keywords: [],
+                        notes: []
+                    });
+                } else {
+                    if (newEp.e_tribe2nd?.length === 0) {
+                        newEp.e_tribe2nd = [{
+                            castawayIDs: [],
+                            tribeIDs: [],
+                            keywords: [],
+                            notes: []
+                        }];
+                    }
+                    newEp.e_tribe2nd[0]?.castawayIDs.push((await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, tribe2nd.name.name)))[0]?.id ?? 0);
                 }
-                return castaway;
-            });
-         
-            console.log(newCastaways);
-         
-            const newEntries = await db.insert(castaways).values(newCastaways).returning({ id: castaways.id, name: castaways.name }).onConflictDoNothing();
-            console.log(newEntries);*/
+            }));
+
+            console.log(newEp, "\n");
+            const newEntries = await db.insert(episodes).values(newEp).returning({ id: episodes.id, number: episodes.number }).onConflictDoNothing();
+            console.log(newEntries);
         }));
     }
 }
@@ -89,7 +113,8 @@ async function basicMap(list: { name: string }[]): Promise<NoteModel[]> {
     return await Promise.all(list.map(async (item) => {
         const castawayIds = [(await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, item.name)))[0]?.id ?? 0];
         return {
-            ids: castawayIds,
+            castawayIDs: castawayIds,
+            tribeIDs: [],
             keywords: [],
             notes: []
         };

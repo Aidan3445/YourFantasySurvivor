@@ -70,7 +70,8 @@ export const castaways = createTable(
 export type Castaway = typeof castaways.$inferSelect;
 
 export type NoteModel = {
-    ids: number[];
+    castawayIDs: number[];
+    tribeIDs: number[];
     keywords: string[];
     notes: string[];
 };
@@ -94,7 +95,6 @@ export const episodes = createTable(
         e_spokeEpTitle: json("e_spokeEpTitle").$type<NoteModel[]>(),
         e_tribe1st: json("e_tribe1st").$type<NoteModel[]>(),
         e_tribe2nd: json("e_tribe2nd").$type<NoteModel[]>(),
-        e_teamWin: json("e_teamWin").$type<NoteModel[]>(),
         e_indivWin: json("e_indivWin").$type<NoteModel[]>(),
         e_indivReward: json("e_indivReward").$type<NoteModel[]>(),
         e_finalists: json("e_finalists").$type<NoteModel[]>(),
