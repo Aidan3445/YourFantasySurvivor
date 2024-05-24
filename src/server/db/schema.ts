@@ -11,9 +11,9 @@ import {
     smallint,
     integer,
     json,
-    boolean,
     uniqueIndex,
     serial,
+    boolean,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -41,7 +41,6 @@ export const tribes = createTable(
         id: serial("tribe_id").notNull().primaryKey(),
         name: varchar("name", { length: 16 }).notNull(),
         color: varchar("color", { length: 7 }).notNull(),
-        mergeTribe: boolean("merge_tribe").notNull().default(false),
         season: integer("season").references(() => seasons.id).notNull(),
     },
     (table) => ({
@@ -56,6 +55,7 @@ export const castaways = createTable(
     {
         id: serial("castaway_id").notNull().primaryKey(),
         name: varchar("name", { length: 64 }).notNull(),
+        shortName: varchar("short_name", { length: 16 }).notNull(),
         age: smallint("age").notNull(),
         hometown: varchar("hometown", { length: 128 }).notNull().default("Unknown"),
         residence: varchar("residence", { length: 128 }).notNull().default("Unknown"),
@@ -69,12 +69,9 @@ export const castaways = createTable(
 );
 export type Castaway = typeof castaways.$inferSelect;
 
-type TribeUpdate = {
-    tribe: string;
-    castaways: string[];
-};
-type NoteModel = {
-    castaways: number[];
+export type NoteModel = {
+    ids: number[];
+    keywords: string[];
     notes: string[];
 };
 
@@ -87,24 +84,26 @@ export const episodes = createTable(
         airDate: timestamp("air_date", { mode: "string" }).notNull(),
         runtime: smallint("runtime").default(90),
         season: integer("season").references(() => seasons.id).notNull(),
+        merge: boolean("merge").notNull().default(false),
 
         // basic events
-        e_advFound: varchar("e_advFound", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_advPlay: varchar("e_advPlay", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_badAdvPlay: varchar("e_badAdvPlay", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_advElim: varchar("e_advElim", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_spokeEpTitle: varchar("e_spokeEpTitle", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_tribe1st: varchar("e_tribe1st", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_tribe2nd: varchar("e_tribe2nd", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_indivWin: varchar("e_indivWin", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_indivReward: varchar("e_indivReward", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_final: varchar("e_final", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_fireWin: varchar("e_fireWin", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_soleSurvivor: varchar("e_soleSurvivor", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_elim: varchar("e_elim", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_noVoteExit: varchar("e_noVoteExit", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-        e_tribeUpdate: json("e_tribeUpdate").$type<TribeUpdate[]>(),
-        e_notes: json("e_notes").$type<NoteModel[]>(),
+        e_advFound: json("e_advFound").$type<NoteModel[]>(),
+        e_advPlay: json("e_advPlay").$type<NoteModel[]>(),
+        e_badAdvPlay: json("e_badAdvPlay").$type<NoteModel[]>(),
+        e_advElim: json("e_advElim").$type<NoteModel[]>(),
+        e_spokeEpTitle: json("e_spokeEpTitle").$type<NoteModel[]>(),
+        e_tribe1st: json("e_tribe1st").$type<NoteModel[]>(),
+        e_tribe2nd: json("e_tribe2nd").$type<NoteModel[]>(),
+        e_teamWin: json("e_teamWin").$type<NoteModel[]>(),
+        e_indivWin: json("e_indivWin").$type<NoteModel[]>(),
+        e_indivReward: json("e_indivReward").$type<NoteModel[]>(),
+        e_finalists: json("e_finalists").$type<NoteModel[]>(),
+        e_fireWin: json("e_fireWin").$type<NoteModel[]>(),
+        e_soleSurvivor: json("e_soleSurvivor").$type<NoteModel[]>(),
+        e_elim: json("e_elim").$type<NoteModel[]>(),
+        e_noVoteExit: json("e_noVoteExit").$type<NoteModel[]>(),
+        e_tribeUpdate: json("e_tribeUpdate").$type<NoteModel[]>(),
+        e_otherNotes: json("e_notes").$type<NoteModel[]>(),
     },
     (table) => ({
     })

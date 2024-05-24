@@ -27,6 +27,7 @@ async function insert(data: { id: number, name: string }[]) {
         const fetchCastaways: Castaway[] = await basicGet(url);
         const newCastaways = fetchCastaways.map((castaway) => {
             castaway.season = id;
+            castaway.shortName = castaway.name.substring(0, 16);
             if (castaway.photo.length > 512) {
                 castaway.photo = "https://via.placeholder.com/150";
             }
@@ -35,7 +36,7 @@ async function insert(data: { id: number, name: string }[]) {
 
         console.log(newCastaways);
 
-        const newEntries = await db.insert(castaways).values(newCastaways).returning({ id: castaways.id, name: castaways.name }).onConflictDoNothing();
+        const newEntries = await db.insert(castaways).values(newCastaways).returning({ id: castaways.id, name: castaways.shortName }).onConflictDoNothing();
         console.log(newEntries);
     }
 }

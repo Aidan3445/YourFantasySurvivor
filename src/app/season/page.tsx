@@ -1,5 +1,6 @@
 import InsertCastaways from "./insertCastaways";
 import InsertEpisodes from "./insertEpisodes";
+import InsertTribes from "./insertTribes";
 
 export default function SeasonPage() {
     return (
@@ -7,6 +8,7 @@ export default function SeasonPage() {
             Season Page
             <InsertCastaways />
             <InsertEpisodes />
+            <InsertTribes />
         </main>
     );
 }
