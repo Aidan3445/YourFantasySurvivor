@@ -3,7 +3,6 @@
 
 import { sql } from "drizzle-orm";
 import {
-    index,
     pgTableCreator,
     timestamp,
     date,
@@ -11,9 +10,9 @@ import {
     smallint,
     integer,
     json,
-    uniqueIndex,
     serial,
     boolean,
+    pgEnum,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -42,11 +41,7 @@ export const tribes = createTable(
         name: varchar("name", { length: 16 }).notNull(),
         color: varchar("color", { length: 7 }).notNull(),
         season: integer("season").references(() => seasons.id).notNull(),
-    },
-    (table) => ({
-        nameIndex: uniqueIndex("tribe_name_idx").on(table.name),
-        seasonIndex: index("tribe_season_idx").on(table.season),
-    })
+    }
 );
 export type Tribe = typeof tribes.$inferSelect;
 
@@ -62,19 +57,9 @@ export const castaways = createTable(
         job: varchar("job", { length: 128 }).notNull().default("Unknown"),
         photo: varchar("photo", { length: 512 }).notNull().default("https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=612x612&w=0&k=20&c=ZBE3NqfzIeHGDPkyvulUw14SaWfDj2rZtyiKv3toItk="),
         season: integer("season").references(() => seasons.id).notNull(),
-    },
-    (table) => ({
-        seasonIndex: index("castaway_season_idx").on(table.season),
-    })
+    }
 );
 export type Castaway = typeof castaways.$inferSelect;
-
-export type NoteModel = {
-    castawayIDs: number[];
-    tribeIDs: number[];
-    keywords: string[];
-    notes: string[];
-};
 
 export const episodes = createTable(
     "episode",
@@ -86,90 +71,100 @@ export const episodes = createTable(
         runtime: smallint("runtime").default(90),
         season: integer("season").references(() => seasons.id).notNull(),
         merge: boolean("merge").notNull().default(false),
-
-        // basic events
-        e_advFound: json("e_advFound").$type<NoteModel[]>(),
-        e_advPlay: json("e_advPlay").$type<NoteModel[]>(),
-        e_badAdvPlay: json("e_badAdvPlay").$type<NoteModel[]>(),
-        e_advElim: json("e_advElim").$type<NoteModel[]>(),
-        e_spokeEpTitle: json("e_spokeEpTitle").$type<NoteModel[]>(),
-        e_tribe1st: json("e_tribe1st").$type<NoteModel[]>(),
-        e_tribe2nd: json("e_tribe2nd").$type<NoteModel[]>(),
-        e_indivWin: json("e_indivWin").$type<NoteModel[]>(),
-        e_indivReward: json("e_indivReward").$type<NoteModel[]>(),
-        e_finalists: json("e_finalists").$type<NoteModel[]>(),
-        e_fireWin: json("e_fireWin").$type<NoteModel[]>(),
-        e_soleSurvivor: json("e_soleSurvivor").$type<NoteModel[]>(),
-        e_elim: json("e_elim").$type<NoteModel[]>(),
-        e_noVoteExit: json("e_noVoteExit").$type<NoteModel[]>(),
-        e_tribeUpdate: json("e_tribeUpdate").$type<NoteModel[]>(),
-        e_otherNotes: json("e_notes").$type<NoteModel[]>(),
-    },
-    (table) => ({
-    })
+    }
 );
 export type Episode = typeof episodes.$inferSelect;
 
-type RuleType = "adminEvent" | "weeklyVote" | "weeklyPredict" | "preseasonPredict" | "mergePredict";
-type RuleModel = {
-    name: string;
-    description: string;
-    points: number;
-    type: RuleType;
-};
-type LeagueSettings = {
-    locked: boolean;
-    pickCount: number;
-    uniqueDraft: boolean;
-};
-
-type CustomEvent = {
-    ruleNumber: number;
-    castaways: number[];
-};
-type CustomEpisode = {
-    episodeNumber: number;
-    events: CustomEvent[];
-};
+export const eventLabel = pgEnum("event_label", [
+    "advFound", "advPlay", "badAdvPlay", "advElim", "spokeEpTitle", "tribe1st", "tribe2nd",
+    "indivWin", "indivReward", "finalists", "fireWin", "soleSurvivor", "elim", "noVoteExit",
+    "tribeUpdate", "otherNotes"]);
+export type EventLabel = (typeof eventLabel.enumValues)[number];
+export const episodeEvents = createTable(
+    "episode_event",
+    {
+        id: serial("episode_event_id").notNull().primaryKey(),
+        episode: integer("episode").references(() => episodes.id).notNull(),
+        label: eventLabel("label").notNull(),
+        castaways: integer("castaways").references(() => castaways.id).notNull().array(),
+        tribes: integer("tribes").references(() => tribes.id).notNull().array(),
+        keywords: varchar("keywords", { length: 32 }).array().notNull(),
+        notes: varchar("notes", { length: 256 }).array().notNull(),
+    }
+);
+export type BasicEvent = typeof episodeEvents.$inferSelect;
 
 export const leagues = createTable(
     "league",
     {
         id: serial("league_id").notNull().primaryKey(),
         name: varchar("name", { length: 64 }).notNull(),
-        password: varchar("password", { length: 64 }).notNull(),
+        password: varchar("password", { length: 64 }),
         season: integer("season_id").references(() => seasons.id).notNull(),
-        ownerId: varchar("owner_id", { length: 64 }).notNull(),
-        adminIds: varchar("admin_ids", { length: 64 }).array().notNull().default(sql`ARRAY[]::varchar[]`),
-
-        // league settings
-        settings: json("settings").$type<LeagueSettings>().notNull().default(sql`'{}'::json`),
-        rules: json("rules").$type<RuleModel[]>(),
-        episodes: json("episodes").$type<CustomEpisode[]>(),
-    },
-    (table) => ({
-        ownerIndex: index("league_owner_idx").on(table.ownerId),
-    })
+        settings: json("settings").$type<LeagueSettings>(),
+    }
 );
 export type League = typeof leagues.$inferSelect;
 
-type SurvivorUpdate = {
-    castawayId: number;
-    episodeNumber: number;
+export type LeagueSettings = {
+    locked: boolean;
+    pickCount: 1 | 2;
+    uniquePicks: boolean;
+    draftStarted: boolean;
 };
+
+export const ruleType = pgEnum("rule_type", ["adminEvent", "weeklyVote", "weeklyPredict", "preseasonPredict", "mergePredict"]);
+export type RuleType = (typeof ruleType.enumValues)[number];
+export const reference = pgEnum("reference", ["castaway", "tribe", "member"]);
+export type Reference = (typeof reference.enumValues)[number];
+export const leagueRules = createTable(
+    "league_rule",
+    {
+        id: serial("league_rule_id").notNull().primaryKey(),
+        league: integer("league_id").references(() => leagues.id).notNull(),
+        name: varchar("name", { length: 32 }).notNull(),
+        description: varchar("description", { length: 256 }).notNull(),
+        points: integer("points").notNull(),
+        type: ruleType("type").notNull(),
+        referenceType: reference("reference_type").notNull(),
+    }
+);
+export type LeagueRule = typeof leagueRules.$inferSelect;
+
+export const leagueEvents = createTable(
+    "league_event",
+    {
+        id: serial("league_event_id").notNull().primaryKey(),
+        league: integer("league_id").references(() => leagues.id).notNull(),
+        episode: integer("episode_id").references(() => episodes.id).notNull(),
+        event: integer("event_id").references(() => leagueRules.id).notNull(),
+        reference: integer("reference_id").notNull(),
+    }
+);
 
 export const leagueMembers = createTable(
     "league_member",
     {
-        league: integer("league_id").references(() => leagues.id).notNull().primaryKey(),
+        id: serial("league_member_id").notNull().primaryKey(),
+        league: integer("league_id").references(() => leagues.id).notNull(),
         userId: varchar("user_id", { length: 64 }).notNull(),
         color: varchar("color", { length: 7 }).notNull(),
         displayName: varchar("display_name", { length: 64 }).notNull(),
         predictions: integer("predictions").array().notNull().default(sql`ARRAY[]::integer[]`),
-        survivorUpdates: json("survivor_updates").$type<SurvivorUpdate[]>()
-    },
-    (table) => ({
-        userIndex: index("league_member_user_idx").on(table.userId),
-    })
+        isOwner: boolean("is_owner").notNull().default(false),
+        isAdmin: boolean("is_admin").notNull().default(false),
+    }
 );
 export type LeagueMember = typeof leagueMembers.$inferSelect;
+
+export const selectionUpdates = createTable(
+    "selection_update",
+    {
+        id: serial("selection_update_id").notNull().primaryKey(),
+        member: integer("member_id").references(() => leagueMembers.id).notNull(),
+        episode: integer("episode_id").references(() => episodes.id).notNull(),
+        oldCastaway: integer("old_castaway_id").references(() => castaways.id).notNull(),
+        newCastaway: integer("new_castaway_id").references(() => castaways.id).notNull(),
+    }
+);
+export type SelectionUpdate = typeof selectionUpdates.$inferSelect;
