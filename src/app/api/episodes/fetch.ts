@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { basicGet } from "../fetchFunctions";
-import { Episode } from "~/server/db/schema";
+import { Episode } from "~/server/db/schema/episodes";
 
 export default async function getEpisodes(season?: string) {
     const origin = headers().get("host");

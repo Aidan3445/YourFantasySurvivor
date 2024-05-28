@@ -2,7 +2,7 @@ import { createTable } from "./createTable";
 import { seasons } from "./seasons";
 import { tribes } from "./tribes";
 import { castaways } from "./castaways";
-import { integer, serial, varchar, smallint, timestamp, boolean, pgEnum } from "drizzle-orm/pg-core";
+import { integer, serial, varchar, smallint, timestamp, boolean, pgEnum, primaryKey } from "drizzle-orm/pg-core";
 
 export const episodes = createTable(
     "episode",
@@ -18,22 +18,50 @@ export const episodes = createTable(
 );
 export type Episode = typeof episodes.$inferSelect;
 
-export const eventLabel = pgEnum("event_label", [
+export const eventName = pgEnum("event_name", [
     "advFound", "advPlay", "badAdvPlay", "advElim", "spokeEpTitle", "tribe1st", "tribe2nd",
     "indivWin", "indivReward", "finalists", "fireWin", "soleSurvivor", "elim", "noVoteExit",
     "tribeUpdate", "otherNotes"]);
-export type EventLabel = (typeof eventLabel.enumValues)[number];
+export type EventName = (typeof eventName.enumValues)[number];
 
-export const episodeEvents = createTable(
-    "episode_event",
+export const baseEvents = createTable(
+    "event_base",
     {
-        id: serial("episode_event_id").notNull().primaryKey(),
+        id: serial("event_base_id").notNull().primaryKey(),
         episode: integer("episode").references(() => episodes.id).notNull(),
-        label: eventLabel("label").notNull(),
-        castaways: integer("castaways").references(() => castaways.id).notNull().array(),
-        tribes: integer("tribes").references(() => tribes.id).notNull().array(),
+        name: eventName("name").notNull(),
         keywords: varchar("keywords", { length: 32 }).array().notNull(),
         notes: varchar("notes", { length: 256 }).array().notNull(),
     }
 );
-export type BasicEvent = typeof episodeEvents.$inferSelect;
+
+export const eventCastaways = createTable(
+    "event_base_castaway",
+    {
+        event: integer("event_id").references(() => baseEvents.id).notNull(),
+        castaway: integer("castaway_id").references(() => castaways.id).notNull(),
+    },
+    (table) => ({
+        pk: primaryKey({ columns: [table.event, table.castaway] }),
+    })
+);
+export const eventTribes = createTable(
+    "event_base_tribe",
+    {
+        event: integer("event_id").references(() => baseEvents.id).notNull(),
+        tribe: integer("tribe_id").references(() => tribes.id).notNull(),
+    },
+    (table) => ({
+        pk: primaryKey({ columns: [table.event, table.tribe] }),
+    })
+);
+export type BaseEvent = {
+    id: number;
+    episode: number;
+    name: EventName;
+    castaways: string[];
+    tribes: string[];
+    keywords: string[];
+    notes: string[];
+};
+

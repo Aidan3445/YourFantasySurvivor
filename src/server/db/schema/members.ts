@@ -24,7 +24,7 @@ export const selectionUpdates = createTable(
         id: serial("selection_update_id").notNull().primaryKey(),
         member: integer("member_id").references(() => leagueMembers.id).notNull(),
         episode: integer("episode_id").references(() => episodes.id).notNull(),
-        castaway: integer("new_castaway_id").references(() => castaways.id).notNull(),
+        castaway: integer("castaway_id").references(() => castaways.id).notNull(),
     }
 );
 export type SelectionUpdate = typeof selectionUpdates.$inferSelect;
