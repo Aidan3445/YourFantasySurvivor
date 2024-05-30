@@ -35,7 +35,7 @@ export const baseEvents = createTable(
     }
 );
 
-export const eventCastaways = createTable(
+export const baseEventCastaways = createTable(
     "event_base_castaway",
     {
         event: integer("event_id").references(() => baseEvents.id).notNull(),
@@ -45,7 +45,7 @@ export const eventCastaways = createTable(
         pk: primaryKey({ columns: [table.event, table.castaway] }),
     })
 );
-export const eventTribes = createTable(
+export const baseEventTribes = createTable(
     "event_base_tribe",
     {
         event: integer("event_id").references(() => baseEvents.id).notNull(),

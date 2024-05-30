@@ -1,5 +1,5 @@
 import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardPortal, HoverCardTrigger } from "@radix-ui/react-hover-card";
-import { EliminationStat } from "~/app/api/episodes/stats";
+import { type EliminationStat } from "~/app/api/seasons/[name]/events/stats";
 
 type EliminationsTableProps = {
     eliminations: EliminationStat[];
@@ -15,7 +15,7 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
             {eliminations.map((elim, index) => (
                 <span key={index} className={`grid grid-cols-3 text-center border-black text-xs lg:text-sm`}>
                     <h3 className="px-1 font-medium  text-md truncate">Episode {elim.episode}</h3>
-                    <h4 className="font-normal border-black border-solid border-x">{elim.castaway}</h4>
+                    <h4 className="font-normal border-black border-solid border-x">{elim.name}</h4>
                     <HoverCard openDelay={100} closeDelay={0}>
                         <HoverCardTrigger>
                             <h4 className="font-normal">{elim.votes.length} votes</h4>

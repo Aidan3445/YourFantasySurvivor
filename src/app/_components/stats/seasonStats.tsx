@@ -11,6 +11,7 @@ import TitlesChart from "./titlesChart";
 import FinalsStats from "./finalsStats";
 import StatsSection from "./statsSection";
 import CardContainer from "../cardContainer";
+import { type BaseEvent } from "~/server/db/schema/episodes";
 
 interface SeasonStatsProps {
     seasons: string[];
@@ -23,9 +24,9 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     // when season is set, fetch episodes and compile stats
     useEffect(() => {
         if (season) {
-            fetch(`/api/episodes?season=${season}`)
+            fetch(`/api/seasons/${season}/events`)
                 .then((res) => res.json())
-                .then((episodes) => setStats(compileStats(episodes)))
+                .then((events: BaseEvent[]) => setStats(compileStats(events)))
                 .catch(() => {
                     setSeason("");
                     setStats(emptyStats());
@@ -34,7 +35,10 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     }, [season]);
 
     const carouselItems = [
-        { title: "Challenges", content: <ChallengesPodium challenges={stats.challenges} /> },
+        {
+            title: "Challenges", content:
+                <ChallengesPodium castaways={stats.castawayChallenges} tribes={stats.tribeChallenges} />
+        },
         { title: "Advantages", content: <AdvantagesTable advantages={stats.advantages} /> },
         { title: "Eliminations", content: <EliminationsTable eliminations={stats.eliminations} /> },
         { title: "Titles", content: <TitlesChart titles={stats.titles} /> },
@@ -52,7 +56,9 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                 <CarouselContent>
                     {carouselItems.map((item) => (
                         <CarouselItem key={item.title} title={item.title}>
-                            <StatsSection title={item.title} children={item.content} />
+                            <StatsSection title={item.title}>
+                                {item.content}
+                            </StatsSection>
                         </CarouselItem>
                     ))}
                     <CarouselItem title="Finals">

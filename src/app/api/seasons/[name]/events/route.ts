@@ -3,11 +3,21 @@ import { type NextRequest, NextResponse } from "next/server";
 import { and, desc, eq } from "drizzle-orm";
 import { db } from "~/server/db";
 import { seasons } from "~/server/db/schema/seasons";
+import { baseEventCastaways, baseEvents, episodes } from "~/server/db/schema/episodes";
 
-export async function GET(req: NextRequest) {
+export async function GET(req: NextRequest, { params }: { params: { name: string } }
+) {
+    const seasonName = params.name;
     const searchParams = req.nextUrl.searchParams;
 
-    
+    const castawayEvents = await db.select()
+        .from(baseEventCastaways)
+        .leftJoin(baseEvents, eq(baseEvents.id, baseEventCastaways.event))
+        .leftJoin(episodes, eq(episodes.id, baseEvents.episode))
+        .leftJoin(seasons, eq(seasons.id, episodes.season))
+        .where(eq(seasons.name, seasonName));
+
+    return NextResponse.json({ castawayEvents });
 }
 
 

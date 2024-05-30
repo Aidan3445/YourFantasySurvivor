@@ -12,6 +12,16 @@ const config = {
     eslint: {
         ignoreDuringBuilds: true,
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'i.imgur.com',
+                port: '',
+                pathname: '/b6cHcaG.png',
+            },
+        ],
+    },
 };
 
 export default config;

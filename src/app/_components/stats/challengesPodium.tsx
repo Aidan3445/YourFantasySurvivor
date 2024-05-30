@@ -2,36 +2,37 @@ import { HoverCardArrow, HoverCardPortal } from "@radix-ui/react-hover-card";
 import { User, Users } from "lucide-react";
 import { HoverCardContent } from "~/app/_components/commonUI/hover";
 import { HoverCard, HoverCardTrigger } from "~/app/_components/commonUI/hover";
-import { ChallengeStat } from "~/app/api/episodes/stats";
+import { type CastawayChallengeStat, type TribeChallengeStat } from "~/app/api/seasons/[name]/events/stats";
 
 interface ChallengesPodiumProps {
-    challenges: ChallengeStat[];
+    castaways: CastawayChallengeStat[];
+    tribes: TribeChallengeStat[];
 }
 
-export default function ChallengesPodium({ challenges }: ChallengesPodiumProps) {
-
+export default function ChallengesPodium({ castaways, tribes }: ChallengesPodiumProps) {
 
     return (
         <figure className="grid grid-flow-col auto-cols-fr gap-1 px-1 pt-2">
-            <Podium stats={challenges[1]} gradient="from-zinc-500 via-zinc-200 to-zinc-500" height="h-24" animation="animate-shimmer" />
-            <Podium stats={challenges[0]} gradient="from-amber-400 from-40% via-amber-300 via-50% to-amber-400 to-60%" height="h-32" animation="animate-shimmer-delay-1" />
-            <Podium stats={challenges[2]} gradient="from-amber-700 via-amber-500 to-amber-700" height="h-20" animation="animate-shimmer-delay-2" />
+            <Podium castaway={castaways[1]} tribe={tribes[1]} gradient="from-zinc-500 via-zinc-200 to-zinc-500" height="h-24" animation="animate-shimmer" />
+            <Podium castaway={castaways[0]} tribe={tribes[0]} gradient="from-amber-400 from-40% via-amber-300 via-50% to-amber-400 to-60%" height="h-32" animation="animate-shimmer-delay-1" />
+            <Podium castaway={castaways[2]} tribe={tribes[2]} gradient="from-amber-700 via-amber-500 to-amber-700" height="h-20" animation="animate-shimmer-delay-2" />
         </figure>
     );
 }
 
 interface PodiumProps {
-    stats?: ChallengeStat;
+    castaway: CastawayChallengeStat | undefined;
+    tribe: TribeChallengeStat | undefined;
     gradient: string;
     height: string;
     animation: string;
 }
 
-function Podium({ stats, gradient, height, animation }: PodiumProps) {
+function Podium({ castaway, tribe, gradient, height, animation }: PodiumProps) {
 
-    if (!stats) {
-        stats = {
-            castaway: "Loading...",
+    if (!castaway && !tribe) {
+        castaway = {
+            name: "Loading...",
             indivWin: 0,
             indivReward: 0,
             tribe1st: 0,
@@ -39,20 +40,28 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
         };
     }
 
+    const name = castaway?.name ?? tribe?.name;
+    const indivWin = castaway?.indivWin ?? 0
+    const indivReward = castaway?.indivReward ?? 0
+    const tribe1st = castaway?.tribe1st ?? tribe?.tribe1st ?? 0
+    const tribe2nd = castaway?.tribe2nd ?? tribe?.tribe2nd ?? 0
+
     return (
         <div className="self-end text-center">
             <HoverCard openDelay={200} closeDelay={100}>
                 <HoverCardTrigger>
-                    <h3 className="p-0 m-0 w-full font-medium md:text-base text-sm truncate">{stats.castaway}</h3>
+                    <h3 className="p-0 m-0 w-full font-medium md:text-base text-sm truncate">{name}</h3>
                     <div className={`flex flex-col ${height} gap-1 p-1 justify-center items-center 
                         rounded-t-md border-2 border-b-0 border-black border-solid bg-gradient-to-br ${gradient} text-center ${animation}`}>
-                        <span className="flex gap-2 items-center">
-                            <User className="bg-b4 rounded-full border border-black" />
-                            <h4 className="font-medium">{stats.indivWin + stats.indivReward}</h4>
-                        </span>
+                        {castaway &&
+                            <span className="flex gap-2 items-center">
+                                <User className="bg-b4 rounded-full border border-black" />
+                                <h4 className="font-medium">{indivWin + indivReward}</h4>
+                            </span>
+                        }
                         <span className="flex gap-2 items-center">
                             <Users className="bg-b4 rounded-full border border-black" />
-                            <h4 className="font-medium">{stats.tribe1st + stats.tribe2nd}</h4>
+                            <h4 className="font-medium">{tribe1st + tribe2nd}</h4>
                         </span>
                     </div>
                 </HoverCardTrigger>
@@ -64,7 +73,7 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                                 <h3>Tribe</h3>
                                 <div className="flex flex-col">
                                     <h3 className="border-b border-black ordinal">1st</h3>
-                                    <h3 className="tabular-nums">{stats.tribe1st}</h3>
+                                    <h3 className="tabular-nums">{tribe1st}</h3>
                                 </div>
                                 <div className="flex flex-col">
                                     <h3 className="border-b border-black relative ordinal">
@@ -79,18 +88,18 @@ function Podium({ stats, gradient, height, animation }: PodiumProps) {
                                             </HoverCardContent>
                                         </HoverCard>
                                     </h3>
-                                    <h3 className="tabular-nums">{stats.tribe2nd}</h3>
+                                    <h3 className="tabular-nums">{tribe2nd}</h3>
                                 </div>
                             </div>
                             <div className="grid grid-cols-subgrid col-span-3 items-center">
                                 <h3>Individual</h3>
                                 <div className="flex flex-col">
                                     <h3 className="border-b border-black">Wins</h3>
-                                    <h3 className="tabular-nums">{stats.indivWin}</h3>
+                                    <h3 className="tabular-nums">{indivWin}</h3>
                                 </div>
                                 <div className="flex flex-col">
                                     <h3 className="border-b border-black">Rewards</h3>
-                                    <h3 className="tabular-nums">{stats.indivReward}</h3>
+                                    <h3 className="tabular-nums">{indivReward}</h3>
                                 </div>
                             </div>
                         </div>

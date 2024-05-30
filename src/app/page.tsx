@@ -13,7 +13,7 @@ export default async function HomePage() {
     return (
         <main>
             <CardContainer>
-                <Image src="https://i.imgur.com/b6cHcaG.png" alt="Header Image" className="w-full" />
+                <Image src="https://i.imgur.com/b6cHcaG.png" width={2100} height={2100} alt="Header Image" />
             </CardContainer>
             <section className="grid grid-cols-1 gap-4 pb-4 w-full sm:grid-cols-2 md:gap-8">
                 <ClerkLoading>
