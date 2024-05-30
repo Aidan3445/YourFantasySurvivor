@@ -1,4 +1,4 @@
-import { BasicEvent } from "~/server/db/schema/episodes";
+import { type BaseEvent } from "~/server/db/schema/episodes";
 
 type AdvantageStatus = "Active" | "Played" | "Misplayed" | "Eliminated";
 export type AdvantageStat = { name: string, advName: string, status: AdvantageStatus };
@@ -42,7 +42,7 @@ export const emptyStats = (): SeasonStats => ({
 });
 
 
-export default function compileStats(events: BasicEvent[]): SeasonStats {
+export default function compileStats(events: BaseEvent[]): SeasonStats {
     const stats: SeasonStats = emptyStats();
 
     events.forEach((event) => {
@@ -50,9 +50,9 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
             case "advFound":
                 event.castaways.forEach((name: string) => {
                     const castaway = stats.advantages.find((c) => c.name === name);
-                    var status: AdvantageStatus = "Active";
+                    const status: AdvantageStatus = "Active";
                     if (!castaway) {
-                        var newCastaway = { name, advName: "????", status };
+                        const newCastaway = { name, advName: "????", status };
                         stats.advantages.push(newCastaway);
                     } else {
                         stats.advantages.push({ name, advName: "????", status });
@@ -62,10 +62,10 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
             case "advPlay":
                 event.castaways.forEach((name: string) => {
                     const castaway = stats.advantages.find((c) => c.name === name);
-                    var status: AdvantageStatus = "Played";
+                    const status: AdvantageStatus = "Played";
                     if (!castaway) {
                         console.warn(`Castaway ${name} '${status}' an advantage they didn't find`);
-                        var newCastaway = { name, advName: "????*", status };
+                        const newCastaway = { name, advName: "????*", status };
                         stats.advantages.push(newCastaway);
                     } else {
                         const advIndex = stats.advantages.findIndex((a) =>
@@ -78,7 +78,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                             }
                         } else {
                             console.warn(`Castaway ${name} '${status}' an advantage they didn't find`);
-                            var newCastaway = { name, advName: "????*", status };
+                            const newCastaway = { name, advName: "????*", status };
                             stats.advantages.push(newCastaway);
                         }
                     }
@@ -87,10 +87,10 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
             case "badAdvPlay":
                 event.castaways.forEach((name: string) => {
                     const castaway = stats.advantages.find((c) => c.name === name);
-                    var status: AdvantageStatus = "Misplayed";
+                    const status: AdvantageStatus = "Misplayed";
                     if (!castaway) {
                         console.warn(`Castaway ${name} '${status}' an advantage they didn't find`);
-                        var newCastaway = { name, advName: "????*", status };
+                        const newCastaway = { name, advName: "????*", status };
                         stats.advantages.push(newCastaway);
                     } else {
                         const advIndex = stats.advantages.findIndex((a) =>
@@ -103,7 +103,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                             }
                         } else {
                             console.warn(`Castaway ${name} '${status}' an advantage they didn't find`);
-                            var newCastaway = { name, advName: "????*", status };
+                            const newCastaway = { name, advName: "????*", status };
                             stats.advantages.push(newCastaway);
                         }
                     }
@@ -112,10 +112,10 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
             case "advElim":
                 event.castaways.forEach((name: string) => {
                     const castaway = stats.advantages.find((c) => c.name === name);
-                    var status: AdvantageStatus = "Eliminated";
+                    const status: AdvantageStatus = "Eliminated";
                     if (!castaway) {
                         console.warn(`Castaway ${name} '${status}' an advantage they didn't find`);
-                        var newCastaway = { name, advName: "????*", status };
+                        const newCastaway = { name, advName: "????*", status };
                         stats.advantages.push(newCastaway);
                     }
                     else {
@@ -129,7 +129,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                             }
                         } else {
                             console.warn(`Castaway ${name} '${status}' an advantage they didn't find`);
-                            var newCastaway = { name, advName: "????*", status };
+                            const newCastaway = { name, advName: "????*", status };
                             stats.advantages.push(newCastaway);
                         }
                     }
@@ -139,7 +139,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                 event.castaways.forEach((name: string) => {
                     const castaway = stats.titles.find((c) => c.name === name);
                     if (!castaway) {
-                        var newCastaway = { name, count: 1 };
+                        const newCastaway = { name, count: 1 };
                         stats.titles.push(newCastaway);
                     } else {
                         castaway.count++;
@@ -152,7 +152,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                     const tribe = stats.tribeChallenges.find((t) => t.name === name);
                     if (!tribe) {
                         // if not, add them and their challenge type
-                        var newTribe = { name, tribe1st: 1, tribe2nd: 0 };
+                        const newTribe = { name, tribe1st: 1, tribe2nd: 0 };
                         stats.tribeChallenges.push(newTribe);
                     } else {
                         // if they are, increment the challenge type
@@ -164,7 +164,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                     const castaway = stats.castawayChallenges.find((c) => c.name === name);
                     if (!castaway) {
                         // if not, add them and their challenge type
-                        var newCastaway = { name, tribe1st: 1, tribe2nd: 0, indivWin: 0, indivReward: 0 };
+                        const newCastaway = { name, tribe1st: 1, tribe2nd: 0, indivWin: 0, indivReward: 0 };
                         stats.castawayChallenges.push(newCastaway);
                     } else {
                         // if they are, increment the challenge type
@@ -178,7 +178,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                     const tribe = stats.tribeChallenges.find((t) => t.name === name);
                     if (!tribe) {
                         // if not, add them and their challenge type
-                        var newTribe = { name, tribe1st: 0, tribe2nd: 1 };
+                        const newTribe = { name, tribe1st: 0, tribe2nd: 1 };
                         stats.tribeChallenges.push(newTribe);
                     } else {
                         // if they are, increment the challenge type
@@ -190,7 +190,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                     const castaway = stats.castawayChallenges.find((c) => c.name === name);
                     if (!castaway) {
                         // if not, add them and their challenge type
-                        var newCastaway = { name, tribe1st: 0, tribe2nd: 1, indivWin: 0, indivReward: 0 };
+                        const newCastaway = { name, tribe1st: 0, tribe2nd: 1, indivWin: 0, indivReward: 0 };
                         stats.castawayChallenges.push(newCastaway);
                     } else {
                         // if they are, increment the challenge type
@@ -204,7 +204,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                     const castaway = stats.castawayChallenges.find((c) => c.name === name);
                     if (!castaway) {
                         // if not, add them and their challenge type
-                        var newCastaway = { name, tribe1st: 0, tribe2nd: 0, indivWin: 1, indivReward: 0 };
+                        const newCastaway = { name, tribe1st: 0, tribe2nd: 0, indivWin: 1, indivReward: 0 };
                         stats.castawayChallenges.push(newCastaway);
                     } else {
                         // if they are, increment the challenge type
@@ -218,7 +218,7 @@ export default function compileStats(events: BasicEvent[]): SeasonStats {
                     const castaway = stats.castawayChallenges.find((c) => c.name === name);
                     if (!castaway) {
                         // if not, add them and their challenge type
-                        var newCastaway = { name, tribe1st: 0, tribe2nd: 0, indivWin: 0, indivReward: 1 };
+                        const newCastaway = { name, tribe1st: 0, tribe2nd: 0, indivWin: 0, indivReward: 1 };
                         stats.castawayChallenges.push(newCastaway);
                     } else {
                         // if they are, increment the challenge type

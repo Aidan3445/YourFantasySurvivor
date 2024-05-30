@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../commonUI/carousel";
-import compileStats, { SeasonStats as SS, emptyStats } from "~/app/api/episodes/stats";
+import compileStats, { type SeasonStats as SS, emptyStats } from "~/app/api/seasons/[name]/events/stats";
 import ChallengesPodium from "./challengesPodium";
 import AdvantagesTable from "./advantagesTable";
 import SelectSeason from "./selectSeason";

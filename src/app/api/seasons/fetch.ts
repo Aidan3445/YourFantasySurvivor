@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
-import { basicGet } from "../fetchFunctions";
+import { basicGet } from "~/app/api/fetchFunctions";
+
 
 export default async function getSeasons() {
     const origin = headers().get("host");

@@ -6,12 +6,12 @@ export const basicGet = async <returnType>(endpoint: URL): Promise<returnType> =
 
     if (!response.ok) throw new Error('Error!');
 
-    const data = await response.json();
+    const data = await response.json() as returnType;
 
     return data;
 };
 
-export const basicPost = async <returnType>(endpoint: URL, body: any): Promise<returnType> => {
+export const basicPost = async <returnType>(endpoint: URL, body: unknown): Promise<returnType> => {
     const response = await fetch(endpoint.toString(), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -20,7 +20,7 @@ export const basicPost = async <returnType>(endpoint: URL, body: any): Promise<r
 
     if (!response.ok) throw new Error('Error!');
 
-    const data = await response.json();
+    const data = await response.json() as returnType;
 
     return data;
 }
