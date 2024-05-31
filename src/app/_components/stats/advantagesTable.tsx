@@ -6,7 +6,7 @@ interface AdvantagesTableProps {
 
 export default function AdvantagesTable({ advantages }: AdvantagesTableProps) {
     if (advantages.length === 0) {
-        return <h2 className="text-lg text-center">No advantages in this season.</h2>;
+        return <h2 className="text-lg text-center">No advantages yet in this season.</h2>;
     }
 
     return (

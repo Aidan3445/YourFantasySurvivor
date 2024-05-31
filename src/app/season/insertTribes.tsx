@@ -1,7 +1,9 @@
 import { db } from "~/server/db";
 import { Button } from "../_components/commonUI/button";
 import { basicGet } from "../api/fetchFunctions";
-import { seasons, Tribe, tribes } from "~/server/db/schema";
+import { seasons } from "~/server/db/schema/seasons";
+import { tribes, type Tribe } from "~/server/db/schema/tribes";
+
 export default async function InsertTribes() {
     return (
         <div>
@@ -20,7 +22,7 @@ export default async function InsertTribes() {
 }
 
 async function insert(data: { id: number, name: string }[]) {
-    for (var { id, name } of data) {
+    for (let { id, name } of data) {
         name = name.replace("Survivor", "Season");
         const url = new URL(`https://fantasyapi-zzxp.onrender.com/api/${name}/tribes`);
         const fetchTribes: Tribe[] = await basicGet(url);

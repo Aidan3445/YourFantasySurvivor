@@ -7,7 +7,7 @@ type EliminationsTableProps = {
 
 export default function EliminationsTable({ eliminations }: EliminationsTableProps) {
     if (eliminations.length === 0) {
-        return <h2 className="text-lg text-center">No eliminations in this season.</h2>;
+        return <h2 className="text-lg text-center">No eliminations yet in this season.</h2>;
     }
 
     return (

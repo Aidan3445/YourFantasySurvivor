@@ -6,7 +6,7 @@ interface TitlesChartProps {
 
 export default function TitlesChart({ titles }: TitlesChartProps) {
     if (titles.length === 0) {
-        return <h2 className="text-lg text-center">No titles in this season.</h2>;
+        return <h2 className="text-lg text-center">No titles yet in this season.</h2>;
     }
 
     return (

@@ -1,4 +1,4 @@
-import { FinalStat, FireWinStat, SoleSurvivorStat } from "~/app/api/episodes/stats";
+import type { FinalStat, FireWinStat, SoleSurvivorStat } from "~/app/api/seasons/[name]/events/stats";
 import StatsSection from "./statsSection";
 
 interface FinalsStatsProps {
@@ -11,22 +11,29 @@ export default function FinalsStats({ final, fireWin, soleSurvivor }: FinalsStat
 
     return (
         <figure className="flex flex-col gap-4">
-            <StatsSection title="Fire Making">
-                <span className="flex justify-center">
-                    {fireWin}
-                </span>
-            </StatsSection>
-            <StatsSection title="Finalists">
-                <span className="flex justify-center">
-                    {final?.join(", ")}
-                </span>
-            </StatsSection>
-            <StatsSection title="Sole Survivors">
-                <span className="flex justify-center">
-                    {soleSurvivor}
-                </span>
-            </StatsSection>
+            <Stat title="Fire Making" content={fireWin!} />
+            <Stat title="Finalists" content={final?.join(", ") ?? ""} />
+            <Stat title="Sole Survivors" content={soleSurvivor!} />
         </figure>
+    );
+}
+
+interface StatProps {
+    title: string;
+    content: string;
+}
+
+function Stat({ title, content }: StatProps) {
+    if (!content) {
+        content = `No ${title.toLowerCase()} yet in this season.`;
+    }
+
+    return (
+        <StatsSection title={title}>
+            <span className="flex justify-center">
+                {content}
+            </span>
+        </StatsSection>
     );
 }
 
