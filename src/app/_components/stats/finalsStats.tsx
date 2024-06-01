@@ -13,7 +13,7 @@ export default function FinalsStats({ final, fireWin, soleSurvivor }: FinalsStat
         <figure className="flex flex-col gap-4">
             <Stat title="Fire Making" content={fireWin!} />
             <Stat title="Finalists" content={final?.join(", ") ?? ""} />
-            <Stat title="Sole Survivors" content={soleSurvivor!} />
+            <Stat title="Sole Survivor" content={soleSurvivor!} />
         </figure>
     );
 }
@@ -30,7 +30,7 @@ function Stat({ title, content }: StatProps) {
 
     return (
         <StatsSection title={title}>
-            <span className="flex justify-center">
+            <span className="flex justify-center font-medium">
                 {content}
             </span>
         </StatsSection>

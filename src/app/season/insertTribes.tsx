@@ -14,14 +14,16 @@ export default async function InsertTribes() {
                 const data = await db.select({ id: seasons.id, name: seasons.name }).from(seasons);
                 await insert(data);
             }}>
-                <Button type="submit" className="bg-b3 hover:bg-b4 border border-black rounded-md p-2">
-                    Insert Tribes                </Button>
+                <Button type="submit" className="p-2 rounded-md border border-black bg-b3 hover:bg-b4">
+                    Insert Tribes
+                </Button>
             </form>
         </div>
     );
 }
 
 async function insert(data: { id: number, name: string }[]) {
+    // eslint-disable-next-line prefer-const
     for (let { id, name } of data) {
         name = name.replace("Survivor", "Season");
         const url = new URL(`https://fantasyapi-zzxp.onrender.com/api/${name}/tribes`);

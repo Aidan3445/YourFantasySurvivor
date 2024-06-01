@@ -16,7 +16,7 @@ export default function SelectSeason({ seasons, season, setSeason }: SelectSeaso
 
     return (
         <Select defaultValue={season} value={season} onValueChange={setSeason}>
-            <SelectTrigger className="self-center font-semibold m-2 w-2/3 hs-in">
+            <SelectTrigger className="self-center m-2 w-2/3 font-semibold hs-in">
                 <br />
                 <SelectValue />
             </SelectTrigger>

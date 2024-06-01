@@ -12,7 +12,7 @@ export default async function InsertSeasons() {
 
                 await insert();
             }}>
-                <Button type="submit" className="bg-b3 hover:bg-b4 border border-black rounded-md p-2">
+                <Button type="submit" className="p-2 rounded-md border border-black bg-b3 hover:bg-b4">
                     Insert Seasons
                 </Button>
             </form>

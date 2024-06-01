@@ -14,7 +14,7 @@ export default async function InsertEpisodes() {
                 const data = await db.select({ id: seasons.id, name: seasons.name }).from(seasons);
                 await insert(data);
             }}>
-                <Button type="submit" className="bg-b3 hover:bg-b4 border border-black rounded-md p-2">
+                <Button type="submit" className="p-2 rounded-md border border-black bg-b3 hover:bg-b4">
                     Insert Episodes
                 </Button>
             </form>
@@ -22,14 +22,27 @@ export default async function InsertEpisodes() {
     );
 }
 
+type FetchEpisode = {
+    id: number;
+    airDate: string;
+    number: number;
+    title: string;
+    season: number;
+    merged: boolean;
+    runtime: number;
+    merge: boolean;
+};
+
 async function insert(data: { id: number, name: string }[]) {
+    // eslint-disable-next-line prefer-const
     for (let { id, name } of data) {
         name = name.replace("Survivor", "Season");
         const url = new URL(`https://fantasyapi-zzxp.onrender.com/api/${name}/episodes`);
-        const fetchEpisodes: Episode[] = await basicGet(url);
-        const newEpisodes = fetchEpisodes.map((episode) => {
-            episode.season = id;
-            episode.merge = episode.merged;
+        const fetchEpisodes: FetchEpisode[] = await basicGet(url);
+        const newEpisodes: Episode[] = fetchEpisodes.map((episode) => {
+            const newEp = episode as Episode;
+            newEp.season = id;
+            newEp.merge = episode.merged;
             return episode;
         });
 

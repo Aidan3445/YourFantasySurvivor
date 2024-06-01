@@ -10,11 +10,11 @@ export default function TitlesChart({ titles }: TitlesChartProps) {
     }
 
     return (
-        <figure className="flex flex-col divide-y divide-y-1 overflow-y-auto max-h-40" id="titlesChart">
+        <figure className="flex overflow-y-auto flex-col max-h-40 divide-y divide-black stats-scroll">
             {titles.map((title, index) => (
-                <span key={index} className="grid grid-cols-3  text-center divide-x-1 border-black text-xs lg:text-sm">
-                    <h3 className="col-span-2 px-1 font-medium border-black text-md truncate">{title.name}</h3>
-                    <h4 className="font-normal border-black border-solid border-x">{title.count}</h4>
+                <span key={index} className="grid grid-cols-3 text-xs text-center divide-x divide-black lg:text-sm">
+                    <h3 className="col-span-2 px-1 font-medium text-md">{title.name}</h3>
+                    <h4 className="font-normal">{title.count}</h4>
                 </span>
             ))}
         </figure>

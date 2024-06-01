@@ -10,12 +10,12 @@ export default function AdvantagesTable({ advantages }: AdvantagesTableProps) {
     }
 
     return (
-        <figure className="flex overflow-y-auto flex-col divide-y divide-y-1 max-h-40" id="advTable">
+        <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 divide-y divide-black stats-scroll">
             {advantages.map((adv, index) => (
-                <span key={index} className={`grid grid-cols-4 text-center divide-x-1 border-black text-xs lg:text-sm`}>
-                    <h3 className="col-span-2 px-1 font-medium border-black text-md truncate">{adv.name}</h3>
-                    <h4 className="font-normal border-black border-solid border-x">{adv.name}</h4>
-                    <h4 className="font-normal border-black border-solid">{adv.status}</h4>
+                <span key={index} className={`grid grid-cols-4 text-center divide-x divide-black text-xs lg:text-sm`}>
+                    <h3 className="col-span-2 px-1 font-medium text-md truncate">{adv.name}</h3>
+                    <h4 className="font-normal">{adv.advName}</h4>
+                    <h4 className="font-normal">{adv.status}</h4>
                 </span>
             ))}
         </figure>

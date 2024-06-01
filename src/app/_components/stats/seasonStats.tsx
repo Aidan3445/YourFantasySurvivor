@@ -11,7 +11,7 @@ import TitlesChart from "./titlesChart";
 import FinalsStats from "./finalsStats";
 import StatsSection from "./statsSection";
 import CardContainer from "../cardContainer";
-import { type BaseEvent } from "~/server/db/schema/episodes";
+import { type CastawayEvent } from "~/app/api/seasons/[name]/events/route";
 
 interface SeasonStatsProps {
     seasons: string[];
@@ -26,10 +26,11 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
         if (season) {
             fetch(`/api/seasons/${season}/events`)
                 .then((res) => res.json())
-                .then((events: BaseEvent[]) => setStats(compileStats(events)))
-                .catch(() => {
+                .then((events: CastawayEvent[]) => setStats(compileStats(events)))
+                .catch((err) => {
                     setSeason("");
                     setStats(emptyStats());
+                    console.error(err);
                 });
         }
     }, [season]);

@@ -50,55 +50,55 @@ function Podium({ castaway, tribe, gradient, height, animation }: PodiumProps) {
         <div className="self-end text-center">
             <HoverCard openDelay={200} closeDelay={100}>
                 <HoverCardTrigger>
-                    <h3 className="p-0 m-0 w-full font-medium md:text-base text-sm truncate">{name}</h3>
+                    <h3 className="p-0 m-0 w-full text-sm font-medium md:text-base truncate">{name}</h3>
                     <div className={`flex flex-col ${height} gap-1 p-1 justify-center items-center 
                         rounded-t-md border-2 border-b-0 border-black border-solid bg-gradient-to-br ${gradient} text-center ${animation}`}>
                         {castaway &&
                             <span className="flex gap-2 items-center">
-                                <User className="bg-b4 rounded-full border border-black" />
+                                <User className="rounded-full border border-black bg-b4" />
                                 <h4 className="font-medium">{indivWin + indivReward}</h4>
                             </span>
                         }
                         <span className="flex gap-2 items-center">
-                            <Users className="bg-b4 rounded-full border border-black" />
+                            <Users className="rounded-full border border-black bg-b4" />
                             <h4 className="font-medium">{tribe1st + tribe2nd}</h4>
                         </span>
                     </div>
                 </HoverCardTrigger>
                 <HoverCardPortal>
-                    <HoverCardContent className="cursor-default border-black bg-b2 w-50 text-nowrap shadow-md shadow-zinc-700">
+                    <HoverCardContent className="border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700">
                         <HoverCardArrow />
                         <div className="grid grid-cols-3 grid-rows-2 gap-2 text-center">
-                            <div className="grid grid-cols-subgrid col-span-3 items-center">
+                            <div className="grid col-span-3 items-center grid-cols-subgrid">
                                 <h3>Tribe</h3>
                                 <div className="flex flex-col">
-                                    <h3 className="border-b border-black ordinal">1st</h3>
+                                    <h3 className="ordinal border-b border-black">1st</h3>
                                     <h3 className="tabular-nums">{tribe1st}</h3>
                                 </div>
                                 <div className="flex flex-col">
-                                    <h3 className="border-b border-black relative ordinal">
+                                    <h3 className="relative ordinal border-b border-black">
                                         2nd
                                         <HoverCard openDelay={100} closeDelay={0}>
                                             <HoverCardTrigger>
-                                                <span className="text-xs cursor-help border-black rounded-full absolute -translate-y-1">?</span>
+                                                <span className="absolute text-xs rounded-full border-black -translate-y-1 cursor-help">?</span>
                                             </HoverCardTrigger>
-                                            <HoverCardContent className="bg-b2 border-black text-xs text-center shadow-md shadow-zinc-700" sideOffset={10} side="top">
+                                            <HoverCardContent className="text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700" sideOffset={10} side="top">
                                                 <HoverCardArrow className="absolute translate-x-0.25" />
-                                                <p className="text-wrap normal-nums">Applies only to seasons with 3-tribe challenges</p>
+                                                <p className="normal-nums text-wrap">Applies only to seasons with 3-tribe challenges</p>
                                             </HoverCardContent>
                                         </HoverCard>
                                     </h3>
                                     <h3 className="tabular-nums">{tribe2nd}</h3>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-subgrid col-span-3 items-center">
+                            <div className="grid col-span-3 items-center grid-cols-subgrid">
                                 <h3>Individual</h3>
                                 <div className="flex flex-col">
-                                    <h3 className="border-b border-black">Wins</h3>
+                                    <h3 className="border-b border-black">Immunity</h3>
                                     <h3 className="tabular-nums">{indivWin}</h3>
                                 </div>
                                 <div className="flex flex-col">
-                                    <h3 className="border-b border-black">Rewards</h3>
+                                    <h3 className="border-b border-black">Reward</h3>
                                     <h3 className="tabular-nums">{indivReward}</h3>
                                 </div>
                             </div>

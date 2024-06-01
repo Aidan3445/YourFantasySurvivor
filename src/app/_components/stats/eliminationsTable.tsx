@@ -11,17 +11,17 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
     }
 
     return (
-        <figure className="flex overflow-y-auto flex-col divide-y divide-y-1 max-h-40" id="elimTable">
+        <figure className="flex overflow-y-auto flex-col max-h-40 divide-y divide-black stats-scroll">
             {eliminations.map((elim, index) => (
-                <span key={index} className={`grid grid-cols-3 text-center border-black text-xs lg:text-sm`}>
-                    <h3 className="px-1 font-medium  text-md truncate">Episode {elim.episode}</h3>
-                    <h4 className="font-normal border-black border-solid border-x">{elim.name}</h4>
+                <span key={index} className="grid grid-cols-3 text-xs font-normal tabular-nums text-center divide-x divide-black lg:text-sm">
+                    <h3>Episode {elim.episode}</h3>
+                    <h4 className="font-medium">{elim.name}</h4>
                     <HoverCard openDelay={100} closeDelay={0}>
                         <HoverCardTrigger>
-                            <h4 className="font-normal">{elim.votes.length} votes</h4>
+                            <h4 >{elim.votes.length} vote{elim.votes.length > 1 ? "s" : ""}</h4>
                         </HoverCardTrigger>
                         <HoverCardPortal>
-                            <HoverCardContent className="rounded border border-black bg-b2 w-50 text-nowrap shadow-md shadow-zinc-700" side="top">
+                            <HoverCardContent className="rounded border border-black shadow-md bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
                                 <HoverCardArrow />
                                 <div className="flex flex-col gap-1 p-1 text-sm">
                                     Votes:

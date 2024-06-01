@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* styles */
-body {
+body  {
     @apply bg-gradient-to-b from-b3 to-b1 min-h-screen;
 }
 
@@ -31,26 +31,32 @@ main {
    @apply flex flex-col items-center text-white gap-4;
 }
 
-#advTable::-webkit-scrollbar, #titlesChart::-webkit-scrollbar {
-    width: 5px;
+/* Scrollbar styles */
+
+/* Main scroll */
+::-webkit-scrollbar {
+    @apply w-4 h-4;
 }
- 
-/* Track */
+
 ::-webkit-scrollbar-track {
-    background: #888;
-    border-radius: 0 0 5px 0;
+    @apply bg-gradient-to-b from-b3 to-b1;
 }
- 
-/* Handle */
+
 ::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 0 0 5px 5px;
+    @apply bg-zinc-200/50 rounded-md w-1;
 }
- 
-/* Handle on hover */
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #000;
+    @apply bg-zinc-200;
 }
+
+/* Stats scroll */
+.stats-scroll::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 0 0 5px 0;
+    border-left: 1px solid #000;
+}
+
 
 /* on hover and selected indent */
 .hs-in {
