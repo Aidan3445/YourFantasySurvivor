@@ -1,4 +1,5 @@
-import { type CastawayEvent } from "./route";
+import { type CastawayEvent } from "./castaway/route";
+import type { TribeEvent, TribeUpdates } from "./tribe/route";
 
 type AdvantageStatus = "Active" | "Played" | "Misplayed" | "Eliminated";
 export type AdvantageStat = { name: string, advName: string, status: AdvantageStatus };
@@ -42,10 +43,15 @@ export const emptyStats = (): SeasonStats => ({
 });
 
 
-export default function compileStats(events: CastawayEvent[]): SeasonStats {
+export default function compileStats(
+    castawayEvents: CastawayEvent[],
+    tribeEvents: TribeEvent[],
+    tribeUpdates: TribeUpdates
+): SeasonStats {
     const stats: SeasonStats = emptyStats();
 
-    events.forEach((event) => {
+    // compile castaway events
+    castawayEvents.forEach((event) => {
         const castawayName = event.castaway;
 
         switch (event.name) {
@@ -219,11 +225,107 @@ export default function compileStats(events: CastawayEvent[]): SeasonStats {
         }
     });
 
+    // compile tribe challenges
+    tribeEvents.forEach((event) => {
+        const tribeName = event.tribe;
+
+        switch (event.name) {
+            case "tribe1st": {
+                // check if tribe is already in the list
+                const tribe = stats.tribeChallenges.find((t) => t.name === tribeName);
+                if (!tribe) {
+                    // if not, add them and their challenge type
+                    const newTribe = { name: tribeName, tribe1st: 1, tribe2nd: 0 };
+                    stats.tribeChallenges.push(newTribe);
+                } else {
+                    // if they are, increment the challenge type
+                    tribe.tribe1st++;
+                }
+
+                // now we need to add the tribe 1st to the castaways on the tribe
+                // the tribe updates are sorted by episode in the record object
+                // so we can iterate from the back of the keys to the front
+                // until we find the first episode that is 
+                // less than or equal to the current event episode
+                for (let i = Object.keys(tribeUpdates).length - 1; i >= 0; i--) {
+                    const episode = parseInt(Object.keys(tribeUpdates)[i]!);
+                    if (isNaN(episode) || episode > event.episode) {
+                        continue;
+                    }
+
+                    const episodeUpdate = tribeUpdates[episode]!;
+                    const castaways = episodeUpdate[tribeName]!;
+
+                    castaways.forEach((castaway) => {
+                        const c = stats.castawayChallenges.find((c) => c.name === castaway);
+                        if (c) {
+                            c.tribe1st++;
+                        } else {
+                            const newCastaway = {
+                                name: castaway,
+                                tribe1st: 1,
+                                tribe2nd: 0,
+                                indivWin: 0,
+                                indivReward: 0
+                            };
+                            stats.castawayChallenges.push(newCastaway);
+                        }
+                    });
+                }
+            };
+                break;
+            case "tribe2nd": {
+                // check if tribe is already in the list
+                const tribe = stats.tribeChallenges.find((t) => t.name === tribeName);
+                if (!tribe) {
+                    // if not, add them and their challenge type
+                    const newTribe = { name: tribeName, tribe1st: 0, tribe2nd: 0.5 };
+                    stats.tribeChallenges.push(newTribe);
+                } else {
+                    // if they are, increment the challenge type
+                    tribe.tribe2nd++;
+                }
+
+                // see tribe1st for explanation of adding tribe 2nd to castaways
+                for (let i = Object.keys(tribeUpdates).length - 1; i >= 0; i--) {
+                    const episode = parseInt(Object.keys(tribeUpdates)[i]!);
+                    if (isNaN(episode) || episode > event.episode) {
+                        continue;
+                    }
+                    const episodeUpdate = tribeUpdates[episode]!;
+                    const castaways = episodeUpdate[tribeName]!;
+
+                    castaways.forEach((castaway) => {
+                        const c = stats.castawayChallenges.find((c) => c.name === castaway);
+                        if (c) {
+                            c.tribe2nd += 0.5;
+                        } else {
+                            const newCastaway = {
+                                name: castaway,
+                                tribe1st: 0,
+                                tribe2nd: 0.5,
+                                indivWin: 0,
+                                indivReward: 0
+                            };
+                            stats.castawayChallenges.push(newCastaway);
+                        }
+                    });
+                }
+            };
+                break;
+            default:
+                break;
+        }
+    });
+
+    // by default the items should be sorted by episode number 
+    // this is not ideal for all stats so we sort those here
+
     // sort the challenges using a weighted sum of the challenge types
     // individual wins are worth 4, individual rewards are worth 3, tribe wins are worth 2, and tribe 2nds are worth 1
     stats.castawayChallenges.sort((a, b) => {
-        const aScore = a.indivWin * 4 + a.indivReward * 3 + a.tribe1st * 2 + a.tribe2nd;
-        const bScore = b.indivWin * 4 + b.indivReward * 3 + b.tribe1st * 2 + b.tribe2nd;
+        const aScore = a.indivWin * 5 + a.indivReward * 3 + a.tribe1st + a.tribe2nd;
+        const bScore = b.indivWin * 5 + b.indivReward * 3 + b.tribe1st + b.tribe2nd;
         return bScore - aScore;
     });
 
@@ -236,9 +338,6 @@ export default function compileStats(events: CastawayEvent[]): SeasonStats {
 
     // sort the titles by count
     stats.titles.sort((a, b) => b.count - a.count);
-
-    // sort the eliminations by episode
-    stats.eliminations.sort((a, b) => a.episode - b.episode);
 
     return stats;
 }

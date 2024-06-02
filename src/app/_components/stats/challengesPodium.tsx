@@ -88,7 +88,8 @@ function Podium({ castaway, tribe, gradient, height, animation }: PodiumProps) {
                                             </HoverCardContent>
                                         </HoverCard>
                                     </h3>
-                                    <h3 className="tabular-nums">{tribe2nd}</h3>
+                                    {/* 2nd place are scored with 0.5 points but we want a count */}
+                                    <h3 className="tabular-nums">{tribe2nd * 2}</h3>
                                 </div>
                             </div>
                             <div className="grid col-span-3 items-center grid-cols-subgrid">

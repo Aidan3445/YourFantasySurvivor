@@ -11,7 +11,8 @@ import TitlesChart from "./titlesChart";
 import FinalsStats from "./finalsStats";
 import StatsSection from "./statsSection";
 import CardContainer from "../cardContainer";
-import { type CastawayEvent } from "~/app/api/seasons/[name]/events/route";
+import { type CastawayEvent } from "~/app/api/seasons/[name]/events/castaway/route";
+import type { TribeEvent, TribeUpdates } from "~/app/api/seasons/[name]/events/tribe/route";
 
 interface SeasonStatsProps {
     seasons: string[];
@@ -24,9 +25,15 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     // when season is set, fetch episodes and compile stats
     useEffect(() => {
         if (season) {
-            fetch(`/api/seasons/${season}/events`)
+            fetch(`/api/seasons/${season}/events/castaway`)
                 .then((res) => res.json())
-                .then((events: CastawayEvent[]) => setStats(compileStats(events)))
+                .then((castawayEvents: CastawayEvent[]) =>
+                    fetch(`/api/seasons/${season}/events/tribe`)
+                        .then((res) => res.json())
+                        .then(({ events, updates}: { events: TribeEvent[], updates: TribeUpdates }) => {
+                            setStats(compileStats(castawayEvents, events, updates));
+                       })
+               )
                 .catch((err) => {
                     setSeason("");
                     setStats(emptyStats());

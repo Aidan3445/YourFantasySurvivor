@@ -1,9 +1,9 @@
 import "server-only";
 import { type NextRequest, NextResponse } from "next/server";
-import { and, eq, isNotNull } from "drizzle-orm";
+import { and, desc, eq, isNotNull, not } from "drizzle-orm";
 import { db } from "~/server/db";
 import { seasons } from "~/server/db/schema/seasons";
-import { baseEventCastaways, baseEvents, episodes } from "~/server/db/schema/episodes";
+import { baseEventCastaways, baseEvents, episodes, type EventName } from "~/server/db/schema/episodes";
 import { castaways } from "~/server/db/schema/castaways";
 
 export async function GET(
@@ -12,9 +12,10 @@ export async function GET(
 ): Promise<NextResponse<CastawayEvent[]>> {
     const seasonName = params.name;
     const searchParams = req.nextUrl.searchParams;
-    const castawayName = searchParams.get("castaway");
+    const castawayName = searchParams.get("name");
 
     const castawayEvents = await db.select({
+        id: baseEvents.id,
         castaway: castaways.shortName,
         name: baseEvents.name,
         episode: episodes.number,
@@ -25,15 +26,18 @@ export async function GET(
         .innerJoin(castaways, eq(castaways.id, baseEventCastaways.castaway))
         .where(and(
             eq(seasons.name, seasonName),
+            not(eq(baseEvents.name, "tribeUpdate")),
             castawayName
                 ? eq(castaways.name, castawayName)
                 : isNotNull(castaways.name)))
+        .orderBy(desc(episodes.number));
 
     return NextResponse.json(castawayEvents);
 }
 
 export type CastawayEvent = {
+    id: number;
     castaway: string;
-    name: string;
+    name: EventName;
     episode: number;
 };
