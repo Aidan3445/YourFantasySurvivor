@@ -45,6 +45,7 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     const carouselItems = [
         { title: "Advantages", content: <AdvantagesTable advantages={stats.advantages} /> },
         { title: "Eliminations", content: <EliminationsTable eliminations={stats.eliminations} /> },
+        { title: "Finals", content: <FinalsStats final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} /> },
         { title: "Titles", content: <TitlesChart titles={stats.titles} /> },
     ];
 
@@ -57,7 +58,7 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                     <h2 className="text-2xl font-semibold">Season Stats</h2>
                     <CarouselNext />
                 </span>
-                <CarouselContent>
+                <CarouselContent className="cursor-ew-resize">
                     <CarouselItem title="Challenges">
                         <ChallengesPodium
                             castaways={stats.castawayChallenges}
@@ -70,9 +71,6 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                             </StatsSection>
                         </CarouselItem>
                     ))}
-                    <CarouselItem title="Finals">
-                        <FinalsStats final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} />
-                    </CarouselItem>
                 </CarouselContent>
             </Carousel>
         </CardContainer>

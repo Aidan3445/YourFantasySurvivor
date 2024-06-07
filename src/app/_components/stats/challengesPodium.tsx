@@ -31,6 +31,9 @@ export default function ChallengesPodium({ castaways, tribes }: ChallengesPodium
     return (
         <StatsSection title={titleSpan}>
             <figure className="grid relative grid-flow-col auto-cols-fr gap-1 px-1 pt-3">
+                <div className="absolute p-2 top-0 right-0 ordinal">
+                    <RemainingCastaways castaways={castaways.slice(3)} />
+                </div>
                 <Podium
                     castaway={castaways[1]}
                     tribe={tribes[1]}
@@ -59,6 +62,8 @@ interface PodiumProps {
 }
 
 function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
+    const [mainOpen, setMainOpen] = useState(false);
+    const toggleMainOpen = () => setMainOpen(!mainOpen);
 
     if (!castaway && !tribe) {
         showTribes = false;
@@ -79,8 +84,8 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
 
     return (
         <div className="self-end text-center">
-            <HoverCard openDelay={200} closeDelay={100}>
-                <HoverCardTrigger>
+            <HoverCard openDelay={200} closeDelay={100} open={mainOpen} onOpenChange={toggleMainOpen}>
+                <HoverCardTrigger onTouchStart={toggleMainOpen}>
                     <h3 className="p-0 m-0 w-full text-sm font-medium md:text-base truncate">{name}</h3>
                     <div className={cn("flex flex-col gap-1 p-1 justify-center items-center rounded-t-md border-2 border-b-0 border-black border-solid text-center relative overflow-hidden",
                         className)}>
@@ -97,7 +102,7 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
                     </div>
                 </HoverCardTrigger>
                 <HoverCardPortal>
-                    <HoverCardContent className="border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700">
+                    <HoverCardContent className="border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
                         <HoverCardArrow />
                         <div className="grid grid-cols-3 gap-2 text-center">
                             <div className="grid col-span-3 items-center grid-cols-subgrid">
@@ -134,12 +139,50 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
                                         <h3 className="border-b border-black">Reward</h3>
                                         <h3 className="tabular-nums">{indivReward}</h3>
                                     </div>
-                                </div>
-                            }
+                                </div>}
                         </div>
                     </HoverCardContent>
                 </HoverCardPortal>
             </HoverCard>
         </div >
+    );
+}
+
+interface RemainingCastawaysProps {
+    castaways: CastawayChallengeStat[];
+}
+
+function RemainingCastaways({ castaways }: RemainingCastawaysProps) {
+    const [open, setOpen] = useState(false);
+    const toggleOpen = () => setOpen(!open);
+
+    return (
+        <HoverCard openDelay={200} closeDelay={100} open={open} onOpenChange={setOpen}>
+            <HoverCardTrigger onTouchStart={toggleOpen}>
+                <div className="text-sm font-medium ordinal px-2 py-1 rounded-md border border-black bg-b3 cursor-help" aria-disabled>4th+</div>
+            </HoverCardTrigger>
+            <HoverCardPortal>
+                <HoverCardContent className="border-black border-b shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
+                    <HoverCardArrow />
+                    <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 divide-black stats-scroll">
+                        <span className="grid grid-cols-6 text-center text-xs lg:text-sm sticky top-0 bg-b2 border-b border-black">
+                            <h4 className="font-normal col-start-3 px-1">Imm.</h4>
+                            <h4 className="font-normal px-1 border-black border-r">Rwd.</h4>
+                            <h4 className="font-normal px-1 ordinal">1st</h4>
+                            <h4 className="font-normal px-1 ordinal">2nd</h4>
+                        </span>
+                        {castaways.map((castaway, index) => (
+                            <span key={index} className="grid grid-cols-6 text-center border-b  divide-x divide-black text-xs lg:text-sm border-x border-black">
+                                <h3 className="col-span-2 px-1 font-medium text-md truncate">{castaway.name}</h3>
+                                <h4 className="font-normal">{castaway.indivWin}</h4>
+                                <h4 className="font-normal">{castaway.indivReward}</h4>
+                                <h4 className="font-normal">{castaway.tribe1st}</h4>
+                                <h4 className="font-normal">{castaway.tribe2nd}</h4>
+                            </span>
+                        ))}
+                    </figure>
+                </HoverCardContent>
+            </HoverCardPortal>
+        </HoverCard>
     );
 }

@@ -72,8 +72,6 @@ main {
 /* Stats scroll */
 .stats-scroll::-webkit-scrollbar-track {
     background: transparent;
-    border-radius: 0 0 5px 0;
-    border-left: 1px solid #000;
 }
 
 
