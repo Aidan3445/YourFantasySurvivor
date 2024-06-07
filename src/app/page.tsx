@@ -24,10 +24,10 @@ export default async function HomePage() {
                         <SignInButton>
                             <SignInCard />
                         </SignInButton>
-                    </SignedOut>*/}
+                    </SignedOut>
                     <SignedIn>
                         <LeaguesCard />
-                    </SignedIn>
+                    </SignedIn>*/}
                 </ClerkLoaded>
                 <SeasonStats seasons={seasons} />
             </section>
