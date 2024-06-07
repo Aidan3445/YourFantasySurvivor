@@ -12,7 +12,7 @@ const inter = Inter({
 export const metadata = {
     title: "Your Fantasy Survivor",
     description: "The best place to play fantasy survivor",
-    icons: [{ rel: "icon", url: "/icon.ico" }],
+    icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
 export default function RootLayout({
@@ -21,7 +21,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <ClerkProvider>
+        <ClerkProvider
+            appearance={{
+                variables: { colorPrimary: "#684528", colorBackground: "#EED9BF" },
+            }}>
             <html lang="en">
                 <body className={`font-sans ${inter.variable}`}>
                     <div className="page">

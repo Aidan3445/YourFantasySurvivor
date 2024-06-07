@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Body styles */
-.page {
-    @apply bg-gradient-to-b from-b3 to-b1 flex flex-col min-h-screen;
+/* styles */
+body  {
+    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen;
 }
 
 /* Responsive padding and margin */
@@ -26,28 +26,88 @@
     }
 }
 
-/* Main container styles */
-main {
-   @apply flex flex-col items-center text-white gap-12;
+/* shimmer effect */
+.shimmer1::before, .shimmer2::before, .shimmer3::before {
+    content: "";
+    @apply  flex box-border absolute w-[200%] h-full 
+    bg-gradient-to-r from-transparent via-white/50 to-transparent;
 }
 
-#advTable::-webkit-scrollbar {
-    width: 5px;
+.shimmer1::before{
+    @apply animate-shimmer1;
 }
- 
-/* Track */
+
+.shimmer2::before {
+    @apply animate-shimmer2;
+}
+
+.shimmer3::before {
+    @apply animate-shimmer3;
+}
+
+/* Main container styles */
+main {
+   @apply flex flex-col items-center text-white gap-4;
+}
+
+/* Scrollbar styles */
+
+/* Main scroll */
+::-webkit-scrollbar {
+    @apply w-4 h-4;
+}
+
 ::-webkit-scrollbar-track {
-    background: #888;
-    border-radius: 0 0 5px 0;
+    @apply bg-gradient-to-b from-b3 to-b1;
 }
- 
-/* Handle */
+
 ::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 0 0 5px 5px;
+    @apply bg-zinc-200/50 rounded-md w-1;
 }
- 
-/* Handle on hover */
+
 ::-webkit-scrollbar-thumb:hover {
-    background: #000;
+    @apply bg-zinc-200;
+}
+
+/* Stats scroll */
+.stats-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+/* on hover and selected indent */
+.hs-in {
+    @apply border-black hover:border-2 hover:shadow-inner bg-b4 
+    aria-expanded:border-2 aria-expanded:shadow-inner 
+    aria-expanded:shadow-b1 hover:shadow-b1;
+    transition: all 0.1s ease-out;
+}
+
+/* Corner frame for cards */
+.corner-frame {
+    @apply relative overflow-clip;
+}
+
+.tl-corner, .tr-corner, .bl-corner, .br-corner {
+    @apply bg-gradient-to-b from-b1 from-50% to-b1-light;
+}
+
+.tl-corner, .tr-corner {
+    @apply w-16 h-8 shadow-md shadow-zinc-800;
+}
+.bl-corner, .br-corner {
+    @apply w-14 h-6 shadow-sm shadow-black;
+}
+
+.tl-corner {
+    @apply absolute top-0 left-0 -translate-y-2 -translate-x-6 -rotate-45;
+}
+.tr-corner {
+    @apply absolute top-0 right-0 -translate-y-2 translate-x-6 rotate-45;
+}
+.bl-corner {
+    @apply absolute bottom-0 left-0 rotate-210 translate-y-3 -translate-x-3;
+}
+.br-corner {
+    @apply absolute bottom-0 right-0 -rotate-210 translate-y-3 translate-x-3;
 }

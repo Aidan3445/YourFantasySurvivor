@@ -20,6 +20,7 @@ const config = {
         extend: {
             colors: {
                 'b1': '#684528',
+                'b1-light': '#8C6D4D',
                 'b2': '#B09472',
                 'b3': '#E5BC8F',
                 'b4': '#EED9BF',
@@ -36,10 +37,47 @@ const config = {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: "0" },
                 },
+                "shimmer1": {
+                    "0%": { transform: "translateX(165%) skewX(-45deg)" },
+                    "25%": { transform: "translateX(-50%) skewX(-45deg)" },
+                    "75%": { transform: "translateX(-50%) skewX(-45deg)" },
+                    "100%": { transform: "translateX(165%) skewX(-45deg)" },
+                },
+                "shimmer2": {
+                    "0%": { transform: "translateX(115%) skewX(-45deg)" },
+                    "25%": { transform: "translateX(-100%) skewX(-45deg)" },
+                    "75%": { transform: "translateX(-100%) skewX(-45deg)" },
+                    "100%": { transform: "translateX(115%) skewX(-45deg)" },
+                },
+                "shimmer3": {
+                    "0%": { transform: "translateX(57.5%) skewX(-45deg)" },
+                    "25%": { transform: "translateX(-157.5%) skewX(-45deg)" },
+                    "75%": { transform: "translateX(-157.5%) skewX(-45deg)" },
+                    "100%": { transform: "translateX(57.5%) skewX(-45deg)" },
+                },
+                "scale-in": {
+                    "0%": { transform: "scale(0)" },
+                    "100%": { transform: "scale(1)" },
+                },
+                "scale-out": {
+                    "0%": { transform: "scale(1)" },
+                    "100%": { transform: "scale(0)" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
+                "shimmer1": "shimmer1 10s infinite",
+                "shimmer2": "shimmer2 10s infinite",
+                "shimmer3": "shimmer3 10s infinite",
+                "scale-in": "scale-in 2s ease-out",
+                "scale-in-fast": "scale-in 0.1s ease-out",
+                "scale-out": "scale-out 2s ease-out",
+                "scale-out-fast": "scale-out 0.1s ease-out",
+            },
+            rotate: {
+                "30": "30deg",
+                "210": "210deg",
             },
         },
     },

@@ -1,16 +1,8 @@
-import "server-only";
 import { NextResponse } from "next/server";
-import { desc } from "drizzle-orm";
-import { db } from "~/server/db";
-import { seasons } from "~/server/db/schema";
+import { getSeasons } from "./query";
 
 export async function GET() {
-    const res = await db.select({ name: seasons.name }).from(seasons).orderBy(desc(seasons.premierDate));
+    const seasonNames = await getSeasons();
 
-    if (!res) {
-        return { status: 404, json: { message: "Seasons not found" } };
-    }
-
-    // Return list of season names
-    return NextResponse.json(res.map((s) => s.name));
+    return NextResponse.json<string[]>(seasonNames, { status: 200 });
 }

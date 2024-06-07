@@ -1,10 +1,18 @@
-import AddCastaway from "./add";
+import InsertCastaways from "./insertCastaways";
+import InsertEpisodes from "./insertEpisodes";
+import InsertEvents from "./insertEvents";
+import InsertSeasons from "./insertSeasons";
+import InsertTribes from "./insertTribes";
 
-export default function HomePage() {
+export default function SeasonPage() {
     return (
         <main>
             Season Page
-            <AddCastaway />
+            <InsertSeasons />
+            <InsertCastaways />
+            <InsertTribes />
+            <InsertEpisodes />
+            <InsertEvents />
         </main>
     );
 }

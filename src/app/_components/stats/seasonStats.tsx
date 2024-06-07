@@ -1,47 +1,78 @@
 "use client";
 
-import compileStats, { SeasonStats as SS, emptyStats } from "~/app/api/episodes/stats";
 import { useEffect, useState } from "react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../commonUI/carousel";
+import compileStats, { type SeasonStats as SS, emptyStats } from "~/app/api/seasons/[name]/events/stats";
 import ChallengesPodium from "./challengesPodium";
 import AdvantagesTable from "./advantagesTable";
-import SelectSeason from "../selectSeason";
+import SelectSeason from "./selectSeason";
+import EliminationsTable from "./eliminationsTable";
+import TitlesChart from "./titlesChart";
+import FinalsStats from "./finalsStats";
+import StatsSection from "./statsSection";
+import CardContainer from "../cardContainer";
+import { type CastawayEvent } from "~/app/api/seasons/[name]/events/castaway/query";
+import type { TribeEvent, TribeUpdates } from "~/app/api/seasons/[name]/events/tribe/query";
 
+interface SeasonStatsProps {
+    seasons: string[];
+}
 
-export default function SeasonStats() {
-    const [seasons, setSeasons] = useState<string[]>([]);
-    const [season, setSeason] = useState<string>("");
+export default function SeasonStats({ seasons }: SeasonStatsProps) {
+    const [season, setSeason] = useState<string>(seasons[0] ?? "");
     const [stats, setStats] = useState<SS>(emptyStats());
-
-    // fetch available seasons
-    useEffect(() => {
-        fetch("/api/seasons")
-            .then((res) => res.json())
-            .then((s) => {
-                setSeasons(s);
-                // set default season to first season which should be the latest
-                if (s[0]) setSeason(s[0]);
-            });
-    }, []);
 
     // when season is set, fetch episodes and compile stats
     useEffect(() => {
         if (season) {
-            fetch(`/api/episodes?season=${season}`)
+            fetch(`/api/seasons/${season}/events/castaway`)
                 .then((res) => res.json())
-                .then((episodes) => setStats(compileStats(episodes)));
+                .then((castawayEvents: CastawayEvent[]) =>
+                    fetch(`/api/seasons/${season}/events/tribe`)
+                        .then((res) => res.json())
+                        .then(({ events, updates }: { events: TribeEvent[], updates: TribeUpdates }) => {
+                            setStats(compileStats(castawayEvents, events, updates));
+                        })
+                )
+                .catch((err) => {
+                    setSeason("");
+                    setStats(emptyStats());
+                    console.error(err);
+                });
         }
     }, [season]);
 
+    const carouselItems = [
+        { title: "Advantages", content: <AdvantagesTable advantages={stats.advantages} /> },
+        { title: "Eliminations", content: <EliminationsTable eliminations={stats.eliminations} /> },
+        { title: "Finals", content: <FinalsStats final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} /> },
+        { title: "Titles", content: <TitlesChart titles={stats.titles} /> },
+    ];
+
     return (
-        <article className="flex flex-col w-full rounded-2xl border-4 border-black border-solid">
-            <div className="flex flex-col gap-1 p-4 text-black rounded-xl border-8 border-solid shadow-inner bg-b4/80 border-b1 shadow-b2">
-                <span className="flex flex-row gap-4">
-                    <h2 className="m-auto text-xl font-bold">Stats:</h2>
-                    <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
+        <CardContainer>
+            <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
+            <Carousel>
+                <span className="flex justify-around pb-2">
+                    <CarouselPrevious />
+                    <h2 className="text-2xl font-semibold">Season Stats</h2>
+                    <CarouselNext />
                 </span>
-                <ChallengesPodium challenges={stats.challenges} />
-                <AdvantagesTable advantages={stats.advantages} />
-            </div>
-        </article>
+                <CarouselContent className="cursor-ew-resize">
+                    <CarouselItem title="Challenges">
+                        <ChallengesPodium
+                            castaways={stats.castawayChallenges}
+                            tribes={stats.tribeChallenges} />
+                    </CarouselItem>
+                    {carouselItems.map((item, index) => (
+                        <CarouselItem key={index}>
+                            <StatsSection title={item.title}>
+                                {item.content}
+                            </StatsSection>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+            </Carousel>
+        </CardContainer>
     );
 }
