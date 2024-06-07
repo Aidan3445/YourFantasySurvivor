@@ -5,6 +5,10 @@ import { User, Users } from "lucide-react";
 import { HoverCardContent } from "~/app/_components/commonUI/hover";
 import { HoverCard, HoverCardTrigger } from "~/app/_components/commonUI/hover";
 import { type CastawayChallengeStat, type TribeChallengeStat } from "~/app/api/seasons/[name]/events/stats";
+import StatsSection from "./statsSection";
+import { Switch } from "../commonUI/switch";
+import { Label } from "../commonUI/label";
+import { cn } from "~/lib/utils";
 
 interface ChallengesPodiumProps {
     castaways: CastawayChallengeStat[];
@@ -14,30 +18,36 @@ interface ChallengesPodiumProps {
 export default function ChallengesPodium({ castaways, tribes }: ChallengesPodiumProps) {
     const [showTribes, setShowTribes] = useState(false);
 
+    const titleSpan = (
+        <span className="flex justify-between">
+            Challenges
+            <div className="flex gap-2 items-center px-2">
+                <Label htmlFor="showTribes">Tribes</Label>
+                <Switch id="showTribes" checked={showTribes} onCheckedChange={setShowTribes} />
+            </div>
+        </span>
+    );
+
     return (
-        <figure className="grid grid-flow-col auto-cols-fr gap-1 px-1 pt-2">
-            <Podium
-                castaway={castaways[1]}
-                tribe={tribes[1]}
-                showTribes={showTribes}
-                gradient="from-zinc-500 via-zinc-200 to-zinc-500"
-                height="h-24"
-                animation="animate-shimmer" />
-            <Podium
-                castaway={castaways[0]}
-                tribe={tribes[0]}
-                showTribes={showTribes}
-                gradient="from-amber-400 from-40% via-amber-300 via-50% to-amber-400 to-60%"
-                height="h-32"
-                animation="animate-shimmer-delay-1" />
-            <Podium
-                castaway={castaways[2]}
-                tribe={tribes[2]}
-                showTribes={showTribes}
-                gradient="from-amber-700 via-amber-500 to-amber-700"
-                height="h-20"
-                animation="animate-shimmer-delay-2" />
-        </figure>
+        <StatsSection title={titleSpan}>
+            <figure className="grid relative grid-flow-col auto-cols-fr gap-1 px-1 pt-3">
+                <Podium
+                    castaway={castaways[1]}
+                    tribe={tribes[1]}
+                    showTribes={showTribes}
+                    className="bg-gradient-to-br from-zinc-300 to-zinc-400 h-24 shimmer1" />
+                <Podium
+                    castaway={castaways[0]}
+                    tribe={tribes[0]}
+                    showTribes={showTribes}
+                    className="bg-gradient-to-br from-amber-300 to-amber-500 h-32 shimmer2" />
+                <Podium
+                    castaway={castaways[2]}
+                    tribe={tribes[2]}
+                    showTribes={showTribes}
+                    className="bg-gradient-to-br from-amber-600 to-amber-700 h-20 shimmer3" />
+            </figure>
+        </StatsSection>
     );
 }
 
@@ -45,12 +55,10 @@ interface PodiumProps {
     castaway: CastawayChallengeStat | undefined;
     tribe: TribeChallengeStat | undefined;
     showTribes: boolean;
-    gradient: string;
-    height: string;
-    animation: string;
+    className: string;
 }
 
-function Podium({ castaway, tribe, showTribes, gradient, height, animation }: PodiumProps) {
+function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
 
     if (!castaway && !tribe) {
         showTribes = false;
@@ -74,8 +82,8 @@ function Podium({ castaway, tribe, showTribes, gradient, height, animation }: Po
             <HoverCard openDelay={200} closeDelay={100}>
                 <HoverCardTrigger>
                     <h3 className="p-0 m-0 w-full text-sm font-medium md:text-base truncate">{name}</h3>
-                    <div className={`flex flex-col ${height} gap-1 p-1 justify-center items-center 
-                        rounded-t-md border-2 border-b-0 border-black border-solid bg-gradient-to-br ${gradient} text-center ${animation}`}>
+                    <div className={cn("flex flex-col gap-1 p-1 justify-center items-center rounded-t-md border-2 border-b-0 border-black border-solid text-center relative overflow-hidden",
+                        className)}>
                         {!showTribes &&
                             <span className="flex gap-2 items-center">
                                 <User className="rounded-full border border-black bg-b4" />

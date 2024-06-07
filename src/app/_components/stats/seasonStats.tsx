@@ -43,10 +43,6 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     }, [season]);
 
     const carouselItems = [
-        {
-            title: "Challenges", content:
-                <ChallengesPodium castaways={stats.castawayChallenges} tribes={stats.tribeChallenges} />
-        },
         { title: "Advantages", content: <AdvantagesTable advantages={stats.advantages} /> },
         { title: "Eliminations", content: <EliminationsTable eliminations={stats.eliminations} /> },
         { title: "Titles", content: <TitlesChart titles={stats.titles} /> },
@@ -62,8 +58,13 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                     <CarouselNext />
                 </span>
                 <CarouselContent>
-                    {carouselItems.map((item) => (
-                        <CarouselItem key={item.title} title={item.title}>
+                    <CarouselItem title="Challenges">
+                        <ChallengesPodium
+                            castaways={stats.castawayChallenges}
+                            tribes={stats.tribeChallenges} />
+                    </CarouselItem>
+                    {carouselItems.map((item, index) => (
+                        <CarouselItem key={index}>
                             <StatsSection title={item.title}>
                                 {item.content}
                             </StatsSection>

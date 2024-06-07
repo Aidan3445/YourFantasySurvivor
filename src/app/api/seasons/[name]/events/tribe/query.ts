@@ -1,5 +1,4 @@
 import "server-only";
-import { type NextRequest, NextResponse } from "next/server";
 import { and, eq, isNotNull, not } from "drizzle-orm";
 import { db } from "~/server/db";
 import { seasons } from "~/server/db/schema/seasons";

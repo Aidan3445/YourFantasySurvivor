@@ -1,5 +1,5 @@
 type StatsSectionProps = {
-    title: string;
+    title: string | React.ReactNode;
     children: React.ReactNode;
 }
 

@@ -26,6 +26,25 @@ body  {
     }
 }
 
+/* shimmer effect */
+.shimmer1::before, .shimmer2::before, .shimmer3::before {
+    content: "";
+    @apply  flex box-border absolute w-[200%] h-full 
+    bg-gradient-to-r from-transparent via-white/50 to-transparent;
+}
+
+.shimmer1::before{
+    @apply animate-shimmer1;
+}
+
+.shimmer2::before {
+    @apply animate-shimmer2;
+}
+
+.shimmer3::before {
+    @apply animate-shimmer3;
+}
+
 /* Main container styles */
 main {
    @apply flex flex-col items-center text-white gap-4;
@@ -60,7 +79,9 @@ main {
 
 /* on hover and selected indent */
 .hs-in {
-    @apply border-black hover:border-2 hover:shadow-inner bg-b4 aria-expanded:border-2 aria-expanded:shadow-inner aria-expanded:shadow-b1 hover:shadow-b1;
+    @apply border-black hover:border-2 hover:shadow-inner bg-b4 
+    aria-expanded:border-2 aria-expanded:shadow-inner 
+    aria-expanded:shadow-b1 hover:shadow-b1;
     transition: all 0.1s ease-out;
 }
 
