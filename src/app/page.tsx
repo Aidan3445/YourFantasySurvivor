@@ -8,8 +8,7 @@ import getSeasons from "./api/seasons/fetch";
 
 export default async function HomePage() {
 
-    //const seasons = await getSeasons();
-    const seasons = ["Survivor 46", "Survivor 45"]
+    const seasons = await getSeasons();
 
     return (
         <main>
