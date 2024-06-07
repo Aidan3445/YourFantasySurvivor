@@ -8,5 +8,5 @@ export default clerkMiddleware((auth, request) => {
 })
 
 export const config = {
-    matcher: ["/((?!.+\\.[\\w]+$|_next|favicon.ico).*)", "/", "/(api|trpc)(.*)"],
+    matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 }
