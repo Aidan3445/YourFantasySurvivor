@@ -25,7 +25,7 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     // when season is set, fetch episodes and compile stats
     useEffect(() => {
         if (season) {
-            fetch(`/api/seasons/${season}/events/castaway`)
+            /*fetch(`/api/seasons/${season}/events/castaway`)
                 .then((res) => res.json())
                 .then((castawayEvents: CastawayEvent[]) =>
                     fetch(`/api/seasons/${season}/events/tribe`)
@@ -39,6 +39,7 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
                     setStats(emptyStats());
                     console.error(err);
                 });
+            */
         }
     }, [season]);
 
