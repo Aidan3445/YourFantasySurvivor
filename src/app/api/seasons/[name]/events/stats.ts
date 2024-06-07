@@ -279,7 +279,7 @@ export default function compileStats(
                 const tribe = stats.tribeChallenges.find((t) => t.name === tribeName);
                 if (!tribe) {
                     // if not, add them and their challenge type
-                    const newTribe = { name: tribeName, tribe1st: 0, tribe2nd: 0.5 };
+                    const newTribe = { name: tribeName, tribe1st: 0, tribe2nd: 1 };
                     stats.tribeChallenges.push(newTribe);
                 } else {
                     // if they are, increment the challenge type
@@ -298,12 +298,12 @@ export default function compileStats(
                     castaways.forEach((castaway) => {
                         const c = stats.castawayChallenges.find((c) => c.name === castaway);
                         if (c) {
-                            c.tribe2nd += 0.5;
+                            c.tribe2nd += 1;
                         } else {
                             const newCastaway = {
                                 name: castaway,
                                 tribe1st: 0,
-                                tribe2nd: 0.5,
+                                tribe2nd: 1,
                                 indivWin: 0,
                                 indivReward: 0
                             };
@@ -324,8 +324,8 @@ export default function compileStats(
     // sort the challenges using a weighted sum of the challenge types
     // individual wins are worth 4, individual rewards are worth 3, tribe wins are worth 2, and tribe 2nds are worth 1
     stats.castawayChallenges.sort((a, b) => {
-        const aScore = a.indivWin * 5 + a.indivReward * 3 + a.tribe1st + a.tribe2nd;
-        const bScore = b.indivWin * 5 + b.indivReward * 3 + b.tribe1st + b.tribe2nd;
+        const aScore = a.indivWin * 5 + a.indivReward * 3 + a.tribe1st * 2 + a.tribe2nd;
+        const bScore = b.indivWin * 5 + b.indivReward * 3 + b.tribe1st * 2 + b.tribe2nd;
         return bScore - aScore;
     });
 
