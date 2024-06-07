@@ -6,6 +6,8 @@ import SeasonStats from "./_components/stats/seasonStats";
 import Image from "next/image";
 import getSeasons from "./api/seasons/fetch";
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
 
     const seasons = await getSeasons();
@@ -20,14 +22,14 @@ export default async function HomePage() {
                     <SignInCard />
                 </ClerkLoading>
                 <ClerkLoaded>
-                    {/*<SignedOut>
+                    <SignedOut>
                         <SignInButton>
                             <SignInCard />
                         </SignInButton>
                     </SignedOut>
                     <SignedIn>
                         <LeaguesCard />
-                    </SignedIn>*/}
+                    </SignedIn>
                 </ClerkLoaded>
                 <SeasonStats seasons={seasons} />
             </section>

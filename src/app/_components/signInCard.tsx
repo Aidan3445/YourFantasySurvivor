@@ -18,9 +18,7 @@ export default function SignInCard() {
                 <li>Compete against friends</li>
                 <li>Make your picks</li>
                 <li>Add weekly, pre-season, and/or mid-season predictions</li>
-                <li>
-                    Completely cusomize your league's scoring system
-                </li>
+                <li> Completely cusomize your league&apos;s scoring system </li>
                 <li>Crown a winner at the end of the season</li>
             </ul>
         </CardContainer>
