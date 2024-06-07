@@ -11,8 +11,8 @@ import TitlesChart from "./titlesChart";
 import FinalsStats from "./finalsStats";
 import StatsSection from "./statsSection";
 import CardContainer from "../cardContainer";
-import { type CastawayEvent } from "~/app/api/seasons/[name]/events/castaway/route";
-import type { TribeEvent, TribeUpdates } from "~/app/api/seasons/[name]/events/tribe/route";
+import { type CastawayEvent } from "~/app/api/seasons/[name]/events/castaway/query";
+import type { TribeEvent, TribeUpdates } from "~/app/api/seasons/[name]/events/tribe/query";
 
 interface SeasonStatsProps {
     seasons: string[];
