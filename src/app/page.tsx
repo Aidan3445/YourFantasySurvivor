@@ -20,11 +20,11 @@ export default async function HomePage() {
                     <SignInCard />
                 </ClerkLoading>
                 <ClerkLoaded>
-                    <SignedOut>
+                    {/*<SignedOut>
                         <SignInButton>
                             <SignInCard />
                         </SignInButton>
-                    </SignedOut>
+                    </SignedOut>*/}
                     <SignedIn>
                         <LeaguesCard />
                     </SignedIn>
