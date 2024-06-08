@@ -39,19 +39,19 @@ const config = {
                 },
                 "shimmer1": {
                     "0%": { transform: "translateX(165%) skewX(-45deg)" },
-                    "25%": { transform: "translateX(-50%) skewX(-45deg)" },
+                    "12%": { transform: "translateX(-50%) skewX(-45deg)" },
                     "75%": { transform: "translateX(-50%) skewX(-45deg)" },
                     "100%": { transform: "translateX(165%) skewX(-45deg)" },
                 },
                 "shimmer2": {
                     "0%": { transform: "translateX(115%) skewX(-45deg)" },
-                    "25%": { transform: "translateX(-100%) skewX(-45deg)" },
+                    "12%": { transform: "translateX(-100%) skewX(-45deg)" },
                     "75%": { transform: "translateX(-100%) skewX(-45deg)" },
                     "100%": { transform: "translateX(115%) skewX(-45deg)" },
                 },
                 "shimmer3": {
                     "0%": { transform: "translateX(57.5%) skewX(-45deg)" },
-                    "25%": { transform: "translateX(-157.5%) skewX(-45deg)" },
+                    "12%": { transform: "translateX(-157.5%) skewX(-45deg)" },
                     "75%": { transform: "translateX(-157.5%) skewX(-45deg)" },
                     "100%": { transform: "translateX(57.5%) skewX(-45deg)" },
                 },
