@@ -1,5 +1,3 @@
-"use client";
-
 import { defaultRules, type BaseEventRules } from "~/server/db/schema/leagues";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,7 +6,6 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "~/app/_components/commonUI/input";
 import { Button } from "~/app/_components/commonUI/button";
 import CardContainer from "~/app/_components/cardContainer";
-import { cn } from "~/lib/utils";
 import { SecondPlaceInfo } from "~/app/_components/stats/challengesPodium";
 
 interface RulesProps {
@@ -38,7 +35,7 @@ const formSchema = z.object({
     noVoteExit: numberRange,
 });
 
-export default function Rules({ rules, setRules, className }: RulesProps) {
+export default function Rules({ setRules, className }: RulesProps) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: defaultRules,
@@ -47,20 +44,34 @@ export default function Rules({ rules, setRules, className }: RulesProps) {
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         setRules(data);
-        console.log(data);
+    }
+
+    const onReset = () => {
+        setRules(defaultRules);
+        form.reset();
     }
 
     return (
         <CardContainer className={className}>
             <Form {...form}>
-                <form className="grid grid-cols-2 grid-flow-col gap-2 p-4 text-black" onSubmit={form.handleSubmit(onSubmit)}>
+                <form
+                    className="grid grid-cols-2 grid-flow-col gap-2 p-4 text-black"
+                    onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="flex flex-col gap-2">
                         <Challenges control={form.control} />
                         <Advantages control={form.control} />
                     </div>
                     <div className="flex flex-col justify-between">
                         <OtherRules control={form.control} />
-                        <Button className="mb-4 w-full" type="submit">Apply</Button>
+                        <span className="flex gap-4">
+                            <Button className="w-2/3" type="submit">Apply</Button>
+                            <Button
+                                className="w-1/3"
+                                type="button"
+                                onClick={onReset}>
+                                Reset
+                            </Button>
+                        </span>
                     </div>
                 </form>
             </Form>
@@ -270,7 +281,7 @@ function Advantages({ control }: FieldProps) {
 function OtherRules({ control }: FieldProps) {
     return (
         <section>
-            <FormLabel className="pl-10 text-2xl">Other Rules</FormLabel>
+            <FormLabel className="text-2xl">Other Rules</FormLabel>
             <FormField
                 control={control}
                 name="spokeEpTitle"
