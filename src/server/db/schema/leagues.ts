@@ -46,8 +46,6 @@ export const baseEventRules = createTable(
         finalists: integer("finalists").notNull(),
         fireWin: integer("fire_win").notNull(),
         soleSurvivor: integer("sole_survivor").notNull(),
-        elim: integer("elim").notNull(),
-        noVoteExit: integer("no_vote_exit").notNull(),
     }
 );
 export type BaseEventRules = {
@@ -63,8 +61,6 @@ export type BaseEventRules = {
     finalists: number;
     fireWin: number;
     soleSurvivor: number;
-    elim: number;
-    noVoteExit: number;
 };
 export const defaultRules: BaseEventRules = {
     advFound: 5,
@@ -79,6 +75,4 @@ export const defaultRules: BaseEventRules = {
     finalists: 5,
     fireWin: 5,
     soleSurvivor: 10,
-    elim: 0,
-    noVoteExit: 0,
 };

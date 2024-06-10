@@ -32,7 +32,7 @@ export default function ChallengesPodium({ castaways, tribes }: ChallengesPodium
         <StatsSection title={titleSpan}>
             <figure className="grid relative grid-flow-col auto-cols-fr gap-1 px-1 pt-3">
                 <div className="absolute top-0 right-0 p-2 ordinal">
-                    <RemainingCastaways castaways={castaways.slice(3)} />
+                    <RemainingCastaways disabled={showTribes} castaways={castaways.slice(3)} />
                 </div>
                 <Podium
                     castaway={castaways[1]}
@@ -141,40 +141,45 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
 
 interface RemainingCastawaysProps {
     castaways: CastawayChallengeStat[];
+    disabled?: boolean;
 }
 
-function RemainingCastaways({ castaways }: RemainingCastawaysProps) {
+function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
     const [open, setOpen] = useState(false);
     const toggleOpen = () => setOpen(!open);
 
     return (
         <HoverCard openDelay={200} closeDelay={100} open={open} onOpenChange={setOpen}>
-            <HoverCardTrigger onTouchStart={toggleOpen}>
-                <div className="py-1 px-2 text-sm font-medium ordinal rounded-md border border-black bg-b3 cursor-help" aria-disabled>4th+</div>
+            <HoverCardTrigger onTouchStart={toggleOpen} aria-disabled={disabled} className="py-1 px-2 text-sm font-medium ordinal rounded-md border border-black bg-b3 aria-disabled:bg-zinc-400/60 transition-all aria-disabled:cursor-not-allowed cursor-help">
+                4th+
             </HoverCardTrigger>
             <HoverCardPortal>
-                <HoverCardContent className="border-b border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
+                {!disabled && <HoverCardContent className="border-b border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
                     <HoverCardArrow />
-                    <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 divide-black stats-scroll">
-                        <span className="grid sticky top-0 grid-cols-6 text-xs text-center border-b border-black lg:text-sm bg-b2">
-                            <h4 className="col-start-3 px-1 font-normal">Imm.</h4>
-                            <h4 className="px-1 font-normal border-r border-black">Rwd.</h4>
-                            <h4 className="px-1 font-normal ordinal">1st</h4>
-                            <h4 className="px-1 font-normal ordinal">2nd</h4>
+                    <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 stats-scroll pt-1">
+                        <span className="grid sticky top-0 grid-cols-7 text-xs text-center border-b border-black lg:text-sm bg-b2">
+                            <h4 className="col-start-4 px-1 font-normal">Imm.</h4>
+                            <h4 className="px-1 font-normal">Rwd.</h4>
+                            <h4 className="px-1 font-normal ordinal border-l border-black">1st</h4>
+                            <h4 className="px-1 font-normal ordinal">
+                                2nd
+                                <SecondPlaceInfo />
+                            </h4>
                         </span>
                         {castaways.map((castaway, index) => (
-                            <span key={index} className="grid grid-cols-6 text-xs text-center border-b border-black divide-x divide-black lg:text-sm border-x">
+                            <span key={index} className={`grid grid-cols-7 font-normal text-xs text-center divide-x divide-black lg:text-sm ${index & 1 ? "bg-white/10" : ""}`}>
+                                <h4>{index + 4}</h4>
                                 <h3 className="col-span-2 px-1 font-medium text-md truncate">{castaway.name}</h3>
-                                <h4 className="font-normal">{castaway.indivWin}</h4>
-                                <h4 className="font-normal">{castaway.indivReward}</h4>
-                                <h4 className="font-normal">{castaway.tribe1st}</h4>
-                                <h4 className="font-normal">{castaway.tribe2nd}</h4>
+                                <h4>{castaway.indivWin}</h4>
+                                <h4>{castaway.indivReward}</h4>
+                                <h4>{castaway.tribe1st}</h4>
+                                <h4>{castaway.tribe2nd}</h4>
                             </span>
                         ))}
                     </figure>
-                </HoverCardContent>
+                </HoverCardContent>}
             </HoverCardPortal>
-        </HoverCard>
+        </HoverCard >
     );
 }
 

@@ -7,6 +7,7 @@ import { Input } from "~/app/_components/commonUI/input";
 import { Button } from "~/app/_components/commonUI/button";
 import CardContainer from "~/app/_components/cardContainer";
 import { SecondPlaceInfo } from "~/app/_components/stats/challengesPodium";
+import { Separator } from "~/app/_components/commonUI/separator";
 
 interface RulesProps {
     rules?: BaseEventRules;
@@ -31,8 +32,6 @@ const formSchema = z.object({
     finalists: numberRange,
     fireWin: numberRange,
     soleSurvivor: numberRange,
-    elim: numberRange,
-    noVoteExit: numberRange,
 });
 
 export default function Rules({ setRules, className }: RulesProps) {
@@ -55,24 +54,32 @@ export default function Rules({ setRules, className }: RulesProps) {
         <CardContainer className={className}>
             <Form {...form}>
                 <form
-                    className="grid grid-cols-2 grid-flow-col gap-2 p-4 text-black"
+                    className="grid grid-cols-1 md:grid-cols-3 gap-2 p-4 text-black"
                     onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="flex flex-col gap-2">
-                        <Challenges control={form.control} />
-                        <Advantages control={form.control} />
+                    <Challenges control={form.control} />
+                    <Advantages control={form.control} />
+                    <OtherRules control={form.control} />
+                    <Separator className="w-full my-1 col-span-3" decorative />
+                    <div className="col-span-2 text-sm">
+                        <p>
+                            You can adjust the point values for each event to customize your
+                            league as you wish.
+                            <br />
+                            Below is a scoreboard to see how these rules
+                            would score in previous seasons.
+                        </p>
                     </div>
-                    <div className="flex flex-col justify-between">
-                        <OtherRules control={form.control} />
-                        <span className="flex gap-4">
-                            <Button className="w-2/3" type="submit">Apply</Button>
-                            <Button
-                                className="w-1/3"
-                                type="button"
-                                onClick={onReset}>
-                                Reset
-                            </Button>
-                        </span>
-                    </div>
+                    <span className="flex gap-4 justify-end">
+                        <Button className="w-2/3" type="submit">
+                            Apply
+                        </Button>
+                        <Button
+                            className="w-1/3"
+                            type="reset"
+                            onClick={onReset}>
+                            Reset
+                        </Button>
+                    </span>
                 </form>
             </Form>
         </CardContainer >
@@ -364,50 +371,6 @@ function OtherRules({ control }: FieldProps) {
                             </FormControl>
                             <FormDescription className="w-56 text-wrap">
                                 Points for winning the season
-                            </FormDescription>
-                        </span>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                control={control}
-                name="elim"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Eliminated</FormLabel>
-                        <span className="flex gap-4 items-center">
-                            <FormControl>
-                                <Input
-                                    className="w-24 text-black"
-                                    type="number"
-                                    placeholder="Points"
-                                    {...field} />
-                            </FormControl>
-                            <FormDescription className="w-56 text-wrap">
-                                Points for being eliminated
-                            </FormDescription>
-                        </span>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />
-            <FormField
-                control={control}
-                name="noVoteExit"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>No Vote Exit</FormLabel>
-                        <span className="flex gap-4 items-center">
-                            <FormControl>
-                                <Input
-                                    className="w-24 text-black"
-                                    type="number"
-                                    placeholder="Points"
-                                    {...field} />
-                            </FormControl>
-                            <FormDescription className="w-56 text-wrap">
-                                Points for quitting or being pulled for medical reasons
                             </FormDescription>
                         </span>
                         <FormMessage />

@@ -28,8 +28,6 @@ export default function compileScores(
             case "finalists":
             case "fireWin":
             case "soleSurvivor":
-            case "elim":
-            case "noVoteExit":
                 points[episode] = (points[episode] ?? 0) + rules[name];
             default:
                 break;

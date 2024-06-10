@@ -10,9 +10,9 @@ export default function TitlesChart({ titles }: TitlesChartProps) {
     }
 
     return (
-        <figure className="flex overflow-y-auto flex-col max-h-40 divide-y divide-black stats-scroll">
+        <figure className="flex overflow-y-auto flex-col max-h-40 stats-scroll">
             {titles.map((title, index) => (
-                <span key={index} className="grid grid-cols-3 text-xs text-center border-r border-black divide-x divide-black lg:text-sm">
+                <span key={index} className={`grid grid-cols-3 text-xs text-center border-r border-black divide-x divide-black lg:text-sm ${index & 1 ? "bg-white/10" : ""}`}>
                     <h3 className="col-span-2 px-1 font-medium text-md">{title.name}</h3>
                     <h4 className="font-normal">{title.count}</h4>
                 </span>
