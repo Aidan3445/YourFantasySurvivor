@@ -6,7 +6,8 @@ import { type Events } from "~/app/api/seasons/[name]/events/query";
 import compileScores from "~/app/api/seasons/[name]/events/scores";
 import { cn } from "~/lib/utils";
 import { type BaseEventRules } from "~/server/db/schema/leagues";
-import ScoreChart from "./scoreChart";
+import Chart from "./scoreChart";
+import Scores from "./scoreboard";
 
 interface LeaderboardProps {
     rules: BaseEventRules;
@@ -52,27 +53,26 @@ export function Leaderboard({ rules, className }: LeaderboardProps) {
 
         return {
             name,
+            color: "hsl(0,100%,50%)",
             score: episodeScores[episodeScores.length - 1] ?? 0,
             episodeScores
         }
     }).sort((a, b) => b.score - a.score);
 
+    sortedScores.forEach((score, index) => {
+        score.color = `hsl(${300 * index / sortedScores.length}, ${index & 1 ? "50%" : "80%"}, 30%)`;
+    });
+
     return (
         <CardContainer className={cn("justify-start items-center p-4", className)}>
             <h3 className="text-2xl">Leaderboard</h3>
             <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
-            <span className="grid grid-cols-3 gap-2 w-full">
-                <figure className="gap-0 border rounded-lg border-black">
-                    {sortedScores.map(({ name, score }, index) => (
-                        <div key={name} className={`flex gap-2 justify-between px-1 ${index & 1 ? "bg-white/10" : ""}`}>
-                            <span>{index + 1}</span>
-                            <span>{name}</span>
-                            <span>{score}</span>
-                        </div>
-                    ))}
-                </figure>
-                <ScoreChart data={sortedScores} />
+            <span className="grid grid-cols-4 gap-2 w-full">
+                <Scores data={sortedScores} />
+                <Chart data={sortedScores} />
             </span >
         </CardContainer >
     );
 }
+
+

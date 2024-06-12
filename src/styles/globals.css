@@ -47,7 +47,7 @@ body  {
 
 /* Main container styles */
 main {
-   @apply flex flex-col items-center text-white gap-4;
+   @apply flex flex-col items-center text-white gap-4 py-2;
 }
 
 /* Scrollbar styles */
