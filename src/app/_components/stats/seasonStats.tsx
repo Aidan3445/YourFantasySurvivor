@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "../commonUI/carousel";
 import compileStats, { type SeasonStats as SS, emptyStats } from "~/app/api/seasons/[name]/events/stats";
@@ -11,8 +10,7 @@ import TitlesChart from "./titlesChart";
 import FinalsStats from "./finalsStats";
 import StatsSection from "./statsSection";
 import CardContainer from "../cardContainer";
-import { type CastawayEvent } from "~/app/api/seasons/[name]/events/castaway/query";
-import type { TribeEvent, TribeUpdates } from "~/app/api/seasons/[name]/events/tribe/query";
+import type { Events } from "~/app/api/seasons/[name]/events/query";
 
 interface SeasonStatsProps {
     seasons: string[];
@@ -25,15 +23,9 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
     // when season is set, fetch episodes and compile stats
     useEffect(() => {
         if (season) {
-            fetch(`/api/seasons/${season}/events/castaway`)
+            fetch(`/api/seasons/${season}/events`)
                 .then((res) => res.json())
-                .then((castawayEvents: CastawayEvent[]) =>
-                    fetch(`/api/seasons/${season}/events/tribe`)
-                        .then((res) => res.json())
-                        .then(({ events, updates }: { events: TribeEvent[], updates: TribeUpdates }) => {
-                            setStats(compileStats(castawayEvents, events, updates));
-                        })
-                )
+                .then((events: Events) => setStats(compileStats(events)))
                 .catch((err) => {
                     setSeason("");
                     setStats(emptyStats());

@@ -1,5 +1,4 @@
-import { type CastawayEvent } from "./castaway/route";
-import type { TribeEvent, TribeUpdates } from "./tribe/route";
+import { type Events } from "./query";
 
 type AdvantageStatus = "Active" | "Played" | "Misplayed" | "Eliminated";
 export type AdvantageStat = { name: string, advName: string, status: AdvantageStatus };
@@ -43,11 +42,7 @@ export const emptyStats = (): SeasonStats => ({
 });
 
 
-export default function compileStats(
-    castawayEvents: CastawayEvent[],
-    tribeEvents: TribeEvent[],
-    tribeUpdates: TribeUpdates
-): SeasonStats {
+export default function compileStats({ castawayEvents, tribeEvents, tribeUpdates }: Events): SeasonStats {
     const stats: SeasonStats = emptyStats();
 
     // compile castaway events

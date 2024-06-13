@@ -31,24 +31,24 @@ export default function ChallengesPodium({ castaways, tribes }: ChallengesPodium
     return (
         <StatsSection title={titleSpan}>
             <figure className="grid relative grid-flow-col auto-cols-fr gap-1 px-1 pt-3">
-                <div className="absolute p-2 top-0 right-0 ordinal">
-                    <RemainingCastaways castaways={castaways.slice(3)} />
+                <div className="absolute top-0 right-0 p-2 ordinal">
+                    <RemainingCastaways disabled={showTribes} castaways={castaways.slice(3)} />
                 </div>
                 <Podium
                     castaway={castaways[1]}
                     tribe={tribes[1]}
                     showTribes={showTribes}
-                    className="bg-gradient-to-br from-zinc-300 to-zinc-400 h-24 shimmer1" />
+                    className="h-24 bg-gradient-to-br from-zinc-300 to-zinc-400 shimmer1" />
                 <Podium
                     castaway={castaways[0]}
                     tribe={tribes[0]}
                     showTribes={showTribes}
-                    className="bg-gradient-to-br from-amber-300 to-amber-500 h-32 shimmer2" />
+                    className="h-32 bg-gradient-to-br from-amber-300 to-amber-500 shimmer2" />
                 <Podium
                     castaway={castaways[2]}
                     tribe={tribes[2]}
                     showTribes={showTribes}
-                    className="bg-gradient-to-br from-amber-600 to-amber-700 h-20 shimmer3" />
+                    className="h-20 bg-gradient-to-br from-amber-600 to-amber-700 shimmer3" />
             </figure>
         </StatsSection>
     );
@@ -114,17 +114,8 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
                                 <div className="flex flex-col">
                                     <h3 className="relative ordinal border-b border-black">
                                         2nd
-                                        <HoverCard openDelay={100} closeDelay={0}>
-                                            <HoverCardTrigger>
-                                                <span className="absolute text-xs rounded-full border-black -translate-y-1 cursor-help">?</span>
-                                            </HoverCardTrigger>
-                                            <HoverCardContent className="text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700" sideOffset={10} side="top">
-                                                <HoverCardArrow className="absolute translate-x-0.25" />
-                                                <p className="normal-nums text-wrap">Applies only to seasons with 3-tribe challenges</p>
-                                            </HoverCardContent>
-                                        </HoverCard>
+                                        <SecondPlaceInfo />
                                     </h3>
-                                    {/* 2nd place are scored with 0.5 points but we want a count */}
                                     <h3 className="tabular-nums">{tribe2nd}</h3>
                                 </div>
                             </div>
@@ -150,39 +141,64 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
 
 interface RemainingCastawaysProps {
     castaways: CastawayChallengeStat[];
+    disabled?: boolean;
 }
 
-function RemainingCastaways({ castaways }: RemainingCastawaysProps) {
+function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
     const [open, setOpen] = useState(false);
     const toggleOpen = () => setOpen(!open);
 
     return (
         <HoverCard openDelay={200} closeDelay={100} open={open} onOpenChange={setOpen}>
-            <HoverCardTrigger onTouchStart={toggleOpen}>
-                <div className="text-sm font-medium ordinal px-2 py-1 rounded-md border border-black bg-b3 cursor-help" aria-disabled>4th+</div>
+            <HoverCardTrigger onTouchStart={toggleOpen} aria-disabled={disabled} className="py-1 px-2 text-sm font-medium ordinal rounded-md border border-black bg-b3 aria-disabled:bg-zinc-400/60 transition-all aria-disabled:cursor-not-allowed cursor-help">
+                4th+
             </HoverCardTrigger>
             <HoverCardPortal>
-                <HoverCardContent className="border-black border-b shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
+                {!disabled && <HoverCardContent className="border-b border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
                     <HoverCardArrow />
-                    <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 divide-black stats-scroll">
-                        <span className="grid grid-cols-6 text-center text-xs lg:text-sm sticky top-0 bg-b2 border-b border-black">
-                            <h4 className="font-normal col-start-3 px-1">Imm.</h4>
-                            <h4 className="font-normal px-1 border-black border-r">Rwd.</h4>
-                            <h4 className="font-normal px-1 ordinal">1st</h4>
-                            <h4 className="font-normal px-1 ordinal">2nd</h4>
+                    <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 rounded-lg overflow-hidden stats-scroll">
+                        <span className="grid sticky top-0 pt-1 grid-cols-7 text-xs text-center border-b border-black lg:text-sm bg-b2">
+                            <h4 className="col-start-4 px-1 font-normal">Imm.</h4>
+                            <h4 className="px-1 font-normal">Rwd.</h4>
+                            <h4 className="px-1 font-normal ordinal border-l border-black">1st</h4>
+                            <h4 className="px-1 font-normal ordinal">
+                                2nd
+                                <SecondPlaceInfo />
+                            </h4>
                         </span>
                         {castaways.map((castaway, index) => (
-                            <span key={index} className="grid grid-cols-6 text-center border-b  divide-x divide-black text-xs lg:text-sm border-x border-black">
+                            <span key={index} className={`grid grid-cols-7 font-normal text-xs text-center divide-x divide-black lg:text-sm ${index & 1 ? "bg-white/20" : "bg-white/10"}`}>
+                                <h4>{index + 4}</h4>
                                 <h3 className="col-span-2 px-1 font-medium text-md truncate">{castaway.name}</h3>
-                                <h4 className="font-normal">{castaway.indivWin}</h4>
-                                <h4 className="font-normal">{castaway.indivReward}</h4>
-                                <h4 className="font-normal">{castaway.tribe1st}</h4>
-                                <h4 className="font-normal">{castaway.tribe2nd}</h4>
+                                <h4>{castaway.indivWin}</h4>
+                                <h4>{castaway.indivReward}</h4>
+                                <h4>{castaway.tribe1st}</h4>
+                                <h4>{castaway.tribe2nd}</h4>
                             </span>
                         ))}
                     </figure>
-                </HoverCardContent>
+                </HoverCardContent>}
             </HoverCardPortal>
+        </HoverCard >
+    );
+}
+
+export function SecondPlaceInfo() {
+    return (
+        <HoverCard openDelay={100} closeDelay={0}>
+            <HoverCardTrigger>
+                <span className="absolute text-xs rounded-full border-black -translate-y-1 cursor-help">?</span>
+            </HoverCardTrigger>
+            <HoverCardContent className="text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700" sideOffset={10} side="top">
+                <HoverCardArrow className="absolute translate-x-0.25" />
+                <p className="normal-nums text-wrap">Applies only to seasons with 3-tribe challenges</p>
+            </HoverCardContent>
         </HoverCard>
     );
 }
+
+
+
+
+
+
