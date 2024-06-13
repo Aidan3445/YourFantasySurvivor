@@ -196,3 +196,9 @@ export function SecondPlaceInfo() {
         </HoverCard>
     );
 }
+
+
+
+
+
+
