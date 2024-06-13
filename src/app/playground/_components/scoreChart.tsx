@@ -8,6 +8,7 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { Separator } from "~/app/_components/commonUI/separator";
+import { mouseOutLeaderboard, mouseOverLeaderboard } from "./leaderboard";
 
 interface ScoreChartProps {
     data: {
@@ -60,9 +61,9 @@ export default function Chart({ data }: ScoreChartProps) {
                     <Tooltip content={<CustomTooltip />} />
                     {sortedData.map((line, index) => (
                         <Line
-                            className="cursor-pointer"
                             id={`line-${line.name}`}
                             name={`line-${index}`}
+                            className="cursor-pointer"
                             type="monotone"
                             dataKey={line.name}
                             stroke={line.color}
@@ -71,7 +72,8 @@ export default function Chart({ data }: ScoreChartProps) {
                             strokeOpacity={0.7}
                             dot={false}
                             key={index}
-                            {...getMouseEvents(line.name, line.color)}
+                            onMouseOver={() => mouseOverLeaderboard(line.name, sortedData.map((d) => d.name))}
+                            onMouseOut={() => mouseOutLeaderboard(line.name, line.color, sortedData.map((d) => d.name))}
                         />
                     ))}
                 </LineChart>
@@ -160,47 +162,3 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
         </div>
     );
 }
-
-export function getMouseEvents(name: string, color: string) {
-    return {
-        onMouseOver: () => {
-            try {
-                // update line style
-                const lineEl = document.getElementById(`line-${name}`)!;
-                lineEl.style.strokeWidth = "10";
-                lineEl.style.strokeOpacity = "1";
-                lineEl.style.stroke = "black";
-                // update scoreboard name style
-                const scoreEl = document.getElementById(`score-${name}`)!;
-                scoreEl.style.color = "black";
-                // update tooltip name style
-                const tooltipEl = document.getElementById(`tooltip-${name}`)!;
-                tooltipEl.style.color = "black";
-            } catch (e) {
-                if (!(e instanceof TypeError)) {
-                    throw e;
-                }
-            }
-        },
-        onMouseOut: () => {
-            try {
-                // reset line style
-                const lineEl = document.getElementById(`line-${name}`)!;
-                lineEl.style.strokeWidth = "6";
-                lineEl.style.strokeOpacity = "0.7";
-                lineEl.style.stroke = color;
-                // reset scoreboard name style
-                const scoreEl = document.getElementById(`score-${name}`)!;
-                scoreEl.style.color = color;
-                // reset tooltip name style
-                const tooltipEl = document.getElementById(`tooltip-${name}`)!;
-                tooltipEl.style.color = color;
-            } catch (e) {
-                if (!(e instanceof TypeError)) {
-                    throw e;
-                }
-            }
-        },
-    };
-}
-

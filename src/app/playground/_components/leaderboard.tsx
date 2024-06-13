@@ -75,4 +75,55 @@ export function Leaderboard({ rules, className }: LeaderboardProps) {
     );
 }
 
+export function mouseOverLeaderboard(name: string, sortedNames: string[]) {
+    // update scoreboard name style
+    const scoreEl = document.getElementById(`score-${name}`);
+    if (scoreEl) scoreEl.style.color = "black";
+    // update tooltip name style
+    const tooltipEl = document.getElementById(`tooltip-${name}`);
+    if (tooltipEl) tooltipEl.style.color = "black";
 
+
+    // update line styles
+    sortedNames.forEach((n) => {
+        const lineEl = document.getElementById(`line-${n}`);
+        if (!lineEl) return;
+
+        if (n !== name) {
+            lineEl.style.strokeOpacity = "0.25";
+        } else {
+            lineEl.style.strokeOpacity = "1";
+            lineEl.style.strokeWidth = "10";
+        }
+    });
+}
+
+export function mouseOutLeaderboard(name: string, color: string, sortedNames: string[]) {
+    try {
+        // reset line style
+        const lineEl = document.getElementById(`line-${name}`);
+        if (lineEl) {
+            lineEl.style.strokeWidth = "6";
+            lineEl.style.strokeOpacity = "0.7";
+            lineEl.style.stroke = color;
+        }
+        // reset scoreboard name style
+        const scoreEl = document.getElementById(`score-${name}`);
+        if (scoreEl) scoreEl.style.color = color;
+        // reset tooltip name style
+        const tooltipEl = document.getElementById(`tooltip-${name}`);
+        if (tooltipEl) tooltipEl.style.color = color;
+
+        // reset other lines visibility
+        sortedNames.forEach((n) => {
+            const otherLineEl = document.getElementById(`line-${n}`);
+            if (!otherLineEl) return;
+
+            otherLineEl.style.strokeOpacity = "0.7";
+        });
+    } catch (e) {
+        if (!(e instanceof TypeError)) {
+            throw e;
+        }
+    }
+}

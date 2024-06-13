@@ -1,7 +1,7 @@
 import { SignedOut, SignedIn, SignInButton, UserButton, ClerkLoading, ClerkLoaded } from "@clerk/nextjs";
 import { LoaderCircle } from "lucide-react";
 
-type NavRoute = '/' | '/playground' | '/league';
+type NavRoute = '/' | '/playground' | '/leagues';
 interface NavItemProps {
     path: NavRoute;
     label: string;
@@ -14,7 +14,7 @@ export default function TopNav() {
             <ul className="flex gap-4">
                 <NavItem path="/" label="Home" />
                 <NavItem path="/playground" label="Playground" />
-                <NavItem path="/league" label="Leagues" />
+                <NavItem path="/leagues" label="Leagues" />
             </ul>
             <div className="flex justify-center items-center">
                 <ClerkLoading>
