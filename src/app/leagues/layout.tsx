@@ -1,4 +1,5 @@
 import "~/styles/globals.css";
+import LeagueNav from "./_components/leagueNav";
 
 export default function LeagueLayout({
     children,
@@ -6,6 +7,9 @@ export default function LeagueLayout({
     children: React.ReactNode;
 }) {
     return (
-        <main>{children}</main>
+        <main>
+            <LeagueNav />
+            {children}
+        </main>
     );
 }

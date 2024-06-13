@@ -1,14 +1,12 @@
 import { SignedOut, SignedIn, SignInButton, UserButton, ClerkLoading, ClerkLoaded } from "@clerk/nextjs";
 import { LoaderCircle } from "lucide-react";
 
-type NavRoute = '/' | '/playground' | '/leagues';
 interface NavItemProps {
-    path: NavRoute;
+    path: string;
     label: string;
 }
 
 export default function TopNav() {
-
     return (
         <nav className="flex justify-between items-center pt-4 font-semibold w-fill min-h-14" >
             <ul className="flex gap-4">
@@ -33,7 +31,7 @@ export default function TopNav() {
     );
 };
 
-function NavItem({ path, label }: NavItemProps) {
+export function NavItem({ path, label }: NavItemProps) {
 
     return (
         <li className="duration-200 hover:-translate-y-1">
