@@ -156,8 +156,8 @@ function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
             <HoverCardPortal>
                 {!disabled && <HoverCardContent className="border-b border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700" side="top">
                     <HoverCardArrow />
-                    <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 stats-scroll pt-1">
-                        <span className="grid sticky top-0 grid-cols-7 text-xs text-center border-b border-black lg:text-sm bg-b2">
+                    <figure className="flex overflow-y-auto overscroll-contain flex-col max-h-40 rounded-lg overflow-hidden stats-scroll">
+                        <span className="grid sticky top-0 pt-1 grid-cols-7 text-xs text-center border-b border-black lg:text-sm bg-b2">
                             <h4 className="col-start-4 px-1 font-normal">Imm.</h4>
                             <h4 className="px-1 font-normal">Rwd.</h4>
                             <h4 className="px-1 font-normal ordinal border-l border-black">1st</h4>
@@ -167,7 +167,7 @@ function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
                             </h4>
                         </span>
                         {castaways.map((castaway, index) => (
-                            <span key={index} className={`grid grid-cols-7 font-normal text-xs text-center divide-x divide-black lg:text-sm ${index & 1 ? "bg-white/10" : ""}`}>
+                            <span key={index} className={`grid grid-cols-7 font-normal text-xs text-center divide-x divide-black lg:text-sm ${index & 1 ? "bg-white/20" : "bg-white/10"}`}>
                                 <h4>{index + 4}</h4>
                                 <h3 className="col-span-2 px-1 font-medium text-md truncate">{castaway.name}</h3>
                                 <h4>{castaway.indivWin}</h4>

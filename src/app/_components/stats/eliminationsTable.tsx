@@ -13,7 +13,7 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
     return (
         <figure className="flex overflow-y-auto flex-col max-h-40 stats-scroll">
             {eliminations.map((elim, index) => (
-                <span key={index} className={`grid grid-cols-3 text-xs text-center border-r border-black divide-x divide-black lg:text-sm ${index & 1 ? "bg-white/10" : ""}`}>
+                <span key={index} className={`grid grid-cols-3 text-xs text-center border-r border-black divide-x divide-black lg:text-sm ${index & 1 ? "bg-white/20" : "bg-white/10"}`}>
                     <h3>Episode {elim.episode}</h3>
                     <h4 className="font-medium">{elim.name}</h4>
                     <HoverCard openDelay={100} closeDelay={0}>

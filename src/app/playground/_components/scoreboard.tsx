@@ -18,11 +18,11 @@ export default function Scores({ data }: ScoresProps) {
     }
 
     return (
-        <figure className="gap-0 border rounded-lg border-black">
+        <figure className="gap-0 border rounded-lg border-black overflow-hidden">
             {data.map(({ name, color, score }, index) => (
-                <div key={index} className={`grid px-2 grid-cols-3 ${index & 1 ? "bg-white/10" : ""}`}>
+                <div key={index} className={`grid px-2 grid-cols-3 ${index & 1 ? "bg-white/20" : "bg-white/10"}`}>
                     <h3>{index + 1}</h3>
-                    <h3
+                    <h3 id={`score-${name}`}
                         className="font-semibold text-nowrap"
                         style={{ color: color }}>
                         {name}
