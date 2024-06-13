@@ -1,3 +1,5 @@
+import { getMouseEvents } from "./scoreChart";
+
 interface ScoresProps {
     data: {
         name: string;
@@ -23,14 +25,16 @@ export default function Scores({ data }: ScoresProps) {
                 <div key={index} className={`grid px-2 grid-cols-3 ${index & 1 ? "bg-white/20" : "bg-white/10"}`}>
                     <h3>{index + 1}</h3>
                     <h3 id={`score-${name}`}
-                        className="font-semibold text-nowrap"
-                        style={{ color: color }}>
+                        className="font-semibold text-nowrap cursor-pointer"
+                        style={{ color: color }}
+                        {...getMouseEvents(name, color)}>
                         {name}
                     </h3>
                     <h3 className="text-right">{score}</h3>
                 </div>
-            ))}
-        </figure>
+            ))
+            }
+        </figure >
     );
 }
 

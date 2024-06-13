@@ -36,6 +36,9 @@ export default function Chart({ data }: ScoreChartProps) {
         return ticks;
     }
 
+    // sort the data so that the end of a line is always visible for hover purposes
+    const sortedData = [...data].sort((a, b) => b.episodeScores.length - a.episodeScores.length);
+
     return (
         <div className="w-full h-full bg-b4/50 border rounded-lg border-black col-span-3">
             <ResponsiveContainer>
@@ -55,8 +58,9 @@ export default function Chart({ data }: ScoreChartProps) {
                             (dataMin: number) => (dataMin),
                             (dataMax: number) => (dataMax + 1)]} />
                     <Tooltip content={<CustomTooltip />} />
-                    {data.map((line, index) => (
+                    {sortedData.map((line, index) => (
                         <Line
+                            className="cursor-pointer"
                             id={`line-${line.name}`}
                             name={`line-${index}`}
                             type="monotone"
@@ -67,53 +71,7 @@ export default function Chart({ data }: ScoreChartProps) {
                             strokeOpacity={0.7}
                             dot={false}
                             key={index}
-                            onMouseOver={() => {
-                                try {
-                                    // update line style
-                                    const lineEl = document.getElementById(`line-${line.name}`)!;
-                                    lineEl.style.strokeWidth = "10";
-                                    lineEl.style.strokeOpacity = "1";
-                                    lineEl.style.stroke = "black";
-                                    // update scoreboard name style
-                                    const scoreEl = document.getElementById(`score-${line.name}`)!;
-                                    scoreEl.style.color = "black";
-                                    // update tooltip name style
-                                    const tooltipEl = document.getElementById(`tooltip-${line.name}`)!;
-                                    tooltipEl.style.color = "black";
-                                    // move line to the front
-                                    const containerEl = document.getElementById("score-chart")!;
-                                    containerEl.appendChild(lineEl);
-                                } catch (e) {
-                                    if (!(e instanceof TypeError)) {
-                                        throw e;
-                                    }
-                                }
-                            }}
-                            onMouseOut={() => {
-                                try {
-                                    // reset line style
-                                    const lineEl = document.getElementById(`line-${line.name}`)!;
-                                    lineEl.style.strokeWidth = "6";
-                                    lineEl.style.strokeOpacity = "0.7";
-                                    lineEl.style.stroke = line.color;
-                                    // reset scoreboard name style
-                                    const scoreEl = document.getElementById(`score-${line.name}`)!;
-                                    scoreEl.style.color = line.color;
-                                    // reset tooltip name style
-                                    const tooltipEl = document.getElementById(`tooltip-${line.name}`)!;
-                                    tooltipEl.style.color = line.color;
-                                    // reset line order
-                                    const containerEl = document.getElementById("score-chart")!;
-                                    data.forEach((line) => {
-                                        const lineEl = document.getElementById(`line-${line.name}`)!;
-                                        containerEl.appendChild(lineEl);
-                                    });
-                                } catch (e) {
-                                    if (!(e instanceof TypeError)) {
-                                        throw e;
-                                    }
-                                }
-                            }}
+                            {...getMouseEvents(line.name, line.color)}
                         />
                     ))}
                 </LineChart>
@@ -202,3 +160,47 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
         </div>
     );
 }
+
+export function getMouseEvents(name: string, color: string) {
+    return {
+        onMouseOver: () => {
+            try {
+                // update line style
+                const lineEl = document.getElementById(`line-${name}`)!;
+                lineEl.style.strokeWidth = "10";
+                lineEl.style.strokeOpacity = "1";
+                lineEl.style.stroke = "black";
+                // update scoreboard name style
+                const scoreEl = document.getElementById(`score-${name}`)!;
+                scoreEl.style.color = "black";
+                // update tooltip name style
+                const tooltipEl = document.getElementById(`tooltip-${name}`)!;
+                tooltipEl.style.color = "black";
+            } catch (e) {
+                if (!(e instanceof TypeError)) {
+                    throw e;
+                }
+            }
+        },
+        onMouseOut: () => {
+            try {
+                // reset line style
+                const lineEl = document.getElementById(`line-${name}`)!;
+                lineEl.style.strokeWidth = "6";
+                lineEl.style.strokeOpacity = "0.7";
+                lineEl.style.stroke = color;
+                // reset scoreboard name style
+                const scoreEl = document.getElementById(`score-${name}`)!;
+                scoreEl.style.color = color;
+                // reset tooltip name style
+                const tooltipEl = document.getElementById(`tooltip-${name}`)!;
+                tooltipEl.style.color = color;
+            } catch (e) {
+                if (!(e instanceof TypeError)) {
+                    throw e;
+                }
+            }
+        },
+    };
+}
+
