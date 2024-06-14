@@ -1,6 +1,6 @@
 {
   "name": "your-survivor-fantasy",
-  "version": "0.1.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,10 @@
     "start": "next start"
   },
   "dependencies": {
+    "@babel/plugin-transform-private-methods": "^7.24.7",
     "@clerk/nextjs": "^5.0.3",
+    "@eslint/config-array": "^0.16.0",
+    "@eslint/object-schema": "^2.1.4",
     "@hookform/resolvers": "^3.6.0",
     "@radix-ui/react-hover-card": "^1.0.7",
     "@radix-ui/react-label": "^2.0.2",
@@ -30,6 +33,7 @@
     "drizzle-orm": "^0.31.1",
     "embla-carousel-react": "^8.1.1",
     "eslint-plugin-react-compiler": "^0.0.0-experimental-51a85ea-20240601",
+    "glob": "^10.4.1",
     "lucide-react": "^0.390.0",
     "next": "^14.2.4",
     "postgres": "^3.4.3",
@@ -37,27 +41,33 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.51.5",
     "recharts": "^2.12.7",
+    "rimraf": "^5.0.7",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@eslint/js": "^9.4.0",
+    "@stylistic/eslint-plugin-js": "^2.1.0",
     "@types/eslint": "^8.56.2",
+    "@types/eslint__js": "^8.42.3",
     "@types/node": "^20.11.20",
     "@types/react": "^18.2.57",
     "@types/react-dom": "^18.2.19",
-    "@typescript-eslint/eslint-plugin": "^7.12.0",
-    "@typescript-eslint/parser": "^7.12.0",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
     "drizzle-kit": "^0.22.4",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.4",
     "eslint-plugin-drizzle": "^0.2.3",
+    "eslint-plugin-react": "^7.34.2",
     "pg": "^8.11.3",
     "postcss": "^8.4.34",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.6.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.4.2"
+    "typescript": "^5.4.5",
+    "typescript-eslint": "^7.13.0"
   },
   "ct3aMetadata": {
     "initVersion": "7.32.0"

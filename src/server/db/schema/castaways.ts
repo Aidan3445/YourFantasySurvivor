@@ -1,19 +1,19 @@
-import { createTable } from "./createTable";
-import { seasons } from "./seasons";
-import { integer, serial, varchar, smallint } from "drizzle-orm/pg-core";
+import { createTable } from './createTable';
+import { seasons } from './seasons';
+import { integer, serial, varchar, smallint } from 'drizzle-orm/pg-core';
 
 export const castaways = createTable(
-    "castaway",
-    {
-        id: serial("castaway_id").notNull().primaryKey(),
-        name: varchar("name", { length: 64 }).notNull(),
-        shortName: varchar("short_name", { length: 16 }).notNull(),
-        age: smallint("age").notNull(),
-        hometown: varchar("hometown", { length: 128 }).notNull().default("Unknown"),
-        residence: varchar("residence", { length: 128 }).notNull().default("Unknown"),
-        job: varchar("job", { length: 128 }).notNull().default("Unknown"),
-        photo: varchar("photo", { length: 512 }).notNull().default("https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=612x612&w=0&k=20&c=ZBE3NqfzIeHGDPkyvulUw14SaWfDj2rZtyiKv3toItk="),
-        season: integer("season").references(() => seasons.id).notNull(),
-    }
+  'castaway',
+  {
+    id: serial('castaway_id').notNull().primaryKey(),
+    name: varchar('name', { length: 64 }).notNull(),
+    shortName: varchar('short_name', { length: 16 }).notNull(),
+    age: smallint('age').notNull(),
+    hometown: varchar('hometown', { length: 128 }).notNull().default('Unknown'),
+    residence: varchar('residence', { length: 128 }).notNull().default('Unknown'),
+    job: varchar('job', { length: 128 }).notNull().default('Unknown'),
+    photo: varchar('photo', { length: 512 }).notNull().default('https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=612x612&w=0&k=20&c=ZBE3NqfzIeHGDPkyvulUw14SaWfDj2rZtyiKv3toItk='),
+    season: integer('season').references(() => seasons.id).notNull(),
+  }
 );
 export type Castaway = typeof castaways.$inferSelect;

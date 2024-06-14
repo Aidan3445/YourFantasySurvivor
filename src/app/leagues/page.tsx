@@ -1,9 +1,9 @@
 export default function LeaguePage() {
-    return (
-        <main>
-            League Page
-        </main>
-    );
+  return (
+    <main>
+      League Page
+    </main>
+  );
 }
 
 /*
