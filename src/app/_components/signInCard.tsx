@@ -1,5 +1,6 @@
 import { HoverCard, HoverCardTrigger, HoverCardContent } from './commonUI/hover';
 import CardContainer from './cardContainer';
+import { SignInButton } from '@clerk/nextjs';
 
 export default function SignInCard() {
   return (
@@ -13,14 +14,16 @@ export default function SignInCard() {
           <h1 className='text-nowrap'>Your Fantasy Survivor</h1>
         </HoverCardContent>
       </HoverCard>
-      <ul className='flex flex-col gap-2 px-4 text-base list-disc'>
-        <li>Create or join a league</li>
-        <li>Compete against friends</li>
-        <li>Make your picks</li>
-        <li>Add weekly, pre-season, and/or mid-season predictions</li>
-        <li> Completely cusomize your league&apos;s scoring system </li>
-        <li>Crown a winner at the end of the season</li>
-      </ul>
+      <SignInButton>
+        <ul className='flex flex-col gap-2 px-4 text-base list-disc cursor-pointer'>
+          <li>Create or join a league</li>
+          <li>Compete against friends</li>
+          <li>Make your picks</li>
+          <li>Add weekly, pre-season, and/or mid-season predictions</li>
+          <li> Completely cusomize your league&apos;s scoring system </li>
+          <li>Crown a winner at the end of the season</li>
+        </ul>
+      </SignInButton>
     </CardContainer>
   );
 }

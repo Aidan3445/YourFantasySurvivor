@@ -1,4 +1,4 @@
-import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
+import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut } from '@clerk/nextjs';
 import SignInCard from './_components/signInCard';
 import CardContainer from './_components/cardContainer';
 import LeaguesCard from './_components/leaguesCard';
@@ -21,9 +21,7 @@ export default async function HomePage() {
         </ClerkLoading>
         <ClerkLoaded>
           <SignedOut>
-            <SignInButton>
-              <SignInCard />
-            </SignInButton>
+            <SignInCard />
           </SignedOut>
           <SignedIn>
             <LeaguesCard />

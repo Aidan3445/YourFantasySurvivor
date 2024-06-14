@@ -54,12 +54,12 @@ export default function Rules({ setRules, className }: RulesProps) {
     <CardContainer className={className}>
       <Form {...form}>
         <form
-          className='grid grid-cols-1 md:grid-cols-3 gap-2 p-4 text-black'
+          className='grid grid-cols-1 gap-2 p-4 text-black md:grid-cols-3'
           onSubmit={form.handleSubmit(onSubmit)}>
           <Challenges control={form.control} />
           <Advantages control={form.control} />
           <OtherRules control={form.control} />
-          <Separator className='w-full my-1 col-span-3' decorative />
+          <Separator className='col-span-3 my-1 w-full' decorative />
           <div className='col-span-2 text-sm'>
             <p>
               You can adjust the point values for each event to customize your

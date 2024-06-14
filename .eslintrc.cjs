@@ -22,6 +22,7 @@ const config = {
     'plugin:@typescript-eslint/stylistic-type-checked',
     'eslint:recommended',
     'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
     'plugin:react/jsx-runtime',
   ],
   rules: {

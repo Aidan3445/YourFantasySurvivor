@@ -33,7 +33,7 @@ export default function Chart({ data }: ScoreChartProps) {
   const sortedData = [...data].sort((a, b) => b.episodeScores.length - a.episodeScores.length);
 
   return (
-    <div className='w-full h-full bg-b4/50 border rounded-lg border-black col-span-3'>
+    <div className='col-span-3 w-full h-full rounded-lg border border-black bg-b4/50'>
       <ResponsiveContainer>
         <LineChart
           id='score-chart'
@@ -126,7 +126,7 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
   }
 
   return (
-    <div className='bg-b3/80 rounded-md border-black border p-1 flex flex-col'>
+    <div className='flex flex-col p-1 rounded-md border border-black bg-b3/80'>
       <div>Episode {label}:</div>
       <Separator />
       <div className='grid gap-2'>
@@ -142,7 +142,7 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
           ))}
         </div>
         {secondSet.length > 0 && (
-          <div className='col-start-2 border-l border-black pl-2'>
+          <div className='col-start-2 pl-2 border-l border-black'>
             {secondSet.map((p) => (
               <span
                 key={p.dataKey}

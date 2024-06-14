@@ -22,7 +22,7 @@ export default function Scores({ data }: ScoresProps) {
   const names = data.map(d => d.name);
 
   return (
-    <figure className='gap-0 border rounded-lg border-black overflow-hidden'>
+    <figure className='overflow-hidden gap-0 rounded-lg border border-black'>
       {data.map(({ name, color, score }, index) => (
         <div
           key={index}
@@ -30,7 +30,7 @@ export default function Scores({ data }: ScoresProps) {
           onMouseOver={() => mouseOverLeaderboard(name, names)}
           onMouseOut={() => mouseOutLeaderboard(name, color, names)}>
           <h3 className='w-min'>{index + 1}</h3>
-          <h3 id={`score-${name}`} className='font-semibold text-nowrap transition-all duration-150' style={{ color: color }}>
+          <h3 id={`score-${name}`} className='font-semibold transition-all duration-150 text-nowrap' style={{ color: color }}>
             {name}
           </h3>
           <h3 className='text-right'>{score}</h3>

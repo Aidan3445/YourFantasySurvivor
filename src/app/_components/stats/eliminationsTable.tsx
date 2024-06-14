@@ -2,7 +2,7 @@ import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardPortal, HoverCard
 import { type EliminationStat } from '~/app/api/seasons/[name]/events/stats';
 
 type EliminationsTableProps = {
-    eliminations: EliminationStat[];
+  eliminations: EliminationStat[];
 }
 
 export default function EliminationsTable({ eliminations }: EliminationsTableProps) {
@@ -11,7 +11,7 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
   }
 
   return (
-    <figure className='flex overflow-y-auto flex-col max-h-40 stats-scroll'>
+    <figure className='stats-scroll'>
       {eliminations.map((elim, index) => (
         <span key={index} className={`grid grid-cols-3 text-xs text-center border-r border-black divide-x divide-black lg:text-sm ${index & 1 ? 'bg-white/20' : 'bg-white/10'}`}>
           <h3>Episode {elim.episode}</h3>

@@ -11,8 +11,8 @@ import { Label } from '../commonUI/label';
 import { cn } from '~/lib/utils';
 
 interface ChallengesPodiumProps {
-    castaways: CastawayChallengeStat[];
-    tribes: TribeChallengeStat[];
+  castaways: CastawayChallengeStat[];
+  tribes: TribeChallengeStat[];
 }
 
 export default function ChallengesPodium({ castaways, tribes }: ChallengesPodiumProps) {
@@ -30,7 +30,7 @@ export default function ChallengesPodium({ castaways, tribes }: ChallengesPodium
 
   return (
     <StatsSection title={titleSpan}>
-      <figure className='grid relative grid-flow-col auto-cols-fr gap-1 px-1 pt-3'>
+      <figure className='grid relative grid-flow-col auto-cols-fr h-44 gap-1 px-1 pt-3'>
         <div className='absolute top-0 right-0 p-2 ordinal'>
           <RemainingCastaways disabled={showTribes} castaways={castaways.slice(3)} />
         </div>
@@ -55,10 +55,10 @@ export default function ChallengesPodium({ castaways, tribes }: ChallengesPodium
 }
 
 interface PodiumProps {
-    castaway: CastawayChallengeStat | undefined;
-    tribe: TribeChallengeStat | undefined;
-    showTribes: boolean;
-    className: string;
+  castaway: CastawayChallengeStat | undefined;
+  tribe: TribeChallengeStat | undefined;
+  showTribes: boolean;
+  className: string;
 }
 
 function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
@@ -85,15 +85,15 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
   return (
     <div className='self-end text-center'>
       <HoverCard openDelay={200} closeDelay={100} open={mainOpen} onOpenChange={toggleMainOpen}>
-        <HoverCardTrigger onTouchStart={toggleMainOpen}>
+        <HoverCardTrigger onTouchStart={toggleMainOpen} onTouchMove={() => setMainOpen(false)}>
           <h3 className='p-0 m-0 w-full text-sm font-medium md:text-base truncate'>{name}</h3>
           <div className={cn('flex flex-col gap-1 p-1 justify-center items-center rounded-t-md border-2 border-b-0 border-black border-solid text-center relative overflow-hidden',
             className)}>
             {!showTribes &&
-            <span className='flex gap-2 items-center'>
-              <User className='rounded-full border border-black bg-b4' />
-              <h4 className='font-medium'>{indivWin + indivReward}</h4>
-            </span>
+              <span className='flex gap-2 items-center'>
+                <User className='rounded-full border border-black bg-b4' />
+                <h4 className='font-medium'>{indivWin + indivReward}</h4>
+              </span>
             }
             <span className='flex gap-2 items-center'>
               <Users className='rounded-full border border-black bg-b4' />
@@ -120,17 +120,17 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
                 </div>
               </div>
               {!showTribes &&
-              <div className='grid col-span-3 items-center grid-cols-subgrid'>
-                <h3>Individual</h3>
-                <div className='flex flex-col'>
-                  <h3 className='border-b border-black'>Immunity</h3>
-                  <h3 className='tabular-nums'>{indivWin}</h3>
-                </div>
-                <div className='flex flex-col'>
-                  <h3 className='border-b border-black'>Reward</h3>
-                  <h3 className='tabular-nums'>{indivReward}</h3>
-                </div>
-              </div>}
+                <div className='grid col-span-3 items-center grid-cols-subgrid'>
+                  <h3>Individual</h3>
+                  <div className='flex flex-col'>
+                    <h3 className='border-b border-black'>Immunity</h3>
+                    <h3 className='tabular-nums'>{indivWin}</h3>
+                  </div>
+                  <div className='flex flex-col'>
+                    <h3 className='border-b border-black'>Reward</h3>
+                    <h3 className='tabular-nums'>{indivReward}</h3>
+                  </div>
+                </div>}
             </div>
           </HoverCardContent>
         </HoverCardPortal>
@@ -140,8 +140,8 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
 }
 
 interface RemainingCastawaysProps {
-    castaways: CastawayChallengeStat[];
-    disabled?: boolean;
+  castaways: CastawayChallengeStat[];
+  disabled?: boolean;
 }
 
 function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
@@ -150,14 +150,14 @@ function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
 
   return (
     <HoverCard openDelay={200} closeDelay={100} open={open} onOpenChange={setOpen}>
-      <HoverCardTrigger onTouchStart={toggleOpen} aria-disabled={disabled} className='py-1 px-2 text-sm font-medium ordinal rounded-md border border-black bg-b3 aria-disabled:bg-zinc-400/60 transition-all aria-disabled:cursor-not-allowed cursor-help'>
+      <HoverCardTrigger onTouchStart={toggleOpen} aria-disabled={disabled} className='py-1 px-2 text-sm font-medium ordinal rounded-md border border-black transition-all bg-b3 aria-disabled:bg-zinc-400/60 aria-disabled:cursor-not-allowed cursor-help'>
         4th+
       </HoverCardTrigger>
       <HoverCardPortal>
         {!disabled && <HoverCardContent className='border-b border-black shadow-md cursor-default bg-b2 w-50 text-nowrap shadow-zinc-700' side='top'>
           <HoverCardArrow />
-          <figure className='flex overflow-y-auto overscroll-contain flex-col max-h-40 rounded-lg overflow-hidden stats-scroll'>
-            <span className='grid sticky top-0 pt-1 grid-cols-7 text-xs text-center border-b border-black lg:text-sm bg-b2'>
+          <figure className='flex overflow-hidden overflow-y-auto overscroll-contain flex-col max-h-40 rounded-lg stats-scroll'>
+            <span className='grid sticky top-0 grid-cols-7 pt-1 text-xs text-center border-b border-black lg:text-sm bg-b2'>
               <h4 className='col-start-4 px-1 font-normal'>Imm.</h4>
               <h4 className='px-1 font-normal'>Rwd.</h4>
               <h4 className='px-1 font-normal ordinal border-l border-black'>1st</h4>

@@ -13,7 +13,7 @@ import CardContainer from '../cardContainer';
 import type { Events } from '~/app/api/seasons/[name]/events/query';
 
 interface SeasonStatsProps {
-    seasons: string[];
+  seasons: string[];
 }
 
 export default function SeasonStats({ seasons }: SeasonStatsProps) {
@@ -35,9 +35,10 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
   }, [season]);
 
   const carouselItems = [
+    { title: 'Challenges', content: <ChallengesPodium castaways={stats.castawayChallenges} tribes={stats.tribeChallenges} />, noWrapper: true },
     { title: 'Advantages', content: <AdvantagesTable advantages={stats.advantages} /> },
     { title: 'Eliminations', content: <EliminationsTable eliminations={stats.eliminations} /> },
-    { title: 'Finals', content: <FinalsStats final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} /> },
+    { title: 'Finals', content: <FinalsStats final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} />, noWrapper: true },
     { title: 'Titles', content: <TitlesChart titles={stats.titles} /> },
   ];
 
@@ -51,16 +52,11 @@ export default function SeasonStats({ seasons }: SeasonStatsProps) {
           <CarouselNext />
         </span>
         <CarouselContent className='cursor-ew-resize'>
-          <CarouselItem title='Challenges'>
-            <ChallengesPodium
-              castaways={stats.castawayChallenges}
-              tribes={stats.tribeChallenges} />
-          </CarouselItem>
           {carouselItems.map((item, index) => (
             <CarouselItem key={index}>
-              <StatsSection title={item.title}>
-                {item.content}
-              </StatsSection>
+              {item.noWrapper
+                ? item.content
+                : <StatsSection title={item.title}> {item.content} </StatsSection>}
             </CarouselItem>
           ))}
         </CarouselContent>

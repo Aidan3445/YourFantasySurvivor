@@ -2,13 +2,13 @@ import { SignedOut, SignedIn, SignInButton, UserButton, ClerkLoading, ClerkLoade
 import { LoaderCircle } from 'lucide-react';
 
 interface NavItemProps {
-    path: string;
-    label: string;
+  path: string;
+  label: string;
 }
 
 export default function TopNav() {
   return (
-    <nav className='flex justify-between items-center pt-4 font-semibold w-fill min-h-14' >
+    <nav className='flex justify-between items-center pt-4 font-semibold min-h-14 px-2' >
       <ul className='flex gap-4'>
         <NavItem path='/' label='Home' />
         <NavItem path='/playground' label='Playground' />

@@ -1,7 +1,7 @@
 import { type AdvantageStat } from '~/app/api/seasons/[name]/events/stats';
 
 interface AdvantagesTableProps {
-    advantages: AdvantageStat[];
+  advantages: AdvantageStat[];
 }
 
 export default function AdvantagesTable({ advantages }: AdvantagesTableProps) {
@@ -10,7 +10,7 @@ export default function AdvantagesTable({ advantages }: AdvantagesTableProps) {
   }
 
   return (
-    <figure className='flex overflow-y-auto overscroll-contain flex-col max-h-40  stats-scroll'>
+    <figure className='stats-scroll'>
       {advantages.map((adv, index) => (
         <span key={index} className={`grid grid-cols-4 text-xs text-center border-r border-black divide-x divide-black lg:text-sm ${index & 1 ? 'bg-white/20' : 'bg-white/10'}`}>
           <h3 className='col-span-2 px-1 font-medium text-md truncate'>{adv.name}</h3>

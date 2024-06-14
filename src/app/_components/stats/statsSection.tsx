@@ -1,8 +1,8 @@
 import { type ReactNode } from 'react';
 
 type StatsSectionProps = {
-    title: string | ReactNode;
-    children: ReactNode;
+  title: string | ReactNode;
+  children: ReactNode;
 }
 
 export default function StatsSection({ title, children }: StatsSectionProps) {

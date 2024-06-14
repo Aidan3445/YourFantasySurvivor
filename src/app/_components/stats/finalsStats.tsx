@@ -2,15 +2,15 @@ import type { FinalStat, FireWinStat, SoleSurvivorStat } from '~/app/api/seasons
 import StatsSection from './statsSection';
 
 interface FinalsStatsProps {
-    final: FinalStat;
-    fireWin: FireWinStat;
-    soleSurvivor: SoleSurvivorStat;
+  final: FinalStat;
+  fireWin: FireWinStat;
+  soleSurvivor: SoleSurvivorStat;
 }
 
 export default function FinalsStats({ final, fireWin, soleSurvivor }: FinalsStatsProps) {
 
   return (
-    <figure className='flex flex-col gap-4'>
+    <figure className='flex flex-col h-44'>
       <Stat title='Fire Making' content={fireWin!} />
       <Stat title='Finalists' content={final?.join(', ') ?? ''} />
       <Stat title='Sole Survivor' content={soleSurvivor!} />
@@ -19,8 +19,8 @@ export default function FinalsStats({ final, fireWin, soleSurvivor }: FinalsStat
 }
 
 interface StatProps {
-    title: string;
-    content: string;
+  title: string;
+  content: string;
 }
 
 function Stat({ title, content }: StatProps) {
