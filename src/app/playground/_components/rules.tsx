@@ -10,16 +10,16 @@ import { SecondPlaceInfo } from '~/app/_components/stats/challengesPodium';
 import { Separator } from '~/app/_components/commonUI/separator';
 
 interface RulesProps {
-    rules?: BaseEventRules;
-    setRules: (rules: BaseEventRules) => void;
-    className?: string;
+  rules?: BaseEventRules;
+  setRules: (rules: BaseEventRules) => void;
+  className?: string;
 }
 
 const numberRange = z.coerce.number()
   .max(512, { message: 'Points must not exceed +/-512' })
   .min(-512, { message: 'Points must not exceed +/-512' });
 
-const formSchema = z.object({
+export const formSchema = z.object({
   advFound: numberRange,
   advPlay: numberRange,
   badAdvPlay: numberRange,
@@ -35,7 +35,6 @@ const formSchema = z.object({
 });
 
 export default function Rules({ setRules, className }: RulesProps) {
-
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: defaultRules,
     resolver: zodResolver(formSchema),
@@ -87,10 +86,10 @@ export default function Rules({ setRules, className }: RulesProps) {
 }
 
 interface FieldProps {
-    control?: Control<z.infer<typeof formSchema>>;
+  control?: Control<z.infer<typeof formSchema>>;
 }
 
-function Challenges({ control }: FieldProps) {
+export function Challenges({ control }: FieldProps) {
   return (
     <section>
       <FormLabel className='text-2xl'>Challenges</FormLabel>
@@ -189,7 +188,7 @@ function Challenges({ control }: FieldProps) {
   );
 }
 
-function Advantages({ control }: FieldProps) {
+export function Advantages({ control }: FieldProps) {
   return (
     <section>
       <FormLabel className='text-2xl'>Advantages</FormLabel>
@@ -285,7 +284,7 @@ function Advantages({ control }: FieldProps) {
   );
 }
 
-function OtherRules({ control }: FieldProps) {
+export function OtherRules({ control }: FieldProps) {
   return (
     <section>
       <FormLabel className='text-2xl'>Other Rules</FormLabel>
