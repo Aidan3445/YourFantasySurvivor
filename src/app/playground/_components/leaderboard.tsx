@@ -10,8 +10,8 @@ import Chart from './scoreChart';
 import Scores from './scoreboard';
 
 interface LeaderboardProps {
-    rules: BaseEventRules;
-    className?: string;
+  rules: BaseEventRules;
+  className?: string;
 }
 
 export function Leaderboard({ rules, className }: LeaderboardProps) {
@@ -65,7 +65,7 @@ export function Leaderboard({ rules, className }: LeaderboardProps) {
 
   return (
     <CardContainer className={cn('justify-start items-center p-4', className)}>
-      <h3 className='text-2xl'>Leaderboard</h3>
+      <h3 className='text-2xl font-medium'>Leaderboard</h3>
       <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
       <span className='grid grid-cols-4 gap-2 w-full'>
         <Scores data={sortedScores} />

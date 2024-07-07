@@ -3,9 +3,9 @@ import { seasons } from './seasons';
 import { integer, json, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
 
 export type LeagueSettings = {
-    locked: boolean;
-    pickCount: 1 | 2;
-    uniquePicks: boolean;
+  locked: boolean;
+  pickCount: 1 | 2;
+  uniquePicks: boolean;
 };
 export const defaultSettings: LeagueSettings = {
   locked: false,
@@ -24,6 +24,7 @@ export const leagues = createTable(
   }
 );
 export type League = typeof leagues.$inferSelect;
+export type LeagueInsert = typeof leagues.$inferInsert;
 
 export const reference = pgEnum('reference', ['castaway', 'tribe', 'member']);
 export type Reference = (typeof reference.enumValues)[number];
@@ -49,18 +50,18 @@ export const baseEventRules = createTable(
   }
 );
 export type BaseEventRules = {
-    advFound: number;
-    advPlay: number;
-    badAdvPlay: number;
-    advElim: number;
-    spokeEpTitle: number;
-    tribe1st: number;
-    tribe2nd: number;
-    indivWin: number;
-    indivReward: number;
-    finalists: number;
-    fireWin: number;
-    soleSurvivor: number;
+  advFound: number;
+  advPlay: number;
+  badAdvPlay: number;
+  advElim: number;
+  spokeEpTitle: number;
+  tribe1st: number;
+  tribe2nd: number;
+  indivWin: number;
+  indivReward: number;
+  finalists: number;
+  fireWin: number;
+  soleSurvivor: number;
 };
 export const defaultRules: BaseEventRules = {
   advFound: 5,

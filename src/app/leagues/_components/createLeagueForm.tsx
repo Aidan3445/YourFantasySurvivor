@@ -41,9 +41,10 @@ const defaultValues = {
 
 interface CreateLeagueFormProps {
   className?: string;
+  subtitle?: string;
 }
 
-export default function CreateLeagueForm({ className }: CreateLeagueFormProps) {
+export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFormProps) {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues,
@@ -51,8 +52,14 @@ export default function CreateLeagueForm({ className }: CreateLeagueFormProps) {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    router.replace(`/leagues/create?name=${data.name}`);
-    console.log(data.settings.uniquePicks);
+    console.log(data);
+    // await fetch('/api/leagues', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(data),
+    // });
+    const leagueID = 'randomizethis hash or something';
+    router.push(`/leagues/id=${leagueID}`);
   };
 
   return (
@@ -61,7 +68,10 @@ export default function CreateLeagueForm({ className }: CreateLeagueFormProps) {
         <form
           className='flex flex-col gap-4'
           onSubmit={form.handleSubmit(onSubmit)}>
-          <Label className='text-2xl font-semibold'>Create League</Label>
+          <section className='flex flex-col gap-0'>
+            <Label className='text-2xl font-medium'>Create League</Label>
+            <FormDescription>{subtitle}</FormDescription>
+          </section>
           <NameAndPassword control={form.control} />
           <Separator className='col-span-3 my-1 w-full' decorative />
           <Settings control={form.control} form={form} />
