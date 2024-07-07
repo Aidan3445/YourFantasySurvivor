@@ -44,11 +44,6 @@ export default function Rules({ setRules, className }: RulesProps) {
     setRules(data);
   };
 
-  const onReset = () => {
-    setRules(defaultRules);
-    form.reset();
-  };
-
   return (
     <CardContainer className={className}>
       <Form {...form}>
@@ -75,7 +70,7 @@ export default function Rules({ setRules, className }: RulesProps) {
             <Button
               className='w-1/3'
               type='reset'
-              onClick={onReset}>
+              onClick={() => form.reset()}>
               Reset
             </Button>
           </span>

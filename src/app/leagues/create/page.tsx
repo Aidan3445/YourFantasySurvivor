@@ -9,7 +9,7 @@ export default function CreateLeague() {
         <SignInCard />
       </SignedOut>
       <SignedIn>
-        <CreateLeagueForm />
+        <CreateLeagueForm className='p-5' />
       </SignedIn>
     </main>
   );

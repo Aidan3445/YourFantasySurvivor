@@ -1,12 +1,15 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, type Control } from 'react-hook-form';
 import { z } from 'zod';
 import CardContainer from '~/app/_components/cardContainer';
+import { Button } from '~/app/_components/commonUI/button';
+import { Checkbox } from '~/app/_components/commonUI/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
 import { Input } from '~/app/_components/commonUI/input';
 import { Label } from '~/app/_components/commonUI/label';
+import { Separator } from '~/app/_components/commonUI/separator';
 import { formSchema as rulesSchema } from '~/app/playground/_components/rules';
 import { defaultRules } from '~/server/db/schema/leagues';
 
@@ -14,8 +17,8 @@ const formSchema = rulesSchema.extend({
   name: z.string()
     .min(3, { message: 'League name must be between 3 and 64 characters' })
     .max(64, { message: 'League name must be between 3 and 64 characters' }),
-  password: z.string().min(8).max(64).optional(),
-  passwordConfirmation: z.string().optional(),
+  password: z.string().min(5).max(64).or(z.literal('')),
+  passwordConfirmation: z.string(),
   settings: z.object({
     pickCount: z.number().int().min(1).max(2),
     uniquePicks: z.boolean(),
@@ -24,19 +27,26 @@ const formSchema = rulesSchema.extend({
   message: 'Passwords do not match',
   path: ['passwordConfirmation']
 }).transform(data => {
-  delete data.passwordConfirmation;
+  data.passwordConfirmation = '';
   return data;
 });
 
 const defaultValues = {
-  ...defaultRules,
+  name: '',
+  password: '',
+  passwordConfirmation: '',
   settings: {
     pickCount: 1,
     uniquePicks: true,
   },
+  ...defaultRules,
 };
 
-export default function CreateLeagueForm() {
+interface CreateLeagueFormProps {
+  className?: string;
+}
+
+export default function CreateLeagueForm({ className }: CreateLeagueFormProps) {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues,
@@ -45,38 +55,169 @@ export default function CreateLeagueForm() {
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     router.replace(`/leagues/create?name=${data.name}`);
+    console.log(data.settings.uniquePicks);
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <CardContainer className='p-5'>
+    <CardContainer className={className} >
+      <Form {...form}>
+        <form
+          className='flex flex-col gap-4'
+          onSubmit={form.handleSubmit(onSubmit)}>
           <Label className='text-2xl font-semibold'>Create League</Label>
-          <FormField
-            control={form.control}
-            name='name'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>League Name</FormLabel>
-                <span className='flex gap-4 items-center'>
-                  <FormControl>
-                    <Input
-                      className='w-32'
-                      type='text'
-                      placeholder='League Name'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    The name of your league
-                  </FormDescription>
-                </span>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </CardContainer>
-      </form>
-    </Form >
+          <NameAndPassword control={form.control} />
+          <Separator className='col-span-3 my-1 w-full' decorative />
+          <Settings control={form.control} form={form} />
+          <span className='flex gap-4 justify-end'>
+            <Button className='w-2/3' type='submit'>
+              Apply
+            </Button>
+            <Button
+              className='w-1/3'
+              type='reset'
+              onClick={() => form.reset()}>
+              Reset
+            </Button>
+          </span>
+        </form>
+      </Form >
+    </CardContainer >
+  );
+}
+
+interface FieldProps {
+  control?: Control<z.infer<typeof formSchema>>;
+  form?: ReturnType<typeof useForm<z.infer<typeof formSchema>>>
+}
+
+function NameAndPassword({ control }: FieldProps) {
+  return (
+    <section>
+      <FormField
+        control={control}
+        name='name'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>League Name</FormLabel>
+            <span className='flex gap-4 items-center'>
+              <FormControl>
+                <Input
+                  className='w-32'
+                  type='text'
+                  placeholder='League Name'
+                  autoComplete='off'
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                The name of your league
+              </FormDescription>
+            </span>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name='password'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Password (optional)</FormLabel>
+            <span className='flex gap-4 items-center'>
+              <FormControl>
+                <Input
+                  className='w-32'
+                  type='text'
+                  placeholder='Password'
+                  autoComplete='off'
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Password to join the league
+              </FormDescription>
+            </span>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name='passwordConfirmation'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Confirm Password</FormLabel>
+            <span className='flex gap-4 items-center'>
+              <FormControl>
+                <Input
+                  className='w-32'
+                  type='password'
+                  placeholder='Confirm'
+                  autoComplete='off'
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Confirm your password
+              </FormDescription>
+            </span>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </section>
+  );
+}
+
+function Settings({ control, form }: FieldProps) {
+  return (
+    <section>
+      <FormField
+        control={control}
+        name='settings.pickCount'
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Pick Count</FormLabel>
+            <span className='flex gap-4 items-center'>
+              <FormControl>
+                <Input
+                  className='w-32'
+                  type='number'
+                  placeholder='1'
+                  autoComplete='off'
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Number of picks per week
+              </FormDescription>
+            </span>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name='settings.uniquePicks'
+        render={() => (
+          <FormItem>
+            <FormLabel>Unique Picks</FormLabel>
+            <span className='flex gap-4 items-center'>
+              <FormControl>
+                <Checkbox
+                  checked={form?.getValues('settings.uniquePicks')}
+                  onCheckedChange={() => {
+                    form?.setValue('settings.uniquePicks', !form?.getValues('settings.uniquePicks'));
+                  }} />
+              </FormControl>
+              <FormDescription>
+                Allow duplicate picks
+              </FormDescription>
+            </span>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </section>
   );
 }
