@@ -5,15 +5,13 @@ import { useForm, type Control } from 'react-hook-form';
 import { z } from 'zod';
 import CardContainer from '~/app/_components/cardContainer';
 import { Button } from '~/app/_components/commonUI/button';
-import { Checkbox } from '~/app/_components/commonUI/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
 import { Input } from '~/app/_components/commonUI/input';
 import { Label } from '~/app/_components/commonUI/label';
 import { Separator } from '~/app/_components/commonUI/separator';
-import { formSchema as rulesSchema } from '~/app/playground/_components/rules';
-import { defaultRules } from '~/server/db/schema/leagues';
+import { Switch } from '~/app/_components/commonUI/switch';
 
-const formSchema = rulesSchema.extend({
+const formSchema = z.object({
   name: z.string()
     .min(3, { message: 'League name must be between 3 and 64 characters' })
     .max(64, { message: 'League name must be between 3 and 64 characters' }),
@@ -39,7 +37,6 @@ const defaultValues = {
     pickCount: 1,
     uniquePicks: true,
   },
-  ...defaultRules,
 };
 
 interface CreateLeagueFormProps {
@@ -175,21 +172,23 @@ function Settings({ control, form }: FieldProps) {
       <FormField
         control={control}
         name='settings.pickCount'
-        render={({ field }) => (
+        render={() => (
           <FormItem>
             <FormLabel>Pick Count</FormLabel>
             <span className='flex gap-4 items-center'>
               <FormControl>
-                <Input
-                  className='w-32'
-                  type='number'
-                  placeholder='1'
-                  autoComplete='off'
-                  {...field}
-                />
+                <span className='grid grid-cols-3 place-items-center'>
+                  <Label className='text-sm'>1</Label>
+                  <Switch
+                    checked={form?.getValues('settings.pickCount') === 2}
+                    onCheckedChange={() => {
+                      form?.setValue('settings.pickCount', form?.getValues('settings.pickCount') === 2 ? 1 : 2);
+                    }} />
+                  <Label className='text-sm'>2</Label>
+                </span>
               </FormControl>
               <FormDescription>
-                Number of picks per week
+                Number of main castaway picks
               </FormDescription>
             </span>
             <FormMessage />
@@ -204,11 +203,15 @@ function Settings({ control, form }: FieldProps) {
             <FormLabel>Unique Picks</FormLabel>
             <span className='flex gap-4 items-center'>
               <FormControl>
-                <Checkbox
-                  checked={form?.getValues('settings.uniquePicks')}
-                  onCheckedChange={() => {
-                    form?.setValue('settings.uniquePicks', !form?.getValues('settings.uniquePicks'));
-                  }} />
+                <span className='grid grid-cols-3 place-items-center'>
+                  <Label className='text-sm'>Off</Label>
+                  <Switch
+                    checked={form?.getValues('settings.uniquePicks')}
+                    onCheckedChange={() => {
+                      form?.setValue('settings.uniquePicks', !form?.getValues('settings.uniquePicks'));
+                    }} />
+                  <Label className='text-sm'>On</Label>
+                </span>
               </FormControl>
               <FormDescription>
                 Allow duplicate picks
