@@ -7,7 +7,7 @@ export default function LeagueNav() {
     <nav className='grid grid-cols-2 gap-2 px-5 py-2 text-black rounded-full bg-b1 border-black border-2'>
       <Popover>
         <PopoverTrigger>
-          <Button className='w-32'>Create League</Button>
+          <div className='w-32'>Create League</div>
         </PopoverTrigger>
         <PopoverContent>
           <CreateLeagueForm />
