@@ -62,8 +62,6 @@ export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFo
       season: latestSeason
     };
 
-    console.log(newLeague);
-
     await fetch(
       '/api/leagues/create',
       {
@@ -71,9 +69,9 @@ export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newLeague)
       })
-      .then(res => res.json() as Promise<{ id: number }>)
-      .then((val) => {
-        router.push(`/leagues/?id=${val.id}`);
+      .then(res => res.json() as Promise<number>)
+      .then(id => {
+        router.push(`/leagues/?id=${id}`);
       })
       .catch(err => console.error(err));
   };
