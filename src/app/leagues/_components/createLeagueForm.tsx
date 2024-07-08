@@ -10,6 +10,7 @@ import { Input } from '~/app/_components/commonUI/input';
 import { Label } from '~/app/_components/commonUI/label';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { Switch } from '~/app/_components/commonUI/switch';
+import { type LeagueInsert } from '~/server/db/schema/leagues';
 
 const formSchema = z.object({
   name: z.string()
@@ -17,10 +18,8 @@ const formSchema = z.object({
     .max(64, { message: 'League name must be between 3 and 64 characters' }),
   password: z.string().min(5).max(64).or(z.literal('')),
   passwordConfirmation: z.string(),
-  settings: z.object({
-    pickCount: z.number().int().min(1).max(2),
-    uniquePicks: z.boolean(),
-  }),
+  pickCount: z.literal(1).or(z.literal(2)),
+  uniquePicks: z.boolean(),
 }).refine(data => data.password === data.passwordConfirmation, {
   message: 'Passwords do not match',
   path: ['passwordConfirmation']
@@ -33,11 +32,9 @@ const defaultValues = {
   name: '',
   password: '',
   passwordConfirmation: '',
-  settings: {
-    pickCount: 1,
-    uniquePicks: true,
-  },
-};
+  pickCount: 1,
+  uniquePicks: true,
+} as z.infer<typeof formSchema>;
 
 interface CreateLeagueFormProps {
   className?: string;
@@ -52,14 +49,33 @@ export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFo
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
-    // await fetch('/api/leagues', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify(data),
-    // });
-    const leagueID = 'randomizethis hash or something';
-    router.push(`/leagues/id=${leagueID}`);
+    const latestSeason = await fetch(
+      '/api/seasons/latest',
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }
+    ).then(res => res.json() as Promise<number>);
+
+    const newLeague: LeagueInsert = {
+      ...data,
+      season: latestSeason
+    };
+
+    console.log(newLeague);
+
+    await fetch(
+      '/api/leagues/create',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newLeague)
+      })
+      .then(res => res.json() as Promise<{ id: number }>)
+      .then((val) => {
+        router.push(`/leagues/?id=${val.id}`);
+      })
+      .catch(err => console.error(err));
   };
 
   return (
@@ -181,7 +197,7 @@ function Settings({ control, form }: FieldProps) {
     <section>
       <FormField
         control={control}
-        name='settings.pickCount'
+        name='pickCount'
         render={() => (
           <FormItem>
             <FormLabel>Pick Count</FormLabel>
@@ -190,9 +206,9 @@ function Settings({ control, form }: FieldProps) {
                 <span className='grid grid-cols-3 place-items-center'>
                   <Label className='text-sm'>1</Label>
                   <Switch
-                    checked={form?.getValues('settings.pickCount') === 2}
+                    checked={form?.getValues('pickCount') === 2}
                     onCheckedChange={() => {
-                      form?.setValue('settings.pickCount', form?.getValues('settings.pickCount') === 2 ? 1 : 2);
+                      form?.setValue('pickCount', form?.getValues('pickCount') === 2 ? 1 : 2);
                     }} />
                   <Label className='text-sm'>2</Label>
                 </span>
@@ -207,7 +223,7 @@ function Settings({ control, form }: FieldProps) {
       />
       <FormField
         control={control}
-        name='settings.uniquePicks'
+        name='uniquePicks'
         render={() => (
           <FormItem>
             <FormLabel>Unique Picks</FormLabel>
@@ -216,9 +232,9 @@ function Settings({ control, form }: FieldProps) {
                 <span className='grid grid-cols-3 place-items-center'>
                   <Label className='text-sm'>Off</Label>
                   <Switch
-                    checked={form?.getValues('settings.uniquePicks')}
+                    checked={form?.getValues('uniquePicks')}
                     onCheckedChange={() => {
-                      form?.setValue('settings.uniquePicks', !form?.getValues('settings.uniquePicks'));
+                      form?.setValue('uniquePicks', !form?.getValues('uniquePicks'));
                     }} />
                   <Label className='text-sm'>On</Label>
                 </span>

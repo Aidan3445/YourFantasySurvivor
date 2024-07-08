@@ -1,17 +1,14 @@
 import { createTable } from './createTable';
 import { seasons } from './seasons';
-import { integer, json, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
+import { boolean, customType, integer, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
 
-export type LeagueSettings = {
-  locked: boolean;
-  pickCount: 1 | 2;
-  uniquePicks: boolean;
-};
-export const defaultSettings: LeagueSettings = {
-  locked: false,
-  pickCount: 1,
-  uniquePicks: true,
-};
+const pickCount = customType<{ data: 1 | 2; notNull: true; default: true }>(
+  {
+    dataType() {
+      return 'integer';
+    },
+  },
+);
 
 export const leagues = createTable(
   'league',
@@ -20,7 +17,9 @@ export const leagues = createTable(
     name: varchar('name', { length: 64 }).notNull(),
     password: varchar('password', { length: 64 }),
     season: integer('season_id').references(() => seasons.id).notNull(),
-    settings: json('settings').$type<LeagueSettings>().notNull().default(defaultSettings),
+    uniquePicks: boolean('unique_picks').notNull().default(true),
+    pickCount: pickCount('pick_count').notNull().default(1),
+    locked: boolean('locked').notNull().default(false),
   }
 );
 export type League = typeof leagues.$inferSelect;

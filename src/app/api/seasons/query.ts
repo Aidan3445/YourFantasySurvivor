@@ -11,3 +11,11 @@ export async function getSeasons(): Promise<string[]> {
     .orderBy(desc(seasons.premierDate))
     .then((seasons) => seasons.map((season) => season.name));
 }
+
+export async function getLatestSeason(): Promise<number> {
+  return db
+    .select({ id: seasons.id })
+    .from(seasons)
+    .orderBy(desc(seasons.premierDate))
+    .then((seasons) => seasons[0]?.id ?? 0);
+}
