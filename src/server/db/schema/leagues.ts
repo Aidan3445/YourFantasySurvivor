@@ -15,11 +15,12 @@ export const leagues = createTable(
   {
     id: serial('league_id').notNull().primaryKey(),
     name: varchar('name', { length: 64 }).notNull(),
-    password: varchar('password', { length: 64 }),
+    password: varchar('password', { length: 64 }).notNull(),
     season: integer('season_id').references(() => seasons.id).notNull(),
     uniquePicks: boolean('unique_picks').notNull().default(true),
     pickCount: pickCount('pick_count').notNull().default(1),
     locked: boolean('locked').notNull().default(false),
+    owner: varchar('owner', { length: 256 }).notNull(),
   }
 );
 export type League = typeof leagues.$inferSelect;

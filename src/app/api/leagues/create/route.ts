@@ -3,8 +3,29 @@ import { insertLeague } from './insert';
 import { type LeagueInsert } from '~/server/db/schema/leagues';
 
 export async function POST(req: NextRequest) {
-  const newLeague = await req.json() as LeagueInsert;
-  const { id } = await insertLeague(newLeague);
-  return NextResponse.json(id, { status: 201 });
+  const { newLeague, displayName } = await req.json() as { newLeague: LeagueInsert, displayName: string };
+
+  try {
+    const id = await insertLeague(newLeague, displayName);
+    return NextResponse.json(id, { status: 201 });
+
+  } catch (e) {
+    let message = 'Unknown error creating league';
+    let status = 500;
+
+    if (typeof e === 'string') {
+      message = e;
+      status = 400;
+    } else if (e instanceof Error) {
+      message = e.message;
+      if (e.message === 'User not authenticated') {
+        status = 401;
+      } else {
+        status = 400;
+      }
+    }
+
+    return NextResponse.json({ message }, { status });
+  }
 }
 

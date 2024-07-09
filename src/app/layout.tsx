@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import TopNav from './_components/topNav';
 import { type ReactNode, StrictMode } from 'react';
+import { Toaster } from './_components/commonUI/toaster';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -19,7 +20,7 @@ export const metadata = {
 export default function RootLayout({
   children,
 }: {
-    children: ReactNode
+  children: ReactNode
 }) {
   return (
     <StrictMode>
@@ -33,6 +34,7 @@ export default function RootLayout({
               <TopNav />
               {children}
             </div>
+            <Toaster />
           </body>
         </html>
       </ClerkProvider>

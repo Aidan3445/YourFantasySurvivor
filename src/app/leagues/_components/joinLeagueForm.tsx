@@ -1,4 +1,5 @@
 'use client';
+import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -8,6 +9,7 @@ import { Button } from '~/app/_components/commonUI/button';
 import { Form, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
 import { Input } from '~/app/_components/commonUI/input';
 import { Label } from '~/app/_components/commonUI/label';
+import { useToast } from '~/app/_components/commonUI/use-toast';
 
 const formSchema = z.object({
   name: z.string(),
@@ -29,22 +31,32 @@ export default function JoinLeagueForm({ className }: JoinLeagueFormProps) {
     defaultValues,
     resolver: zodResolver(formSchema),
   });
+  const { toast } = useToast();
+  const { user } = useUser();
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const id = await fetch('/api/leagues/join', {
+    await fetch('/api/leagues/join', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    }).then(res => res.json() as Promise<number>);
+      body: JSON.stringify({ ...data, displayName: user?.fullName }),
+    })
+      .then(async res => {
+        const status = res.status;
+        const data = await (res.json() as Promise<number | { message: string }>);
 
-    console.log(id);
-
-    if (id === 0) {
-      form.setError('password', { type: 'manual', message: 'Invalid league name or password' });
-      return;
-    }
-
-    router.push(`/leagues/?id=${id}`);
+        if (typeof data === 'number') router.push(`/leagues/?id=${data}`);
+        else if (status === 401) throw new Error('Must be signed in to join a league');
+        else if (status === 403) form.setError('password', { type: 'manual', message: 'Invalid league name or password' });
+        else throw new Error(data.message);
+      }).catch((e) => {
+        if (e instanceof Error) {
+          toast({
+            title: 'Error joining league',
+            description: e.message,
+            variant: 'error',
+          });
+        }
+      });
   };
 
   return (

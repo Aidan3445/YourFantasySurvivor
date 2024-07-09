@@ -1,4 +1,5 @@
 'use client';
+import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm, type Control } from 'react-hook-form';
@@ -10,6 +11,7 @@ import { Input } from '~/app/_components/commonUI/input';
 import { Label } from '~/app/_components/commonUI/label';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { Switch } from '~/app/_components/commonUI/switch';
+import { useToast } from '~/app/_components/commonUI/use-toast';
 import { type LeagueInsert } from '~/server/db/schema/leagues';
 
 const formSchema = z.object({
@@ -47,6 +49,8 @@ export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFo
     defaultValues,
     resolver: zodResolver(formSchema),
   });
+  const { toast } = useToast();
+  const { user } = useUser();
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const latestSeason = await fetch(
@@ -59,7 +63,8 @@ export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFo
 
     const newLeague: LeagueInsert = {
       ...data,
-      season: latestSeason
+      season: latestSeason,
+      owner: '',
     };
 
     await fetch(
@@ -67,13 +72,24 @@ export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFo
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newLeague)
+        body: JSON.stringify({ newLeague, displayName: user?.fullName })
       })
-      .then(res => res.json() as Promise<number>)
-      .then(id => {
-        router.push(`/leagues/?id=${id}`);
-      })
-      .catch(err => console.error(err));
+      .then(async res => {
+        const status = res.status;
+        const data = await (res.json() as Promise<number | { message: string }>);
+
+        if (typeof data === 'number') router.push(`/leagues/?id=${data}`);
+        else if (status === 401) throw new Error('Must be signed in to join a league');
+        else throw new Error(data.message);
+      }).catch((e) => {
+        if (e instanceof Error) {
+          toast({
+            title: 'Error creating league',
+            description: e.message,
+            variant: 'error',
+          });
+        }
+      });
   };
 
   return (

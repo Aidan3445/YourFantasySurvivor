@@ -5,7 +5,7 @@ import { type ReactNode } from 'react';
 export default function LeagueLayout({
   children,
 }: {
-    children: ReactNode;
+  children: ReactNode;
 }) {
   return (
     <main>
