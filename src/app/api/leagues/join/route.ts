@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
       message = e.message;
       if (e.message === 'User not authenticated') status = 401;
       else if (e.message === 'Invalid league name or password') status = 403;
+      else if (e.message.startsWith('duplicate')) status = 409;
     }
 
     return NextResponse.json({ message }, { status });

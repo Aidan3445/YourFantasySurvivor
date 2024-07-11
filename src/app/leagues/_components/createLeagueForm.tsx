@@ -40,10 +40,11 @@ const defaultValues = {
 
 interface CreateLeagueFormProps {
   className?: string;
+  closePopup?: () => void;
   subtitle?: string;
 }
 
-export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFormProps) {
+export default function CreateLeagueForm({ className, subtitle, closePopup }: CreateLeagueFormProps) {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues,
@@ -78,8 +79,11 @@ export default function CreateLeagueForm({ className, subtitle }: CreateLeagueFo
         const status = res.status;
         const data = await (res.json() as Promise<number | { message: string }>);
 
-        if (typeof data === 'number') router.push(`/leagues/${data}`);
-        else if (status === 401) throw new Error('Must be signed in to join a league');
+        if (typeof data === 'number') {
+          closePopup?.();
+          router.push(`/leagues/${data}`);
+        } else if (status === 401) throw new Error('Must be signed in to join a league');
+        else if (status === 409) form.setError('name', { type: 'manual', message: 'A league already exists with this name' });
         else throw new Error(data.message);
       }).catch((e) => {
         if (e instanceof Error) {

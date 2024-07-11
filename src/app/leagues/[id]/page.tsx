@@ -5,5 +5,7 @@ interface PageProps {
 }
 
 export default function League({ params }: PageProps) {
+  
+
   return <div>{params.id}</div>;
 }

@@ -15,7 +15,7 @@ export async function insertLeague(league: LeagueInsert, displayName: string): P
     .returning({ id: leagues.id })
     .then((result) => result[0]);
 
-  if (!leagueId) throw new Error('Error creating league');
+  if (!leagueId) throw new Error('Unknown error occurred');
 
   await insertMember(leagueId.id, user.userId, displayName, true, true);
 

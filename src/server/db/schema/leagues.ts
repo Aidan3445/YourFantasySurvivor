@@ -14,7 +14,7 @@ export const leagues = createTable(
   'league',
   {
     id: serial('league_id').notNull().primaryKey(),
-    name: varchar('name', { length: 64 }).notNull(),
+    name: varchar('name', { length: 64 }).notNull().unique(),
     password: varchar('password', { length: 64 }).notNull(),
     season: integer('season_id').references(() => seasons.id).notNull(),
     uniquePicks: boolean('unique_picks').notNull().default(true),

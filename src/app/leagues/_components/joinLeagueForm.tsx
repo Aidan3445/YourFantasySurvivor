@@ -23,9 +23,10 @@ const defaultValues = {
 
 interface JoinLeagueFormProps {
   className?: string;
+  closePopup?: () => void;
 }
 
-export default function JoinLeagueForm({ className }: JoinLeagueFormProps) {
+export default function JoinLeagueForm({ className, closePopup }: JoinLeagueFormProps) {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues,
@@ -44,9 +45,12 @@ export default function JoinLeagueForm({ className }: JoinLeagueFormProps) {
         const status = res.status;
         const data = await (res.json() as Promise<number | { message: string }>);
 
-        if (typeof data === 'number') router.push(`/leagues/${data}`);
-        else if (status === 401) throw new Error('Must be signed in to join a league');
+        if (typeof data === 'number') {
+          router.push(`/leagues/${data}`);
+          closePopup?.();
+        } else if (status === 401) throw new Error('Must be signed in to join a league');
         else if (status === 403) form.setError('password', { type: 'manual', message: 'Invalid league name or password' });
+        else if (status === 409) throw new Error('You are already a member of this league');
         else throw new Error(data.message);
       }).catch((e) => {
         if (e instanceof Error) {
@@ -90,7 +94,7 @@ export default function JoinLeagueForm({ className }: JoinLeagueFormProps) {
                 <FormLabel>Password (optional)</FormLabel>
                 <Input
                   className='w-32'
-                  type='text'
+                  type='password'
                   placeholder='Password'
                   autoComplete='off'
                   {...field}

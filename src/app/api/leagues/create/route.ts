@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(id, { status: 201 });
 
   } catch (e) {
-    let message = 'Unknown error creating league';
+    let message = 'Unknown error occurred';
     let status = 500;
 
     if (typeof e === 'string') {
@@ -18,11 +18,8 @@ export async function POST(req: NextRequest) {
       status = 400;
     } else if (e instanceof Error) {
       message = e.message;
-      if (e.message === 'User not authenticated') {
-        status = 401;
-      } else {
-        status = 400;
-      }
+      if (e.message === 'User not authenticated') status = 401;
+      else if (e.message.startsWith('duplicate')) status = 409;
     }
 
     return NextResponse.json({ message }, { status });
