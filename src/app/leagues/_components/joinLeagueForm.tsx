@@ -44,7 +44,7 @@ export default function JoinLeagueForm({ className }: JoinLeagueFormProps) {
         const status = res.status;
         const data = await (res.json() as Promise<number | { message: string }>);
 
-        if (typeof data === 'number') router.push(`/leagues/?id=${data}`);
+        if (typeof data === 'number') router.push(`/leagues/${data}`);
         else if (status === 401) throw new Error('Must be signed in to join a league');
         else if (status === 403) form.setError('password', { type: 'manual', message: 'Invalid league name or password' });
         else throw new Error(data.message);

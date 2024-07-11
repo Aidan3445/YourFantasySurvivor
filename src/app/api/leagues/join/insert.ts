@@ -12,6 +12,9 @@ export async function insertMember(leagueId: number, userId: string, displayName
       displayName: displayName,
       isOwner: isOwner,
       isAdmin: isAdmin,
+    })
+    .onConflictDoNothing({
+      target: [leagueMembers.league, leagueMembers.userId],
     });
 }
 

@@ -2,7 +2,7 @@ import { createTable } from './createTable';
 import { leagues } from './leagues';
 import { episodes } from './episodes';
 import { castaways } from './castaways';
-import { integer, serial, varchar, boolean } from 'drizzle-orm/pg-core';
+import { integer, serial, varchar, boolean, unique } from 'drizzle-orm/pg-core';
 
 export const leagueMembers = createTable(
   'league_member',
@@ -14,7 +14,11 @@ export const leagueMembers = createTable(
     displayName: varchar('display_name', { length: 64 }).notNull(),
     isOwner: boolean('is_owner').notNull().default(false),
     isAdmin: boolean('is_admin').notNull().default(false),
-  }
+  },
+  (table) => ({
+    singleJoin: unique().on(table.league, table.userId),
+  })
+
 );
 export type LeagueMember = typeof leagueMembers.$inferSelect;
 
