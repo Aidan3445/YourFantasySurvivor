@@ -7,7 +7,6 @@ import { insertMember } from '../join/insert';
 export async function insertLeague(league: LeagueInsert, displayName: string): Promise<number> {
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
-  league.owner = user.userId;
 
   const leagueId = await db
     .insert(leagues)

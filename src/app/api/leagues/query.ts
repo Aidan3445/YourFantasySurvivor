@@ -11,7 +11,13 @@ export async function getLeague(leagueId: number) {
   if (!user.userId) throw new Error('User not authenticated');
 
   const leagueFetch = db
-    .select()
+    .select({
+      name: leagues.name,
+      season: seasons.name,
+      locked: leagues.locked,
+      unique: leagues.uniquePicks,
+      picks: leagues.pickCount
+    })
     .from(leagues)
     .where(eq(leagues.id, leagueId))
     .rightJoin(seasons, eq(seasons.id, leagues.season));
@@ -30,7 +36,31 @@ export async function getLeague(leagueId: number) {
 
   if (league.length === 0) throw new Error('League not found');
   if (!members.find((member) => member.userId === user.userId)) throw new Error('User not a member of this league');
+  const safeMembers = members.map((member) => {
+    const safeMember: {
+      displayName: string;
+      color: string;
+      isAdmin: boolean;
+      isOwner: boolean;
+      userId?: string;
+    } = { ...member };
+    delete safeMember.userId;
+    return safeMember;
+  });
 
-  return { league: league[0], members };
+  return { league: league[0], members: safeMembers };
 }
 
+export async function getLeagues() {
+  const user = auth();
+  if (!user.userId) throw new Error('User not authenticated');
+
+  const userLeagues = await db
+    .select({ name: leagues.name, season: seasons.name, id: leagues.id })
+    .from(leagueMembers)
+    .where(eq(leagueMembers.userId, user.userId))
+    .innerJoin(leagues, eq(leagueMembers.league, leagues.id))
+    .innerJoin(seasons, eq(leagues.season, seasons.id));
+
+  return userLeagues;
+}

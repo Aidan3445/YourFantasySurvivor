@@ -13,6 +13,7 @@ export default function TopNav() {
         <NavItem path='/' label='Home' />
         <NavItem path='/playground' label='Playground' />
         <NavItem path='/leagues' label='Leagues' />
+        <NavItem path='/seasons' label='Seasons' />
       </ul>
       <div className='flex justify-center items-center'>
         <ClerkLoading>
@@ -32,7 +33,6 @@ export default function TopNav() {
 }
 
 export function NavItem({ path, label }: NavItemProps) {
-
   return (
     <li className='duration-200 hover:-translate-y-1'>
       <a href={path}>{label}</a>

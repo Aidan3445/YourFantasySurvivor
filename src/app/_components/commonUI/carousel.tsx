@@ -16,19 +16,19 @@ type CarouselOptions = UseCarouselParameters[0]
 type CarouselPlugin = UseCarouselParameters[1]
 
 type CarouselProps = {
-    opts?: CarouselOptions
-    plugins?: CarouselPlugin
-    orientation?: 'horizontal' | 'vertical'
-    setApi?: (api: CarouselApi) => void
+  opts?: CarouselOptions
+  plugins?: CarouselPlugin
+  orientation?: 'horizontal' | 'vertical'
+  setApi?: (api: CarouselApi) => void
 }
 
 type CarouselContextProps = {
-    carouselRef: ReturnType<typeof useEmblaCarousel>[0]
-    api: ReturnType<typeof useEmblaCarousel>[1]
-    scrollPrev: () => void
-    scrollNext: () => void
-    canScrollPrev: boolean
-    canScrollNext: boolean
+  carouselRef: ReturnType<typeof useEmblaCarousel>[0]
+  api: ReturnType<typeof useEmblaCarousel>[1]
+  scrollPrev: () => void
+  scrollNext: () => void
+  canScrollPrev: boolean
+  canScrollNext: boolean
 } & CarouselProps
 
 const CarouselContext = React.createContext<CarouselContextProps | null>(null);
@@ -44,8 +44,8 @@ function useCarousel() {
 }
 
 const Carousel = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement> & CarouselProps
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & CarouselProps
 >(
   (
     {
@@ -128,7 +128,7 @@ const Carousel = React.forwardRef<
           api: api,
           opts,
           orientation:
-                        orientation || (opts?.axis === 'y' ? 'vertical' : 'horizontal'),
+            orientation || (opts?.axis === 'y' ? 'vertical' : 'horizontal'),
           scrollPrev,
           scrollNext,
           canScrollPrev,
@@ -152,8 +152,8 @@ const Carousel = React.forwardRef<
 Carousel.displayName = 'Carousel';
 
 const CarouselContent = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   const { carouselRef } = useCarousel();
 
@@ -162,7 +162,7 @@ const CarouselContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          'flex gap-2',
+          'flex gap-2 cursor-ew-resize',
           className
         )}
         {...props}
@@ -173,8 +173,8 @@ const CarouselContent = React.forwardRef<
 CarouselContent.displayName = 'CarouselContent';
 
 const CarouselItem = React.forwardRef<
-    HTMLDivElement,
-    React.HTMLAttributes<HTMLDivElement>
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => {
   //const { } = useCarousel();
 
@@ -194,8 +194,8 @@ const CarouselItem = React.forwardRef<
 CarouselItem.displayName = 'CarouselItem';
 
 const CarouselPrevious = React.forwardRef<
-    HTMLButtonElement,
-    React.ComponentProps<typeof Button>
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button>
 >(({ className, variant = 'outline', size = 'icon', ...props }, ref) => {
   const { scrollPrev, canScrollPrev } = useCarousel();
 
@@ -220,8 +220,8 @@ const CarouselPrevious = React.forwardRef<
 CarouselPrevious.displayName = 'CarouselPrevious';
 
 const CarouselNext = React.forwardRef<
-    HTMLButtonElement,
-    React.ComponentProps<typeof Button>
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button>
 >(({ className, variant = 'outline', size = 'icon', ...props }, ref) => {
   const { scrollNext, canScrollNext } = useCarousel();
 

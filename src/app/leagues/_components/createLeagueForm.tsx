@@ -1,5 +1,5 @@
 'use client';
-import { useUser } from '@clerk/nextjs';
+import { SignInButton, useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm, type Control } from 'react-hook-form';
@@ -12,6 +12,7 @@ import { Label } from '~/app/_components/commonUI/label';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { Switch } from '~/app/_components/commonUI/switch';
 import { useToast } from '~/app/_components/commonUI/use-toast';
+import { cn } from '~/lib/utils';
 import { type LeagueInsert } from '~/server/db/schema/leagues';
 
 const formSchema = z.object({
@@ -51,7 +52,7 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
     resolver: zodResolver(formSchema),
   });
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const latestSeason = await fetch(
@@ -65,7 +66,6 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
     const newLeague: LeagueInsert = {
       ...data,
       season: latestSeason,
-      owner: '',
     };
 
     await fetch(
@@ -73,7 +73,7 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ newLeague, displayName: user?.fullName })
+        body: JSON.stringify({ newLeague, displayName: user?.username })
       })
       .then(async res => {
         const status = res.status;
@@ -97,16 +97,22 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
   };
 
   return (
-    <CardContainer className={className} >
+    <CardContainer className={className}>
       <Form {...form}>
+        {!isSignedIn &&
+          <SignInButton>
+            <Button className='absolute text-md font-medium inset-y-1/2 z-10 place-self-center'>
+              Log in to create a league
+            </Button>
+          </SignInButton>}
         <form
-          className='flex flex-col gap-4'
+          className={cn('flex flex-col gap-4', isSignedIn ? '' : 'blur pointer-events-none')}
           onSubmit={form.handleSubmit(onSubmit)}>
           <section className='flex flex-col gap-0'>
             <Label className='text-2xl font-medium'>Create League</Label>
             <FormDescription>{subtitle}</FormDescription>
           </section>
-          <NameAndPassword control={form.control} />
+          <NameAndPassword control={form.control} disabled={!isSignedIn} />
           <Separator className='col-span-3 my-1 w-full' decorative />
           <Settings control={form.control} form={form} />
           <span className='flex gap-4 justify-end'>
@@ -129,6 +135,7 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
 interface FieldProps {
   control?: Control<z.infer<typeof formSchema>>;
   form?: ReturnType<typeof useForm<z.infer<typeof formSchema>>>
+  disabled?: boolean;
 }
 
 function NameAndPassword({ control }: FieldProps) {

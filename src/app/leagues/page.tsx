@@ -1,5 +1,6 @@
 import { SignedOut, SignedIn } from '@clerk/nextjs';
 import SignInCard from '../_components/signInCard';
+import YourLeagues from './_components/yourLeagues';
 
 export default function LeagueHome() {
   return (
@@ -9,7 +10,7 @@ export default function LeagueHome() {
         <SignInCard />
       </SignedOut>
       <SignedIn>
-        <h1 className='text-3xl font-semibold'>Your Leagues</h1>
+        <YourLeagues />
       </SignedIn>
     </main>
   );

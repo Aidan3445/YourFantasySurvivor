@@ -15,19 +15,8 @@ interface LeaderboardProps {
 }
 
 export function Leaderboard({ rules, className }: LeaderboardProps) {
-  const [seasons, setSeasons] = useState<string[]>([]);
   const [season, setSeason] = useState<string>('');
   const [scores, setScores] = useState<Record<string, number[]>>({});
-
-  useEffect(() => {
-    fetch('/api/seasons')
-      .then((res) => res.json())
-      .then((data: string[]) => {
-        setSeasons(data);
-        setSeason(data[0] ?? '');
-      })
-      .catch((err) => console.error(err));
-  }, []);
 
   useEffect(() => {
     if (season) {
@@ -66,7 +55,7 @@ export function Leaderboard({ rules, className }: LeaderboardProps) {
   return (
     <CardContainer className={cn('justify-start items-center p-4', className)}>
       <h3 className='text-2xl font-medium'>Leaderboard</h3>
-      <SelectSeason seasons={seasons} season={season} setSeason={setSeason} />
+      <SelectSeason season={season} setSeason={setSeason} />
       <span className='grid grid-cols-4 gap-2 w-full'>
         <Scores data={sortedScores} />
         <Chart data={sortedScores} />

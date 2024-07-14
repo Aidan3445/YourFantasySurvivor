@@ -4,12 +4,8 @@ import CardContainer from './_components/cardContainer';
 import LeaguesCard from './_components/leaguesCard';
 import SeasonStats from './_components/stats/seasonStats';
 import Image from 'next/image';
-import { getSeasons } from './api/seasons/query';
 
 export default async function HomePage() {
-
-  const seasons = await getSeasons();
-
   return (
     <main>
       <CardContainer>
@@ -27,7 +23,7 @@ export default async function HomePage() {
             <LeaguesCard />
           </SignedIn>
         </ClerkLoaded>
-        <SeasonStats seasons={seasons} />
+        <SeasonStats />
       </section>
     </main >
   );

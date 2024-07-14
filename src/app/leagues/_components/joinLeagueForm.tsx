@@ -1,5 +1,5 @@
 'use client';
-import { useUser } from '@clerk/nextjs';
+import { SignInButton, useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -10,6 +10,7 @@ import { Form, FormField, FormItem, FormLabel, FormMessage } from '~/app/_compon
 import { Input } from '~/app/_components/commonUI/input';
 import { Label } from '~/app/_components/commonUI/label';
 import { useToast } from '~/app/_components/commonUI/use-toast';
+import { cn } from '~/lib/utils';
 
 const formSchema = z.object({
   name: z.string(),
@@ -33,13 +34,13 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
     resolver: zodResolver(formSchema),
   });
   const { toast } = useToast();
-  const { user } = useUser();
+  const { user, isSignedIn } = useUser();
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     await fetch('/api/leagues/join', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...data, displayName: user?.fullName }),
+      body: JSON.stringify({ ...data, displayName: user?.username }),
     })
       .then(async res => {
         const status = res.status;
@@ -66,8 +67,14 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
   return (
     <CardContainer className={className}>
       <Form {...form}>
+        {!isSignedIn &&
+          <SignInButton>
+            <Button className='absolute text-md font-medium inset-y-1/2 z-10 place-self-center'>
+              Log in to create a league
+            </Button>
+          </SignInButton>}
         <form
-          className='flex flex-col gap-4 h-full'
+          className={cn('flex flex-col gap-4 h-full', isSignedIn ? '' : 'blur pointer-events-none')}
           onSubmit={form.handleSubmit(onSubmit)}>
           <Label className='text-2xl font-medium'>Join a League</Label>
           <FormField

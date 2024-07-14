@@ -8,9 +8,9 @@ import { castaways } from '~/server/db/schema/castaways';
 
 
 export type CastawayEvent = {
-    castaway: string;
-    name: EventName;
-    episode: number;
+  castaway: string;
+  name: EventName;
+  episode: number;
 };
 
 export async function getCastawayEvents(
@@ -36,12 +36,10 @@ export async function getCastawayEvents(
 }
 
 export type TribeEvent = {
-    tribe: string;
-    name: EventName;
-    episode: number;
+  tribe: string;
+  name: EventName;
+  episode: number;
 };
-
-export type TribeUpdates = Record<number, Record<string, string[]>>;
 
 export async function getTribeEvents(
   seasonName: string, tribeName: string | null
@@ -63,9 +61,11 @@ export async function getTribeEvents(
         : isNotNull(tribes.name)));
 }
 
+export type TribeUpdates = Record<number, Record<string, string[]>>;
+
 export async function getTribeUpdates(seasonName: string):
-    Promise<TribeUpdates> {
-  const rows = db.select({
+  Promise<TribeUpdates> {
+  const rows = await db.select({
     tribe: tribes.name,
     castaway: castaways.shortName,
     episode: episodes.number,
@@ -80,27 +80,27 @@ export async function getTribeUpdates(seasonName: string):
       eq(seasons.name, seasonName),
       eq(baseEvents.name, 'tribeUpdate')));
 
-  return rows.then((updates) => updates.reduce((acc, { tribe, castaway, episode },) => {
+  return rows.reduce((acc, { tribe, castaway, episode },) => {
     // initialize the episode if it doesn't exist
     if (!acc[episode]) {
       acc[episode] = {};
     }
 
     // initialize the tribe if it doesn't exist
-    const update = acc[episode]!;
+    const update = acc[episode];
     if (!update[tribe]) {
       update[tribe] = [];
     }
 
     // add the castaway to the tribe update
-    const newUpdate = update[tribe]!;
+    const newUpdate = update[tribe];
     newUpdate.push(castaway);
     return acc;
-  }, {} as TribeUpdates));
+  }, {} as TribeUpdates);
 }
 
 export type Events = {
-    castawayEvents: CastawayEvent[];
-    tribeEvents: TribeEvent[];
-    tribeUpdates: TribeUpdates;
+  castawayEvents: CastawayEvent[];
+  tribeEvents: TribeEvent[];
+  tribeUpdates: TribeUpdates;
 };

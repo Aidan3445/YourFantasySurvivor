@@ -20,7 +20,6 @@ export const leagues = createTable(
     uniquePicks: boolean('unique_picks').notNull().default(true),
     pickCount: pickCount('pick_count').notNull().default(1),
     locked: boolean('locked').notNull().default(false),
-    owner: varchar('owner', { length: 256 }).notNull(),
   }
 );
 export type League = typeof leagues.$inferSelect;

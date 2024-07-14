@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Select,
   SelectContent,
@@ -7,12 +8,24 @@ import {
 } from '~/app/_components/commonUI/select';
 
 interface SelectSeasonProps {
-    seasons: string[];
-    season: string;
-    setSeason: (season: string) => void;
+  season: string;
+  setSeason: (season: string) => void;
 }
 
-export default function SelectSeason({ seasons, season, setSeason }: SelectSeasonProps) {
+export default function SelectSeason({ season, setSeason }: SelectSeasonProps) {
+  const [seasons, setSeasons] = useState<string[]>([]);
+
+  useEffect(() => {
+    'use client';
+
+    fetch('/api/seasons')
+      .then((res) => res.json())
+      .then((data: string[]) => {
+        setSeasons(data);
+        setSeason(data[0] ?? '');
+      })
+      .catch((err) => console.error(err));
+  }, [setSeason]);
 
   return (
     <Select defaultValue={season} value={season} onValueChange={setSeason}>
@@ -21,7 +34,7 @@ export default function SelectSeason({ seasons, season, setSeason }: SelectSeaso
         <SelectValue />
       </SelectTrigger>
       <SelectContent className='border-black bg-b4'>
-        {seasons.map((s) => <SelectItem className='hover:bg-b3' key={s} value={s}>{s}</SelectItem>)}
+        {seasons?.map((s) => <SelectItem className='hover:bg-b3' key={s} value={s}>{s}</SelectItem>)}
       </SelectContent>
     </Select >
   );

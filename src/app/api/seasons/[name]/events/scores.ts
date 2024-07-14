@@ -13,7 +13,7 @@ export default function compileScores(
       scores[castaway] = [];
     }
 
-    const points = scores[castaway]!;
+    const points = scores[castaway];
 
     switch (name) {
     case 'indivWin':
@@ -44,7 +44,7 @@ export default function compileScores(
         scores[castaway] = [];
       }
 
-      const points = scores[castaway]!;
+      const points = scores[castaway];
 
       switch (name) {
       case 'tribe1st':
