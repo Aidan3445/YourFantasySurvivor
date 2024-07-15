@@ -26,6 +26,13 @@ const config = {
         port: '',
         pathname: '/*/tenor.gif',
       },
+      {
+        protocol: 'https',
+        hostname: 'parade.com',
+        port: '',
+        pathname: '*',
+      },
+
     ],
   },
 };
