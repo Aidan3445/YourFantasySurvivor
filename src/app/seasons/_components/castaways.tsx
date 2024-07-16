@@ -37,13 +37,16 @@ export default function Castaways({ season }: CastawaysProps) {
           <li key={index}>
             <CardContainer className='p-6'>
               <div className='flex justify-between items-center'>
-                <article className='flex flex-col space-y-2'>
+                <article className='flex flex-col'>
                   <h3 className='text-xl font-semibold'>{castaway.name}</h3>
-                  <TribeLabel className='text-lg' tribe={castaway.startingTribe.name} color={castaway.startingTribe.color} />
+                  <TribeLabel
+                    className='text-lg'
+                    tribe={castaway.startingTribe.name}
+                    color={castaway.startingTribe.color} />
                   <div className='flex space-x-2'>
                     {castaway.tribes.slice(1).map((tribe, index) => (
-                      <div key={index} className='flex space-x-1'>
-                        <ArrowRight className='w-4 h-4 translate-y-1' />
+                      <div key={index} className='flex space-x-1 items-center'>
+                        <ArrowRight className='w-4 h-4' />
                         <TribeLabel className='text-sm' tribe={tribe.name} color={tribe.color} />
                       </div>
                     ))}
@@ -74,7 +77,7 @@ interface TribeLabelProps {
 function TribeLabel({ className, tribe, color }: TribeLabelProps) {
   return (
     <h2
-      className={cn('w-min drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,1)]', className)}
+      className={cn('w-min drop-shadow-text', className)}
       style={{ color: color }}>
       {tribe}
     </h2>

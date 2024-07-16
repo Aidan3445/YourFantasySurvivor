@@ -1,31 +1,51 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useToast } from '~/app/_components/commonUI/use-toast';
 import CardContainer from '~/app/_components/cardContainer';
-import SelectSeason from '~/app/_components/stats/selectSeason';
+import SelectSeason from '~/app/_components/selectSeason';
 import { type Events } from '~/app/api/seasons/[name]/events/query';
 import compileScores from '~/app/api/seasons/[name]/events/scores';
 import { cn } from '~/lib/utils';
-import { type BaseEventRules } from '~/server/db/schema/leagues';
+import { defaultRules, type BaseEventRules } from '~/server/db/schema/leagues';
 import Chart from './scoreChart';
 import Scores from './scoreboard';
+import { Share2 } from 'lucide-react';
+import { Button } from '~/app/_components/commonUI/button';
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '~/app/_components/commonUI/hover';
+import { HoverCardArrow } from '@radix-ui/react-hover-card';
 
 interface LeaderboardProps {
-  rules: BaseEventRules;
   className?: string;
 }
 
-export function Leaderboard({ rules, className }: LeaderboardProps) {
-  const [season, setSeason] = useState<string>('');
+export function Leaderboard({ className }: LeaderboardProps) {
   const [scores, setScores] = useState<Record<string, number[]>>({});
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const season = searchParams.get('season')!;
 
   useEffect(() => {
+    const rules: BaseEventRules = defaultRules;
+    // iterate through rules and set to searchParams if found
+    for (const key in rules) {
+      const value = searchParams.get(key);
+      if (value) rules[key as keyof BaseEventRules] = parseInt(value);
+    }
+
     if (season) {
       fetch(`/api/seasons/${season}/events`)
         .then((res) => res.json())
         .then((events: Events) => setScores(compileScores(events, rules)))
-        .catch((err) => console.error(err));
+        .catch((err: Error) => {
+          toast({
+            title: 'Error fetching scores',
+            description: err.message,
+            variant: 'error',
+          });
+        });
     }
-  }, [season, rules]);
+  }, [season, toast, searchParams]);
 
   const sortedScores = Object.entries(scores).map(([name, score]) => {
     const episodeScores = score.reduce((totals, score, index) => {
@@ -52,10 +72,38 @@ export function Leaderboard({ rules, className }: LeaderboardProps) {
     score.color = `hsl(${300 * index / sortedScores.length}, ${index & 1 ? '50%' : '80%'}, 30%)`;
   });
 
+
+  const copyUrl = async () => {
+    // get url to copy
+    const url = window.location.href;
+
+    // Copy the text inside the text field
+    await navigator.clipboard.writeText(url);
+
+    // make toast
+    toast({
+      title: 'Copied to clipboard',
+      description: 'URL copied to clipboard',
+    });
+  };
+
   return (
     <CardContainer className={cn('justify-start items-center p-4', className)}>
       <h3 className='text-2xl font-medium'>Leaderboard</h3>
-      <SelectSeason season={season} setSeason={setSeason} />
+      <span className='flex justify-evenly w-full items-center'>
+        <SelectSeason />
+        <HoverCard>
+          <HoverCardTrigger>
+            <Button className='p-2' onClick={copyUrl}>
+              <Share2 className='w-6 h-6' />
+            </Button>
+          </HoverCardTrigger>
+          <HoverCardContent className='w-full rounded-md border border-black bg-b2' side='top'>
+            <HoverCardArrow />
+            <p>Copy url to share these scoring rules.</p>
+          </HoverCardContent>
+        </HoverCard>
+      </span>
       <span className='grid grid-cols-4 gap-2 w-full'>
         <Scores data={sortedScores} />
         <Chart data={sortedScores} />
@@ -116,3 +164,4 @@ export function mouseOutLeaderboard(name: string, color: string, sortedNames: st
     }
   }
 }
+

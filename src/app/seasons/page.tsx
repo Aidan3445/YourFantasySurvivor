@@ -1,15 +1,16 @@
 'use client';
-import { useState } from 'react';
-import SelectSeason from '../_components/stats/selectSeason';
+import SelectSeason from '../_components/selectSeason';
 import Castaways from './_components/castaways';
+import { useSearchParams } from 'next/navigation';
 
 export default function SeasonPage() {
-  const [season, setSeason] = useState('');
+  const searchParams = useSearchParams();
+  const season = searchParams.get('season')!;
 
   return (
     <main>
       <h1 className='text-5xl font-bold text-black'>Survivor Seasons</h1>
-      <SelectSeason season={season} setSeason={setSeason} />
+      <SelectSeason />
       <Castaways season={season} />
     </main>
   );

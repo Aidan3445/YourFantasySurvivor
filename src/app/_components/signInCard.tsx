@@ -1,6 +1,7 @@
 import { HoverCard, HoverCardTrigger, HoverCardContent } from './commonUI/hover';
 import CardContainer from './cardContainer';
 import { SignInButton } from '@clerk/nextjs';
+import { HoverCardArrow } from '@radix-ui/react-hover-card';
 
 export default function SignInCard() {
   return (
@@ -13,6 +14,7 @@ export default function SignInCard() {
               <h4 className='text-xl font-semibold cursor-help text-nowrap w-min'>What is YFS?</h4>
             </HoverCardTrigger>
             <HoverCardContent className='w-full font-serif text-2xl font-bold text-black rounded-md border border-black bg-b2' side='top'>
+              <HoverCardArrow />
               <h1 className='text-nowrap'>Your Fantasy Survivor</h1>
             </HoverCardContent>
           </HoverCard>

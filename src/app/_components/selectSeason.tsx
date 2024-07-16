@@ -1,4 +1,6 @@
+'use client';
 import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Select,
   SelectContent,
@@ -7,28 +9,31 @@ import {
   SelectValue,
 } from '~/app/_components/commonUI/select';
 
-interface SelectSeasonProps {
-  season: string;
-  setSeason: (season: string) => void;
-}
-
-export default function SelectSeason({ season, setSeason }: SelectSeasonProps) {
+export default function SelectSeason() {
   const [seasons, setSeasons] = useState<string[]>([]);
+  const router = useRouter();
+  const params = useSearchParams();
 
   useEffect(() => {
-    'use client';
-
     fetch('/api/seasons')
       .then((res) => res.json())
       .then((data: string[]) => {
         setSeasons(data);
-        setSeason(data[0] ?? '');
+        if (!params.has('season')) router.push(`?season=${data[0]}`, { scroll: false });
       })
       .catch((err) => console.error(err));
-  }, [setSeason]);
+  }, [router, params]);
+
+  const season = params.get('season')!;
+
+  const updateSeason = (newSeason: string) => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('season', newSeason);
+    router.push(url.search, { scroll: false });
+  };
 
   return (
-    <Select defaultValue={season} value={season} onValueChange={setSeason}>
+    <Select defaultValue={season} value={season} onValueChange={(value) => updateSeason(value)}>
       <SelectTrigger className='self-center m-2 w-3/4 font-semibold hs-in'>
         <br />
         <SelectValue />

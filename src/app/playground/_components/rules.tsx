@@ -1,3 +1,5 @@
+'use client';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { defaultRules, type BaseEventRules } from '~/server/db/schema/leagues';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,10 +10,9 @@ import { Button } from '~/app/_components/commonUI/button';
 import CardContainer from '~/app/_components/cardContainer';
 import { SecondPlaceInfo } from '~/app/_components/stats/challengesPodium';
 import { Separator } from '~/app/_components/commonUI/separator';
+import { useEffect } from 'react';
 
 interface RulesProps {
-  rules?: BaseEventRules;
-  setRules: (rules: BaseEventRules) => void;
   className?: string;
 }
 
@@ -34,14 +35,38 @@ export const formSchema = z.object({
   soleSurvivor: numberRange,
 });
 
-export default function Rules({ setRules, className }: RulesProps) {
+export default function Rules({ className }: RulesProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     defaultValues: defaultRules,
     resolver: zodResolver(formSchema),
   });
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // iterate through form schema and set values to any search params
+    Object.keys(formSchema.shape).forEach(key => {
+      const value = searchParams.get(key);
+      if (value) {
+        form.setValue(key as keyof BaseEventRules, parseInt(value));
+      }
+    });
+  }, [searchParams, form]);
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    setRules(data);
+    const url = new URL(pathname, window.location.href);
+
+    // set the season param
+    url.searchParams.set('season', searchParams.get('season')!);
+
+    // map through form data and set search params
+    Object.entries(data).forEach(([key, value]) => {
+      url.searchParams.set(key, value.toString());
+    });
+
+    // push new search params to router
+    router.push(url.pathname + url.search, { scroll: false });
   };
 
   return (

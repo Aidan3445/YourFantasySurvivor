@@ -1,20 +1,24 @@
 'use client';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../commonUI/carousel';
 import compileStats, { type SeasonStats as SS, emptyStats } from '~/app/api/seasons/[name]/events/stats';
 import ChallengesPodium from './challengesPodium';
 import AdvantagesTable from './advantagesTable';
-import SelectSeason from './selectSeason';
+import SelectSeason from '../selectSeason';
 import EliminationsTable from './eliminationsTable';
 import TitlesChart from './titlesChart';
 import FinalsStats from './finalsStats';
 import StatsSection from './statsSection';
 import CardContainer from '../cardContainer';
 import type { Events } from '~/app/api/seasons/[name]/events/query';
+import { useToast } from '../commonUI/use-toast';
 
 export default function SeasonStats() {
-  const [season, setSeason] = useState<string>('');
   const [stats, setStats] = useState<SS>(emptyStats());
+  const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const season = searchParams.get('season')!;
 
   // when season is set, fetch episodes and compile stats
   useEffect(() => {
@@ -22,13 +26,16 @@ export default function SeasonStats() {
       fetch(`/api/seasons/${season}/events`)
         .then((res) => res.json())
         .then((events: Events) => setStats(compileStats(events)))
-        .catch((err) => {
-          setSeason('');
+        .catch((err: Error) => {
           setStats(emptyStats());
-          console.error(err);
+          toast({
+            title: 'Error fetching events',
+            description: err.message,
+            variant: 'error',
+          });
         });
     }
-  }, [season]);
+  }, [season, toast]);
 
   const carouselItems = [
     { title: 'Challenges', content: <ChallengesPodium castaways={stats.castawayChallenges} tribes={stats.tribeChallenges} />, noWrapper: true },
@@ -40,7 +47,7 @@ export default function SeasonStats() {
 
   return (
     <CardContainer>
-      <SelectSeason season={season} setSeason={setSeason} />
+      <SelectSeason />
       <Carousel>
         <span className='flex justify-around pb-2'>
           <CarouselPrevious />
