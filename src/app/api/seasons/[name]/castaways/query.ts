@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, eq } from 'drizzle-orm';
+import { and, asc, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { seasons } from '~/server/db/schema/seasons';
 import { baseEventTribes, baseEventCastaways, baseEvents, episodes } from '~/server/db/schema/episodes';
@@ -15,6 +15,7 @@ export type CastawayDetails = {
   name: string;
   photo: string;
   tribes: Tribe[];
+  startingTribe: Tribe;
 };
 
 export async function getCastaways(seasonName: string, castawayName: string | null) {
@@ -34,14 +35,25 @@ export async function getCastaways(seasonName: string, castawayName: string | nu
     .where(and(
       eq(seasons.name, seasonName),
       eq(baseEvents.name, 'tribeUpdate'),
-      eq(castaways.name, castawayName ?? castaways.name)));
+      eq(castaways.name, castawayName ?? castaways.name)))
+    .orderBy(asc(episodes.number));
 
   const castawaysWithTribes = rows.reduce((acc, row) => {
-    const castaway = acc[row.name] ?? { name: row.name, photo: row.photo, tribes: [] as Tribe[] };
+    const castaway = acc[row.name] ?? {
+      name: row.name,
+      photo: row.photo,
+      tribes: [] as Tribe[],
+      startingTribe: {
+        name: row.tribe,
+        color: row.color,
+        episode: row.episode
+      }
+    };
     castaway.tribes.push({ name: row.tribe, color: row.color, episode: row.episode });
     acc[row.name] = castaway;
     return acc;
   }, {} as Record<string, CastawayDetails>);
 
-  return Object.values(castawaysWithTribes);
+  return Object.values(castawaysWithTribes).sort(
+    (a, b) => a.startingTribe.name.localeCompare(b.startingTribe.name));
 }

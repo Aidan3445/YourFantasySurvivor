@@ -30,7 +30,37 @@ const config = {
         protocol: 'https',
         hostname: 'parade.com',
         port: '',
-        pathname: '*',
+        pathname: '/.image/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        port: '',
+        pathname: '/150',
+      },
+      {
+        protocol: 'https',
+        hostname: 'media.licdn.com',
+        port: '',
+        pathname: '/dms/image/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.truedorktimes.com',
+        port: '',
+        pathname: '/*/images/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'imagesvc.meredithcorp.io',
+        port: '',
+        pathname: '/v3/mm/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'external-preview.redd.it',
+        port: '',
+        pathname: '/**',
       },
 
     ],
