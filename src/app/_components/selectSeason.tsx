@@ -8,8 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/app/_components/commonUI/select';
+import { cn } from '~/lib/utils';
 
-export default function SelectSeason() {
+export interface SelectSeasonProps {
+  className?: string;
+}
+
+export default function SelectSeason({ className }: SelectSeasonProps) {
   const [seasons, setSeasons] = useState<string[]>([]);
   const router = useRouter();
   const params = useSearchParams();
@@ -34,7 +39,7 @@ export default function SelectSeason() {
 
   return (
     <Select defaultValue={season} value={season} onValueChange={(value) => updateSeason(value)}>
-      <SelectTrigger className='self-center m-2 w-3/4 font-semibold hs-in'>
+      <SelectTrigger className={cn('self-center m-2 w-3/4 font-semibold hs-in', className)}>
         <br />
         <SelectValue />
       </SelectTrigger>

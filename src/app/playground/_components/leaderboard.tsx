@@ -13,7 +13,7 @@ import Scores from './scoreboard';
 import { Share2 } from 'lucide-react';
 import { Button } from '~/app/_components/commonUI/button';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '~/app/_components/commonUI/hover';
-import { HoverCardArrow } from '@radix-ui/react-hover-card';
+import { HoverCardArrow, HoverCardPortal } from '@radix-ui/react-hover-card';
 
 interface LeaderboardProps {
   className?: string;
@@ -76,32 +76,32 @@ export function Leaderboard({ className }: LeaderboardProps) {
   const copyUrl = async () => {
     // get url to copy
     const url = window.location.href;
-
     // Copy the text inside the text field
     await navigator.clipboard.writeText(url);
-
     // make toast
     toast({
       title: 'Copied to clipboard',
-      description: 'URL copied to clipboard',
+      description: 'Share this link to these rules with your friends!',
     });
   };
 
   return (
     <CardContainer className={cn('justify-start items-center p-4', className)}>
       <h3 className='text-2xl font-medium'>Leaderboard</h3>
-      <span className='flex justify-evenly w-full items-center'>
-        <SelectSeason />
-        <HoverCard>
+      <span className='flex justify-between w-full items-center'>
+        <SelectSeason className='mx-0' />
+        <HoverCard openDelay={300}>
           <HoverCardTrigger>
-            <Button className='p-2' onClick={copyUrl}>
-              <Share2 className='w-6 h-6' />
+            <Button className='p-0.5 w-min h-min left-auto' onClick={copyUrl}>
+              <Share2 className='w-5 h-5' />
             </Button>
           </HoverCardTrigger>
-          <HoverCardContent className='w-full rounded-md border border-black bg-b2' side='top'>
-            <HoverCardArrow />
-            <p>Copy url to share these scoring rules.</p>
-          </HoverCardContent>
+          <HoverCardPortal>
+            <HoverCardContent className='w-full rounded-md border border-black bg-b2' side='top'>
+              <HoverCardArrow />
+              <p>Copy url to share these scoring rules.</p>
+            </HoverCardContent>
+          </HoverCardPortal>
         </HoverCard>
       </span>
       <span className='grid grid-cols-4 gap-2 w-full'>

@@ -15,7 +15,7 @@ export default function LeagueNav() {
           Create League
         </PopoverTrigger>
         <PopoverContent>
-          <CreateLeagueForm className='p-4 bg-b3' closePopup={() => setCreateOpen(false)} />
+          <CreateLeagueForm className='p-4' closePopup={() => setCreateOpen(false)} />
         </PopoverContent>
       </Popover>
       <Popover open={joinOpen} onOpenChange={setJoinOpen}>
@@ -23,7 +23,7 @@ export default function LeagueNav() {
           Join League
         </PopoverTrigger>
         <PopoverContent>
-          <JoinLeagueForm className='w-60 h-[21rem] p-4 bg-b3' closePopup={() => setJoinOpen(false)} />
+          <JoinLeagueForm className='w-60 h-[21rem] p-4' closePopup={() => setJoinOpen(false)} />
         </PopoverContent>
       </Popover>
     </nav>
