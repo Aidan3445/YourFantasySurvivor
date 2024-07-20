@@ -26,6 +26,8 @@ const config = {
     'plugin:react/jsx-runtime',
   ],
   rules: {
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
     'react/jsx-indent': [
       'error',
       2

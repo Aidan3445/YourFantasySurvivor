@@ -24,12 +24,13 @@ export default function SelectSeason({ className }: SelectSeasonProps) {
       .then((res) => res.json())
       .then((data: string[]) => {
         setSeasons(data);
-        if (!params.has('season')) router.push(`?season=${data[0]}`, { scroll: false });
       })
       .catch((err) => console.error(err));
   }, [router, params]);
 
-  const season = params.get('season')!;
+  const season = params.get('season') ?? '';
+
+
 
   const updateSeason = (newSeason: string) => {
     const url = new URL(window.location.href);
@@ -41,7 +42,7 @@ export default function SelectSeason({ className }: SelectSeasonProps) {
     <Select defaultValue={season} value={season} onValueChange={(value) => updateSeason(value)}>
       <SelectTrigger className={cn('self-center m-2 w-3/4 font-semibold hs-in', className)}>
         <br />
-        <SelectValue />
+        <SelectValue placeholder='Select Season' defaultValue={'fdfdf'} />
       </SelectTrigger>
       <SelectContent className='border-black bg-b4'>
         {seasons?.map((s) => <SelectItem className='hover:bg-b3' key={s} value={s}>{s}</SelectItem>)}

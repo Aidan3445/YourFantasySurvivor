@@ -16,15 +16,29 @@ export type CastawayDetails = {
   photo: string;
   tribes: Tribe[];
   startingTribe: Tribe;
+  more: {
+    shortName: string;
+    age: number;
+    hometown: string;
+    residence: string;
+    job: string;
+  };
 };
 
-export async function getCastaways(seasonName: string, castawayName: string | null) {
+export async function getCastaways(seasonName: string, castawayName: string | null): Promise<CastawayDetails[]> {
   const rows = await db.select({
     name: castaways.name,
     photo: castaways.photo,
     tribe: tribes.name,
     color: tribes.color,
     episode: episodes.number,
+    moreDetails: {
+      shortName: castaways.shortName,
+      age: castaways.age,
+      hometown: castaways.hometown,
+      residence: castaways.residence,
+      job: castaways.job
+    }
   }).from(baseEventTribes)
     .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
     .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
@@ -47,7 +61,8 @@ export async function getCastaways(seasonName: string, castawayName: string | nu
         name: row.tribe,
         color: row.color,
         episode: row.episode
-      }
+      },
+      more: row.moreDetails
     };
     castaway.tribes.push({ name: row.tribe, color: row.color, episode: row.episode });
     acc[row.name] = castaway;

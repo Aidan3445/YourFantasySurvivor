@@ -1,11 +1,12 @@
-'use client';
 import SelectSeason from '../_components/selectSeason';
 import Castaways from './_components/castaways';
-import { useSearchParams } from 'next/navigation';
 
-export default function SeasonPage() {
-  const searchParams = useSearchParams();
-  const season = searchParams.get('season')!;
+interface SeasonProps {
+  searchParams: { season: string };
+}
+
+export default function SeasonPage({ searchParams }: SeasonProps) {
+  const season = searchParams.season;
 
   return (
     <main>

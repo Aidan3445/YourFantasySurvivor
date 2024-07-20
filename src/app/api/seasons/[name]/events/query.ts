@@ -1,5 +1,5 @@
 import 'server-only';
-import { desc, and, eq, isNotNull, not } from 'drizzle-orm';
+import { desc, and, eq, not } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { seasons } from '~/server/db/schema/seasons';
 import { baseEventTribes, baseEventCastaways, baseEvents, type EventName, episodes } from '~/server/db/schema/episodes';
@@ -28,9 +28,7 @@ export async function getCastawayEvents(
     .where(and(
       eq(seasons.name, seasonName),
       not(eq(baseEvents.name, 'tribeUpdate')),
-      castawayName
-        ? eq(castaways.name, castawayName)
-        : isNotNull(castaways.name)))
+      eq(castaways.name, castawayName ?? castaways.name)))
     .orderBy(desc(episodes.number));
 
 }
@@ -56,9 +54,7 @@ export async function getTribeEvents(
     .where(and(
       eq(seasons.name, seasonName),
       not(eq(baseEvents.name, 'tribeUpdate')),
-      tribeName
-        ? eq(tribes.name, tribeName)
-        : isNotNull(tribes.name)));
+      eq(tribes.name, tribeName ?? tribes.name)));
 }
 
 export type TribeUpdates = Record<number, Record<string, string[]>>;
