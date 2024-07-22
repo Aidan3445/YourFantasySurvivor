@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { seasons } from '~/server/db/schema/seasons';
 import { baseEventTribes, baseEventCastaways, baseEvents, episodes } from '~/server/db/schema/episodes';
@@ -49,7 +49,8 @@ export async function getCastaways(seasonName: string, castawayName: string | nu
     .where(and(
       eq(seasons.name, seasonName),
       eq(baseEvents.name, 'tribeUpdate'),
-      eq(castaways.name, castawayName ?? castaways.name)))
+      or(eq(castaways.name, castawayName ?? castaways.name),
+        eq(castaways.shortName, castawayName ?? castaways.shortName))))
     .orderBy(asc(episodes.number));
 
   const castawaysWithTribes = rows.reduce((acc, row) => {

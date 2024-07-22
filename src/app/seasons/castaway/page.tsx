@@ -18,7 +18,7 @@ export default async function CastawayPage({ searchParams }: CastawayPageProps) 
   const { details, events } = await getCastaway(searchParams.season, searchParams.castaway);
 
   return (
-    <div>
+    <main>
       <section className='flex flex-col md:flex-row gap-4 justify-between items-center'>
         <LargeCastawayCard details={details} />
         <CardContainer className='px-6 min-w-60 lg:min-w-80 h-full min-h-40 w-fit6'>STATS</CardContainer>
@@ -32,7 +32,7 @@ export default async function CastawayPage({ searchParams }: CastawayPageProps) 
           ))}
         </ul>
       </section>
-    </div>
+    </main>
   );
 }
 

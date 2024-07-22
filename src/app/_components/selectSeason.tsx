@@ -12,9 +12,10 @@ import { cn } from '~/lib/utils';
 
 export interface SelectSeasonProps {
   className?: string;
+  selectDefault?: boolean;
 }
 
-export default function SelectSeason({ className }: SelectSeasonProps) {
+export default function SelectSeason({ className, selectDefault = false }: SelectSeasonProps) {
   const [seasons, setSeasons] = useState<string[]>([]);
   const router = useRouter();
   const params = useSearchParams();
@@ -28,15 +29,17 @@ export default function SelectSeason({ className }: SelectSeasonProps) {
       .catch((err) => console.error(err));
   }, [router, params]);
 
-  const season = params.get('season') ?? '';
-
-
-
   const updateSeason = (newSeason: string) => {
     const url = new URL(window.location.href);
     url.searchParams.set('season', newSeason);
     router.push(url.search, { scroll: false });
   };
+
+  let season = params.get('season') ?? '';
+  // if select default then set the first season as default
+  if (selectDefault && !season) {
+    season = seasons[0] ?? '';
+  }
 
   return (
     <Select defaultValue={season} value={season} onValueChange={(value) => updateSeason(value)}>

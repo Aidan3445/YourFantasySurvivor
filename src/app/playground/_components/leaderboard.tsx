@@ -62,6 +62,7 @@ export function Leaderboard({ className }: LeaderboardProps) {
 
     return {
       name,
+      url: `/seasons/castaway?season=${season}&castaway=${name}`,
       color: 'hsl(0,100%,50%)',
       score: episodeScores[episodeScores.length - 1] ?? 0,
       episodeScores

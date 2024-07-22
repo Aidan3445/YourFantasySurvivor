@@ -47,7 +47,7 @@ export default function SeasonStats() {
 
   return (
     <CardContainer>
-      <SelectSeason />
+      <SelectSeason selectDefault />
       <Carousel>
         <span className='flex justify-around pb-2'>
           <CarouselPrevious />

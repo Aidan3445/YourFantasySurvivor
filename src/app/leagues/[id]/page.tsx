@@ -10,7 +10,7 @@ export default async function League({ params }: PageProps) {
   const { league, members } = await getLeague(parseInt(params.id));
 
   return (
-    <section className='text-center flex flex-col'>
+    <main className='text-center flex flex-col'>
       <h1 className='font-semibold text-2xl'>{league?.name}</h1>
       <h3 className='font-semibold text-lg'>{league?.season}</h3>
       <div className='flex flex-col gap-3'>
@@ -18,6 +18,6 @@ export default async function League({ params }: PageProps) {
           <div key={member.userId}>{member.displayName}</div>
         ))}
       </div>
-    </section>
+    </main>
   );
 }

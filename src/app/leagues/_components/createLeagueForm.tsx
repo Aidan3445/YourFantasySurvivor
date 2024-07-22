@@ -1,5 +1,5 @@
 'use client';
-import { SignInButton, useUser } from '@clerk/nextjs';
+import { SignedOut, SignInButton, useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm, type Control } from 'react-hook-form';
@@ -98,13 +98,14 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
 
   return (
     <CardContainer className={className}>
+      <SignedOut>
+        <SignInButton>
+          <Button className='absolute text-md font-medium inset-y-1/2 z-10 place-self-center'>
+            Log in to create a league
+          </Button>
+        </SignInButton>
+      </SignedOut>
       <Form {...form}>
-        {!isSignedIn &&
-          <SignInButton>
-            <Button className='absolute text-md font-medium inset-y-1/2 z-10 place-self-center'>
-              Log in to create a league
-            </Button>
-          </SignInButton>}
         <form
           className={cn('flex flex-col gap-4', isSignedIn ? '' : 'blur pointer-events-none')}
           onSubmit={form.handleSubmit(onSubmit)}>
