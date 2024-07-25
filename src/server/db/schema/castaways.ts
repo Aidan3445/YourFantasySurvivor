@@ -17,7 +17,8 @@ export const castaways = createTable(
   },
   // uniquie name and shortname for each season
   (table) => ({
-    unique: unique().on(table.name, table.shortName, table.season)
+    uniqueName: unique().on(table.name, table.season),
+    uniqueShortName: unique().on(table.shortName, table.season)
   })
 );
 export type Castaway = typeof castaways.$inferSelect;
