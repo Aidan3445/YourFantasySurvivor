@@ -69,8 +69,8 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
       <Form {...form}>
         {!isSignedIn &&
           <SignInButton>
-            <Button className='absolute text-md font-medium inset-y-1/2 z-10 place-self-center'>
-              Log in to create a league
+            <Button className='absolute inset-y-1/2 z-10 place-self-center font-medium text-md'>
+              Sign in to create a league
             </Button>
           </SignInButton>}
         <form
@@ -112,7 +112,7 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
           <FormMessage>
             {form.formState.errors.password?.message}
           </FormMessage>
-          <Button className='w-full mt-auto' type='submit'>Join League</Button>
+          <Button className='mt-auto w-full' type='submit'>Join League</Button>
         </form>
       </Form>
     </CardContainer>

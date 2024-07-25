@@ -27,6 +27,7 @@ const config = {
         'g1': '#3D5540',
         'g2': '#7D9277',
         'g3': '#A9CF9F',
+        'error': 'rgb(248, 113, 113, .6)',
       },
       keyframes: {
         'accordion-down': {

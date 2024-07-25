@@ -89,11 +89,11 @@ export function Leaderboard({ className }: LeaderboardProps) {
   return (
     <CardContainer className={cn('justify-start items-center p-4', className)}>
       <h3 className='text-2xl font-medium'>Leaderboard</h3>
-      <span className='flex justify-between w-full items-center'>
+      <span className='flex justify-between items-center w-full'>
         <SelectSeason className='mx-0' />
         <HoverCard openDelay={300}>
           <HoverCardTrigger>
-            <Button className='p-0.5 w-min h-min left-auto' onClick={copyUrl}>
+            <Button className='left-auto p-0.5 w-min h-min' onClick={copyUrl}>
               <Share2 className='w-5 h-5' />
             </Button>
           </HoverCardTrigger>

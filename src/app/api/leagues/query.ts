@@ -35,7 +35,7 @@ export async function getLeague(leagueId: number) {
   const [league, members] = await Promise.all([leagueFetch, membersFetch]);
 
   if (league.length === 0) throw new Error('League not found');
-  if (!members.find((member) => member.userId === user.userId)) throw new Error('User not a member of this league');
+  if (!members.find((member) => member.userId === user.userId)) throw new Error('The signed in user is not a member of this league');
   const safeMembers = members.map((member) => {
     const safeMember: {
       displayName: string;

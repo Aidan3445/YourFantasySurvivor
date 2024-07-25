@@ -10,14 +10,20 @@ export default async function League({ params }: PageProps) {
   const { league, members } = await getLeague(parseInt(params.id));
 
   return (
-    <main className='text-center flex flex-col'>
-      <h1 className='font-semibold text-2xl'>{league?.name}</h1>
-      <h3 className='font-semibold text-lg'>{league?.season}</h3>
+    <main className='flex flex-col text-center'>
+      <h1 className='text-2xl font-semibold'>{league?.name}</h1>
+      <h3 className='text-lg font-semibold'>{league?.season}</h3>
       <div className='flex flex-col gap-3'>
-        {members.map((member) => (
-          <div key={member.userId}>{member.displayName}</div>
-        ))}
+        {members.map((member) => {
+          return (
+            <div
+              key={member.userId}
+              className='px-4 rounded border border-black'
+              style={{ background: member.color }}>{member.displayName}</div>
+          );
+        })}
       </div>
     </main>
   );
+
 }

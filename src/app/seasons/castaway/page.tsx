@@ -19,9 +19,9 @@ export default async function CastawayPage({ searchParams }: CastawayPageProps) 
 
   return (
     <main>
-      <section className='flex flex-col md:flex-row gap-4 justify-between items-center'>
+      <section className='flex flex-col gap-4 justify-between items-center md:flex-row'>
         <LargeCastawayCard details={details} />
-        <CardContainer className='px-6 min-w-60 lg:min-w-80 h-full min-h-40 w-fit6'>STATS</CardContainer>
+        <CardContainer className='px-6 h-full min-w-60 min-h-40 w-fit6 lg:min-w-80'>STATS</CardContainer>
       </section>
       <section>
         <ul className='flex flex-col gap-4'>
@@ -42,9 +42,9 @@ interface LargeCastawayCardProps {
 
 function LargeCastawayCard({ details }: LargeCastawayCardProps) {
   return (
-    <CardContainer className='px-6 min-w-60 lg:min-w-80 h-full w-fit'>
-      <h3 className='text-xl font-semibold w-full text-center'>{details.name}</h3>
-      <div className='flex justify-between items-center gap-6'>
+    <CardContainer className='px-6 h-full min-w-60 w-fit lg:min-w-80'>
+      <h3 className='w-full text-xl font-semibold text-center'>{details.name}</h3>
+      <div className='flex gap-6 justify-between items-center'>
         <div className='flex flex-col'>
           <article className='flex flex-col'>
             <h4 className='text-lg font-semibold'>Castaway Info</h4>
@@ -73,11 +73,11 @@ function LargeCastawayCard({ details }: LargeCastawayCardProps) {
             </div>
           </article>
         </div>
-        <div className='flex min-w-20 min-h-40 lg:min-w-40 lg:min-h-80 relative items-start mb-4'>
+        <div className='flex relative items-start mb-4 min-w-20 min-h-40 lg:min-w-40 lg:min-h-80'>
           <Image
             src={details.photo}
             alt={`${details.name} photo`}
-            className='rounded-md object-top object-cover overflow-hidden'
+            className='object-cover object-top overflow-hidden rounded-md'
             sizes='250px'
             fill />
         </div>
@@ -93,7 +93,7 @@ interface EventCardProps {
 function EventCard({ event }: EventCardProps) {
   return (
     <CardContainer className='px-6 w-full h-full'>
-      <h3 className='text-xl font-semibold w-full text-center'>{event.name}</h3>
+      <h3 className='w-full text-xl font-semibold text-center'>{event.name}</h3>
       <div className='flex flex-col gap-2'>
         <p className='text-sm'>{event.name}</p>
         <p className='text-sm'>Episode: {event.episode}</p>

@@ -14,7 +14,7 @@ export default async function YourLeagues() {
 
   return (
     <div className='text-center'>
-      <h1 className='font-semibold text-2xl'>Your Leagues</h1>
+      <h1 className='text-2xl font-semibold'>Your Leagues</h1>
       <Carousel
         className='flex gap-3 items-center'
         opts={{

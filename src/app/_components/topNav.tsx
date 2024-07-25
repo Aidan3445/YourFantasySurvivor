@@ -8,7 +8,7 @@ interface NavItemProps {
 
 export default function TopNav() {
   return (
-    <nav className='flex justify-between items-center pt-4 font-semibold min-h-14 px-2' >
+    <nav className='flex justify-between items-center px-2 pt-4 font-semibold min-h-14' >
       <ul className='flex gap-4'>
         <NavItem path='/' label='Home' />
         <NavItem path='/playground' label='Playground' />

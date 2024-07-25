@@ -100,8 +100,8 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
     <CardContainer className={className}>
       <SignedOut>
         <SignInButton>
-          <Button className='absolute text-md font-medium inset-y-1/2 z-10 place-self-center'>
-            Log in to create a league
+          <Button className='absolute inset-y-1/2 z-10 place-self-center font-medium text-md'>
+            Sign in to create a league
           </Button>
         </SignInButton>
       </SignedOut>

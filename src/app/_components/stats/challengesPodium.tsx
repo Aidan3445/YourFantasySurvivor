@@ -30,7 +30,7 @@ export default function ChallengesPodium({ castaways, tribes }: ChallengesPodium
 
   return (
     <StatsSection title={titleSpan}>
-      <figure className='grid relative grid-flow-col auto-cols-fr h-44 gap-1 px-1 pt-3'>
+      <figure className='grid relative grid-flow-col auto-cols-fr gap-1 px-1 pt-3 h-44'>
         <div className='absolute top-0 right-0 p-2 ordinal'>
           <RemainingCastaways disabled={showTribes} castaways={castaways.slice(3)} />
         </div>

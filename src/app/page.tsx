@@ -1,5 +1,5 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut } from '@clerk/nextjs';
-import SignInCard from './_components/signInCard';
+import SignInCard, { SignInCardBase } from './_components/signInCard';
 import CardContainer from './_components/cardContainer';
 import LeaguesCard from './_components/leaguesCard';
 import SeasonStats from './_components/stats/seasonStats';
@@ -13,7 +13,7 @@ export default async function HomePage() {
       </CardContainer>
       <section className='grid grid-cols-1 gap-4 w-full sm:grid-cols-2 md:gap-8'>
         <ClerkLoading>
-          <SignInCard />
+          <SignInCardBase />
         </ClerkLoading>
         <ClerkLoaded>
           <SignedOut>
