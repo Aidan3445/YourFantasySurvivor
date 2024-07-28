@@ -85,11 +85,11 @@ main {
 
 /* on hover and selected indent */
 .hs-in {
-    @apply border box-border border-black hover:border-2 hover:shadow-inner bg-b4 
+    @apply border box-border border-black hover:shadow-inner bg-b4 
     aria-expanded:border-2 aria-expanded:shadow-inner 
     aria-expanded:shadow-b1 hover:shadow-b1
-    disabled:hover:cursor-default disabled:hover:border disabled:hover:shadow-none;
-    transition: all 0.1s ease-out;
+    disabled:hover:cursor-default disabled:hover:border disabled:hover:shadow-none
+    transition-all duration-100 ease-out;
 }
 
 /* Corner frame for cards */

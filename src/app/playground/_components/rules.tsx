@@ -54,7 +54,7 @@ export default function Rules({ className }: RulesProps) {
     });
   }, [searchParams, form]);
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = form.handleSubmit((data: z.infer<typeof formSchema>) => {
     const url = new URL(pathname, window.location.href);
 
     // set the season param
@@ -67,14 +67,14 @@ export default function Rules({ className }: RulesProps) {
 
     // push new search params to router
     router.push(url.pathname + url.search, { scroll: false });
-  };
+  });
 
   return (
     <CardContainer className={className}>
       <Form {...form}>
         <form
           className='grid grid-cols-1 gap-2 p-4 text-black md:grid-cols-3'
-          onSubmit={form.handleSubmit(onSubmit)}>
+          onSubmit={onSubmit}>
           <Challenges control={form.control} />
           <Advantages control={form.control} />
           <OtherRules control={form.control} />
@@ -133,8 +133,7 @@ export function Challenges({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='indivReward'
@@ -155,8 +154,7 @@ export function Challenges({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='tribe1st'
@@ -177,8 +175,7 @@ export function Challenges({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='tribe2nd'
@@ -202,8 +199,7 @@ export function Challenges({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
     </section>
   );
 }
@@ -232,8 +228,7 @@ export function Advantages({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='advPlay'
@@ -254,8 +249,7 @@ export function Advantages({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='badAdvPlay'
@@ -276,8 +270,7 @@ export function Advantages({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='advElim'
@@ -298,8 +291,7 @@ export function Advantages({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
     </section>
   );
 }
@@ -328,8 +320,7 @@ export function OtherRules({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='finalists'
@@ -350,8 +341,7 @@ export function OtherRules({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='fireWin'
@@ -372,8 +362,7 @@ export function OtherRules({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='soleSurvivor'
@@ -394,8 +383,7 @@ export function OtherRules({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
     </section>
   );
 }

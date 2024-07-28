@@ -11,12 +11,14 @@ export const leagueMembers = createTable(
     league: integer('league_id').references(() => leagues.id).notNull(),
     userId: varchar('user_id', { length: 64 }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
-    displayName: varchar('display_name', { length: 64 }).notNull(),
+    displayName: varchar('display_name', { length: 16 }).notNull(),
     isOwner: boolean('is_owner').notNull().default(false),
     isAdmin: boolean('is_admin').notNull().default(false),
   },
   (table) => ({
     singleJoin: unique().on(table.league, table.userId),
+    uniqueDisplayName: unique().on(table.league, table.displayName),
+    uniqueColor: unique().on(table.league, table.color),
   })
 
 );

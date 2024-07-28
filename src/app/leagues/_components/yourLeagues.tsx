@@ -4,12 +4,16 @@ import { getLeagues } from '~/app/api/leagues/query';
 
 export default async function YourLeagues() {
 
-  let yourLeagues: { name: string, season: string, id: number }[] = [];
-  try {
-    yourLeagues = await getLeagues();
-  } catch (e) {
-    if (!(e instanceof Error)) return <div>ERROR: {e as string}</div>;
-    return <div>ERROR: {e.message}</div>;
+  const yourLeagues = await getLeagues();
+
+  if (yourLeagues.length === 0) {
+    return (
+      <div className='text-center'>
+        <h1 className='text-2xl font-semibold mb-2'>Your Leagues</h1>
+        <h3>You are not a member of any leagues.</h3>
+        <h3>Join or create a league to get started.</h3>
+      </div>
+    );
   }
 
   return (

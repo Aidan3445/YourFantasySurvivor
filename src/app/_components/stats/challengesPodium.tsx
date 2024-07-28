@@ -187,12 +187,14 @@ export function SecondPlaceInfo() {
   return (
     <HoverCard openDelay={100} closeDelay={0}>
       <HoverCardTrigger>
-        <span className='absolute text-xs rounded-full border-black -translate-y-1 cursor-help'>?</span>
+        <p className='absolute text-xs rounded-full border-black -translate-y-1 cursor-help'>?</p>
       </HoverCardTrigger>
-      <HoverCardContent className='text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
-        <HoverCardArrow className='absolute translate-x-0.25' />
-        <p className='normal-nums text-wrap'>Applies only to seasons with 3-tribe challenges</p>
-      </HoverCardContent>
+      <HoverCardPortal>
+        <HoverCardContent className='text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
+          <HoverCardArrow className='absolute translate-x-0.25' />
+          <p className='normal-nums text-wrap'>Applies only to seasons with 3-tribe challenges</p>
+        </HoverCardContent>
+      </HoverCardPortal>
     </HoverCard>
   );
 }

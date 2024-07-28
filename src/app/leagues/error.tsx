@@ -13,9 +13,9 @@ export default function LeagueError({ error }: PageProps) {
   const message = error.message ?? 'An error occurred';
   const signInAgain = message === 'The signed in user is not a member of this league';
   return (
-    <main className='p-2 text-center text-black rounded border border-black bg-error shadow-lg max-w-64 md:max-w-96'>
+    <main className='p-2 text-center text-black rounded border border-black shadow-lg bg-error max-w-64 md:max-w-96'>
       {message}
-      <div className='grid grid-cols-2 w-full gap-4'>
+      <div className='grid grid-cols-2 gap-4 w-full'>
         <Button className={signInAgain ? '' : 'col-span-2'}>
           <a href='/leagues'>Back to Leagues</a>
         </Button>

@@ -54,7 +54,7 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
   const { toast } = useToast();
   const { user, isSignedIn } = useUser();
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = form.handleSubmit(async (data: z.infer<typeof formSchema>) => {
     const latestSeason = await fetch(
       '/api/seasons/latest',
       {
@@ -94,7 +94,7 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
           });
         }
       });
-  };
+  });
 
   return (
     <CardContainer className={className}>
@@ -108,7 +108,7 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
       <Form {...form}>
         <form
           className={cn('flex flex-col gap-4', isSignedIn ? '' : 'blur pointer-events-none')}
-          onSubmit={form.handleSubmit(onSubmit)}>
+          onSubmit={onSubmit}>
           <section className='flex flex-col gap-0'>
             <Label className='text-2xl font-medium'>Create League</Label>
             <FormDescription>{subtitle}</FormDescription>
@@ -118,7 +118,7 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
           <Settings control={form.control} form={form} />
           <span className='flex gap-4 justify-end'>
             <Button className='w-2/3' type='submit'>
-              Apply
+              Create
             </Button>
             <Button
               className='w-1/3'
@@ -164,8 +164,7 @@ function NameAndPassword({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='password'
@@ -188,8 +187,7 @@ function NameAndPassword({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='passwordConfirmation'
@@ -212,8 +210,7 @@ function NameAndPassword({ control }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
     </section>
   );
 }
@@ -245,8 +242,7 @@ function Settings({ control, form }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
       <FormField
         control={control}
         name='uniquePicks'
@@ -271,8 +267,7 @@ function Settings({ control, form }: FieldProps) {
             </span>
             <FormMessage />
           </FormItem>
-        )}
-      />
+        )} />
     </section>
   );
 }

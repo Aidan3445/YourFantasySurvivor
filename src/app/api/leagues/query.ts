@@ -42,9 +42,14 @@ export async function getLeague(leagueId: number) {
       color: string;
       isAdmin: boolean;
       isOwner: boolean;
-      userId?: string;
-    } = { ...member };
-    delete safeMember.userId;
+      loggedIn: boolean;
+    } = {
+      displayName: member.displayName,
+      color: member.color,
+      isAdmin: member.isAdmin,
+      isOwner: member.isOwner,
+      loggedIn: member.userId === user.userId,
+    };
     return safeMember;
   });
 

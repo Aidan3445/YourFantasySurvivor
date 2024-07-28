@@ -36,7 +36,7 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
   const { toast } = useToast();
   const { user, isSignedIn } = useUser();
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+  const onSubmit = form.handleSubmit(async (data: z.infer<typeof formSchema>) => {
     await fetch('/api/leagues/join', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -62,7 +62,7 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
           });
         }
       });
-  };
+  });
 
   return (
     <CardContainer className={className}>
@@ -75,7 +75,7 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
           </SignInButton>}
         <form
           className={cn('flex flex-col gap-4 h-full', isSignedIn ? '' : 'blur pointer-events-none')}
-          onSubmit={form.handleSubmit(onSubmit)}>
+          onSubmit={onSubmit}>
           <Label className='text-2xl font-medium'>Join a League</Label>
           <FormField
             control={form.control}
@@ -91,8 +91,7 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
                   {...field}
                 />
               </FormItem>
-            )}
-          />
+            )} />
           <FormField
             control={form.control}
             name='password'
@@ -106,13 +105,10 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
                   autoComplete='off'
                   {...field}
                 />
+                <FormMessage />
               </FormItem>
-            )}
-          />
-          <FormMessage>
-            {form.formState.errors.password?.message}
-          </FormMessage>
-          <Button className='mt-auto w-full' type='submit'>Join League</Button>
+            )} />
+          <Button className='w-full' type='submit'>Join</Button>
         </form>
       </Form>
     </CardContainer>
