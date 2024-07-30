@@ -8,7 +8,7 @@ export const leagueMembers = createTable(
   'league_member',
   {
     id: serial('league_member_id').notNull().primaryKey(),
-    league: integer('league_id').references(() => leagues.id).notNull(),
+    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
     userId: varchar('user_id', { length: 64 }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
     displayName: varchar('display_name', { length: 16 }).notNull(),
@@ -28,9 +28,9 @@ export const selectionUpdates = createTable(
   'selection_update',
   {
     id: serial('selection_update_id').notNull().primaryKey(),
-    member: integer('member_id').references(() => leagueMembers.id).notNull(),
-    episode: integer('episode_id').references(() => episodes.id).notNull(),
-    castaway: integer('castaway_id').references(() => castaways.id).notNull(),
+    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type SelectionUpdate = typeof selectionUpdates.$inferSelect;

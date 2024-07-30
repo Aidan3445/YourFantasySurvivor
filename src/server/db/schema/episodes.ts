@@ -12,7 +12,7 @@ export const episodes = createTable(
     title: varchar('name', { length: 64 }).notNull(),
     airDate: timestamp('air_date', { mode: 'string' }).notNull(),
     runtime: smallint('runtime').default(90),
-    season: integer('season').references(() => seasons.id).notNull(),
+    season: integer('season').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
     merge: boolean('merge').notNull().default(false),
   }
 );
@@ -28,7 +28,7 @@ export const baseEvents = createTable(
   'event_base',
   {
     id: serial('event_base_id').notNull().primaryKey(),
-    episode: integer('episode').references(() => episodes.id).notNull(),
+    episode: integer('episode').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     name: eventName('name').notNull(),
     keywords: varchar('keywords', { length: 32 }).array().notNull(),
     notes: varchar('notes', { length: 256 }).array().notNull(),
@@ -38,8 +38,8 @@ export const baseEvents = createTable(
 export const baseEventCastaways = createTable(
   'event_base_castaway',
   {
-    event: integer('event_id').references(() => baseEvents.id).notNull(),
-    castaway: integer('castaway_id').references(() => castaways.id).notNull(),
+    event: integer('event_id').references(() => baseEvents.id, { onDelete: 'cascade' }).notNull(),
+    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.event, table.castaway] }),
@@ -48,20 +48,20 @@ export const baseEventCastaways = createTable(
 export const baseEventTribes = createTable(
   'event_base_tribe',
   {
-    event: integer('event_id').references(() => baseEvents.id).notNull(),
-    tribe: integer('tribe_id').references(() => tribes.id).notNull(),
+    event: integer('event_id').references(() => baseEvents.id, { onDelete: 'cascade' }).notNull(),
+    tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.event, table.tribe] }),
   })
 );
 export type BaseEvent = {
-    id: number;
-    episode: number;
-    name: EventName;
-    castaways: string[];
-    tribes: string[];
-    keywords: string[];
-    notes: string[];
+  id: number;
+  episode: number;
+  name: EventName;
+  castaways: string[];
+  tribes: string[];
+  keywords: string[];
+  notes: string[];
 };
 

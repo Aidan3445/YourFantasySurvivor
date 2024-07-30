@@ -1,10 +1,11 @@
 'use server';
 import { db } from '~/server/db';
-import { eq } from 'drizzle-orm';
+import { eq, and, exists } from 'drizzle-orm';
 import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
+import { leagues } from '~/server/db/schema/leagues';
 
-export async function updateDisplayName(newName?: string) {
+export async function updateDisplayName(leagueId: number, newName?: string) {
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
 
@@ -14,10 +15,12 @@ export async function updateDisplayName(newName?: string) {
 
   await db.update(leagueMembers)
     .set({ displayName: newName })
-    .where(eq(leagueMembers.userId, user.userId));
+    .where(and(
+      eq(leagueMembers.userId, user.userId),
+      eq(leagueMembers.league, leagueId)));
 }
 
-export async function updateColor(newColor?: string) {
+export async function updateColor(leagueId: number, newColor?: string) {
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
 
@@ -27,5 +30,33 @@ export async function updateColor(newColor?: string) {
 
   await db.update(leagueMembers)
     .set({ color: newColor })
-    .where(eq(leagueMembers.userId, user.userId));
+    .where(and(
+      eq(leagueMembers.userId, user.userId),
+      eq(leagueMembers.league, leagueId)));
+}
+
+export async function leaveLeague(leagueId: number) {
+  const user = auth();
+  if (!user.userId) throw new Error('User not authenticated');
+
+  await db.delete(leagueMembers)
+    .where(and(
+      eq(leagueMembers.userId, user.userId),
+      eq(leagueMembers.league, leagueId)));
+}
+
+export async function deleteLeague(leagueId: number) {
+  const user = auth();
+  if (!user.userId) throw new Error('User not authenticated');
+
+  await db.delete(leagues)
+    .where(and(
+      eq(leagues.id, leagueId),
+      exists(db.select().from(leagueMembers)
+        .where(and(
+          eq(leagueMembers.league, leagueId),
+          eq(leagueMembers.userId, user.userId),
+          eq(leagueMembers.isOwner, true)
+        ))
+      )));
 }

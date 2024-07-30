@@ -27,9 +27,9 @@ export const weeklyEvents = createTable(
   'event_weekly',
   {
     id: serial('event_weekly_id').notNull().primaryKey(),
-    rule: integer('rule_id').references(() => weeklyEventRules.id).notNull(),
-    episode: integer('episode_id').references(() => episodes.id).notNull(),
-    member: integer('member_id').references(() => leagueMembers.id).notNull(),
+    rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type WeeklyEvent = typeof weeklyEvents.$inferSelect;
@@ -37,8 +37,8 @@ export type WeeklyEvent = typeof weeklyEvents.$inferSelect;
 export const weeklyEventsCastaways = createTable(
   'event_weekly_castaway',
   {
-    event: integer('event_id').references(() => weeklyEvents.id).notNull(),
-    castaway: integer('castaway_id').references(() => castaways.id).notNull(),
+    event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
+    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.event, table.castaway] }),
@@ -48,8 +48,8 @@ export const weeklyEventsCastaways = createTable(
 export const weeklyEventsTribes = createTable(
   'event_weekly_tribe',
   {
-    event: integer('event_id').references(() => weeklyEvents.id).notNull(),
-    tribe: integer('tribe_id').references(() => tribes.id).notNull(),
+    event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
+    tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.event, table.tribe] }),
@@ -59,8 +59,8 @@ export const weeklyEventsTribes = createTable(
 export const weeklyEventsMembers = createTable(
   'event_weekly_member',
   {
-    event: integer('event_id').references(() => weeklyEvents.id).notNull(),
-    member: integer('member_id').references(() => leagueMembers.id).notNull(),
+    event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
+    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
     pk: primaryKey({ columns: [table.event, table.member] }),

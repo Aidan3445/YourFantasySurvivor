@@ -16,7 +16,7 @@ export const leagues = createTable(
     id: serial('league_id').notNull().primaryKey(),
     name: varchar('name', { length: 64 }).notNull().unique(),
     password: varchar('password', { length: 64 }).notNull(),
-    season: integer('season_id').references(() => seasons.id).notNull(),
+    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
     uniquePicks: boolean('unique_picks').notNull().default(true),
     pickCount: pickCount('pick_count').notNull().default(1),
     locked: boolean('locked').notNull().default(false),
@@ -32,7 +32,7 @@ export const baseEventRules = createTable(
   'event_base_rule',
   {
     id: serial('base_rule_id').notNull().primaryKey(),
-    league: integer('league_id').references(() => leagues.id).notNull(),
+    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
     // point values for all the base events
     advFound: integer('adv_found').notNull(),
     advPlay: integer('adv_play').notNull(),

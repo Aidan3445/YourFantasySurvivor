@@ -5,6 +5,7 @@ import { getContrastingColor } from '@uiw/color-convert';
 import MemberEdit from './memberEdit';
 
 interface MembersProps {
+  leagueId: number;
   members: {
     displayName: string;
     color: string;
@@ -14,7 +15,7 @@ interface MembersProps {
   }[];
 }
 
-export default function Members({ members }: MembersProps) {
+export default function Members({ leagueId, members }: MembersProps) {
   return (
     <div className='flex flex-col gap-3'>
       {members.map((member) => {
@@ -29,7 +30,7 @@ export default function Members({ members }: MembersProps) {
               style={{ color: cColor }}>
               {member.displayName}
             </h3>
-            {member.loggedIn && <MemberEdit color={cColor} />}
+            {member.loggedIn && <MemberEdit color={cColor} leagueId={leagueId} isOwner={member.isOwner} />}
             <div className='mr-auto px-1' />
             <RoleHover
               isAdmin={member.isAdmin}
@@ -55,7 +56,7 @@ function RoleHover({ isAdmin, isOwner, color }: RoleHoverProps) {
     <div className='flex gap-1'>
       <HoverCard openDelay={200}>
         <HoverCardTrigger>
-          {isOwner && <Crown size={16} color={color} />}
+          {isOwner && <Crown size={16} color={color} fill={color} />}
         </HoverCardTrigger>
         <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
           <HoverCardArrow className='absolute -translate-x-1' />
@@ -64,7 +65,7 @@ function RoleHover({ isAdmin, isOwner, color }: RoleHoverProps) {
       </HoverCard>
       <HoverCard openDelay={200}>
         <HoverCardTrigger>
-          {isAdmin && <Shield size={16} color={color} />}
+          {isAdmin && <Shield size={16} color={color} fill={color} />}
         </HoverCardTrigger>
         <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
           <HoverCardArrow className='absolute -translate-x-1' />
