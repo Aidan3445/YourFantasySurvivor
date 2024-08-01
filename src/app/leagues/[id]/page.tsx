@@ -21,7 +21,7 @@ export default async function League({ params }: PageProps) {
         {ownerLoggedIn && <DeleteLeague leagueId={leagueId} />}
       </div>
       <h3 className='text-lg font-semibold'>{league?.season}</h3>
-      <Members leagueId={leagueId} members={members} />
+      <Members leagueId={leagueId} members={members} ownerLoggedIn={ownerLoggedIn} />
     </main>
   );
 }
