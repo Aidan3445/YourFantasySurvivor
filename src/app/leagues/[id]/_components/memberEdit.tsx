@@ -87,6 +87,7 @@ function EditName({ leagueId }: UpdateProps) {
                         className='w-48'
                         type='text'
                         placeholder='Change Display Name'
+                        maxLength={16}
                         {...field} />
                     </FormControl>
                     <FormMessage />
