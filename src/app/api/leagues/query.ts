@@ -37,13 +37,7 @@ export async function getLeague(leagueId: number) {
   if (league.length === 0) throw new Error('League not found');
   if (!members.find((member) => member.userId === user.userId)) throw new Error('The signed in user is not a member of this league');
   const safeMembers = members.map((member) => {
-    const safeMember: {
-      displayName: string;
-      color: string;
-      isAdmin: boolean;
-      isOwner: boolean;
-      loggedIn: boolean;
-    } = {
+    const safeMember: Member = {
       displayName: member.displayName,
       color: member.color,
       isAdmin: member.isAdmin,
@@ -68,4 +62,12 @@ export async function getLeagues() {
     .innerJoin(seasons, eq(leagues.season, seasons.id));
 
   return userLeagues;
+}
+
+export interface Member {
+  displayName: string;
+  color: string;
+  isAdmin: boolean;
+  isOwner: boolean;
+  loggedIn: boolean;
 }

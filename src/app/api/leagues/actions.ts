@@ -1,6 +1,6 @@
 'use server';
 import { db } from '~/server/db';
-import { eq, and, exists } from 'drizzle-orm';
+import { eq, and, exists, not } from 'drizzle-orm';
 import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
 import { leagues } from '~/server/db/schema/leagues';
@@ -43,10 +43,14 @@ export async function leaveLeague(leagueId: number) {
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
 
-  await db.delete(leagueMembers)
+  const member = await db.delete(leagueMembers)
     .where(and(
       eq(leagueMembers.userId, user.userId),
-      eq(leagueMembers.league, leagueId)));
+      eq(leagueMembers.league, leagueId),
+      not(eq(leagueMembers.isOwner, true))))
+    .returning({ name: leagueMembers.displayName });
+
+  if (member.length === 0) throw new Error('User cannot leave league as owner');
 }
 
 export async function deleteLeague(leagueId: number) {

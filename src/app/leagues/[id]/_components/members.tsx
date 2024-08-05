@@ -4,16 +4,11 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components
 import { getContrastingColor } from '@uiw/color-convert';
 import EditMember, { ManageMember } from './memberEdit';
 import { cn } from '~/lib/utils';
+import { type Member } from '~/app/api/leagues/query';
 
 interface MembersProps {
   leagueId: number;
-  members: {
-    displayName: string;
-    color: string;
-    isAdmin: boolean;
-    isOwner: boolean;
-    loggedIn: boolean;
-  }[];
+  members: Member[];
   ownerLoggedIn: boolean;
 }
 
@@ -35,7 +30,7 @@ export default function Members({ leagueId, members, ownerLoggedIn }: MembersPro
             {member.loggedIn &&
               <EditMember color={cColor} leagueId={leagueId} isOwner={member.isOwner} />}
             {ownerLoggedIn && !member.loggedIn &&
-              <ManageMember color={cColor} leagueId={leagueId} displayName={member.displayName} />}
+              <ManageMember color={cColor} leagueId={leagueId} member={member} />}
             <div className='mr-auto px-1' />
             <RoleHover
               isAdmin={member.isAdmin}

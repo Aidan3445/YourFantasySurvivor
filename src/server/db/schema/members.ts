@@ -20,7 +20,6 @@ export const leagueMembers = createTable(
     uniqueDisplayName: unique().on(table.league, table.displayName),
     uniqueColor: unique().on(table.league, table.color),
   })
-
 );
 export type LeagueMember = typeof leagueMembers.$inferSelect;
 
