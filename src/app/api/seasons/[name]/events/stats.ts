@@ -1,34 +1,34 @@
 import { type Events } from './query';
 
-type AdvantageStatus = 'Active' | 'Played' | 'Misplayed' | 'Eliminated';
+type AdvantageStatus = 'Active' | 'Played' | 'Misplayed' | 'Eliminated' | '-';
 export type AdvantageStat = { name: string, advName: string, status: AdvantageStatus };
 export type CastawayChallengeStat = {
-    name: string,
-    indivWin: number,
-    indivReward: number,
-    tribe1st: number,
-    tribe2nd: number
+  name: string,
+  indivWin: number,
+  indivReward: number,
+  tribe1st: number,
+  tribe2nd: number
 };
 export type TribeChallengeStat = {
-    name: string,
-    tribe1st: number,
-    tribe2nd: number
+  name: string,
+  tribe1st: number,
+  tribe2nd: number
 };
-export type TitleStat = { name: string, count: number };
+export type TitleStat = { name: string, count?: number };
 export type FinalStat = string[] | null;
 export type FireWinStat = string | null;
 export type SoleSurvivorStat = string | null;
 export type EliminationStat = { name: string, episode: number, votes: string[] };
 
 export type SeasonStats = {
-    advantages: AdvantageStat[],
-    titles: TitleStat[],
-    castawayChallenges: CastawayChallengeStat[],
-    tribeChallenges: TribeChallengeStat[],
-    final: FinalStat,
-    fireWin: FireWinStat,
-    soleSurvivor: SoleSurvivorStat,
-    eliminations: EliminationStat[]
+  advantages: AdvantageStat[],
+  titles: TitleStat[],
+  castawayChallenges: CastawayChallengeStat[],
+  tribeChallenges: TribeChallengeStat[],
+  final: FinalStat,
+  fireWin: FireWinStat,
+  soleSurvivor: SoleSurvivorStat,
+  eliminations: EliminationStat[]
 }
 export const emptyStats = (): SeasonStats => ({
   advantages: [],
@@ -140,7 +140,7 @@ export default function compileStats({ castawayEvents, tribeEvents, tribeUpdates
         const newCastaway = { name: castawayName, count: 1 };
         stats.titles.push(newCastaway);
       } else {
-        castaway.count++;
+          castaway.count!++;
       }
     }
       break;
@@ -332,7 +332,7 @@ export default function compileStats({ castawayEvents, tribeEvents, tribeUpdates
   });
 
   // sort the titles by count
-  stats.titles.sort((a, b) => b.count - a.count);
+  stats.titles.sort((a, b) => (b.count ?? 0) - (a.count ?? 0));
 
   return stats;
 }

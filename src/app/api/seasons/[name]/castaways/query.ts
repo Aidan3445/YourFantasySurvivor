@@ -39,13 +39,13 @@ export async function getCastaways(seasonName: string, castawayName: string | nu
       residence: castaways.residence,
       job: castaways.job
     }
-  }).from(baseEventTribes)
-    .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
-    .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(tribes, eq(tribes.id, baseEventTribes.tribe))
-    .innerJoin(baseEventCastaways, eq(baseEvents.id, baseEventCastaways.event))
-    .innerJoin(castaways, eq(castaways.id, baseEventCastaways.castaway))
+  }).from(castaways)
+    .rightJoin(seasons, eq(seasons.id, castaways.season))
+    .rightJoin(baseEventCastaways, eq(baseEventCastaways.castaway, castaways.id))
+    .rightJoin(baseEventTribes, eq(baseEventTribes.event, baseEventCastaways.event))
+    .rightJoin(tribes, eq(tribes.id, baseEventTribes.tribe))
+    .rightJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
+    .rightJoin(episodes, eq(episodes.id, baseEvents.episode))
     .where(and(
       eq(seasons.name, seasonName),
       eq(baseEvents.name, 'tribeUpdate'),
@@ -54,6 +54,13 @@ export async function getCastaways(seasonName: string, castawayName: string | nu
     .orderBy(asc(episodes.number));
 
   const castawaysWithTribes = rows.reduce((acc, row) => {
+    // this is a hack to filter out rows that don't have all the necessary data
+    // this shouldn't happen but will make typescript happy
+    if (!row?.name || !row?.tribe || !row?.color || !row?.photo || !row?.moreDetails) {
+      console.warn('Skipping row:', row);
+      return acc;
+    }
+
     const castaway = acc[row.name] ?? {
       name: row.name,
       photo: row.photo,
@@ -73,3 +80,4 @@ export async function getCastaways(seasonName: string, castawayName: string | nu
   return Object.values(castawaysWithTribes).sort(
     (a, b) => a.startingTribe.name.localeCompare(b.startingTribe.name));
 }
+

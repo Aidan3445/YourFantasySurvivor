@@ -20,14 +20,14 @@ export default async function YourLeagues() {
     <div className='text-center'>
       <h1 className='text-2xl font-semibold'>Your Leagues</h1>
       <Carousel
-        className='flex gap-3 items-center'
+        className='flex items-center'
         opts={{
           loop: true
         }}>
         <CarouselPrevious />
         <CarouselContent>
           {yourLeagues.map((league) => (
-            <CarouselItem className='' key={league.id}>
+            <CarouselItem className='mx-1 px-1' key={league.id}>
               <CardContainer className='p-6' key={league.id}>
                 <a className='flex flex-col' href={`/leagues/${league.id}`}>
                   <div>{league.name}</div>

@@ -9,6 +9,11 @@ export default function AdvantagesTable({ advantages }: AdvantagesTableProps) {
     return <h2 className='text-lg text-center'>No advantages yet in this season.</h2>;
   }
 
+  // pad advantages with at least 9 entries
+  while (advantages.length < 9) {
+    advantages.push({ name: '-', advName: '-', status: '-' });
+  }
+
   return (
     <figure className='stats-scroll'>
       {advantages.map((adv, index) => (
