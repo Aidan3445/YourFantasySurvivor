@@ -12,15 +12,17 @@ export async function getLeague(leagueId: number) {
 
   const leagueFetch = db
     .select({
+      id: leagues.id,
       name: leagues.name,
       season: seasons.name,
       locked: leagues.locked,
       unique: leagues.uniquePicks,
-      picks: leagues.pickCount
+      picks: leagues.pickCount,
+      password: leagues.password,
     })
     .from(leagues)
     .where(eq(leagues.id, leagueId))
-    .rightJoin(seasons, eq(seasons.id, leagues.season));
+    .innerJoin(seasons, eq(seasons.id, leagues.season));
   const membersFetch = db
     .select({
       displayName: leagueMembers.displayName,
@@ -47,7 +49,7 @@ export async function getLeague(leagueId: number) {
     return safeMember;
   });
 
-  return { league: league[0], members: safeMembers };
+  return { league: league[0]!, members: safeMembers };
 }
 
 export async function getLeagues() {
@@ -60,7 +62,6 @@ export async function getLeagues() {
     .where(eq(leagueMembers.userId, user.userId))
     .innerJoin(leagues, eq(leagueMembers.league, leagues.id))
     .innerJoin(seasons, eq(leagues.season, seasons.id));
-
   return userLeagues;
 }
 

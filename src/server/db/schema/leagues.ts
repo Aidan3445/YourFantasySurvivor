@@ -1,6 +1,6 @@
 import { createTable } from './createTable';
 import { seasons } from './seasons';
-import { boolean, customType, integer, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
+import { boolean, customType, integer, pgEnum, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 const pickCount = customType<{ data: 1 | 2; notNull: true; default: true }>(
   {
@@ -17,8 +17,6 @@ export const leagues = createTable(
     name: varchar('name', { length: 64 }).notNull().unique(),
     password: varchar('password', { length: 64 }).notNull(),
     season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
-    uniquePicks: boolean('unique_picks').notNull().default(true),
-    pickCount: pickCount('pick_count').notNull().default(1),
     locked: boolean('locked').notNull().default(false),
   }
 );
@@ -75,4 +73,24 @@ export const defaultRules: BaseEventRules = {
   finalists: 5,
   fireWin: 5,
   soleSurvivor: 10,
+};
+
+export const draftSettings = createTable(
+  'league_settings',
+  {
+    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull().primaryKey(),
+    inviteOnly: boolean('invite_only').notNull().default(false),
+    uniquePicks: boolean('unique_picks').notNull().default(true),
+    pickCount: pickCount('pick_count').notNull().default(1),
+    date: timestamp('draft_date', { mode: 'string' }).notNull(),
+    order: integer('draft_order').array().notNull(),
+    turnLimitMins: integer('turn_limit_mins').notNull().default(10),
+  }
+);
+export type DraftSettings = {
+  uniquePicks: boolean;
+  pickCount: 1 | 2;
+  date: Date;
+  order: number[]; // member ids
+  turnLimitMins: number; // minutes before pick is skipped
 };

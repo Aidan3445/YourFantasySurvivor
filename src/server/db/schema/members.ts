@@ -2,7 +2,8 @@ import { createTable } from './createTable';
 import { leagues } from './leagues';
 import { episodes } from './episodes';
 import { castaways } from './castaways';
-import { integer, serial, varchar, boolean, unique } from 'drizzle-orm/pg-core';
+import { integer, serial, varchar, boolean, unique, timestamp } from 'drizzle-orm/pg-core';
+import { nanoid } from 'nanoid';
 
 export const leagueMembers = createTable(
   'league_member',
@@ -33,3 +34,13 @@ export const selectionUpdates = createTable(
   }
 );
 export type SelectionUpdate = typeof selectionUpdates.$inferSelect;
+
+export const leagueInvite = createTable(
+  'league_invite',
+  {
+    id: varchar('invite_id', { length: 16 }).notNull().primaryKey().default(nanoid()),
+    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
+    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }),
+    expiration: timestamp('expiration', { mode: 'string' }).notNull(),
+  }
+);

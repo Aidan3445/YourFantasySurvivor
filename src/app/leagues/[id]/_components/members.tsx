@@ -14,7 +14,7 @@ interface MembersProps {
 
 export default function Members({ leagueId, members, ownerLoggedIn }: MembersProps) {
   return (
-    <div className='flex flex-col gap-3'>
+    <div className='flex flex-col gap-1'>
       {members.map((member) => {
         const cColor = getContrastingColor(member.color);
         return (
@@ -31,7 +31,6 @@ export default function Members({ leagueId, members, ownerLoggedIn }: MembersPro
               <EditMember color={cColor} leagueId={leagueId} isOwner={member.isOwner} />}
             {ownerLoggedIn && !member.loggedIn &&
               <ManageMember color={cColor} leagueId={leagueId} member={member} />}
-            <div className='mr-auto px-1' />
             <RoleHover
               isAdmin={member.isAdmin}
               isOwner={member.isOwner}
@@ -53,25 +52,27 @@ interface RoleHoverProps {
 
 function RoleHover({ isAdmin, isOwner, color }: RoleHoverProps) {
   return (
-    <div className='flex gap-1'>
-      <HoverCard openDelay={200}>
-        <HoverCardTrigger>
-          {isOwner && <Crown size={16} color={color} fill={color} />}
-        </HoverCardTrigger>
-        <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
-          <HoverCardArrow className='absolute -translate-x-1' />
-          <p className='text-nowrap'>League Owner</p>
-        </HoverCardContent>
-      </HoverCard>
-      <HoverCard openDelay={200}>
-        <HoverCardTrigger>
-          {isAdmin && !isOwner && <Shield size={16} color={color} fill={color} />}
-        </HoverCardTrigger>
-        <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
-          <HoverCardArrow className='absolute -translate-x-1' />
-          <p className='text-nowrap'>League Admin</p>
-        </HoverCardContent>
-      </HoverCard>
+    <div className='ml-auto pl-3'>
+      {isOwner &&
+        <HoverCard openDelay={200}>
+          <HoverCardTrigger>
+            <Crown size={16} color={color} fill={color} />
+          </HoverCardTrigger>
+          <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
+            <HoverCardArrow className='absolute -translate-x-1' />
+            <p className='text-nowrap'>League Owner</p>
+          </HoverCardContent>
+        </HoverCard>}
+      {isAdmin && !isOwner &&
+        <HoverCard openDelay={200}>
+          <HoverCardTrigger>
+            <Shield size={16} color={color} fill={color} />
+          </HoverCardTrigger>
+          <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
+            <HoverCardArrow className='absolute -translate-x-1' />
+            <p className='text-nowrap'>League Admin</p>
+          </HoverCardContent>
+        </HoverCard>}
     </div>
   );
 }
