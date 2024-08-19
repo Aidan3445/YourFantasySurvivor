@@ -2,9 +2,10 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodes } from './episodes';
-import { leagues, reference } from './leagues';
+import { baseEventRules, leagues, reference } from './leagues';
 import { leagueMembers } from './members';
 import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
+import { adminEventRules } from './adminEvents';
 
 export const predictionTypes = pgEnum('event_prediction_type', ['preseason', 'merge']);
 
@@ -14,10 +15,14 @@ export const predictionRules = createTable(
     id: serial('prediction_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
     name: varchar('name', { length: 32 }).notNull(),
-    description: varchar('description', { length: 256 }).notNull(),
+    // weekly events either exist on their own
+    // or are tied to an admin or base event
+    adminEvent: integer('admin_event_id').references(() => adminEventRules.id),
+    baseEvent: integer('base_event_id').references(() => baseEventRules.id),
+    description: varchar('description', { length: 256 }),
     points: integer('points').notNull(),
-    type: predictionTypes('type').notNull(),
-    referenceType: reference('reference_type').notNull(),
+    referenceType: reference('reference_type'),
+    selectionCount: integer('selection_count').notNull().default(1),
   }
 );
 export type PredictionRule = typeof predictionRules.$inferSelect;

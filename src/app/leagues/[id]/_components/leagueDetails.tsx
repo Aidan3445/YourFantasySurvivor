@@ -5,21 +5,18 @@ import { ToggleVisibility } from './toggleVis';
 import { Checkbox } from '~/app/_components/commonUI/checkbox';
 import { cn } from '~/lib/utils';
 
-interface LeagueRulesProps {
+export interface LeagueOwnerProps {
   league: {
     id: number;
     name: string;
     season: string;
-    locked: boolean;
-    unique: boolean;
-    picks: 1 | 2;
     password: string;
   };
   ownerLoggedIn: boolean;
   className?: string;
 }
 
-export default function LeagueDetails({ league, ownerLoggedIn, className }: LeagueRulesProps) {
+export default function LeagueDetails({ league, ownerLoggedIn, className }: LeagueOwnerProps) {
   return (
     <Popover>
       <PopoverTrigger className={cn(className, 'hs-in p-1 rounded-md')}>
@@ -61,7 +58,7 @@ interface BoolProps {
   value: boolean;
 }
 
-function Bool({ value }: BoolProps) {
+export function Bool({ value }: BoolProps) {
   return (
     <Checkbox className='pointer-events-none' checked={value} />
   );

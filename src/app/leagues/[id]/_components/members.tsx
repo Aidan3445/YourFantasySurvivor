@@ -1,27 +1,24 @@
-import { HoverCardArrow } from '@radix-ui/react-hover-card';
-import { Crown, Shield } from 'lucide-react';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
 import { getContrastingColor } from '@uiw/color-convert';
-import EditMember, { ManageMember } from './memberEdit';
+import EditMember, { InviteMember, ManageMember, RoleHover } from './memberEdit';
 import { cn } from '~/lib/utils';
 import { type Member } from '~/app/api/leagues/query';
+import { type ReactNode } from 'react';
+import { Separator } from '~/app/_components/commonUI/separator';
 
 interface MembersProps {
   leagueId: number;
   members: Member[];
   ownerLoggedIn: boolean;
+  isFull: boolean;
 }
 
-export default function Members({ leagueId, members, ownerLoggedIn }: MembersProps) {
+export default function Members({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   return (
     <div className='flex flex-col gap-1'>
       {members.map((member) => {
         const cColor = getContrastingColor(member.color);
         return (
-          <div
-            key={member.displayName}
-            className={cn('px-2 gap-1 rounded border border-black flex items-center', member.loggedIn && 'border ring ring-white')}
-            style={{ background: member.color }}>
+          <MemberRow key={member.displayName} color={member.color} loggedIn={member.loggedIn}>
             <h3
               className='font-medium'
               style={{ color: cColor }}>
@@ -35,44 +32,30 @@ export default function Members({ leagueId, members, ownerLoggedIn }: MembersPro
               isAdmin={member.isAdmin}
               isOwner={member.isOwner}
               color={cColor} />
-          </div>
+          </MemberRow>
         );
       })}
-    </div >
+      {!isFull &&
+        <div>
+          <Separator className='col-span-3 my-1 w-full' decorative />
+          <InviteMember leagueId={leagueId} />
+        </div>}
+    </div>
   );
 }
 
-
-
-interface RoleHoverProps {
-  isAdmin: boolean;
-  isOwner: boolean;
+interface MemberRowProps {
+  children: ReactNode;
   color: string;
+  loggedIn: boolean;
 }
 
-function RoleHover({ isAdmin, isOwner, color }: RoleHoverProps) {
+export function MemberRow({ children, color, loggedIn }: MemberRowProps) {
   return (
-    <div className='ml-auto pl-3'>
-      {isOwner &&
-        <HoverCard openDelay={200}>
-          <HoverCardTrigger>
-            <Crown size={16} color={color} fill={color} />
-          </HoverCardTrigger>
-          <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
-            <HoverCardArrow className='absolute -translate-x-1' />
-            <p className='text-nowrap'>League Owner</p>
-          </HoverCardContent>
-        </HoverCard>}
-      {isAdmin && !isOwner &&
-        <HoverCard openDelay={200}>
-          <HoverCardTrigger>
-            <Shield size={16} color={color} fill={color} />
-          </HoverCardTrigger>
-          <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
-            <HoverCardArrow className='absolute -translate-x-1' />
-            <p className='text-nowrap'>League Admin</p>
-          </HoverCardContent>
-        </HoverCard>}
+    <div
+      className={cn('px-2 gap-1 rounded border border-black flex items-center', loggedIn && 'border ring ring-white')}
+      style={{ background: color }}>
+      {children}
     </div>
   );
 }

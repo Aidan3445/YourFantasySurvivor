@@ -18,6 +18,7 @@ import { hsvaToHex, getContrastingColor, } from '@uiw/color-convert';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { twentyColors } from '~/lib/colors';
 import { type Member } from '~/app/api/leagues/query';
+import { MemberRow } from './members';
 
 interface MemberEditProps {
   leagueId: number;
@@ -30,8 +31,8 @@ export default function MemberEdit({ leagueId, color, isOwner }: MemberEditProps
   const toggleOpen = () => setOpen(!open);
 
   return (
-    <HoverCard openDelay={150} open={open} onOpenChange={setOpen}>
-      <HoverCardTrigger onTouchStart={toggleOpen}>
+    <HoverCard openDelay={500} closeDelay={100} open={open} onOpenChange={setOpen}>
+      <HoverCardTrigger onClick={toggleOpen}>
         <SlidersHorizontal size={14} color={color} />
       </HoverCardTrigger>
       <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700 flex gap-2' sideOffset={10} side='top'>
@@ -278,7 +279,7 @@ export function DeleteLeague({ leagueId }: UpdateProps) {
   return (
     <Popover open={deleteOpen} onOpenChange={setDeleteOpen}>
       <PopoverTrigger>
-        <Trash2 size={16} />
+        <Trash2 className='inline-flex align-middle' size={16} />
       </PopoverTrigger>
       <Popup>
         <form className='flex flex-col gap-1 text-center' action={catchUpdate}>
@@ -438,3 +439,67 @@ function DemoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
   );
 }
 
+interface RoleHoverProps {
+  isAdmin: boolean;
+  isOwner: boolean;
+  color: string;
+}
+
+export function RoleHover({ isAdmin, isOwner, color }: RoleHoverProps) {
+  const [open, setOpen] = useState(false);
+  const toggleOpen = () => setOpen(!open);
+
+  const Icon = isOwner ?
+    <Crown size={16} color={color} fill={color} /> :
+    isAdmin ?
+      <Shield size={16} color={color} fill={color} /> :
+      null;
+
+  const label = isOwner ? 'League Owner' : isAdmin ? 'League Admin' : null;
+
+  return (
+    <div className='ml-auto pl-3'>
+      <HoverCard openDelay={500} closeDelay={0} open={open} onOpenChange={setOpen}>
+        <HoverCardTrigger onClick={toggleOpen}>
+          {Icon}
+        </HoverCardTrigger>
+        <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
+          <HoverCardArrow className='absolute -translate-x-1' />
+          <p className='text-nowrap'>{label}</p>
+        </HoverCardContent>
+      </HoverCard>
+    </div>
+  );
+}
+
+export function InviteMember({ leagueId }: UpdateProps) {
+  const { toast } = useToast();
+
+  const [inviteOpen, setInviteOpen] = useState(false);
+
+  const catchInvite = () => {
+    toast({
+      title: 'Not Implemented',
+      description: 'This feature is not yet implemented',
+      variant: 'error',
+    });
+  };
+
+  return (
+    <Popover open={inviteOpen} onOpenChange={setInviteOpen}>
+      <PopoverTrigger className='w-full'>
+        <MemberRow color='white' loggedIn={false}>
+          <h3 className='font-medium'>Invite</h3>
+          <UserPlus className='ml-auto' size={16} />
+        </MemberRow>
+      </PopoverTrigger>
+      <Popup>
+        <form className='flex flex-col gap-1 text-center' action={catchInvite}>
+          <h3>Invite a new member to the league: {leagueId}
+          </h3>
+          <Button type='submit'>Invite Member</Button>
+        </form>
+      </Popup>
+    </Popover >
+  );
+}

@@ -36,7 +36,7 @@ export async function getCastawayEvents(
     .where(
       and(
         eq(seasons.name, seasonName),
-        //not(eq(baseEvents.name, 'tribeUpdate')),
+        not(eq(baseEvents.name, "tribeUpdate")),
         or(
           eq(castaways.name, castawayName ?? castaways.name),
           eq(castaways.shortName, castawayName ?? castaways.shortName),
@@ -70,7 +70,7 @@ export async function getTribeEvents(
     .where(
       and(
         eq(seasons.name, seasonName),
-        //not(eq(baseEvents.name, 'tribeUpdate')),
+        not(eq(baseEvents.name, "tribeUpdate")),
         eq(tribes.name, tribeName ?? tribes.name),
       ),
     );

@@ -1,6 +1,7 @@
 import { createTable } from './createTable';
 import { seasons } from './seasons';
 import { boolean, customType, integer, pgEnum, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { nanoid } from 'nanoid';
 
 const pickCount = customType<{ data: 1 | 2; notNull: true; default: true }>(
   {
@@ -17,7 +18,6 @@ export const leagues = createTable(
     name: varchar('name', { length: 64 }).notNull().unique(),
     password: varchar('password', { length: 64 }).notNull(),
     season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
-    locked: boolean('locked').notNull().default(false),
   }
 );
 export type League = typeof leagues.$inferSelect;
@@ -75,7 +75,7 @@ export const defaultRules: BaseEventRules = {
   soleSurvivor: 10,
 };
 
-export const draftSettings = createTable(
+export const settings = createTable(
   'league_settings',
   {
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull().primaryKey(),
@@ -87,10 +87,19 @@ export const draftSettings = createTable(
     turnLimitMins: integer('turn_limit_mins').notNull().default(10),
   }
 );
-export type DraftSettings = {
+export type Settings = {
   uniquePicks: boolean;
   pickCount: 1 | 2;
   date: Date;
   order: number[]; // member ids
   turnLimitMins: number; // minutes before pick is skipped
 };
+
+export const leagueInvite = createTable(
+  'league_invite',
+  {
+    id: varchar('invite_id', { length: 16 }).notNull().primaryKey().default(nanoid()),
+    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
+    expiration: timestamp('expiration', { mode: 'string' }).notNull(),
+  }
+);

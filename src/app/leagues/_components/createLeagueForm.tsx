@@ -9,8 +9,6 @@ import { Button } from '~/app/_components/commonUI/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
 import { Input } from '~/app/_components/commonUI/input';
 import { Label } from '~/app/_components/commonUI/label';
-import { Separator } from '~/app/_components/commonUI/separator';
-import { Switch } from '~/app/_components/commonUI/switch';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { cn } from '~/lib/utils';
 import { type LeagueInsert } from '~/server/db/schema/leagues';
@@ -114,8 +112,6 @@ export default function CreateLeagueForm({ className, subtitle, closePopup }: Cr
             <FormDescription>{subtitle}</FormDescription>
           </section>
           <NameAndPassword control={form.control} disabled={!isSignedIn} />
-          <Separator className='col-span-3 my-1 w-full' decorative />
-          <Settings control={form.control} form={form} />
           <span className='flex gap-4 justify-end'>
             <Button className='w-2/3' type='submit'>
               Create
@@ -215,6 +211,7 @@ function NameAndPassword({ control }: FieldProps) {
   );
 }
 
+/*
 function Settings({ control, form }: FieldProps) {
   return (
     <section>
@@ -271,3 +268,4 @@ function Settings({ control, form }: FieldProps) {
     </section>
   );
 }
+*/
