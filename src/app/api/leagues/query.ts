@@ -1,14 +1,14 @@
 import 'server-only';
 import { db } from '~/server/db';
 import { count, eq } from 'drizzle-orm';
-import { baseEventRules, leagues, settings } from '~/server/db/schema/leagues';
+import { type BaseEventRuleType, baseEventRules, leagues } from '~/server/db/schema/leagues';
 import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { castaways } from '~/server/db/schema/castaways';
-import { adminEventRules } from '~/server/db/schema/adminEvents';
-import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
-import { predictionRules } from '~/server/db/schema/predictions';
+import { type AdminEventRuleType, adminEventRules } from '~/server/db/schema/adminEvents';
+import { weeklyEventRules, type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
+import { predictionRules, type PredictionEventRuleType, } from '~/server/db/schema/predictions';
 
 export async function getLeague(leagueId: number) {
   const user = auth();
@@ -81,31 +81,32 @@ export interface Member {
   loggedIn: boolean;
 }
 
-export async function getSettings(leagueId: number) {
-  // get events and draft settings
+export async function getRules(leagueId: number):
+  Promise<
+    BaseEventRuleType &
+    {
+      admin: AdminEventRuleType[];
+      weekly: WeeklyEventRuleType[];
+      season: PredictionEventRuleType[]
+    }> {
+  // get event rules
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const baseEvents = db
     .select({
-      advantages: {
-        found: baseEventRules.advFound,
-        play: baseEventRules.advPlay,
-        badPlay: baseEventRules.badAdvPlay,
-        elim: baseEventRules.advElim,
-      },
-      challenges: {
-        tribe1st: baseEventRules.tribe1st,
-        tribe2nd: baseEventRules.tribe2nd,
-        indivWin: baseEventRules.indivWin,
-        indivReward: baseEventRules.indivReward,
-      },
-      other: {
-        spokeEpTitle: baseEventRules.spokeEpTitle,
-        finalists: baseEventRules.finalists,
-        fireWin: baseEventRules.fireWin,
-        soleSurvivor: baseEventRules.soleSurvivor,
-      },
+      advFound: baseEventRules.advFound,
+      advPlay: baseEventRules.advPlay,
+      badAdvPlay: baseEventRules.badAdvPlay,
+      advElim: baseEventRules.advElim,
+      tribe1st: baseEventRules.tribe1st,
+      tribe2nd: baseEventRules.tribe2nd,
+      indivWin: baseEventRules.indivWin,
+      indivReward: baseEventRules.indivReward,
+      spokeEpTitle: baseEventRules.spokeEpTitle,
+      finalists: baseEventRules.finalists,
+      fireWin: baseEventRules.fireWin,
+      soleSurvivor: baseEventRules.soleSurvivor,
     })
     .from(baseEventRules)
     .where(eq(baseEventRules.league, leagueId));
@@ -147,20 +148,9 @@ export async function getSettings(leagueId: number) {
     .from(predictionRules)
     .where(eq(predictionRules.league, leagueId));
 
-  const draft = db
-    .select({
-      inviteOnly: settings.inviteOnly,
-      uniquePicks: settings.uniquePicks,
-      pickCount: settings.pickCount,
-      date: settings.date,
-      order: settings.order,
-      turnLimitMins: settings.turnLimitMins,
-    })
-    .from(settings)
-    .where(eq(settings.league, leagueId));
+  const [base, admin, weekly, season] = await Promise.all([baseEvents, adminEvents, weeklyEvents, predictionEvents]);
 
-  const [base, admin, weekly, season, draftSettings] = await Promise.all([baseEvents, adminEvents, weeklyEvents, predictionEvents, draft]);
-
-  return { base: base[0], admin, weekly, season, draft: draftSettings[0] };
+  // base spread is technically not safe but is handled by the form
+  return { ...base[0]!, admin, weekly, season };
 }
 

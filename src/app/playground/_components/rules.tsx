@@ -1,9 +1,9 @@
 'use client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { defaultRules, type BaseEventRules } from '~/server/db/schema/leagues';
-import { z } from 'zod';
+import { type z } from 'zod';
+import { defaultBaseRules, type BaseEventRuleType, BaseEventRule } from '~/server/db/schema/leagues';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, type Control } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
 import { Input } from '~/app/_components/commonUI/input';
 import { Button } from '~/app/_components/commonUI/button';
@@ -14,31 +14,13 @@ import { useEffect } from 'react';
 
 interface RulesProps {
   className?: string;
+
 }
 
-const numberRange = z.coerce.number()
-  .max(512, { message: 'Points must not exceed +/-512' })
-  .min(-512, { message: 'Points must not exceed +/-512' });
-
-export const formSchema = z.object({
-  advFound: numberRange,
-  advPlay: numberRange,
-  badAdvPlay: numberRange,
-  advElim: numberRange,
-  spokeEpTitle: numberRange,
-  tribe1st: numberRange,
-  tribe2nd: numberRange,
-  indivWin: numberRange,
-  indivReward: numberRange,
-  finalists: numberRange,
-  fireWin: numberRange,
-  soleSurvivor: numberRange,
-});
-
 export default function Rules({ className }: RulesProps) {
-  const form = useForm<z.infer<typeof formSchema>>({
-    defaultValues: defaultRules,
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof BaseEventRule>>({
+    defaultValues: defaultBaseRules,
+    resolver: zodResolver(BaseEventRule),
   });
   const router = useRouter();
   const pathname = usePathname();
@@ -46,15 +28,15 @@ export default function Rules({ className }: RulesProps) {
 
   useEffect(() => {
     // iterate through form schema and set values to any search params
-    Object.keys(formSchema.shape).forEach(key => {
+    Object.keys(BaseEventRule.shape).forEach(key => {
       const value = searchParams.get(key);
       if (value) {
-        form.setValue(key as keyof BaseEventRules, parseInt(value));
+        form.setValue(key as keyof BaseEventRuleType, parseInt(value));
       }
     });
   }, [searchParams, form]);
 
-  const onSubmit = form.handleSubmit((data: z.infer<typeof formSchema>) => {
+  const onSubmit = form.handleSubmit((data: z.infer<typeof BaseEventRule>) => {
     const url = new URL(pathname, window.location.href);
 
     // set the season param
@@ -75,9 +57,9 @@ export default function Rules({ className }: RulesProps) {
         <form
           className='grid grid-cols-1 gap-2 p-4 text-black md:grid-cols-3'
           onSubmit={onSubmit}>
-          <Challenges control={form.control} />
-          <Advantages control={form.control} />
-          <OtherRules control={form.control} />
+          <Challenges />
+          <Advantages />
+          <Other />
           <Separator className='col-span-3 my-1 w-full' decorative />
           <div className='col-span-2 text-sm'>
             <p>
@@ -95,7 +77,7 @@ export default function Rules({ className }: RulesProps) {
             <Button
               className='w-1/3'
               type='reset'
-              onClick={() => form.reset()}>
+              onClick={async () => { form.reset(); await onSubmit(); }}>
               Reset
             </Button>
           </span>
@@ -105,16 +87,11 @@ export default function Rules({ className }: RulesProps) {
   );
 }
 
-interface FieldProps {
-  control?: Control<z.infer<typeof formSchema>>;
-}
-
-export function Challenges({ control }: FieldProps) {
+export function Challenges() {
   return (
     <section>
       <FormLabel className='text-2xl'>Challenges</FormLabel>
       <FormField
-        control={control}
         name='indivWin'
         render={({ field }) => (
           <FormItem>
@@ -135,7 +112,6 @@ export function Challenges({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='indivReward'
         render={({ field }) => (
           <FormItem>
@@ -156,7 +132,6 @@ export function Challenges({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='tribe1st'
         render={({ field }) => (
           <FormItem>
@@ -177,13 +152,11 @@ export function Challenges({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='tribe2nd'
         render={({ field }) => (
           <FormItem>
             <FormLabel>
-              Tribe 2nd Place
-              <SecondPlaceInfo />
+              Tribe <SecondPlaceInfo /> Place
             </FormLabel>
             <span className='flex gap-4 items-center'>
               <FormControl>
@@ -204,12 +177,11 @@ export function Challenges({ control }: FieldProps) {
   );
 }
 
-export function Advantages({ control }: FieldProps) {
+export function Advantages() {
   return (
     <section>
       <FormLabel className='text-2xl'>Advantages</FormLabel>
       <FormField
-        control={control}
         name='advFound'
         render={({ field }) => (
           <FormItem>
@@ -230,7 +202,6 @@ export function Advantages({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='advPlay'
         render={({ field }) => (
           <FormItem>
@@ -251,7 +222,6 @@ export function Advantages({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='badAdvPlay'
         render={({ field }) => (
           <FormItem>
@@ -272,7 +242,6 @@ export function Advantages({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='advElim'
         render={({ field }) => (
           <FormItem>
@@ -296,12 +265,11 @@ export function Advantages({ control }: FieldProps) {
   );
 }
 
-export function OtherRules({ control }: FieldProps) {
+export function Other() {
   return (
     <section>
       <FormLabel className='text-2xl'>Other Rules</FormLabel>
       <FormField
-        control={control}
         name='spokeEpTitle'
         render={({ field }) => (
           <FormItem>
@@ -322,7 +290,6 @@ export function OtherRules({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='finalists'
         render={({ field }) => (
           <FormItem>
@@ -343,7 +310,6 @@ export function OtherRules({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='fireWin'
         render={({ field }) => (
           <FormItem>
@@ -364,7 +330,6 @@ export function OtherRules({ control }: FieldProps) {
           </FormItem>
         )} />
       <FormField
-        control={control}
         name='soleSurvivor'
         render={({ field }) => (
           <FormItem>

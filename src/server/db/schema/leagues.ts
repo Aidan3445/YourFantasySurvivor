@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { createTable } from './createTable';
 import { seasons } from './seasons';
 import { boolean, customType, integer, pgEnum, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
@@ -46,21 +47,28 @@ export const baseEventRules = createTable(
     soleSurvivor: integer('sole_survivor').notNull(),
   }
 );
-export type BaseEventRules = {
-  advFound: number;
-  advPlay: number;
-  badAdvPlay: number;
-  advElim: number;
-  spokeEpTitle: number;
-  tribe1st: number;
-  tribe2nd: number;
-  indivWin: number;
-  indivReward: number;
-  finalists: number;
-  fireWin: number;
-  soleSurvivor: number;
-};
-export const defaultRules: BaseEventRules = {
+export const pointRange = z.coerce.number()
+  .max(512, { message: 'Points must not exceed ±512' })
+  .min(-512, { message: 'Points must not exceed ±512' });
+
+export const BaseEventRule = z.object({
+  advFound: pointRange,
+  advPlay: pointRange,
+  badAdvPlay: pointRange,
+  advElim: pointRange,
+  spokeEpTitle: pointRange,
+  tribe1st: pointRange,
+  tribe2nd: pointRange,
+  indivWin: pointRange,
+  indivReward: pointRange,
+  finalists: pointRange,
+  fireWin: pointRange,
+  soleSurvivor: pointRange,
+});
+
+export type BaseEventRuleType = z.infer<typeof BaseEventRule>;
+
+export const defaultBaseRules: BaseEventRuleType = {
   advFound: 5,
   advPlay: 10,
   badAdvPlay: -5,

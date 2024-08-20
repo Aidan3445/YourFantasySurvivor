@@ -113,7 +113,6 @@ function Podium({ castaway, tribe, showTribes, className }: PodiumProps) {
                 </div>
                 <div className='flex flex-col'>
                   <h3 className='relative ordinal border-b border-black'>
-                    2nd
                     <SecondPlaceInfo />
                   </h3>
                   <h3 className='tabular-nums'>{tribe2nd}</h3>
@@ -162,7 +161,6 @@ function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
               <h4 className='px-1 font-normal'>Rwd.</h4>
               <h4 className='px-1 font-normal ordinal border-l border-black'>1st</h4>
               <h4 className='px-1 font-normal ordinal'>
-                2nd
                 <SecondPlaceInfo />
               </h4>
             </span>
@@ -186,12 +184,13 @@ function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
 export function SecondPlaceInfo() {
   return (
     <HoverCard openDelay={100} closeDelay={0}>
-      <HoverCardTrigger>
-        <p className='absolute text-xs rounded-full border-black -translate-y-1 cursor-help'>?</p>
+      <HoverCardTrigger className='justify-center cursor-help inline-flex'>
+        2nd
+        <p className='text-xs rounded-full text-b4 -translate-y-2'>?</p>
       </HoverCardTrigger>
       <HoverCardPortal>
         <HoverCardContent className='text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
-          <HoverCardArrow className='absolute translate-x-0.25' />
+          <HoverCardArrow className='' />
           <p className='normal-nums text-wrap'>Applies only to seasons with 3-tribe challenges</p>
         </HoverCardContent>
       </HoverCardPortal>

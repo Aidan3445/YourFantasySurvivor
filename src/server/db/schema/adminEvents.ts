@@ -2,9 +2,10 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodes } from './episodes';
-import { leagues, reference } from './leagues';
+import { leagues, reference, pointRange } from './leagues';
 import { leagueMembers } from './members';
 import { integer, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
+import { z } from 'zod';
 
 export const adminEventRules = createTable(
   'event_admin_rule',
@@ -17,7 +18,23 @@ export const adminEventRules = createTable(
     referenceType: reference('reference_type').notNull(),
   }
 );
-export type AdminEventRule = typeof adminEventRules.$inferSelect;
+
+export const eventName = z.coerce.string()
+  .min(3, { message: 'Name must be between 3 and 16 characters' })
+  .max(32, { message: 'Name must be between 3 and 16 characters' });
+
+export const description = z.coerce.string()
+  .min(3, { message: 'Description must be between 3 and 256 characters' })
+  .max(256, { message: 'Description must be between 3 and 256 characters' });
+
+export const AdminEventRule = z.object({
+  name: eventName,
+  description: z.string(),
+  points: pointRange,
+  referenceType: z.enum(reference.enumValues),
+});
+
+export type AdminEventRuleType = z.infer<typeof AdminEventRule>;
 
 export const adminEvents = createTable(
   'event_admin',

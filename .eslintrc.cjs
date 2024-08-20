@@ -76,6 +76,13 @@ const config = {
         argsIgnorePattern: '^_'
       }
     ],
+    'no-unused-vars': [
+      'error',
+      {
+        argsIgnorePattern: '^_'
+      }
+    ],
+
     '@typescript-eslint/require-await': 'off',
     '@typescript-eslint/no-misused-promises': [
       'error',

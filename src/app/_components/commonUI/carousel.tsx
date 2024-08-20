@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { cn } from '~/lib/utils';
 import { Button } from './button';
+import { Tabs, TabsList, TabsTrigger } from './tabs';
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -271,25 +272,24 @@ CarouselNext.displayName = 'CarouselNext';
 const DotButtons = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<typeof Button>
->(({ className, variant = 'outline', size = 'icon', ...props }, ref) => {
+>(({ className }, _ref) => {
   const { selectedIndex, scrollSnaps, dotSelected } = useCarousel();
 
   return (
-    <div className={className}>
-      {scrollSnaps.map((_, index) => (
-        <Button
-          key={index}
-          ref={ref}
-          variant={variant}
-          size={size}
-          className={cn(
-            'h-4 w-4 rounded-full hs-in text-xs',
-            selectedIndex === index && 'ring-2 ring-white'
-          )}
-          onClick={() => dotSelected(index)}
-          {...props}
-        >{index + 1}</Button>))}
-    </div>
+    <Tabs className={className} defaultValue='0' value={selectedIndex.toString()}>
+      <TabsList>
+        {scrollSnaps.map((_, index) => {
+          return (
+            <TabsTrigger
+              key={index}
+              value={index.toString()}
+              onClick={() => dotSelected(index)}>
+              {index + 1}
+            </TabsTrigger>
+          );
+        })}
+      </TabsList>
+    </Tabs>
   );
 });
 DotButtons.displayName = 'DotButton';

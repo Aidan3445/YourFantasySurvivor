@@ -7,7 +7,7 @@ import SelectSeason from '~/app/_components/selectSeason';
 import { type Events } from '~/app/api/seasons/[name]/events/query';
 import compileScores from '~/app/api/seasons/[name]/events/scores';
 import { cn } from '~/lib/utils';
-import { defaultRules, type BaseEventRules } from '~/server/db/schema/leagues';
+import { defaultBaseRules, type BaseEventRuleType } from '~/server/db/schema/leagues';
 import Chart from './scoreChart';
 import Scores from './scoreboard';
 import { Share2 } from 'lucide-react';
@@ -26,11 +26,11 @@ export function Leaderboard({ className }: LeaderboardProps) {
   const season = searchParams.get('season')!;
 
   useEffect(() => {
-    const rules: BaseEventRules = defaultRules;
+    const rules: BaseEventRuleType = defaultBaseRules;
     // iterate through rules and set to searchParams if found
     for (const key in rules) {
       const value = searchParams.get(key);
-      if (value) rules[key as keyof BaseEventRules] = parseInt(value);
+      if (value) rules[key as keyof BaseEventRuleType] = parseInt(value);
     }
 
     if (season) {

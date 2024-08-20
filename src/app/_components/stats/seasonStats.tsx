@@ -1,7 +1,7 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, DotButtons } from '../commonUI/carousel';
+import { Carousel, CarouselContent, CarouselItem, DotButtons } from '../commonUI/carousel';
 import compileStats, { type SeasonStats as SS, emptyStats } from '~/app/api/seasons/[name]/events/stats';
 import ChallengesPodium from './challengesPodium';
 import AdvantagesTable from './advantagesTable';
@@ -49,13 +49,9 @@ export default function SeasonStats() {
     <CardContainer>
       <SelectSeason selectDefault />
       <Carousel>
-        <span className='flex justify-around pb-2'>
-          <CarouselPrevious />
-          <div className='justify-center'>
-            <h2 className='text-2xl font-semibold'>Season Stats</h2>
-            <DotButtons className='justify-evenly w-full flex h-min p-0' />
-          </div>
-          <CarouselNext />
+        <span className='pb-2 text-center'>
+          <h2 className='text-2xl font-semibold'>Season Stats</h2>
+          <DotButtons className='justify-evenly w-full flex h-min p-0' />
         </span>
         <CarouselContent>
           {carouselItems.map((item, index) => (

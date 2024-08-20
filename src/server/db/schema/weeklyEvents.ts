@@ -2,10 +2,11 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodes } from './episodes';
-import { baseEventRules, leagues, reference } from './leagues';
+import { baseEventRules, leagues, pointRange, reference } from './leagues';
 import { leagueMembers } from './members';
 import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
 import { adminEventRules } from './adminEvents';
+import { z } from 'zod';
 
 export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
 
@@ -26,7 +27,30 @@ export const weeklyEventRules = createTable(
     selectionCount: integer('selection_count').notNull().default(1),
   }
 );
-export type WeeklyEventRule = typeof weeklyEventRules.$inferSelect;
+
+export const WeeklyEventRule = z.object({
+  name: z.string().nullable(),
+  adminEvent: z.number().nullable(),
+  baseEvent: z.number().nullable(),
+  description: z.string().nullable(),
+  points: pointRange,
+  referenceType: z.enum(reference.enumValues).nullable(),
+  type: z.enum(weeklyEventType.enumValues),
+  selectionCount: z.number(),
+}).refine((rule) => {
+  const refAdmin = rule.adminEvent !== null;
+  const refBase = rule.baseEvent !== null;
+  const newRule = rule.name !== null && rule.description !== null && rule.referenceType !== null;
+
+  // rule must be tied to an admin event, base event, or be a new rule
+  // it should not reference both an admin and base event or
+  // be a new rule with a reference of either type
+  return (refAdmin && !refBase && !newRule)
+    || (!refAdmin && refBase && !newRule)
+    || (!refAdmin && !refBase && newRule);
+});
+
+export type WeeklyEventRuleType = z.infer<typeof WeeklyEventRule>;
 
 export const weeklyEvents = createTable(
   'event_weekly',

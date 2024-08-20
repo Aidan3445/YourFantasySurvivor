@@ -1,7 +1,7 @@
 import { getLeague } from '~/app/api/leagues/query';
 import Members from './_components/members';
 import LeagueDetails from './_components/leagueDetails';
-import LeagueSettings from './_components/leagueSettings';
+import LeagueScoring from './_components/events/leagueScoring';
 
 interface PageProps {
   params: {
@@ -21,7 +21,7 @@ export default async function League({ params }: PageProps) {
       <h3 className='text-md font-semibold'>Season: {league?.season}</h3>
       <span className='grid grid-cols-2'>
         <LeagueDetails className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
-        <LeagueSettings className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
+        <LeagueScoring className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
       </span>
       <Members
         leagueId={leagueId}

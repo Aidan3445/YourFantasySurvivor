@@ -8,7 +8,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/app/_components/commonUI/select';
-import { cn } from '~/lib/utils';
 
 export interface SelectSeasonProps {
   className?: string;
@@ -43,12 +42,12 @@ export default function SelectSeason({ className, selectDefault = false }: Selec
 
   return (
     <Select defaultValue={season} value={season} onValueChange={(value) => updateSeason(value)}>
-      <SelectTrigger className={cn('self-center m-2 w-3/4 font-semibold hs-in', className)}>
+      <SelectTrigger className={className}>
         <br />
         <SelectValue placeholder='Select Season' defaultValue={'fdfdf'} />
       </SelectTrigger>
-      <SelectContent className='border-black bg-b4'>
-        {seasons?.map((s) => <SelectItem className='hover:bg-b3' key={s} value={s}>{s}</SelectItem>)}
+      <SelectContent>
+        {seasons?.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
       </SelectContent>
     </Select >
   );

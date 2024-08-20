@@ -30,5 +30,19 @@ const PopoverContent = React.forwardRef<
 ));
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
-export { Popover, PopoverTrigger, PopoverContent };
+const PopoverCenter = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Anchor>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Anchor>
+>(({ className, ...props }, ref) => (
+  <PopoverPrimitive.Anchor
+    ref={ref}
+    className={cn(
+      'fixed left-1/2 top-20 -translate-x-1/2 -translate-y-1/2 transform z-50',
+      className)}
+    {...props}
+  />
+));
+PopoverCenter.displayName = PopoverPrimitive.Anchor.displayName;
+
+export { Popover, PopoverTrigger, PopoverContent, PopoverCenter };
 
