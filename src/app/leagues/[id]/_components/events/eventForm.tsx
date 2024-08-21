@@ -37,7 +37,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
   // merge default rules with provided rules
   // any unspecified rules will use defaults
   const defaultRules = {
-    ...defaultBaseRules,
+    ...defaultBaseRules(),
     ...rules
   };
 

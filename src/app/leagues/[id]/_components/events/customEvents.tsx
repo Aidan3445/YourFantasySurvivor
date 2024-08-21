@@ -19,6 +19,15 @@ interface CustomEventsProps extends ComponentProps {
 export default function CustomEvents({ className, form }: CustomEventsProps) {
   const [customEvents, setCustomEvents] = useState(form.getValues().admin);
 
+  const updateEvent = (event: AdminEventRuleType | null, eventId: number) => {
+    const newEvents = [...customEvents];
+
+    if (!event) newEvents.splice(eventId, 1);
+    else newEvents[eventId] = event;
+
+    setCustomEvents(newEvents);
+  };
+
   useEffect(() => {
     form.setValue('admin', [...customEvents]);
   }, [form, customEvents]);
@@ -47,7 +56,7 @@ export default function CustomEvents({ className, form }: CustomEventsProps) {
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col gap-4'>
         {customEvents.map((event, index) => (
-          <CustomEvent key={index} event={event} />
+          <CustomEvent key={index} event={event} eventId={index} updateEvent={updateEvent} />
         ))}
       </section>
       <Select value='' onValueChange={newEvent}>
@@ -67,15 +76,28 @@ export default function CustomEvents({ className, form }: CustomEventsProps) {
 
 interface CustomEventProps {
   event: AdminEventRuleType;
+  eventId: number;
+  updateEvent: (event: AdminEventRuleType | null, eventId: number) => void;
 }
 
-function CustomEvent({ event }: CustomEventProps) {
+function CustomEvent({ event, eventId, updateEvent }: CustomEventProps) {
   const [newEvent, setNewEvent] = useState(event);
 
-  const updateReferenceType = (value: string) => {
+  const updateReferenceType = (value: string): AdminEventRuleType => {
     if (value === 'castaway' || value === 'tribe' || value === 'member') {
-      setNewEvent({ ...newEvent, referenceType: value });
+      return { ...newEvent, referenceType: value };
     }
+
+    return newEvent;
+  };
+
+  const saveEvent = (changedEvent: AdminEventRuleType) => {
+    updateEvent(changedEvent, eventId);
+    setNewEvent(changedEvent);
+  };
+
+  const deleteEvent = () => {
+    updateEvent(null, eventId);
   };
 
   return (
@@ -86,8 +108,8 @@ function CustomEvent({ event }: CustomEventProps) {
           type='text'
           placeholder='Event Name'
           value={newEvent.name}
-          onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })} />
-        <Ellipsis className='inline-flex align-middle' size={24} />
+          onChange={(e) => saveEvent({ ...newEvent, name: e.target.value })} />
+        <Ellipsis className='inline-flex align-middle' size={24} onClick={deleteEvent} />
       </span>
       <span className='flex pr-2 gap-2 items-center'>
         <Input
@@ -95,8 +117,8 @@ function CustomEvent({ event }: CustomEventProps) {
           type='number'
           placeholder='Points'
           value={newEvent.points}
-          onChange={(e) => setNewEvent({ ...newEvent, points: parseInt(e.target.value) })} />
-        <Select value={event.referenceType} onValueChange={updateReferenceType}>
+          onChange={(e) => saveEvent({ ...newEvent, points: parseInt(e.target.value) })} />
+        <Select value={event.referenceType} onValueChange={(value) => saveEvent(updateReferenceType(value))}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -111,7 +133,7 @@ function CustomEvent({ event }: CustomEventProps) {
         className='w-full'
         placeholder='Description'
         value={newEvent.description}
-        onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })} />
+        onChange={(e) => saveEvent({ ...newEvent, description: e.target.value })} />
       <Separator className='mt-2' />
     </article >
   );
