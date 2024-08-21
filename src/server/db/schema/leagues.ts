@@ -68,7 +68,7 @@ export const BaseEventRule = z.object({
 
 export type BaseEventRuleType = z.infer<typeof BaseEventRule>;
 
-export const defaultBaseRules: BaseEventRuleType = {
+export const defaultBaseRules = (): BaseEventRuleType => ({
   advFound: 5,
   advPlay: 10,
   badAdvPlay: -5,
@@ -81,7 +81,7 @@ export const defaultBaseRules: BaseEventRuleType = {
   finalists: 5,
   fireWin: 5,
   soleSurvivor: 10,
-};
+});
 
 export const settings = createTable(
   'league_settings',

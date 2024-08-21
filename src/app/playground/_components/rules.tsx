@@ -1,6 +1,6 @@
 'use client';
+import { useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { type z } from 'zod';
 import { defaultBaseRules, type BaseEventRuleType, BaseEventRule } from '~/server/db/schema/leagues';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -10,7 +10,6 @@ import { Button } from '~/app/_components/commonUI/button';
 import CardContainer from '~/app/_components/cardContainer';
 import { SecondPlaceInfo } from '~/app/_components/stats/challengesPodium';
 import { Separator } from '~/app/_components/commonUI/separator';
-import { useEffect } from 'react';
 
 interface RulesProps {
   className?: string;
@@ -18,8 +17,8 @@ interface RulesProps {
 }
 
 export default function Rules({ className }: RulesProps) {
-  const form = useForm<z.infer<typeof BaseEventRule>>({
-    defaultValues: defaultBaseRules,
+  const form = useForm<BaseEventRuleType>({
+    defaultValues: defaultBaseRules(),
     resolver: zodResolver(BaseEventRule),
   });
   const router = useRouter();
@@ -36,14 +35,18 @@ export default function Rules({ className }: RulesProps) {
     });
   }, [searchParams, form]);
 
-  const onSubmit = form.handleSubmit((data: z.infer<typeof BaseEventRule>) => {
+  const onSubmit = form.handleSubmit((data: BaseEventRuleType) => {
     const url = new URL(pathname, window.location.href);
 
-    // set the season param
-    url.searchParams.set('season', searchParams.get('season')!);
+    // set the season param if it's not null
+    if (searchParams.get('season')) url.searchParams.set('season', searchParams.get('season')!);
 
     // map through form data and set search params
     Object.entries(data).forEach(([key, value]) => {
+
+      // only set non default params
+      if (value == defaultBaseRules()[key as keyof BaseEventRuleType]) return;
+
       url.searchParams.set(key, value.toString());
     });
 
@@ -51,11 +54,18 @@ export default function Rules({ className }: RulesProps) {
     router.push(url.pathname + url.search, { scroll: false });
   });
 
+  const onReset = async () => {
+    form.reset();
+    await onSubmit();
+  };
+
+
   return (
     <CardContainer className={className}>
       <Form {...form}>
         <form
           className='grid grid-cols-1 gap-2 p-4 text-black md:grid-cols-3'
+          onReset={onReset}
           onSubmit={onSubmit}>
           <Challenges />
           <Advantages />
@@ -71,15 +81,8 @@ export default function Rules({ className }: RulesProps) {
             </p>
           </div>
           <span className='flex gap-4 justify-end'>
-            <Button className='w-2/3' type='submit'>
-              Apply
-            </Button>
-            <Button
-              className='w-1/3'
-              type='reset'
-              onClick={async () => { form.reset(); await onSubmit(); }}>
-              Reset
-            </Button>
+            <Button className='w-2/3' type='submit'> Apply </Button>
+            <Button className='w-1/3' type='reset'> Reset </Button>
           </span>
         </form>
       </Form>
@@ -268,7 +271,7 @@ export function Advantages() {
 export function Other() {
   return (
     <section>
-      <FormLabel className='text-2xl'>Other Rules</FormLabel>
+      <FormLabel className='text-2xl'>Other</FormLabel>
       <FormField
         name='spokeEpTitle'
         render={({ field }) => (

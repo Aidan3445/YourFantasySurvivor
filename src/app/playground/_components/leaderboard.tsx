@@ -15,6 +15,8 @@ import { Button } from '~/app/_components/commonUI/button';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '~/app/_components/commonUI/hover';
 import { HoverCardArrow, HoverCardPortal } from '@radix-ui/react-hover-card';
 
+export const dynamic = 'force-dynamic';
+
 interface LeaderboardProps {
   className?: string;
 }
@@ -26,7 +28,7 @@ export function Leaderboard({ className }: LeaderboardProps) {
   const season = searchParams.get('season')!;
 
   useEffect(() => {
-    const rules: BaseEventRuleType = defaultBaseRules;
+    const rules: BaseEventRuleType = defaultBaseRules();
     // iterate through rules and set to searchParams if found
     for (const key in rules) {
       const value = searchParams.get(key);

@@ -6,9 +6,9 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-} from "recharts";
-import { Separator } from "~/app/_components/commonUI/separator";
-import { mouseOutLeaderboard, mouseOverLeaderboard } from "./leaderboard";
+} from 'recharts';
+import { Separator } from '~/app/_components/commonUI/separator';
+import { mouseOutLeaderboard, mouseOverLeaderboard } from './leaderboard';
 
 interface ScoreChartProps {
   data: {
@@ -19,7 +19,7 @@ interface ScoreChartProps {
 }
 
 export default function Chart({ data }: ScoreChartProps) {
-  const getTicks = (data: ScoreChartProps["data"]) => {
+  const getTicks = (data: ScoreChartProps['data']) => {
     // we want ticks evenly spaced between the min and max values
     // as well as always a tick at zero
     const allScores = data.flatMap((d) => d.episodeScores);
@@ -46,10 +46,10 @@ export default function Chart({ data }: ScoreChartProps) {
   );
 
   return (
-    <div className="col-span-3 h-full w-full rounded-lg border border-black bg-b4/50">
+    <div className='col-span-3 h-full w-full rounded-lg border border-black bg-b4/50'>
       <ResponsiveContainer>
         <LineChart
-          id="score-chart"
+          id='score-chart'
           data={formatData({ data })}
           margin={{
             top: 10,
@@ -58,10 +58,10 @@ export default function Chart({ data }: ScoreChartProps) {
             bottom: 0,
           }}
         >
-          <CartesianGrid stroke="#4D4D4D" />
-          <XAxis dataKey="episode" type="category" stroke="black" />
+          <CartesianGrid stroke='#4D4D4D' />
+          <XAxis dataKey='episode' type='category' stroke='black' />
           <YAxis
-            stroke="black"
+            stroke='black'
             ticks={getTicks(data)}
             domain={[
               (dataMin: number) => dataMin,
@@ -73,12 +73,12 @@ export default function Chart({ data }: ScoreChartProps) {
             <Line
               id={`line-${line.name}`}
               name={`line-${index}`}
-              className="cursor-pointer"
-              type="monotone"
+              className='cursor-pointer'
+              type='monotone'
               dataKey={line.name}
               stroke={line.color}
               strokeWidth={5}
-              strokeLinecap="round"
+              strokeLinecap='round'
               strokeOpacity={0.7}
               dot={false}
               key={index}
@@ -109,7 +109,7 @@ type FormattedData = {
 }[];
 
 function formatData({ data }: ScoreChartProps) {
-  const formattedData: FormattedData = [{ episode: "" }];
+  const formattedData: FormattedData = [{ episode: '' }];
   data.forEach((data) => {
     const ep1 = formattedData[0]!;
     ep1[data.name] = 0;
@@ -120,7 +120,7 @@ function formatData({ data }: ScoreChartProps) {
           episode: episodeNumber,
         };
       }
-      const episode = formattedData[episodeNumber]!;
+      const episode = formattedData[episodeNumber];
       episode[data.name] = value;
     });
   });
@@ -153,16 +153,16 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
   }
 
   return (
-    <div className="flex flex-col rounded-md border border-black bg-b3/80 p-1">
+    <div className='flex flex-col rounded-md border border-black bg-b3/80 p-1'>
       <div>Episode {label}:</div>
       <Separator />
-      <div className="grid gap-2">
+      <div className='grid gap-2'>
         <div>
           {firstSet.map((p) => (
             <span
               key={p.dataKey}
-              className="flex justify-between gap-2"
-              style={{ color: p.stroke, stroke: "black" }}
+              className='flex justify-between gap-2'
+              style={{ color: p.stroke, stroke: 'black' }}
             >
               <span id={`tooltip-${p.dataKey}`}> {p.dataKey}: </span>
               <span>{p.value}</span>
@@ -170,12 +170,12 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
           ))}
         </div>
         {secondSet.length > 0 && (
-          <div className="col-start-2 border-l border-black pl-2">
+          <div className='col-start-2 border-l border-black pl-2'>
             {secondSet.map((p) => (
               <span
                 key={p.dataKey}
-                className="flex justify-between gap-2"
-                style={{ color: p.stroke, stroke: "black" }}
+                className='flex justify-between gap-2'
+                style={{ color: p.stroke, stroke: 'black' }}
               >
                 <span id={`tooltip-${p.dataKey}`}> {p.dataKey}: </span>
                 <span>{p.value}</span>
