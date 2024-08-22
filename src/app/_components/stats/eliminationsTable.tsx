@@ -9,8 +9,8 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
   if (eliminations.length === 0) {
     return <h2 className='text-lg text-center'>No one eliminated yet in this season.</h2>;
   }
-  // pad eliminations with at least 9 entries
-  while (eliminations.length < 9) {
+  // pad eliminations with at least 8 entries
+  while (eliminations.length < 8) {
     eliminations.push({ episode: -1, name: '-', votes: [] });
   }
 

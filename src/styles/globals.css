@@ -75,7 +75,7 @@ main {
 
 /* Stats scroll */
 .stats-scroll {
-    @apply flex overscroll-contain flex-col min-h-44 max-h-44;
+    @apply flex overscroll-contain flex-col h-40;
     overflow-y: auto;
 }
 
@@ -91,17 +91,17 @@ main {
 
 .light-scroll::-webkit-scrollbar-track {
     background: transparent;
-    @apply bg-gradient-to-b from-white/40 to-white/20 rounded-md;
+    @apply bg-gradient-to-b from-white/40 to-white/20 rounded-md my-2;
 }
     
 
 /* on hover and selected indent */
 .hs-in {
-    @apply border box-border border-black hover:shadow-inner bg-b4 
-     aria-expanded:shadow-inner 
-    aria-expanded:shadow-b1 hover:shadow-b1
-    disabled:hover:cursor-default disabled:hover:border disabled:hover:shadow-none
-    transition-all duration-100 ease-out;
+    @apply border box-border border-black hover:shadow-inner bg-b4 hover:shadow-b1
+    aria-expanded:shadow-inner aria-expanded:shadow-b1 
+    focus:shadow-inner focus:shadow-b1
+    cursor-pointer transition-all duration-100 ease-out
+    disabled:hover:cursor-default disabled:hover:border disabled:hover:shadow-none;
 }
 
 /* Corner frame for cards */

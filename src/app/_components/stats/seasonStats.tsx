@@ -46,7 +46,7 @@ export default function SeasonStats() {
   ];
 
   return (
-    <CardContainer>
+    <CardContainer className='gap-0'>
       <SelectSeason selectDefault />
       <Carousel>
         <span className='pb-2 text-center'>

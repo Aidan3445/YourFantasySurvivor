@@ -9,8 +9,8 @@ export default function TitlesTable({ titles }: TitlesTableProps) {
     return <h2 className='text-lg text-center'>No titles yet in this season.</h2>;
   }
 
-  // pad titles with at least 9 entries
-  while (titles.length < 9) {
+  // pad titles with at least 8 entries
+  while (titles.length < 8) {
     titles.push({ name: '-', count: 0 });
   }
 

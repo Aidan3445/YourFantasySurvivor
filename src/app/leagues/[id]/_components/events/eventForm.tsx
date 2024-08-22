@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type ReactNode, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, type UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '~/app/_components/commonUI/button';
 import { Form } from '~/app/_components/commonUI/form';
@@ -13,6 +13,8 @@ import { PredictionEventRule, type PredictionEventRuleType } from '~/server/db/s
 import { WeeklyEventRule, type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
 import CustomEvents from './customEvents';
 import BaseEvents from './baseEvents';
+import { type ComponentProps } from '~/lib/utils';
+import WeeklyEvents from './weeklyEvents';
 
 interface EventsFormProps {
   className?: string;
@@ -65,7 +67,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
     <Form {...form}>
       <form onSubmit={onSubmit} className={className}>
         <Tab value='base'>
-          <BaseEvents className='col-span-3 row-span-2' />
+          <BaseEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Base Events</h3>
             Base events are added automatically when they
@@ -85,17 +87,21 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
           </article>
         </Tab>
         <Tab value='weekly'>
-          <article>
-            WEEKLY EVENTS
-          </article>
-          <article>
-            Weekly events allow league members to earn points even if
-            their castaway is eliminated. Weekly events come in two flavors:
-            <ul className='list-disc pl-4'>
-              <li>Votes - after an episode airs, members vote on events or awards to
-                give points to whoever get the most votes.</li>
-              <li>Predictions - before an episode airs, members predict events or awards and
-                earn points for correct predictions. <br /> <p className='italic text-sm'>
+          <WeeklyEvents className='col-span-3 row-span-2' form={form} />
+          <article className='col-span-2'>
+            <h3 className='font-semibold text-lg'>Weekly Events</h3>
+            League members can earn points through weekly events,
+            even if their castaway is eliminated. <br />
+            There are two types of weekly events:
+            <ul className='list-disc pl-4 light-scroll h-40'>
+              <li>
+                <h3 className='font-semibold inline'>Votes</h3>:
+                After each episode, members vote on specific events.
+                Points are awarded to those who receive the most votes.</li>
+              <li>
+                <h3 className='font-semibold inline'>Predictions</h3>:
+                Before an episode airs, members predict upcoming events.
+                Correct predictions earn points. <br /> <p className='italic text-sm'>
                   Predictions can be tied to other events and poins will be earned for each
                   event that matches the prediction in the next episode.</p></li>
             </ul>
@@ -126,10 +132,14 @@ interface TabProps {
 function Tab({ children, value }: TabProps) {
   return (
     <TabsContent value={value}>
-      <section className='grid grid-cols-5 grid-rows-2 gap-2 max-w-screen-sm'>
+      <section className='grid grid-cols-5 gap-2 max-w-screen-sm'>
         {children}
         <Button className='row-start-2 col-start-5 mt-auto mb-4' type='submit'>Save</Button>
       </section>
     </TabsContent>
   );
+}
+
+export interface EventsProps extends ComponentProps {
+  form: UseFormReturn<z.infer<typeof eventSchema>>;
 }

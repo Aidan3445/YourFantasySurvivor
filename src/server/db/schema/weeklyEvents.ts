@@ -15,7 +15,7 @@ export const weeklyEventRules = createTable(
   {
     id: serial('event_weekly_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id).notNull(),
-    name: varchar('name', { length: 32 }),
+    name: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own
     // or are tied to an admin or base event
     adminEvent: integer('admin_event_id').references(() => adminEventRules.id),
@@ -29,7 +29,7 @@ export const weeklyEventRules = createTable(
 );
 
 export const WeeklyEventRule = z.object({
-  name: z.string().nullable(),
+  name: z.string(),
   adminEvent: z.number().nullable(),
   baseEvent: z.number().nullable(),
   description: z.string().nullable(),
@@ -40,7 +40,7 @@ export const WeeklyEventRule = z.object({
 }).refine((rule) => {
   const refAdmin = rule.adminEvent !== null;
   const refBase = rule.baseEvent !== null;
-  const newRule = rule.name !== null && rule.description !== null && rule.referenceType !== null;
+  const newRule = rule.description !== null && rule.referenceType !== null;
 
   // rule must be tied to an admin event, base event, or be a new rule
   // it should not reference both an admin and base event or

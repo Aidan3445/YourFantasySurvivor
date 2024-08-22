@@ -5,32 +5,32 @@ import { Input } from '~/app/_components/commonUI/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { cn } from '~/lib/utils';
 import { useEffect, useState } from 'react';
-import { type AdminEventRuleType } from '~/server/db/schema/adminEvents';
+import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
 import { Textarea } from '~/app/_components/commonUI/textArea';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 
 
-export default function CustomEvents({ className, form }: EventsProps) {
-  const [customEvents, setCustomEvents] = useState(form.getValues().admin);
+export default function WeeklyEvents({ className, form }: EventsProps) {
+  const [weeklyEvents, setWeeklyEvents] = useState(form.getValues().weekly);
 
-  const updateEvent = (event: AdminEventRuleType | null, eventId: number | null) => {
-    const newEvents = [...customEvents];
+  const updateEvent = (event: WeeklyEventRuleType | null, eventId: number | null) => {
+    const newEvents = [...weeklyEvents];
 
     if (eventId === null && !event) return;
     else if (eventId === null && event) newEvents.push(event);
     else if (!event) newEvents.splice(eventId!, 1);
     else newEvents[eventId!] = event;
 
-    setCustomEvents(newEvents);
+    setWeeklyEvents(newEvents);
   };
 
   useEffect(() => {
-    form.setValue('admin', [...customEvents]);
-  }, [form, customEvents]);
+    form.setValue('weekly', [...weeklyEvents]);
+  }, [form, weeklyEvents]);
 
   const newEvent = (value: string) => {
-    let event: AdminEventRuleType;
+    let event: WeeklyEventRuleType;
 
     switch (value) {
       case 'confessional':
@@ -46,22 +46,23 @@ export default function CustomEvents({ className, form }: EventsProps) {
         event = blankEvent;
     }
 
-    setCustomEvents([...customEvents, event]);
+    setWeeklyEvents([...weeklyEvents, event]);
   };
 
   return (
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col'>
-        {customEvents.map((event, index) => (
-          <CustomEvent key={index} event={event} eventId={index} updateEvent={updateEvent} />
+        {weeklyEvents.map((event, index) => (
+          <WeeklyEvent key={index} event={event} eventId={index} updateEvent={updateEvent} />
         ))}
       </section>
       <Select value='' onValueChange={newEvent}>
         <SelectTrigger>
-          <SelectValue placeholder='New Custom Event' />
+          <SelectValue placeholder='New Weekly Event' />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value='new'>New</SelectItem>
+          <SelectItem value='vote'>New Vote</SelectItem>
+          <SelectItem value='prediction'>New Prediction</SelectItem>
           <SelectItem value='confessional'>Confessional</SelectItem>
           <SelectItem value='challengeMVP'>Challenge MVP</SelectItem>
           <SelectItem value='blindside'>Orchestrate Blindside</SelectItem>
@@ -71,16 +72,16 @@ export default function CustomEvents({ className, form }: EventsProps) {
   );
 }
 
-interface CustomEventProps {
-  event: AdminEventRuleType;
+interface WeeklyEventProps {
+  event: WeeklyEventRuleType;
   eventId: number;
-  updateEvent: (event: AdminEventRuleType | null, eventId: number | null) => void;
+  updateEvent: (event: WeeklyEventRuleType | null, eventId: number | null) => void;
 }
 
-function CustomEvent({ event, eventId, updateEvent }: CustomEventProps) {
+function WeeklyEvent({ event, eventId, updateEvent }: WeeklyEventProps) {
   const [newEvent, setNewEvent] = useState(event);
 
-  const updateReferenceType = (value: string): AdminEventRuleType => {
+  const updateReferenceType = (value: string): WeeklyEventRuleType => {
     if (value === 'castaway' || value === 'tribe' || value === 'member') {
       return { ...newEvent, referenceType: value };
     }
@@ -88,7 +89,7 @@ function CustomEvent({ event, eventId, updateEvent }: CustomEventProps) {
     return newEvent;
   };
 
-  const saveEvent = (changedEvent: AdminEventRuleType) => {
+  const saveEvent = (changedEvent: WeeklyEventRuleType) => {
     updateEvent(changedEvent, eventId);
     setNewEvent(changedEvent);
   };
@@ -110,7 +111,7 @@ function CustomEvent({ event, eventId, updateEvent }: CustomEventProps) {
           placeholder='Event Name'
           value={newEvent.name}
           onChange={(e) => saveEvent({ ...newEvent, name: e.target.value })} />
-        <SquareX className='inline-flex align-middle ml-4 rounded-md' size={24} onClick={deleteEvent} />
+        <SquareX className='inline-flex align-middle ml-auto rounded-md' size={24} onClick={deleteEvent} />
         <CopyPlus className='inline-flex align-middle rounded-md' size={24} onClick={copyEvent} />
       </span>
       <span className='flex gap-2 items-center'>
@@ -142,28 +143,28 @@ function CustomEvent({ event, eventId, updateEvent }: CustomEventProps) {
 }
 
 // example event templates below
-const blankEvent: AdminEventRuleType = {
+const blankEvent: WeeklyEventRuleType = {
   name: '',
   points: 0,
   description: '',
   referenceType: 'castaway'
 };
 
-const confessionalEvent: AdminEventRuleType = {
+const confessionalEvent: WeeklyEventRuleType = {
   name: 'Confessional',
   points: 1,
   description: 'A castaway records a confessional.',
   referenceType: 'castaway'
 };
 
-const challengeMVPEvent: AdminEventRuleType = {
+const challengeMVPEvent: WeeklyEventRuleType = {
   name: 'Challenge MVP',
   points: 2,
   description: 'A castaway is the most valuable player in a challenge.',
   referenceType: 'castaway'
 };
 
-const orchestrateBlindsideEvent: AdminEventRuleType = {
+const orchestrateBlindsideEvent: WeeklyEventRuleType = {
   name: 'Orchestrate Blindside',
   points: 3,
   description: 'A castaway orchestrates a blindside.',
