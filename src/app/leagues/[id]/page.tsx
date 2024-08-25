@@ -21,7 +21,7 @@ export default async function League({ params }: PageProps) {
       <h3 className='text-md font-semibold'>Season: {league?.season}</h3>
       <span className='grid grid-cols-2'>
         <LeagueDetails className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
-        <LeagueScoring className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
+        <LeagueScoring className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} openDefault={ownerLoggedIn && members.length === 1} />
       </span>
       <Members
         leagueId={leagueId}

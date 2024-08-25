@@ -287,7 +287,7 @@ export function DeleteLeague({ leagueId }: UpdateProps) {
           <Button type='submit' variant='destructive'>Delete League</Button>
         </form>
       </Popup>
-    </Popover>
+    </Popover >
   );
 }
 

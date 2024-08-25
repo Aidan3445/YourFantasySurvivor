@@ -30,6 +30,8 @@ export const description = z.coerce.string()
 
 
 export const CustomEventRule = z.object({
+  // id used for updating and deleting
+  id: z.number().optional(),
   name: eventName,
   description: description,
   points: pointRange,

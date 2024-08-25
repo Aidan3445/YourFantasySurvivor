@@ -8,9 +8,9 @@ import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-cor
 import { z } from 'zod';
 import { description, eventName } from './customEvents';
 
-export const eventTiming = pgEnum('event_season_type', ['premiere', 'merge', 'finale']);
+export const eventTiming = pgEnum('event_season_timing', ['premiere', 'merge', 'finale']);
 
-export const seasonRules = createTable(
+export const seasonEventRules = createTable(
   'event_season_rule',
   {
     id: serial('season_rule_id').notNull().primaryKey(),
@@ -28,6 +28,7 @@ export const seasonRules = createTable(
 );
 
 export const SeasonEventRule = z.object({
+  id: z.number().optional(),
   name: eventName,
   //adminEvent: z.number().nullable(),
   //baseEvent: z.number().nullable(),
@@ -36,7 +37,7 @@ export const SeasonEventRule = z.object({
   referenceType: z.enum(reference.enumValues),
   // nullable internally but not in the database
   // the database will enforce a value
-  timing: z.enum(eventTiming.enumValues).nullable(),
+  timing: z.enum(eventTiming.enumValues)
 });/*.refine((rule) => {
   const refAdmin = rule.adminEvent !== null;
   const refBase = rule.baseEvent !== null;
@@ -56,7 +57,7 @@ export const seasons = createTable(
   'event_season',
   {
     id: serial('event_season_id').notNull().primaryKey(),
-    rule: integer('rule_id').references(() => seasonRules.id, { onDelete: 'cascade' }).notNull(),
+    rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   }

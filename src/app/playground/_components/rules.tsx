@@ -59,7 +59,6 @@ export default function Rules({ className }: RulesProps) {
     await onSubmit();
   };
 
-
   return (
     <CardContainer className={className}>
       <Form {...form}>
@@ -104,6 +103,7 @@ export function Challenges() {
                 <Input
                   className='w-24'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -124,6 +124,7 @@ export function Challenges() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -144,6 +145,7 @@ export function Challenges() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -166,6 +168,7 @@ export function Challenges() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -194,6 +197,7 @@ export function Advantages() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -214,6 +218,7 @@ export function Advantages() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -234,6 +239,7 @@ export function Advantages() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -254,6 +260,7 @@ export function Advantages() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -282,6 +289,7 @@ export function Other() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -302,6 +310,7 @@ export function Other() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -322,6 +331,7 @@ export function Other() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -342,6 +352,7 @@ export function Other() {
                 <Input
                   className='w-24 text-black'
                   type='number'
+                  step={1}
                   placeholder='Points'
                   {...field} />
               </FormControl>

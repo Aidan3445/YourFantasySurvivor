@@ -12,6 +12,10 @@ import WeeklyEvents from './weeklyEvents';
 import { Rules, type RulesType } from '~/server/db/schema/rules';
 import { defaultBaseRules } from '~/server/db/schema/leagues';
 import SeasonEvents from './seasonEvents';
+import { updateRules } from '~/app/api/leagues/[id]/rules/actions';
+import { useToast } from '~/app/_components/commonUI/use-toast';
+
+export const dynamic = 'force-dynamic';
 
 interface EventsFormProps {
   className?: string;
@@ -28,25 +32,36 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
     ...rules
   };
 
-
   const form = useForm<RulesType>({
     defaultValues: defaultRules,
     resolver: zodResolver(Rules),
   });
+  const { toast } = useToast();
+
   const [valid, setValid] = useState(true);
 
-  const onSubmit = form.handleSubmit((data: RulesType) => {
-    console.log(data);
-  });
+  const catchUpdate = () => {
+    const update = updateRules.bind(null, leagueId, form.getValues());
+    update()
+      .then((res) => {
+        toast({
+          title: 'League updated',
+          description: 'Your league has been updated',
+        });
 
-  useEffect(() => {
-    async function submitOnLoad() {
-      console.log('SUBMITTING', leagueId);
-      console.log('FORM', form.getValues());
-    }
-
-    submitOnLoad().catch(console.error);
-  }, [leagueId, form]);
+        // update the form with the new rules
+        form.reset(res);
+      })
+      .catch((e) => {
+        if (e instanceof Error) {
+          toast({
+            title: 'Error creating league',
+            description: e.message,
+            variant: 'error',
+          });
+        }
+      });
+  };
 
   const watch = form.watch();
 
@@ -61,7 +76,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className={className}>
+      <form className={className} action={catchUpdate}>
         <Tab value='base' valid={valid}>
           <BaseEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>

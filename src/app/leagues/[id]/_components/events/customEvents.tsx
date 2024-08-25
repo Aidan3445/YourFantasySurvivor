@@ -13,20 +13,21 @@ import { Label } from '~/app/_components/commonUI/label';
 export default function CustomEvents({ className, form }: EventsProps) {
   const [customEvents, setCustomEvents] = useState(form.getValues().custom);
 
-  const updateEvent = (event: CustomEventRuleType | null, eventId: number | null) => {
+  const updateEvent = (event: CustomEventRuleType | null, eventCount: number | null) => {
     const newEvents = [...customEvents];
 
-    if (eventId === null && !event) return;
-    else if (eventId === null && event) newEvents.push(event);
-    else if (!event) newEvents.splice(eventId!, 1);
-    else newEvents[eventId!] = event;
+    if (eventCount === null && !event) return;
+    else if (eventCount === null && event) newEvents.push({ ...event, id: undefined });
+    else if (!event) newEvents.splice(eventCount!, 1);
+    else newEvents[eventCount!] = event;
 
-    setCustomEvents(newEvents);
+    form.setValue('custom', [...newEvents]);
   };
 
+  const watch = form.watch('custom');
   useEffect(() => {
-    form.setValue('custom', [...customEvents]);
-  }, [form, customEvents]);
+    setCustomEvents(form.getValues().custom);
+  }, [watch, form]);
 
   const newEvent = (value: string) => {
     let event: CustomEventRuleType;
@@ -45,14 +46,14 @@ export default function CustomEvents({ className, form }: EventsProps) {
         event = blankEvent;
     }
 
-    setCustomEvents([...customEvents, event]);
+    form.setValue('custom', [...customEvents, event]);
   };
 
   return (
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col'>
         {customEvents.map((event, index) => (
-          <CustomEvent key={index} event={event} eventId={index} updateEvent={updateEvent} />
+          <CustomEvent key={index} event={event} eventCount={index} updateEvent={updateEvent} />
         ))}
       </section>
       <Select value='' onValueChange={newEvent}>
@@ -75,13 +76,17 @@ export default function CustomEvents({ className, form }: EventsProps) {
 
 export interface CustomEventProps extends ComponentProps {
   event: CustomEventRuleType;
-  eventId: number;
-  updateEvent: (event: CustomEventRuleType | null, eventId: number | null) => void;
+  eventCount: number;
+  updateEvent: (event: CustomEventRuleType | null, eventCount: number | null) => void;
 }
 
-function CustomEvent({ event, eventId, updateEvent, className }: CustomEventProps) {
+function CustomEvent({ event, eventCount, updateEvent, className }: CustomEventProps) {
   const [newEvent, setNewEvent] = useState(event);
   const [nameError, setNameError] = useState('');
+
+  useEffect(() => {
+    setNewEvent(event);
+  }, [event]);
 
   const updateReferenceType = (value: string): CustomEventRuleType => {
     if (value === 'castaway' || value === 'tribe' || value === 'member') {
@@ -103,12 +108,12 @@ function CustomEvent({ event, eventId, updateEvent, className }: CustomEventProp
       }
     }
 
-    updateEvent(changedEvent, eventId);
+    updateEvent(changedEvent, eventCount);
     setNewEvent(changedEvent);
   };
 
   const deleteEvent = () => {
-    updateEvent(null, eventId);
+    updateEvent(null, eventCount);
   };
 
   const copyEvent = () => {
@@ -117,6 +122,7 @@ function CustomEvent({ event, eventId, updateEvent, className }: CustomEventProp
 
   return (
     <article className={cn('flex flex-col gap-2 mr-2', className)}>
+      {event.id}-{eventCount}
       <span className='flex gap-2 items-center'>
         <div className='w-3/4 mr-4'>
           <Label>Event Name</Label>

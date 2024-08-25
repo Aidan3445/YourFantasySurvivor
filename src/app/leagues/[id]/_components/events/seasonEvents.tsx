@@ -171,7 +171,7 @@ const blankEvent: SeasonEventRuleType = {
   points: 0,
   description: '',
   referenceType: 'castaway',
-  timing: null,
+  timing: 'premiere',
 };
 
 const soleSurvivor: SeasonEventRuleType = {
@@ -179,7 +179,7 @@ const soleSurvivor: SeasonEventRuleType = {
   points: 10,
   description: 'Predict the winner of the season.',
   referenceType: 'castaway',
-  timing: null,
+  timing: 'merge',
 };
 
 const firstBoot: SeasonEventRuleType = {

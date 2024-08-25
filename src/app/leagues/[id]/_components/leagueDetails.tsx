@@ -3,9 +3,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/app/_components/commo
 import CardContainer from '~/app/_components/cardContainer';
 import { ToggleVisibility } from './toggleVis';
 import { Checkbox } from '~/app/_components/commonUI/checkbox';
-import { cn } from '~/lib/utils';
+import { cn, type ComponentProps } from '~/lib/utils';
 
-export interface LeagueOwnerProps {
+export interface LeagueOwnerProps extends ComponentProps {
   league: {
     id: number;
     name: string;
@@ -41,13 +41,9 @@ export default function LeagueDetails({ league, ownerLoggedIn, className }: Leag
                     <ToggleVisibility text={league.password} />
                   </td>
                 </tr>}
-              {ownerLoggedIn &&
-                <tr>
-                  <th className='pr-4 text-right'>Delete League</th>
-                  <DeleteLeague leagueId={league.id} />
-                </tr>}
             </tbody>
           </table>
+          {ownerLoggedIn && <DeleteLeague leagueId={league.id} />}
         </CardContainer>
       </PopoverContent>
     </Popover>

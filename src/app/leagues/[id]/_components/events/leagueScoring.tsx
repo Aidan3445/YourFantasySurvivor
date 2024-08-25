@@ -2,14 +2,16 @@ import { Popover, PopoverCenter, PopoverContent, PopoverTrigger } from '~/app/_c
 import CardContainer from '~/app/_components/cardContainer';
 import { cn } from '~/lib/utils';
 import { type LeagueOwnerProps } from '../leagueDetails';
-import { getRules } from '~/app/api/leagues/query';
+import { getRules } from '~/app/api/leagues/[id]/rules/query';
 import { Tabs, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import EventsForm from './eventForm';
 
-export default async function LeagueScoring({ league, ownerLoggedIn, className }: LeagueOwnerProps) {
-  const rules = await getRules(league.id);
+interface LeagueScoringProps extends LeagueOwnerProps {
+  openDefault?: boolean;
+}
 
-  const openDefault = !rules.advFound;
+export default async function LeagueScoring({ league, ownerLoggedIn, className, openDefault }: LeagueScoringProps) {
+  const rules = await getRules(league.id);
 
   return (
     <Popover defaultOpen={openDefault}>

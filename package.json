@@ -10,6 +10,9 @@
     "db:pull": "drizzle-kit introspect",
     "db:up": "drizzle-kit up",
     "db:check": "drizzle-kit check",
+    "db:gen": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:drop": "drizzle-kit drop",
     "dev": "next dev -p 1234 --turbo",
     "lint": "next lint",
     "start": "next start"
