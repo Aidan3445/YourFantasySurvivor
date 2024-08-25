@@ -58,7 +58,7 @@ main {
 
 /* Main scroll */
 ::-webkit-scrollbar {
-    @apply w-4 h-4;
+    @apply w-2;
 }
 
 ::-webkit-scrollbar-track {
@@ -66,7 +66,7 @@ main {
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-200/50 rounded-md w-1;
+    @apply bg-zinc-200/70 rounded-md;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -91,9 +91,8 @@ main {
 
 .light-scroll::-webkit-scrollbar-track {
     background: transparent;
-    @apply bg-gradient-to-b from-white/40 to-white/20 rounded-md my-2;
+    @apply bg-white/20 rounded-md my-2;
 }
-    
 
 /* on hover and selected indent */
 .hs-in {

@@ -11,6 +11,7 @@ import { type ComponentProps } from '~/lib/utils';
 import WeeklyEvents from './weeklyEvents';
 import { Rules, type RulesType } from '~/server/db/schema/rules';
 import { defaultBaseRules } from '~/server/db/schema/leagues';
+import SeasonEvents from './seasonEvents';
 
 interface EventsFormProps {
   className?: string;
@@ -103,13 +104,11 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
           </article>
         </Tab>
         <Tab value='season' valid={valid}>
-          <article>
-            SEASON EVENTS
-          </article>
-          <article>
+          <SeasonEvents className='col-span-3 row-span-2' form={form} />
+          <article className='col-span-2'>
             Season events are special predictions members make only once.
             They can be made before the season starts, after the merge,
-            or after a specific episode. <br /> <p className='italic text-sm'>
+            or before the final episode of the season. <br /> <p className='italic text-sm'>
               Predictions can be tied to other events and poins will be earned for each
               event that matches the prediction for all subsequent episodes.</p>
           </article>

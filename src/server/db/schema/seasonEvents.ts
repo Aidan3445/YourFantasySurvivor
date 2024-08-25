@@ -2,13 +2,13 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodes } from './episodes';
-import { baseEventRules, leagues, pointRange, reference } from './leagues';
+import { leagues, pointRange, reference } from './leagues';
 import { leagueMembers } from './members';
 import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
-import { customEventRules } from './customEvents';
 import { z } from 'zod';
+import { description, eventName } from './customEvents';
 
-export const seasonTypes = pgEnum('event_season_type', ['preseason', 'merge']);
+export const eventTiming = pgEnum('event_season_type', ['premiere', 'merge', 'finale']);
 
 export const seasonRules = createTable(
   'event_season_rule',
@@ -18,22 +18,26 @@ export const seasonRules = createTable(
     name: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own
     // or are tied to an admin or base event
-    adminEvent: integer('admin_event_id').references(() => customEventRules.id),
-    baseEvent: integer('base_event_id').references(() => baseEventRules.id),
-    description: varchar('description', { length: 256 }),
+    //adminEvent: integer('admin_event_id').references(() => customEventRules.id),
+    //baseEvent: integer('base_event_id').references(() => baseEventRules.id),
+    description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
-    referenceType: reference('reference_type'),
+    referenceType: reference('reference_type').notNull(),
+    timing: eventTiming('timing').notNull(),
   }
 );
 
 export const SeasonEventRule = z.object({
-  name: z.string().nullable(),
-  adminEvent: z.number().nullable(),
-  baseEvent: z.number().nullable(),
-  description: z.string().nullable(),
+  name: eventName,
+  //adminEvent: z.number().nullable(),
+  //baseEvent: z.number().nullable(),
+  description: description,
   points: pointRange,
-  referenceType: z.enum(reference.enumValues).nullable(),
-}).refine((rule) => {
+  referenceType: z.enum(reference.enumValues),
+  // nullable internally but not in the database
+  // the database will enforce a value
+  timing: z.enum(eventTiming.enumValues).nullable(),
+});/*.refine((rule) => {
   const refAdmin = rule.adminEvent !== null;
   const refBase = rule.baseEvent !== null;
   const newRule = rule.name !== null && rule.description !== null && rule.referenceType !== null;
@@ -44,7 +48,7 @@ export const SeasonEventRule = z.object({
   return (refAdmin && !refBase && !newRule)
     || (!refAdmin && refBase && !newRule)
     || (!refAdmin && !refBase && newRule);
-});
+});*/
 
 export type SeasonEventRuleType = z.infer<typeof SeasonEventRule>;
 

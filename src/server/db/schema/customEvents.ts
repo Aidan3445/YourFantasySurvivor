@@ -24,12 +24,14 @@ export const eventName = z.coerce.string()
   .max(32, { message: 'Name must be between 3 and 16 characters' });
 
 export const description = z.coerce.string()
-  .min(3, { message: 'Description must be between 3 and 256 characters' })
-  .max(256, { message: 'Description must be between 3 and 256 characters' });
+  .min(3, { message: 'Description must be between 3 and 256 characters, or blank' })
+  .max(256, { message: 'Description must be between 3 and 256 characters, or blank' })
+  .or(z.literal(''));
+
 
 export const CustomEventRule = z.object({
   name: eventName,
-  description: z.string(),
+  description: description,
   points: pointRange,
   referenceType: z.enum(reference.enumValues),
 });

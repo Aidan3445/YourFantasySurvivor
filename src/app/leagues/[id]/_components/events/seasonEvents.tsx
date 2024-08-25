@@ -31,23 +31,23 @@ export default function SeasonEvents({ className, form }: EventsProps) {
     let event: SeasonEventRuleType;
 
     switch (value) {
-      case 'vote':
-        event = blankEvent('vote');
+      case 'soleSurvivor':
+        event = soleSurvivor;
         break;
-      case 'predict':
-        event = blankEvent('predict');
+      case 'firstBoot':
+        event = firstBoot;
         break;
-      case 'challengeMVP':
-        event = challengeMVPEvent;
+      case 'firstLoser':
+        event = firstLoser;
         break;
-      case 'bestGCMeme':
-        event = bestGCMemeEvent;
+      case 'tribeBeast':
+        event = tribeBeast;
         break;
-      case 'nextBoot':
-        event = nextBootEvent;
+      case 'individualBeast':
+        event = individualBeast;
         break;
       default:
-        event = blankEvent('vote');
+        event = blankEvent;
     }
 
     setSeasonEvents([...seasonEvents, event]);
@@ -65,13 +65,14 @@ export default function SeasonEvents({ className, form }: EventsProps) {
           <SelectValue placeholder='New Season Event' />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value='vote'>New Vote</SelectItem>
-          <SelectItem value='predict'>New Prediction</SelectItem>
+          <SelectItem value='new'>New</SelectItem>
           <SelectGroup>
             <SelectLabel>Examples</SelectLabel>
-            <SelectItem value='challengeMVP'>Challenge MVP</SelectItem>
-            <SelectItem value='bestGCMeme'>Best GC Meme</SelectItem>
-            <SelectItem value='nextBoot'>Next Boot</SelectItem>
+            <SelectItem value='soleSurvivor'>Sole Survivor</SelectItem>
+            <SelectItem value='firstBoot'>First Boot</SelectItem>
+            <SelectItem value='firstLoser'>First Loser</SelectItem>
+            <SelectItem value='tribeBeast'>Beast Tribe</SelectItem>
+            <SelectItem value='individualBeast'>Beast Castaway</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
@@ -110,7 +111,7 @@ function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
   };
 
   return (
-    <article className='flex flex-col mr-2'>
+    <article className='flex flex-col gap-2 mr-2'>
       <span className='flex gap-2 items-center'>
         <Input
           className='w-3/4 mr-4'
@@ -141,15 +142,16 @@ function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
           </SelectContent>
         </Select>
       </span>
-      <Select value={event.type} onValueChange={(value) => saveEvent({ ...newEvent, type: value as 'vote' | 'predict' })}>
+      <Select value={event.timing ?? ''} onValueChange={(value) => saveEvent({ ...newEvent, timing: value as 'premiere' | 'merge' | 'finale' })}>
         <SelectTrigger className='w-full mt-0'>
-          <SelectValue placeholder='Type' />
+          <SelectValue placeholder='Timing' />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
-            <SelectLabel>Type</SelectLabel>
-            <SelectItem value='vote'>Vote</SelectItem>
-            <SelectItem value='predict'>Prediction</SelectItem>
+            <SelectLabel>Timing</SelectLabel>
+            <SelectItem value='premiere'>Premiere</SelectItem>
+            <SelectItem value='merge'>Merge</SelectItem>
+            <SelectItem value='finale'>Finale</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
@@ -158,36 +160,57 @@ function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
         placeholder='Description (Optional)'
         value={newEvent.description}
         onChange={(e) => saveEvent({ ...newEvent, description: e.target.value })} />
-      <Separator className='my-2' />
+      <Separator className='mb-2' />
     </article >
   );
 }
 
 // example event templates below
-const blankEvent = (type: 'vote' | 'predict'): SeasonEventRuleType => ({
+const blankEvent: SeasonEventRuleType = {
   name: '',
   points: 0,
   description: '',
   referenceType: 'castaway',
-});
-
-const challengeMVPEvent: SeasonEventRuleType = {
-  name: 'Challenge MVP',
-  points: 2,
-  description: 'A castaway is the most valuable player in a challenge.',
-  referenceType: 'castaway',
+  timing: null,
 };
 
-const bestGCMemeEvent: SeasonEventRuleType = {
-  name: 'Best GC Meme',
-  points: 1,
-  description: 'Which league member sent the best meme in the group chat this week?',
+const soleSurvivor: SeasonEventRuleType = {
+  name: 'Sole Survivor',
+  points: 10,
+  description: 'Predict the winner of the season.',
+  referenceType: 'castaway',
+  timing: null,
+};
+
+const firstBoot: SeasonEventRuleType = {
+  name: 'First Boot',
+  points: 5,
+  description: 'Predict the first boot of the season.',
+  referenceType: 'castaway',
+  timing: 'premiere',
+};
+
+const firstLoser: SeasonEventRuleType = {
+  name: 'First Loser',
+  points: 5,
+  description: 'Predict the first league member to have their castaway eliminated.',
   referenceType: 'member',
+  timing: 'premiere',
 };
 
-const nextBootEvent: SeasonEventRuleType = {
-  name: 'Next Boot',
-  points: 2,
-  description: 'Predict the next castaway to be voted off.',
-  referenceType: 'castaway',
+const tribeBeast: SeasonEventRuleType = {
+  name: 'Beast Tribe',
+  points: 5,
+  description: 'Predict the tribe that wins the most challenges.',
+  referenceType: 'tribe',
+  timing: 'premiere',
 };
+
+const individualBeast: SeasonEventRuleType = {
+  name: 'Beast Castaway',
+  points: 5,
+  description: 'Predict the castaway that wins the most individual challenges.',
+  referenceType: 'castaway',
+  timing: 'merge',
+};
+

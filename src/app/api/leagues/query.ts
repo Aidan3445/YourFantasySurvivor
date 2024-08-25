@@ -132,11 +132,12 @@ export async function getRules(leagueId: number):
   const seasonEvents = db
     .select({
       name: seasonRules.name,
-      adminEvent: seasonRules.adminEvent,
-      baseEvent: seasonRules.baseEvent,
+      //adminEvent: seasonRules.adminEvent,
+      //baseEvent: seasonRules.baseEvent,
       description: seasonRules.description,
       points: seasonRules.points,
       referenceType: seasonRules.referenceType,
+      timing: seasonRules.timing,
     })
     .from(seasonRules)
     .where(eq(seasonRules.league, leagueId));

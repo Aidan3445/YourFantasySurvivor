@@ -6,6 +6,7 @@ import { leagues, pointRange, reference } from './leagues';
 import { leagueMembers } from './members';
 import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
+import { description, eventName } from './customEvents';
 
 export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
 
@@ -27,10 +28,10 @@ export const weeklyEventRules = createTable(
 );
 
 export const WeeklyEventRule = z.object({
-  name: z.string(),
+  name: eventName,
   //customEvent: z.number().nullable(),
   //baseEvent: z.number().nullable(),
-  description: z.string(),
+  description: description,
   points: pointRange,
   referenceType: z.enum(reference.enumValues),
   type: z.enum(weeklyEventType.enumValues),

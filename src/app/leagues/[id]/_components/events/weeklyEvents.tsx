@@ -110,7 +110,7 @@ function WeeklyEvent({ event, eventId, updateEvent }: WeeklyEventProps) {
   };
 
   return (
-    <article className='flex flex-col mr-2'>
+    <article className='flex flex-col gap-2 mr-2'>
       <span className='flex gap-2 items-center'>
         <Input
           className='w-3/4 mr-4'
@@ -158,7 +158,7 @@ function WeeklyEvent({ event, eventId, updateEvent }: WeeklyEventProps) {
         placeholder='Description (Optional)'
         value={newEvent.description}
         onChange={(e) => saveEvent({ ...newEvent, description: e.target.value })} />
-      <Separator className='my-2' />
+      <Separator className='mb-2' />
     </article >
   );
 }

@@ -8,6 +8,7 @@ import { CustomEventRule, type CustomEventRuleType } from '~/server/db/schema/cu
 import { Textarea } from '~/app/_components/commonUI/textArea';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
+import { Label } from '~/app/_components/commonUI/label';
 
 export default function CustomEvents({ className, form }: EventsProps) {
   const [customEvents, setCustomEvents] = useState(form.getValues().custom);
@@ -115,44 +116,55 @@ function CustomEvent({ event, eventId, updateEvent, className }: CustomEventProp
   };
 
   return (
-    <article className={cn('flex flex-col mr-2', className)}>
+    <article className={cn('flex flex-col gap-2 mr-2', className)}>
       <span className='flex gap-2 items-center'>
-        <Input
-          className='w-3/4 mr-4'
-          type='text'
-          placeholder='Event Name'
-          value={newEvent.name}
-          onChange={(e) => update({ ...newEvent, name: e.target.value })} />
-        <CopyPlus className='inline-flex align-middle rounded-md' size={24} onClick={copyEvent} />
-        <SquareX className='inline-flex align-middle rounded-md' size={24} onClick={deleteEvent} />
+        <div className='w-3/4 mr-4'>
+          <Label>Event Name</Label>
+          <Input
+            type='text'
+            placeholder='Event Name'
+            value={newEvent.name}
+            onChange={(e) => update({ ...newEvent, name: e.target.value })} />
+        </div>
+        <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
+        <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
       </span>
-      <h4 className='text-xs font-normal text-red-700'>{nameError}</h4>
       <span className='flex gap-2 items-center'>
-        <Input
-          type='number'
-          placeholder='Points'
-          value={newEvent.points}
-          onChange={(e) => update({ ...newEvent, points: parseInt(e.target.value) })} />
-        <Select value={event.referenceType} onValueChange={(value) => update(updateReferenceType(value))}>
-          <SelectTrigger className='w-full'>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Points for</SelectLabel>
-              <SelectItem value='castaway'>Castaway</SelectItem>
-              <SelectItem value='tribe'>Tribe</SelectItem>
-              <SelectItem value='member'>Member</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <div>
+          <Label>Points</Label>
+          <Input
+            type='number'
+            placeholder='Points'
+            value={newEvent.points}
+            onChange={(e) => update({ ...newEvent, points: parseInt(e.target.value) })} />
+        </div>
+        <div className='w-full'>
+          <Label>Points for</Label>
+          <Select value={event.referenceType} onValueChange={(value) => update(updateReferenceType(value))}>
+            <SelectTrigger className='w-full'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Points for</SelectLabel>
+                <SelectItem value='castaway'>Castaway</SelectItem>
+                <SelectItem value='tribe'>Tribe</SelectItem>
+                <SelectItem value='member'>Member</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
       </span>
-      <Textarea
-        className='w-full'
-        placeholder='Description (Optional)'
-        value={newEvent.description}
-        onChange={(e) => update({ ...newEvent, description: e.target.value })} />
-      <Separator className='my-2' />
+      <div>
+        <Label>Description</Label>
+        <Textarea
+          className='w-full'
+          placeholder='Description (Optional)'
+          value={newEvent.description}
+          onChange={(e) => update({ ...newEvent, description: e.target.value })} />
+      </div>
+      {nameError && <h4 className='text-xs font-normal text-red-700'>{nameError}</h4>}
+      <Separator className='mb-2' />
     </article >
   );
 }
