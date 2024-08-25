@@ -5,36 +5,34 @@ import { episodes } from './episodes';
 import { baseEventRules, leagues, pointRange, reference } from './leagues';
 import { leagueMembers } from './members';
 import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
-import { adminEventRules } from './adminEvents';
+import { customEventRules } from './customEvents';
 import { z } from 'zod';
 
-export const predictionTypes = pgEnum('event_prediction_type', ['preseason', 'merge']);
+export const seasonTypes = pgEnum('event_season_type', ['preseason', 'merge']);
 
-export const predictionRules = createTable(
-  'event_prediction_rule',
+export const seasonRules = createTable(
+  'event_season_rule',
   {
-    id: serial('prediction_rule_id').notNull().primaryKey(),
+    id: serial('season_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
     name: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own
     // or are tied to an admin or base event
-    adminEvent: integer('admin_event_id').references(() => adminEventRules.id),
+    adminEvent: integer('admin_event_id').references(() => customEventRules.id),
     baseEvent: integer('base_event_id').references(() => baseEventRules.id),
     description: varchar('description', { length: 256 }),
     points: integer('points').notNull(),
     referenceType: reference('reference_type'),
-    selectionCount: integer('selection_count').notNull().default(1),
   }
 );
 
-export const PredictionEventRule = z.object({
+export const SeasonEventRule = z.object({
   name: z.string().nullable(),
   adminEvent: z.number().nullable(),
   baseEvent: z.number().nullable(),
   description: z.string().nullable(),
   points: pointRange,
   referenceType: z.enum(reference.enumValues).nullable(),
-  selectionCount: z.number(),
 }).refine((rule) => {
   const refAdmin = rule.adminEvent !== null;
   const refBase = rule.baseEvent !== null;
@@ -48,47 +46,47 @@ export const PredictionEventRule = z.object({
     || (!refAdmin && !refBase && newRule);
 });
 
-export type PredictionEventRuleType = z.infer<typeof PredictionEventRule>;
+export type SeasonEventRuleType = z.infer<typeof SeasonEventRule>;
 
-export const predictions = createTable(
-  'event_prediction',
+export const seasons = createTable(
+  'event_season',
   {
-    id: serial('event_prediction_id').notNull().primaryKey(),
-    rule: integer('rule_id').references(() => predictionRules.id, { onDelete: 'cascade' }).notNull(),
+    id: serial('event_season_id').notNull().primaryKey(),
+    rule: integer('rule_id').references(() => seasonRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   }
 );
 
-export const predictionCastaways = createTable(
-  'event_prediction_castaway',
+export const seasonCastaways = createTable(
+  'event_season_castaway',
   {
-    prediction: integer('prediction_id').references(() => predictions.id, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.prediction, table.castaway] }),
+    pk: primaryKey({ columns: [table.season, table.castaway] }),
   })
 );
 
-export const predictionTribes = createTable(
-  'event_prediction_tribe',
+export const seasonTribes = createTable(
+  'event_season_tribe',
   {
-    prediction: integer('prediction_id').references(() => predictions.id, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
     tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.prediction, table.tribe] }),
+    pk: primaryKey({ columns: [table.season, table.tribe] }),
   })
 );
 
-export const predictionMembers = createTable(
-  'event_prediction_member',
+export const seasonMembers = createTable(
+  'event_season_member',
   {
-    prediction: integer('prediction_id').references(() => predictions.id, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
-    pk: primaryKey({ columns: [table.prediction, table.member] }),
+    pk: primaryKey({ columns: [table.season, table.member] }),
   })
 );

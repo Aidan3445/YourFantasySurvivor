@@ -2,10 +2,9 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodes } from './episodes';
-import { baseEventRules, leagues, pointRange, reference } from './leagues';
+import { leagues, pointRange, reference } from './leagues';
 import { leagueMembers } from './members';
 import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
-import { adminEventRules } from './adminEvents';
 import { z } from 'zod';
 
 export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
@@ -18,27 +17,25 @@ export const weeklyEventRules = createTable(
     name: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own
     // or are tied to an admin or base event
-    adminEvent: integer('admin_event_id').references(() => adminEventRules.id),
-    baseEvent: integer('base_event_id').references(() => baseEventRules.id),
-    description: varchar('description', { length: 256 }),
+    //adminEvent: integer('admin_event_id').references(() => adminEventRules.id),
+    //baseEvent: integer('base_event_id').references(() => baseEventRules.id),
+    description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
     type: weeklyEventType('type').notNull(),
-    referenceType: reference('reference_type'),
-    selectionCount: integer('selection_count').notNull().default(1),
+    referenceType: reference('reference_type').notNull(),
   }
 );
 
 export const WeeklyEventRule = z.object({
   name: z.string(),
-  adminEvent: z.number().nullable(),
-  baseEvent: z.number().nullable(),
-  description: z.string().nullable(),
+  //customEvent: z.number().nullable(),
+  //baseEvent: z.number().nullable(),
+  description: z.string(),
   points: pointRange,
-  referenceType: z.enum(reference.enumValues).nullable(),
+  referenceType: z.enum(reference.enumValues),
   type: z.enum(weeklyEventType.enumValues),
-  selectionCount: z.number(),
-}).refine((rule) => {
-  const refAdmin = rule.adminEvent !== null;
+});/*.refine((rule) => {
+  const refAdmin = rule.customEvent !== null;
   const refBase = rule.baseEvent !== null;
   const newRule = rule.description !== null && rule.referenceType !== null;
 
@@ -48,7 +45,7 @@ export const WeeklyEventRule = z.object({
   return (refAdmin && !refBase && !newRule)
     || (!refAdmin && refBase && !newRule)
     || (!refAdmin && !refBase && newRule);
-});
+});*/
 
 export type WeeklyEventRuleType = z.infer<typeof WeeklyEventRule>;
 

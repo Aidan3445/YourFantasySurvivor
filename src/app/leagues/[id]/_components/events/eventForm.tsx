@@ -1,39 +1,23 @@
 'use client';
-
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useForm, type UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
 import { Button } from '~/app/_components/commonUI/button';
 import { Form } from '~/app/_components/commonUI/form';
 import { TabsContent } from '~/app/_components/commonUI/tabs';
-import { AdminEventRule, type AdminEventRuleType } from '~/server/db/schema/adminEvents';
-import { BaseEventRule, type BaseEventRuleType, defaultBaseRules } from '~/server/db/schema/leagues';
-import { PredictionEventRule, type PredictionEventRuleType } from '~/server/db/schema/predictions';
-import { WeeklyEventRule, type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
 import CustomEvents from './customEvents';
 import BaseEvents from './baseEvents';
 import { type ComponentProps } from '~/lib/utils';
 import WeeklyEvents from './weeklyEvents';
+import { Rules, type RulesType } from '~/server/db/schema/rules';
+import { defaultBaseRules } from '~/server/db/schema/leagues';
 
 interface EventsFormProps {
   className?: string;
   leagueId: number;
-  rules: BaseEventRuleType & {
-    admin: AdminEventRuleType[];
-    weekly: WeeklyEventRuleType[];
-    season: PredictionEventRuleType[];
-  };
+  rules: RulesType;
   ownerLoggedIn: boolean;
 }
-
-export const eventSchema = z.intersection(
-  BaseEventRule,
-  z.object({
-    admin: z.array(AdminEventRule),
-    weekly: z.array(WeeklyEventRule),
-    season: z.array(PredictionEventRule),
-  }));
 
 export default function EventsForm({ className, leagueId, rules }: EventsFormProps) {
   // merge default rules with provided rules
@@ -44,12 +28,13 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
   };
 
 
-  const form = useForm<z.infer<typeof eventSchema>>({
+  const form = useForm<RulesType>({
     defaultValues: defaultRules,
-    resolver: zodResolver(eventSchema),
+    resolver: zodResolver(Rules),
   });
+  const [valid, setValid] = useState(true);
 
-  const onSubmit = form.handleSubmit((data: z.infer<typeof eventSchema>) => {
+  const onSubmit = form.handleSubmit((data: RulesType) => {
     console.log(data);
   });
 
@@ -62,11 +47,21 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
     submitOnLoad().catch(console.error);
   }, [leagueId, form]);
 
+  const watch = form.watch();
+
+  useEffect(() => {
+    try {
+      Rules.parse(form.getValues());
+      setValid(true);
+    } catch {
+      setValid(false);
+    }
+  }, [form, watch]);
 
   return (
     <Form {...form}>
       <form onSubmit={onSubmit} className={className}>
-        <Tab value='base'>
+        <Tab value='base' valid={valid}>
           <BaseEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Base Events</h3>
@@ -77,7 +72,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
               you can override it in the score entry page.</p>
           </article>
         </Tab>
-        <Tab value='custom'>
+        <Tab value='custom' valid={valid}>
           <CustomEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Custom Events</h3>
@@ -86,14 +81,14 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
             Use one of our examples or create your own.
           </article>
         </Tab>
-        <Tab value='weekly'>
+        <Tab value='weekly' valid={valid}>
           <WeeklyEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Weekly Events</h3>
             League members can earn points through weekly events,
             even if their castaway is eliminated. <br />
             There are two types of weekly events:
-            <ul className='list-disc pl-4 light-scroll h-40'>
+            <ul className='list-disc pl-4 light-scroll h-40 text-sm'>
               <li>
                 <h3 className='font-semibold inline'>Votes</h3>:
                 After each episode, members vote on specific events.
@@ -101,13 +96,13 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
               <li>
                 <h3 className='font-semibold inline'>Predictions</h3>:
                 Before an episode airs, members predict upcoming events.
-                Correct predictions earn points. <br /> <p className='italic text-sm'>
+                Correct predictions earn points. <br /> <p className='italic'>
                   Predictions can be tied to other events and poins will be earned for each
                   event that matches the prediction in the next episode.</p></li>
             </ul>
           </article>
         </Tab>
-        <Tab value='season'>
+        <Tab value='season' valid={valid}>
           <article>
             SEASON EVENTS
           </article>
@@ -125,21 +120,22 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
 }
 
 interface TabProps {
-  value: string;
   children: ReactNode;
+  value: string;
+  valid: boolean;
 }
 
-function Tab({ children, value }: TabProps) {
+function Tab({ children, value, valid }: TabProps) {
   return (
     <TabsContent value={value}>
       <section className='grid grid-cols-5 gap-2 max-w-screen-sm'>
         {children}
-        <Button className='row-start-2 col-start-5 mt-auto mb-4' type='submit'>Save</Button>
+        <Button className='row-start-2 col-start-5 mt-auto mb-4' disabled={!valid} type='submit'>Save</Button>
       </section>
     </TabsContent>
   );
 }
 
 export interface EventsProps extends ComponentProps {
-  form: UseFormReturn<z.infer<typeof eventSchema>>;
+  form: UseFormReturn<RulesType>;
 }

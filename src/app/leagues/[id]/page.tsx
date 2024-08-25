@@ -16,7 +16,7 @@ export default async function League({ params }: PageProps) {
   const ownerLoggedIn = members.some((member) => member.isOwner && member.loggedIn);
 
   return (
-    <main className='flex flex-col gap-0 text-center'>
+    <main className='flex flex-col gap-0 text-center' >
       <h1 className='text-2xl font-semibold'>{league?.name}</h1>
       <h3 className='text-md font-semibold'>Season: {league?.season}</h3>
       <span className='grid grid-cols-2'>
@@ -28,7 +28,7 @@ export default async function League({ params }: PageProps) {
         members={members}
         ownerLoggedIn={ownerLoggedIn}
         isFull={isFull} />
-    </main>
+    </main >
   );
 }
 

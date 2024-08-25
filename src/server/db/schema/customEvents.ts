@@ -7,10 +7,10 @@ import { leagueMembers } from './members';
 import { integer, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
-export const adminEventRules = createTable(
-  'event_admin_rule',
+export const customEventRules = createTable(
+  'event_custom_rule',
   {
-    id: serial('admin_rule_id').notNull().primaryKey(),
+    id: serial('custom_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
     name: varchar('name', { length: 32 }).notNull(),
     description: varchar('description', { length: 256 }).notNull(),
@@ -27,29 +27,29 @@ export const description = z.coerce.string()
   .min(3, { message: 'Description must be between 3 and 256 characters' })
   .max(256, { message: 'Description must be between 3 and 256 characters' });
 
-export const AdminEventRule = z.object({
+export const CustomEventRule = z.object({
   name: eventName,
   description: z.string(),
   points: pointRange,
   referenceType: z.enum(reference.enumValues),
 });
 
-export type AdminEventRuleType = z.infer<typeof AdminEventRule>;
+export type CustomEventRuleType = z.infer<typeof CustomEventRule>;
 
-export const adminEvents = createTable(
-  'event_admin',
+export const customEvents = createTable(
+  'event_custom',
   {
-    id: serial('event_admin_id').notNull().primaryKey(),
-    rule: integer('rule_id').references(() => adminEventRules.id, { onDelete: 'cascade' }).notNull(),
+    id: serial('event_custom_id').notNull().primaryKey(),
+    rule: integer('rule_id').references(() => customEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
   }
 );
-export type AdminEvent = typeof adminEvents.$inferSelect;
+export type CustomEvent = typeof customEvents.$inferSelect;
 
-export const adminEventCastaways = createTable(
-  'event_admin_castaway',
+export const customEventCastaways = createTable(
+  'event_custom_castaway',
   {
-    event: integer('event_id').references(() => adminEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
@@ -57,10 +57,10 @@ export const adminEventCastaways = createTable(
   })
 );
 
-export const adminEventTribes = createTable(
-  'event_admin_tribe',
+export const customEventTribes = createTable(
+  'event_custom_tribe',
   {
-    event: integer('event_id').references(() => adminEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
     tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
@@ -68,10 +68,10 @@ export const adminEventTribes = createTable(
   })
 );
 
-export const adminEventMembers = createTable(
-  'event_admin_member',
+export const customEventMembers = createTable(
+  'event_custom_member',
   {
-    event: integer('event_id').references(() => adminEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({

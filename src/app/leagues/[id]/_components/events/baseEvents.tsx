@@ -1,5 +1,4 @@
 'use client';
-
 import { ListRestart } from 'lucide-react';
 import { useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
@@ -37,7 +36,7 @@ export default function BaseEvents({ className, form }: EventsProps) {
     <article className={className}>
       <span className='flex gap-2 pr-2 items-center'>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger>
+          <SelectTrigger className='mt-0' >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

@@ -1,14 +1,15 @@
 import 'server-only';
 import { db } from '~/server/db';
 import { count, eq } from 'drizzle-orm';
-import { type BaseEventRuleType, baseEventRules, leagues } from '~/server/db/schema/leagues';
+import { baseEventRules, leagues } from '~/server/db/schema/leagues';
 import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { castaways } from '~/server/db/schema/castaways';
-import { type AdminEventRuleType, adminEventRules } from '~/server/db/schema/adminEvents';
-import { weeklyEventRules, type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
-import { predictionRules, type PredictionEventRuleType, } from '~/server/db/schema/predictions';
+import { customEventRules } from '~/server/db/schema/customEvents';
+import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
+import { seasonRules } from '~/server/db/schema/seasonEvents';
+import { type RulesType } from '~/server/db/schema/rules';
 
 export async function getLeague(leagueId: number) {
   const user = auth();
@@ -82,13 +83,7 @@ export interface Member {
 }
 
 export async function getRules(leagueId: number):
-  Promise<
-    BaseEventRuleType &
-    {
-      admin: AdminEventRuleType[];
-      weekly: WeeklyEventRuleType[];
-      season: PredictionEventRuleType[]
-    }> {
+  Promise<RulesType> {
   // get event rules
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
@@ -111,46 +106,44 @@ export async function getRules(leagueId: number):
     .from(baseEventRules)
     .where(eq(baseEventRules.league, leagueId));
 
-  const adminEvents = db
+  const customEvents = db
     .select({
-      name: adminEventRules.name,
-      description: adminEventRules.description,
-      points: adminEventRules.points,
-      referenceType: adminEventRules.referenceType,
+      name: customEventRules.name,
+      description: customEventRules.description,
+      points: customEventRules.points,
+      referenceType: customEventRules.referenceType,
     })
-    .from(adminEventRules)
-    .where(eq(adminEventRules.league, leagueId));
+    .from(customEventRules)
+    .where(eq(customEventRules.league, leagueId));
 
   const weeklyEvents = db
     .select({
       name: weeklyEventRules.name,
-      adminEvent: weeklyEventRules.adminEvent,
-      baseEvent: weeklyEventRules.baseEvent,
+      //adminEvent: weeklyEventRules.adminEvent,
+      //baseEvent: weeklyEventRules.baseEvent,
       description: weeklyEventRules.description,
       points: weeklyEventRules.points,
       type: weeklyEventRules.type,
       referenceType: weeklyEventRules.referenceType,
-      selectionCount: weeklyEventRules.selectionCount,
     })
     .from(weeklyEventRules)
     .where(eq(weeklyEventRules.league, leagueId));
 
-  const predictionEvents = db
+  const seasonEvents = db
     .select({
-      name: predictionRules.name,
-      adminEvent: predictionRules.adminEvent,
-      baseEvent: predictionRules.baseEvent,
-      description: predictionRules.description,
-      points: predictionRules.points,
-      referenceType: predictionRules.referenceType,
-      selectionCount: predictionRules.selectionCount,
+      name: seasonRules.name,
+      adminEvent: seasonRules.adminEvent,
+      baseEvent: seasonRules.baseEvent,
+      description: seasonRules.description,
+      points: seasonRules.points,
+      referenceType: seasonRules.referenceType,
     })
-    .from(predictionRules)
-    .where(eq(predictionRules.league, leagueId));
+    .from(seasonRules)
+    .where(eq(seasonRules.league, leagueId));
 
-  const [base, admin, weekly, season] = await Promise.all([baseEvents, adminEvents, weeklyEvents, predictionEvents]);
+  const [base, custom, weekly, season] = await Promise.all([baseEvents, customEvents, weeklyEvents, seasonEvents]);
 
   // base spread is technically not safe but is handled by the form
-  return { ...base[0]!, admin, weekly, season };
+  return { ...base[0]!, custom, weekly, season };
 }
 

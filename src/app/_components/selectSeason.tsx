@@ -4,7 +4,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from '~/app/_components/commonUI/select';
@@ -47,7 +49,10 @@ export default function SelectSeason({ className, selectDefault = false }: Selec
         <SelectValue placeholder='Select Season' defaultValue={'fdfdf'} />
       </SelectTrigger>
       <SelectContent>
-        {seasons?.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+        <SelectGroup>
+          <SelectLabel>Select Season</SelectLabel>
+          {seasons?.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+        </SelectGroup>
       </SelectContent>
     </Select >
   );

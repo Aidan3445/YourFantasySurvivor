@@ -1,16 +1,16 @@
-import "server-only";
-import { desc, and, eq, not, or } from "drizzle-orm";
-import { db } from "~/server/db";
-import { seasons } from "~/server/db/schema/seasons";
+import 'server-only';
+import { desc, and, eq, not, or } from 'drizzle-orm';
+import { db } from '~/server/db';
+import { seasons } from '~/server/db/schema/seasons';
 import {
   baseEventTribes,
   baseEventCastaways,
   baseEvents,
   type EventName,
   episodes,
-} from "~/server/db/schema/episodes";
-import { tribes } from "~/server/db/schema/tribes";
-import { castaways } from "~/server/db/schema/castaways";
+} from '~/server/db/schema/episodes';
+import { tribes } from '~/server/db/schema/tribes';
+import { castaways } from '~/server/db/schema/castaways';
 
 export type CastawayEvent = {
   castaway: string;
@@ -36,7 +36,7 @@ export async function getCastawayEvents(
     .where(
       and(
         eq(seasons.name, seasonName),
-        not(eq(baseEvents.name, "tribeUpdate")),
+        not(eq(baseEvents.name, 'tribeUpdate')),
         or(
           eq(castaways.name, castawayName ?? castaways.name),
           eq(castaways.shortName, castawayName ?? castaways.shortName),
@@ -70,7 +70,7 @@ export async function getTribeEvents(
     .where(
       and(
         eq(seasons.name, seasonName),
-        not(eq(baseEvents.name, "tribeUpdate")),
+        not(eq(baseEvents.name, 'tribeUpdate')),
         eq(tribes.name, tribeName ?? tribes.name),
       ),
     );
@@ -95,7 +95,7 @@ export async function getTribeUpdates(
     .innerJoin(baseEventCastaways, eq(baseEvents.id, baseEventCastaways.event))
     .innerJoin(castaways, eq(castaways.id, baseEventCastaways.castaway))
     .where(
-      and(eq(seasons.name, seasonName), eq(baseEvents.name, "tribeUpdate")),
+      and(eq(seasons.name, seasonName), eq(baseEvents.name, 'tribeUpdate')),
     );
 
   return rows.reduce((acc, { tribe, castaway, episode }) => {
