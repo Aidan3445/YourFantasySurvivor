@@ -266,6 +266,10 @@ export function DeleteLeague({ leagueId }: UpdateProps) {
     deleteL()
       .then(() => {
         router.push('/leagues');
+        toast({
+          title: 'League Deleted',
+          description: 'This league has been deleted',
+        });
       })
       .catch((e: Error) => {
         toast({
@@ -331,6 +335,10 @@ function PromoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
       .then(() => {
         setRoleOpen(false);
         router.refresh();
+        toast({
+          title: 'Member promoted',
+          description: `${displayName} is now ${isAdmin ? 'the owner' : 'an admin'}`,
+        });
       })
       .catch((e: Error) => {
         toast({
@@ -357,10 +365,11 @@ function PromoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
                 style={{ background: color, color: cColor }}>
                 {displayName}
               </span> to {isAdmin ? (
-                <h3>owner <Crown className='inline-flex' size={12} fill='black' /></h3>
+                <div>owner <Crown className='inline-flex' size={12} fill='black' /></div>
               ) : (
-                <h3>admin <Shield className='inline-flex' size={16} fill='black' /></h3>)}?
-            </h3> {isAdmin ?
+                <div>admin <Shield className='inline-flex' size={16} fill='black' /></div>)}?
+            </h3>
+            {isAdmin ?
               <h4 className='text-xs text-red-700'>
                 Warning: This will remove your owner privileges which only the current owner can restore.
               </h4> :
@@ -387,6 +396,10 @@ function DemoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
       .then(() => {
         setRemoveOpen(false);
         router.refresh();
+        toast({
+          title: 'Member demoted',
+          description: `${displayName} is no longer ${isAdmin ? 'an admin' : 'in the league'}`,
+        });
       })
       .catch((e: Error) => {
         toast({
@@ -418,7 +431,7 @@ function DemoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
                   {displayName}
                 </span>?
               </h3> :
-              <h3>
+              <div>
                 <h3 className='flex gap-1'> Boot
                   <span
                     className='px-0.5 inline-flex rounded-md w-min h-min whitespace-nowrap'
@@ -430,7 +443,7 @@ function DemoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
                 <h4 className='text-xs text-red-700'>
                   This will delete their data and cannot be undone.
                 </h4>
-              </h3>}
+              </div>}
           </section>
           <Button type='submit' variant='destructive'>{isAdmin ? 'Demote' : 'Boot'} Member</Button>
         </form>

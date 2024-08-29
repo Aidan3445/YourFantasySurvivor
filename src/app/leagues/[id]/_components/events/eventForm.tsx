@@ -39,6 +39,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
   const { toast } = useToast();
 
   const [valid, setValid] = useState(true);
+  const [unsaved, setUnsaved] = useState(false);
 
   const catchUpdate = () => {
     const update = updateRules.bind(null, leagueId, form.getValues());
@@ -46,11 +47,12 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
       .then((res) => {
         toast({
           title: 'League updated',
-          description: 'Your league has been updated',
+          description: 'The league rules have been saved',
         });
 
         // update the form with the new rules
         form.reset(res);
+        setUnsaved(false);
       })
       .catch((e) => {
         if (e instanceof Error) {
@@ -72,12 +74,14 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
     } catch {
       setValid(false);
     }
+
+    setUnsaved(form.formState.isDirty);
   }, [form, watch]);
 
   return (
     <Form {...form}>
       <form className={className} action={catchUpdate}>
-        <Tab value='base' valid={valid}>
+        <Tab value='base' valid={valid} unsaved={unsaved}>
           <BaseEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Base Events</h3>
@@ -88,7 +92,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
               you can override it in the score entry page.</p>
           </article>
         </Tab>
-        <Tab value='custom' valid={valid}>
+        <Tab value='custom' valid={valid} unsaved={unsaved}>
           <CustomEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Custom Events</h3>
@@ -97,7 +101,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
             Use one of our examples or create your own.
           </article>
         </Tab>
-        <Tab value='weekly' valid={valid}>
+        <Tab value='weekly' valid={valid} unsaved={unsaved}>
           <WeeklyEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Weekly Events</h3>
@@ -118,7 +122,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
             </ul>
           </article>
         </Tab>
-        <Tab value='season' valid={valid}>
+        <Tab value='season' valid={valid} unsaved={unsaved}>
           <SeasonEvents className='col-span-3 row-span-2' form={form} />
           <article className='col-span-2'>
             Season events are special predictions members make only once.
@@ -129,7 +133,7 @@ export default function EventsForm({ className, leagueId, rules }: EventsFormPro
           </article>
         </Tab>
       </form>
-    </Form>
+    </Form >
   );
 }
 
@@ -137,16 +141,20 @@ interface TabProps {
   children: ReactNode;
   value: string;
   valid: boolean;
+  unsaved: boolean;
 }
 
-function Tab({ children, value, valid }: TabProps) {
+function Tab({ children, value, valid, unsaved }: TabProps) {
   return (
     <TabsContent value={value}>
       <section className='grid grid-cols-5 gap-2 max-w-screen-sm'>
         {children}
-        <Button className='row-start-2 col-start-5 mt-auto mb-4' disabled={!valid} type='submit'>Save</Button>
+        <div className='row-start-2 col-start-5 flex flex-col gap-2 mt-auto mb-4 text-center'>
+          {unsaved && <p className='text-red-900 text-sm font-semibold'>Unsaved Changes</p>}
+          <Button disabled={!valid} type='submit'>Save</Button>
+        </div>
       </section>
-    </TabsContent>
+    </TabsContent >
   );
 }
 

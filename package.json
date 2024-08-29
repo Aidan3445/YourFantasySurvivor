@@ -23,6 +23,7 @@
     "@eslint/config-array": "^0.16.0",
     "@eslint/object-schema": "^2.1.4",
     "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-hover-card": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",

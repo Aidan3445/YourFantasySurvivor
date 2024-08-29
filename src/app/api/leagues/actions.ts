@@ -1,9 +1,11 @@
 'use server';
 import { db } from '~/server/db';
 import { eq, and, not, exists } from 'drizzle-orm';
-import { auth } from '@clerk/nextjs/server';
+//import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
 import { leagues } from '~/server/db/schema/leagues';
+
+const auth = () => ({ userId: '_7' });
 
 export async function updateDisplayName(leagueId: number, newName?: string) {
   const user = auth();
@@ -33,6 +35,7 @@ export async function updateDisplayName(leagueId: number, newName?: string) {
 export async function updateColor(leagueId: number, newColor?: string) {
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
+  console.log(user.userId);
 
   if (!newColor) throw new Error('Color is required');
   if (newColor.length !== 7) throw new Error('Color must be 7 characters long');

@@ -7,6 +7,7 @@ import { leagueMembers } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { castaways } from '~/server/db/schema/castaways';
 
+
 export async function getLeague(leagueId: number) {
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');

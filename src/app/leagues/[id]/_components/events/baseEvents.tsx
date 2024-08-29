@@ -36,7 +36,7 @@ export default function BaseEvents({ className, form }: EventsProps) {
     <article className={className}>
       <span className='flex gap-2 pr-2 items-center'>
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger className='mt-0' >
+          <SelectTrigger className='mb-2' >
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
