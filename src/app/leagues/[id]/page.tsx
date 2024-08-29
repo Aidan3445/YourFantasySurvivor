@@ -2,6 +2,7 @@ import { getLeague } from '~/app/api/leagues/query';
 import Members from './_components/members';
 import LeagueDetails from './_components/leagueDetails';
 import LeagueScoring from './_components/events/leagueScoring';
+import { Button } from '~/app/_components/commonUI/button';
 
 interface PageProps {
   params: {
@@ -19,9 +20,10 @@ export default async function League({ params }: PageProps) {
     <main className='flex flex-col gap-0 text-center' >
       <h1 className='text-2xl font-semibold'>{league?.name}</h1>
       <h3 className='text-md font-semibold'>Season: {league?.season}</h3>
-      <span className='grid grid-cols-2'>
-        <LeagueDetails className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
-        <LeagueScoring className='m-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} openDefault={ownerLoggedIn && members.length === 1} />
+      <span className='grid grid-cols-2 gap-2 mb-2'>
+        <LeagueDetails className='text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
+        <LeagueScoring className='text-black' league={league} ownerLoggedIn={ownerLoggedIn} openDefault={ownerLoggedIn && members.length === 1} />
+        <Button className='col-span-2'>DRAFT</Button>
       </span>
       <Members
         leagueId={leagueId}

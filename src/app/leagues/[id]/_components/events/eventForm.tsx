@@ -150,11 +150,12 @@ function Tab({ children, value, valid, unsaved, ownerLoggedIn }: TabProps) {
     <TabsContent value={value}>
       <section className='grid grid-cols-5 gap-2 max-w-screen-sm'>
         {children}
-        {ownerLoggedIn &&
+        {ownerLoggedIn ?
           <div className='row-start-2 col-start-5 flex flex-col gap-2 mt-auto mb-4 text-center'>
             {unsaved && <p className='text-red-900 text-sm font-semibold'>Unsaved Changes</p>}
             <Button disabled={!valid} type='submit'>Save</Button>
-          </div>}
+          </div> :
+          <h3 className='row-start-2 col-start-4 col-span-2 italic text-sm mt-auto mb-4'>Only the owner can edit league rules</h3>}
       </section>
     </TabsContent >
   );
