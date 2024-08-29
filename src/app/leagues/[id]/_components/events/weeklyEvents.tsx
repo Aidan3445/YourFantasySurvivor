@@ -9,7 +9,7 @@ import { Textarea } from '~/app/_components/commonUI/textArea';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 
-export default function WeeklyEvents({ className, form }: EventsProps) {
+export default function WeeklyEvents({ className, form, freeze }: EventsProps) {
   const [weeklyEvents, setWeeklyEvents] = useState(form.getValues().weekly);
 
   const updateEvent = (event: WeeklyEventRuleType | null, eventId: number | null) => {
@@ -57,24 +57,25 @@ export default function WeeklyEvents({ className, form }: EventsProps) {
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col'>
         {weeklyEvents.map((event, index) => (
-          <WeeklyEvent key={index} event={event} eventId={index} updateEvent={updateEvent} />
+          <WeeklyEvent key={index} event={event} eventId={index} updateEvent={freeze ? undefined : updateEvent} />
         ))}
       </section>
-      <Select value='' onValueChange={newEvent}>
-        <SelectTrigger>
-          <SelectValue placeholder='New Weekly Event' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='vote'>New Vote</SelectItem>
-          <SelectItem value='predict'>New Prediction</SelectItem>
-          <SelectGroup>
-            <SelectLabel>Examples</SelectLabel>
-            <SelectItem value='challengeMVP'>Challenge MVP</SelectItem>
-            <SelectItem value='bestGCMeme'>Best GC Meme</SelectItem>
-            <SelectItem value='nextBoot'>Next Boot</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      {!freeze &&
+        <Select value='' onValueChange={newEvent}>
+          <SelectTrigger>
+            <SelectValue placeholder='New Weekly Event' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='vote'>New Vote</SelectItem>
+            <SelectItem value='predict'>New Prediction</SelectItem>
+            <SelectGroup>
+              <SelectLabel>Examples</SelectLabel>
+              <SelectItem value='challengeMVP'>Challenge MVP</SelectItem>
+              <SelectItem value='bestGCMeme'>Best GC Meme</SelectItem>
+              <SelectItem value='nextBoot'>Next Boot</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>}
     </article>
   );
 }
@@ -82,7 +83,7 @@ export default function WeeklyEvents({ className, form }: EventsProps) {
 interface WeeklyEventProps {
   event: WeeklyEventRuleType;
   eventId: number;
-  updateEvent: (event: WeeklyEventRuleType | null, eventId: number | null) => void;
+  updateEvent?: (event: WeeklyEventRuleType | null, eventId: number | null) => void;
 }
 
 function WeeklyEvent({ event, eventId, updateEvent }: WeeklyEventProps) {
@@ -97,29 +98,33 @@ function WeeklyEvent({ event, eventId, updateEvent }: WeeklyEventProps) {
   };
 
   const saveEvent = (changedEvent: WeeklyEventRuleType) => {
-    updateEvent(changedEvent, eventId);
+    updateEvent?.(changedEvent, eventId);
     setNewEvent(changedEvent);
   };
 
   const deleteEvent = () => {
-    updateEvent(null, eventId);
+    updateEvent?.(null, eventId);
   };
 
   const copyEvent = () => {
-    updateEvent(newEvent, null);
+    updateEvent?.(newEvent, null);
   };
 
   return (
     <article className='flex flex-col gap-2 mr-2'>
       <span className='flex gap-2 items-center'>
-        <Input
-          className='w-3/4 mr-4'
-          type='text'
-          placeholder='Event Name'
-          value={newEvent.name}
-          onChange={(e) => saveEvent({ ...newEvent, name: e.target.value })} />
-        <CopyPlus className='inline-flex align-middle rounded-md' size={24} onClick={copyEvent} />
-        <SquareX className='inline-flex align-middle rounded-md' size={24} onClick={deleteEvent} />
+        <div className='w-full'>
+          <Input
+            type='text'
+            placeholder='Event Name'
+            value={newEvent.name}
+            onChange={(e) => saveEvent({ ...newEvent, name: e.target.value })} />
+        </div>
+        {updateEvent &&
+          <span className='flex gap-2'>
+            <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
+            <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
+          </span>}
       </span>
       <span className='flex gap-2 items-center'>
         <Input

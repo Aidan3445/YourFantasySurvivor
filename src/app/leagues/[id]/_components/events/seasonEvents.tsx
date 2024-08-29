@@ -9,7 +9,7 @@ import { Textarea } from '~/app/_components/commonUI/textArea';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 
-export default function SeasonEvents({ className, form }: EventsProps) {
+export default function SeasonEvents({ className, form, freeze }: EventsProps) {
   const [seasonEvents, setSeasonEvents] = useState(form.getValues().season);
 
   const updateEvent = (event: SeasonEventRuleType | null, eventId: number | null) => {
@@ -57,25 +57,26 @@ export default function SeasonEvents({ className, form }: EventsProps) {
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col'>
         {seasonEvents.map((event, index) => (
-          <SeasonEvent key={index} event={event} eventId={index} updateEvent={updateEvent} />
+          <SeasonEvent key={index} event={event} eventId={index} updateEvent={freeze ? undefined : updateEvent} />
         ))}
       </section>
-      <Select value='' onValueChange={newEvent}>
-        <SelectTrigger>
-          <SelectValue placeholder='New Season Event' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='new'>New</SelectItem>
-          <SelectGroup>
-            <SelectLabel>Examples</SelectLabel>
-            <SelectItem value='soleSurvivor'>Sole Survivor</SelectItem>
-            <SelectItem value='firstBoot'>First Boot</SelectItem>
-            <SelectItem value='firstLoser'>First Loser</SelectItem>
-            <SelectItem value='tribeBeast'>Beast Tribe</SelectItem>
-            <SelectItem value='individualBeast'>Beast Castaway</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      {!freeze &&
+        <Select value='' onValueChange={newEvent}>
+          <SelectTrigger>
+            <SelectValue placeholder='New Season Event' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='new'>New</SelectItem>
+            <SelectGroup>
+              <SelectLabel>Examples</SelectLabel>
+              <SelectItem value='soleSurvivor'>Sole Survivor</SelectItem>
+              <SelectItem value='firstBoot'>First Boot</SelectItem>
+              <SelectItem value='firstLoser'>First Loser</SelectItem>
+              <SelectItem value='tribeBeast'>Beast Tribe</SelectItem>
+              <SelectItem value='individualBeast'>Beast Castaway</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>}
     </article>
   );
 }
@@ -83,7 +84,7 @@ export default function SeasonEvents({ className, form }: EventsProps) {
 interface SeasonEventProps {
   event: SeasonEventRuleType;
   eventId: number;
-  updateEvent: (event: SeasonEventRuleType | null, eventId: number | null) => void;
+  updateEvent?: (event: SeasonEventRuleType | null, eventId: number | null) => void;
 }
 
 function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
@@ -98,29 +99,33 @@ function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
   };
 
   const saveEvent = (changedEvent: SeasonEventRuleType) => {
-    updateEvent(changedEvent, eventId);
+    updateEvent?.(changedEvent, eventId);
     setNewEvent(changedEvent);
   };
 
   const deleteEvent = () => {
-    updateEvent(null, eventId);
+    updateEvent?.(null, eventId);
   };
 
   const copyEvent = () => {
-    updateEvent(newEvent, null);
+    updateEvent?.(newEvent, null);
   };
 
   return (
     <article className='flex flex-col gap-2 mr-2'>
       <span className='flex gap-2 items-center'>
-        <Input
-          className='w-3/4 mr-4'
-          type='text'
-          placeholder='Event Name'
-          value={newEvent.name}
-          onChange={(e) => saveEvent({ ...newEvent, name: e.target.value })} />
-        <CopyPlus className='inline-flex align-middle rounded-md' size={24} onClick={copyEvent} />
-        <SquareX className='inline-flex align-middle rounded-md' size={24} onClick={deleteEvent} />
+        <div className='w-full'>
+          <Input
+            type='text'
+            placeholder='Event Name'
+            value={newEvent.name}
+            onChange={(e) => saveEvent({ ...newEvent, name: e.target.value })} />
+        </div>
+        {updateEvent &&
+          <span className='flex gap-2'>
+            <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
+            <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
+          </span>}
       </span>
       <span className='flex gap-2 items-center'>
         <Input

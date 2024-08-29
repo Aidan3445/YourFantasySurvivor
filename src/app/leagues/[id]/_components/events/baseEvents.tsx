@@ -8,7 +8,7 @@ import { defaultBaseRules } from '~/server/db/schema/leagues';
 
 const defaultBase = defaultBaseRules();
 
-export default function BaseEvents({ className, form }: EventsProps) {
+export default function BaseEvents({ className, form, freeze }: EventsProps) {
   const [category, setCategory] = useState('all');
 
   const reset = () => {
@@ -46,12 +46,14 @@ export default function BaseEvents({ className, form }: EventsProps) {
             <SelectItem value='other'>Other</SelectItem>
           </SelectContent>
         </Select>
-        <ListRestart className='inline-flex align-middle ml-4 cursor-pointer' size={24} onClick={reset} />
+        {!freeze && <ListRestart className='inline-flex align-middle ml-4 cursor-pointer' size={24} onClick={reset} />}
       </span>
       <div className='light-scroll h-96 pb-4 gap-4'>
-        {(category === 'all' || category === 'challenges') && <Challenges />}
-        {(category === 'all' || category === 'advantages') && <Advantages />}
-        {(category === 'all' || category === 'other') && <Other />}
+        <div className={freeze ? 'pointer-events-none' : ''}>
+          {(category === 'all' || category === 'challenges') && <Challenges />}
+          {(category === 'all' || category === 'advantages') && <Advantages />}
+          {(category === 'all' || category === 'other') && <Other />}
+        </div>
       </div>
     </article>
   );

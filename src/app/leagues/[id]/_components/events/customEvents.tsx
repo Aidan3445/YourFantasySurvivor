@@ -10,7 +10,7 @@ import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 import { Label } from '~/app/_components/commonUI/label';
 
-export default function CustomEvents({ className, form }: EventsProps) {
+export default function CustomEvents({ className, form, freeze }: EventsProps) {
   const [customEvents, setCustomEvents] = useState(form.getValues().custom);
 
   const updateEvent = (event: CustomEventRuleType | null, eventCount: number | null) => {
@@ -51,25 +51,26 @@ export default function CustomEvents({ className, form }: EventsProps) {
 
   return (
     <article className={cn('light-scroll h-96 pb-16', className)}>
-      <section className='flex flex-col'>
+      <section className={cn('flex flex-col', freeze ? 'pointer-events-none' : '')}>
         {customEvents.map((event, index) => (
-          <CustomEvent key={index} event={event} eventCount={index} updateEvent={updateEvent} />
+          <CustomEvent key={index} event={event} eventCount={index} updateEvent={freeze ? undefined : updateEvent} />
         ))}
       </section>
-      <Select value='' onValueChange={newEvent}>
-        <SelectTrigger>
-          <SelectValue placeholder='New Custom Event' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='new'>New</SelectItem>
-          <SelectGroup>
-            <SelectLabel>Examples</SelectLabel>
-            <SelectItem value='confessional'>Confessional</SelectItem>
-            <SelectItem value='liveTribal'>Live Tribal Council</SelectItem>
-            <SelectItem value='blindside'>Orchestrate Blindside</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
+      {!freeze &&
+        <Select value='' onValueChange={newEvent}>
+          <SelectTrigger>
+            <SelectValue placeholder='New Custom Event' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='new'>New</SelectItem>
+            <SelectGroup>
+              <SelectLabel>Examples</SelectLabel>
+              <SelectItem value='confessional'>Confessional</SelectItem>
+              <SelectItem value='liveTribal'>Live Tribal Council</SelectItem>
+              <SelectItem value='blindside'>Orchestrate Blindside</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>}
     </article>
   );
 }
@@ -77,7 +78,7 @@ export default function CustomEvents({ className, form }: EventsProps) {
 export interface CustomEventProps extends ComponentProps {
   event: CustomEventRuleType;
   eventCount: number;
-  updateEvent: (event: CustomEventRuleType | null, eventCount: number | null) => void;
+  updateEvent?: (event: CustomEventRuleType | null, eventCount: number | null) => void;
 }
 
 function CustomEvent({ event, eventCount, updateEvent, className }: CustomEventProps) {
@@ -108,23 +109,22 @@ function CustomEvent({ event, eventCount, updateEvent, className }: CustomEventP
       }
     }
 
-    updateEvent(changedEvent, eventCount);
+    updateEvent?.(changedEvent, eventCount);
     setNewEvent(changedEvent);
   };
 
   const deleteEvent = () => {
-    updateEvent(null, eventCount);
+    updateEvent?.(null, eventCount);
   };
 
   const copyEvent = () => {
-    updateEvent(newEvent, null);
+    updateEvent?.(newEvent, null);
   };
 
   return (
     <article className={cn('flex flex-col gap-2 mr-2', className)}>
-      {event.id}-{eventCount}
       <span className='flex gap-2 items-center'>
-        <div className='w-3/4 mr-4'>
+        <div className='w-full'>
           <Label>Event Name</Label>
           <Input
             type='text'
@@ -132,8 +132,11 @@ function CustomEvent({ event, eventCount, updateEvent, className }: CustomEventP
             value={newEvent.name}
             onChange={(e) => update({ ...newEvent, name: e.target.value })} />
         </div>
-        <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
-        <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
+        {updateEvent &&
+          <span className='flex gap-2'>
+            <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
+            <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
+          </span>}
       </span>
       <span className='flex gap-2 items-center'>
         <div>
