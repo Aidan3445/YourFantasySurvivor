@@ -1,11 +1,9 @@
 'use server';
 import { db } from '~/server/db';
 import { eq, and, not, exists } from 'drizzle-orm';
-//import { auth } from '@clerk/nextjs/server';
+import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
 import { leagues, leagueSettings } from '~/server/db/schema/leagues';
-
-const auth = () => ({ userId: '_7' });
 
 export async function updateDisplayName(leagueId: number, newName?: string) {
   const user = auth();

@@ -9,7 +9,7 @@ import { castaways } from '~/server/db/schema/castaways';
 
 
 export async function getLeague(leagueId: number) {
-  const user = { userId: '_7' };
+  const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const leagueFetch = db
