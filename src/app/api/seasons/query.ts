@@ -19,3 +19,12 @@ export async function getLatestSeason(): Promise<number> {
     .orderBy(desc(seasons.premierDate))
     .then((seasons) => seasons[0]?.id ?? 0);
 }
+
+export async function getNextPremierDate(): Promise<Date> {
+  return await db
+    .select({ premierDate: seasons.premierDate })
+    .from(seasons)
+    .orderBy(desc(seasons.premierDate))
+    .then((seasons) => seasons[0]?.premierDate ?
+      new Date(seasons[0].premierDate) : new Date());
+}

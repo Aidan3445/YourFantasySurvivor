@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { joinLeague } from './query';
+import { joinLeague } from './insert';
 
 export async function POST(req: NextRequest) {
   const { name, password, displayName } = await req.json() as { name: string, password: string, displayName: string };

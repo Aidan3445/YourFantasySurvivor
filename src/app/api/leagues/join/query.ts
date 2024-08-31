@@ -1,7 +1,7 @@
 import 'server-only';
 import { db } from '~/server/db';
 import { and, count, eq } from 'drizzle-orm';
-import { leagues } from '~/server/db/schema/leagues';
+import { leagues, leagueSettings } from '~/server/db/schema/leagues';
 import { auth } from '@clerk/nextjs/server';
 import { insertMember } from './insert';
 import { leagueMembers } from '~/server/db/schema/members';
@@ -12,13 +12,13 @@ export async function joinLeague(name: string, password: string, displayName: st
   if (!user.userId) throw new Error('User not authenticated');
 
   const league = await db
-    .select({ id: leagues.id, locked: leagues.locked, season: leagues.season })
+    .select({ id: leagues.id, inviteOnly: leagueSettings.inviteOnly, season: leagues.season })
     .from(leagues)
+    .leftJoin(leagueSettings, eq(leagues.id, leagueSettings.league))
     .where(and(eq(leagues.name, name), eq(leagues.password, password)))
     .then((leagues) => leagues[0]);
 
-  if (!league) throw new Error('Invalid league name or password');
-  else if (league.locked) throw new Error('League is locked');
+  if (!league || league.inviteOnly) throw new Error('Invalid league name or password');
 
   const memberCounter = db
     .select({ count: count() })

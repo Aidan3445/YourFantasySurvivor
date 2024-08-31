@@ -8,7 +8,6 @@ export async function POST(req: NextRequest) {
   try {
     const id = await insertLeague(newLeague, displayName);
     return NextResponse.json(id, { status: 201 });
-
   } catch (e) {
     let message = 'Unknown error occurred';
     let status = 500;
@@ -21,6 +20,8 @@ export async function POST(req: NextRequest) {
       if (e.message === 'User not authenticated') status = 401;
       else if (e.message.startsWith('duplicate')) status = 409;
     }
+
+    console.error(e);
 
     return NextResponse.json({ message }, { status });
   }

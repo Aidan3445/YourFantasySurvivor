@@ -3,6 +3,8 @@ import { auth } from '@clerk/nextjs/server';
 import { db } from '~/server/db';
 import { baseEventRules, defaultBaseRules, leagues, type LeagueInsert } from '~/server/db/schema/leagues';
 import { insertMember } from '../join/insert';
+import { newLeagueSettings } from '../[id]/settings/insert';
+import { eq } from 'drizzle-orm';
 
 export async function insertLeague(league: LeagueInsert, displayName: string): Promise<number> {
   const user = auth();
@@ -16,12 +18,20 @@ export async function insertLeague(league: LeagueInsert, displayName: string): P
 
   if (!leagueId) throw new Error('Unknown error occurred');
 
-  // add the creator as league owner
-  await insertMember(leagueId.id, user.userId, displayName, true, true);
-  // set default base rules
-  await db
-    .insert(baseEventRules)
-    .values({ league: leagueId.id, ...defaultBaseRules() });
+  try {
+    // set default base rules
+    await db.insert(baseEventRules).values({ league: leagueId.id, ...defaultBaseRules() });
+    // set default settings
+    await newLeagueSettings(leagueId.id);
+    // add the creator as league owner
+    await insertMember(leagueId.id, user.userId, displayName, true, true);
+  } catch (e) {
+    // rollback 
+    // because of cascade rules, deleting the league will 
+    // also delete any subsequent inserts before the error
+    await db.delete(leagues).where(eq(leagues.id, leagueId.id));
+    throw e;
+  }
 
   return leagueId.id;
 }

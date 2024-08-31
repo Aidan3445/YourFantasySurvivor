@@ -3,7 +3,7 @@ import { db } from '~/server/db';
 import { eq, and, not, exists } from 'drizzle-orm';
 //import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
-import { leagues } from '~/server/db/schema/leagues';
+import { leagues, leagueSettings } from '~/server/db/schema/leagues';
 
 const auth = () => ({ userId: '_7' });
 
@@ -35,7 +35,6 @@ export async function updateDisplayName(leagueId: number, newName?: string) {
 export async function updateColor(leagueId: number, newColor?: string) {
   const user = auth();
   if (!user.userId) throw new Error('User not authenticated');
-  console.log(user.userId);
 
   if (!newColor) throw new Error('Color is required');
   if (newColor.length !== 7) throw new Error('Color must be 7 characters long');
@@ -69,6 +68,17 @@ export async function leaveLeague(leagueId: number) {
     .returning({ name: leagueMembers.displayName });
 
   if (member.length === 0) throw new Error('User cannot leave league as owner');
+
+  // remove user from draft order
+  const draftOrder = (await db
+    .select({ draftOrder: leagueSettings.draftOrder })
+    .from(leagueSettings)
+    .where(eq(leagueSettings.league, leagueId))
+    .then((res) => res[0]?.draftOrder ?? [])).filter(id => id !== user.userId);
+  await db
+    .update(leagueSettings)
+    .set({ draftOrder })
+    .where(eq(leagueSettings.league, leagueId));
 }
 
 export async function deleteLeague(leagueId: number) {
