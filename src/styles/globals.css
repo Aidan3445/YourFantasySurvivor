@@ -98,9 +98,13 @@ main {
 .hs-in {
     @apply border box-border border-black hover:shadow-inner bg-b4 hover:shadow-b1
     aria-expanded:shadow-inner aria-expanded:shadow-b1 
-    focus:shadow-inner focus:shadow-b1
     cursor-pointer transition-all duration-100 ease-out
     disabled:hover:cursor-default disabled:hover:border disabled:hover:shadow-none;
+}
+
+button, .hs-in {
+  @apply focus-visible:outline-none focus:ring-0 
+  focus:outline-none focus-visible:ring-0;
 }
 
 /* Corner frame for cards */

@@ -47,15 +47,20 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull }: Me
 interface MemberRowProps {
   children: ReactNode;
   color: string;
-  loggedIn: boolean;
+  loggedIn?: boolean;
+  dataSwapyItem?: string;
 }
 
-export function MemberRow({ children, color, loggedIn }: MemberRowProps) {
+export function MemberRow({ children, color, loggedIn, dataSwapyItem }: MemberRowProps) {
   return (
-    <div
-      className={cn('px-2 gap-1 rounded border border-black flex items-center', loggedIn && 'border ring ring-white')}
-      style={{ background: color }}>
-      {children}
+    <div data-swapy-item={dataSwapyItem}>
+      <div
+        className={cn(
+          'px-2 gap-1 rounded border border-black flex items-center transition-all duration-500',
+          loggedIn && 'border ring ring-white')}
+        style={{ background: color }}>
+        {children}
+      </div>
     </div>
   );
 }

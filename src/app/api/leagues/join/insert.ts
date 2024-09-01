@@ -42,6 +42,8 @@ export async function joinLeague(name: string, password: string, displayName: st
 export async function insertMember(leagueId: number, userId: string, displayName: string, isOwner = false, isAdmin = false): Promise<void> {
   const color = await chooseColor(leagueId);
 
+  displayName = displayName.slice(0, 16);
+
   // insert member
   await db
     .insert(leagueMembers)

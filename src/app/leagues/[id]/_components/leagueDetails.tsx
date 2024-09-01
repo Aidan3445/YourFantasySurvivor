@@ -13,7 +13,6 @@ export interface LeagueOwnerProps extends ComponentProps {
     password: string;
   };
   ownerLoggedIn: boolean;
-  className?: string;
 }
 
 export default function LeagueDetails({ league, ownerLoggedIn, className }: LeagueOwnerProps) {

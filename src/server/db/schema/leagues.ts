@@ -90,7 +90,7 @@ export const leagueSettings = createTable(
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull().primaryKey(),
     inviteOnly: boolean('invite_only').notNull().default(false),
     pickCount: pickCount('pick_count').notNull().default(1),
-    draftDate: timestamp('draft_date').notNull(),
+    draftDate: timestamp('draft_date', { mode: 'string' }).notNull(),
     draftOrder: text('draft_order').array().notNull().default(sql`ARRAY[]::text[]`),
     turnLimitMins: integer('turn_limit_mins').notNull().default(10),
   }
@@ -98,7 +98,10 @@ export const leagueSettings = createTable(
 export type Settings = {
   pickCount: 1 | 2;
   draftDate: Date;
-  draftOrder: string[]; // member ids
+  draftOrder: {
+    name: string;
+    color: string;
+  }[];
   turnLimitMins: number; // minutes before pick is skipped
 };
 
