@@ -14,6 +14,7 @@ import { defaultBaseRules } from '~/server/db/schema/leagues';
 import SeasonEvents from './seasonEvents';
 import { updateRules } from '~/app/api/leagues/[id]/rules/actions';
 import { useToast } from '~/app/_components/commonUI/use-toast';
+import { useRouter } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,6 +37,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
     defaultValues: defaultRules,
     resolver: zodResolver(Rules),
   });
+  const router = useRouter();
   const { toast } = useToast();
 
   const [valid, setValid] = useState(true);
@@ -53,11 +55,12 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
         // update the form with the new rules
         form.reset(res);
         setUnsaved(false);
+        router.refresh();
       })
       .catch((e) => {
         if (e instanceof Error) {
           toast({
-            title: 'Error creating league',
+            title: 'Error updating league rules',
             description: e.message,
             variant: 'error',
           });
@@ -165,3 +168,4 @@ export interface EventsProps extends ComponentProps {
   form: UseFormReturn<RulesType>;
   freeze: boolean;
 }
+

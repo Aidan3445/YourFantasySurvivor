@@ -13,7 +13,7 @@ export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
 export const weeklyEventRules = createTable(
   'event_weekly_rule',
   {
-    id: serial('event_weekly_rule_id').notNull().primaryKey(),
+    id: serial('weekly_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
     name: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own

@@ -5,23 +5,24 @@ import { getContrastingColor } from '@uiw/color-convert';
 import { useState } from 'react';
 import { Button } from '~/app/_components/commonUI/button';
 import { updateDraftOrder } from '~/app/api/leagues/[id]/settings/actions';
-import { useRouter } from 'next/navigation';
 import { closestCenter, DndContext, KeyboardSensor, PointerSensor, type UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import SortableItem, { handleDragEnd } from '~/app/_components/commonUI/sortableItem';
 import { GripVertical } from 'lucide-react';
+import { useToast } from '~/app/_components/commonUI/use-toast';
+import { useRouter } from 'next/navigation';
 
 interface DraftOrderProps extends ComponentProps {
   leagueId: number;
   draftOrder: { name: string, color: string }[];
-  ownerLoggedIn: boolean;
+  orderLocked: boolean;
 }
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 2;
 
-export default function DraftOrder({ leagueId, draftOrder, ownerLoggedIn, className }: DraftOrderProps) {
+export default function DraftOrder({ leagueId, draftOrder, orderLocked, className }: DraftOrderProps) {
   const [order, setOrder] = useState(draftOrder
     .map((member) => ({ ...member, id: member.name as UniqueIdentifier })));
   const sensors = useSensors(
@@ -29,6 +30,7 @@ export default function DraftOrder({ leagueId, draftOrder, ownerLoggedIn, classN
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
   const router = useRouter();
+  const { toast } = useToast();
 
   const shuffleOrderWithAnimation = () => {
     // shuffle order by swapping items one by one
@@ -50,13 +52,27 @@ export default function DraftOrder({ leagueId, draftOrder, ownerLoggedIn, classN
     const update = updateDraftOrder.bind(null, leagueId, order.map((member) => member.name));
 
     update()
-      .then(() => router.refresh())
-      .catch((e) => console.error(e));
+      .then(() => {
+        toast({
+          title: 'Draft order saved',
+          description: 'The draft order has been saved',
+        });
+        router.refresh();
+      })
+      .catch((e) => {
+        if (e instanceof Error) {
+          toast({
+            title: 'Error saving draft order',
+            description: e.message,
+            variant: 'error',
+          });
+        }
+      });
   };
 
   return (
     <section className={className}>
-      {ownerLoggedIn && <span className='w-full grid grid-cols-2 gap-1'>
+      {!orderLocked && <span className='w-full grid grid-cols-2 gap-1'>
         <Button onClick={shuffleOrderWithAnimation}>Shuffle</Button>
         <form action={saveOrder}>
           <Button className='w-full' type='submit'>Save</Button>
@@ -70,10 +86,10 @@ export default function DraftOrder({ leagueId, draftOrder, ownerLoggedIn, classN
           onDragEnd={(event) => handleDragEnd(event, setOrder)}>
           <SortableContext items={order} strategy={verticalListSortingStrategy}>
             {order.map((member, index) =>
-              <SortableItem key={member.name} id={member.id} disabled={!ownerLoggedIn}>
+              <SortableItem key={member.name} id={member.id} disabled={orderLocked}>
                 <MemberRow color={member.color}>
                   <h3 style={{ color: getContrastingColor(member.color) }}>{index + 1} - {member.name}</h3>
-                  {ownerLoggedIn &&
+                  {!orderLocked &&
                     <GripVertical
                       className='cursor-row-resize ml-auto'
                       color={getContrastingColor(member.color)} />}

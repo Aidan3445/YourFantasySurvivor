@@ -1,6 +1,6 @@
 'use server';
 import { db } from '~/server/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, notInArray } from 'drizzle-orm';
 import { auth } from '@clerk/nextjs/server';
 import { baseEventRules } from '~/server/db/schema/leagues';
 import { type RulesType } from '~/server/db/schema/rules';
@@ -75,6 +75,31 @@ export async function updateRules(leagueId: number, rules: RulesType) {
       .returning();
   });
   const season = (await Promise.all(allSeason)).flat();
+
+  // delete any removed rules
+  const customIds = custom.map((c) => c.id);
+  const deleteCustom = db
+    .delete(customEventRules)
+    .where(
+      and(
+        eq(customEventRules.league, leagueId),
+        notInArray(customEventRules.id, customIds)));
+  const weeklyIds = weekly.map((w) => w.id);
+  const deleteWeekly = db
+    .delete(weeklyEventRules)
+    .where(
+      and(
+        eq(weeklyEventRules.league, leagueId),
+        notInArray(weeklyEventRules.id, weeklyIds)));
+  const seasonIds = season.map((s) => s.id);
+  const deleteSeason = db
+    .delete(seasonEventRules)
+    .where(
+      and(
+        eq(seasonEventRules.league, leagueId),
+        notInArray(seasonEventRules.id, seasonIds)));
+
+  await Promise.all([deleteCustom, deleteWeekly, deleteSeason]);
 
   return {
     ...base[0]!,

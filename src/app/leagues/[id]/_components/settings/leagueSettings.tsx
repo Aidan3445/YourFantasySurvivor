@@ -7,6 +7,7 @@ import { Button } from '~/app/_components/commonUI/button';
 import Countdown from '~/app/_components/countdown';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
 import DraftOrder from './draftOrder';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 
 export default async function DraftInfo({ league, ownerLoggedIn, className }: LeagueOwnerProps) {
   const [settings, { season, weekly }] = await Promise.all([
@@ -21,16 +22,30 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
 
   console.log(preseasonPredictions);
 
+  const orderLocked = !ownerLoggedIn || settings.draftDate < new Date();
+
   return (
     <Popover>
       <PopoverCenter />
-      <PopoverTrigger className={cn(className, 'hs-in px-2 rounded-md')}>
+      <PopoverTrigger className={cn(className, 'hs-in p-1 rounded-md')}>
         Draft
       </PopoverTrigger>
       <PopoverContent>
         <CardContainer className='flex flex-col gap-1 p-6 transition-all'>
           <h2 className='text-2xl text-center font-semibold'>Draft Info</h2>
-          <DraftOrder leagueId={league.id} draftOrder={settings.draftOrder} ownerLoggedIn={ownerLoggedIn} className='w-full flex flex-col gap-1' />
+          <Tabs defaultValue='order'>
+            <TabsList className='w-full grid grid-flow-col auto-cols-fr'>
+              <TabsTrigger value='order'>Order</TabsTrigger>
+              <TabsTrigger value='predictions'>Predictions</TabsTrigger>
+            </TabsList>
+            <TabsContent value='order'>
+              <DraftOrder leagueId={league.id} draftOrder={settings.draftOrder} orderLocked={orderLocked} className='w-full flex flex-col gap-1' />
+            </TabsContent>
+            <TabsContent value='predictions'>
+              <p>Season Predictions {preseasonPredictions.season.length}</p>
+              <p>Weekly Predictions {preseasonPredictions.weekly.length}</p>
+            </TabsContent>
+          </Tabs>
           <Countdown className='text-center hs-in rounded-md p-1' endDate={settings.draftDate}>
             <Button className='w-full'>Go To Draft</Button>
           </Countdown>

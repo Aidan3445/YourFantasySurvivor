@@ -3,7 +3,7 @@ import { CopyPlus, SquareX } from 'lucide-react';
 import { Input } from '~/app/_components/commonUI/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { cn, type ComponentProps } from '~/lib/utils';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { CustomEventRule, type CustomEventRuleType } from '~/server/db/schema/customEvents';
 import { Textarea } from '~/app/_components/commonUI/textArea';
 import { Separator } from '~/app/_components/commonUI/separator';
@@ -11,50 +11,40 @@ import { type EventsProps } from './eventForm';
 import { Label } from '~/app/_components/commonUI/label';
 
 export default function CustomEvents({ className, form, freeze }: EventsProps) {
-  const [customEvents, setCustomEvents] = useState(form.getValues().custom);
+  const customEvents = form.watch('custom');
 
-  const updateEvent = (event: CustomEventRuleType | null, eventCount: number | null) => {
+  const updateEvent = (
+    event: CustomEventRuleType,
+    action: 'copy' | 'delete' | 'update',
+    eventIndex: number) => {
     const newEvents = [...customEvents];
 
-    if (eventCount === null && !event) return;
-    else if (eventCount === null && event) newEvents.push({ ...event, id: undefined });
-    else if (!event) newEvents.splice(eventCount!, 1);
-    else newEvents[eventCount!] = event;
-
-    form.setValue('custom', [...newEvents]);
-  };
-
-  const watch = form.watch('custom');
-  useEffect(() => {
-    setCustomEvents(form.getValues().custom);
-  }, [watch, form]);
-
-  const newEvent = (value: string) => {
-    let event: CustomEventRuleType;
-
-    switch (value) {
-      case 'confessional':
-        event = confessionalEvent;
+    switch (action) {
+      case 'copy':
+        newEvents.push({ ...event, id: undefined, name: '' });
         break;
-      case 'liveTribal':
-        event = liveTribalCouncilEvent;
+      case 'delete':
+        newEvents.splice(eventIndex, 1);
         break;
-      case 'blindside':
-        event = orchestrateBlindsideEvent;
+      case 'update':
+        newEvents[eventIndex] = event;
         break;
-      default:
-        event = blankEvent;
     }
 
-    form.setValue('custom', [...customEvents, event]);
+    form.setValue('custom', newEvents);
+  };
+
+  const newEvent = (value: keyof typeof CustomTemplates) => {
+    form.setValue('custom', [...customEvents, { ...CustomTemplates[value] }]);
   };
 
   return (
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className={cn('flex flex-col', freeze ? 'pointer-events-none' : '')}>
         {customEvents.map((event, index) => (
-          <CustomEvent key={index} event={event} eventCount={index} updateEvent={freeze ? undefined : updateEvent} />
+          <CustomEvent key={index} event={event} eventIndex={index} updateEvent={freeze ? undefined : updateEvent} />
         ))}
+        {customEvents.length === 0 && <h4 className='text-lg font-normal text-gray-700'>No custom events</h4>}
       </section>
       {!freeze &&
         <Select value='' onValueChange={newEvent}>
@@ -77,23 +67,21 @@ export default function CustomEvents({ className, form, freeze }: EventsProps) {
 
 export interface CustomEventProps extends ComponentProps {
   event: CustomEventRuleType;
-  eventCount: number;
-  updateEvent?: (event: CustomEventRuleType | null, eventCount: number | null) => void;
+  eventIndex: number;
+  updateEvent?: (
+    event: CustomEventRuleType,
+    action: 'copy' | 'delete' | 'update',
+    eventIndex: number) => void;
 }
 
-function CustomEvent({ event, eventCount, updateEvent, className }: CustomEventProps) {
+function CustomEvent({ event, eventIndex, updateEvent, className }: CustomEventProps) {
   const [newEvent, setNewEvent] = useState(event);
   const [nameError, setNameError] = useState('');
-
-  useEffect(() => {
-    setNewEvent(event);
-  }, [event]);
 
   const updateReferenceType = (value: string): CustomEventRuleType => {
     if (value === 'castaway' || value === 'tribe' || value === 'member') {
       return { ...newEvent, referenceType: value };
     }
-
     return newEvent;
   };
 
@@ -109,16 +97,16 @@ function CustomEvent({ event, eventCount, updateEvent, className }: CustomEventP
       }
     }
 
-    updateEvent?.(changedEvent, eventCount);
+    updateEvent?.(changedEvent, 'update', eventIndex);
     setNewEvent(changedEvent);
   };
 
   const deleteEvent = () => {
-    updateEvent?.(null, eventCount);
+    updateEvent?.(newEvent, 'delete', eventIndex);
   };
 
   const copyEvent = () => {
-    updateEvent?.(newEvent, null);
+    updateEvent?.(newEvent, 'copy', eventIndex);
   };
 
   return (
@@ -148,7 +136,7 @@ function CustomEvent({ event, eventCount, updateEvent, className }: CustomEventP
             onChange={(e) => update({ ...newEvent, points: parseInt(e.target.value) })} />
         </div>
         <div className='w-full'>
-          <Label>Points for</Label>
+          <Label>Reference Type</Label>
           <Select value={event.referenceType} onValueChange={(value) => update(updateReferenceType(value))}>
             <SelectTrigger className='w-full'>
               <SelectValue />
@@ -205,5 +193,12 @@ const orchestrateBlindsideEvent: CustomEventRuleType = {
   points: 3,
   description: 'A castaway orchestrates a blindside.',
   referenceType: 'castaway'
+};
+
+const CustomTemplates = {
+  new: blankEvent,
+  confessional: confessionalEvent,
+  liveTribal: liveTribalCouncilEvent,
+  blindside: orchestrateBlindsideEvent
 };
 

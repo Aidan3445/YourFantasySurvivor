@@ -2,63 +2,49 @@
 import { CopyPlus, SquareX } from 'lucide-react';
 import { Input } from '~/app/_components/commonUI/input';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
-import { cn } from '~/lib/utils';
-import { useEffect, useState } from 'react';
+import { cn, type ComponentProps } from '~/lib/utils';
+import { useState } from 'react';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
 import { Textarea } from '~/app/_components/commonUI/textArea';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
+import { Label } from '~/app/_components/commonUI/label';
 
 export default function SeasonEvents({ className, form, freeze }: EventsProps) {
-  const [seasonEvents, setSeasonEvents] = useState(form.getValues().season);
+  const seasonEvents = form.watch('season');
 
-  const updateEvent = (event: SeasonEventRuleType | null, eventId: number | null) => {
+  const updateEvent = (
+    event: SeasonEventRuleType,
+    action: 'copy' | 'delete' | 'update',
+    eventIndex: number) => {
     const newEvents = [...seasonEvents];
 
-    if (eventId === null && !event) return;
-    else if (eventId === null && event) newEvents.push(event);
-    else if (!event) newEvents.splice(eventId!, 1);
-    else newEvents[eventId!] = event;
-
-    setSeasonEvents(newEvents);
-  };
-
-  useEffect(() => {
-    form.setValue('season', [...seasonEvents]);
-  }, [form, seasonEvents]);
-
-  const newEvent = (value: string) => {
-    let event: SeasonEventRuleType;
-
-    switch (value) {
-      case 'soleSurvivor':
-        event = soleSurvivor;
+    switch (action) {
+      case 'copy':
+        newEvents.push({ ...event, id: undefined, name: '' });
         break;
-      case 'firstBoot':
-        event = firstBoot;
+      case 'delete':
+        newEvents.splice(eventIndex, 1);
         break;
-      case 'firstLoser':
-        event = firstLoser;
+      case 'update':
+        newEvents[eventIndex] = event;
         break;
-      case 'tribeBeast':
-        event = tribeBeast;
-        break;
-      case 'individualBeast':
-        event = individualBeast;
-        break;
-      default:
-        event = blankEvent;
     }
 
-    setSeasonEvents([...seasonEvents, event]);
+    form.setValue('season', newEvents);
+  };
+
+  const newEvent = (value: keyof typeof SeasonTemplates) => {
+    form.setValue('season', [...seasonEvents, { ...SeasonTemplates[value] }]);
   };
 
   return (
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col'>
         {seasonEvents.map((event, index) => (
-          <SeasonEvent key={index} event={event} eventId={index} updateEvent={freeze ? undefined : updateEvent} />
+          <SeasonEvent key={index} event={event} eventIndex={index} updateEvent={freeze ? undefined : updateEvent} />
         ))}
+        {seasonEvents.length === 0 && <h4 className='text-lg font-normal text-gray-700'>No season events</h4>}
       </section>
       {!freeze &&
         <Select value='' onValueChange={newEvent}>
@@ -81,13 +67,16 @@ export default function SeasonEvents({ className, form, freeze }: EventsProps) {
   );
 }
 
-interface SeasonEventProps {
+interface SeasonEventProps extends ComponentProps {
   event: SeasonEventRuleType;
-  eventId: number;
-  updateEvent?: (event: SeasonEventRuleType | null, eventId: number | null) => void;
+  eventIndex: number;
+  updateEvent?: (
+    event: SeasonEventRuleType,
+    action: 'copy' | 'delete' | 'update',
+    eventIndex: number) => void;
 }
 
-function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
+function SeasonEvent({ event, eventIndex, updateEvent, className }: SeasonEventProps) {
   const [newEvent, setNewEvent] = useState(event);
 
   const updateReferenceType = (value: string): SeasonEventRuleType => {
@@ -99,22 +88,23 @@ function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
   };
 
   const saveEvent = (changedEvent: SeasonEventRuleType) => {
-    updateEvent?.(changedEvent, eventId);
+    updateEvent?.(changedEvent, 'update', eventIndex);
     setNewEvent(changedEvent);
   };
 
   const deleteEvent = () => {
-    updateEvent?.(null, eventId);
+    updateEvent?.(newEvent, 'delete', eventIndex);
   };
 
   const copyEvent = () => {
-    updateEvent?.(newEvent, null);
+    updateEvent?.(newEvent, 'copy', eventIndex);
   };
 
   return (
-    <article className='flex flex-col gap-2 mr-2'>
+    <article className={cn('flex flex-col gap-2 mr-2', className)}>
       <span className='flex gap-2 items-center'>
         <div className='w-full'>
+          <Label>Event Name</Label>
           <Input
             type='text'
             placeholder='Event Name'
@@ -128,43 +118,55 @@ function SeasonEvent({ event, eventId, updateEvent }: SeasonEventProps) {
           </span>}
       </span>
       <span className='flex gap-2 items-center'>
-        <Input
-          type='number'
-          placeholder='Points'
-          value={newEvent.points}
-          onChange={(e) => saveEvent({ ...newEvent, points: parseInt(e.target.value) })} />
-        <Select value={event.referenceType} onValueChange={(value) => saveEvent(updateReferenceType(value))}>
-          <SelectTrigger className='w-full'>
-            <SelectValue />
+        <div>
+          <Label>Points</Label>
+          <Input
+            type='number'
+            placeholder='Points'
+            value={newEvent.points}
+            onChange={(e) => saveEvent({ ...newEvent, points: parseInt(e.target.value) })} />
+        </div>
+        <div className='w-full'>
+          <Label>Reference Type</Label>
+          <Select value={event.referenceType} onValueChange={(value) => saveEvent(updateReferenceType(value))}>
+            <SelectTrigger className='w-full'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Vote for</SelectLabel>
+                <SelectItem value='castaway'>Castaway</SelectItem>
+                <SelectItem value='tribe'>Tribe</SelectItem>
+                <SelectItem value='member'>Member</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </span>
+      <div>
+        <Label>Timing</Label>
+        <Select value={event.timing ?? ''} onValueChange={(value) => saveEvent({ ...newEvent, timing: value as 'premiere' | 'merge' | 'finale' })}>
+          <SelectTrigger className='w-full mt-0'>
+            <SelectValue placeholder='Timing' />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectLabel>Vote for</SelectLabel>
-              <SelectItem value='castaway'>Castaway</SelectItem>
-              <SelectItem value='tribe'>Tribe</SelectItem>
-              <SelectItem value='member'>Member</SelectItem>
+              <SelectLabel>Timing</SelectLabel>
+              <SelectItem value='premiere'>Premiere</SelectItem>
+              <SelectItem value='merge'>Merge</SelectItem>
+              <SelectItem value='finale'>Finale</SelectItem>
             </SelectGroup>
           </SelectContent>
         </Select>
-      </span>
-      <Select value={event.timing ?? ''} onValueChange={(value) => saveEvent({ ...newEvent, timing: value as 'premiere' | 'merge' | 'finale' })}>
-        <SelectTrigger className='w-full mt-0'>
-          <SelectValue placeholder='Timing' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Timing</SelectLabel>
-            <SelectItem value='premiere'>Premiere</SelectItem>
-            <SelectItem value='merge'>Merge</SelectItem>
-            <SelectItem value='finale'>Finale</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-      <Textarea
-        className='w-full'
-        placeholder='Description (Optional)'
-        value={newEvent.description}
-        onChange={(e) => saveEvent({ ...newEvent, description: e.target.value })} />
+      </div>
+      <div>
+        <Label>Description</Label>
+        <Textarea
+          className='w-full'
+          placeholder='Description (Optional)'
+          value={newEvent.description}
+          onChange={(e) => saveEvent({ ...newEvent, description: e.target.value })} />
+      </div>
       <Separator className='mb-2' />
     </article >
   );
@@ -217,5 +219,14 @@ const individualBeast: SeasonEventRuleType = {
   description: 'Predict the castaway that wins the most individual challenges.',
   referenceType: 'castaway',
   timing: 'merge',
+};
+
+const SeasonTemplates = {
+  new: blankEvent,
+  soleSurvivor,
+  firstBoot,
+  firstLoser,
+  tribeBeast,
+  individualBeast,
 };
 

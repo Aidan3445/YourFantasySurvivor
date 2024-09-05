@@ -2,6 +2,7 @@ import 'server-only';
 import { db } from '~/server/db';
 import { count, eq } from 'drizzle-orm';
 import { leagues } from '~/server/db/schema/leagues';
+//const auth = () => ({ userId: '_1' }); 
 import { auth } from '@clerk/nextjs/server';
 import { leagueMembers } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';

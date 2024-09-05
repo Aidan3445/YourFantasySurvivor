@@ -11,7 +11,7 @@ export async function newLeagueSettings(leagueId: number): Promise<void> {
   // get premier date and set default to 1 week before
   const draftDate = await getNextPremierDate().then((date) => {
     date.setDate(date.getDate() - 7);
-    return date;
+    return date.toISOString();
   });
 
   await db
