@@ -76,7 +76,7 @@ interface SeasonEventProps extends ComponentProps {
     eventIndex: number) => void;
 }
 
-function SeasonEvent({ event, eventIndex, updateEvent, className }: SeasonEventProps) {
+export function SeasonEvent({ event, eventIndex, updateEvent, className }: SeasonEventProps) {
   const [newEvent, setNewEvent] = useState(event);
 
   const updateReferenceType = (value: string): SeasonEventRuleType => {
@@ -101,7 +101,7 @@ function SeasonEvent({ event, eventIndex, updateEvent, className }: SeasonEventP
   };
 
   return (
-    <article className={cn('flex flex-col gap-2 mr-2', className)}>
+    <article className={cn('flex flex-col gap-2 mr-2', className, updateEvent ?? 'pointer-events-none')}>
       <span className='flex gap-2 items-center'>
         <div className='w-full'>
           <Label>Event Name</Label>

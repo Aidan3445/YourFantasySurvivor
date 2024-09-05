@@ -77,13 +77,11 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
     } catch {
       setValid(false);
     }
-
-    setUnsaved(form.formState.isDirty);
-  }, [form, watch]);
+  }, [form, watch, rules]);
 
   return (
     <Form {...form}>
-      <form className={className} action={catchUpdate}>
+      <form className={className} action={catchUpdate} onChange={() => setUnsaved(true)}>
         <Tab value='base' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
           <BaseEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} />
           <article className='col-span-2'>

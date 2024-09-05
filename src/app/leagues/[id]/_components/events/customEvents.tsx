@@ -40,7 +40,7 @@ export default function CustomEvents({ className, form, freeze }: EventsProps) {
 
   return (
     <article className={cn('light-scroll h-96 pb-16', className)}>
-      <section className={cn('flex flex-col', freeze ? 'pointer-events-none' : '')}>
+      <section className='flex flex-col'>
         {customEvents.map((event, index) => (
           <CustomEvent key={index} event={event} eventIndex={index} updateEvent={freeze ? undefined : updateEvent} />
         ))}
@@ -110,7 +110,7 @@ function CustomEvent({ event, eventIndex, updateEvent, className }: CustomEventP
   };
 
   return (
-    <article className={cn('flex flex-col gap-2 mr-2', className)}>
+    <article className={cn('flex flex-col gap-2 mr-2', className, updateEvent ?? 'pointer-events-none')}>
       <span className='flex gap-2 items-center'>
         <div className='w-full'>
           <Label>Event Name</Label>

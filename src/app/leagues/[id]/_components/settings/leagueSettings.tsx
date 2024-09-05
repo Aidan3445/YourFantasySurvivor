@@ -1,13 +1,15 @@
 import CardContainer from '~/app/_components/cardContainer';
 import { Popover, PopoverCenter, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
 import { getLeagueSettings } from '~/app/api/leagues/[id]/settings/query';
-import { cn } from '~/lib/utils';
+import { cn, type ComponentProps } from '~/lib/utils';
 import { type LeagueOwnerProps } from '../leagueDetails';
 import { Button } from '~/app/_components/commonUI/button';
 import Countdown from '~/app/_components/countdown';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
 import DraftOrder from './draftOrder';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
+import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
+import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
 
 export default async function DraftInfo({ league, ownerLoggedIn, className }: LeagueOwnerProps) {
   const [settings, { season, weekly }] = await Promise.all([
@@ -15,10 +17,9 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
     getRules(league.id)
   ]);
 
-  const preseasonPredictions = {
-    season: season.filter((rule) => rule.timing === 'premiere'),
-    weekly: weekly.filter((rule) => rule.type === 'predict')
-  };
+  const preseasonPredictions = [
+    ...season.filter((rule) => rule.timing === 'premiere'),
+    ...weekly.filter((rule) => rule.type === 'predict')];
 
   console.log(preseasonPredictions);
 
@@ -42,8 +43,11 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
               <DraftOrder leagueId={league.id} draftOrder={settings.draftOrder} orderLocked={orderLocked} className='w-full flex flex-col gap-1' />
             </TabsContent>
             <TabsContent value='predictions'>
-              <p>Season Predictions {preseasonPredictions.season.length}</p>
-              <p>Weekly Predictions {preseasonPredictions.weekly.length}</p>
+              <section className='light-scroll h-80 flex flex-col gap-1'>
+                {preseasonPredictions.map((rule, index) => (
+                  <PredictionInfo key={index} prediction={rule} parity={index % 2 === 0} />
+                ))}
+              </section>
             </TabsContent>
           </Tabs>
           <Countdown className='text-center hs-in rounded-md p-1' endDate={settings.draftDate}>
@@ -52,5 +56,19 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
         </CardContainer>
       </PopoverContent>
     </Popover>
+  );
+}
+
+interface PredictionInfoProps extends ComponentProps {
+  prediction: SeasonEventRuleType | WeeklyEventRuleType;
+  parity: boolean;
+}
+
+function PredictionInfo({ prediction, parity }: PredictionInfoProps) {
+  return (
+    <div className={cn(parity ? 'bg-b4/80' : 'bg-b3/80', 'p-2 rounded-md')}>
+      <p>Predict {prediction.name} for {prediction.points} points.</p>
+      <p className='text-xs italic'>Choose a {prediction.referenceType}</p>
+    </div >
   );
 }

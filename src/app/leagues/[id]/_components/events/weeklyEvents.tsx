@@ -111,7 +111,7 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
   };
 
   return (
-    <article className={cn('flex flex-col gap-2 mr-2', className)}>
+    <article className={cn('flex flex-col gap-2 mr-2', className, updateEvent ?? 'pointer-events-none')}>
       <span className='flex gap-2 items-center'>
         <div className='w-full'>
           <Label>Event Name</Label>
