@@ -17,6 +17,8 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
     getRules(league.id)
   ]);
 
+  //if (settings.draftOver) return null;
+
   const preseasonPredictions = [
     ...season.filter((rule) => rule.timing === 'premiere'),
     ...weekly.filter((rule) => rule.type === 'predict')];
@@ -51,7 +53,9 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
             </TabsContent>
           </Tabs>
           <Countdown className='text-center hs-in rounded-md p-1' endDate={settings.draftDate}>
-            <Button className='w-full'>Go To Draft</Button>
+            <a href={`/leagues/${league.id}/draft`}>
+              <Button className='w-full'>Go To Draft</Button>
+            </a>
           </Countdown>
         </CardContainer>
       </PopoverContent>
