@@ -2,7 +2,7 @@ import { getLeague } from '~/app/api/leagues/query';
 import Members from './_components/members';
 import LeagueDetails from './_components/leagueDetails';
 import LeagueScoring from './_components/events/leagueScoring';
-import DraftInfo from './_components/settings/leagueSettings';
+import DraftInfo from './_components/settings/draftInfo';
 
 interface PageProps {
   params: {

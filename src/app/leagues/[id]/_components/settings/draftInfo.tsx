@@ -23,8 +23,6 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
     ...season.filter((rule) => rule.timing === 'premiere'),
     ...weekly.filter((rule) => rule.type === 'predict')];
 
-  console.log(preseasonPredictions);
-
   const orderLocked = !ownerLoggedIn || settings.draftDate < new Date();
 
   return (
@@ -68,11 +66,11 @@ interface PredictionInfoProps extends ComponentProps {
   parity: boolean;
 }
 
-function PredictionInfo({ prediction, parity }: PredictionInfoProps) {
+export function PredictionInfo({ prediction, parity, className, children }: PredictionInfoProps) {
   return (
-    <div className={cn(parity ? 'bg-b4/80' : 'bg-b3/80', 'p-2 rounded-md')}>
+    <div className={cn(parity ? 'bg-b4/80' : 'bg-b3/80', 'p-2 rounded-md', className)}>
       <p>Predict {prediction.name} for {prediction.points} points.</p>
-      <p className='text-xs italic'>Choose a {prediction.referenceType}</p>
+      {children ? children : <p className='text-xs italic'>Choose a {prediction.referenceType}</p>}
     </div >
   );
 }

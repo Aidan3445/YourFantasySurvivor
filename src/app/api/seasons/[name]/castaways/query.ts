@@ -25,7 +25,7 @@ export type CastawayDetails = {
   };
 };
 
-export async function getCastaways(seasonName: string, castawayName: string | null): Promise<CastawayDetails[]> {
+export async function getCastaways(seasonName: string, castawayName?: string): Promise<CastawayDetails[]> {
   const rows = await db.select({
     name: castaways.name,
     photo: castaways.photo,
