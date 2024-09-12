@@ -4,7 +4,7 @@ import { count, eq } from 'drizzle-orm';
 import { leagues } from '~/server/db/schema/leagues';
 //const auth = () => ({ userId: '_1' }); 
 import { auth } from '@clerk/nextjs/server';
-import { leagueMembers } from '~/server/db/schema/members';
+import { leagueMembers, type Member } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { castaways } from '~/server/db/schema/castaways';
 
@@ -72,10 +72,3 @@ export async function getLeagues() {
   return userLeagues;
 }
 
-export interface Member {
-  displayName: string;
-  color: string;
-  isAdmin: boolean;
-  isOwner: boolean;
-  loggedIn: boolean;
-}

@@ -22,3 +22,23 @@ export const castaways = createTable(
   })
 );
 export type Castaway = typeof castaways.$inferSelect;
+
+export type TribeEp = {
+  name: string;
+  color: string;
+  episode: number;
+};
+
+export type CastawayDetails = {
+  name: string;
+  photo: string;
+  tribes: TribeEp[];
+  startingTribe: TribeEp;
+  more: {
+    shortName: string;
+    age: number;
+    hometown: string;
+    residence: string;
+    job: string;
+  };
+};

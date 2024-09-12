@@ -12,3 +12,4 @@ export const tribes = createTable(
   }
 );
 export type Tribe = typeof tribes.$inferSelect;
+

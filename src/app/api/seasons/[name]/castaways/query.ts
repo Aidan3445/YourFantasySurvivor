@@ -4,26 +4,7 @@ import { db } from '~/server/db';
 import { seasons } from '~/server/db/schema/seasons';
 import { baseEventTribes, baseEventCastaways, baseEvents, episodes } from '~/server/db/schema/episodes';
 import { tribes } from '~/server/db/schema/tribes';
-import { castaways } from '~/server/db/schema/castaways';
-
-type Tribe = {
-  name: string;
-  color: string;
-  episode: number;
-};
-export type CastawayDetails = {
-  name: string;
-  photo: string;
-  tribes: Tribe[];
-  startingTribe: Tribe;
-  more: {
-    shortName: string;
-    age: number;
-    hometown: string;
-    residence: string;
-    job: string;
-  };
-};
+import { type CastawayDetails, castaways, type TribeEp } from '~/server/db/schema/castaways';
 
 export async function getCastaways(seasonName: string, castawayName?: string): Promise<CastawayDetails[]> {
   const rows = await db.select({
@@ -64,7 +45,7 @@ export async function getCastaways(seasonName: string, castawayName?: string): P
     const castaway = acc[row.name] ?? {
       name: row.name,
       photo: row.photo,
-      tribes: [] as Tribe[],
+      tribes: [] as TribeEp[],
       startingTribe: {
         name: row.tribe,
         color: row.color,

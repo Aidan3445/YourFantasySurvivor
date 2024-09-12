@@ -17,7 +17,7 @@ import Swatch from '@uiw/react-color-swatch';
 import { hsvaToHex, getContrastingColor, } from '@uiw/color-convert';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { twentyColors } from '~/lib/colors';
-import { type Member } from '~/app/api/leagues/query';
+import { type Member } from '~/server/db/schema/members';
 import { MemberRow } from './members';
 
 interface MemberEditProps {

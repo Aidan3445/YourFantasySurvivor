@@ -1,8 +1,7 @@
 import { getContrastingColor } from '@uiw/color-convert';
 import EditMember, { InviteMember, ManageMember, RoleHover } from './memberEdit';
-import { cn } from '~/lib/utils';
-import { type Member } from '~/app/api/leagues/query';
-import { type ReactNode } from 'react';
+import { cn, type ComponentProps } from '~/lib/utils';
+import { type Member } from '~/server/db/schema/members';
 import { Separator } from '~/app/_components/commonUI/separator';
 
 interface MembersProps {
@@ -44,23 +43,20 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull }: Me
   );
 }
 
-interface MemberRowProps {
-  children: ReactNode;
+interface MemberRowProps extends ComponentProps {
   color: string;
   loggedIn?: boolean;
-  dataSwapyItem?: string;
 }
 
-export function MemberRow({ children, color, loggedIn, dataSwapyItem }: MemberRowProps) {
+export function MemberRow({ children, className, color, loggedIn }: MemberRowProps) {
   return (
-    <div data-swapy-item={dataSwapyItem}>
-      <div
-        className={cn(
-          'px-2 gap-1 rounded border border-black flex items-center transition-all duration-500',
-          loggedIn && 'border ring ring-white')}
-        style={{ background: color }}>
-        {children}
-      </div>
+    <div
+      className={cn(
+        'px-2 gap-1 rounded border border-black flex items-center transition-all duration-500',
+        loggedIn && 'border ring ring-white',
+        className)}
+      style={{ background: color }}>
+      {children}
     </div>
   );
 }

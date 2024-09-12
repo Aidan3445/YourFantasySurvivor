@@ -1,15 +1,14 @@
 import CardContainer from '~/app/_components/cardContainer';
 import { Popover, PopoverCenter, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
 import { getLeagueSettings } from '~/app/api/leagues/[id]/settings/query';
-import { cn, type ComponentProps } from '~/lib/utils';
+import { cn } from '~/lib/utils';
 import { type LeagueOwnerProps } from '../leagueDetails';
 import { Button } from '~/app/_components/commonUI/button';
 import Countdown from '~/app/_components/countdown';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
 import DraftOrder from './draftOrder';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
-import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
-import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
+import { PredictionCard } from './predictionCard';
 
 export default async function DraftInfo({ league, ownerLoggedIn, className }: LeagueOwnerProps) {
   const [settings, { season, weekly }] = await Promise.all([
@@ -45,7 +44,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
             <TabsContent value='predictions'>
               <section className='light-scroll h-80 flex flex-col gap-1'>
                 {preseasonPredictions.map((rule, index) => (
-                  <PredictionInfo key={index} prediction={rule} parity={index % 2 === 0} />
+                  <PredictionCard key={index} prediction={rule} parity={index % 2 === 0} />
                 ))}
               </section>
             </TabsContent>
@@ -61,16 +60,3 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
   );
 }
 
-interface PredictionInfoProps extends ComponentProps {
-  prediction: SeasonEventRuleType | WeeklyEventRuleType;
-  parity: boolean;
-}
-
-export function PredictionInfo({ prediction, parity, className, children }: PredictionInfoProps) {
-  return (
-    <div className={cn(parity ? 'bg-b4/80' : 'bg-b3/80', 'p-2 rounded-md', className)}>
-      <p>Predict {prediction.name} for {prediction.points} points.</p>
-      {children ? children : <p className='text-xs italic'>Choose a {prediction.referenceType}</p>}
-    </div >
-  );
-}
