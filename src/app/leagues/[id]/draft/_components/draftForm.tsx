@@ -13,6 +13,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Button } from '~/app/_components/commonUI/button';
 import { MemberRow as ColorRow } from '../../_components/members';
 import { getContrastingColor } from '@uiw/color-convert';
+import { useState } from 'react';
 
 export interface DraftFormProps extends ComponentProps {
   pickCount: number;
@@ -39,29 +40,28 @@ export default function DraftForm({
     acc[c.startingTribe.name]!.push(c);
     return acc;
   }, {} as Record<string, CastawayDetails[]>);
+  pickCount = 2;
 
   const draftSchema = z.object({
     firstPick: z.string(),
-    secondPick: z.string().optional(),
+    secondPick: z.string().refine((value) => value || pickCount === 1),
     castaway: z.array(z.string()),
     tribe: z.array(z.string()),
     member: z.array(z.string())
-  }).refine((data) => (pickCount == 1 && !data.secondPick) || (pickCount == 2 && data.secondPick)
-    , { message: 'You must make a second pick', })
-    .refine((data) => !castaway || data.castaway.filter((c) => c).length === castaway.length,
-      { message: 'You must make all castaway predictions', })
-    .refine((data) => !tribe || data.tribe.filter((t) => t).length === tribe.length,
-      { message: 'You must make all tribe predictions', })
-    .refine((data) => !member || data.member.filter((m) => m).length === member.length,
-      { message: 'You must make all member predictions', });
+  });
+  type Data = z.infer<typeof draftSchema>;
 
-  const form = useForm<z.infer<typeof draftSchema>>({
+  const form = useForm<Data>({
     resolver: zodResolver(draftSchema),
   });
 
+  const submitPicks = async (data: Data) => {
+    console.log('success', data);
+  };
+
   return (
     <Form {...form}>
-      <form className={className} onSubmit={form.handleSubmit((data) => console.log(data))}>
+      <form className={className} onSubmit={form.handleSubmit(submitPicks)}>
         <MainPicks pickCount={pickCount} options={castawaysByTribe} formState={form.formState} />
         {castaway &&
           <div>
@@ -174,46 +174,52 @@ interface PicksProps {
 }
 
 function MainPicks({ pickCount, options, formState }: PicksProps) {
-  return (<>
-    <FormLabel className='text-2xl'> Pick your Survivor{pickCount > 1 ? 's' : ''}</FormLabel>
-    <FormField
-      name='firstPick'
-      render={({ field }) => (
-        <FormItem className='justify-center flex flex-col rounded-md bg-b4/70 p-2 my-0'>
-          <FormControl>
-            <Select onValueChange={field.onChange} {...field}>
-              <SelectTrigger>
-                <SelectValue placeholder='First Pick' />
-              </SelectTrigger>
-              <SelectCastawaysByTribe castawaysByTribe={options} />
-            </Select>
-          </FormControl>
-          <FormMessage className='text-left pl-12'>{formState.errors.firstPick?.message}</FormMessage>
-        </FormItem>)} />
-    {pickCount > 1 &&
+  const [pick1, setPick1] = useState<string | undefined>();
+  const [pick2, setPick2] = useState<string | undefined>();
+
+  return (
+    <div className='flex flex-col gap-1'>
+      <FormLabel className='text-2xl'> Pick your Survivor{pickCount > 1 ? 's' : ''}</FormLabel>
       <FormField
-        name='secondPick'
+        name='firstPick'
         render={({ field }) => (
-          <FormItem className='justify-center flex flex-col rounded-md bg-b3/80 p-2 my-0'>
+          <FormItem className='justify-center flex flex-col rounded-md bg-b4/70 p-2 my-0'>
             <FormControl>
-              <Select onValueChange={field.onChange} {...field}>
+              <Select onValueChange={(val) => { setPick1(val); field.onChange(val); }} {...field}>
                 <SelectTrigger>
-                  <SelectValue placeholder='Second Pick' />
+                  <SelectValue placeholder='First Pick' />
                 </SelectTrigger>
-                <SelectCastawaysByTribe castawaysByTribe={options} />
+                <SelectCastawaysByTribe castawaysByTribe={options} otherChoices={[pick2]} />
               </Select>
             </FormControl>
-            <FormMessage className='text-left pl-12'>{formState.errors.secondPick?.message}</FormMessage>
-          </FormItem >)
-        } />}
-  </>);
+            <FormMessage className='text-left pl-12'>{formState.errors.firstPick?.message}</FormMessage>
+          </FormItem>)} />
+      {pickCount > 1 &&
+        <FormField
+          name='secondPick'
+          render={({ field }) => (
+            <FormItem className='justify-center flex flex-col rounded-md bg-b3/80 p-2 my-0'>
+              <FormControl>
+                <Select onValueChange={(val) => { setPick2(val); field.onChange(val); }} {...field}>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Second Pick' />
+                  </SelectTrigger>
+                  <SelectCastawaysByTribe castawaysByTribe={options} otherChoices={[pick1]} />
+                </Select>
+              </FormControl>
+              <FormMessage className='text-left pl-12'>{formState.errors.secondPick?.message}</FormMessage>
+            </FormItem >)
+          } />}
+    </div>
+  );
 }
 
 interface SelectCastawaysByTribeProps {
   castawaysByTribe: Record<string, CastawayDetails[]>;
+  otherChoices?: (string | undefined)[];
 }
 
-function SelectCastawaysByTribe({ castawaysByTribe }: SelectCastawaysByTribeProps) {
+function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastawaysByTribeProps) {
   return (
     <SelectContent>
       {Object.entries(castawaysByTribe).map(([tribe, castaways]) => (
@@ -223,13 +229,15 @@ function SelectCastawaysByTribe({ castawaysByTribe }: SelectCastawaysByTribeProp
               <h3 style={{ color: getContrastingColor(castaways[0]!.startingTribe.color) }}>{tribe}</h3>
             </ColorRow>
           </SelectLabel>
-          {castaways.map((castaway) => (
-            <SelectItem key={castaway.name} value={castaway.name}>
-              <ColorRow color={castaway.startingTribe.color} className='w-52'>
-                <h3 style={{ color: getContrastingColor(castaway.startingTribe.color) }}>{castaway.name}</h3>
-              </ColorRow>
-            </SelectItem>
-          ))}
+          {castaways
+            .filter((castaway) => !otherChoices?.includes(castaway.name)) // Filter out selected choices
+            .map((castaway) => (
+              <SelectItem key={castaway.name} value={castaway.name}>
+                <ColorRow color={castaway.startingTribe.color} className='w-52'>
+                  <h3 style={{ color: getContrastingColor(castaway.startingTribe.color) }}>{castaway.name}</h3>
+                </ColorRow>
+              </SelectItem>
+            ))}
         </SelectGroup>
       ))}
     </SelectContent>
