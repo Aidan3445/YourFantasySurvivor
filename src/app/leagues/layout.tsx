@@ -10,7 +10,9 @@ export default function LeagueLayout({
   return (
     <main>
       <LeagueNav />
-      {children}
+      <div className='mt-12 md:mt-0'>
+        {children}
+      </div>
     </main>
   );
 }

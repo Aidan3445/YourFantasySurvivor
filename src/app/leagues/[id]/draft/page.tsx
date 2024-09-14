@@ -32,7 +32,7 @@ export default async function League({ params }: PageProps) {
       preds[rule.referenceType]!.push(rule);
       return preds;
     }, {
-      pickCount, picks: {
+      leagueId, pickCount, picks: {
         castaways,
         tribes,
         members

@@ -23,6 +23,7 @@ export const leagueMembers = createTable(
 );
 export type LeagueMember = typeof leagueMembers.$inferSelect;
 export interface Member {
+  id: number;
   displayName: string;
   color: string;
   isAdmin: boolean;

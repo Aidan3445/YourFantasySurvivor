@@ -24,13 +24,7 @@ export async function getLeague(leagueId: number) {
     .where(eq(leagues.id, leagueId))
     .innerJoin(seasons, eq(seasons.id, leagues.season));
   const membersFetch = db
-    .select({
-      displayName: leagueMembers.displayName,
-      color: leagueMembers.color,
-      isAdmin: leagueMembers.isAdmin,
-      isOwner: leagueMembers.isOwner,
-      userId: leagueMembers.userId,
-    })
+    .select()
     .from(leagueMembers)
     .where(eq(leagueMembers.league, leagueId));
 
@@ -40,6 +34,7 @@ export async function getLeague(leagueId: number) {
   if (!members.find((member) => member.userId === user.userId)) throw new Error('The signed in user is not a member of this league');
   const safeMembers = members.map((member) => {
     const safeMember: Member = {
+      id: member.id,
       displayName: member.displayName,
       color: member.color,
       isAdmin: member.isAdmin,

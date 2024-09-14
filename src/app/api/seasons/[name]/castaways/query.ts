@@ -8,6 +8,7 @@ import { type CastawayDetails, castaways, type TribeEp } from '~/server/db/schem
 
 export async function getCastaways(seasonName: string, castawayName?: string): Promise<CastawayDetails[]> {
   const rows = await db.select({
+    id: castaways.id,
     name: castaways.name,
     photo: castaways.photo,
     tribe: tribes.name,
@@ -37,12 +38,13 @@ export async function getCastaways(seasonName: string, castawayName?: string): P
   const castawaysWithTribes = rows.reduce((acc, row) => {
     // this is a hack to filter out rows that don't have all the necessary data
     // this shouldn't happen but will make typescript happy
-    if (!row?.name || !row?.tribe || !row?.color || !row?.photo || !row?.moreDetails) {
+    if (!row?.id || !row?.name || !row?.tribe || !row?.color || !row?.photo || !row?.moreDetails) {
       console.warn('Skipping row:', row);
       return acc;
     }
 
     const castaway = acc[row.name] ?? {
+      id: row.id,
       name: row.name,
       photo: row.photo,
       tribes: [] as TribeEp[],

@@ -1,10 +1,9 @@
 import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
-import { episodes } from './episodes';
 import { leagues, pointRange, reference } from './leagues';
 import { leagueMembers } from './members';
-import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { description, eventName } from './customEvents';
 
@@ -28,7 +27,7 @@ export const seasonEventRules = createTable(
 );
 
 export const SeasonEventRule = z.object({
-  id: z.number().optional(),
+  id: z.number(),
   name: eventName,
   //adminEvent: z.number().nullable(),
   //baseEvent: z.number().nullable(),
@@ -53,45 +52,36 @@ export const SeasonEventRule = z.object({
 
 export type SeasonEventRuleType = z.infer<typeof SeasonEventRule>;
 
-export const seasons = createTable(
+export const seasonEvents = createTable(
   'event_season',
   {
     id: serial('event_season_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    timing: eventTiming('timing').notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
-  }
+  },
+  (table) => ({
+    unique: unique().on(table.rule, table.member),
+  })
 );
 
 export const seasonCastaways = createTable(
   'event_season_castaway',
   {
-    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.season, table.castaway] }),
-  })
-);
+  });
 
 export const seasonTribes = createTable(
   'event_season_tribe',
   {
-    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.season, table.tribe] }),
-  })
-);
+  });
 
 export const seasonMembers = createTable(
   'event_season_member',
   {
-    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.season, table.member] }),
-  })
-);
+  });

@@ -14,8 +14,11 @@ import { Button } from '~/app/_components/commonUI/button';
 import { MemberRow as ColorRow } from '../../_components/members';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useState } from 'react';
+import { type Picks, submitDraft } from '~/app/api/leagues/[id]/draft/actions';
+import { useRouter } from 'next/navigation';
 
 export interface DraftFormProps extends ComponentProps {
+  leagueId: number;
   pickCount: number;
   castaway?: SeasonEventRuleType[];
   tribe?: SeasonEventRuleType[];
@@ -28,6 +31,7 @@ export interface DraftFormProps extends ComponentProps {
 }
 
 export default function DraftForm({
+  leagueId,
   pickCount,
   castaway,
   tribe,
@@ -40,11 +44,11 @@ export default function DraftForm({
     acc[c.startingTribe.name]!.push(c);
     return acc;
   }, {} as Record<string, CastawayDetails[]>);
-  pickCount = 2;
-
   const draftSchema = z.object({
     firstPick: z.string(),
-    secondPick: z.string().refine((value) => value || pickCount === 1),
+    secondPick: z.string().optional().refine(
+      (value) => value ?? pickCount === 1,
+      { message: 'Required' }),
     castaway: z.array(z.string()),
     tribe: z.array(z.string()),
     member: z.array(z.string())
@@ -54,14 +58,56 @@ export default function DraftForm({
   const form = useForm<Data>({
     resolver: zodResolver(draftSchema),
   });
+  const router = useRouter();
 
-  const submitPicks = async (data: Data) => {
-    console.log('success', data);
+  const submitPicks = () => {
+    try {
+      form.handleSubmit(() => null)().catch((err) => { throw err; });
+      draftSchema.parse(form.getValues());
+    } catch (err) {
+      console.error('Failed to submit picks', err);
+      return;
+    }
+
+    const data = form.getValues();
+
+    const firstPickId = picks.castaways.find((c) => c.name === data.firstPick)?.id;
+
+    if (!firstPickId) {
+      form.setError('firstPick', { message: 'Invalid castaway' });
+      return;
+    }
+
+    const submission = { firstPick: firstPickId, castaway: {}, tribe: {}, member: {} } as Picks;
+    castaway?.forEach((event, index) => {
+      const castawayId = picks.castaways.find((c) => c.name === data.castaway[index])?.id;
+      if (castawayId) submission.castaway[event.id] = castawayId;
+    });
+    tribe?.forEach((event, index) => {
+      const tribeId = picks.tribes.find((t) => t.name === data.tribe[index])?.id;
+      if (tribeId) submission.tribe[event.id] = tribeId;
+    });
+    member?.forEach((event, index) => {
+      const memberId = picks.members.find((m) => m.displayName === data.member[index])?.id;
+      if (memberId) submission.member[event.id] = memberId;
+    });
+    const submit = submitDraft.bind(null, leagueId, submission);
+
+    submit()
+      .then(() => {
+        console.log('Submitted picks');
+        router.push(`/leagues/${leagueId}/`);
+      })
+      .catch((err) => {
+        console.error('Failed to submit picks', err);
+      });
   };
 
   return (
     <Form {...form}>
-      <form className={className} onSubmit={form.handleSubmit(submitPicks)}>
+      <form
+        className={className}
+        action={submitPicks}>
         <MainPicks pickCount={pickCount} options={castawaysByTribe} formState={form.formState} />
         {castaway &&
           <div>

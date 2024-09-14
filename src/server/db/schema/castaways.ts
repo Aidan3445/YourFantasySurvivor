@@ -30,6 +30,7 @@ export type TribeEp = {
 };
 
 export type CastawayDetails = {
+  id: number;
   name: string;
   photo: string;
   tribes: TribeEp[];
