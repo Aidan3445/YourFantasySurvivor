@@ -16,9 +16,11 @@ import { getContrastingColor } from '@uiw/color-convert';
 import { useState } from 'react';
 import { type Picks, submitDraft } from '~/app/api/leagues/[id]/draft/actions';
 import { useRouter } from 'next/navigation';
+import { type Predictions } from '~/app/api/leagues/[id]/draft/query';
 
 export interface DraftFormProps extends ComponentProps {
   leagueId: number;
+  currentPicks: Predictions;
   pickCount: number;
   castaway?: SeasonEventRuleType[];
   tribe?: SeasonEventRuleType[];
@@ -32,6 +34,7 @@ export interface DraftFormProps extends ComponentProps {
 
 export default function DraftForm({
   leagueId,
+  currentPicks,
   pickCount,
   castaway,
   tribe,
@@ -39,6 +42,8 @@ export default function DraftForm({
   picks,
   className
 }: DraftFormProps) {
+  console.log(currentPicks);
+
   const castawaysByTribe: Record<string, CastawayDetails[]> = picks.castaways.reduce((acc, c) => {
     if (!acc[c.startingTribe.name]) acc[c.startingTribe.name] = [];
     acc[c.startingTribe.name]!.push(c);
@@ -108,7 +113,10 @@ export default function DraftForm({
       <form
         className={className}
         action={submitPicks}>
-        <MainPicks pickCount={pickCount} options={castawaysByTribe} formState={form.formState} />
+        <MainPicks
+          pickCount={pickCount}
+          options={castawaysByTribe}
+          formState={form.formState} />
         {castaway &&
           <div>
             <br />
@@ -121,7 +129,7 @@ export default function DraftForm({
                       <FormField
                         name={`castaway[${index}]`}
                         render={({ field }) => (
-                          <Select onValueChange={field.onChange} {...field}>
+                          <Select onValueChange={field.onChange} {...field} defaultValue={currentPicks.castawayPicks?.[index]}>
                             <SelectTrigger>
                               <SelectValue placeholder='Choose a Castaway' />
                             </SelectTrigger>

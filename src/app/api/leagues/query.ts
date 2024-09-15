@@ -10,8 +10,8 @@ import { castaways } from '~/server/db/schema/castaways';
 
 
 export async function getLeague(leagueId: number) {
-  const user = auth();
-  if (!user.userId) throw new Error('User not authenticated');
+  const { userId } = auth();
+  if (!userId) throw new Error('User not authenticated');
 
   const leagueFetch = db
     .select({
@@ -31,7 +31,7 @@ export async function getLeague(leagueId: number) {
   const [league, members] = await Promise.all([leagueFetch, membersFetch]);
 
   if (league.length === 0) throw new Error('League not found');
-  if (!members.find((member) => member.userId === user.userId)) throw new Error('The signed in user is not a member of this league');
+  if (!members.find((member) => member.userId === userId)) throw new Error('The signed in user is not a member of this league');
   const safeMembers = members.map((member) => {
     const safeMember: Member = {
       id: member.id,
@@ -39,7 +39,7 @@ export async function getLeague(leagueId: number) {
       color: member.color,
       isAdmin: member.isAdmin,
       isOwner: member.isOwner,
-      loggedIn: member.userId === user.userId,
+      loggedIn: member.userId === userId,
     };
     return safeMember;
   });
@@ -55,13 +55,13 @@ export async function getLeague(leagueId: number) {
 }
 
 export async function getLeagues() {
-  const user = auth();
-  if (!user.userId) throw new Error('User not authenticated');
+  const { userId } = auth();
+  if (!userId) throw new Error('User not authenticated');
 
   const userLeagues = await db
     .select({ name: leagues.name, season: seasons.name, id: leagues.id })
     .from(leagueMembers)
-    .where(eq(leagueMembers.userId, user.userId))
+    .where(eq(leagueMembers.userId, userId))
     .innerJoin(leagues, eq(leagueMembers.league, leagues.id))
     .innerJoin(seasons, eq(leagues.season, seasons.id));
   return userLeagues;

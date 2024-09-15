@@ -3,7 +3,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
-import { leagueMembers } from '~/server/db/schema/members';
+import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { seasonCastaways, seasonEvents, seasonMembers, seasonTribes } from '~/server/db/schema/seasonEvents';
 
 export interface Picks {
@@ -15,20 +15,26 @@ export interface Picks {
 }
 
 export async function submitDraft(leagueId: number, picks: Picks) {
-  const user = auth();
-  if (!user.userId) throw new Error('User not authenticated');
+  const { userId } = auth();
+  if (!userId) throw new Error('User not authenticated');
 
   const memberId = await db
     .select({ id: leagueMembers.id })
     .from(leagueMembers)
     .where(and(
       eq(leagueMembers.league, leagueId),
-      eq(leagueMembers.userId, user.userId)))
+      eq(leagueMembers.userId, userId)))
     .then((res) => res[0]?.id);
   if (!memberId) throw new Error('Member not found');
 
+  // initial pick (cannot be changed via draft form)
+  await db.insert(selectionUpdates)
+    .values({ member: memberId, episode: null, castaway: picks.firstPick })
+    .onConflictDoNothing();
+
+  // predictions
   await Promise.all([
-    Promise.all(Object.entries(picks.castaway).map(async ([ruleId, castawayId]) => {
+    Promise.all(Object.entries(picks.castaway).map(async ([ruleId, castaway]) => {
       // create event
       const eventId = await db
         .insert(seasonEvents)
@@ -43,13 +49,13 @@ export async function submitDraft(leagueId: number, picks: Picks) {
 
       // submit pick
       return db.insert(seasonCastaways)
-        .values({ event: eventId, castaway: castawayId })
+        .values({ event: eventId, castaway: castaway })
         .onConflictDoUpdate({
           target: seasonCastaways.event,
-          set: { castaway: castawayId },
+          set: { castaway },
         });
     })),
-    Promise.all(Object.entries(picks.tribe).map(async ([ruleId, tribeId]) => {
+    Promise.all(Object.entries(picks.tribe).map(async ([ruleId, tribe]) => {
       // create event
       const eventId = await db
         .insert(seasonEvents)
@@ -64,13 +70,13 @@ export async function submitDraft(leagueId: number, picks: Picks) {
 
       // submit pick
       return db.insert(seasonTribes)
-        .values({ event: eventId, tribe: tribeId })
+        .values({ event: eventId, tribe })
         .onConflictDoUpdate({
           target: seasonCastaways.event,
-          set: { tribe: tribeId },
+          set: { tribe },
         });
     })),
-    Promise.all(Object.entries(picks.member).map(async ([ruleId, memberId]) => {
+    Promise.all(Object.entries(picks.member).map(async ([ruleId, member]) => {
       // create event
       const eventId = await db
         .insert(seasonEvents)
@@ -85,10 +91,10 @@ export async function submitDraft(leagueId: number, picks: Picks) {
 
       // submit pick
       return db.insert(seasonMembers)
-        .values({ event: eventId, member: memberId })
+        .values({ event: eventId, member })
         .onConflictDoUpdate({
           target: seasonCastaways.event,
-          set: { member: memberId },
+          set: { member },
         });
     }))
   ]);
