@@ -1,12 +1,12 @@
 'use client';
 import { type ComponentProps } from '~/lib/utils';
-import { MemberRow } from '../members';
+import { ColorRow } from '../members';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useState } from 'react';
 import { Button } from '~/app/_components/commonUI/button';
 import { updateDraftOrder } from '~/app/api/leagues/[id]/settings/actions';
-import { closestCenter, DndContext, KeyboardSensor, PointerSensor, type UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { closestCenter, DndContext, PointerSensor, type UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import SortableItem, { handleDragEnd } from '~/app/_components/commonUI/sortableItem';
 import { GripVertical } from 'lucide-react';
@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 
 interface DraftOrderProps extends ComponentProps {
   leagueId: number;
-  draftOrder: { name: string, color: string }[];
+  draftOrder: { name: string, color: string, drafted: string | null }[];
   orderLocked: boolean;
 }
 
@@ -25,10 +25,7 @@ const SHUFFLE_LOOPS = 2;
 export default function DraftOrder({ leagueId, draftOrder, orderLocked, className }: DraftOrderProps) {
   const [order, setOrder] = useState(draftOrder
     .map((member) => ({ ...member, id: member.name as UniqueIdentifier })));
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
+  const sensors = useSensors(useSensor(PointerSensor));
   const router = useRouter();
   const { toast } = useToast();
 
@@ -78,26 +75,34 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, classNam
           <Button className='w-full' type='submit'>Save</Button>
         </form>
       </span>}
-      <article className='flex flex-col gap-1'>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          modifiers={[restrictToParentElement]}
-          onDragEnd={(event) => handleDragEnd(event, setOrder)}>
-          <SortableContext items={order} strategy={verticalListSortingStrategy}>
-            {order.map((member, index) =>
-              <SortableItem key={member.name} id={member.id} disabled={orderLocked}>
-                <MemberRow color={member.color}>
-                  <h3 style={{ color: getContrastingColor(member.color) }}>{index + 1} - {member.name}</h3>
-                  {!orderLocked &&
-                    <GripVertical
-                      className='cursor-row-resize ml-auto'
-                      color={getContrastingColor(member.color)} />}
-                </MemberRow>
-              </SortableItem>)}
-          </SortableContext>
-        </DndContext>
-      </article>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        modifiers={[restrictToParentElement]}
+        onDragEnd={(event) => handleDragEnd(event, setOrder)}>
+        <SortableContext items={order} strategy={verticalListSortingStrategy}>
+          <div className='grid gap-1 auto-cols-min'>
+            {order.map((member, index) => {
+              const color = member.drafted ? '#AAAAAA' : member.color;
+              return (
+                <SortableItem className='grid grid-cols-subgrid col-span-2' key={member.name} id={member.id} disabled={orderLocked}>
+                  <ColorRow className='w-full tabular-nums' color={color}>
+                    <h3 style={{ color: getContrastingColor(color) }}>{index + 1} - {member.name}</h3>
+                    {!orderLocked &&
+                      <GripVertical
+                        className='cursor-row-resize ml-auto'
+                        color={getContrastingColor(color)} />}
+                  </ColorRow>
+                  {member.drafted &&
+                    <ColorRow className='text-xs p-1' color={color}>
+                      {member.drafted}
+                    </ColorRow>}
+                </SortableItem>
+              );
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
     </section>
   );
 }

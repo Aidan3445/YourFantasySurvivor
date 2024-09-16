@@ -7,6 +7,7 @@ import { auth } from '@clerk/nextjs/server';
 import { leagueMembers, type Member } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { castaways } from '~/server/db/schema/castaways';
+import { getDraftedSurvivor } from './[id]/settings/query';
 
 
 export async function getLeague(leagueId: number) {
@@ -32,8 +33,8 @@ export async function getLeague(leagueId: number) {
 
   if (league.length === 0) throw new Error('League not found');
   if (!members.find((member) => member.userId === userId)) throw new Error('The signed in user is not a member of this league');
-  const safeMembers = members.map((member) => {
-    const safeMember: Member = {
+  const safeMembers = await Promise.all(members.map(async (member) => {
+    const safeMember = {
       id: member.id,
       displayName: member.displayName,
       color: member.color,
@@ -41,8 +42,9 @@ export async function getLeague(leagueId: number) {
       isOwner: member.isOwner,
       loggedIn: member.userId === userId,
     };
-    return safeMember;
-  });
+    return { ...safeMember, drafted: (await getDraftedSurvivor(leagueId, member.id))?.drafted ?? null } as Member;
+  }));
+
 
   const isFull = await db
     .select({ count: count() })

@@ -18,7 +18,7 @@ import { hsvaToHex, getContrastingColor, } from '@uiw/color-convert';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { twentyColors } from '~/lib/colors';
 import { type Member } from '~/server/db/schema/members';
-import { MemberRow } from './members';
+import { ColorRow } from './members';
 
 interface MemberEditProps {
   leagueId: number;
@@ -501,10 +501,10 @@ export function InviteMember({ leagueId }: UpdateProps) {
   return (
     <Popover open={inviteOpen} onOpenChange={setInviteOpen}>
       <PopoverTrigger className='w-full'>
-        <MemberRow color='white' loggedIn={false}>
+        <ColorRow color='white' loggedIn={false}>
           <h3 className='font-medium'>Invite</h3>
           <UserPlus className='ml-auto' size={16} />
-        </MemberRow>
+        </ColorRow>
       </PopoverTrigger>
       <Popup>
         <form className='flex flex-col gap-1 text-center' action={catchInvite}>

@@ -4,7 +4,7 @@ import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
 
 interface PredictionCardProps extends ComponentProps {
   prediction: SeasonEventRuleType | WeeklyEventRuleType;
-  parity: boolean;
+  parity?: boolean;
 }
 
 export function PredictionCard({ prediction, parity, className, children }: PredictionCardProps) {

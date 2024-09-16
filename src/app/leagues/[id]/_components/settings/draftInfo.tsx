@@ -49,7 +49,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
               </section>
             </TabsContent>
           </Tabs>
-          <Countdown className='text-center hs-in rounded-md p-1' endDate={settings.draftDate}>
+          <Countdown className='bg-b4 rounded-md text-center p-1 cursor-default' endDate={settings.draftDate}>
             <a href={`/leagues/${league.id}/draft`}>
               <Button className='w-full'>Go To Draft</Button>
             </a>

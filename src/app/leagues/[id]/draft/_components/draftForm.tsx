@@ -2,21 +2,21 @@
 import { z } from 'zod';
 import { type ComponentProps } from '~/lib/utils';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
-import { PredictionCard } from '../../_components/settings/predictionCard';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { type Tribe } from '~/server/db/schema/tribes';
 import { type Member } from '~/server/db/schema/members';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
-import { type FormState, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
 import { Button } from '~/app/_components/commonUI/button';
-import { MemberRow as ColorRow } from '../../_components/members';
+import { ColorRow as ColorRow } from '../../_components/members';
 import { getContrastingColor } from '@uiw/color-convert';
-import { useState } from 'react';
 import { type Picks, submitDraft } from '~/app/api/leagues/[id]/draft/actions';
 import { useRouter } from 'next/navigation';
 import { type Predictions } from '~/app/api/leagues/[id]/draft/query';
+import { useToast } from '~/app/_components/commonUI/use-toast';
+import { AlertDialog, AlertDialogContent, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription } from '~/app/_components/commonUI/alert';
 
 export interface DraftFormProps extends ComponentProps {
   leagueId: number;
@@ -25,11 +25,13 @@ export interface DraftFormProps extends ComponentProps {
   castaway?: SeasonEventRuleType[];
   tribe?: SeasonEventRuleType[];
   member?: SeasonEventRuleType[];
-  picks: {
+  options: {
     castaways: CastawayDetails[];
     tribes: Tribe[];
     members: Member[];
+    unavailable: CastawayDetails[];
   };
+  yourTurn: boolean;
 }
 
 export default function DraftForm({
@@ -39,16 +41,10 @@ export default function DraftForm({
   castaway,
   tribe,
   member,
-  picks,
+  options,
+  yourTurn,
   className
 }: DraftFormProps) {
-  console.log(currentPicks);
-
-  const castawaysByTribe: Record<string, CastawayDetails[]> = picks.castaways.reduce((acc, c) => {
-    if (!acc[c.startingTribe.name]) acc[c.startingTribe.name] = [];
-    acc[c.startingTribe.name]!.push(c);
-    return acc;
-  }, {} as Record<string, CastawayDetails[]>);
   const draftSchema = z.object({
     firstPick: z.string(),
     secondPick: z.string().optional().refine(
@@ -64,6 +60,7 @@ export default function DraftForm({
     resolver: zodResolver(draftSchema),
   });
   const router = useRouter();
+  const { toast } = useToast();
 
   const submitPicks = () => {
     try {
@@ -76,7 +73,7 @@ export default function DraftForm({
 
     const data = form.getValues();
 
-    const firstPickId = picks.castaways.find((c) => c.name === data.firstPick)?.id;
+    const firstPickId = options.castaways.find((c) => c.name === data.firstPick)?.id;
 
     if (!firstPickId) {
       form.setError('firstPick', { message: 'Invalid castaway' });
@@ -85,63 +82,123 @@ export default function DraftForm({
 
     const submission = { firstPick: firstPickId, castaway: {}, tribe: {}, member: {} } as Picks;
     castaway?.forEach((event, index) => {
-      const castawayId = picks.castaways.find((c) => c.name === data.castaway[index])?.id;
+      const castawayId = options.castaways.find((c) => c.name === data.castaway[index])?.id;
       if (castawayId) submission.castaway[event.id] = castawayId;
     });
     tribe?.forEach((event, index) => {
-      const tribeId = picks.tribes.find((t) => t.name === data.tribe[index])?.id;
+      const tribeId = options.tribes.find((t) => t.name === data.tribe[index])?.id;
       if (tribeId) submission.tribe[event.id] = tribeId;
     });
     member?.forEach((event, index) => {
-      const memberId = picks.members.find((m) => m.displayName === data.member[index])?.id;
+      const memberId = options.members.find((m) => m.displayName === data.member[index])?.id;
       if (memberId) submission.member[event.id] = memberId;
     });
     const submit = submitDraft.bind(null, leagueId, submission);
 
     submit()
       .then(() => {
-        console.log('Submitted picks');
         router.push(`/leagues/${leagueId}/`);
       })
-      .catch((err) => {
-        console.error('Failed to submit picks', err);
+      .catch((e) => {
+        if (e instanceof Error) {
+          toast({
+            title: 'Error joining league',
+            description: e.message,
+            variant: 'error',
+          });
+        }
       });
+  };
+
+  const castawaysByTribe: Record<string, CastawayDetails[]> = options.castaways.reduce((acc, c) => {
+    if (!acc[c.startingTribe.name]) acc[c.startingTribe.name] = [];
+    acc[c.startingTribe.name]!.push(c);
+    return acc;
+  }, {} as Record<string, CastawayDetails[]>);
+
+  const getAlert = () => {
+    let content: { title: string, description: string } = { title: '', description: '' };
+    if (currentPicks.firstPick) {
+      content = {
+        title: 'You have already submitted your draft.',
+        description: `You can only update your predictions. You will be able to change your 
+                      survivor pick once all players have submitted theirs.`,
+      };
+    } else if (!yourTurn) {
+      content = {
+        title: 'It is not your turn to draft.',
+        description: 'You can submit your predictions now but must wait for your survivor pick.',
+      };
+    } else {
+      content = {
+        title: 'It\'s your turn!',
+        description: `You can now submit your prediction and your survivor pick. Note that your 
+                      survivor pick cannot be changed once submitted until all players have drafted.
+                      Choose wisely.`,
+      };
+    }
+    return (
+      <AlertDialog defaultOpen={true}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{content.title}</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>{content.description}</AlertDialogDescription>
+          <AlertDialogFooter><AlertDialogCancel>Close</AlertDialogCancel></AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
   };
 
   return (
     <Form {...form}>
+      {getAlert()}
       <form
         className={className}
         action={submitPicks}>
-        <MainPicks
-          pickCount={pickCount}
-          options={castawaysByTribe}
-          formState={form.formState} />
+        <FormLabel className='text-2xl'> Pick your Survivor{pickCount > 1 ? 's' : ''}</FormLabel>
+        <FormField
+          name='firstPick'
+          defaultValue={currentPicks.firstPick}
+          render={({ field }) => (
+            <FormItem className='justify-center flex flex-col rounded-md my-0'>
+              <FormControl>
+                <Select onValueChange={field.onChange} {...field}>
+                  <SelectTrigger disabled={currentPicks.firstPick !== undefined}>
+                    <div className='flex-grow'>
+                      <SelectValue placeholder='Choose your Survivor' />
+                      <FormMessage className='text-left pl-5'>{form.formState.errors.firstPick?.message}</FormMessage>
+                    </div>
+                  </SelectTrigger>
+                  <SelectCastawaysByTribe
+                    castawaysByTribe={castawaysByTribe}
+                    otherChoices={currentPicks.firstPick ? undefined : options.unavailable} />
+                </Select>
+              </FormControl>
+            </FormItem>)} />
         {castaway &&
           <div>
             <br />
             <FormLabel className='text-2xl'>Castaway Predictions</FormLabel>
             <div className='flex flex-col gap-1'>
               {castaway?.map((c, index) => (
-                <PredictionCard key={index} className='flex flex-col justify-center' prediction={c} parity={index % 2 === 0}>
-                  <FormItem className='justify-center flex flex-col rounded-md my-0'>
-                    <FormControl>
-                      <FormField
-                        name={`castaway[${index}]`}
-                        render={({ field }) => (
-                          <Select onValueChange={field.onChange} {...field} defaultValue={currentPicks.castawayPicks?.[index]}>
-                            <SelectTrigger>
+                <FormItem key={c.id} className='justify-center flex flex-col rounded-md my-0'>
+                  <FormControl>
+                    <FormField
+                      name={`castaway[${index}]`}
+                      defaultValue={currentPicks.castawayPicks?.[index]}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} {...field}>
+                          <SelectTrigger>
+                            <div className='flex-grow'>
                               <SelectValue placeholder='Choose a Castaway' />
-                            </SelectTrigger>
-                            <SelectCastawaysByTribe castawaysByTribe={castawaysByTribe} />
-                          </Select>
-                        )}
-                      />
-                    </FormControl>
-                    <FormMessage className='text-left pl-12'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
-                  </FormItem>
-                </PredictionCard>
-              ))}
+                              <FormMessage className='text-left pl-8'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
+                            </div>
+                          </SelectTrigger>
+                          <SelectCastawaysByTribe castawaysByTribe={castawaysByTribe} />
+                        </Select>)} />
+                  </FormControl>
+                </FormItem>))}
             </div>
           </div>}
         {tribe &&
@@ -150,32 +207,31 @@ export default function DraftForm({
             <FormLabel className='text-2xl'>Tribe Predictions</FormLabel>
             <div className='flex flex-col gap-1'>
               {tribe?.map((t, index) => (
-                <PredictionCard key={index} className='flex flex-col justify-center' prediction={t} parity={index % 2 === 0}>
-                  <FormItem className='justify-center flex flex-col rounded-md my-0'>
-                    <FormControl>
-                      <FormField
-                        name={`tribe[${index}]`}
-                        render={({ field }) => (
-                          <Select onValueChange={field.onChange} {...field}>
-                            <SelectTrigger>
+                <FormItem key={t.id} className='justify-center flex flex-col rounded-md my-0'>
+                  <FormControl>
+                    <FormField
+                      name={`tribe[${index}]`}
+                      defaultValue={currentPicks.tribePicks?.[index]}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} {...field} >
+                          <SelectTrigger>
+                            <div className='flex-grow'>
                               <SelectValue placeholder='Choose a Tribe' />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {picks.tribes.map((pick) => (
-                                <SelectItem key={pick.name} value={pick.name}>
-                                  <ColorRow color={pick.color} className='w-52'>
-                                    <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.name}</h3>
-                                  </ColorRow>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        )} />
-                    </FormControl>
-                    <FormMessage className='text-left pl-12'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
-                  </FormItem>
-                </PredictionCard>
-              ))}
+                              <FormMessage className='text-left pl-12'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {options.tribes.map((pick) => (
+                              <SelectItem key={pick.name} className='block w-full pr-6' value={pick.name}>
+                                <ColorRow color={pick.color}>
+                                  <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.name}</h3>
+                                </ColorRow>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>)} />
+                  </FormControl>
+                </FormItem>))}
             </div>
           </div>}
         {member &&
@@ -184,53 +240,60 @@ export default function DraftForm({
             <h2 className='text-2xl text-center font-semibold'>Member Predictions</h2>
             <div className='flex flex-col gap-1'>
               {member?.map((m, index) => (
-                <PredictionCard key={index} className='flex flex-col justify-center' prediction={m} parity={index % 2 === 0}>
-                  <FormItem className='justify-center flex flex-col rounded-md my-0'>
-                    <FormControl>
-                      <FormField
-                        name={`member[${index}]`}
-                        render={({ field }) => (
-                          <Select onValueChange={field.onChange} {...field}>
-                            <SelectTrigger>
+                <FormItem key={m.id} className='justify-center flex flex-col rounded-md my-0'>
+                  <FormControl>
+                    <FormField
+                      name={`member[${index}]`}
+                      defaultValue={currentPicks.memberPicks?.[index]}
+                      render={({ field }) => (
+                        <Select onValueChange={field.onChange} {...field}>
+                          <SelectTrigger>
+                            <div className='flex-grow'>
                               <SelectValue placeholder='Choose a Member' />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {picks.members.map((pick) => {
-                                if (pick.loggedIn) return null;
-                                return (
-                                  <SelectItem key={pick.displayName} value={pick.displayName}>
-                                    <ColorRow color={pick.color} className='w-52'>
-                                      <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.displayName}</h3>
-                                    </ColorRow>
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
-                        )} />
-                    </FormControl>
-                    <FormMessage className='text-left pl-12'>{form.formState.errors.member?.[index]?.message}</FormMessage>
-                  </FormItem>
-                </PredictionCard>
-              ))}
+                              <FormMessage className='text-left pl-[38px]'>{form.formState.errors.member?.[index]?.message}</FormMessage>
+                            </div>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {options.members.map((pick) => {
+                              if (pick.loggedIn) return null;
+                              return (
+                                <SelectItem key={pick.displayName} className='block w-full pr-6' value={pick.displayName}>
+                                  <ColorRow color={pick.color}>
+                                    <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.displayName}</h3>
+                                  </ColorRow>
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>)} />
+                  </FormControl>
+                </FormItem>))}
             </div>
           </div>}
-        <Button type='submit' className='mt-4'>Submit Draft</Button>
+        <span className='flex gap-2 justify-center'>
+          <Button type='submit' className='mt-4'>
+            {currentPicks.firstPick ? 'Update and return' : 'Submit Picks'}
+          </Button>
+          <Button type='button' onClick={() => router.push(`/leagues/${leagueId}/`)} className='mt-4'>
+            Cancel
+          </Button>
+        </span>
       </form >
     </Form >
   );
 }
 
+/*
 interface PicksProps {
   pickCount: number;
   options: Record<string, CastawayDetails[]>;
   formState: FormState<{ firstPick: string; secondPick?: string; }>;
 }
-
+ 
 function MainPicks({ pickCount, options, formState }: PicksProps) {
   const [pick1, setPick1] = useState<string | undefined>();
   const [pick2, setPick2] = useState<string | undefined>();
-
+ 
   return (
     <div className='flex flex-col gap-1'>
       <FormLabel className='text-2xl'> Pick your Survivor{pickCount > 1 ? 's' : ''}</FormLabel>
@@ -240,7 +303,7 @@ function MainPicks({ pickCount, options, formState }: PicksProps) {
           <FormItem className='justify-center flex flex-col rounded-md bg-b4/70 p-2 my-0'>
             <FormControl>
               <Select onValueChange={(val) => { setPick1(val); field.onChange(val); }} {...field}>
-                <SelectTrigger>
+                <SelectTrigger disabled>
                   <SelectValue placeholder='First Pick' />
                 </SelectTrigger>
                 <SelectCastawaysByTribe castawaysByTribe={options} otherChoices={[pick2]} />
@@ -267,10 +330,11 @@ function MainPicks({ pickCount, options, formState }: PicksProps) {
     </div>
   );
 }
+*/
 
 interface SelectCastawaysByTribeProps {
   castawaysByTribe: Record<string, CastawayDetails[]>;
-  otherChoices?: (string | undefined)[];
+  otherChoices?: CastawayDetails[];
 }
 
 function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastawaysByTribeProps) {
@@ -279,15 +343,15 @@ function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastaw
       {Object.entries(castawaysByTribe).map(([tribe, castaways]) => (
         <SelectGroup key={tribe}>
           <SelectLabel>
-            <ColorRow color={castaways[0]!.startingTribe.color} className='w-56 -mx-4 px-4 italic'>
+            <ColorRow color={castaways[0]!.startingTribe.color} className='w-full -mx-4 px-4 italic'>
               <h3 style={{ color: getContrastingColor(castaways[0]!.startingTribe.color) }}>{tribe}</h3>
             </ColorRow>
           </SelectLabel>
           {castaways
-            .filter((castaway) => !otherChoices?.includes(castaway.name)) // Filter out selected choices
+            .filter((castaway) => !otherChoices?.some((s) => s.name === castaway.name))
             .map((castaway) => (
-              <SelectItem key={castaway.name} value={castaway.name}>
-                <ColorRow color={castaway.startingTribe.color} className='w-52'>
+              <SelectItem className='block w-full pr-6' key={castaway.name} value={castaway.name}>
+                <ColorRow color={castaway.startingTribe.color}>
                   <h3 style={{ color: getContrastingColor(castaway.startingTribe.color) }}>{castaway.name}</h3>
                 </ColorRow>
               </SelectItem>

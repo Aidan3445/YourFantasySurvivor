@@ -2,6 +2,8 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import { cn, type ComponentProps } from '~/lib/utils';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from './commonUI/hover';
+import { HoverCardPortal } from '@radix-ui/react-hover-card';
 
 interface CountdownProps extends ComponentProps {
   children: ReactNode;
@@ -28,16 +30,21 @@ export default function Countdown({ endDate, children, className }: CountdownPro
 
   return (
     timer > 0 ?
-      <span className={cn(className, timer > 0 ? 'pointer-events-none' : '')}>
-        Draft on {endDate.toLocaleString()}
-        <br />
-        <div className='font-mono'>
-          {days}:
-          {String(hours).padStart(2, '0')}:
-          {String(minutes).padStart(2, '0')}:
-          {String(seconds).padStart(2, '0')}
-        </div>
-      </span >
+      <span className={cn('w-full flex', className)}>
+        <HoverCard openDelay={100}>
+          <HoverCardTrigger className='flex-grow tabular-nums'>
+            {days}:
+            {String(hours).padStart(2, '0')}:
+            {String(minutes).padStart(2, '0')}:
+            {String(seconds).padStart(2, '0')}
+          </HoverCardTrigger>
+          <HoverCardPortal>
+            <HoverCardContent side='top'>
+              Draft on {endDate.toLocaleString()}
+            </HoverCardContent>
+          </HoverCardPortal>
+        </HoverCard>
+      </span>
       :
       children
   );

@@ -189,7 +189,7 @@ export function SecondPlaceInfo() {
         <p className='text-xs rounded-full text-b4 -translate-y-2'>?</p>
       </HoverCardTrigger>
       <HoverCardPortal>
-        <HoverCardContent className='text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
+        <HoverCardContent sideOffset={10} side='top'>
           <HoverCardArrow className='' />
           <p className='normal-nums text-wrap'>Applies only to seasons with 3-tribe challenges</p>
         </HoverCardContent>

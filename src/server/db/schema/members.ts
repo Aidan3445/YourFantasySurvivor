@@ -29,6 +29,7 @@ export interface Member {
   isAdmin: boolean;
   isOwner: boolean;
   loggedIn: boolean;
+  drafted: string | null;
 }
 
 export const selectionUpdates = createTable(

@@ -70,7 +70,7 @@ export default function JoinLeagueForm({ className, closePopup }: JoinLeagueForm
         {!isSignedIn &&
           <SignInButton>
             <Button className='absolute inset-y-1/2 z-10 place-self-center font-medium text-md'>
-              Sign in to create a league
+              Sign in to join a league
             </Button>
           </SignInButton>}
         <form

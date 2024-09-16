@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createTable } from './createTable';
 import { seasons } from './seasons';
-import { boolean, customType, integer, pgEnum, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { boolean, customType, integer, pgEnum, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 import { sql } from 'drizzle-orm';
 
@@ -91,7 +91,7 @@ export const leagueSettings = createTable(
     inviteOnly: boolean('invite_only').notNull().default(false),
     pickCount: pickCount('pick_count').notNull().default(1),
     draftDate: timestamp('draft_date', { mode: 'string' }).notNull(),
-    draftOrder: text('draft_order').array().notNull().default(sql`ARRAY[]::text[]`),
+    draftOrder: integer('draft_order').array().notNull().default(sql`ARRAY[]::integer[]`),
     turnLimitMins: integer('turn_limit_mins').notNull().default(10),
   }
 );
