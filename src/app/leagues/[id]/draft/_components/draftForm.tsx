@@ -372,5 +372,5 @@ function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastaw
 const survivorPrediction = {
   name: 'Main Survivor',
   points: 0,
-  description: 'Your main castaway that will earn you points for each episode',
+  description: 'Your main castaway that will earn you points for each episode.',
 } as SeasonEventRuleType;
