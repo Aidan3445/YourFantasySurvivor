@@ -10,7 +10,7 @@ import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 import { Label } from '~/app/_components/commonUI/label';
 
-export default function SeasonEvents({ className, form, freeze }: EventsProps) {
+export default function SeasonEvents({ className, form, freeze, setUnsaved }: EventsProps) {
   const seasonEvents = form.watch('season');
 
   const updateEvent = (
@@ -36,6 +36,7 @@ export default function SeasonEvents({ className, form, freeze }: EventsProps) {
 
   const newEvent = (value: keyof typeof SeasonTemplates) => {
     form.setValue('season', [...seasonEvents, { ...SeasonTemplates[value] }]);
+    setUnsaved && setUnsaved();
   };
 
   return (

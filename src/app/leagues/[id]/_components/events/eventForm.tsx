@@ -69,12 +69,13 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
   };
 
   const watch = form.watch();
+  const unsave = () => setUnsaved(true);
 
   useEffect(() => {
     try {
       Rules.parse(form.getValues());
       setValid(true);
-    } catch {
+    } catch (e) {
       setValid(false);
     }
   }, [form, watch, rules]);
@@ -94,7 +95,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
           </article>
         </Tab>
         <Tab value='custom' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
-          <CustomEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} />
+          <CustomEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} setUnsaved={unsave} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Custom Events</h3>
             Custom events are added manually by a league admin.
@@ -103,7 +104,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
           </article>
         </Tab>
         <Tab value='weekly' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
-          <WeeklyEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} />
+          <WeeklyEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} setUnsaved={unsave} />
           <article className='col-span-2'>
             <h3 className='font-semibold text-lg'>Weekly Events</h3>
             League members can earn points through weekly events,
@@ -124,7 +125,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
           </article>
         </Tab>
         <Tab value='season' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
-          <SeasonEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} />
+          <SeasonEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} setUnsaved={unsave} />
           <article className='col-span-2'>
             Season events are special predictions members make only once.
             They can be made before the season starts, after the merge,
@@ -165,5 +166,6 @@ function Tab({ children, value, valid, unsaved, ownerLoggedIn }: TabProps) {
 export interface EventsProps extends ComponentProps {
   form: UseFormReturn<RulesType>;
   freeze: boolean;
+  setUnsaved?: () => void;
 }
 

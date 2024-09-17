@@ -1,5 +1,5 @@
 'use client';
-import { type ComponentProps } from '~/lib/utils';
+import { cn, type ComponentProps } from '~/lib/utils';
 import { ColorRow } from '../members';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useState } from 'react';
@@ -75,18 +75,18 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, classNam
           <Button className='w-full' type='submit'>Save</Button>
         </form>
       </span>}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        modifiers={[restrictToParentElement]}
-        onDragEnd={(event) => handleDragEnd(event, setOrder)}>
-        <SortableContext items={order} strategy={verticalListSortingStrategy}>
-          <div className='grid gap-1 auto-cols-min'>
+      <span className='w-full grid grid-cols-2 gap-1'>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          modifiers={[restrictToParentElement]}
+          onDragEnd={(event) => handleDragEnd(event, setOrder)}>
+          <SortableContext items={order} strategy={verticalListSortingStrategy}>
             {order.map((member, index) => {
               const color = member.drafted ? '#AAAAAA' : member.color;
               return (
                 <SortableItem className='grid grid-cols-subgrid col-span-2' key={member.name} id={member.id} disabled={orderLocked}>
-                  <ColorRow className='w-full tabular-nums' color={color}>
+                  <ColorRow className={cn('w-full tabular-nums', member.drafted ?? 'col-span-2')} color={color}>
                     <h3 style={{ color: getContrastingColor(color) }}>{index + 1} - {member.name}</h3>
                     {!orderLocked &&
                       <GripVertical
@@ -100,9 +100,9 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, classNam
                 </SortableItem>
               );
             })}
-          </div>
-        </SortableContext>
-      </DndContext>
+          </SortableContext>
+        </DndContext>
+      </span>
     </section>
   );
 }

@@ -45,7 +45,7 @@ export async function insertMember(leagueId: number, userId: string, displayName
   displayName = displayName.slice(0, 16);
 
   // insert member
-  await db
+  const memberId = await db
     .insert(leagueMembers)
     .values({
       league: leagueId,
@@ -54,13 +54,18 @@ export async function insertMember(leagueId: number, userId: string, displayName
       displayName: displayName,
       isOwner: isOwner,
       isAdmin: isAdmin,
-    });
+    })
+    .returning({ id: leagueMembers.id })
+    .then((res) => res[0]?.id);
 
   try {
+    // check if member was inserted successfully
+    if (!memberId) throw new Error('Failed joining league');
+
     // add member to draft order
     await db
       .update(leagueSettings)
-      .set({ draftOrder: sql`array_append(${leagueSettings.draftOrder}, ${userId})` })
+      .set({ draftOrder: sql`array_append(${leagueSettings.draftOrder}, ${memberId})` })
       .where(eq(leagueSettings.league, leagueId));
   } catch (e) {
     // rollback member insert

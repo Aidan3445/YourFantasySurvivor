@@ -83,15 +83,15 @@ export default function DraftForm({
     const submission = { firstPick: firstPickId, castaway: {}, tribe: {}, member: {} } as Picks;
     castaway?.forEach((event, index) => {
       const castawayId = options.castaways.find((c) => c.name === data.castaway[index])?.id;
-      if (castawayId) submission.castaway[event.id] = castawayId;
+      if (castawayId && event.id) submission.castaway[event.id] = castawayId;
     });
     tribe?.forEach((event, index) => {
       const tribeId = options.tribes.find((t) => t.name === data.tribe[index])?.id;
-      if (tribeId) submission.tribe[event.id] = tribeId;
+      if (tribeId && event.id) submission.tribe[event.id] = tribeId;
     });
     member?.forEach((event, index) => {
       const memberId = options.members.find((m) => m.displayName === data.member[index])?.id;
-      if (memberId) submission.member[event.id] = memberId;
+      if (memberId && event.id) submission.member[event.id] = memberId;
     });
     const submit = submitDraft.bind(null, leagueId, submission);
 

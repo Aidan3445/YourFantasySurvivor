@@ -10,7 +10,7 @@ import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 import { Label } from '~/app/_components/commonUI/label';
 
-export default function CustomEvents({ className, form, freeze }: EventsProps) {
+export default function CustomEvents({ className, form, freeze, setUnsaved }: EventsProps) {
   const customEvents = form.watch('custom');
 
   const updateEvent = (
@@ -36,6 +36,7 @@ export default function CustomEvents({ className, form, freeze }: EventsProps) {
 
   const newEvent = (value: keyof typeof CustomTemplates) => {
     form.setValue('custom', [...customEvents, { ...CustomTemplates[value] }]);
+    setUnsaved && setUnsaved();
   };
 
   return (

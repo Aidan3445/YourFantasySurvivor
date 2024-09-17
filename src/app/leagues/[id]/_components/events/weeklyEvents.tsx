@@ -9,7 +9,7 @@ import { type EventsProps } from './eventForm';
 import { useState } from 'react';
 import { Label } from '~/app/_components/commonUI/label';
 
-export default function WeeklyEvents({ className, form, freeze }: EventsProps) {
+export default function WeeklyEvents({ className, form, freeze, setUnsaved }: EventsProps) {
   const weeklyEvents = form.watch('weekly');
 
   const updateEvent = (
@@ -35,6 +35,7 @@ export default function WeeklyEvents({ className, form, freeze }: EventsProps) {
 
   const newEvent = (value: keyof typeof WeeklyTemplates) => {
     form.setValue('weekly', [...weeklyEvents, { ...WeeklyTemplates[value] }]);
+    setUnsaved && setUnsaved();
   };
 
   return (
