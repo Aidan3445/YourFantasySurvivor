@@ -32,24 +32,24 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
       </PopoverTrigger>
       <PopoverContent>
         <CardContainer className='flex flex-col gap-1 p-6 transition-all'>
-          <h2 className='text-2xl text-center font-semibold'>Draft Info</h2>
+          <h2 className='text-2xl font-semibold text-center'>Draft Info</h2>
           <Tabs defaultValue='order'>
-            <TabsList className='w-full grid grid-flow-col auto-cols-fr'>
+            <TabsList className='grid grid-flow-col auto-cols-fr w-full'>
               <TabsTrigger value='order'>Order</TabsTrigger>
               <TabsTrigger value='predictions'>Predictions</TabsTrigger>
             </TabsList>
             <TabsContent value='order'>
-              <DraftOrder leagueId={league.id} draftOrder={settings.draftOrder} orderLocked={orderLocked} className='w-full flex flex-col gap-1' />
+              <DraftOrder leagueId={league.id} draftOrder={settings.draftOrder} orderLocked={orderLocked} className='flex flex-col gap-1 w-full' />
             </TabsContent>
             <TabsContent value='predictions'>
-              <section className='light-scroll h-80 flex flex-col gap-1'>
+              <section className='flex flex-col gap-1 h-80 light-scroll'>
                 {preseasonPredictions.map((rule, index) => (
                   <PredictionCard key={index} prediction={rule} parity={index % 2 === 0} />
                 ))}
               </section>
             </TabsContent>
           </Tabs>
-          <Countdown className='bg-b4 rounded-md text-center p-1 cursor-default' endDate={settings.draftDate}>
+          <Countdown className='p-1 text-center rounded-md cursor-default bg-b4' endDate={settings.draftDate}>
             <a href={`/leagues/${league.id}/draft`}>
               <Button className='w-full'>Go To Draft</Button>
             </a>

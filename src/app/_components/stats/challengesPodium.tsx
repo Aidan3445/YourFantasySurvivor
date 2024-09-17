@@ -184,9 +184,9 @@ function RemainingCastaways({ castaways, disabled }: RemainingCastawaysProps) {
 export function SecondPlaceInfo() {
   return (
     <HoverCard openDelay={100} closeDelay={0}>
-      <HoverCardTrigger className='justify-center cursor-help inline-flex'>
+      <HoverCardTrigger className='inline-flex justify-center cursor-help'>
         2nd
-        <p className='text-xs rounded-full text-b4 -translate-y-2'>?</p>
+        <p className='text-xs rounded-full -translate-y-2 text-b4'>?</p>
       </HoverCardTrigger>
       <HoverCardPortal>
         <HoverCardContent sideOffset={10} side='top'>

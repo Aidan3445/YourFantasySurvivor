@@ -30,8 +30,8 @@ export default async function League({ params }: PageProps) {
   return (
     <main>
       <h1 className='text-3xl font-semibold'>League Draft</h1>
-      <article className='grid md:grid-cols-2 gap-10'>
-        <section className='sticky top-32 self-start flex flex-col justify-center'>
+      <article className='grid gap-10 md:grid-cols-2'>
+        <section className='flex sticky top-32 flex-col justify-center self-start'>
           <h3 className='text-xl font-semibold text-center'>Draft Order</h3>
           <DraftOrder leagueId={leagueId} draftOrder={settings.draftOrder} orderLocked />
         </section>

@@ -18,13 +18,13 @@ export default async function LeagueScoring({ league, ownerLoggedIn, className, 
       <PopoverCenter />
       <PopoverTrigger className={cn(className, 'hs-in px-2 rounded-md')}>
         Scoring
-        {openDefault && <span className='inline-flex ml-2 align-middle rounded-full bg-b2 animate-pulse w-2 h-2' />}
+        {openDefault && <span className='inline-flex ml-2 w-2 h-2 align-middle rounded-full animate-pulse bg-b2' />}
       </PopoverTrigger>
       <PopoverContent>
         <CardContainer className='flex flex-col gap-1 p-6 pb-0 transition-all'>
-          <h2 className='text-2xl text-center font-semibold'>League Event Scoring</h2>
+          <h2 className='text-2xl font-semibold text-center'>League Event Scoring</h2>
           <Tabs defaultValue='base'>
-            <TabsList className='w-full grid grid-flow-col md:auto-cols-fr'>
+            <TabsList className='grid grid-flow-col w-full md:auto-cols-fr'>
               <TabsTrigger value='base'>Base</TabsTrigger>
               <TabsTrigger value='custom'>Custom</TabsTrigger>
               <TabsTrigger value='weekly'>Weekly</TabsTrigger>

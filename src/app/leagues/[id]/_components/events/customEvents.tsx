@@ -123,8 +123,8 @@ function CustomEvent({ event, eventIndex, updateEvent, className }: CustomEventP
         </div>
         {updateEvent &&
           <span className='flex gap-2'>
-            <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
-            <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
+            <CopyPlus className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={copyEvent} />
+            <SquareX className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={deleteEvent} />
           </span>}
       </span>
       <span className='flex gap-2 items-center'>

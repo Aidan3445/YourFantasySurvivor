@@ -9,7 +9,7 @@ export default async function YourLeagues() {
   if (yourLeagues.length === 0) {
     return (
       <div className='text-center'>
-        <h1 className='text-2xl font-semibold mb-2'>Your Leagues</h1>
+        <h1 className='mb-2 text-2xl font-semibold'>Your Leagues</h1>
         <h3>You are not a member of any leagues.</h3>
         <h3>Join or create a league to get started.</h3>
       </div>
@@ -27,7 +27,7 @@ export default async function YourLeagues() {
         <CarouselPrevious />
         <CarouselContent>
           {yourLeagues.map((league) => (
-            <CarouselItem className='mx-1 px-1' key={league.id}>
+            <CarouselItem className='px-1 mx-1' key={league.id}>
               <CardContainer className='p-6' key={league.id}>
                 <a className='flex flex-col' href={`/leagues/${league.id}`}>
                   <div>{league.name}</div>

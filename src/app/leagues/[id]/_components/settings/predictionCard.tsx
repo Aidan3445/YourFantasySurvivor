@@ -16,7 +16,7 @@ export function PredictionCard({ prediction, parity, className, children }: Pred
 
   return (
     <div className={cn(parity ? 'bg-b4/70' : 'bg-b3/80', 'p-2 rounded-md', className)}>
-      <span className='text-xs inline-flex gap-2 items-center'>
+      <span className='inline-flex gap-2 items-center text-xs'>
         <p>Predict {prediction.name} {prediction.points != 0 ? `for ${prediction.points} points.` : ''}</p>
         <HoverCard open={open} onOpenChange={() => setOpen(!open)}>
           <HoverCardTrigger onClick={() => setOpen(!open)}>

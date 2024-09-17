@@ -48,13 +48,13 @@ export default function AutoJoin() {
     <>
       <SignedOut>
         <SignInButton>
-          <Button className='mt-20 scale-150 flex gap-1 pb-1' >
-            <div className='animate-bounce inline'> Sign </div>
-            <div className='animate-bounce inline delay-100'> in </div>
-            <div className='animate-bounce inline delay-200'> to </div>
-            <div className='animate-bounce inline delay-300'> join </div>
-            <div className='animate-bounce inline delay-400'> the </div>
-            <div className='animate-bounce inline delay-500'> league </div>
+          <Button className='flex gap-1 pb-1 mt-20 scale-150' >
+            <div className='inline animate-bounce'> Sign </div>
+            <div className='inline delay-100 animate-bounce'> in </div>
+            <div className='inline delay-200 animate-bounce'> to </div>
+            <div className='inline delay-300 animate-bounce'> join </div>
+            <div className='inline animate-bounce delay-400'> the </div>
+            <div className='inline delay-500 animate-bounce'> league </div>
           </Button >
         </SignInButton>
       </SignedOut>

@@ -159,14 +159,14 @@ export default function DraftForm({
           name='firstPick'
           defaultValue={currentPicks.firstPick}
           render={({ field }) => (
-            <FormItem className='justify-center flex flex-col rounded-md my-0'>
+            <FormItem className='flex flex-col justify-center my-0 rounded-md'>
               <PredictionCard prediction={survivorPrediction}>
                 <FormControl>
                   <Select onValueChange={field.onChange} {...field}>
                     <SelectTrigger className='w-full' disabled={!yourTurn}>
                       <div className='flex-grow text-nowrap'>
                         <SelectValue className='px-0' placeholder='Choose your Survivor' />
-                        <FormMessage className='text-left pl-5'>{form.formState.errors.firstPick?.message}</FormMessage>
+                        <FormMessage className='pl-5 text-left'>{form.formState.errors.firstPick?.message}</FormMessage>
                       </div>
                     </SelectTrigger>
                     <SelectCastawaysByTribe
@@ -182,7 +182,7 @@ export default function DraftForm({
             <FormLabel className='text-2xl'>Castaway Predictions</FormLabel>
             <div className='flex flex-col gap-1'>
               {castaway?.map((c, index) => (
-                <FormItem key={c.id} className='justify-center flex flex-col rounded-md my-0'>
+                <FormItem key={c.id} className='flex flex-col justify-center my-0 rounded-md'>
                   <PredictionCard prediction={c} >
                     <FormControl>
                       <FormField
@@ -193,7 +193,7 @@ export default function DraftForm({
                             <SelectTrigger className='w-full'>
                               <div className='flex-grow text-nowrap'>
                                 <SelectValue placeholder='Choose a Castaway' />
-                                <FormMessage className='text-left pl-8'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
+                                <FormMessage className='pl-8 text-left'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
                               </div>
                             </SelectTrigger>
                             <SelectCastawaysByTribe castawaysByTribe={castawaysByTribe} />
@@ -209,7 +209,7 @@ export default function DraftForm({
             <FormLabel className='text-2xl'>Tribe Predictions</FormLabel>
             <div className='flex flex-col gap-1'>
               {tribe?.map((t, index) => (
-                <FormItem key={t.id} className='justify-center flex flex-col rounded-md my-0'>
+                <FormItem key={t.id} className='flex flex-col justify-center my-0 rounded-md'>
                   <PredictionCard prediction={t} >
                     <FormControl>
                       <FormField
@@ -220,12 +220,12 @@ export default function DraftForm({
                             <SelectTrigger className='w-full'>
                               <div className='flex-grow text-nowrap'>
                                 <SelectValue placeholder='Choose a Tribe' />
-                                <FormMessage className='text-left pl-12'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
+                                <FormMessage className='pl-12 text-left'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
                               </div>
                             </SelectTrigger>
                             <SelectContent>
                               {options.tribes.map((pick) => (
-                                <SelectItem key={pick.name} className='block w-full pr-6' value={pick.name}>
+                                <SelectItem key={pick.name} className='block pr-6 w-full' value={pick.name}>
                                   <ColorRow color={pick.color}>
                                     <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.name}</h3>
                                   </ColorRow>
@@ -241,10 +241,10 @@ export default function DraftForm({
         {member &&
           <div>
             <br />
-            <h2 className='text-2xl text-center font-semibold'>Member Predictions</h2>
+            <h2 className='text-2xl font-semibold text-center'>Member Predictions</h2>
             <div className='flex flex-col gap-1'>
               {member?.map((m, index) => (
-                <FormItem key={m.id} className='justify-center flex flex-col rounded-md my-0'>
+                <FormItem key={m.id} className='flex flex-col justify-center my-0 rounded-md'>
                   <PredictionCard prediction={m} >
                     <FormControl>
                       <FormField
@@ -262,7 +262,7 @@ export default function DraftForm({
                               {options.members.map((pick) => {
                                 if (pick.loggedIn) return null;
                                 return (
-                                  <SelectItem key={pick.displayName} className='block w-full pr-6' value={pick.displayName}>
+                                  <SelectItem key={pick.displayName} className='block pr-6 w-full' value={pick.displayName}>
                                     <ColorRow color={pick.color}>
                                       <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.displayName}</h3>
                                     </ColorRow>
@@ -306,7 +306,7 @@ function MainPicks({ pickCount, options, formState }: PicksProps) {
       <FormField
         name='firstPick'
         render={({ field }) => (
-          <FormItem className='justify-center flex flex-col rounded-md bg-b4/70 p-2 my-0'>
+          <FormItem className='flex flex-col justify-center p-2 my-0 rounded-md bg-b4/70'>
             <FormControl>
               <Select onValueChange={(val) => { setPick1(val); field.onChange(val); }} {...field}>
                 <SelectTrigger disabled>
@@ -315,13 +315,13 @@ function MainPicks({ pickCount, options, formState }: PicksProps) {
                 <SelectCastawaysByTribe castawaysByTribe={options} otherChoices={[pick2]} />
               </Select>
             </FormControl>
-            <FormMessage className='text-left pl-12'>{formState.errors.firstPick?.message}</FormMessage>
+            <FormMessage className='pl-12 text-left'>{formState.errors.firstPick?.message}</FormMessage>
           </FormItem>)} />
       {pickCount > 1 &&
         <FormField
           name='secondPick'
           render={({ field }) => (
-            <FormItem className='justify-center flex flex-col rounded-md bg-b3/80 p-2 my-0'>
+            <FormItem className='flex flex-col justify-center p-2 my-0 rounded-md bg-b3/80'>
               <FormControl>
                 <Select onValueChange={(val) => { setPick2(val); field.onChange(val); }} {...field}>
                   <SelectTrigger>
@@ -330,7 +330,7 @@ function MainPicks({ pickCount, options, formState }: PicksProps) {
                   <SelectCastawaysByTribe castawaysByTribe={options} otherChoices={[pick1]} />
                 </Select>
               </FormControl>
-              <FormMessage className='text-left pl-12'>{formState.errors.secondPick?.message}</FormMessage>
+              <FormMessage className='pl-12 text-left'>{formState.errors.secondPick?.message}</FormMessage>
             </FormItem >)
           } />}
     </div>
@@ -349,14 +349,14 @@ function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastaw
       {Object.entries(castawaysByTribe).map(([tribe, castaways]) => (
         <SelectGroup key={tribe}>
           <SelectLabel>
-            <ColorRow color={castaways[0]!.startingTribe.color} className='w-full -mx-4 px-4 italic'>
+            <ColorRow color={castaways[0]!.startingTribe.color} className='px-4 -mx-4 w-full italic'>
               <h3 style={{ color: getContrastingColor(castaways[0]!.startingTribe.color) }}>{tribe}</h3>
             </ColorRow>
           </SelectLabel>
           {castaways
             .filter((castaway) => !otherChoices?.some((s) => s.name === castaway.name))
             .map((castaway) => (
-              <SelectItem className='block w-full pr-6' key={castaway.name} value={castaway.name}>
+              <SelectItem className='block pr-6 w-full' key={castaway.name} value={castaway.name}>
                 <ColorRow color={castaway.startingTribe.color}>
                   <h3 style={{ color: getContrastingColor(castaway.startingTribe.color) }}>{castaway.name}</h3>
                 </ColorRow>

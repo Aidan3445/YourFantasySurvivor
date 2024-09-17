@@ -34,7 +34,7 @@ export default function BaseEvents({ className, form, freeze }: EventsProps) {
 
   return (
     <article className={className}>
-      <span className='flex gap-2 pr-2 items-center'>
+      <span className='flex gap-2 items-center pr-2'>
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger className='mb-2' >
             <SelectValue />
@@ -46,9 +46,9 @@ export default function BaseEvents({ className, form, freeze }: EventsProps) {
             <SelectItem value='other'>Other</SelectItem>
           </SelectContent>
         </Select>
-        {!freeze && <ListRestart className='inline-flex align-middle ml-4 cursor-pointer' size={24} onClick={reset} />}
+        {!freeze && <ListRestart className='inline-flex ml-4 align-middle cursor-pointer' size={24} onClick={reset} />}
       </span>
-      <div className='light-scroll h-96 pb-4 gap-4'>
+      <div className='gap-4 pb-4 h-96 light-scroll'>
         <div className={freeze ? 'pointer-events-none' : ''}>
           {(category === 'all' || category === 'challenges') && <Challenges />}
           {(category === 'all' || category === 'advantages') && <Advantages />}

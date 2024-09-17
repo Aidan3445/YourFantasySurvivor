@@ -69,13 +69,13 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, classNam
 
   return (
     <section className={className}>
-      {!orderLocked && <span className='w-full grid grid-cols-2 gap-1'>
+      {!orderLocked && <span className='grid grid-cols-2 gap-1 w-full'>
         <Button onClick={shuffleOrderWithAnimation}>Shuffle</Button>
         <form action={saveOrder}>
           <Button className='w-full' type='submit'>Save</Button>
         </form>
       </span>}
-      <span className='w-full grid grid-cols-2 gap-1'>
+      <span className='grid grid-cols-2 gap-1 w-full'>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -85,16 +85,16 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, classNam
             {order.map((member, index) => {
               const color = member.drafted ? '#AAAAAA' : member.color;
               return (
-                <SortableItem className='grid grid-cols-subgrid col-span-2' key={member.name} id={member.id} disabled={orderLocked}>
+                <SortableItem className='grid col-span-2 grid-cols-subgrid' key={member.name} id={member.id} disabled={orderLocked}>
                   <ColorRow className={cn('w-full tabular-nums', member.drafted ?? 'col-span-2')} color={color}>
                     <h3 style={{ color: getContrastingColor(color) }}>{index + 1} - {member.name}</h3>
                     {!orderLocked &&
                       <GripVertical
-                        className='cursor-row-resize ml-auto'
+                        className='ml-auto cursor-row-resize'
                         color={getContrastingColor(color)} />}
                   </ColorRow>
                   {member.drafted &&
-                    <ColorRow className='text-xs p-1' color={color}>
+                    <ColorRow className='p-1 text-xs' color={color}>
                       {member.drafted}
                     </ColorRow>}
                 </SortableItem>

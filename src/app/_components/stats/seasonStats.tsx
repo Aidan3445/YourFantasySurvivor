@@ -51,7 +51,7 @@ export default function SeasonStats() {
       <Carousel>
         <span className='pb-2 text-center'>
           <h2 className='text-2xl font-semibold'>Season Stats</h2>
-          <DotButtons className='justify-evenly w-full flex h-min p-0' />
+          <DotButtons className='flex justify-evenly p-0 w-full h-min' />
         </span>
         <CarouselContent>
           {carouselItems.map((item, index) => (

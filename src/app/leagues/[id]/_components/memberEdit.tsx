@@ -35,7 +35,7 @@ export default function MemberEdit({ leagueId, color, isOwner }: MemberEditProps
       <HoverCardTrigger onClick={toggleOpen}>
         <SlidersHorizontal size={14} color={color} />
       </HoverCardTrigger>
-      <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700 flex gap-2' sideOffset={10} side='top'>
+      <HoverCardContent className='flex gap-2 p-0.5 w-min text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
         <HoverCardArrow className='absolute -translate-x-1' />
         <EditName leagueId={leagueId} />
         <EditColor leagueId={leagueId} />
@@ -158,7 +158,7 @@ function EditColor({ leagueId }: UpdateProps) {
                 <FormItem>
                   <FormControl>
                     <Swatch
-                      className='justify-center w-28 gap-1 m-2'
+                      className='gap-1 justify-center m-2 w-28'
                       colors={twentyColors}
                       color={field.value}
                       rectProps={{
@@ -307,7 +307,7 @@ export function ManageMember({ leagueId, color, member }: ManageMemberProps) {
       <HoverCardTrigger>
         <UserCog size={14} color={color} />
       </HoverCardTrigger>
-      <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700 flex gap-2' sideOffset={10} side='top'>
+      <HoverCardContent className='flex gap-2 p-0.5 w-min text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
         <HoverCardArrow className='absolute -translate-x-1' />
         <PromoteMember leagueId={leagueId} {...member} />
         <DemoteMember leagueId={leagueId} {...member} />
@@ -359,9 +359,9 @@ function PromoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
       <Popup>
         <form className='flex flex-col gap-1 justify-center' action={catchUpdate}>
           <section>
-            <h3 className='items-center inline-flex gap-1'> Promote
+            <h3 className='inline-flex gap-1 items-center'> Promote
               <span
-                className='px-0.5 inline-flex rounded-md w-min h-min whitespace-nowrap'
+                className='inline-flex px-0.5 w-min whitespace-nowrap rounded-md h-min'
                 style={{ background: color, color: cColor }}>
                 {displayName}
               </span> to {isAdmin ? (
@@ -421,12 +421,12 @@ function DemoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
         <form className='flex flex-col gap-1 justify-center' action={catchUpdate}>
           <section>
             {isAdmin ?
-              <h3 className='items-center inline-flex gap-1'> Revoke
+              <h3 className='inline-flex gap-1 items-center'> Revoke
                 <span className='flex gap-1 items-center'>
                   admin <Shield className='inline-flex' size={16} fill='black' />
                 </span> from
                 <span
-                  className='px-0.5 inline-flex rounded-md w-min h-min whitespace-nowrap'
+                  className='inline-flex px-0.5 w-min whitespace-nowrap rounded-md h-min'
                   style={{ background: color, color: cColor }}>
                   {displayName}
                 </span>?
@@ -434,7 +434,7 @@ function DemoteMember({ leagueId, displayName, isAdmin, color }: ManageProps) {
               <div>
                 <h3 className='flex gap-1'> Boot
                   <span
-                    className='px-0.5 inline-flex rounded-md w-min h-min whitespace-nowrap'
+                    className='inline-flex px-0.5 w-min whitespace-nowrap rounded-md h-min'
                     style={{ background: color, color: cColor }}>
                     {displayName}
                   </span> from the league?
@@ -471,12 +471,12 @@ export function RoleHover({ isAdmin, isOwner, color }: RoleHoverProps) {
   const label = isOwner ? 'League Owner' : isAdmin ? 'League Admin' : null;
 
   return (
-    <div className='ml-auto pl-3'>
+    <div className='pl-3 ml-auto'>
       <HoverCard openDelay={500} closeDelay={0} open={open} onOpenChange={setOpen}>
         <HoverCardTrigger onClick={toggleOpen}>
           {Icon}
         </HoverCardTrigger>
-        <HoverCardContent className='text-xs p-0.5 w-min text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
+        <HoverCardContent className='p-0.5 w-min text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
           <HoverCardArrow className='absolute -translate-x-1' />
           <p className='text-nowrap'>{label}</p>
         </HoverCardContent>

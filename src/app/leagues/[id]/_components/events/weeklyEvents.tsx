@@ -124,8 +124,8 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
         </div>
         {updateEvent &&
           <span className='flex gap-2'>
-            <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
-            <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
+            <CopyPlus className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={copyEvent} />
+            <SquareX className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={deleteEvent} />
           </span>}
       </span>
       <span className='flex gap-2 items-center'>
@@ -157,7 +157,7 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
       <div>
         <Label>Type</Label>
         <Select value={event.type} onValueChange={(value) => update({ ...newEvent, type: value as 'vote' | 'predict' })}>
-          <SelectTrigger className='w-full mt-0'>
+          <SelectTrigger className='mt-0 w-full'>
             <SelectValue placeholder='Type' />
           </SelectTrigger>
           <SelectContent>

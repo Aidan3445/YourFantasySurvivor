@@ -13,7 +13,7 @@ interface MembersProps {
 
 export default function Members({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   return (
-    <div className='grid gap-1 auto-cols-min'>
+    <div className='grid auto-cols-min gap-1'>
       {members.map((member) => {
         const cColor = getContrastingColor(member.color);
         return (
@@ -38,7 +38,7 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull }: Me
                 color={cColor} />
             </ColorRow>
             {member.drafted ?
-              <ColorRow color={member.color} className='text-xs py-1'>
+              <ColorRow color={member.color} className='py-1 text-xs'>
                 <h3 style={{ color: cColor }}>{member.drafted}</h3>
               </ColorRow> :
               <br />}

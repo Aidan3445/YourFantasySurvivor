@@ -114,8 +114,8 @@ export function SeasonEvent({ event, eventIndex, updateEvent, className }: Seaso
         </div>
         {updateEvent &&
           <span className='flex gap-2'>
-            <CopyPlus className='inline-flex align-middle rounded-md mt-6' size={24} onClick={copyEvent} />
-            <SquareX className='inline-flex align-middle rounded-md mt-6' size={24} onClick={deleteEvent} />
+            <CopyPlus className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={copyEvent} />
+            <SquareX className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={deleteEvent} />
           </span>}
       </span>
       <span className='flex gap-2 items-center'>
@@ -147,7 +147,7 @@ export function SeasonEvent({ event, eventIndex, updateEvent, className }: Seaso
       <div>
         <Label>Timing</Label>
         <Select value={event.timing ?? ''} onValueChange={(value) => saveEvent({ ...newEvent, timing: value as 'premiere' | 'merge' | 'finale' })}>
-          <SelectTrigger className='w-full mt-0'>
+          <SelectTrigger className='mt-0 w-full'>
             <SelectValue placeholder='Timing' />
           </SelectTrigger>
           <SelectContent>

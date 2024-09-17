@@ -46,7 +46,7 @@ export default function Chart({ data }: ScoreChartProps) {
   );
 
   return (
-    <div className='col-span-3 h-full w-full rounded-lg border border-black bg-b4/50'>
+    <div className='col-span-3 w-full h-full rounded-lg border border-black bg-b4/50'>
       <ResponsiveContainer>
         <LineChart
           id='score-chart'
@@ -153,7 +153,7 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
   }
 
   return (
-    <div className='flex flex-col rounded-md border border-black bg-b3/80 p-1'>
+    <div className='flex flex-col p-1 rounded-md border border-black bg-b3/80'>
       <div>Episode {label}:</div>
       <Separator />
       <div className='grid gap-2'>
@@ -161,7 +161,7 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
           {firstSet.map((p) => (
             <span
               key={p.dataKey}
-              className='flex justify-between gap-2'
+              className='flex gap-2 justify-between'
               style={{ color: p.stroke, stroke: 'black' }}
             >
               <span id={`tooltip-${p.dataKey}`}> {p.dataKey}: </span>
@@ -170,11 +170,11 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
           ))}
         </div>
         {secondSet.length > 0 && (
-          <div className='col-start-2 border-l border-black pl-2'>
+          <div className='col-start-2 pl-2 border-l border-black'>
             {secondSet.map((p) => (
               <span
                 key={p.dataKey}
-                className='flex justify-between gap-2'
+                className='flex gap-2 justify-between'
                 style={{ color: p.stroke, stroke: 'black' }}
               >
                 <span id={`tooltip-${p.dataKey}`}> {p.dataKey}: </span>
