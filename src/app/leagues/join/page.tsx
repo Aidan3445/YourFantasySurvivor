@@ -18,6 +18,7 @@ export default function AutoJoin() {
   const searchParams = useSearchParams();
   const name = searchParams.get('name');
   const password = searchParams.get('password');
+  console.log(name, password);
 
   const form = useForm<z.infer<typeof joinSchema>>({
     resolver: zodResolver(joinSchema),
@@ -25,6 +26,7 @@ export default function AutoJoin() {
 
   const joinAction = () => {
     if (!name || !password) return;
+    console.log('joinAction', form.getValues().displayName);
 
     const join = joinLeague.bind(null, name, password, form.getValues().displayName);
 
@@ -57,10 +59,10 @@ export default function AutoJoin() {
             <h3 className='text-2xl font-bold'>Join the League</h3>
             <FormField
               name='displayName'
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Input type='text' name='displayName' placeholder='Display Name' />
+                    <Input type='text' placeholder='Display Name' {...field} />
                   </FormControl>
                 </FormItem>
               )} />
