@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import { type Predictions } from '~/app/api/leagues/[id]/draft/query';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { AlertDialog, AlertDialogContent, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription } from '~/app/_components/commonUI/alert';
+import { PredictionCard } from '../../_components/settings/predictionCard';
 
 export interface DraftFormProps extends ComponentProps {
   leagueId: number;
@@ -180,21 +181,23 @@ export default function DraftForm({
             <div className='flex flex-col gap-1'>
               {castaway?.map((c, index) => (
                 <FormItem key={c.id} className='justify-center flex flex-col rounded-md my-0'>
-                  <FormControl>
-                    <FormField
-                      name={`castaway[${index}]`}
-                      defaultValue={currentPicks.castawayPicks?.[index]}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} {...field}>
-                          <SelectTrigger>
-                            <div className='flex-grow'>
-                              <SelectValue placeholder='Choose a Castaway' />
-                              <FormMessage className='text-left pl-8'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
-                            </div>
-                          </SelectTrigger>
-                          <SelectCastawaysByTribe castawaysByTribe={castawaysByTribe} />
-                        </Select>)} />
-                  </FormControl>
+                  <PredictionCard prediction={c} >
+                    <FormControl>
+                      <FormField
+                        name={`castaway[${index}]`}
+                        defaultValue={currentPicks.castawayPicks?.[index]}
+                        render={({ field }) => (
+                          <Select onValueChange={field.onChange} {...field}>
+                            <SelectTrigger className='w-full'>
+                              <div className='flex-grow text-nowrap'>
+                                <SelectValue placeholder='Choose a Castaway' />
+                                <FormMessage className='text-left pl-8'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
+                              </div>
+                            </SelectTrigger>
+                            <SelectCastawaysByTribe castawaysByTribe={castawaysByTribe} />
+                          </Select>)} />
+                    </FormControl>
+                  </PredictionCard>
                 </FormItem>))}
             </div>
           </div>}
@@ -205,29 +208,31 @@ export default function DraftForm({
             <div className='flex flex-col gap-1'>
               {tribe?.map((t, index) => (
                 <FormItem key={t.id} className='justify-center flex flex-col rounded-md my-0'>
-                  <FormControl>
-                    <FormField
-                      name={`tribe[${index}]`}
-                      defaultValue={currentPicks.tribePicks?.[index]}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} {...field} >
-                          <SelectTrigger>
-                            <div className='flex-grow'>
-                              <SelectValue placeholder='Choose a Tribe' />
-                              <FormMessage className='text-left pl-12'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
-                            </div>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {options.tribes.map((pick) => (
-                              <SelectItem key={pick.name} className='block w-full pr-6' value={pick.name}>
-                                <ColorRow color={pick.color}>
-                                  <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.name}</h3>
-                                </ColorRow>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>)} />
-                  </FormControl>
+                  <PredictionCard prediction={t} >
+                    <FormControl>
+                      <FormField
+                        name={`tribe[${index}]`}
+                        defaultValue={currentPicks.tribePicks?.[index]}
+                        render={({ field }) => (
+                          <Select onValueChange={field.onChange} {...field} >
+                            <SelectTrigger className='w-full'>
+                              <div className='flex-grow text-nowrap'>
+                                <SelectValue placeholder='Choose a Tribe' />
+                                <FormMessage className='text-left pl-12'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {options.tribes.map((pick) => (
+                                <SelectItem key={pick.name} className='block w-full pr-6' value={pick.name}>
+                                  <ColorRow color={pick.color}>
+                                    <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.name}</h3>
+                                  </ColorRow>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>)} />
+                    </FormControl>
+                  </PredictionCard>
                 </FormItem>))}
             </div>
           </div>}
@@ -238,32 +243,34 @@ export default function DraftForm({
             <div className='flex flex-col gap-1'>
               {member?.map((m, index) => (
                 <FormItem key={m.id} className='justify-center flex flex-col rounded-md my-0'>
-                  <FormControl>
-                    <FormField
-                      name={`member[${index}]`}
-                      defaultValue={currentPicks.memberPicks?.[index]}
-                      render={({ field }) => (
-                        <Select onValueChange={field.onChange} {...field}>
-                          <SelectTrigger>
-                            <div className='flex-grow'>
-                              <SelectValue placeholder='Choose a Member' />
-                              <FormMessage className='text-left pl-[38px]'>{form.formState.errors.member?.[index]?.message}</FormMessage>
-                            </div>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {options.members.map((pick) => {
-                              if (pick.loggedIn) return null;
-                              return (
-                                <SelectItem key={pick.displayName} className='block w-full pr-6' value={pick.displayName}>
-                                  <ColorRow color={pick.color}>
-                                    <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.displayName}</h3>
-                                  </ColorRow>
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>)} />
-                  </FormControl>
+                  <PredictionCard prediction={m} >
+                    <FormControl>
+                      <FormField
+                        name={`member[${index}]`}
+                        defaultValue={currentPicks.memberPicks?.[index]}
+                        render={({ field }) => (
+                          <Select onValueChange={field.onChange} {...field}>
+                            <SelectTrigger className='w-full'>
+                              <div className='flex-grow text-nowrap'>
+                                <SelectValue placeholder='Choose a Member' />
+                                <FormMessage className='text-left pl-[38px]'>{form.formState.errors.member?.[index]?.message}</FormMessage>
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {options.members.map((pick) => {
+                                if (pick.loggedIn) return null;
+                                return (
+                                  <SelectItem key={pick.displayName} className='block w-full pr-6' value={pick.displayName}>
+                                    <ColorRow color={pick.color}>
+                                      <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.displayName}</h3>
+                                    </ColorRow>
+                                  </SelectItem>
+                                );
+                              })}
+                            </SelectContent>
+                          </Select>)} />
+                    </FormControl>
+                  </PredictionCard>
                 </FormItem>))}
             </div>
           </div>}
