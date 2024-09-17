@@ -160,19 +160,21 @@ export default function DraftForm({
           defaultValue={currentPicks.firstPick}
           render={({ field }) => (
             <FormItem className='justify-center flex flex-col rounded-md my-0'>
-              <FormControl>
-                <Select onValueChange={field.onChange} {...field}>
-                  <SelectTrigger className='w-full' disabled={!yourTurn}>
-                    <div className='flex-grow text-nowrap'>
-                      <SelectValue className='px-0' placeholder='Choose your Survivor' />
-                      <FormMessage className='text-left pl-5'>{form.formState.errors.firstPick?.message}</FormMessage>
-                    </div>
-                  </SelectTrigger>
-                  <SelectCastawaysByTribe
-                    castawaysByTribe={castawaysByTribe}
-                    otherChoices={currentPicks.firstPick ? undefined : options.unavailable} />
-                </Select>
-              </FormControl>
+              <PredictionCard prediction={survivorPrediction}>
+                <FormControl>
+                  <Select onValueChange={field.onChange} {...field}>
+                    <SelectTrigger className='w-full' disabled={!yourTurn}>
+                      <div className='flex-grow text-nowrap'>
+                        <SelectValue className='px-0' placeholder='Choose your Survivor' />
+                        <FormMessage className='text-left pl-5'>{form.formState.errors.firstPick?.message}</FormMessage>
+                      </div>
+                    </SelectTrigger>
+                    <SelectCastawaysByTribe
+                      castawaysByTribe={castawaysByTribe}
+                      otherChoices={currentPicks.firstPick ? undefined : options.unavailable} />
+                  </Select>
+                </FormControl>
+              </PredictionCard>
             </FormItem>)} />
         {castaway &&
           <div>
@@ -365,3 +367,10 @@ function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastaw
     </SelectContent>
   );
 }
+
+
+const survivorPrediction = {
+  name: 'Main Survivor',
+  points: 0,
+  description: 'Your main castaway that will earn you points for each episode',
+} as SeasonEventRuleType;

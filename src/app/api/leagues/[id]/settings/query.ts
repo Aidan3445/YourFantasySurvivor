@@ -40,7 +40,7 @@ export async function getDraftedSurvivor(leagueId: number, memberId: number) {
     .select({
       name: leagueMembers.displayName,
       color: leagueMembers.color,
-      drafted: castaways.name
+      drafted: castaways.shortName
     })
     .from(leagueMembers)
     .leftJoin(selectionUpdates, and(
