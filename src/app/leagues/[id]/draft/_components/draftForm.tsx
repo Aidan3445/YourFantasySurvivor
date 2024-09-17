@@ -164,9 +164,9 @@ export default function DraftForm({
             <FormItem className='justify-center flex flex-col rounded-md my-0'>
               <FormControl>
                 <Select onValueChange={field.onChange} {...field}>
-                  <SelectTrigger disabled={currentPicks.firstPick !== undefined}>
-                    <div className='flex-grow'>
-                      <SelectValue placeholder='Choose your Survivor' />
+                  <SelectTrigger className='w-full' disabled={currentPicks.firstPick !== undefined}>
+                    <div className='flex-grow text-nowrap'>
+                      <SelectValue className='px-0' placeholder='Choose your Survivor' />
                       <FormMessage className='text-left pl-5'>{form.formState.errors.firstPick?.message}</FormMessage>
                     </div>
                   </SelectTrigger>

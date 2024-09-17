@@ -24,7 +24,7 @@ export default async function LeagueScoring({ league, ownerLoggedIn, className, 
         <CardContainer className='flex flex-col gap-1 p-6 pb-0 transition-all'>
           <h2 className='text-2xl text-center font-semibold'>League Event Scoring</h2>
           <Tabs defaultValue='base'>
-            <TabsList className='w-full grid grid-flow-col auto-cols-fr'>
+            <TabsList className='w-full grid grid-flow-col md:auto-cols-fr'>
               <TabsTrigger value='base'>Base</TabsTrigger>
               <TabsTrigger value='custom'>Custom</TabsTrigger>
               <TabsTrigger value='weekly'>Weekly</TabsTrigger>
