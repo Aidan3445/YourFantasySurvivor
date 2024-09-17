@@ -5,8 +5,8 @@ import CardContainer from '~/app/_components/cardContainer';
 import { ArrowDown } from 'lucide-react';
 import Image from 'next/image';
 import { Separator } from '~/app/_components/commonUI/separator';
-import { type CastawayDetails } from '~/app/api/seasons/[name]/castaways/query';
 import { type CastawayEvent } from '~/app/api/seasons/[name]/events/query';
+import { type CastawayDetails } from '~/server/db/schema/castaways';
 
 interface CastawayPageProps {
   searchParams: { season?: string, castaway?: string };

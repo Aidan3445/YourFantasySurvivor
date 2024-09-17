@@ -10,12 +10,12 @@ export async function updateDraftOrder(leagueId: number, order: string[]) {
   if (!user.userId) throw new Error('User not authenticated');
 
   const ids = (await Promise.all(order.map((name) => db
-    .select({ id: leagueMembers.userId })
+    .select({ id: leagueMembers.id })
     .from(leagueMembers)
     .where(and(
       eq(leagueMembers.league, leagueId),
       eq(leagueMembers.displayName, name))))))
-    .map((res) => res[0]?.id) as string[];
+    .map((res) => res[0]?.id) as number[];
 
   await db
     .update(leagueSettings)

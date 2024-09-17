@@ -1,8 +1,9 @@
-import { type CastawayDetails, getCastaways } from '~/app/api/seasons/[name]/castaways/query';
+import { getCastaways } from '~/app/api/seasons/[name]/castaways/query';
 import CardContainer from '~/app/_components/cardContainer';
 import Image from 'next/image';
 import { cn } from '~/lib/utils';
 import { ArrowDown } from 'lucide-react';
+import { type CastawayDetails } from '~/server/db/schema/castaways';
 
 interface CastawaysProps {
   season: string;
@@ -10,7 +11,7 @@ interface CastawaysProps {
 
 export default async function Castaways({ season }: CastawaysProps) {
 
-  const castaways = await getCastaways(season, null);
+  const castaways = await getCastaways(season);
 
   return (
     <div>
