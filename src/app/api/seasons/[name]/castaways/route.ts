@@ -5,7 +5,7 @@ import { getCastaways } from './query';
 export async function GET(req: NextRequest, { params }: { params: { name: string } }) {
   const seasonName = params.name;
   const searchParams = req.nextUrl.searchParams;
-  const castawayName = searchParams.get('castaway');
+  const castawayName = searchParams.get('castaway') ?? undefined;
 
   const castawayDetails = await getCastaways(seasonName, castawayName);
 

@@ -83,7 +83,7 @@ export async function getCurrentPredictions(
         eq(users.userId, userId)))
       .innerJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
       .innerJoin(castaways, eq(seasonCastaways.castaway, castaways.id))
-      .where(eq(seasonEvents.rule, rule.id))
+      .where(eq(seasonEvents.rule, rule.id!))
       .then((res) => res[0]?.castaway)) : []),
 
     Promise.all(tribe ? tribe.map((rule) => db
@@ -94,7 +94,7 @@ export async function getCurrentPredictions(
         eq(users.userId, userId)))
       .innerJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
       .innerJoin(tribes, eq(seasonTribes.tribe, tribes.id))
-      .where(eq(seasonEvents.rule, rule.id))
+      .where(eq(seasonEvents.rule, rule.id!))
       .then((res) => res[0]?.tribe)) : []),
 
     Promise.all(member ? member.map((rule) => db
@@ -105,7 +105,7 @@ export async function getCurrentPredictions(
         eq(users.userId, userId)))
       .innerJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
       .innerJoin(leagueMembers, eq(seasonMembers.member, leagueMembers.id))
-      .where(eq(seasonEvents.rule, rule.id))
+      .where(eq(seasonEvents.rule, rule.id!))
       .then((res) => res[0]?.member)) : [])
   ]);
 
