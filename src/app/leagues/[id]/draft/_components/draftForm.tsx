@@ -46,7 +46,9 @@ export default function DraftForm({
   className
 }: DraftFormProps) {
   const draftSchema = z.object({
-    firstPick: z.string(),
+    firstPick: z.string().optional().refine(
+      (value) => value ?? !yourTurn,
+      { message: 'Required' }),
     secondPick: z.string().optional().refine(
       (value) => value ?? pickCount === 1,
       { message: 'Required' }),
@@ -74,11 +76,6 @@ export default function DraftForm({
     const data = form.getValues();
 
     const firstPickId = options.castaways.find((c) => c.name === data.firstPick)?.id;
-
-    if (!firstPickId) {
-      form.setError('firstPick', { message: 'Invalid castaway' });
-      return;
-    }
 
     const submission = { firstPick: firstPickId, castaway: {}, tribe: {}, member: {} } as Picks;
     castaway?.forEach((event, index) => {
@@ -164,7 +161,7 @@ export default function DraftForm({
             <FormItem className='justify-center flex flex-col rounded-md my-0'>
               <FormControl>
                 <Select onValueChange={field.onChange} {...field}>
-                  <SelectTrigger className='w-full' disabled={currentPicks.firstPick !== undefined}>
+                  <SelectTrigger className='w-full' disabled={!yourTurn}>
                     <div className='flex-grow text-nowrap'>
                       <SelectValue className='px-0' placeholder='Choose your Survivor' />
                       <FormMessage className='text-left pl-5'>{form.formState.errors.firstPick?.message}</FormMessage>

@@ -7,7 +7,7 @@ import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { seasonCastaways, seasonEvents, seasonMembers, seasonTribes } from '~/server/db/schema/seasonEvents';
 
 export interface Picks {
-  firstPick: number;
+  firstPick?: number;
   secondPick?: number;
   castaway: Record<number, number>;
   tribe: Record<number, number>;
@@ -28,9 +28,11 @@ export async function submitDraft(leagueId: number, picks: Picks) {
   if (!memberId) throw new Error('Member not found');
 
   // initial pick (cannot be changed via draft form)
-  await db.insert(selectionUpdates)
-    .values({ member: memberId, episode: null, castaway: picks.firstPick })
-    .onConflictDoNothing();
+  if (picks.firstPick) {
+    await db.insert(selectionUpdates)
+      .values({ member: memberId, episode: null, castaway: picks.firstPick })
+      .onConflictDoNothing();
+  }
 
   // predictions
   await Promise.all([
