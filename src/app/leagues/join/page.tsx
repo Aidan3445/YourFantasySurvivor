@@ -18,15 +18,13 @@ export default function AutoJoin() {
   const searchParams = useSearchParams();
   const name = searchParams.get('name');
   const password = searchParams.get('password');
-  console.log(name, password);
 
   const form = useForm<z.infer<typeof joinSchema>>({
     resolver: zodResolver(joinSchema),
   });
 
   const joinAction = () => {
-    if (!name || !password) return;
-    console.log('joinAction', form.getValues().displayName);
+    if (!name || !password || !(form.getValues()?.displayName.length > 3)) return;
 
     const join = joinLeague.bind(null, name, password, form.getValues().displayName);
 
