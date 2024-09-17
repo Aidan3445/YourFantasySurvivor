@@ -25,7 +25,8 @@ export default function AutoJoin() {
   });
 
   const joinAction = () => {
-    if (!name || !password) return;
+    if (!name || !password || !(form.getValues().displayName?.length > 3)) return;
+
     console.log('joinAction', form.getValues().displayName);
 
     const join = joinLeague.bind(null, name, password, form.getValues().displayName);

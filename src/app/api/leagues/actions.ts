@@ -63,7 +63,7 @@ export async function leaveLeague(leagueId: number) {
         eq(leagueMembers.league, leagueId),
       ),
     )
-    .returning({ name: leagueMembers.displayName });
+    .returning({ name: leagueMembers.displayName, id: leagueMembers.id });
 
   if (member.length === 0) throw new Error('User cannot leave league as owner');
 
@@ -72,7 +72,7 @@ export async function leaveLeague(leagueId: number) {
     .select({ draftOrder: leagueSettings.draftOrder })
     .from(leagueSettings)
     .where(eq(leagueSettings.league, leagueId))
-    .then((res) => res[0]?.draftOrder ?? [])).filter(id => id !== user.userId);
+    .then((res) => res[0]?.draftOrder ?? [])).filter(id => id !== member[0]!.id);
   await db
     .update(leagueSettings)
     .set({ draftOrder })
