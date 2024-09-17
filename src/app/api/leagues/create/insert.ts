@@ -2,7 +2,7 @@
 import { auth } from '@clerk/nextjs/server';
 import { db } from '~/server/db';
 import { baseEventRules, defaultBaseRules, leagues, type LeagueInsert } from '~/server/db/schema/leagues';
-import { insertMember } from '../join/insert';
+import { insertMember } from '../join/actions';
 import { newLeagueSettings } from '../[id]/settings/insert';
 import { eq } from 'drizzle-orm';
 
