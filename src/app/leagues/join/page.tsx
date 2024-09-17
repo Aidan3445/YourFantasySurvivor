@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { Button } from '~/app/_components/commonUI/button';
 import { Form, FormControl, FormField, FormItem } from '~/app/_components/commonUI/form';
 import { Input } from '~/app/_components/commonUI/input';
+import { useToast } from '~/app/_components/commonUI/use-toast';
 import { joinLeague } from '~/app/api/leagues/join/actions';
 
 const joinSchema = z.object({
@@ -15,20 +16,17 @@ const joinSchema = z.object({
 
 export default function AutoJoin() {
   const router = useRouter();
+  const { toast } = useToast();
   const searchParams = useSearchParams();
   const name = searchParams.get('name');
   const password = searchParams.get('password');
-  console.log(name, password);
 
   const form = useForm<z.infer<typeof joinSchema>>({
     resolver: zodResolver(joinSchema),
   });
 
   const joinAction = () => {
-    if (!name || !password || !(form.getValues().displayName?.length > 3)) return;
-
-    console.log('joinAction', form.getValues().displayName);
-
+    if (!name || !password) return;
     const join = joinLeague.bind(null, name, password, form.getValues().displayName);
 
     join()
@@ -36,7 +34,13 @@ export default function AutoJoin() {
         router.push(`/leagues/${leagueId}`);
       })
       .catch((error) => {
-        console.error(error);
+        if (error instanceof Error) {
+          toast({
+            title: 'Failed to join league',
+            description: error.message,
+            variant: 'error',
+          });
+        }
       });
   };
 
@@ -44,14 +48,14 @@ export default function AutoJoin() {
     <>
       <SignedOut>
         <SignInButton>
-          <Button className='mt-20 scale-150 flex gap-1 pb-1'>
+          <Button className='mt-20 scale-150 flex gap-1 pb-1' >
             <div className='animate-bounce inline'> Sign </div>
             <div className='animate-bounce inline delay-100'> in </div>
             <div className='animate-bounce inline delay-200'> to </div>
             <div className='animate-bounce inline delay-300'> join </div>
             <div className='animate-bounce inline delay-400'> the </div>
             <div className='animate-bounce inline delay-500'> league </div>
-          </Button>
+          </Button >
         </SignInButton>
       </SignedOut>
       <SignedIn>
