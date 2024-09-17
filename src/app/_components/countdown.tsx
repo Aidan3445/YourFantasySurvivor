@@ -12,6 +12,7 @@ interface CountdownProps extends ComponentProps {
 
 export default function Countdown({ endDate, children, className }: CountdownProps) {
   const [timer, setTimer] = useState(endDate.getTime() - Date.now());
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (timer <= 0) return;
@@ -31,8 +32,10 @@ export default function Countdown({ endDate, children, className }: CountdownPro
   return (
     timer > 0 ?
       <span className={cn('w-full flex', className)}>
-        <HoverCard openDelay={100}>
-          <HoverCardTrigger className='flex-grow tabular-nums'>
+        <HoverCard openDelay={100} open={open} onOpenChange={setOpen}>
+          <HoverCardTrigger
+            className='flex-grow tabular-nums'
+            onClick={() => setOpen(!open)}>
             {days}:
             {String(hours).padStart(2, '0')}:
             {String(minutes).padStart(2, '0')}:
