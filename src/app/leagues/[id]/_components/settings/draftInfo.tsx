@@ -11,16 +11,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/comm
 import { PredictionCard } from './predictionCard';
 
 export default async function DraftInfo({ league, ownerLoggedIn, className }: LeagueOwnerProps) {
-  const [settings, { season, weekly }] = await Promise.all([
+  const [settings, { season }] = await Promise.all([
     getLeagueSettings(league.id),
     getRules(league.id)
   ]);
 
-  //if (settings.draftOver) return null;
-
-  const preseasonPredictions = [
-    ...season.filter((rule) => rule.timing === 'premiere'),
-    ...weekly.filter((rule) => rule.type === 'predict')];
+  const preseasonPredictions = season.filter((rule) => rule.timing === 'premiere');
 
   const orderLocked = !ownerLoggedIn || settings.draftDate < new Date();
 
@@ -28,7 +24,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
     <Popover>
       <PopoverCenter />
       <PopoverTrigger className={cn(className, 'hs-in p-1 rounded-md')}>
-        Draft
+        {settings.draftOver && 'View'} Draft
       </PopoverTrigger>
       <PopoverContent>
         <CardContainer className='flex flex-col gap-1 p-6 transition-all'>
@@ -39,7 +35,11 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
               <TabsTrigger value='predictions'>Predictions</TabsTrigger>
             </TabsList>
             <TabsContent value='order'>
-              <DraftOrder leagueId={league.id} draftOrder={settings.draftOrder} orderLocked={orderLocked} className='flex flex-col gap-1 w-full' />
+              <DraftOrder
+                className='flex flex-col gap-1 w-full'
+                leagueId={league.id}
+                orderLocked={orderLocked}
+                {...settings} />
             </TabsContent>
             <TabsContent value='predictions'>
               <section className='flex flex-col gap-1 h-80 light-scroll'>

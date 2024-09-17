@@ -33,6 +33,7 @@ export interface DraftFormProps extends ComponentProps {
     unavailable: CastawayDetails[];
   };
   yourTurn: boolean;
+  draftOver: boolean;
 }
 
 export default function DraftForm({
@@ -44,6 +45,7 @@ export default function DraftForm({
   member,
   options,
   yourTurn,
+  draftOver,
   className
 }: DraftFormProps) {
   const draftSchema = z.object({
@@ -148,9 +150,11 @@ export default function DraftForm({
     );
   };
 
+  console.log(options);
+
   return (
     <Form {...form}>
-      {getAlert()}
+      {!draftOver && getAlert()}
       <form
         className={className}
         action={submitPicks}>
@@ -190,7 +194,7 @@ export default function DraftForm({
                         defaultValue={currentPicks.castawayPicks?.[index]}
                         render={({ field }) => (
                           <Select onValueChange={field.onChange} {...field}>
-                            <SelectTrigger className='w-full'>
+                            <SelectTrigger className='w-full' disabled={draftOver}>
                               <div className='flex-grow text-nowrap'>
                                 <SelectValue placeholder='Choose a Castaway' />
                                 <FormMessage className='pl-8 text-left'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
@@ -217,7 +221,7 @@ export default function DraftForm({
                         defaultValue={currentPicks.tribePicks?.[index]}
                         render={({ field }) => (
                           <Select onValueChange={field.onChange} {...field} >
-                            <SelectTrigger className='w-full'>
+                            <SelectTrigger className='w-full' disabled={draftOver}>
                               <div className='flex-grow text-nowrap'>
                                 <SelectValue placeholder='Choose a Tribe' />
                                 <FormMessage className='pl-12 text-left'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
@@ -252,7 +256,7 @@ export default function DraftForm({
                         defaultValue={currentPicks.memberPicks?.[index]}
                         render={({ field }) => (
                           <Select onValueChange={field.onChange} {...field}>
-                            <SelectTrigger className='w-full'>
+                            <SelectTrigger className='w-full' disabled={draftOver}>
                               <div className='flex-grow text-nowrap'>
                                 <SelectValue placeholder='Choose a Member' />
                                 <FormMessage className='text-left pl-[38px]'>{form.formState.errors.member?.[index]?.message}</FormMessage>
@@ -277,11 +281,12 @@ export default function DraftForm({
             </div>
           </div>}
         <span className='flex gap-2 justify-center'>
-          <Button type='submit' className='mt-4'>
-            {currentPicks.firstPick ? 'Update and return' : 'Submit Picks'}
-          </Button>
+          {!draftOver &&
+            <Button type='submit' className='mt-4'>
+              {currentPicks.firstPick ? 'Update and return' : 'Submit Picks'}
+            </Button>}
           <Button type='button' onClick={() => router.push(`/leagues/${leagueId}/`)} className='mt-4'>
-            Cancel
+            {draftOver ? 'Back' : 'Cancel'}
           </Button>
         </span>
       </form >

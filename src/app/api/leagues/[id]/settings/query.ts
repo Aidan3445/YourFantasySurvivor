@@ -3,8 +3,9 @@ import { auth } from '@clerk/nextjs/server';
 import { and, eq, isNull } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
-import { leagueSettings } from '~/server/db/schema/leagues';
+import { leagues, leagueSettings } from '~/server/db/schema/leagues';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
+import { seasons } from '~/server/db/schema/seasons';
 
 export async function getLeagueSettings(leagueId: number) {
   const user = auth();
@@ -23,6 +24,17 @@ export async function getLeagueSettings(leagueId: number) {
 
   if (!settings) throw new Error('League settings not found');
 
+  const draftOver = await db.select({ premiere: seasons.premierDate })
+    .from(seasons)
+    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .innerJoin(leagueSettings, eq(leagueSettings.league, leagues.id))
+    .where(eq(leagueSettings.league, leagueId))
+    .then((res) => res[0]?.premiere)
+    .then((premiere) => {
+      if (!premiere) throw new Error('Season premiere date not found');
+      return new Date(premiere) < new Date();
+    });
+
   const draftOrder = (await Promise.all(settings.draftOrder
     .map((memberId: number) => getDraftedSurvivor(leagueId, memberId))))
     .filter((member) => member.name && member.color) as {
@@ -32,7 +44,7 @@ export async function getLeagueSettings(leagueId: number) {
     }[];
   if (draftOrder.length !== settings.draftOrder.length) throw new Error('Draft order not found');
 
-  return { ...settings, draftOrder, draftDate: new Date(settings.draftDate) };
+  return { ...settings, draftOrder, draftDate: new Date(settings.draftDate), draftOver };
 }
 
 export async function getDraftedSurvivor(leagueId: number, memberId: number) {

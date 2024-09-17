@@ -38,19 +38,19 @@ export async function getDraftDetails(leagueId: number) {
     getTribes(league.league.season),
   ]);
 
-  const nextTurn = settings.draftOrder.find((member) => !member.drafted) ?? settings.draftOrder[0]!;
+  const nextTurn = settings.draftOrder.find((member) => !member.drafted);
 
-  const yourTurn = await db
-    .selectDistinct({ yourTurn: leagueMembers.id })
-    .from(leagueMembers)
-    .where(and(
-      eq(leagueMembers.league, leagueId),
-      eq(leagueMembers.userId, userId),
-      eq(leagueMembers.displayName, nextTurn.name)))
-    .limit(1)
-    .then((res) => res.length > 0);
-
-  console.log(yourTurn);
+  const yourTurn = nextTurn
+    ? await db
+      .selectDistinct({ yourTurn: leagueMembers.id })
+      .from(leagueMembers)
+      .where(and(
+        eq(leagueMembers.league, leagueId),
+        eq(leagueMembers.userId, userId),
+        eq(leagueMembers.displayName, nextTurn.name)))
+      .limit(1)
+      .then((res) => res.length > 0)
+    : false;
 
   return { league, settings, predictions, castaways, tribes, yourTurn };
 }

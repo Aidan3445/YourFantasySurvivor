@@ -17,12 +17,13 @@ interface DraftOrderProps extends ComponentProps {
   leagueId: number;
   draftOrder: { name: string, color: string, drafted: string | null }[];
   orderLocked: boolean;
+  draftOver: boolean;
 }
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 2;
 
-export default function DraftOrder({ leagueId, draftOrder, orderLocked, className }: DraftOrderProps) {
+export default function DraftOrder({ leagueId, draftOrder, orderLocked, draftOver, className }: DraftOrderProps) {
   const [order, setOrder] = useState(draftOrder
     .map((member) => ({ ...member, id: member.name as UniqueIdentifier })));
   const sensors = useSensors(useSensor(PointerSensor));
@@ -83,7 +84,7 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, classNam
           onDragEnd={(event) => handleDragEnd(event, setOrder)}>
           <SortableContext items={order} strategy={verticalListSortingStrategy}>
             {order.map((member, index) => {
-              const color = member.drafted ? '#AAAAAA' : member.color;
+              const color = member.drafted && !draftOver ? '#AAAAAA' : member.color;
               return (
                 <SortableItem className='grid col-span-2 grid-cols-subgrid' key={member.name} id={member.id} disabled={orderLocked}>
                   <ColorRow className={cn('w-full tabular-nums', member.drafted ?? 'col-span-2')} color={color}>
@@ -95,7 +96,7 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, classNam
                   </ColorRow>
                   {member.drafted &&
                     <ColorRow className='p-1 text-xs' color={color}>
-                      {member.drafted}
+                      <h3 style={{ color: getContrastingColor(color) }}>{member.drafted}</h3>
                     </ColorRow>}
                 </SortableItem>
               );

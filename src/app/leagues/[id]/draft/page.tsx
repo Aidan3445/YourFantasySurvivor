@@ -22,18 +22,19 @@ export default async function League({ params }: PageProps) {
       castaways,
       tribes,
       members: league.members,
-      unavailable: castaways.filter((c) => settings.draftOrder.some((d) => d.drafted === c.name)),
+      unavailable: castaways.filter((c) => settings.draftOrder.some((d) => d.drafted === c.more.shortName))
     },
-    yourTurn
+    yourTurn,
+    draftOver: settings.draftOver
   } as DraftFormProps;
 
   return (
     <main>
       <h1 className='text-3xl font-semibold'>League Draft</h1>
       <article className='grid gap-10 md:grid-cols-2'>
-        <section className='flex sticky top-32 flex-col justify-center self-start'>
+        <section className='flex md:sticky top-32 flex-col justify-center self-start'>
           <h3 className='text-xl font-semibold text-center'>Draft Order</h3>
-          <DraftOrder leagueId={leagueId} draftOrder={settings.draftOrder} orderLocked />
+          <DraftOrder leagueId={leagueId} {...settings} orderLocked />
         </section>
         <DraftForm className='items-stretch text-center' {...preseasonPredictions} />
       </article>
