@@ -7,6 +7,10 @@ body  {
     @apply bg-gradient-to-b from-b3 to-b1 min-h-screen;
 }
 
+* {
+    @apply text-black;
+}
+
 /* Responsive padding and margin */
 @media (min-width: 640px) { /* Adjust numbers based on your design preferences */
     .page {
@@ -54,7 +58,7 @@ main {
 
 /* Main scroll */
 ::-webkit-scrollbar {
-    @apply w-4 h-4;
+    @apply w-2;
 }
 
 ::-webkit-scrollbar-track {
@@ -62,7 +66,7 @@ main {
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-200/50 rounded-md w-1;
+    @apply bg-zinc-200/70 rounded-md;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -70,17 +74,38 @@ main {
 }
 
 /* Stats scroll */
+.stats-scroll {
+    @apply flex overscroll-contain flex-col h-40;
+    overflow-y: auto;
+}
+
 .stats-scroll::-webkit-scrollbar-track {
     background: transparent;
 }
 
+/* Light scroll */
+.light-scroll {
+    @apply flex overscroll-contain flex-col;
+    overflow-y: auto;
+}
+
+.light-scroll::-webkit-scrollbar-track {
+    background: transparent;
+    @apply bg-white/20 rounded-md my-2;
+}
 
 /* on hover and selected indent */
 .hs-in {
-    @apply border border-black hover:border-2 hover:shadow-inner bg-b4 
-    aria-expanded:border-2 aria-expanded:shadow-inner 
-    aria-expanded:shadow-b1 hover:shadow-b1;
-    transition: all 0.1s ease-out;
+    @apply hover:shadow-inner bg-b4 hover:shadow-b1
+    aria-expanded:shadow-inner aria-expanded:shadow-b1 
+    cursor-pointer transition-all duration-100 ease-out
+    disabled:hover:cursor-default disabled:hover:border disabled:hover:shadow-none;
+}
+
+button, .hs-in {
+  @apply focus-visible:outline-none focus:ring-0 
+  focus:outline-none focus-visible:ring-0
+  border-none outline-none;
 }
 
 /* Corner frame for cards */
