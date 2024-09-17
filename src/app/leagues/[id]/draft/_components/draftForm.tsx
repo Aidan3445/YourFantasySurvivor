@@ -50,9 +50,9 @@ export default function DraftForm({
     secondPick: z.string().optional().refine(
       (value) => value ?? pickCount === 1,
       { message: 'Required' }),
-    castaway: z.array(z.string()),
-    tribe: z.array(z.string()),
-    member: z.array(z.string())
+    castaway: z.array(z.string()).optional(),
+    tribe: z.array(z.string()).optional(),
+    member: z.array(z.string()).optional(),
   });
   type Data = z.infer<typeof draftSchema>;
 
@@ -82,15 +82,15 @@ export default function DraftForm({
 
     const submission = { firstPick: firstPickId, castaway: {}, tribe: {}, member: {} } as Picks;
     castaway?.forEach((event, index) => {
-      const castawayId = options.castaways.find((c) => c.name === data.castaway[index])?.id;
+      const castawayId = options.castaways.find((c) => c.name === data.castaway![index])?.id;
       if (castawayId && event.id) submission.castaway[event.id] = castawayId;
     });
     tribe?.forEach((event, index) => {
-      const tribeId = options.tribes.find((t) => t.name === data.tribe[index])?.id;
+      const tribeId = options.tribes.find((t) => t.name === data.tribe![index])?.id;
       if (tribeId && event.id) submission.tribe[event.id] = tribeId;
     });
     member?.forEach((event, index) => {
-      const memberId = options.members.find((m) => m.displayName === data.member[index])?.id;
+      const memberId = options.members.find((m) => m.displayName === data.member![index])?.id;
       if (memberId && event.id) submission.member[event.id] = memberId;
     });
     const submit = submitDraft.bind(null, leagueId, submission);
