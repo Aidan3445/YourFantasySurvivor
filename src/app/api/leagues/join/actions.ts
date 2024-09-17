@@ -1,4 +1,4 @@
-import 'server-only';
+'use server';
 import { db } from '~/server/db';
 import { leagueMembers } from '~/server/db/schema/members';
 import { and, eq, count, sql } from 'drizzle-orm';

@@ -76,6 +76,9 @@ const config = {
         'scale-out': 'scale-out 2s ease-out',
         'scale-out-fast': 'scale-out 0.1s ease-out',
       },
+      transitionDelay: {
+        400: '400ms',
+      },
       rotate: {
         30: '30deg',
         210: '210deg',

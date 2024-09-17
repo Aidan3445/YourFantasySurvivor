@@ -22,7 +22,11 @@ export default async function League({ params }: PageProps) {
       <br />
       <span className='w-full grid grid-cols-2 gap-2 mb-2'>
         <LeagueDetails className='text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
-        <LeagueScoring className='text-black' league={league} ownerLoggedIn={ownerLoggedIn} openDefault={ownerLoggedIn && members.length === 1} />
+        <LeagueScoring
+          className='text-black'
+          league={league}
+          ownerLoggedIn={ownerLoggedIn}
+          openDefault={ownerLoggedIn && members.length === 1} />
         <DraftInfo className='col-span-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
       </span>
       <Members
