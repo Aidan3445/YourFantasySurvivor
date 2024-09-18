@@ -46,3 +46,8 @@ export const selectionUpdates = createTable(
   })
 );
 export type SelectionUpdate = typeof selectionUpdates.$inferSelect;
+export interface Selection {
+  member: string;
+  episode: number;
+  castaway: string;
+}

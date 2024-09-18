@@ -1,3 +1,4 @@
+'use client';
 import {
   LineChart,
   Line,
@@ -9,44 +10,26 @@ import {
 } from 'recharts';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { mouseOutLeaderboard, mouseOverLeaderboard } from './leaderboard';
+import { cn, type ComponentProps } from '~/lib/utils';
+import { ColorRow } from '~/app/leagues/[id]/_components/scores/membersScores';
 
-interface ScoreChartProps {
+interface ScoreChartProps extends ComponentProps {
   data: {
     name: string;
     color: string;
     episodeScores: number[];
   }[];
+  label?: boolean;
 }
 
-export default function Chart({ data }: ScoreChartProps) {
-  const getTicks = (data: ScoreChartProps['data']) => {
-    // we want ticks evenly spaced between the min and max values
-    // as well as always a tick at zero
-    const allScores = data.flatMap((d) => d.episodeScores);
-    const min = Math.min(...allScores);
-    const max = Math.max(...allScores);
-    const tickCount = 5;
-    const tickInterval = Math.floor((max - min) / tickCount);
-    const ticks = Array.from(
-      { length: tickCount + 1 },
-      (_, i) => min - 1 + i * tickInterval,
-    );
-
-    // insert zero if it's not already in the ticks must be in order
-    if (!ticks.includes(0)) {
-      const index = ticks.findIndex((tick) => tick > 0);
-      ticks.splice(index, 0, 0);
-    }
-    return ticks;
-  };
-
+export default function Chart({ data, label, className }: ScoreChartProps) {
   // sort the data so that the end of a line is always visible for hover purposes
   const sortedData = [...data].sort(
     (a, b) => b.episodeScores.length - a.episodeScores.length,
   );
 
   return (
-    <div className='col-span-3 w-full h-full rounded-lg border border-black bg-b4/50'>
+    <div className={cn(className, 'rounded-lg border border-black bg-b4/50')}>
       <ResponsiveContainer>
         <LineChart
           id='score-chart'
@@ -59,15 +42,18 @@ export default function Chart({ data }: ScoreChartProps) {
           }}
         >
           <CartesianGrid stroke='#4D4D4D' />
-          <XAxis dataKey='episode' type='category' stroke='black' />
+          <XAxis
+            dataKey='episode' type='category' stroke='black'
+            label={label ? <text x={175} y={275} fill='black' transform='rotate(0)'>Episodes</text> : undefined} />
           <YAxis
             stroke='black'
-            ticks={getTicks(data)}
+            tickCount={10}
+            allowDecimals={false}
+            label={label ? <text x={-150} y={15} fill='black' transform='rotate(-90)'>Points</text> : undefined}
             domain={[
               (dataMin: number) => dataMin,
               (dataMax: number) => dataMax + 1,
-            ]}
-          />
+            ]} />
           <Tooltip content={<CustomTooltip />} />
           {sortedData.map((line, index) => (
             <Line
@@ -155,30 +141,36 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
   return (
     <div className='flex flex-col p-1 rounded-md border border-black bg-b3/80'>
       <div>Episode {label}:</div>
-      <Separator />
-      <div className='grid gap-2'>
-        <div>
+      <Separator className='mb-1' />
+      <div className='flex gap-2'>
+        <div className='grid grid-cols-min gap-1'>
           {firstSet.map((p) => (
             <span
               key={p.dataKey}
-              className='flex gap-2 justify-between'
-              style={{ color: p.stroke, stroke: 'black' }}
-            >
-              <span id={`tooltip-${p.dataKey}`}> {p.dataKey}: </span>
-              <span>{p.value}</span>
+              className='grid grid-cols-subgrid col-span-2 opacity-60'
+              style={{ color: p.stroke, stroke: p.stroke }}>
+              <ColorRow className='col-start-1' color={p.stroke}>
+                <h3 className='col-start-2'>{p.dataKey}</h3>
+              </ColorRow>
+              <ColorRow className='col-start-2' color={p.stroke}>
+                <h3>{p.value}</h3>
+              </ColorRow>
             </span>
           ))}
         </div>
         {secondSet.length > 0 && (
-          <div className='col-start-2 pl-2 border-l border-black'>
-            {secondSet.map((p) => (
+          <div className='grid grid-cols-min gap-1'>
+            {firstSet.map((p) => (
               <span
                 key={p.dataKey}
-                className='flex gap-2 justify-between'
-                style={{ color: p.stroke, stroke: 'black' }}
-              >
-                <span id={`tooltip-${p.dataKey}`}> {p.dataKey}: </span>
-                <span>{p.value}</span>
+                className='grid grid-cols-subgrid col-span-2'
+                style={{ color: p.stroke, stroke: p.stroke }}>
+                <ColorRow className='col-start-1' color={p.stroke}>
+                  <h3 className='col-start-2'>{p.dataKey}</h3>
+                </ColorRow>
+                <ColorRow className='col-start-2' color={p.stroke}>
+                  <h3>{p.value}</h3>
+                </ColorRow>
               </span>
             ))}
           </div>

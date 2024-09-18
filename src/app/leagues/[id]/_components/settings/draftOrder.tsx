@@ -95,7 +95,7 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, draftOve
                         color={getContrastingColor(color)} />}
                   </ColorRow>
                   {member.drafted &&
-                    <ColorRow className='p-1 text-xs' color={color}>
+                    <ColorRow className='p-1 text-xs flex justify-center' color={color}>
                       <h3 style={{ color: getContrastingColor(color) }}>{member.drafted}</h3>
                     </ColorRow>}
                 </SortableItem>
