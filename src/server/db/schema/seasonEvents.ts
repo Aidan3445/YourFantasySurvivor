@@ -6,6 +6,7 @@ import { leagueMembers } from './members';
 import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { description, eventName } from './customEvents';
+import { episodes } from './episodes';
 
 export const eventTiming = pgEnum('event_season_timing', ['premiere', 'merge', 'finale']);
 
@@ -68,20 +69,30 @@ export const seasonEvents = createTable(
 export const seasonCastaways = createTable(
   'event_season_castaway',
   {
-    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonTribes = createTable(
   'event_season_tribe',
   {
-    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull(),
     tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonMembers = createTable(
   'event_season_member',
   {
-    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   });
+
+export const seasonEventResults = createTable(
+  'event_season_result',
+  {
+    rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').notNull(), // can either be a castaway or tribe or member id
+  }
+);
+

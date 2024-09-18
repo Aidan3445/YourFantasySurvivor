@@ -94,3 +94,12 @@ export const weeklyEventsMembers = createTable(
     pk: primaryKey({ columns: [table.event, table.member] }),
   })
 );
+
+export const weeklyEventResults = createTable(
+  'event_weekly_result',
+  {
+    rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').notNull(), // can either be a castaway or tribe or member id
+  }
+);

@@ -7,6 +7,7 @@ import { seasons } from '~/server/db/schema/seasons';
 import { episodes } from '~/server/db/schema/episodes';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { castaways } from '~/server/db/schema/castaways';
+import { customEventCastaways, customEventRules, customEvents } from '~/server/db/schema/customEvents';
 
 export async function getEvents(leagueId: number) {
   const seasonName = await db
@@ -23,6 +24,23 @@ export async function getEvents(leagueId: number) {
   ]);
 
   return { castawayEvents, tribeEvents, tribeUpdates };
+}
+
+export async function getCustomEvents(leagueId: number) {
+  return await db
+    .select({
+      castaway: castaways.shortName,
+      points: customEventRules.points,
+      episode: episodes.number,
+    })
+    .from(customEventCastaways)
+    .innerJoin(customEvents, eq(customEvents.id, customEventCastaways.event))
+    .innerJoin(customEventRules, eq(customEvents.rule, customEventRules.id))
+    .innerJoin(episodes, eq(episodes.id, customEvents.episode))
+    .innerJoin(seasons, eq(seasons.id, episodes.season))
+    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .innerJoin(castaways, eq(castaways.id, customEventCastaways.castaway))
+    .where(eq(leagues.id, leagueId));
 }
 
 export async function getCastawayMemberEpisodeTable(memberIds: number[]) {

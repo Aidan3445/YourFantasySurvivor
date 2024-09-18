@@ -2,7 +2,7 @@ import { type Member } from '~/server/db/schema/members';
 import Members from './membersScores';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
-import { getCastawayMemberEpisodeTable, getEvents } from '~/app/api/leagues/[id]/score/query';
+import { getCastawayMemberEpisodeTable, getCustomEvents, getEvents } from '~/app/api/leagues/[id]/score/query';
 import compileScores from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
 
@@ -14,11 +14,15 @@ interface MembersProps {
 }
 
 export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
-  const [rules, events, memberCastaways] = await Promise.all([
-    getRules(leagueId), getEvents(leagueId), getCastawayMemberEpisodeTable(members.map((m) => m.id)),
+  const [
+    rules, events, customEvents, memberCastaways
+  ] = await Promise.all([
+    getRules(leagueId), getEvents(leagueId), getCustomEvents(leagueId),
+    getCastawayMemberEpisodeTable(members.map((m) => m.id)),
   ]);
 
-  const baseScores = compileScores(events, memberCastaways, rules);
+  const altEvents = [...customEvents]; // eventually add weekly and season events
+  const baseScores = compileScores(events, altEvents, memberCastaways, rules);
 
   const membersWithScores = members.map((member) => {
     const points = baseScores[member.displayName] ?? [0, 0];

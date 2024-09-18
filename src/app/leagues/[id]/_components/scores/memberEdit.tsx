@@ -38,7 +38,7 @@ export default function MemberEdit({ leagueId, color, isOwner }: MemberEditProps
       <HoverCardContent className='flex gap-2 p-0.5 w-min text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
         <HoverCardArrow className='absolute -translate-x-1' />
         <EditName leagueId={leagueId} />
-        <EditColor leagueId={leagueId} />
+        <EditColor leagueId={leagueId} currentColor={color} />
         <LeaveLeague leagueId={leagueId} isOwner={isOwner} />
       </HoverCardContent>
     </HoverCard >
@@ -64,7 +64,7 @@ interface UpdateProps {
 }
 
 const editNameSchema = z.object({
-  newName: z.string().min(1).max(64)
+  newName: z.string().min(1, { message: 'Too short' }).max(64, { message: 'Too long' }),
 });
 
 function EditName({ leagueId }: UpdateProps) {
@@ -76,14 +76,23 @@ function EditName({ leagueId }: UpdateProps) {
   const [nameOpen, setNameOpen] = useState(false);
 
   const catchUpdate = () => {
+    try {
+      form.handleSubmit(() => null)().catch(() => null);
+      editNameSchema.parse(form.getValues());
+    } catch (e) {
+      if (e instanceof Error) form.setError('newName', { type: 'manual', message: e.message });
+      else form.setError('newName', { type: 'manual', message: 'Invalid name' });
+      return;
+    }
+
     const update = updateDisplayName.bind(null, leagueId, form.getValues('newName'));
     update()
       .then(() => {
         setNameOpen(false);
         router.refresh();
       })
-      .catch((e: Error) => {
-        form.setError('newName', { type: 'manual', message: e.message });
+      .catch(() => {
+        form.setError('newName', { type: 'manual', message: 'Name is already taken' });
       });
   };
 
@@ -119,11 +128,16 @@ function EditName({ leagueId }: UpdateProps) {
   );
 }
 
+interface EditColorProps extends UpdateProps {
+  currentColor: string;
+}
+
+
 const editColorSchema = z.object({
   newColor: z.string().length(7)
 });
 
-function EditColor({ leagueId }: UpdateProps) {
+function EditColor({ leagueId, currentColor }: EditColorProps) {
   const form = useForm<z.infer<typeof editColorSchema>>({
     resolver: zodResolver(editColorSchema),
   });
@@ -138,8 +152,8 @@ function EditColor({ leagueId }: UpdateProps) {
         setColorOpen(false);
         router.refresh();
       })
-      .catch((e: Error) => {
-        form.setError('newColor', { type: 'manual', message: e.message });
+      .catch(() => {
+        form.setError('newColor', { type: 'manual', message: 'Color already taken.' });
       });
   };
 
@@ -161,6 +175,8 @@ function EditColor({ leagueId }: UpdateProps) {
                       className='gap-1 justify-center m-2 w-28'
                       colors={twentyColors}
                       color={field.value}
+                      defaultValue={currentColor}
+                      defaultChecked
                       rectProps={{
                         children: <Point />,
                         style: {

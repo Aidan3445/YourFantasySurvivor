@@ -1,11 +1,11 @@
 import { type Events } from '~/app/api/seasons/[name]/events/query';
 import { type BaseEventRuleType } from '~/server/db/schema/leagues';
-import { type RulesType } from '~/server/db/schema/rules';
 
 export default function compileScores(
   { castawayEvents, tribeEvents, tribeUpdates }: Events,
+  altEvents: { castaway: string; points: number; episode: number }[],
   memberCastaways: Record<number, Record<string, string>>,
-  rules: RulesType
+  rules: BaseEventRuleType
 ): Record<string, number[]> {
   const scores: Record<string, number[]> = {};
 
@@ -43,6 +43,17 @@ export default function compileScores(
       }
     }
   }
+
+  // alt events
+  for (const { castaway, points, episode } of altEvents) {
+    const member = findMember(memberCastaways, castaway, episode);
+    if (!member) continue;
+
+    scores[member] ??= [];
+    const memberPoints = scores[member];
+    memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
+  }
+
   return scores;
 }
 
