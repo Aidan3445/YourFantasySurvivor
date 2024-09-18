@@ -32,7 +32,6 @@ export async function getLeagueSettings(leagueId: number) {
     .then((res) => res[0]?.premiere)
     .then((premiere) => {
       if (!premiere) throw new Error('Season premiere date not found');
-      console.log(new Date(premiere), new Date());
       return new Date(premiere) < new Date();
     });
 
