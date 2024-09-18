@@ -1,3 +1,4 @@
+import 'server-only';
 import { getLeagueSettings } from '~/app/api/leagues/[id]/settings/query';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
 import { getCastaways } from '~/app/api/seasons/[name]/castaways/query';

@@ -1,3 +1,4 @@
+import 'server-only';
 import { asc, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { seasons } from '~/server/db/schema/seasons';

@@ -1,4 +1,4 @@
-'server-only';
+import 'server-only';
 import { auth } from '@clerk/nextjs/server';
 import { db } from '~/server/db';
 import { baseEventRules, defaultBaseRules, leagues, type LeagueInsert } from '~/server/db/schema/leagues';

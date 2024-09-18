@@ -16,13 +16,13 @@ export default async function WhoAreYou() {
 
   return (
     <AlertDialog defaultOpen={members.every((m) => m.userId !== userId)}>
-      <AlertDialogContent className='w-40'>
+      <AlertDialogContent className='w-44'>
         <AlertDialogHeader>
           <AlertDialogTitle>Who are you?</AlertDialogTitle>
         </AlertDialogHeader>
-        <ul className='gap-1 grid grid-cols-1'>
+        <ul className='grid grid-cols-1 gap-4'>
           {members.filter((member) => member.userId.length == 2).map((member) => (
-            <AlertDialogAction className='flex w-min -p-1 h-0' key={member.id}>
+            <AlertDialogAction className='h-0' key={member.id}>
               <AssignMember member={member} userId={userId} />
             </AlertDialogAction>
           ))}

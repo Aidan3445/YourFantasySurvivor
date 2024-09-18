@@ -1,4 +1,4 @@
-'server-only';
+import 'server-only';
 import { auth } from '@clerk/nextjs/server';
 import { getNextPremierDate } from '~/app/api/seasons/query';
 import { db } from '~/server/db';
