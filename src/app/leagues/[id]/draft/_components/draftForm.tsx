@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
 import { Button } from '~/app/_components/commonUI/button';
-import { ColorRow as ColorRow } from '../../_components/members';
+import { ColorRow } from '../../_components/scores/membersScores';
 import { getContrastingColor } from '@uiw/color-convert';
 import { type Picks, submitDraft } from '~/app/api/leagues/[id]/draft/actions';
 import { useRouter } from 'next/navigation';
@@ -167,7 +167,7 @@ export default function DraftForm({
               <PredictionCard prediction={survivorPrediction}>
                 <FormControl>
                   <Select onValueChange={field.onChange} {...field}>
-                    <SelectTrigger className='w-full' disabled={!yourTurn}>
+                    <SelectTrigger className='w-full' disabled={!yourTurn || draftOver}>
                       <div className='flex-grow text-nowrap'>
                         <SelectValue className='px-0' placeholder='Choose your Survivor' />
                         <FormMessage className='pl-5 text-left'>{form.formState.errors.firstPick?.message}</FormMessage>

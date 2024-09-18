@@ -27,22 +27,22 @@ export default async function InsertEvents() {
 }
 
 type FetchedEpisode = {
-    number: number,
-    advsFound: { name: string }[],
-    advPlaysSelf: { name: string }[],
-    advPlaysOther: { name: string }[],
-    badAdvPlays: { name: string }[],
-    advsEliminated: { name: string }[],
-    spokeEpTitle: { name: string }[],
-    tribe1sts: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }[],
-    tribe2nds: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }[],
-    indivWins: { name: string }[],
-    indivRewards: { name: string }[],
-    finalThree: { name: string }[],
-    fireWins: { name: string }[],
-    soleSurvivor: { name: string }[],
-    eliminated: { name: string }[],
-    tribeUpdates: { tribe: { name: string }, survivors: { name: string }[] }[],
+  number: number,
+  advsFound: { name: string }[],
+  advPlaysSelf: { name: string }[],
+  advPlaysOther: { name: string }[],
+  badAdvPlays: { name: string }[],
+  advsEliminated: { name: string }[],
+  spokeEpTitle: { name: string }[],
+  tribe1sts: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }[],
+  tribe2nds: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }[],
+  indivWins: { name: string }[],
+  indivRewards: { name: string }[],
+  finalThree: { name: string }[],
+  fireWins: { name: string }[],
+  soleSurvivor: { name: string }[],
+  eliminated: { name: string }[],
+  tribeUpdates: { tribe: { name: string }, survivors: { name: string }[] }[],
 };
 
 type EventInsert = typeof baseEvents.$inferInsert;
@@ -53,347 +53,351 @@ async function insert(data: { id: number, name: string }[]) {
   // eslint-disable-next-line prefer-const
   for (let { id, name } of data) {
     name = name.replace('Survivor', 'Season');
-    const url = new URL(`https://fantasyapi-zzxp.onrender.com/api/${name}/episodes`);
-    const fetchEpisodes: FetchedEpisode[] = await basicGet(url);
-    await Promise.all(fetchEpisodes.map(async (episode) => {
-      // get the episode from the current db that matches the old db episode via season and number
-      const ep = await db.select({ id: episodes.id }).from(episodes).where(and(eq(episodes.season, id), eq(episodes.number, episode.number)));
+    try {
+      const url = new URL(`https://fantasyapi-zzxp.onrender.com/api/${name}/episodes`);
+      const fetchEpisodes: FetchedEpisode[] = await basicGet(url);
+      await Promise.all(fetchEpisodes.map(async (episode) => {
+        // get the episode from the current db that matches the old db episode via season and number
+        const ep = await db.select({ id: episodes.id }).from(episodes).where(and(eq(episodes.season, id), eq(episodes.number, episode.number)));
 
-      // go through each event in the episode and insert a new event into the baseEvents table
-      await Promise.all(episode.advsFound.map(async ({ name }) => {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'advFound',
-          keywords: ['idol'],
-          notes: ['found it in a bush']
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        // go through each event in the episode and insert a new event into the baseEvents table
+        await Promise.all(episode.advsFound.map(async ({ name }) => {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'advFound',
+            keywords: ['idol'],
+            notes: ['found it in a bush']
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
 
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
 
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-
-      }));
-
-      await Promise.all(episode.advPlaysSelf.map(async ({ name }) => {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'advPlay',
-          keywords: ['idol'],
-          notes: ['played it on themselves']
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      await Promise.all(episode.advPlaysOther.map(async ({ name }) => {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'advPlay',
-          keywords: ['idol'],
-          notes: ['played it on someone else']
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      await Promise.all(episode.badAdvPlays.map(async ({ name }) => {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'badAdvPlay',
-          keywords: ['idol'],
-          notes: ['played it wrong']
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      await Promise.all(episode.advsEliminated.map(async ({ name }) => {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'advElim',
-          keywords: ['idol'],
-          notes: ['eliminated with idol']
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      let newEvent: EventInsert = {
-        episode: ep[0]?.id ?? 0,
-        name: 'spokeEpTitle',
-        keywords: [],
-        notes: []
-      };
-      let newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-      await Promise.all(episode.spokeEpTitle.map(async ({ name }) => {
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      const tribeTribe1st = episode.tribe1sts.filter((tribe1st) => tribe1st.onModel === 'Tribes');
-      const tribeSurvivor1st = episode.tribe1sts.filter((tribe1st) => tribe1st.onModel === 'Survivors');
-
-      await Promise.all(tribeTribe1st.map(async (tribe1st: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'tribe1st',
-          keywords: [],
-          notes: []
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, tribe1st.name.name)))[0]?.id ?? 0;
-        const newEventTribe = {
-          event: newEventId[0]?.id,
-          tribe: tribeId
-        } as TribeInsert;
-        await db.insert(baseEventTribes).values(newEventTribe);
-      }));
-
-      if (tribeSurvivor1st.length > 0) {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'tribe1st',
-          keywords: [],
-          notes: []
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        await Promise.all(tribeSurvivor1st.map(async (tribe1st: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
-          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, tribe1st.name.name)))[0]?.id ?? 0;
           const newEventCastaway = {
             event: newEventId[0]?.id,
             castaway: castawayId
           } as CastawayInsert;
+
           await db.insert(baseEventCastaways).values(newEventCastaway);
+
         }));
-      }
 
-      const tribeTribe2nd = episode.tribe2nds.filter((tribe2nd) => tribe2nd.onModel === 'Tribes');
-      const tribeSurvivor2nd = episode.tribe2nds.filter((tribe2nd) => tribe2nd.onModel === 'Survivors');
+        await Promise.all(episode.advPlaysSelf.map(async ({ name }) => {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'advPlay',
+            keywords: ['idol'],
+            notes: ['played it on themselves']
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
 
-      await Promise.all(tribeTribe2nd.map(async (tribe2nd: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'tribe2nd',
-          keywords: [],
-          notes: []
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
 
-        const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, tribe2nd.name.name)))[0]?.id ?? 0;
-        const newEventTribe = {
-          event: newEventId[0]?.id,
-          tribe: tribeId
-        } as TribeInsert;
-        await db.insert(baseEventTribes).values(newEventTribe);
-      }));
-
-      if (tribeSurvivor2nd.length > 0) {
-        const newEvent: EventInsert = {
-          episode: ep[0]?.id ?? 0,
-          name: 'tribe2nd',
-          keywords: [],
-          notes: []
-        };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        await Promise.all(tribeSurvivor2nd.map(async (tribe2nd: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
-          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, tribe2nd.name.name)))[0]?.id ?? 0;
           const newEventCastaway = {
             event: newEventId[0]?.id,
             castaway: castawayId
           } as CastawayInsert;
+
           await db.insert(baseEventCastaways).values(newEventCastaway);
         }));
-      }
 
-      newEvent = {
-        episode: ep[0]?.id ?? 0,
-        name: 'indivWin',
-        keywords: [],
-        notes: []
-      };
-      newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-      await Promise.all(episode.indivWins.map(async ({ name }) => {
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
+        await Promise.all(episode.advPlaysOther.map(async ({ name }) => {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'advPlay',
+            keywords: ['idol'],
+            notes: ['played it on someone else']
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
 
-      newEvent = {
-        episode: ep[0]?.id ?? 0,
-        name: 'indivReward',
-        keywords: [],
-        notes: []
-      };
-      newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-      await Promise.all(episode.indivRewards.map(async ({ name }) => {
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
 
-      newEvent = {
-        episode: ep[0]?.id ?? 0,
-        name: 'finalists',
-        keywords: [],
-        notes: []
-      };
-      newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-      await Promise.all(episode.finalThree.map(async ({ name }) => {
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
 
-      newEvent = {
-        episode: ep[0]?.id ?? 0,
-        name: 'fireWin',
-        keywords: [],
-        notes: []
-      };
-      newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-      await Promise.all(episode.fireWins.map(async ({ name }) => {
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      newEvent = {
-        episode: ep[0]?.id ?? 0,
-        name: 'soleSurvivor',
-        keywords: [],
-        notes: []
-      };
-      newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-      await Promise.all(episode.soleSurvivor.map(async ({ name }) => {
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      newEvent = {
-        episode: ep[0]?.id ?? 0,
-        name: 'elim',
-        keywords: [],
-        notes: []
-      };
-      newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-      await Promise.all(episode.eliminated.map(async ({ name }) => {
-        const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
-        const newEventCastaway = {
-          event: newEventId[0]?.id,
-          castaway: castawayId
-        } as CastawayInsert;
-        await db.insert(baseEventCastaways).values(newEventCastaway);
-      }));
-
-      await Promise.all(episode.tribeUpdates.map(async (update: { tribe: { name: string }, survivors: { name: string }[] }) => {
-        const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, update.tribe.name)))[0]?.id ?? 0;
-        const castawayids = await Promise.all(update.survivors.map(async (survivor) => {
-          return (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, survivor.name)))[0]?.id ?? 0;
+          await db.insert(baseEventCastaways).values(newEventCastaway);
         }));
 
-        let keywords: string[];
-        switch (episode.number) {
-        case 1:
-          keywords = ['Initial tribes'];
-          break;
-        case 7:
-          keywords = ['Merge'];
-          break;
-        default:
-          keywords = ['Tribe swap'];
-          break;
+        await Promise.all(episode.badAdvPlays.map(async ({ name }) => {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'badAdvPlay',
+            keywords: ['idol'],
+            notes: ['played it wrong']
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        await Promise.all(episode.advsEliminated.map(async ({ name }) => {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'advElim',
+            keywords: ['idol'],
+            notes: ['eliminated with idol']
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        let newEvent: EventInsert = {
+          episode: ep[0]?.id ?? 0,
+          name: 'spokeEpTitle',
+          keywords: [],
+          notes: []
+        };
+        let newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        await Promise.all(episode.spokeEpTitle.map(async ({ name }) => {
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        const tribeTribe1st = episode.tribe1sts.filter((tribe1st) => tribe1st.onModel === 'Tribes');
+        const tribeSurvivor1st = episode.tribe1sts.filter((tribe1st) => tribe1st.onModel === 'Survivors');
+
+        await Promise.all(tribeTribe1st.map(async (tribe1st: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'tribe1st',
+            keywords: [],
+            notes: []
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+
+          const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, tribe1st.name.name)))[0]?.id ?? 0;
+          const newEventTribe = {
+            event: newEventId[0]?.id,
+            tribe: tribeId
+          } as TribeInsert;
+          await db.insert(baseEventTribes).values(newEventTribe);
+        }));
+
+        if (tribeSurvivor1st.length > 0) {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'tribe1st',
+            keywords: [],
+            notes: []
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+
+          await Promise.all(tribeSurvivor1st.map(async (tribe1st: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
+            const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, tribe1st.name.name)))[0]?.id ?? 0;
+            const newEventCastaway = {
+              event: newEventId[0]?.id,
+              castaway: castawayId
+            } as CastawayInsert;
+            await db.insert(baseEventCastaways).values(newEventCastaway);
+          }));
         }
 
+        const tribeTribe2nd = episode.tribe2nds.filter((tribe2nd) => tribe2nd.onModel === 'Tribes');
+        const tribeSurvivor2nd = episode.tribe2nds.filter((tribe2nd) => tribe2nd.onModel === 'Survivors');
 
-        const newEvent: EventInsert = {
+        await Promise.all(tribeTribe2nd.map(async (tribe2nd: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'tribe2nd',
+            keywords: [],
+            notes: []
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+
+          const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, tribe2nd.name.name)))[0]?.id ?? 0;
+          const newEventTribe = {
+            event: newEventId[0]?.id,
+            tribe: tribeId
+          } as TribeInsert;
+          await db.insert(baseEventTribes).values(newEventTribe);
+        }));
+
+        if (tribeSurvivor2nd.length > 0) {
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'tribe2nd',
+            keywords: [],
+            notes: []
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+
+          await Promise.all(tribeSurvivor2nd.map(async (tribe2nd: { name: { name: string }, onModel: 'Tribes' | 'Survivors' }) => {
+            const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, tribe2nd.name.name)))[0]?.id ?? 0;
+            const newEventCastaway = {
+              event: newEventId[0]?.id,
+              castaway: castawayId
+            } as CastawayInsert;
+            await db.insert(baseEventCastaways).values(newEventCastaway);
+          }));
+        }
+
+        newEvent = {
           episode: ep[0]?.id ?? 0,
-          name: 'tribeUpdate',
-          keywords,
+          name: 'indivWin',
+          keywords: [],
           notes: []
         };
-        const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
-
-        const newEventTribe = {
-          event: newEventId[0]?.id,
-          tribe: tribeId
-        } as TribeInsert;
-        await db.insert(baseEventTribes).values(newEventTribe);
-
-        await Promise.all(castawayids.map(async (castawayId) => {
+        newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        await Promise.all(episode.indivWins.map(async ({ name }) => {
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
           const newEventCastaway = {
             event: newEventId[0]?.id,
             castaway: castawayId
           } as CastawayInsert;
           await db.insert(baseEventCastaways).values(newEventCastaway);
         }));
+
+        newEvent = {
+          episode: ep[0]?.id ?? 0,
+          name: 'indivReward',
+          keywords: [],
+          notes: []
+        };
+        newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        await Promise.all(episode.indivRewards.map(async ({ name }) => {
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        newEvent = {
+          episode: ep[0]?.id ?? 0,
+          name: 'finalists',
+          keywords: [],
+          notes: []
+        };
+        newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        await Promise.all(episode.finalThree.map(async ({ name }) => {
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        newEvent = {
+          episode: ep[0]?.id ?? 0,
+          name: 'fireWin',
+          keywords: [],
+          notes: []
+        };
+        newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        await Promise.all(episode.fireWins.map(async ({ name }) => {
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        newEvent = {
+          episode: ep[0]?.id ?? 0,
+          name: 'soleSurvivor',
+          keywords: [],
+          notes: []
+        };
+        newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        await Promise.all(episode.soleSurvivor.map(async ({ name }) => {
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        newEvent = {
+          episode: ep[0]?.id ?? 0,
+          name: 'elim',
+          keywords: [],
+          notes: []
+        };
+        newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+        await Promise.all(episode.eliminated.map(async ({ name }) => {
+          const castawayId = (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, name)))[0]?.id ?? 0;
+          const newEventCastaway = {
+            event: newEventId[0]?.id,
+            castaway: castawayId
+          } as CastawayInsert;
+          await db.insert(baseEventCastaways).values(newEventCastaway);
+        }));
+
+        await Promise.all(episode.tribeUpdates.map(async (update: { tribe: { name: string }, survivors: { name: string }[] }) => {
+          const tribeId = (await db.select({ id: tribes.id }).from(tribes).where(eq(tribes.name, update.tribe.name)))[0]?.id ?? 0;
+          const castawayids = await Promise.all(update.survivors.map(async (survivor) => {
+            return (await db.select({ id: castaways.id }).from(castaways).where(eq(castaways.name, survivor.name)))[0]?.id ?? 0;
+          }));
+
+          let keywords: string[];
+          switch (episode.number) {
+            case 1:
+              keywords = ['Initial tribes'];
+              break;
+            case 7:
+              keywords = ['Merge'];
+              break;
+            default:
+              keywords = ['Tribe swap'];
+              break;
+          }
+
+
+          const newEvent: EventInsert = {
+            episode: ep[0]?.id ?? 0,
+            name: 'tribeUpdate',
+            keywords,
+            notes: []
+          };
+          const newEventId = await db.insert(baseEvents).values(newEvent).returning({ id: baseEvents.id });
+
+          const newEventTribe = {
+            event: newEventId[0]?.id,
+            tribe: tribeId
+          } as TribeInsert;
+          await db.insert(baseEventTribes).values(newEventTribe);
+
+          await Promise.all(castawayids.map(async (castawayId) => {
+            const newEventCastaway = {
+              event: newEventId[0]?.id,
+              castaway: castawayId
+            } as CastawayInsert;
+            await db.insert(baseEventCastaways).values(newEventCastaway);
+          }));
+        }));
+
       }));
 
-    }));
-
-    console.log('Inserted events for', name);
+      console.log('Inserted events for', name);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 

@@ -26,17 +26,21 @@ async function insert(data: { id: number, name: string }[]) {
   // eslint-disable-next-line prefer-const
   for (let { id, name } of data) {
     name = name.replace('Survivor', 'Season');
-    const url = new URL(`https://fantasyapi-zzxp.onrender.com/api/${name}/tribes`);
-    const fetchTribes: Tribe[] = await basicGet(url);
-    const newTribes = fetchTribes.map((tribe) => {
-      tribe.season = id;
-      return tribe;
-    });
+    try {
+      const url = new URL(`https://fantasyapi-zzxp.onrender.com/api/${name}/tribes`);
+      const fetchTribes: Tribe[] = await basicGet(url);
+      const newTribes = fetchTribes.map((tribe) => {
+        tribe.season = id;
+        return tribe;
+      });
 
-    console.log(newTribes);
+      console.log(newTribes);
 
-    const newEntries = await db.insert(tribes).values(newTribes).returning({ id: tribes.id, name: tribes.name }).onConflictDoNothing();
-    console.log(newEntries);
+      const newEntries = await db.insert(tribes).values(newTribes).returning({ id: tribes.id, name: tribes.name }).onConflictDoNothing();
+      console.log(newEntries);
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
 

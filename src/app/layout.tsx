@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/nextjs';
 import TopNav from './_components/topNav';
 import { type ReactNode, StrictMode } from 'react';
 import { Toaster } from './_components/commonUI/toaster';
+import WhoAreYou from './_components/emergency/whoAreYou';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,6 +33,7 @@ export default function RootLayout({
           <body className={`font-sans ${inter.variable}`}>
             <div className='page'>
               <TopNav />
+              <WhoAreYou />
               {children}
             </div>
             <Toaster />

@@ -13,7 +13,7 @@ export const episodes = createTable(
     airDate: timestamp('air_date', { mode: 'string' }).notNull(),
     runtime: smallint('runtime').default(90),
     season: integer('season').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
-    merge: boolean('merge').notNull().default(false),
+    merge: boolean('merge').default(false),
   }
 );
 export type Episode = typeof episodes.$inferSelect;

@@ -1,6 +1,6 @@
 'use client';
 import { cn, type ComponentProps } from '~/lib/utils';
-import { ColorRow } from '../members';
+import { ColorRow } from '../scores/membersScores';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useState } from 'react';
 import { Button } from '~/app/_components/commonUI/button';
@@ -76,7 +76,7 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, draftOve
           <Button className='w-full' type='submit'>Save</Button>
         </form>
       </span>}
-      <span className='grid grid-cols-2 gap-1 w-full'>
+      <span className='grid auto-cols-auto gap-1'>
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}

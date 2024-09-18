@@ -13,12 +13,12 @@ interface MembersProps {
 
 export default function Members({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   return (
-    <div className='grid auto-cols-min gap-1'>
+    <div className='grid auto-cols-auto gap-1'>
       {members.map((member) => {
         const cColor = getContrastingColor(member.color);
         return (
           <>
-            < ColorRow className='w-full' color={member.color} loggedIn={member.loggedIn} >
+            <ColorRow className={cn('w-full', member.drafted ? '' : 'col-span-2')} color={member.color} loggedIn={member.loggedIn} >
               <h3
                 className='font-medium'
                 style={{ color: cColor }}>
@@ -37,11 +37,10 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull }: Me
                 isOwner={member.isOwner}
                 color={cColor} />
             </ColorRow>
-            {member.drafted ?
-              <ColorRow color={member.color} className='py-1 text-xs'>
+            {member.drafted &&
+              <ColorRow color={member.color} className='py-1 text-xs col-start-2'>
                 <h3 style={{ color: cColor }}>{member.drafted}</h3>
-              </ColorRow> :
-              <br />}
+              </ColorRow>}
           </>
         );
       })}

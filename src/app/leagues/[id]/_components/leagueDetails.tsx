@@ -1,4 +1,4 @@
-import { DeleteLeague } from './memberEdit';
+import { DeleteLeague } from './scores/memberEdit';
 import { Popover, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
 import CardContainer from '~/app/_components/cardContainer';
 import { ToggleVisibility } from './toggleVis';

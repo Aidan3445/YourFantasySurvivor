@@ -85,7 +85,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
       <form className={className} action={catchUpdate} onChange={() => setUnsaved(true)}>
         <Tab value='base' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
           <BaseEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} />
-          <article className='hidden col-span-2 lg:block'>
+          <article className='hidden col-span-2 md:block'>
             <h3 className='text-lg font-semibold'>Base Events</h3>
             Base events are added automatically when they
             occur in an episode. <br />
@@ -96,7 +96,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
         </Tab>
         <Tab value='custom' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
           <CustomEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} setUnsaved={unsave} />
-          <article className='hidden col-span-2 lg:block'>
+          <article className='hidden col-span-2 md:block'>
             <h3 className='text-lg font-semibold'>Custom Events</h3>
             Custom events are added manually by a league admin.
             They all you to score events not included on the base events list. <br />
@@ -105,7 +105,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
         </Tab>
         <Tab value='weekly' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
           <WeeklyEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} setUnsaved={unsave} />
-          <article className='hidden col-span-2 lg:block'>
+          <article className='hidden col-span-2 md:block'>
             <h3 className='text-lg font-semibold'>Weekly Events</h3>
             League members can earn points through weekly events,
             even if their castaway is eliminated. <br />
@@ -126,7 +126,7 @@ export default function EventsForm({ className, leagueId, rules, ownerLoggedIn }
         </Tab>
         <Tab value='season' valid={valid} unsaved={unsaved} ownerLoggedIn={ownerLoggedIn}>
           <SeasonEvents className='col-span-3 row-span-2' form={form} freeze={!ownerLoggedIn} setUnsaved={unsave} />
-          <article className='hidden col-span-2 lg:block'>
+          <article className='hidden col-span-2 md:block'>
             Season events are special predictions members make only once.
             They can be made before the season starts, after the merge,
             or before the final episode of the season. <br /> <p className='text-sm italic'>

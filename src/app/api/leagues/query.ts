@@ -1,7 +1,7 @@
 import 'server-only';
 import { db } from '~/server/db';
 import { count, eq } from 'drizzle-orm';
-import { leagues } from '~/server/db/schema/leagues';
+import { leagues, leagueSettings } from '~/server/db/schema/leagues';
 //const auth = () => ({ userId: '_1' }); 
 import { auth } from '@clerk/nextjs/server';
 import { leagueMembers, type Member } from '~/server/db/schema/members';
@@ -20,10 +20,12 @@ export async function getLeague(leagueId: number) {
       name: leagues.name,
       season: seasons.name,
       password: leagues.password,
+      draftDate: leagueSettings.draftDate,
     })
     .from(leagues)
     .where(eq(leagues.id, leagueId))
-    .innerJoin(seasons, eq(seasons.id, leagues.season));
+    .innerJoin(seasons, eq(seasons.id, leagues.season))
+    .innerJoin(leagueSettings, eq(leagueSettings.league, leagues.id));
   const membersFetch = db
     .select()
     .from(leagueMembers)
@@ -46,12 +48,13 @@ export async function getLeague(leagueId: number) {
   }));
 
 
-  const isFull = await db
-    .select({ count: count() })
-    .from(castaways)
-    .innerJoin(seasons, eq(castaways.season, seasons.id))
-    .where(eq(seasons.name, league[0]!.season))
-    .then((count) => count[0]!.count <= safeMembers.length);
+  const isFull = new Date(league[0]!.draftDate) < new Date() ||
+    await db
+      .select({ count: count() })
+      .from(castaways)
+      .innerJoin(seasons, eq(castaways.season, seasons.id))
+      .where(eq(seasons.name, league[0]!.season))
+      .then((count) => count[0]!.count <= safeMembers.length);
 
   return { league: league[0]!, members: safeMembers, isFull };
 }
