@@ -22,7 +22,7 @@ export default async function League({ params }: PageProps) {
       castaways,
       tribes,
       members: league.members,
-      unavailable: castaways.filter((c) => settings.draftOrder.some((d) => d.drafted === c.more.shortName))
+      unavailable: castaways.filter((c) => settings.draftOrder.some((d) => d.drafted[0] === c.more.shortName))
     },
     yourTurn,
     draftOver: settings.draftOver

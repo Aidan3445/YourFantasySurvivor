@@ -9,7 +9,7 @@ import { seasonCastaways, type SeasonEventRuleType, seasonEvents, seasonMembers,
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
-import { aliasedTable, and, eq, isNull } from 'drizzle-orm';
+import { aliasedTable, and, asc, eq } from 'drizzle-orm';
 import { tribes } from '~/server/db/schema/tribes';
 
 export async function getDraftDetails(leagueId: number) {
@@ -71,9 +71,8 @@ export async function getCurrentPredictions(
         eq(selectionUpdates.member, leagueMembers.id),
         eq(leagueMembers.league, leagueId)))
       .innerJoin(castaways, eq(selectionUpdates.castaway, castaways.id))
-      .where(and(
-        eq(leagueMembers.userId, userId),
-        isNull(selectionUpdates.episode)))
+      .where(eq(leagueMembers.userId, userId))
+      .orderBy(asc(selectionUpdates.episode))
       .then((res) => res[0]?.name),
 
     Promise.all(castaway ? castaway.map((rule) => db

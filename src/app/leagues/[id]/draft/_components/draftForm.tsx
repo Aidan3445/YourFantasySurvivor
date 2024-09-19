@@ -150,8 +150,6 @@ export default function DraftForm({
     );
   };
 
-  console.log(options);
-
   return (
     <Form {...form}>
       {!draftOver && getAlert()}

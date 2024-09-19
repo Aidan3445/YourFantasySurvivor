@@ -15,7 +15,7 @@ import { useRouter } from 'next/navigation';
 
 interface DraftOrderProps extends ComponentProps {
   leagueId: number;
-  draftOrder: { name: string, color: string, drafted: string | null }[];
+  draftOrder: { name: string, color: string, drafted: string[] }[];
   orderLocked: boolean;
   draftOver: boolean;
 }
@@ -96,7 +96,7 @@ export default function DraftOrder({ leagueId, draftOrder, orderLocked, draftOve
                   </ColorRow>
                   {member.drafted &&
                     <ColorRow className='p-1 text-xs flex justify-center' color={color}>
-                      <h3 style={{ color: getContrastingColor(color) }}>{member.drafted}</h3>
+                      <h3 style={{ color: getContrastingColor(color) }}>{member.drafted[0]}</h3>
                     </ColorRow>}
                 </SortableItem>
               );

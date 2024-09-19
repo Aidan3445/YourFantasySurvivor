@@ -36,7 +36,7 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
                   </ColorRow>
                 </td>}
               <td>
-                <ColorRow className={cn('col-start-3', member.drafted ? '' : 'col-span-2')} color={member.color} loggedIn={member.loggedIn} >
+                <ColorRow className={cn('col-start-3', member.drafted.length ? '' : 'col-span-2')} color={member.color} loggedIn={member.loggedIn} >
                   <h3
                     className='font-medium'
                     style={{ color: cColor }}>
@@ -52,10 +52,10 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
                     color={cColor} />
                 </ColorRow>
               </td>
-              {member.drafted &&
+              {!!member.drafted.length &&
                 <td>
                   <ColorRow color={member.color} className='py-1 text-xs col-start-4 flex justify-center'>
-                    <h3 style={{ color: cColor }}>{member.drafted}</h3>
+                    <h3 style={{ color: cColor }}>{member.drafted.slice(-1)[0]}</h3>
                   </ColorRow>
                 </td>}
             </tr>

@@ -69,27 +69,28 @@ export const seasonEvents = createTable(
 export const seasonCastaways = createTable(
   'event_season_castaway',
   {
-    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonTribes = createTable(
   'event_season_tribe',
   {
-    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonMembers = createTable(
   'event_season_member',
   {
-    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonEventResults = createTable(
   'event_season_result',
   {
+    id: serial('event_season_result_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     result: integer('result').notNull(), // can either be a castaway or tribe or member id

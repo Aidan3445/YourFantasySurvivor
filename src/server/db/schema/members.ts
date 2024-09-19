@@ -29,7 +29,7 @@ export interface Member {
   isAdmin: boolean;
   isOwner: boolean;
   loggedIn: boolean;
-  drafted: string | null;
+  drafted: string[];
 }
 
 export const selectionUpdates = createTable(
@@ -38,7 +38,7 @@ export const selectionUpdates = createTable(
     id: serial('selection_update_id').notNull().primaryKey(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
     // null episode indicates initial pick
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({

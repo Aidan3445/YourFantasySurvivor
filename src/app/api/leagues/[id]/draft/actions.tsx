@@ -3,8 +3,11 @@
 import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
+import { episodes } from '~/server/db/schema/episodes';
+import { leagues } from '~/server/db/schema/leagues';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { seasonCastaways, seasonEvents, seasonMembers, seasonTribes } from '~/server/db/schema/seasonEvents';
+import { seasons } from '~/server/db/schema/seasons';
 
 export interface Picks {
   firstPick?: number;
@@ -18,6 +21,16 @@ export async function submitDraft(leagueId: number, picks: Picks) {
   const { userId } = auth();
   if (!userId) throw new Error('User not authenticated');
 
+  const firstEp = await db
+    .select({ id: episodes.id })
+    .from(episodes)
+    .innerJoin(seasons, eq(seasons.id, episodes.season))
+    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .where(and(
+      eq(leagues.id, leagueId),
+      eq(episodes.number, 1)));
+  if (!firstEp[0]) throw new Error('Season does not have any episodes');
+
   const memberId = await db
     .select({ id: leagueMembers.id })
     .from(leagueMembers)
@@ -30,7 +43,7 @@ export async function submitDraft(leagueId: number, picks: Picks) {
   // initial pick (cannot be changed via draft form)
   if (picks.firstPick) {
     await db.insert(selectionUpdates)
-      .values({ member: memberId, episode: null, castaway: picks.firstPick })
+      .values({ member: memberId, episode: firstEp[0].id, castaway: picks.firstPick })
       .onConflictDoNothing();
   }
 
