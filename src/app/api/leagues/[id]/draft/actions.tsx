@@ -1,8 +1,8 @@
 'use server';
-
 import { auth } from '@clerk/nextjs/server';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq, or } from 'drizzle-orm';
 import { db } from '~/server/db';
+import { castaways } from '~/server/db/schema/castaways';
 import { episodes } from '~/server/db/schema/episodes';
 import { leagues } from '~/server/db/schema/leagues';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
@@ -114,3 +114,48 @@ export async function submitDraft(leagueId: number, picks: Picks) {
     }))
   ]);
 }
+
+export async function changeSurvivorPick(leagueId: number, castaway: string) {
+  const { userId } = auth();
+  if (!userId) throw new Error('User not authenticated');
+
+  const memberId = await db
+    .select({ id: leagueMembers.id })
+    .from(leagueMembers)
+    .where(and(
+      eq(leagueMembers.league, leagueId),
+      eq(leagueMembers.userId, userId)))
+    .then((res) => res[0]?.id);
+  if (!memberId) throw new Error('Member not found');
+
+  const currentEp = await db
+    .select({ id: episodes.id })
+    .from(episodes)
+    .innerJoin(seasons, eq(seasons.id, episodes.season))
+    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .where(eq(leagues.id, leagueId))
+    .orderBy(desc(episodes.number))
+    .limit(1).then((res) => res[0]?.id);
+  if (!currentEp) throw new Error('Season does not have any episodes');
+
+  const castawayId = await db
+    .select({ id: castaways.id })
+    .from(castaways)
+    .innerJoin(seasons, eq(seasons.id, castaways.season))
+    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .where(and(
+      eq(leagues.id, leagueId),
+      or(eq(castaways.name, castaway), eq(castaways.shortName, castaway))))
+    .then((res) => res[0]?.id);
+  if (!castawayId) throw new Error('Castaway not found');
+
+  await db
+    .insert(selectionUpdates)
+    .values({ member: memberId, episode: currentEp, castaway: castawayId })
+    .onConflictDoUpdate({
+      target: [selectionUpdates.member, selectionUpdates.episode],
+      set: { castaway: castawayId },
+    });
+}
+
+

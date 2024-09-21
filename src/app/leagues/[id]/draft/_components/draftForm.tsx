@@ -1,6 +1,6 @@
 'use client';
 import { z } from 'zod';
-import { type ComponentProps } from '~/lib/utils';
+import { castawaysByTribe, type ComponentProps } from '~/lib/utils';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { type Tribe } from '~/server/db/schema/tribes';
@@ -110,11 +110,7 @@ export default function DraftForm({
       });
   };
 
-  const castawaysByTribe: Record<string, CastawayDetails[]> = options.castaways.reduce((acc, c) => {
-    if (!acc[c.startingTribe.name]) acc[c.startingTribe.name] = [];
-    acc[c.startingTribe.name]!.push(c);
-    return acc;
-  }, {} as Record<string, CastawayDetails[]>);
+  const castaways = castawaysByTribe(options.castaways);
 
   const getAlert = () => {
     let content: { title: string, description: string } = { title: '', description: '' };
@@ -172,7 +168,7 @@ export default function DraftForm({
                       </div>
                     </SelectTrigger>
                     <SelectCastawaysByTribe
-                      castawaysByTribe={castawaysByTribe}
+                      castawaysByTribe={castaways}
                       otherChoices={currentPicks.firstPick ? undefined : options.unavailable} />
                   </Select>
                 </FormControl>
@@ -198,7 +194,7 @@ export default function DraftForm({
                                 <FormMessage className='pl-8 text-left'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
                               </div>
                             </SelectTrigger>
-                            <SelectCastawaysByTribe castawaysByTribe={castawaysByTribe} />
+                            <SelectCastawaysByTribe castawaysByTribe={castaways} />
                           </Select>)} />
                     </FormControl>
                   </PredictionCard>
@@ -341,12 +337,12 @@ function MainPicks({ pickCount, options, formState }: PicksProps) {
 }
 */
 
-interface SelectCastawaysByTribeProps {
+export interface SelectCastawaysByTribeProps {
   castawaysByTribe: Record<string, CastawayDetails[]>;
   otherChoices?: CastawayDetails[];
 }
 
-function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastawaysByTribeProps) {
+export function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastawaysByTribeProps) {
   return (
     <SelectContent>
       {Object.entries(castawaysByTribe).map(([tribe, castaways]) => (

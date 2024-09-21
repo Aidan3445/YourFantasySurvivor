@@ -35,14 +35,12 @@ export interface Member {
 export const selectionUpdates = createTable(
   'selection_update',
   {
-    id: serial('selection_update_id').notNull().primaryKey(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
-    // null episode indicates initial pick
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
-    uniqueEp: unique().on(table.member, table.episode).nullsNotDistinct(),
+    uniqueEp: unique().on(table.member, table.episode),
   })
 );
 export type SelectionUpdate = typeof selectionUpdates.$inferSelect;

@@ -10,7 +10,15 @@ interface PageProps {
 
 export default async function League({ params }: PageProps) {
   const leagueId = parseInt(params.id);
-  const { league, settings, predictions, castaways, tribes, yourTurn } = await getDraftDetails(leagueId);
+  const {
+    league,
+    settings,
+    predictions,
+    castaways,
+    tribes,
+    yourTurn,
+    unavailable
+  } = await getDraftDetails(leagueId);
 
   const preseasonPredictions = {
     ...predictions,
@@ -22,7 +30,7 @@ export default async function League({ params }: PageProps) {
       castaways,
       tribes,
       members: league.members,
-      unavailable: castaways.filter((c) => settings.draftOrder.some((d) => d.drafted[0] === c.more.shortName))
+      unavailable
     },
     yourTurn,
     draftOver: settings.draftOver

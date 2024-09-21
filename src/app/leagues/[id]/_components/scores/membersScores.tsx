@@ -1,19 +1,28 @@
 import { getContrastingColor } from '@uiw/color-convert';
-import EditMember, { InviteMember, ManageMember, RoleHover } from './memberEdit';
-import { cn, type ComponentProps } from '~/lib/utils';
+import EditMember, { ChangeSurvivor, InviteMember, ManageMember, RoleHover } from './memberEdit';
+import { castawaysByTribe, cn, type ComponentProps } from '~/lib/utils';
 import { type Member } from '~/server/db/schema/members';
 import { Separator } from '~/app/_components/commonUI/separator';
+import { type CastawayDetails } from '~/server/db/schema/castaways';
 
 interface MembersProps {
   leagueId: number;
   members: (Member & { points: number })[];
+  details: {
+    remaining: CastawayDetails[];
+    unavailable: CastawayDetails[];
+  };
   ownerLoggedIn: boolean;
   isFull: boolean;
 }
 
-export default async function Members({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
+export default async function Members({ leagueId, members, ownerLoggedIn, isFull, details }: MembersProps) {
   const showPointsPlace = members.some((m) => m.points > 0);
   const showDrafted = members.some((m) => m.drafted);
+
+  console.log('rem', details.remaining);
+
+  const byTribe = castawaysByTribe(details.remaining);
 
   return (
     <table className='space-x-1 space-y-2'>
@@ -54,8 +63,15 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
               </td>
               {!!member.drafted.length &&
                 <td>
-                  <ColorRow color={member.color} className='py-1 text-xs col-start-4 flex justify-center'>
+                  <ColorRow color={member.color} className='py-1 text-xs col-start-4 flex gap-2 justify-center'>
                     <h3 style={{ color: cColor }}>{member.drafted.slice(-1)[0]}</h3>
+                    {member.loggedIn &&
+                      <ChangeSurvivor
+                        leagueId={leagueId}
+                        color={cColor}
+                        castawaysByTribe={byTribe}
+                        otherChoices={details.unavailable}
+                        currentPick={member.drafted.slice(-1)[0]} />}
                   </ColorRow>
                 </td>}
             </tr>

@@ -1,4 +1,5 @@
 'use client';
+import { HoverCardPortal } from '@radix-ui/react-hover-card';
 import { Info } from 'lucide-react';
 import { useState } from 'react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
@@ -16,15 +17,17 @@ export function PredictionCard({ prediction, parity, className, children }: Pred
 
   return (
     <div className={cn(parity ? 'bg-b4/70' : 'bg-b3/80', 'p-2 rounded-md', className)}>
-      <span className='inline-flex gap-2 items-center text-xs'>
+      <span className='flex gap-2 justify-between text-xs'>
         <p>Predict {prediction.name} {prediction.points != 0 ? `for ${prediction.points} points.` : ''}</p>
         <HoverCard open={open} onOpenChange={() => setOpen(!open)}>
           <HoverCardTrigger onClick={() => setOpen(!open)}>
             <Info size={16} />
           </HoverCardTrigger>
-          <HoverCardContent>
-            <p>{prediction.description}</p>
-          </HoverCardContent>
+          <HoverCardPortal>
+            <HoverCardContent>
+              <p>{prediction.description}</p>
+            </HoverCardContent>
+          </HoverCardPortal>
         </HoverCard>
       </span>
       {children ? children : <p className='text-xs italic'>Choose a {prediction.referenceType}</p>}

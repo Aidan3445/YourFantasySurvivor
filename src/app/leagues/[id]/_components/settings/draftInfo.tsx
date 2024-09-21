@@ -27,7 +27,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
         {settings.draftOver && 'View'} Draft
       </PopoverTrigger>
       <PopoverContent>
-        <CardContainer className='flex flex-col gap-1 p-6 transition-all'>
+        <CardContainer className='flex flex-col gap-1 p-6 min-w-80'>
           <h2 className='text-2xl font-semibold text-center'>Draft Info</h2>
           <Tabs defaultValue='order'>
             <TabsList className='grid grid-flow-col auto-cols-fr w-full'>

@@ -1,7 +1,7 @@
 import 'server-only';
 import { getLeagueSettings } from '~/app/api/leagues/[id]/settings/query';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
-import { getCastaways } from '~/app/api/seasons/[name]/castaways/query';
+import { getCastaways, getRemainingCastaways } from '~/app/api/seasons/[name]/castaways/query';
 import { getLeague } from '~/app/api/leagues/query';
 import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
 import { auth } from '@clerk/nextjs/server';
@@ -41,19 +41,33 @@ export async function getDraftDetails(leagueId: number) {
 
   const nextTurn = settings.draftOrder.find((member) => !member.drafted);
 
-  const yourTurn = nextTurn
-    ? await db
-      .selectDistinct({ yourTurn: leagueMembers.id })
+  const [yourTurn, remaining] = await Promise.all([(nextTurn ?
+    db.selectDistinct({ yourTurn: leagueMembers.id })
       .from(leagueMembers)
       .where(and(
         eq(leagueMembers.league, leagueId),
         eq(leagueMembers.userId, userId),
         eq(leagueMembers.displayName, nextTurn.name)))
       .limit(1)
-      .then((res) => res.length > 0)
-    : false;
+      .then((res) => res.length > 0) : false),
+  getRemainingCastaways(league.league.season)
+  ]);
 
-  return { league, settings, predictions, castaways, tribes, yourTurn };
+  const unavailable = castaways
+    .filter((c) => remaining.some((r) => r.name === c.name))
+    .filter((c) => settings.draftOrder
+      .some((d) => d.drafted.slice(-1)[0] === c.more.shortName));
+
+  return {
+    league,
+    settings,
+    predictions,
+    castaways,
+    tribes,
+    yourTurn,
+    unavailable,
+    remaining: castaways.filter((c) => remaining.some((r) => r.name === c.name)),
+  };
 }
 
 export async function getCurrentPredictions(

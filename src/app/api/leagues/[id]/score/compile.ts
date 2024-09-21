@@ -85,7 +85,6 @@ export default function compileScores(
       }
     }
   }
-  console.log(scores);
 
   return scores;
 }

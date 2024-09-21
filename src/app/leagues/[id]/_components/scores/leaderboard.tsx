@@ -5,6 +5,7 @@ import { getRules } from '~/app/api/leagues/[id]/rules/query';
 import { getCastawayMemberEpisodeTable, getCustomEvents, getEvents } from '~/app/api/leagues/[id]/score/query';
 import compileScores from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
+import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
 
 interface MembersProps {
   leagueId: number;
@@ -15,10 +16,11 @@ interface MembersProps {
 
 export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   const [
-    rules, events, customEvents, memberCastaways
+    rules, events, customEvents, memberCastaways, details,
   ] = await Promise.all([
     getRules(leagueId), getEvents(leagueId), getCustomEvents(leagueId),
     getCastawayMemberEpisodeTable(members.map((m) => m.id)),
+    getDraftDetails(leagueId),
   ]);
 
   const altEvents = [...customEvents]; // eventually add weekly and season events
@@ -42,7 +44,12 @@ export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: 
       </TabsList>
       <TabsContent value='members'>
         <span className='flex flex-wrap gap-4 w-full justify-center'>
-          <Members leagueId={leagueId} members={membersWithScores} ownerLoggedIn={ownerLoggedIn} isFull={isFull} />
+          <Members
+            leagueId={leagueId}
+            members={membersWithScores}
+            ownerLoggedIn={ownerLoggedIn}
+            isFull={isFull}
+            details={details} />
           {Object.keys(baseScores).length !== 0 && <Chart className='w-96' data={membersWithScores} label />}
         </span>
       </TabsContent>

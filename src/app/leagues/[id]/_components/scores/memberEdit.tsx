@@ -1,7 +1,7 @@
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { HoverCardArrow } from '@radix-ui/react-hover-card';
-import { Check, Crown, LogOut, Palette, Pencil, Shield, SlidersHorizontal, Trash2, UserCog, UserPlus, UserX } from 'lucide-react';
+import { Check, Crown, LogOut, Palette, Pencil, RefreshCw, Shield, SlidersHorizontal, Trash2, UserCog, UserPlus, UserX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -19,6 +19,9 @@ import { useToast } from '~/app/_components/commonUI/use-toast';
 import { twentyColors } from '~/lib/colors';
 import { type Member } from '~/server/db/schema/members';
 import { ColorRow } from './membersScores';
+import { SelectCastawaysByTribe, type SelectCastawaysByTribeProps } from '../../draft/_components/draftForm';
+import { Select, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
+import { changeSurvivorPick } from '~/app/api/leagues/[id]/draft/actions';
 
 interface MemberEditProps {
   leagueId: number;
@@ -532,3 +535,78 @@ export function InviteMember({ leagueId }: UpdateProps) {
     </Popover >
   );
 }
+
+interface ChangeSurvivorProps extends UpdateProps, SelectCastawaysByTribeProps {
+  currentPick?: string;
+  color: string;
+}
+
+const changeSurvivorSchema = z.object({
+  newSurvivor: z.string()
+});
+
+export function ChangeSurvivor({
+  leagueId,
+  castawaysByTribe,
+  otherChoices,
+  currentPick,
+  color
+}: ChangeSurvivorProps) {
+  const form = useForm<z.infer<typeof changeSurvivorSchema>>({
+    resolver: zodResolver(changeSurvivorSchema),
+  });
+  const router = useRouter();
+
+  const [changeOpen, setChangeOpen] = useState(false);
+
+  const catchUpdate = () => {
+    const update = changeSurvivorPick.bind(null, leagueId, form.getValues('newSurvivor'));
+    update()
+      .then(() => {
+        setChangeOpen(false);
+        router.refresh();
+      })
+      .catch(() => {
+        form.setError('newSurvivor', { type: 'manual', message: 'The castaway may have been taken. Reload and try again.' });
+      });
+  };
+
+  const current = otherChoices?.find((c) => c.more.shortName === currentPick);
+
+  return (
+    <Popover open={changeOpen} onOpenChange={setChangeOpen}>
+      <PopoverTrigger>
+        <RefreshCw size={16} color={color} />
+      </PopoverTrigger>
+      <Popup>
+        <Form {...form}>
+          <form className='flex flex-col gap-1 text-center' action={catchUpdate}>
+            <FormField
+              control={form.control}
+              name='newSurvivor'
+              defaultValue={current?.name}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} {...field}>
+                      <SelectTrigger className='w-full'>
+                        <div className='flex-grow text-nowrap'>
+                          <SelectValue placeholder='Choose your Survivor' />
+                        </div>
+                      </SelectTrigger>
+                      <SelectCastawaysByTribe
+                        castawaysByTribe={castawaysByTribe}
+                        otherChoices={otherChoices?.filter((c) => c.more.shortName !== currentPick)} />
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+            <Button type='submit'>Change</Button>
+          </form>
+        </Form >
+      </Popup>
+    </Popover>
+  );
+}
+
