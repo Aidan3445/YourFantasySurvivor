@@ -22,6 +22,7 @@ import { ColorRow } from './membersScores';
 import { SelectCastawaysByTribe, type SelectCastawaysByTribeProps } from '../../draft/_components/draftForm';
 import { Select, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { changeSurvivorPick } from '~/app/api/leagues/[id]/draft/actions';
+import { type ComponentProps } from '~/lib/utils';
 
 interface MemberEditProps {
   leagueId: number;
@@ -62,7 +63,7 @@ function Popup({ children }: PopupProps) {
   );
 }
 
-interface UpdateProps {
+interface UpdateProps extends ComponentProps {
   leagueId: number;
 }
 
@@ -321,9 +322,11 @@ interface ManageMemberProps {
 }
 
 export function ManageMember({ leagueId, color, member }: ManageMemberProps) {
+  const [manageOpen, setManageOpen] = useState(false);
+
   return (
-    <HoverCard openDelay={150}>
-      <HoverCardTrigger>
+    <HoverCard openDelay={150} open={manageOpen} onOpenChange={setManageOpen}>
+      <HoverCardTrigger onClick={() => setManageOpen(!manageOpen)}>
         <UserCog size={14} color={color} />
       </HoverCardTrigger>
       <HoverCardContent className='flex gap-2 p-0.5 w-min text-xs text-center border-black shadow-md bg-b2 shadow-zinc-700' sideOffset={10} side='top'>
@@ -550,7 +553,8 @@ export function ChangeSurvivor({
   castawaysByTribe,
   otherChoices,
   currentPick,
-  color
+  color,
+  className,
 }: ChangeSurvivorProps) {
   const form = useForm<z.infer<typeof changeSurvivorSchema>>({
     resolver: zodResolver(changeSurvivorSchema),
@@ -575,7 +579,7 @@ export function ChangeSurvivor({
 
   return (
     <Popover open={changeOpen} onOpenChange={setChangeOpen}>
-      <PopoverTrigger>
+      <PopoverTrigger className={className}>
         <RefreshCw size={16} color={color} />
       </PopoverTrigger>
       <Popup>

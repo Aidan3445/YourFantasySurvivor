@@ -20,8 +20,6 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
   const showPointsPlace = members.some((m) => m.points > 0);
   const showDrafted = members.some((m) => m.drafted);
 
-  console.log('rem', details.remaining);
-
   const byTribe = castawaysByTribe(details.remaining);
 
   return (
@@ -34,18 +32,18 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
             <tr key={member.id}>
               {showPointsPlace &&
                 <td>
-                  <ColorRow color={member.color} className='py-1 text-xs col-start-1 flex justify-center'>
+                  <ColorRow color={member.color} className='py-1 text-xs  flex justify-center'>
                     <h3 style={{ color: cColor }}>{index + 1}</h3>
                   </ColorRow>
                 </td>}
               {showPointsPlace &&
                 <td>
-                  <ColorRow color={member.color} className='py-1 text-xs col-start-2 flex justify-center'>
+                  <ColorRow color={member.color} className='py-1 text-xs flex justify-center'>
                     <h3 style={{ color: cColor }}>{member.points}</h3>
                   </ColorRow>
                 </td>}
               <td>
-                <ColorRow className={cn('col-start-3', member.drafted.length ? '' : 'col-span-2')} color={member.color} loggedIn={member.loggedIn} >
+                <ColorRow color={member.color} loggedIn={member.loggedIn} >
                   <h3
                     className='font-medium'
                     style={{ color: cColor }}>
@@ -63,10 +61,11 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
               </td>
               {!!member.drafted.length &&
                 <td>
-                  <ColorRow color={member.color} className='py-1 text-xs col-start-4 flex gap-2 justify-center'>
+                  <ColorRow color={member.color} className='py-1 text-xs flex gap-2'>
                     <h3 style={{ color: cColor }}>{member.drafted.slice(-1)[0]}</h3>
                     {member.loggedIn &&
                       <ChangeSurvivor
+                        className='ml-auto'
                         leagueId={leagueId}
                         color={cColor}
                         castawaysByTribe={byTribe}

@@ -54,7 +54,7 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
               (dataMin: number) => dataMin,
               (dataMax: number) => dataMax + 1,
             ]} />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} offset={50} />
           {sortedData.map((line, index) => (
             <Line
               id={`line-${line.name}`}
@@ -68,21 +68,13 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
               strokeOpacity={0.7}
               dot={false}
               key={index}
-              onMouseOver={() =>
-                mouseOverLeaderboard(
-                  line.name,
-                  sortedData.map((d) => d.name),
-                )
-              }
-              onMouseOut={() =>
-                mouseOutLeaderboard(
-                  line.name,
-                  line.color,
-                  sortedData.map((d) => d.name),
-                )
-              }
-            />
-          ))}
+              onMouseOver={() => mouseOverLeaderboard(
+                line.name,
+                sortedData.map((d) => d.name))}
+              onMouseOut={() => mouseOutLeaderboard(
+                line.name,
+                line.color,
+                sortedData.map((d) => d.name))} />))}
         </LineChart>
       </ResponsiveContainer>
     </div>
@@ -139,7 +131,7 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
   }
 
   return (
-    <div className='flex flex-col p-1 rounded-md border border-black bg-b3/80'>
+    <div className='flex flex-col p-1 rounded-md border border-black bg-b3/95'>
       <div>Episode {label}:</div>
       <Separator className='mb-1' />
       <div className='flex gap-2'>
@@ -160,10 +152,10 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
         </div>
         {secondSet.length > 0 && (
           <div className='grid grid-cols-min gap-1'>
-            {firstSet.map((p) => (
+            {secondSet.map((p) => (
               <span
                 key={p.dataKey}
-                className='grid grid-cols-subgrid col-span-2'
+                className='grid grid-cols-subgrid col-span-2 opacity-60'
                 style={{ color: p.stroke, stroke: p.stroke }}>
                 <ColorRow className='col-start-1' color={p.stroke}>
                   <h3 className='col-start-2'>{p.dataKey}</h3>

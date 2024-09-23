@@ -4,7 +4,7 @@ import { tribes } from './tribes';
 import { episodes } from './episodes';
 import { leagues, pointRange, reference } from './leagues';
 import { leagueMembers } from './members';
-import { integer, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { description, eventName } from './customEvents';
 
@@ -58,48 +58,66 @@ export const weeklyEvents = createTable(
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
-  }
+  },
+  (table) => ({
+    unique: unique().on(table.rule, table.episode, table.member),
+  })
 );
 export type WeeklyEvent = typeof weeklyEvents.$inferSelect;
 
-export const weeklyEventsCastaways = createTable(
+export const weeklyCastaways = createTable(
   'event_weekly_castaway',
   {
+    id: serial('event_weekly_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
-    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.castaway] }),
-  })
+    reference: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+  }
 );
 
-export const weeklyEventsTribes = createTable(
+export const weeklyTribes = createTable(
   'event_weekly_tribe',
   {
+    id: serial('event_weekly_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
-    tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.tribe] }),
-  })
+    reference: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+  }
 );
 
-export const weeklyEventsMembers = createTable(
+export const weeklyMembers = createTable(
   'event_weekly_member',
   {
+    id: serial('event_weekly_member_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
-    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.member] }),
-  })
+    reference: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+  }
 );
 
-export const weeklyEventResults = createTable(
-  'event_weekly_result',
+export const weeklyCastawayResults = createTable(
+  'event_weekly_result_castaway',
   {
+    id: serial('event_weekly_result_castaway_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').notNull(), // can either be a castaway or tribe or member id
+    result: integer('result').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+  }
+);
+
+export const weeklyTribeResults = createTable(
+  'event_weekly_result_tribe',
+  {
+    id: serial('event_weekly_result_tribe_id').notNull().primaryKey(),
+    rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+  }
+);
+
+export const weeklyMemberResults = createTable(
+  'event_weekly_result_member',
+  {
+    id: serial('event_weekly_result_member_id').notNull().primaryKey(),
+    rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   }
 );

@@ -1,9 +1,10 @@
 import { type Events } from '~/app/api/seasons/[name]/events/query';
 import { type BaseEventRuleType } from '~/server/db/schema/leagues';
+import { type AltEvents } from './query';
 
 export default function compileScores(
   { castawayEvents, tribeEvents, tribeUpdates }: Events,
-  altEvents: { castaway: string; points: number; episode: number }[],
+  altEvents: AltEvents,
   memberCastaways: Record<number, Record<string, string>>,
   rules: BaseEventRuleType
 ): Record<string, number[]> {
@@ -53,7 +54,7 @@ export default function compileScores(
   }
 
   // alt events
-  for (const { castaway, points, episode } of altEvents) {
+  for (const { castaway, points, episode } of altEvents.castawayEvents) {
     const member = findMember(memberCastaways, castaway, episode);
     if (!member) continue;
 
@@ -62,22 +63,41 @@ export default function compileScores(
     memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
   }
 
+  for (const { tribe, points, episode } of altEvents.tribeEvents) {
+    const castaways = tribeUpdates[episode]?.[tribe] ?? [];
+
+    for (const castaway of castaways) {
+      const member = findMember(memberCastaways, castaway, episode);
+      if (!member) continue;
+
+      scores[member] ??= [];
+      const memberPoints = scores[member];
+      memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
+    }
+  }
+
+  for (const { member, points, episode } of altEvents.memberEvents) {
+    scores[member] ??= [];
+    const memberPoints = scores[member];
+    memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
+  }
+
+
+
   // add survival bonus
   // each episode that your castaway survives
   // you get points for the number of episodes they've survived
-  const survivalTable = Object.values(Object.values(memberCastaways)[0] ?? {}).reduce(
-    (acc, castaway) => {
-      acc[castaway] = 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const members = Object.values(Object.values(memberCastaways)[0] ?? {});
+  const survivalTable = members.reduce((acc, castaway) => {
+    acc[castaway] = 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   for (let i = 1; i <= elimList.length; i++) {
     const elminated = elimList[i - 1]!;
 
     for (const member in survivalTable) {
-      if (findMember(memberCastaways, elminated, i) === member) survivalTable[member] = 1;
+      if (findMember(memberCastaways, elminated, i) === member) survivalTable[member] = 0;
       else {
         scores[member] ??= [];
         scores[member][i] ??= 0;

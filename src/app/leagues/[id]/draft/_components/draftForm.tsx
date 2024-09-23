@@ -345,24 +345,27 @@ export interface SelectCastawaysByTribeProps {
 export function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastawaysByTribeProps) {
   return (
     <SelectContent>
-      {Object.entries(castawaysByTribe).map(([tribe, castaways]) => (
-        <SelectGroup key={tribe}>
-          <SelectLabel>
-            <ColorRow color={castaways[0]!.startingTribe.color} className='px-4 -mx-4 w-full italic'>
-              <h3 style={{ color: getContrastingColor(castaways[0]!.startingTribe.color) }}>{tribe}</h3>
-            </ColorRow>
-          </SelectLabel>
-          {castaways
-            .filter((castaway) => !otherChoices?.some((s) => s.name === castaway.name))
-            .map((castaway) => (
-              <SelectItem className='block pr-6 w-full' key={castaway.name} value={castaway.name}>
-                <ColorRow color={castaway.startingTribe.color}>
-                  <h3 style={{ color: getContrastingColor(castaway.startingTribe.color) }}>{castaway.name}</h3>
-                </ColorRow>
-              </SelectItem>
-            ))}
-        </SelectGroup>
-      ))}
+      {Object.entries(castawaysByTribe).map(([tribe, castaways]) => {
+        castaways = castaways.filter((castaway) => !otherChoices?.some((s) => s.name === castaway.name));
+        if (!castaways.length) return null;
+        return (
+          <SelectGroup key={tribe}>
+            <SelectLabel>
+              <ColorRow color={castaways[0]!.startingTribe.color} className='px-4 -mx-4 w-full italic'>
+                <h3 style={{ color: getContrastingColor(castaways[0]!.startingTribe.color) }}>{tribe}</h3>
+              </ColorRow>
+            </SelectLabel>
+            {castaways
+              .map((castaway) => (
+                <SelectItem className='block pr-6 w-full' key={castaway.name} value={castaway.name}>
+                  <ColorRow color={castaway.startingTribe.color}>
+                    <h3 style={{ color: getContrastingColor(castaway.startingTribe.color) }}>{castaway.name}</h3>
+                  </ColorRow>
+                </SelectItem>
+              ))}
+          </SelectGroup>
+        );
+      })}
     </SelectContent>
   );
 }

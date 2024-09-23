@@ -58,7 +58,6 @@ export const seasonEvents = createTable(
   {
     id: serial('event_season_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
-    timing: eventTiming('timing').notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => ({
@@ -69,31 +68,53 @@ export const seasonEvents = createTable(
 export const seasonCastaways = createTable(
   'event_season_castaway',
   {
+    id: serial('event_season_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonTribes = createTable(
   'event_season_tribe',
   {
+    id: serial('event_season_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonMembers = createTable(
   'event_season_member',
   {
+    id: serial('event_season_member_id').notNull().primaryKey(),
     event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   });
 
-export const seasonEventResults = createTable(
-  'event_season_result',
+export const seasonCastawayResults = createTable(
+  'event_season_result_castaway',
   {
-    id: serial('event_season_result_id').notNull().primaryKey(),
+    id: serial('event_season_result_castaway_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').notNull(), // can either be a castaway or tribe or member id
+    result: integer('result').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   }
 );
 
+export const seasonTribeResults = createTable(
+  'event_season_result_tribe',
+  {
+    id: serial('event_season_result_tribe_id').notNull().primaryKey(),
+    rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+  }
+);
+
+export const seasonMemberResults = createTable(
+  'event_season_result_member',
+  {
+    id: serial('event_season_result_member_id').notNull().primaryKey(),
+    rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+  }
+);

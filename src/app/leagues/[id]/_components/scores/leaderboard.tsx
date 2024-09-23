@@ -2,7 +2,7 @@ import { type Member } from '~/server/db/schema/members';
 import Members from './membersScores';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
-import { getCastawayMemberEpisodeTable, getCustomEvents, getEvents } from '~/app/api/leagues/[id]/score/query';
+import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents } from '~/app/api/leagues/[id]/score/query';
 import compileScores from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
@@ -16,14 +16,21 @@ interface MembersProps {
 
 export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   const [
-    rules, events, customEvents, memberCastaways, details,
+    rules, events, customEvents, weeklyEvents, seasonEvents,
+    memberCastaways, details,
   ] = await Promise.all([
-    getRules(leagueId), getEvents(leagueId), getCustomEvents(leagueId),
+    getRules(leagueId), getBaseEvents(leagueId),
+    getCustomEvents(leagueId), getWeeklyEvents(leagueId), getSeasonEvents(leagueId),
     getCastawayMemberEpisodeTable(members.map((m) => m.id)),
     getDraftDetails(leagueId),
   ]);
 
-  const altEvents = [...customEvents]; // eventually add weekly and season events
+  const altEvents = {
+    castawayEvents: [...customEvents.castawayEvents, ...weeklyEvents.castawayEvents, ...seasonEvents.castawayEvents],
+    tribeEvents: [...customEvents.tribeEvents, ...weeklyEvents.tribeEvents, ...seasonEvents.tribeEvents],
+    memberEvents: [...customEvents.memberEvents, ...weeklyEvents.memberEvents, ...seasonEvents.memberEvents],
+  };
+
   const baseScores = compileScores(events, altEvents, memberCastaways, rules);
 
   const membersWithScores = members.map((member) => {

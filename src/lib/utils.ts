@@ -13,7 +13,6 @@ export interface ComponentProps {
 }
 
 export function castawaysByTribe(options: CastawayDetails[]): Record<string, CastawayDetails[]> {
-  console.log('options', options);
   return options.reduce((acc, c) => {
     if (!acc[c.startingTribe.name]) acc[c.startingTribe.name] = [];
     acc[c.startingTribe.name]!.push(c);

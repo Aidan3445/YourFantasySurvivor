@@ -4,7 +4,7 @@ import { tribes } from './tribes';
 import { episodes } from './episodes';
 import { leagues, reference, pointRange } from './leagues';
 import { leagueMembers } from './members';
-import { integer, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
+import { integer, serial, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 
 export const customEventRules = createTable(
@@ -50,36 +50,30 @@ export const customEvents = createTable(
 );
 export type CustomEvent = typeof customEvents.$inferSelect;
 
-export const customEventCastaways = createTable(
+export const customCastaways = createTable(
   'event_custom_castaway',
   {
+    id: serial('event_custom_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.castaway] }),
-  })
 );
 
-export const customEventTribes = createTable(
+export const customTribes = createTable(
   'event_custom_tribe',
   {
+    id: serial('event_custom_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.tribe] }),
-  })
 );
 
-export const customEventMembers = createTable(
+export const customMembers = createTable(
   'event_custom_member',
   {
+    id: serial('event_custom_member_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.member] }),
-  })
 );
 

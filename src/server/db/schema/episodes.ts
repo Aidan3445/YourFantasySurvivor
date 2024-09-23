@@ -2,7 +2,7 @@ import { createTable } from './createTable';
 import { seasons } from './seasons';
 import { tribes } from './tribes';
 import { castaways } from './castaways';
-import { integer, serial, varchar, smallint, timestamp, boolean, pgEnum, primaryKey } from 'drizzle-orm/pg-core';
+import { integer, serial, varchar, smallint, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
 
 export const episodes = createTable(
   'episode',
@@ -38,22 +38,18 @@ export const baseEvents = createTable(
 export const baseEventCastaways = createTable(
   'event_base_castaway',
   {
+    id: serial('event_base_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => baseEvents.id, { onDelete: 'cascade' }).notNull(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.castaway] }),
-  })
+  }
 );
 export const baseEventTribes = createTable(
   'event_base_tribe',
   {
+    id: serial('event_base_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => baseEvents.id, { onDelete: 'cascade' }).notNull(),
     tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
-  },
-  (table) => ({
-    pk: primaryKey({ columns: [table.event, table.tribe] }),
-  })
+  }
 );
 export type BaseEvent = {
   id: number;
