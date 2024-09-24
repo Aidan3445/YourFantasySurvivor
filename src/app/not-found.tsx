@@ -9,7 +9,8 @@ export default function NotFound() {
           src='https://c.tenor.com/2urhaFhIGqIAAAAC/tenor.gif'
           alt='404: Page Not Found'
           width={1000}
-          height={500} />
+          height={500}
+          priority />
       </CardContainer>
       <h1 className='text-3xl font-semibold'>404: Page Not Found</h1>
     </main>

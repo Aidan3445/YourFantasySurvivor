@@ -3,6 +3,8 @@ import LeagueDetails from './_components/leagueDetails';
 import LeagueScoring from './_components/events/leagueScoring';
 import DraftInfo from './_components/settings/draftInfo';
 import { LeaderBoard } from './_components/scores/leaderboard';
+import { cn } from '~/lib/utils';
+import { Button } from '~/app/_components/commonUI/button';
 
 interface PageProps {
   params: {
@@ -27,7 +29,10 @@ export default async function League({ params }: PageProps) {
           league={league}
           ownerLoggedIn={ownerLoggedIn}
           openDefault={ownerLoggedIn && members.length === 1} />
-        <DraftInfo className='col-span-2 text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
+        <DraftInfo className={cn('text-black', !ownerLoggedIn && 'col-span-2')} league={league} ownerLoggedIn={ownerLoggedIn} />
+        <a href={`/leagues/${leagueId}/admin`}>
+          <Button className='w-full hs-in p-1 rounded-md text-base font-normal'>Admin</Button>
+        </a>
       </span>
       <LeaderBoard
         leagueId={leagueId}
