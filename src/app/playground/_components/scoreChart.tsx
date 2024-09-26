@@ -38,12 +38,12 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
             top: 10,
             right: 10,
             left: -20,
-            bottom: 0,
+            bottom: 10,
           }}>
           <CartesianGrid stroke='#4D4D4D' />
           <XAxis
             dataKey='episode' type='category' stroke='black'
-            label={label ? <text x={175} y={275} fill='black' transform='rotate(0)'>Episodes</text> : undefined} />
+            label={label ? <text x={175} y={273} fill='black' transform='rotate(0)'>Episodes</text> : undefined} />
           <YAxis
             stroke='black'
             tickCount={10}
