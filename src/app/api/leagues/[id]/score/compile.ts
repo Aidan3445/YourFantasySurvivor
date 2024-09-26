@@ -15,17 +15,18 @@ export default function compileScores(
   // sort for consistent elimination order
   const sortedCE = castawayEvents.sort((a, b) => a.episode - b.episode);
   for (const { castaway, name, episode } of sortedCE) {
+    if (!(name in rules)) {
+      // this means they left the game
+      elimList.push(castaway);
+      continue;
+    }
+
     const member = findMember(memberCastaways, castaway, episode);
     if (!member) continue;
 
     scores[member] ??= [];
 
     const points = scores[member];
-    if (!(name in rules)) {
-      // this means they left the game
-      elimList.push(castaway);
-      continue;
-    }
     points[episode] = (points[episode] ?? 0) + rules[name as keyof BaseEventRuleType];
   }
 
@@ -114,6 +115,7 @@ export default function compileScores(
       points[i] ??= 0;
     }
   }
+  console.log(elimList);
 
   return scores;
 }

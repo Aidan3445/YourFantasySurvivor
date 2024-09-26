@@ -75,7 +75,7 @@ export function SelectCastaways<T extends FieldValues>(
   const byTribe = castawaysByTribe(castaways);
 
   return (
-    <Select onValueChange={(a) => { console.log(a, 'A'); field.onChange(a); }} {...field}>
+    <Select onValueChange={field.onChange} {...field}>
       <SelectTrigger className='w-60'>
         <div className='flex-grow text-nowrap'>
           <SelectValue placeholder='Choose your Survivor' />
