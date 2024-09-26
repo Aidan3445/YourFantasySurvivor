@@ -573,7 +573,10 @@ export function ChangeSurvivor({
         router.refresh();
       })
       .catch(() => {
-        form.setError('newSurvivor', { type: 'manual', message: 'The castaway may have been taken. Reload and try again.' });
+        form.setError('newSurvivor', {
+          type: 'manual',
+          message: 'Changing Survivor is not available, try again later.'
+        });
       });
   };
 

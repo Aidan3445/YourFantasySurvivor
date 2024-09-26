@@ -27,7 +27,6 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
   const sortedData = [...data].sort(
     (a, b) => b.episodeScores.length - a.episodeScores.length,
   );
-  console.log('sortedData:', sortedData);
 
   return (
     <div className={cn(className, 'rounded-lg border border-black bg-b4/50')}>
@@ -40,8 +39,7 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
             right: 10,
             left: -20,
             bottom: 0,
-          }}
-        >
+          }}>
           <CartesianGrid stroke='#4D4D4D' />
           <XAxis
             dataKey='episode' type='category' stroke='black'

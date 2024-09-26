@@ -105,8 +105,6 @@ export default function compileScores(
     }
   }
 
-  console.log(scores);
-
   // fill in missing episodes
   const episodes = Math.max(...Object.values(scores).map((s) => s.length)) - 1;
   for (const member in scores) {
