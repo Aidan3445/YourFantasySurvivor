@@ -1,8 +1,8 @@
 'use client';
 import { z } from 'zod';
-import { castawaysByTribe, type ComponentProps } from '~/lib/utils';
+import { type ComponentProps } from '~/lib/utils';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { type Tribe } from '~/server/db/schema/tribes';
 import { type Member } from '~/server/db/schema/members';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
@@ -18,6 +18,7 @@ import { type Predictions } from '~/app/api/leagues/[id]/draft/query';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { AlertDialog, AlertDialogContent, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription } from '~/app/_components/commonUI/alert';
 import { PredictionCard } from '../../_components/settings/predictionCard';
+import { SelectCastaways } from '~/app/_components/selectSeason';
 
 export interface DraftFormProps extends ComponentProps {
   leagueId: number;
@@ -110,8 +111,6 @@ export default function DraftForm({
       });
   };
 
-  const castaways = castawaysByTribe(options.castaways);
-
   const getAlert = () => {
     let content: { title: string, description: string } = { title: '', description: '' };
     if (currentPicks.firstPick) {
@@ -160,21 +159,14 @@ export default function DraftForm({
             <FormItem className='flex flex-col justify-center my-0 rounded-md'>
               <PredictionCard prediction={survivorPrediction}>
                 <FormControl>
-                  <Select onValueChange={field.onChange} {...field}>
-                    <SelectTrigger className='w-full' disabled={!yourTurn || draftOver}>
-                      <div className='flex-grow text-nowrap'>
-                        <SelectValue className='px-0' placeholder='Choose your Survivor' />
-                        <FormMessage className='pl-5 text-left'>{form.formState.errors.firstPick?.message}</FormMessage>
-                      </div>
-                    </SelectTrigger>
-                    <SelectCastawaysByTribe
-                      castawaysByTribe={castaways}
-                      otherChoices={currentPicks.firstPick ? undefined : options.unavailable} />
-                  </Select>
+                  <SelectCastaways
+                    castaways={options.castaways}
+                    otherChoices={currentPicks.firstPick ? undefined : options.unavailable}
+                    field={field} />
                 </FormControl>
               </PredictionCard>
             </FormItem>)} />
-        {castaway &&
+        {castaway && // TODO: FormItem goes inside the FormField
           <div>
             <br />
             <FormLabel className='text-2xl'>Castaway Predictions</FormLabel>
@@ -187,21 +179,15 @@ export default function DraftForm({
                         name={`castaway[${index}]`}
                         defaultValue={currentPicks.castawayPicks?.[index]}
                         render={({ field }) => (
-                          <Select onValueChange={field.onChange} {...field}>
-                            <SelectTrigger className='w-full' disabled={draftOver}>
-                              <div className='flex-grow text-nowrap'>
-                                <SelectValue placeholder='Choose a Castaway' />
-                                <FormMessage className='pl-8 text-left'>{form.formState.errors.castaway?.[index]?.message}</FormMessage>
-                              </div>
-                            </SelectTrigger>
-                            <SelectCastawaysByTribe castawaysByTribe={castaways} />
-                          </Select>)} />
+                          <SelectCastaways
+                            castaways={options.castaways}
+                            field={field} />)} />
                     </FormControl>
                   </PredictionCard>
                 </FormItem>))}
             </div>
           </div>}
-        {tribe &&
+        {tribe && // TODO: FormItem goes inside the FormField
           <div>
             <br />
             <FormLabel className='text-2xl'>Tribe Predictions</FormLabel>
@@ -287,89 +273,6 @@ export default function DraftForm({
     </Form >
   );
 }
-
-/*
-interface PicksProps {
-  pickCount: number;
-  options: Record<string, CastawayDetails[]>;
-  formState: FormState<{ firstPick: string; secondPick?: string; }>;
-}
- 
-function MainPicks({ pickCount, options, formState }: PicksProps) {
-  const [pick1, setPick1] = useState<string | undefined>();
-  const [pick2, setPick2] = useState<string | undefined>();
- 
-  return (
-    <div className='flex flex-col gap-1'>
-      <FormLabel className='text-2xl'> Pick your Survivor{pickCount > 1 ? 's' : ''}</FormLabel>
-      <FormField
-        name='firstPick'
-        render={({ field }) => (
-          <FormItem className='flex flex-col justify-center p-2 my-0 rounded-md bg-b4/70'>
-            <FormControl>
-              <Select onValueChange={(val) => { setPick1(val); field.onChange(val); }} {...field}>
-                <SelectTrigger disabled>
-                  <SelectValue placeholder='First Pick' />
-                </SelectTrigger>
-                <SelectCastawaysByTribe castawaysByTribe={options} otherChoices={[pick2]} />
-              </Select>
-            </FormControl>
-            <FormMessage className='pl-12 text-left'>{formState.errors.firstPick?.message}</FormMessage>
-          </FormItem>)} />
-      {pickCount > 1 &&
-        <FormField
-          name='secondPick'
-          render={({ field }) => (
-            <FormItem className='flex flex-col justify-center p-2 my-0 rounded-md bg-b3/80'>
-              <FormControl>
-                <Select onValueChange={(val) => { setPick2(val); field.onChange(val); }} {...field}>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Second Pick' />
-                  </SelectTrigger>
-                  <SelectCastawaysByTribe castawaysByTribe={options} otherChoices={[pick1]} />
-                </Select>
-              </FormControl>
-              <FormMessage className='pl-12 text-left'>{formState.errors.secondPick?.message}</FormMessage>
-            </FormItem >)
-          } />}
-    </div>
-  );
-}
-*/
-
-export interface SelectCastawaysByTribeProps {
-  castawaysByTribe: Record<string, CastawayDetails[]>;
-  otherChoices?: CastawayDetails[];
-}
-
-export function SelectCastawaysByTribe({ castawaysByTribe, otherChoices }: SelectCastawaysByTribeProps) {
-  return (
-    <SelectContent>
-      {Object.entries(castawaysByTribe).map(([tribe, castaways]) => {
-        castaways = castaways.filter((castaway) => !otherChoices?.some((s) => s.name === castaway.name));
-        if (!castaways.length) return null;
-        return (
-          <SelectGroup key={tribe}>
-            <SelectLabel>
-              <ColorRow color={castaways[0]!.startingTribe.color} className='px-4 -mx-4 w-full italic'>
-                <h3 style={{ color: getContrastingColor(castaways[0]!.startingTribe.color) }}>{tribe}</h3>
-              </ColorRow>
-            </SelectLabel>
-            {castaways
-              .map((castaway) => (
-                <SelectItem className='block pr-6 w-full' key={castaway.name} value={castaway.name}>
-                  <ColorRow color={castaway.startingTribe.color}>
-                    <h3 style={{ color: getContrastingColor(castaway.startingTribe.color) }}>{castaway.name}</h3>
-                  </ColorRow>
-                </SelectItem>
-              ))}
-          </SelectGroup>
-        );
-      })}
-    </SelectContent>
-  );
-}
-
 
 const survivorPrediction = {
   name: 'Main Survivor',

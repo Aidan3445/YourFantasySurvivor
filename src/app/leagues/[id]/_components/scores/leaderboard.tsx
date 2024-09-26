@@ -38,7 +38,14 @@ export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: 
     return {
       ...member,
       points: points.reduce((a, b) => a + b, 0),
-      episodeScores: points,
+      episodeScores: points.reduce((totals, score, index) => {
+        const last = totals.pop() ?? 0;
+        for (let i = totals.length; i < index; i++) {
+          totals.push(last);
+        }
+        totals.push(last + score);
+        return totals;
+      }, [] as number[]),
       name: member.displayName
     };
   }).sort((a, b) => b.points - a.points);
@@ -57,7 +64,7 @@ export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: 
             ownerLoggedIn={ownerLoggedIn}
             isFull={isFull}
             details={details} />
-          {Object.keys(baseScores).length !== 0 && <Chart className='w-96' data={membersWithScores} label />}
+          {Object.keys(baseScores).length !== 0 && <Chart className='w-96 min-h-60' data={membersWithScores} label />}
         </span>
       </TabsContent>
       <TabsContent value='castaways'>

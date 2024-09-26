@@ -19,10 +19,10 @@ import { useToast } from '~/app/_components/commonUI/use-toast';
 import { twentyColors } from '~/lib/colors';
 import { type Member } from '~/server/db/schema/members';
 import { ColorRow } from './membersScores';
-import { SelectCastawaysByTribe, type SelectCastawaysByTribeProps } from '../../draft/_components/draftForm';
-import { Select, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { changeSurvivorPick } from '~/app/api/leagues/[id]/draft/actions';
 import { type ComponentProps } from '~/lib/utils';
+import { SelectCastaways } from '~/app/_components/selectSeason';
+import { type CastawayDetails } from '~/server/db/schema/castaways';
 
 interface MemberEditProps {
   leagueId: number;
@@ -539,9 +539,11 @@ export function InviteMember({ leagueId }: UpdateProps) {
   );
 }
 
-interface ChangeSurvivorProps extends UpdateProps, SelectCastawaysByTribeProps {
+interface ChangeSurvivorProps extends UpdateProps {
   currentPick?: string;
   color: string;
+  castaways: CastawayDetails[];
+  otherChoices?: CastawayDetails[];
 }
 
 const changeSurvivorSchema = z.object({
@@ -550,7 +552,7 @@ const changeSurvivorSchema = z.object({
 
 export function ChangeSurvivor({
   leagueId,
-  castawaysByTribe,
+  castaways,
   otherChoices,
   currentPick,
   color,
@@ -592,16 +594,10 @@ export function ChangeSurvivor({
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <Select onValueChange={field.onChange} {...field}>
-                      <SelectTrigger className='w-full'>
-                        <div className='flex-grow text-nowrap'>
-                          <SelectValue placeholder='Choose your Survivor' />
-                        </div>
-                      </SelectTrigger>
-                      <SelectCastawaysByTribe
-                        castawaysByTribe={castawaysByTribe}
-                        otherChoices={otherChoices?.filter((c) => c.more.shortName !== currentPick)} />
-                    </Select>
+                    <SelectCastaways
+                      castaways={castaways}
+                      otherChoices={otherChoices?.filter((c) => c.more.shortName !== currentPick)}
+                      field={field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

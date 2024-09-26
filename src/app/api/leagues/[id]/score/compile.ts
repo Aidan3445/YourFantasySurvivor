@@ -31,7 +31,8 @@ export default function compileScores(
 
   // tribe events
   for (const { tribe, name, episode } of tribeEvents) {
-    const castaways = tribeUpdates[episode]?.[tribe] ?? [];
+    //const castaways = tribeUpdates[episode]?.[tribe] ?? [];
+    const castaways = findTribeCastaways(tribeUpdates, tribe, episode);
 
     for (const castaway of castaways) {
       const member = findMember(memberCastaways, castaway, episode);
@@ -82,8 +83,6 @@ export default function compileScores(
     memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
   }
 
-
-
   // add survival bonus
   // each episode that your castaway survives
   // you get points for the number of episodes they've survived
@@ -106,6 +105,18 @@ export default function compileScores(
     }
   }
 
+  console.log(scores);
+
+  // fill in missing episodes
+  const episodes = Math.max(...Object.values(scores).map((s) => s.length)) - 1;
+  for (const member in scores) {
+    const points = scores[member];
+    if (!points) continue;
+    for (let i = 1; i <= episodes; i++) {
+      points[i] ??= 0;
+    }
+  }
+
   return scores;
 }
 
@@ -116,3 +127,24 @@ function findMember(memberCastaways: Record<number, Record<string, string>>, cas
     if (member) return member;
   }
 }
+
+// find the castaways on a tribe at a given episode
+function findTribeCastaways(
+  tribeUpdates: Record<number, Record<string, string[]>>,
+  tribe: string,
+  episode: number) {
+  const onTribe = new Set(tribeUpdates[1]?.[tribe] ?? []);
+  for (let i = 2; i <= episode; i++) {
+    if (!tribeUpdates[i]) continue;
+    Object.entries(tribeUpdates[i]!).forEach(([tribeName, castaways]) => {
+      if (tribeName === tribe) {
+        castaways.forEach((castaway) => onTribe.add(castaway));
+      } else {
+        castaways.forEach((castaway) => onTribe.delete(castaway));
+      }
+    });
+  }
+
+  return [...onTribe];
+}
+

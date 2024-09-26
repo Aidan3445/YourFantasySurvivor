@@ -27,6 +27,7 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
   const sortedData = [...data].sort(
     (a, b) => b.episodeScores.length - a.episodeScores.length,
   );
+  console.log('sortedData:', sortedData);
 
   return (
     <div className={cn(className, 'rounded-lg border border-black bg-b4/50')}>
@@ -54,7 +55,7 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
               (dataMin: number) => dataMin,
               (dataMax: number) => dataMax + 1,
             ]} />
-          <Tooltip content={<CustomTooltip />} offset={50} />
+          <Tooltip content={<CustomTooltip />} offset={-200} allowEscapeViewBox={{ x: true, y: true }} />
           {sortedData.map((line, index) => (
             <Line
               id={`line-${line.name}`}

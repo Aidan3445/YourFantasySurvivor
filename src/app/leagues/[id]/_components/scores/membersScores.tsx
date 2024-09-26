@@ -1,6 +1,6 @@
 import { getContrastingColor } from '@uiw/color-convert';
 import EditMember, { ChangeSurvivor, InviteMember, ManageMember, RoleHover } from './memberEdit';
-import { castawaysByTribe, cn, type ComponentProps } from '~/lib/utils';
+import { cn, type ComponentProps } from '~/lib/utils';
 import { type Member } from '~/server/db/schema/members';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
@@ -19,8 +19,6 @@ interface MembersProps {
 export default async function Members({ leagueId, members, ownerLoggedIn, isFull, details }: MembersProps) {
   const showPointsPlace = members.some((m) => m.points > 0);
   const showDrafted = members.some((m) => m.drafted);
-
-  const byTribe = castawaysByTribe(details.remaining);
 
   return (
     <table className='space-x-1 space-y-2'>
@@ -68,7 +66,7 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
                         className='ml-auto'
                         leagueId={leagueId}
                         color={cColor}
-                        castawaysByTribe={byTribe}
+                        castaways={details.remaining}
                         otherChoices={details.unavailable}
                         currentPick={member.drafted.slice(-1)[0]} />}
                   </ColorRow>
