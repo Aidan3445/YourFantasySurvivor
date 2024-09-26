@@ -24,6 +24,8 @@ export default function compileScores(
     const member = findMember(memberCastaways, castaway, episode);
     if (!member) continue;
 
+    console.log(`${member} scored ${rules[name as keyof BaseEventRuleType]} for ${name} in episode ${episode} from ${castaway}`);
+
     scores[member] ??= [];
 
     const points = scores[member];
@@ -32,12 +34,13 @@ export default function compileScores(
 
   // tribe events
   for (const { tribe, name, episode } of tribeEvents) {
-    //const castaways = tribeUpdates[episode]?.[tribe] ?? [];
-    const castaways = findTribeCastaways(tribeUpdates, tribe, episode);
+    const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
 
     for (const castaway of castaways) {
       const member = findMember(memberCastaways, castaway, episode);
       if (!member) continue;
+
+      console.log(`${member} scored ${rules[name as keyof BaseEventRuleType]} for ${name} in episode ${episode} from ${castaway} on ${tribe}`);
 
       scores[member] ??= [];
       const points = scores[member];
@@ -60,17 +63,21 @@ export default function compileScores(
     const member = findMember(memberCastaways, castaway, episode);
     if (!member) continue;
 
+    console.log(`${member} scored ${points} for castaway event in episode ${episode} from ${castaway}`);
+
     scores[member] ??= [];
     const memberPoints = scores[member];
     memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
   }
 
   for (const { tribe, points, episode } of altEvents.tribeEvents) {
-    const castaways = tribeUpdates[episode]?.[tribe] ?? [];
+    const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
 
     for (const castaway of castaways) {
       const member = findMember(memberCastaways, castaway, episode);
       if (!member) continue;
+
+      console.log(`${member} scored ${points} for tribe event in episode ${episode} from ${castaway} on ${tribe}`);
 
       scores[member] ??= [];
       const memberPoints = scores[member];
@@ -79,6 +86,9 @@ export default function compileScores(
   }
 
   for (const { member, points, episode } of altEvents.memberEvents) {
+
+    console.log(`${member} scored ${points} for member event in episode ${episode}`);
+
     scores[member] ??= [];
     const memberPoints = scores[member];
     memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
@@ -97,8 +107,10 @@ export default function compileScores(
     const elminated = elimList[i - 1]!;
 
     for (const member in survivalTable) {
-      if (findMember(memberCastaways, elminated, i) === member) survivalTable[member] = 0;
-      else {
+      if (findMember(memberCastaways, elminated, i) === member) {
+        survivalTable[member] = 0;
+        console.log(`${member} lost ${elminated} in episode ${i}`);
+      } else {
         scores[member] ??= [];
         scores[member][i] ??= 0;
         scores[member][i]! += survivalTable[member]!++;
@@ -115,26 +127,41 @@ export default function compileScores(
       points[i] ??= 0;
     }
   }
-  console.log(elimList);
+
+  console.log(scores);
 
   return scores;
 }
 
 // find the member that has the castaway selected 
 function findMember(memberCastaways: Record<number, Record<string, string>>, castaway: string, episode: number) {
-  for (let i = episode; i >= 0; i--) {
-    const member = memberCastaways[i]?.[castaway];
-    if (member) return member;
+  console.log(`Finding member for ${castaway} in episode ${episode}`);
+  console.log(memberCastaways);
+
+  let member = memberCastaways[1]?.[castaway];
+  for (let i = 2; i <= episode; i++) {
+    if (!memberCastaways[i]) continue;
+
+    if (memberCastaways[i]![castaway]) member = memberCastaways[i]![castaway];
+    else if (member && Object.values(memberCastaways[i]!).includes(member)) member = undefined;
   }
+  console.log(`Found ${member}`);
+
+  return member;
+
 }
 
 // find the castaways on a tribe at a given episode
 function findTribeCastaways(
   tribeUpdates: Record<number, Record<string, string[]>>,
+  elimList: string[],
   tribe: string,
   episode: number) {
   const onTribe = new Set(tribeUpdates[1]?.[tribe] ?? []);
   for (let i = 2; i <= episode; i++) {
+    // -2 because we're looking at the previous episode
+    // and the elimList is 0-indexed while the episodes/tribeUpdates are 1-indexed
+    if (elimList[i - 2]) onTribe.delete(elimList[i - 2]!);
     if (!tribeUpdates[i]) continue;
     Object.entries(tribeUpdates[i]!).forEach(([tribeName, castaways]) => {
       if (tribeName === tribe) {
