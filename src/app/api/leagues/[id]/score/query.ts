@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, desc, eq, inArray } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/seasons/[name]/events/query';
 import { leagues } from '~/server/db/schema/leagues';
@@ -343,4 +343,14 @@ export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
     lookup[update.episode]![update.castaway] = update.member;
     return lookup;
   }, {} as Record<number, Record<string, string>>);
+}
+
+export async function getEpisodes(leagueId: number) {
+  return db
+    .select({ id: episodes.id, number: episodes.number, title: episodes.title, airDate: episodes.airDate })
+    .from(episodes)
+    .innerJoin(seasons, eq(seasons.id, episodes.season))
+    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .where(eq(leagues.id, leagueId))
+    .orderBy(desc(episodes.number));
 }

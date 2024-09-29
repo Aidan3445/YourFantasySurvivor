@@ -15,6 +15,8 @@ import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { castawaysByTribe } from '~/lib/utils';
 import { ColorRow } from '../leagues/[id]/_components/scores/membersScores';
 import { type FieldValues, type ControllerRenderProps, type Path } from 'react-hook-form';
+import { type Tribe } from '~/server/db/schema/tribes';
+import { type Member } from '~/server/db/schema/members';
 
 export interface SelectSeasonProps {
   className?: string;
@@ -63,7 +65,7 @@ export default function SelectSeason({ className, selectDefault = false }: Selec
   );
 }
 
-export interface SelectCastawaysProps<T extends FieldValues> {
+interface SelectCastawaysProps<T extends FieldValues> {
   castaways: CastawayDetails[];
   otherChoices?: CastawayDetails[];
   field: ControllerRenderProps<T, Path<T>>;
@@ -108,3 +110,54 @@ export function SelectCastaways<T extends FieldValues>(
   );
 }
 
+interface SelectTribesProps<T extends FieldValues> {
+  tribes: Tribe[];
+  field: ControllerRenderProps<T, Path<T>>;
+}
+
+export function SelectTribes<T extends FieldValues>({ tribes, field }: SelectTribesProps<T>) {
+  return (
+    <Select onValueChange={field.onChange} {...field}>
+      <SelectTrigger className='w-60'>
+        <div className='flex-grow text-nowrap'>
+          <SelectValue placeholder='Choose your Tribe' />
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {tribes.map((tribe) => (
+          <SelectItem className='block pr-6 w-full' key={tribe.name} value={tribe.name}>
+            <ColorRow color={tribe.color}>
+              <h3 style={{ color: getContrastingColor(tribe.color) }}>{tribe.name}</h3>
+            </ColorRow>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
+
+interface SelectMembersProps<T extends FieldValues> {
+  members: Member[];
+  field: ControllerRenderProps<T, Path<T>>;
+}
+
+export function SelectMembers<T extends FieldValues>({ members, field }: SelectMembersProps<T>) {
+  return (
+    <Select onValueChange={field.onChange} {...field}>
+      <SelectTrigger className='w-60'>
+        <div className='flex-grow text-nowrap'>
+          <SelectValue placeholder='Choose your Member' />
+        </div>
+      </SelectTrigger>
+      <SelectContent>
+        {members.map((member) => (
+          <SelectItem className='block pr-6 w-full' key={member.displayName} value={member.displayName}>
+            <ColorRow color={member.color}>
+              <h3 style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h3>
+            </ColorRow>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+}
