@@ -9,10 +9,10 @@ export const episodes = createTable(
   {
     id: serial('episode_id').notNull().primaryKey(),
     number: smallint('number').notNull(),
-    title: varchar('name', { length: 64 }).notNull(),
+    title: varchar('title', { length: 64 }).notNull(),
     airDate: timestamp('air_date', { mode: 'string' }).notNull(),
     runtime: smallint('runtime').default(90),
-    season: integer('season').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
     merge: boolean('merge').default(false),
   }
 );
@@ -28,7 +28,7 @@ export const baseEvents = createTable(
   'event_base',
   {
     id: serial('event_base_id').notNull().primaryKey(),
-    episode: integer('episode').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     name: eventName('name').notNull(),
     keywords: varchar('keywords', { length: 32 }).array().notNull(),
     notes: varchar('notes', { length: 256 }).array().notNull(),

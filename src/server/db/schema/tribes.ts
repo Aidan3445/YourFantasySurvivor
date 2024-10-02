@@ -8,7 +8,7 @@ export const tribes = createTable(
     id: serial('tribe_id').notNull().primaryKey(),
     name: varchar('name', { length: 16 }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
-    season: integer('season').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type Tribe = typeof tribes.$inferSelect;
