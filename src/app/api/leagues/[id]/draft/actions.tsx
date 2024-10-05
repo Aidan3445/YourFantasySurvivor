@@ -133,7 +133,7 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
     .where(eq(leagues.id, leagueId))
     .orderBy(asc(episodes.number));
 
-  const currentEp = eps.find((ep) => Date.now() < new Date(ep.airDate).getTime())?.id;
+  const currentEp = eps.find((ep) => Date.now() < new Date(`${ep.airDate} -5:00`).getTime())?.id;
   if (!currentEp) throw new Error('No future episodes');
 
   const [newCastawayId, currentCastawayId] = await Promise.all([
