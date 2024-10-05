@@ -341,16 +341,19 @@ export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
 
     // initial castaway selection has null episode, replace with 0
     lookup[update.episode]![update.castaway] = update.member;
+
     return lookup;
   }, {} as Record<number, Record<string, string>>);
 }
 
 export async function getEpisodes(leagueId: number) {
-  return db
+  const eps = await db
     .select({ id: episodes.id, number: episodes.number, title: episodes.title, airDate: episodes.airDate })
     .from(episodes)
     .innerJoin(seasons, eq(seasons.id, episodes.season))
     .innerJoin(leagues, eq(leagues.season, seasons.id))
     .where(eq(leagues.id, leagueId))
     .orderBy(desc(episodes.number));
+
+  return eps.filter((ep) => new Date(`${ep.airDate} -5:00`) < new Date());
 }

@@ -19,3 +19,10 @@ export function castawaysByTribe(options: CastawayDetails[]): Record<string, Cas
     return acc;
   }, {} as Record<string, CastawayDetails[]>);
 }
+
+export function getCurrentTribe(castaway?: CastawayDetails, episode?: number) {
+  if (!castaway) return;
+
+  episode = episode ?? castaway.tribes[castaway.tribes.length - 1]?.episode;
+  return castaway.tribes.find((t) => t.episode <= (episode ?? 0)) ?? castaway.startingTribe;
+}

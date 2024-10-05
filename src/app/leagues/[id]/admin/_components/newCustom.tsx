@@ -5,7 +5,7 @@ import { type CustomEventRuleType } from '~/server/db/schema/customEvents';
 import { type Member } from '~/server/db/schema/members';
 import { type Tribe } from '~/server/db/schema/tribes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
-import { type ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type AltEvents } from '~/app/api/leagues/[id]/score/query';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -160,36 +160,40 @@ export default function NewCustomEvent({
         <form className='flex flex-col gap-2 justify-center md:w-3/4' action={catchSubmit}>
           <span className='flex gap-2 items-center w-full'>
             <FormField name='episodeId' render={({ field }) => (
-              <FormItem className='flex-grow'>
-                <Select onValueChange={field.onChange} {...field}>
-                  <SelectTrigger className='w-full'>
-                    <SelectValue placeholder='Select Episode' />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {episodes.map((episode) => (
-                      <SelectItem key={episode.id} value={episode.id.toString()}>
-                        {episode.number}: {episode.title} - {new Date(episode.airDate).toLocaleDateString()}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormItem>
+              <FormControl>
+                <FormItem className='flex-grow'>
+                  <Select onValueChange={field.onChange} {...field}>
+                    <SelectTrigger className='w-full'>
+                      <SelectValue placeholder='Select Episode' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {episodes.map((episode) => (
+                        <SelectItem key={episode.id} value={episode.id.toString()}>
+                          {episode.number}: {episode.title} - {new Date(episode.airDate).toLocaleDateString()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              </FormControl>
             )} />
             <Button type='submit' className='px-1 right-0'>Score Event</Button>
           </span>
           <FormField name='ruleId' render={({ field }) => (
-            <FormItem>
-              <Select onValueChange={getRuleById} {...field} value={selectedRule?.id?.toString()}>
-                <SelectTrigger className='w-full'>
-                  <SelectValue placeholder='Select rule' />
-                </SelectTrigger>
-                <SelectContent>
-                  {rules.map((rule) => (
-                    <SelectItem value={rule.id!.toString()} key={rule.id}>{rule.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItem>
+            <FormControl>
+              <FormItem>
+                <Select onValueChange={getRuleById} {...field} value={selectedRule?.id?.toString()}>
+                  <SelectTrigger className='w-full'>
+                    <SelectValue placeholder='Select rule' />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rules.map((rule) => (
+                      <SelectItem value={rule.id!.toString()} key={rule.id}>{rule.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            </FormControl>
           )} />
           {selectedRule && (
             <article className='bg-b3/80 rounded-md p-2 flex flex-col gap-3'>

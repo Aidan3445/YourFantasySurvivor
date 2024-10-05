@@ -25,18 +25,18 @@ export async function getCastawayEvents(
   return db
     .select({
       castaway: castaways.shortName,
-      name: baseEvents.name,
+      name: baseEvents.eventName,
       episode: episodes.number,
     })
     .from(baseEventCastaways)
     .innerJoin(baseEvents, eq(baseEvents.id, baseEventCastaways.event))
     .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
     .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(castaways, eq(castaways.id, baseEventCastaways.castaway))
+    .innerJoin(castaways, eq(castaways.id, baseEventCastaways.reference))
     .where(
       and(
         eq(seasons.name, seasonName),
-        not(eq(baseEvents.name, 'tribeUpdate')),
+        not(eq(baseEvents.eventName, 'tribeUpdate')),
         or(
           eq(castaways.name, castawayName ?? castaways.name),
           eq(castaways.shortName, castawayName ?? castaways.shortName),
@@ -59,18 +59,18 @@ export async function getTribeEvents(
   return db
     .select({
       tribe: tribes.name,
-      name: baseEvents.name,
+      name: baseEvents.eventName,
       episode: episodes.number,
     })
     .from(baseEventTribes)
     .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
     .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
     .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(tribes, eq(tribes.id, baseEventTribes.tribe))
+    .innerJoin(tribes, eq(tribes.id, baseEventTribes.reference))
     .where(
       and(
         eq(seasons.name, seasonName),
-        not(eq(baseEvents.name, 'tribeUpdate')),
+        not(eq(baseEvents.eventName, 'tribeUpdate')),
         eq(tribes.name, tribeName ?? tribes.name),
       ),
     );
@@ -91,11 +91,11 @@ export async function getTribeUpdates(
     .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
     .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
     .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(tribes, eq(tribes.id, baseEventTribes.tribe))
+    .innerJoin(tribes, eq(tribes.id, baseEventTribes.reference))
     .innerJoin(baseEventCastaways, eq(baseEvents.id, baseEventCastaways.event))
-    .innerJoin(castaways, eq(castaways.id, baseEventCastaways.castaway))
+    .innerJoin(castaways, eq(castaways.id, baseEventCastaways.reference))
     .where(
-      and(eq(seasons.name, seasonName), eq(baseEvents.name, 'tribeUpdate')),
+      and(eq(seasons.name, seasonName), eq(baseEvents.eventName, 'tribeUpdate')),
     );
 
   return rows.reduce((acc, { tribe, castaway, episode }) => {

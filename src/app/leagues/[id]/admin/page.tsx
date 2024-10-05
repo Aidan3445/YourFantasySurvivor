@@ -1,14 +1,12 @@
-import { auth } from '@clerk/nextjs/server';
-import { and, eq, or } from 'drizzle-orm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
 import { getBaseEvents, getCustomEvents, getEpisodes, getWeeklyEvents } from '~/app/api/leagues/[id]/score/query';
 import { sysAuth } from '~/app/api/system/query';
-import { db } from '~/server/db';
-import { leagueMembers } from '~/server/db/schema/members';
 import NewCustomEvent from './_components/newCustom';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
+import { isOwner } from '~/app/api/leagues/[id]/settings/query';
+import NewBaseEvent from './_components/newBase';
+import { EventQueue } from './_components/eventsQueue';
 
 interface AdminPageProps {
   params: {
@@ -18,21 +16,10 @@ interface AdminPageProps {
 
 export default async function Admin({ params }: AdminPageProps) {
   const leagueId = parseInt(params.id);
-  const { userId } = auth();
+  const { userId, sys } = await sysAuth();
   if (!userId) throw new Error('Not authenticated');
 
-  const { isOwner } = await db
-    .select({ isOwner: leagueMembers.isOwner })
-    .from(leagueMembers).where(and(
-      eq(leagueMembers.league, leagueId),
-      eq(leagueMembers.userId, userId),
-      or(eq(leagueMembers.isAdmin, true), eq(leagueMembers.isOwner, true))))
-    .then((members) => {
-      if (members.length === 0) throw new Error('Not authorized');
-      return members[0]!;
-    });
-
-  const sys = await sysAuth();
+  const owner = await isOwner(leagueId, userId);
 
   const [
     rules, events, { league, castaways, tribes, remaining },
@@ -40,9 +27,9 @@ export default async function Admin({ params }: AdminPageProps) {
   ] =
     await Promise.all([
       getRules(leagueId), sys ? getBaseEvents(leagueId) : null, getDraftDetails(leagueId),
-      isOwner ? getCustomEvents(leagueId) : null,
-      isOwner ? getWeeklyEvents(leagueId) : null,
-      isOwner ? getWeeklyEvents(leagueId) : null,
+      owner ? getCustomEvents(leagueId) : null,
+      owner ? getWeeklyEvents(leagueId) : null,
+      owner ? getWeeklyEvents(leagueId) : null,
       getEpisodes(leagueId),
     ]);
 
@@ -55,7 +42,7 @@ export default async function Admin({ params }: AdminPageProps) {
     <main className='flex flex-col gap-0 text-center' >
       <h1 className='text-2xl font-semibold'>ADMIN</h1>
       <a href={`/leagues/${leagueId}`} className='hs-in rounded-md text-black p-1 px-6 m-1'>Back</a>
-      <Tabs defaultValue='custom'>
+      <Tabs defaultValue={sys ? 'base' : 'custom'}>
         <TabsList>
           {sys && <TabsTrigger value='base'>Base</TabsTrigger>}
           <TabsTrigger value='custom'>Custom</TabsTrigger>
@@ -63,7 +50,14 @@ export default async function Admin({ params }: AdminPageProps) {
           <TabsTrigger value='season'>Season</TabsTrigger>
         </TabsList>
         {sys && <TabsContent value='base'>
-          <div>Base</div>
+          <EventQueue>
+            <NewBaseEvent
+              castaways={castaways}
+              tribes={tribes}
+              remaining={remaining}
+              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]}
+              events={events} />
+          </EventQueue>
         </TabsContent>}
         <TabsContent value='custom'>
           <NewCustomEvent
@@ -87,4 +81,3 @@ export default async function Admin({ params }: AdminPageProps) {
     </main >
   );
 }
-

@@ -28,14 +28,14 @@ export async function getCastaways(seasonName: string, castawayName?: string): P
     .select(CastawayDetailsSelect)
     .from(castaways)
     .rightJoin(seasons, eq(seasons.id, castaways.season))
-    .rightJoin(baseEventCastaways, eq(baseEventCastaways.castaway, castaways.id))
+    .rightJoin(baseEventCastaways, eq(baseEventCastaways.reference, castaways.id))
     .rightJoin(baseEventTribes, eq(baseEventTribes.event, baseEventCastaways.event))
-    .rightJoin(tribes, eq(tribes.id, baseEventTribes.tribe))
+    .rightJoin(tribes, eq(tribes.id, baseEventTribes.reference))
     .rightJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
     .rightJoin(episodes, eq(episodes.id, baseEvents.episode))
     .where(and(
       eq(seasons.name, seasonName),
-      eq(baseEvents.name, 'tribeUpdate'),
+      eq(baseEvents.eventName, 'tribeUpdate'),
       or(eq(castaways.name, castawayName ?? castaways.name),
         eq(castaways.shortName, castawayName ?? castaways.shortName))))
     .orderBy(asc(episodes.number));
@@ -82,11 +82,11 @@ export async function getRemainingCastaways(seasonName: string) {
     .where(and(
       eq(seasons.name, seasonName),
       notExists(db
-        .select({ id: baseEventCastaways.castaway })
+        .select({ id: baseEventCastaways.reference })
         .from(baseEventCastaways)
         .innerJoin(baseEvents, eq(baseEvents.id, baseEventCastaways.event))
         .where(and(
-          eq(baseEventCastaways.castaway, castaways.id),
-          inArray(baseEvents.name, ['elim', 'noVoteExit'])))))) as CastawayDetails[];
+          eq(baseEventCastaways.reference, castaways.id),
+          inArray(baseEvents.eventName, ['elim', 'noVoteExit'])))))) as CastawayDetails[];
 }
 

@@ -4,7 +4,7 @@
 
 /* styles */
 body  {
-    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen;
+    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen overflow-x-clip;
 }
 
 * {
@@ -85,8 +85,8 @@ main {
 
 /* Light scroll */
 .light-scroll {
-    @apply flex overscroll-contain flex-col;
-    overflow-y: auto;
+    @apply overscroll-contain;
+    overflow: auto;
 }
 
 .light-scroll::-webkit-scrollbar-track {

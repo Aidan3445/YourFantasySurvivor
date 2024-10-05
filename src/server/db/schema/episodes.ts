@@ -29,7 +29,7 @@ export const baseEvents = createTable(
   {
     id: serial('event_base_id').notNull().primaryKey(),
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
-    name: eventName('name').notNull(),
+    eventName: eventName('name').notNull(),
     keywords: varchar('keywords', { length: 32 }).array().notNull(),
     notes: varchar('notes', { length: 256 }).array().notNull(),
   }
@@ -40,7 +40,7 @@ export const baseEventCastaways = createTable(
   {
     id: serial('event_base_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => baseEvents.id, { onDelete: 'cascade' }).notNull(),
-    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   }
 );
 export const baseEventTribes = createTable(
@@ -48,7 +48,7 @@ export const baseEventTribes = createTable(
   {
     id: serial('event_base_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => baseEvents.id, { onDelete: 'cascade' }).notNull(),
-    tribe: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type BaseEvent = {

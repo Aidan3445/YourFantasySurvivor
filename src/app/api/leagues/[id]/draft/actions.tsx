@@ -1,6 +1,6 @@
 'use server';
 import { auth } from '@clerk/nextjs/server';
-import { and, asc, eq, or } from 'drizzle-orm';
+import { and, asc, desc, eq, or, lt } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
 import { episodes } from '~/server/db/schema/episodes';
@@ -136,23 +136,45 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
   const currentEp = eps.find((ep) => Date.now() < new Date(ep.airDate).getTime())?.id;
   if (!currentEp) throw new Error('No future episodes');
 
-  const castawayId = await db
-    .select({ id: castaways.id })
-    .from(castaways)
-    .innerJoin(seasons, eq(seasons.id, castaways.season))
-    .innerJoin(leagues, eq(leagues.season, seasons.id))
-    .where(and(
-      eq(leagues.id, leagueId),
-      or(eq(castaways.name, castaway), eq(castaways.shortName, castaway))))
-    .then((res) => res[0]?.id);
-  if (!castawayId) throw new Error('Castaway not found');
+  const [newCastawayId, currentCastawayId] = await Promise.all([
+    db
+      .select({ id: castaways.id })
+      .from(castaways)
+      .innerJoin(seasons, eq(seasons.id, castaways.season))
+      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .where(and(
+        eq(leagues.id, leagueId),
+        or(eq(castaways.name, castaway), eq(castaways.shortName, castaway))))
+      .then((res) => res[0]?.id),
+    db
+      .select({ castaway: castaways.id })
+      .from(selectionUpdates)
+      .innerJoin(leagueMembers, eq(leagueMembers.id, selectionUpdates.member))
+      .innerJoin(castaways, eq(castaways.id, selectionUpdates.castaway))
+      .where(and(
+        eq(leagueMembers.id, memberId),
+        lt(selectionUpdates.episode, currentEp)))
+      .orderBy(desc(selectionUpdates.episode))
+      .then((res) => res[0]?.castaway),
+  ]);
+  if (!newCastawayId) throw new Error('Castaway not found');
+
+  if (newCastawayId === currentCastawayId) {
+    await db
+      .delete(selectionUpdates)
+      .where(and(
+        eq(selectionUpdates.member, memberId),
+        eq(selectionUpdates.episode, currentEp)));
+    return;
+  }
+
 
   await db
     .insert(selectionUpdates)
-    .values({ member: memberId, episode: currentEp, castaway: castawayId })
+    .values({ member: memberId, episode: currentEp, castaway: newCastawayId })
     .onConflictDoUpdate({
       target: [selectionUpdates.member, selectionUpdates.episode],
-      set: { castaway: castawayId },
+      set: { castaway: newCastawayId },
     });
 }
 

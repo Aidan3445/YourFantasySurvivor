@@ -1,9 +1,11 @@
 import { getContrastingColor } from '@uiw/color-convert';
 import EditMember, { ChangeSurvivor, InviteMember, ManageMember, RoleHover } from './memberEdit';
-import { cn, type ComponentProps } from '~/lib/utils';
+import { cn, getCurrentTribe, type ComponentProps } from '~/lib/utils';
 import { type Member } from '~/server/db/schema/members';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
+import { Skull } from 'lucide-react';
 
 interface MembersProps {
   leagueId: number;
@@ -11,6 +13,7 @@ interface MembersProps {
   details: {
     remaining: CastawayDetails[];
     unavailable: CastawayDetails[];
+    castaways: CastawayDetails[];
   };
   ownerLoggedIn: boolean;
   isFull: boolean;
@@ -26,6 +29,10 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
       <tbody>
         {members.map((member, index) => {
           const cColor = getContrastingColor(member.color);
+          const sColor = getCurrentTribe(details.remaining
+            .find((c) => c.more.shortName === member.drafted.slice(-1)[0]))?.color
+            ?? '#AAAAAA';
+          const csColor = getContrastingColor(sColor);
           return (
             <tr key={member.id}>
               {showPointsPlace &&
@@ -59,17 +66,36 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
               </td>
               {!!member.drafted.length &&
                 <td>
-                  <ColorRow color={member.color} className='py-1 text-xs flex gap-2'>
-                    <h3 style={{ color: cColor }}>{member.drafted.slice(-1)[0]}</h3>
-                    {member.loggedIn &&
-                      <ChangeSurvivor
-                        className='ml-auto'
-                        leagueId={leagueId}
-                        color={cColor}
-                        castaways={details.remaining}
-                        otherChoices={details.unavailable}
-                        currentPick={member.drafted.slice(-1)[0]} />}
-                  </ColorRow>
+                  <HoverCard>
+                    <HoverCardTrigger>
+                      <ColorRow color={sColor} className='py-1 text-xs flex gap-2'>
+                        <h3 style={{ color: csColor }}>{member.drafted.slice(-1)[0]}</h3>
+                        {member.loggedIn &&
+                          <ChangeSurvivor
+                            className='ml-auto'
+                            leagueId={leagueId}
+                            color={csColor}
+                            castaways={details.remaining}
+                            otherChoices={details.unavailable}
+                            currentPick={member.drafted.slice(-1)[0]} />}
+                      </ColorRow>
+                    </HoverCardTrigger>
+                    <HoverCardContent className='w-min p-1 grid gap-1'>
+                      {member.drafted.map((d, i) => {
+                        const dColor = getCurrentTribe(details.castaways.find((c) => c.more.shortName === d))?.color ?? '#222222';
+                        const cdColor = getContrastingColor(dColor);
+                        const eliminated = !details.remaining.some((c) => c.more.shortName === d);
+                        return (
+                          <ColorRow key={i} color={dColor} className='py-1 text-xs flex justify-center'>
+                            <h3 style={{ color: cdColor }}>
+                              {d}
+                            </h3>
+                            {eliminated && <Skull className='inline' size={16} color={cdColor} />}
+                          </ColorRow>
+                        );
+                      })}
+                    </HoverCardContent>
+                  </HoverCard>
                 </td>}
             </tr>
           );

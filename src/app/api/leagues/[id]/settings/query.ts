@@ -1,6 +1,6 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { and, asc, eq } from 'drizzle-orm';
+import { and, asc, eq, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
 import { leagues, leagueSettings } from '~/server/db/schema/leagues';
@@ -68,4 +68,17 @@ export async function getSurvivorsList(leagueId: number, memberId: number) {
       eq(leagueMembers.id, memberId)))
     .orderBy(asc(episodes.number))
     .then((res) => res.map((castaway) => castaway.name));
+}
+
+export async function isOwner(leagueId: number, userId: string) {
+  return db
+    .select({ isOwner: leagueMembers.isOwner })
+    .from(leagueMembers).where(and(
+      eq(leagueMembers.league, leagueId),
+      eq(leagueMembers.userId, userId),
+      or(eq(leagueMembers.isAdmin, true), eq(leagueMembers.isOwner, true))))
+    .then((members) => {
+      if (members.length === 0) throw new Error('Not authorized');
+      return members[0]!.isOwner;
+    });
 }
