@@ -1,3 +1,4 @@
+import { ColorRow, type ColorRowProps } from '~/app/leagues/[id]/_components/scores/membersScores';
 import { mouseOutLeaderboard, mouseOverLeaderboard } from './leaderboard';
 
 interface ScoresProps {
@@ -24,23 +25,81 @@ export default function Scores({ data }: ScoresProps) {
   const names = data.map(d => d.name);
 
   return (
-    <figure className='overflow-hidden gap-0 rounded-lg border border-black'>
-      {data.map(({ name, url, color, score }, index) => (
-        <a
-          key={index}
-          className={`flex justify-between px-2 cursor-pointer ${index & 1 ? 'bg-white/20' : 'bg-white/10'}`}
-          href={url}
-          onMouseOver={() => mouseOverLeaderboard(name, names)}
-          onMouseOut={() => mouseOutLeaderboard(name, color, names)}>
-          <h3 className='w-min'>{index + 1}</h3>
-          <h3 id={`score-${name}`} className='font-semibold transition-all duration-150 text-nowrap' style={{ color: color }}>
-            {name}
-          </h3>
-          <h3 className='text-right'>{score}</h3>
-        </a>
-      ))
-      }
-    </figure >
+    <table>
+      <thead>
+        <tr>
+          <th>
+            <ColorRow color='white' className='py-1 text-xs flex justify-center'>
+              <h3>Place</h3>
+            </ColorRow>
+          </th>
+          <th>
+            <ColorRow color='white' className='py-1 text-xs flex justify-center'>
+              <h3>Member</h3>
+            </ColorRow>
+          </th>
+          <th>
+            <ColorRow color='white' className='py-1 text-xs flex justify-center'>
+              <h3>Points</h3>
+            </ColorRow>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map(({ name, url, color, score }, index) => {
+          return (
+            <tr key={index}>
+              <td>
+                <ColorRowWrapper
+                  color={color}
+                  names={names}
+                  name={name}
+                  url={url}>
+                  {index + 1}
+                </ColorRowWrapper>
+              </td>
+              <td>
+                <ColorRowWrapper
+                  color={color}
+                  names={names}
+                  name={name}
+                  url={url}>
+                  {name}
+                </ColorRowWrapper>
+              </td>
+              <td>
+                <ColorRowWrapper
+                  color={color}
+                  names={names}
+                  name={name}
+                  url={url}>
+                  {score}
+                </ColorRowWrapper>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
+
+interface ColorRowWrapperProps extends ColorRowProps {
+  name: string;
+  url: string;
+  names: string[];
+}
+
+export function ColorRowWrapper({ name, url, names, color, children }: ColorRowWrapperProps) {
+  return (
+    <a
+      href={url}
+      onMouseOver={() => mouseOverLeaderboard(name, names)}
+      onMouseOut={() => mouseOutLeaderboard(name, color, names)}>
+      <ColorRow color={color} className='py-1 text-xs flex justify-center'>
+        <h3 className='text-white'>{children}</h3>
+      </ColorRow>
+    </a>
   );
 }
 

@@ -1,3 +1,4 @@
+'use client';
 import { getContrastingColor } from '@uiw/color-convert';
 import EditMember, { ChangeSurvivor, InviteMember, ManageMember, RoleHover } from './memberEdit';
 import { cn, getCurrentTribe, type ComponentProps } from '~/lib/utils';
@@ -6,6 +7,7 @@ import { Separator } from '~/app/_components/commonUI/separator';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
 import { Skull } from 'lucide-react';
+import { mouseOutLeaderboard, mouseOverLeaderboard } from '~/app/playground/_components/leaderboard';
 
 interface MembersProps {
   leagueId: number;
@@ -19,9 +21,11 @@ interface MembersProps {
   isFull: boolean;
 }
 
-export default async function Members({ leagueId, members, ownerLoggedIn, isFull, details }: MembersProps) {
+export default function Members({ leagueId, members, ownerLoggedIn, isFull, details }: MembersProps) {
   const showPointsPlace = members.some((m) => m.points > 0);
   const showDrafted = members.some((m) => m.drafted);
+
+  const memberDisplayNames = members.map((m) => m.displayName);
 
   return (
     <table className='space-x-1 space-y-2'>
@@ -34,7 +38,11 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
             ?? '#AAAAAA';
           const csColor = getContrastingColor(sColor);
           return (
-            <tr key={member.id}>
+            <tr
+              key={member.id}
+              className='cursor-default'
+              onMouseOver={() => mouseOverLeaderboard(member.displayName, memberDisplayNames)}
+              onMouseOut={() => mouseOutLeaderboard(member.displayName, member.color, memberDisplayNames)}>
               {showPointsPlace &&
                 <td>
                   <ColorRow color={member.color} className='py-1 text-xs  flex justify-center'>
@@ -80,18 +88,23 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
                             currentPick={member.drafted.slice(-1)[0]} />}
                       </ColorRow>
                     </HoverCardTrigger>
-                    <HoverCardContent className='w-min p-1 grid gap-1'>
+                    <HoverCardContent className='w-min p-1 grid gap-1' side='right'>
                       {member.drafted.map((d, i) => {
-                        const dColor = getCurrentTribe(details.castaways.find((c) => c.more.shortName === d))?.color ?? '#222222';
+                        const castaway = details.castaways.find((c) => c.more.shortName === d);
+                        const dColor = getCurrentTribe(castaway)?.color ?? '#222222';
                         const cdColor = getContrastingColor(dColor);
                         const eliminated = !details.remaining.some((c) => c.more.shortName === d);
                         return (
-                          <ColorRow key={i} color={dColor} className='py-1 text-xs flex justify-center'>
-                            <h3 style={{ color: cdColor }}>
-                              {d}
-                            </h3>
-                            {eliminated && <Skull className='inline' size={16} color={cdColor} />}
-                          </ColorRow>
+                          <a key={i} href={`/seasons/castaway?season=${castaway?.more.season}&castaway=${d}`}>
+                            <ColorRow
+                              color={dColor}
+                              className='py-1 text-xs flex justify-center cursor-pointer'>
+                              <h3 style={{ color: cdColor }}>
+                                {d}
+                              </h3>
+                              {eliminated && <Skull className='inline' size={16} color={cdColor} />}
+                            </ColorRow>
+                          </a>
                         );
                       })}
                     </HoverCardContent>
@@ -112,7 +125,7 @@ export default async function Members({ leagueId, members, ownerLoggedIn, isFull
   );
 }
 
-interface ColorRowProps extends ComponentProps {
+export interface ColorRowProps extends ComponentProps {
   color: string;
   loggedIn?: boolean;
 }

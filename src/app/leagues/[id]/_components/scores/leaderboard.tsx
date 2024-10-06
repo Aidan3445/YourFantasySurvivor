@@ -51,9 +51,7 @@ export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: 
   }).sort((a, b) => {
     // sort by last episode score, ties go to previous episode
     for (let i = a.episodeScores.length - 1; i >= 0; i--) {
-      if (a.episodeScores[i] !== b.episodeScores[i]) {
-        return b.episodeScores[i]! - a.episodeScores[i]!;
-      }
+      return b.episodeScores[i]! - a.episodeScores[i]!;
     }
     return 0;
   });

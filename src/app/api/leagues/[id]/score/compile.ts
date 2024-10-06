@@ -2,6 +2,7 @@ import 'server-only';
 import { type Events } from '~/app/api/seasons/[name]/events/query';
 import { type BaseEventRuleType } from '~/server/db/schema/leagues';
 import { type AltEvents } from './query';
+import { findTribeCastaways } from '~/app/api/seasons/[name]/events/scores';
 
 export default function compileScores(
   { castawayEvents, tribeEvents, tribeUpdates }: Events,
@@ -134,29 +135,5 @@ function findMember(memberCastaways: Record<number, Record<string, string>>, cas
   }
 
   return member;
-}
-
-// find the castaways on a tribe at a given episode
-function findTribeCastaways(
-  tribeUpdates: Record<number, Record<string, string[]>>,
-  elimList: string[],
-  tribe: string,
-  episode: number) {
-  const onTribe = new Set(tribeUpdates[1]?.[tribe] ?? []);
-  for (let i = 2; i <= episode; i++) {
-    // -2 because we're looking at the previous episode
-    // and the elimList is 0-indexed while the episodes/tribeUpdates are 1-indexed
-    if (elimList[i - 2]) onTribe.delete(elimList[i - 2]!);
-    if (!tribeUpdates[i]) continue;
-    Object.entries(tribeUpdates[i]!).forEach(([tribeName, castaways]) => {
-      if (tribeName === tribe) {
-        castaways.forEach((castaway) => onTribe.add(castaway));
-      } else {
-        castaways.forEach((castaway) => onTribe.delete(castaway));
-      }
-    });
-  }
-
-  return [...onTribe];
 }
 

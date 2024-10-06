@@ -41,5 +41,6 @@ export type CastawayDetails = {
     hometown: string;
     residence: string;
     job: string;
+    season: string;
   };
 };

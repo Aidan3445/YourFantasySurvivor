@@ -12,7 +12,7 @@ export default function SeasonPage({ searchParams }: SeasonProps) {
     <main>
       <h1 className='text-5xl font-bold text-black'>Survivor Seasons</h1>
       <SelectSeason />
-      <Castaways season={season} />
+      {season && <Castaways season={season} />}
     </main>
   );
 }

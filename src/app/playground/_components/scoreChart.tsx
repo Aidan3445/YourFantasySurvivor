@@ -53,7 +53,7 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
               (dataMin: number) => dataMin,
               (dataMax: number) => dataMax + 1,
             ]} />
-          <Tooltip content={<CustomTooltip />} offset={-200} allowEscapeViewBox={{ x: true, y: true }} />
+          <Tooltip content={<CustomTooltip />} />
           {sortedData.map((line, index) => (
             <Line
               id={`line-${line.name}`}
@@ -122,7 +122,7 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
   let firstSet: typeof payload, secondSet: typeof payload;
 
   if (payload.length > 9) {
-    firstSet = payload.slice(0, payload.length / 2 + 1);
+    firstSet = payload.slice(0, payload.length / 2);
     secondSet = payload.slice(payload.length / 2);
   } else {
     firstSet = payload;

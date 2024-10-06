@@ -18,21 +18,21 @@ export const CastawayDetailsSelect = {
     age: castaways.age,
     hometown: castaways.hometown,
     residence: castaways.residence,
-    job: castaways.job
+    job: castaways.job,
+    season: seasons.name,
   }
 };
-
 
 export async function getCastaways(seasonName: string, castawayName?: string): Promise<CastawayDetails[]> {
   const rows = await db
     .select(CastawayDetailsSelect)
     .from(castaways)
-    .rightJoin(seasons, eq(seasons.id, castaways.season))
-    .rightJoin(baseEventCastaways, eq(baseEventCastaways.reference, castaways.id))
-    .rightJoin(baseEventTribes, eq(baseEventTribes.event, baseEventCastaways.event))
-    .rightJoin(tribes, eq(tribes.id, baseEventTribes.reference))
-    .rightJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
-    .rightJoin(episodes, eq(episodes.id, baseEvents.episode))
+    .innerJoin(baseEventCastaways, eq(baseEventCastaways.reference, castaways.id))
+    .innerJoin(baseEventTribes, eq(baseEventTribes.event, baseEventCastaways.event))
+    .innerJoin(tribes, eq(tribes.id, baseEventTribes.reference))
+    .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
+    .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
+    .innerJoin(seasons, eq(seasons.id, castaways.season))
     .where(and(
       eq(seasons.name, seasonName),
       eq(baseEvents.eventName, 'tribeUpdate'),
@@ -41,13 +41,6 @@ export async function getCastaways(seasonName: string, castawayName?: string): P
     .orderBy(asc(episodes.number));
 
   const castawaysWithTribes = rows.reduce((acc, row) => {
-    // this is a hack to filter out rows that don't have all the necessary data
-    // this shouldn't happen but will make typescript happy
-    if (!row?.id || !row?.name || !row?.tribe || !row?.color || !row?.photo || !row?.moreDetails) {
-      console.warn('Skipping row:', row);
-      return acc;
-    }
-
     const castaway = acc[row.name] ?? {
       id: row.id,
       name: row.name,

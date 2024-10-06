@@ -5,12 +5,13 @@ import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/se
 import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
 import { sysAuth } from '~/app/api/system/query';
 import NewBaseEvent from '~/app/leagues/[id]/admin/_components/newBase';
+import { EventQueue } from '../leagues/[id]/admin/_components/eventsQueue';
 
 interface AdminPageProps {
-  params: { season: string };
+  searchParams: { season: string };
 }
 
-export default async function AdminPage({ params }: AdminPageProps) {
+export default async function AdminPage({ searchParams: params }: AdminPageProps) {
   const { sys } = await sysAuth();
   if (!sys) throw new Error('Not authorized');
 
@@ -23,14 +24,18 @@ export default async function AdminPage({ params }: AdminPageProps) {
 
   return (
     <main>
+      <h1 className='text-5xl font-bold text-black'>Admin Page</h1>
       <SelectSeason />
-      <br />
-      <NewBaseEvent
-        castaways={castaways}
-        tribes={tribes}
-        remaining={remaining}
-        episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]}
-        events={{ castawayEvents, tribeEvents, tribeUpdates }} />
+      {season &&
+        <EventQueue>
+          <NewBaseEvent
+            castaways={castaways}
+            tribes={tribes}
+            remaining={remaining}
+            episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]}
+            events={{ castawayEvents, tribeEvents, tribeUpdates }} />
+        </EventQueue>
+      }
     </main>
   );
 }

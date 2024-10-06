@@ -7,11 +7,9 @@ export default function PlaygroundPage() {
   return (
     <main>
       <h1 className='text-5xl font-bold text-black'>Welcome to the Fantasy Playground!</h1>
-      <section className='grid grid-cols-3 auto-rows-min gap-2'>
-        <Rules className='col-span-3' />
-        <Leaderboard className='col-span-2' />
-        <CreateLeagueForm className='col-span-1 p-4' subtitle='w/ above rules (can be changed)' />
-      </section>
+      <Rules />
+      <Leaderboard />
+      <CreateLeagueForm className='p-4 w-full' subtitle='w/ above rules (can be changed)' />
     </main>
   );
 }

@@ -25,7 +25,7 @@ export function Leaderboard({ className }: LeaderboardProps) {
   const [scores, setScores] = useState<Record<string, number[]>>({});
   const { toast } = useToast();
   const searchParams = useSearchParams();
-  const season = searchParams.get('season')!;
+  const [season, setSeason] = useState(searchParams.get('season'));
 
   useEffect(() => {
     const rules: BaseEventRuleType = defaultBaseRules();
@@ -34,6 +34,7 @@ export function Leaderboard({ className }: LeaderboardProps) {
       const value = searchParams.get(key);
       if (value) rules[key as keyof BaseEventRuleType] = parseInt(value);
     }
+
 
     if (season) {
       fetch(`/api/seasons/${season}/events`)
@@ -48,6 +49,10 @@ export function Leaderboard({ className }: LeaderboardProps) {
         });
     }
   }, [season, toast, searchParams]);
+
+  useEffect(() => {
+    setSeason(searchParams.get('season'));
+  }, [searchParams]);
 
   const sortedScores = Object.entries(scores).map(([name, score]) => {
     const episodeScores = score.reduce((totals, score, index) => {
@@ -70,11 +75,14 @@ export function Leaderboard({ className }: LeaderboardProps) {
       episodeScores
     };
   }).sort((a, b) => {
-    // sort by last episode score, ties go to previous episode
-    for (let i = a.episodeScores.length - 1; i >= 0; i--) {
-      if (a.episodeScores[i] !== b.episodeScores[i]) {
-        return b.episodeScores[i]! - a.episodeScores[i]!;
-      }
+    // sort by total score
+    if (a.score !== b.score) return b.score - a.score;
+    // ties then go to elimination order
+    if (a.episodeScores.length !== b.episodeScores.length)
+      return b.episodeScores.length - a.episodeScores.length;
+    // further ties go by episode totals
+    for (let i = b.episodeScores.length - 1; i >= 0; i--) {
+      return b.episodeScores[i]! - a.episodeScores[i]!;
     }
     return 0;
   });
@@ -100,7 +108,7 @@ export function Leaderboard({ className }: LeaderboardProps) {
     <CardContainer className={cn('justify-start items-center p-4', className)}>
       <h3 className='text-2xl font-medium'>Leaderboard</h3>
       <span className='flex justify-between items-center w-full'>
-        <SelectSeason className='mx-0' />
+        <SelectSeason className='mx-0' initSeason={setSeason} />
         <HoverCard openDelay={300}>
           <HoverCardTrigger>
             <Button className='left-auto p-0.5 w-min h-min' onClick={copyUrl}>

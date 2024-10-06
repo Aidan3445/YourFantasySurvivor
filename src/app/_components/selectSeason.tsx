@@ -12,18 +12,17 @@ import {
   SelectValue,
 } from '~/app/_components/commonUI/select';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
-import { castawaysByTribe } from '~/lib/utils';
+import { castawaysByTribe, type ComponentProps } from '~/lib/utils';
 import { ColorRow } from '../leagues/[id]/_components/scores/membersScores';
 import { type FieldValues, type ControllerRenderProps, type Path } from 'react-hook-form';
 import { type Tribe } from '~/server/db/schema/tribes';
 import { type Member } from '~/server/db/schema/members';
 
-export interface SelectSeasonProps {
-  className?: string;
-  selectDefault?: boolean;
+export interface SelectSeasonProps extends ComponentProps {
+  initSeason?: (season: string) => void;
 }
 
-export default function SelectSeason({ className, selectDefault = false }: SelectSeasonProps) {
+export default function SelectSeason({ className, initSeason }: SelectSeasonProps) {
   const [seasons, setSeasons] = useState<string[]>([]);
   const router = useRouter();
   const params = useSearchParams();
@@ -45,8 +44,9 @@ export default function SelectSeason({ className, selectDefault = false }: Selec
 
   let season = params.get('season') ?? '';
   // if select default then set the first season as default
-  if (selectDefault && !season) {
+  if (initSeason && !season) {
     season = seasons[0] ?? '';
+    initSeason?.(season);
   }
 
   return (

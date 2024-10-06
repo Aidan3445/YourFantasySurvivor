@@ -18,7 +18,7 @@ export default function SeasonStats() {
   const [stats, setStats] = useState<SS>(emptyStats());
   const { toast } = useToast();
   const searchParams = useSearchParams();
-  const season = searchParams.get('season')!;
+  const [season, setSeason] = useState(searchParams.get('season'));
 
   // when season is set, fetch episodes and compile stats
   useEffect(() => {
@@ -37,6 +37,10 @@ export default function SeasonStats() {
     }
   }, [season, toast]);
 
+  useEffect(() => {
+    setSeason(searchParams.get('season'));
+  }, [searchParams]);
+
   const carouselItems = [
     { title: 'Challenges', content: <ChallengesPodium castaways={stats.castawayChallenges} tribes={stats.tribeChallenges} />, noWrapper: true },
     { title: 'Advantages', content: <AdvantagesTable advantages={stats.advantages} /> },
@@ -47,7 +51,7 @@ export default function SeasonStats() {
 
   return (
     <CardContainer className='gap-0'>
-      <SelectSeason className='mt-2' selectDefault />
+      <SelectSeason className='mt-2' initSeason={setSeason} />
       <Carousel>
         <span className='pb-2 text-center'>
           <h2 className='text-2xl font-semibold'>Season Stats</h2>
