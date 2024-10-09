@@ -28,7 +28,7 @@ export const weeklyEventRules = createTable(
 );
 
 export const WeeklyEventRule = z.object({
-  id: z.number().optional(),
+  id: z.number(),
   name: eventName,
   //customEvent: z.number().nullable(),
   //baseEvent: z.number().nullable(),

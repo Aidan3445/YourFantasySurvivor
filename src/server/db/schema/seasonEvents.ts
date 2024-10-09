@@ -28,7 +28,7 @@ export const seasonEventRules = createTable(
 );
 
 export const SeasonEventRule = z.object({
-  id: z.number().optional(),
+  id: z.number(),
   name: eventName,
   //adminEvent: z.number().nullable(),
   //baseEvent: z.number().nullable(),

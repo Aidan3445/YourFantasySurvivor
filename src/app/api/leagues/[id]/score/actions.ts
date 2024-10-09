@@ -1,22 +1,19 @@
 'use server';
 import { auth } from '@clerk/nextjs/server';
-import { and, eq, or } from 'drizzle-orm';
+import { and, eq, inArray, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { customCastaways, customEventRules, type CustomEventRuleType, customEvents, customMembers, customTribes } from '~/server/db/schema/customEvents';
+import { seasonCastawayResults, seasonTribeResults, type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
+import { weeklyCastawayResults, type WeeklyEventRuleType, weeklyMemberResults, weeklyTribeResults } from '~/server/db/schema/weeklyEvents';
 import { episodes } from '~/server/db/schema/episodes';
 import { leagues } from '~/server/db/schema/leagues';
 import { leagueMembers } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 
-export async function submitCustomEvent(
-  leagueId: number,
-  episodeId: number,
-  rule: CustomEventRuleType,
-  references: { id: number; /*notes: string[]*/ }[],
-  //commonNotes: string[]
-) {
+async function eventAuth(leagueId: number, episodeId: number,
+  rule: CustomEventRuleType | WeeklyEventRuleType | SeasonEventRuleType) {
   const { userId } = auth();
-  if (!userId) throw new Error('Not authenticated');
+  if (!userId) return { userId: null };
 
   // ensure user is league admin or owner 
   // with the correct league, season for the episode, and rule
@@ -30,18 +27,31 @@ export async function submitCustomEvent(
     .where(and(
       eq(leagueMembers.userId, userId),
       eq(leagueMembers.league, leagueId),
-      eq(customEventRules.id, rule.id!),
+      eq(customEventRules.id, rule.id),
       eq(episodes.id, episodeId),
       or(eq(leagueMembers.isAdmin, true), eq(leagueMembers.isOwner, true))))
     .then((members) => {
-      if (members.length === 0) throw new Error('Not authorized');
+      if (members.length === 0) return { userId: null };
       return members[0]!;
     });
+
+  return { userId };
+}
+
+export async function submitCustomEvent(
+  leagueId: number,
+  episodeId: number,
+  rule: CustomEventRuleType,
+  references: { id: number; /*notes: string[]*/ }[],
+  //commonNotes: string[]
+) {
+  const { userId } = await eventAuth(leagueId, episodeId, rule);
+  if (!userId) throw new Error('Not authorized');
 
   // first insert the event
   const event = await db
     .insert(customEvents)
-    .values({ rule: rule.id!, episode: episodeId })
+    .values({ rule: rule.id, episode: episodeId })
     .returning({ id: customEvents.id })
     .then((res) => res[0]);
   if (!event) throw new Error('Failed to insert event');
@@ -66,11 +76,88 @@ export async function submitCustomEvent(
       .returning({ id: insertTable.id });
     if (confimration.length !== references.length) throw new Error('Failed to insert references');
   } catch {
-    // rollback event
+    // rollback event the cascade should remove any successful inserts
     await db
       .delete(customEvents)
       .where(eq(customEvents.id, event.id));
     throw new Error('Failed to insert references');
   }
 
+}
+
+export async function submitWeeklyResult(
+  leagueId: number,
+  episodeId: number,
+  rule: WeeklyEventRuleType,
+  references: { id: number }[],
+) {
+  const { userId } = await eventAuth(leagueId, episodeId, rule);
+  if (!userId) throw new Error('Not authorized');
+
+  let insertTable: typeof weeklyCastawayResults | typeof weeklyTribeResults | typeof weeklyMemberResults;
+  switch (rule.referenceType) {
+    case 'castaway':
+      insertTable = weeklyCastawayResults;
+      break;
+    case 'tribe':
+      insertTable = weeklyTribeResults;
+      break;
+    case 'member':
+      insertTable = weeklyMemberResults;
+      break;
+  }
+
+  const confirmation = await db
+    .insert(insertTable)
+    .values(references.map((ref) => ({ rule: rule.id, episode: episodeId, result: ref.id }))
+
+    )
+    .returning({ id: insertTable.id });
+  try {
+    if (confirmation.length !== references.length) throw new Error('Failed to insert references');
+  } catch {
+    // rollback any successful inserts
+    await db
+      .delete(insertTable)
+      .where(inArray(insertTable.id, confirmation.map((c) => c.id)));
+    throw new Error('Failed to insert references');
+  }
+}
+
+export async function submitSeasonResult(
+  leagueId: number,
+  episodeId: number,
+  rule: SeasonEventRuleType,
+  references: { id: number }[],
+) {
+  const { userId } = await eventAuth(leagueId, episodeId, rule);
+  if (!userId) throw new Error('Not authorized');
+
+  let insertTable: typeof seasonCastawayResults | typeof seasonTribeResults | typeof weeklyMemberResults;
+  switch (rule.referenceType) {
+    case 'castaway':
+      insertTable = seasonCastawayResults;
+      break;
+    case 'tribe':
+      insertTable = seasonTribeResults;
+      break;
+    case 'member':
+      insertTable = weeklyMemberResults;
+      break;
+  }
+
+  const confirmation = await db
+    .insert(insertTable)
+    .values(references.map((ref) => ({ rule: rule.id, episode: episodeId, result: ref.id }))
+    )
+    .returning({ id: insertTable.id });
+  try {
+    if (confirmation.length !== references.length) throw new Error('Failed to insert references');
+  } catch {
+    // rollback any successful inserts
+    await db
+      .delete(insertTable)
+      .where(inArray(insertTable.id, confirmation.map((c) => c.id)));
+    throw new Error('Failed to insert references');
+  }
 }

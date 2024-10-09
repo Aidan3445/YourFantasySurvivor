@@ -1,7 +1,6 @@
 'use client';
 import { type ComponentProps } from '~/lib/utils';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
-import { type CustomEventRuleType } from '~/server/db/schema/customEvents';
 import { type Member } from '~/server/db/schema/members';
 import { type Tribe } from '~/server/db/schema/tribes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
@@ -15,15 +14,17 @@ import { SelectCastaways, SelectMembers, SelectTribes } from '~/app/_components/
 import { Button } from '~/app/_components/commonUI/button';
 import { Switch } from '~/app/_components/commonUI/switch';
 import { useToast } from '~/app/_components/commonUI/use-toast';
-import { submitCustomEvent } from '~/app/api/leagues/[id]/score/actions';
-import { useRouter } from 'next/navigation';
+import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
+import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
+import { submitSeasonResult, submitWeeklyResult } from '~/app/api/leagues/[id]/score/actions';
 /*import { Popover, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
 import { NotepadText } from 'lucide-react';
 import { Textarea } from '~/app/_components/commonUI/textArea';
 import CardContainer from '~/app/_components/cardContainer';*/
 
 interface NewEventProps extends ComponentProps {
-  rules: CustomEventRuleType[];
+  rules: (WeeklyEventRuleType | SeasonEventRuleType)[];
+  type: 'weekly' | 'season';
   events: AltEvents | null;
   leagueId: number;
   castaways: CastawayDetails[];
@@ -33,12 +34,12 @@ interface NewEventProps extends ComponentProps {
   episodes: [{ id: number; title: string, number: number, airDate: string }];
 }
 
-const newCustomEventSchema = z.object({
+export const newEventSchema = z.object({
   ruleId: z.number(),
   episodeId: z.string(),
-  references: z.array(z.string()).refine((refs) => {
+  references: z.array(z.string().or(z.undefined())).refine((refs) => {
     if (refs.length === 0) return false;
-    if (refs.findIndex((ref) => ref === '') !== -1) return false;
+    if (refs.findIndex((ref) => ref === undefined) !== -1) return false;
     return true;
   }),
   /*notes: z.object({
@@ -47,8 +48,9 @@ const newCustomEventSchema = z.object({
   }).array(),*/
 });
 
-export default function NewCustomEvent({
+export default function NewEventResult({
   rules,
+  type,
   leagueId,
   castaways,
   tribes,
@@ -56,20 +58,19 @@ export default function NewCustomEvent({
   remaining,
   episodes,
 }: NewEventProps) {
-  const [selectedRule, setSelectedRule] = useState<CustomEventRuleType | null>(null);
+  const [selectedRule, setSelectedRule] = useState<WeeklyEventRuleType | SeasonEventRuleType | null>(null);
   const [remainingOnly, setRemainingOnly] = useState(true);
 
-  const form = useForm<z.infer<typeof newCustomEventSchema>>({
+  const form = useForm<z.infer<typeof newEventSchema>>({
     defaultValues: {
       references: [],
       //notes: [],
       episodeId: episodes[0].id.toString(),
     },
-    resolver: zodResolver(newCustomEventSchema),
+    resolver: zodResolver(newEventSchema),
   });
 
   const { toast } = useToast();
-  const router = useRouter();
 
   const refs = form.watch('references');
 
@@ -98,7 +99,7 @@ export default function NewCustomEvent({
     const data = form.getValues();
 
     try {
-      newCustomEventSchema.parse(data);
+      newEventSchema.parse(data);
     } catch {
       toast({
         title: 'Invalid data',
@@ -125,14 +126,27 @@ export default function NewCustomEvent({
           r = members.find((m) => m.displayName === ref);
           if (r) references.push({ id: r.id });
           break;
+        case undefined:
+          toast({
+            title: 'Invalid rule',
+            description: 'Please select a rule',
+            variant: 'error',
+          });
+          return;
       }
     });
 
-    const submit = submitCustomEvent.bind(
+    const submit = type === 'weekly' ? submitWeeklyResult.bind(
       null,
       leagueId,
       parseInt(data.episodeId),
-      selectedRule!,
+      selectedRule! as WeeklyEventRuleType,
+      references,
+    ) : submitSeasonResult.bind(
+      null,
+      leagueId,
+      parseInt(data.episodeId),
+      selectedRule! as SeasonEventRuleType,
       references,
     );
 
@@ -143,7 +157,6 @@ export default function NewCustomEvent({
           description: 'The event has been scored',
         });
         form.reset();
-        router.refresh();
       })
       .catch((e) => {
         if (e instanceof Error) {
@@ -155,6 +168,8 @@ export default function NewCustomEvent({
         }
       });
   };
+
+  console.log('refs', refs);
 
   return (
     <Form {...form}>
@@ -202,8 +217,8 @@ export default function NewCustomEvent({
           </FormControl>
         )} />
         {selectedRule && (
-          <article className='bg-b3/80 rounded-md p-2 flex flex-col gap-3'>
-            <div>
+          <article className='bg-b3/80 rounded-md p-2 flex flex-col gap-3 items-center'>
+            <div className='max-w-sm'>
               <h3 className='text-xl font-semibold'>{selectedRule.name}</h3>
               <p>{selectedRule.description}</p>
             </div>
@@ -251,7 +266,7 @@ export default function NewCustomEvent({
               <Button
                 type='button'
                 className='px-1'
-                onClick={() => form.setValue('references', [...refs, ''])}>
+                onClick={() => form.setValue('references', [...refs, undefined])}>
                 Add {selectedRule.referenceType}
               </Button>
               <Button

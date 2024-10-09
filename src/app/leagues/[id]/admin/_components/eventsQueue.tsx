@@ -4,7 +4,11 @@ import { Button } from '~/app/_components/commonUI/button';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type ComponentProps } from '~/lib/utils';
 
-export function EventQueue({ children }: ComponentProps) {
+interface EventQueueProps extends ComponentProps {
+  disabled?: boolean;
+}
+
+export function EventQueue({ children, disabled }: EventQueueProps) {
   const [count, setCount] = useState(1);
 
   return (
@@ -16,13 +20,15 @@ export function EventQueue({ children }: ComponentProps) {
           </div>
         ))}
       </article>
-      <div className='flex gap-2 items-center self-start mt-5'>
-        <Separator orientation='vertical' className='h-20' />
-        <div className='flex flex-col gap-2'>
-          <Button onClick={() => setCount(count + 1)}>Add</Button>
-          <Button onClick={() => setCount(1)} disabled={count === 1}>Reset</Button>
+      {!disabled && (
+        <div className='flex gap-2 items-center self-start mt-5'>
+          <Separator orientation='vertical' className='h-20' />
+          <div className='flex flex-col gap-2'>
+            <Button onClick={() => setCount(count + 1)}>Add</Button>
+            <Button onClick={() => setCount(1)} disabled={count === 1}>Reset</Button>
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

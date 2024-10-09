@@ -20,9 +20,10 @@ interface ScoreChartProps extends ComponentProps {
     episodeScores: number[];
   }[];
   label?: boolean;
+  bounded?: boolean;
 }
 
-export default function Chart({ data, label, className }: ScoreChartProps) {
+export default function Chart({ data, label, bounded, className }: ScoreChartProps) {
   // sort the data so that the end of a line is always visible for hover purposes
   const sortedData = [...data].sort(
     (a, b) => b.episodeScores.length - a.episodeScores.length,
@@ -53,7 +54,10 @@ export default function Chart({ data, label, className }: ScoreChartProps) {
               (dataMin: number) => dataMin,
               (dataMax: number) => dataMax + 1,
             ]} />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip
+            content={<CustomTooltip />}
+            allowEscapeViewBox={bounded ? { x: false, y: false } : { x: true, y: true }}
+            offset={bounded ? 0 : -250} />
           {sortedData.map((line, index) => (
             <Line
               id={`line-${line.name}`}

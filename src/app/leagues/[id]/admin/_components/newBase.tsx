@@ -17,6 +17,9 @@ import { submitBaseEvent } from '~/app/api/seasons/[name]/events/actions';
 import { Textarea } from '~/app/_components/commonUI/textArea';
 import { type getBaseEvents } from '~/app/api/leagues/[id]/score/query';
 import { useRouter } from 'next/navigation';
+import { type CustomEventRuleType } from '~/server/db/schema/customEvents';
+import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
+import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
 /*import { Popover, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
 import { NotepadText } from 'lucide-react';
 import { Textarea } from '~/app/_components/commonUI/textArea';
@@ -28,6 +31,11 @@ interface NewBaseEventProps extends ComponentProps {
   remaining: CastawayDetails[];
   episodes: [{ id: number; title: string, number: number, airDate: string }];
   events: Awaited<ReturnType<typeof getBaseEvents>> | null;
+  otherRules?: {
+    custom: CustomEventRuleType[];
+    weekly: WeeklyEventRuleType[];
+    season: SeasonEventRuleType[];
+  };
 }
 
 const newBaseEventSchema = z.object({
@@ -52,6 +60,7 @@ export default function NewBaseEvent({
   tribes,
   remaining,
   episodes,
+  otherRules
 }: NewBaseEventProps) {
   const [showEliminated, setShowEliminated] = useState(false);
 
@@ -256,7 +265,6 @@ export default function NewBaseEvent({
                   Remove {selectedReferenceType}
                 </Button>
               </span>)}
-            <br />
             <section className='flex flex-col gap-1'>
               <span className='inline items-center'>
                 <h3 className='text-xl font-semibold '>Keywords and Notes </h3>
@@ -287,6 +295,11 @@ export default function NewBaseEvent({
               {form.formState.errors.notes &&
                 <FormMessage> Each line must be between 3 and 256 characters </FormMessage>}
             </section>
+            {otherRules && (
+              <section className='flex flex-col gap-1'>
+                <h3 className='text-xl font-semibold'>Submit with other rule</h3>
+                <p>Coming soon...</p>
+              </section>)}
           </article>)}
       </form>
     </Form>

@@ -125,7 +125,7 @@ export function Leaderboard({ className }: LeaderboardProps) {
       </span>
       <span className='grid grid-cols-4 gap-2 w-full'>
         <Scores data={sortedScores} />
-        <Chart className='col-span-3 w-full h-full' data={sortedScores} />
+        <Chart className='col-span-3 w-full h-full' data={sortedScores} bounded />
       </span >
     </CardContainer >
   );

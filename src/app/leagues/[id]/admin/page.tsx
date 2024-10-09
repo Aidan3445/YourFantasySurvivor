@@ -7,6 +7,7 @@ import NewCustomEvent from './_components/newCustom';
 import { isOwner } from '~/app/api/leagues/[id]/settings/query';
 import NewBaseEvent from './_components/newBase';
 import { EventQueue } from './_components/eventsQueue';
+import NewWeeklySeasonResult from './_components/newWeeklySeason';
 
 interface AdminPageProps {
   params: {
@@ -33,9 +34,6 @@ export default async function Admin({ params }: AdminPageProps) {
       getEpisodes(leagueId),
     ]);
 
-  // temp hide error
-  events; weeklyEvents; seasonEvents;
-
   if (episodes.length === 0) throw new Error('No episodes found');
 
   return (
@@ -60,21 +58,45 @@ export default async function Admin({ params }: AdminPageProps) {
           </EventQueue>
         </TabsContent>}
         <TabsContent value='custom'>
-          <NewCustomEvent
-            rules={rules.custom}
-            events={customEvents}
-            leagueId={leagueId}
-            castaways={castaways}
-            tribes={tribes}
-            members={league.members}
-            remaining={remaining}
-            episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]} />
+          <EventQueue disabled={rules.custom.length === 0}>
+            <NewCustomEvent
+              rules={rules.custom}
+              events={customEvents}
+              leagueId={leagueId}
+              castaways={castaways}
+              tribes={tribes}
+              members={league.members}
+              remaining={remaining}
+              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]} />
+          </EventQueue>
         </TabsContent>
         <TabsContent value='weekly'>
-          <div>Weekly</div>
+          <EventQueue disabled={rules.weekly.length === 0}>
+            <NewWeeklySeasonResult
+              rules={rules.weekly.filter((rule) => rule.type === 'predict')}
+              type='weekly'
+              events={weeklyEvents}
+              leagueId={leagueId}
+              castaways={castaways}
+              tribes={tribes}
+              members={league.members}
+              remaining={remaining}
+              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]} />
+          </EventQueue>
         </TabsContent>
         <TabsContent value='season'>
-          <div>Season</div>
+          <EventQueue disabled={rules.season.length === 0}>
+            <NewWeeklySeasonResult
+              rules={rules.season}
+              type='season'
+              events={seasonEvents}
+              leagueId={leagueId}
+              castaways={castaways}
+              tribes={tribes}
+              members={league.members}
+              remaining={remaining}
+              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]} />
+          </EventQueue>
         </TabsContent>
       </Tabs>
       <br />
