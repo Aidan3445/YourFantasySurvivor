@@ -2,7 +2,7 @@ import { createTable } from './createTable';
 import { seasons } from './seasons';
 import { tribes } from './tribes';
 import { castaways } from './castaways';
-import { integer, serial, varchar, smallint, timestamp, boolean, pgEnum } from 'drizzle-orm/pg-core';
+import { integer, serial, varchar, smallint, timestamp, boolean, pgEnum, unique } from 'drizzle-orm/pg-core';
 
 export const episodes = createTable(
   'episode',
@@ -11,10 +11,14 @@ export const episodes = createTable(
     number: smallint('number').notNull(),
     title: varchar('title', { length: 64 }).notNull(),
     airDate: timestamp('air_date', { mode: 'string' }).notNull(),
-    runtime: smallint('runtime').default(90),
+    runtime: smallint('runtime').default(90).notNull(),
     season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
-    merge: boolean('merge').default(false),
-  }
+    merge: boolean('merge').default(false).notNull(),
+    finale: boolean('finale').default(false).notNull(),
+  },
+  (table) => ({
+    unique: unique().on(table.season, table.number),
+  })
 );
 export type Episode = typeof episodes.$inferSelect;
 

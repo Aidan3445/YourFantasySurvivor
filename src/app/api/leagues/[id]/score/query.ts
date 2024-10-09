@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, desc, eq, inArray } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/seasons/[name]/events/query';
 import { leagues } from '~/server/db/schema/leagues';
@@ -11,8 +11,26 @@ import { customCastaways, customEventRules, customEvents, customMembers, customT
 import { tribes } from '~/server/db/schema/tribes';
 import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, weeklyEvents, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
 import { seasonCastawayResults, seasonCastaways, seasonEventRules, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
+import { auth } from '@clerk/nextjs/server';
+
+async function eventAuth(leagueId: number): Promise<{ userId?: string, memberId?: number }> {
+  const { userId } = auth();
+  if (!userId) return {};
+
+  // ensure user is in the league
+  const member = await db
+    .select()
+    .from(leagueMembers)
+    .where(and(eq(leagueMembers.userId, userId), eq(leagueMembers.league, leagueId)))
+    .then((res) => res[0]);
+
+  return { userId, memberId: member?.id };
+}
 
 export async function getBaseEvents(leagueId: number) {
+  const { memberId } = await eventAuth(leagueId);
+  if (!memberId) throw new Error('Not authorized');
+
   const seasonName = await db
     .select({ seasonName: seasons.name })
     .from(seasons)
@@ -44,6 +62,9 @@ export interface AltEvents {
 }
 
 export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
+  const { memberId } = await eventAuth(leagueId);
+  if (!memberId) throw new Error('Not authorized');
+
   const events = await Promise.all([
     db
       .select({
@@ -102,6 +123,9 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
 }
 
 export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
+  const { memberId } = await eventAuth(leagueId);
+  if (!memberId) throw new Error('Not authorized');
+
   // weekly events are split in two, 
   // * predictions always earn points for the member directly
   // * votes are mapped to the castaway or tribe and them to members in scoring
@@ -256,6 +280,9 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
 }
 
 export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
+  const { memberId } = await eventAuth(leagueId);
+  if (!memberId) throw new Error('Not authorized');
+
   // season events are all predictions and get mapped directly to members
   const events = await Promise.all([
     db
@@ -327,13 +354,23 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
 }
 
 export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
+  const { userId } = auth();
+  if (!userId) throw new Error('Not authorized');
+
   const updates = await db
-    .select({ episode: episodes.number, member: leagueMembers.displayName, castaway: castaways.shortName })
+    .select({
+      episode: episodes.number,
+      member: leagueMembers.displayName,
+      castaway: castaways.shortName,
+      id: leagueMembers.userId
+    })
     .from(selectionUpdates)
     .innerJoin(leagueMembers, eq(leagueMembers.id, selectionUpdates.member))
     .innerJoin(castaways, eq(castaways.id, selectionUpdates.castaway))
     .leftJoin(episodes, eq(episodes.id, selectionUpdates.episode))
     .where(inArray(leagueMembers.id, memberIds));
+
+  if (!updates.some((update) => update.id === userId)) throw new Error('Not authorized');
 
   return updates.reduce((lookup, update) => {
     update.episode ??= 0;
@@ -356,4 +393,111 @@ export async function getEpisodes(leagueId: number) {
     .orderBy(desc(episodes.number));
 
   return eps.filter((ep) => new Date(`${ep.airDate} -5:00`) < new Date());
+}
+
+export async function getMemberEpisodeEvents(leagueId: number) {
+  const { memberId } = await eventAuth(leagueId);
+  if (!memberId) throw new Error('Not authorized');
+
+  const { currentEpisode, nextEpisode } = await db
+    .select({
+      episode: episodes.number,
+      airDate: episodes.airDate,
+      runtime: episodes.runtime,
+      merge: episodes.merge,
+      finale: episodes.finale,
+    })
+    .from(episodes)
+    .innerJoin(seasons, eq(seasons.id, episodes.season))
+    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .where(eq(leagues.id, leagueId))
+    .orderBy(asc(episodes.number))
+    .then((res) => ({
+      currentEpisode: res.reverse().find((ep) => new Date(`${ep.airDate} -5:00`) < new Date()),
+      nextEpisode: res.find((ep) => new Date(`${ep.airDate} -5:00`) > new Date()),
+    }));
+
+  if (!currentEpisode) return {
+    weekly: { votes: [], predictions: [] },
+    season: []
+  };
+
+  // get votes for the current episode that this member has not yet scored
+  const votes = await db
+    .select({
+      name: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      points: weeklyEventRules.points,
+      referenceType: weeklyEventRules.referenceType,
+    })
+    .from(weeklyEventRules)
+    .leftJoin(weeklyEvents, and(
+      eq(weeklyEvents.rule, weeklyEventRules.id),
+      eq(weeklyEvents.member, memberId),
+      eq(weeklyEvents.episode, currentEpisode.episode)))
+    .where(and(
+      eq(weeklyEventRules.league, leagueId),
+      eq(weeklyEventRules.type, 'vote'),
+      isNull(weeklyEvents.id)));
+
+  // only if the next episode is available
+  // and the current episode is done airing
+  if (!nextEpisode || new Date(new Date(
+    `${currentEpisode.airDate} -5:00`).getTime() + currentEpisode.runtime * 60 * 1000
+  ) > new Date()) return {
+    weekly: { votes, predictions: [] },
+    season: []
+  };
+
+  // get predictions for the next episode
+  const predictions = await db
+    .select({
+      name: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      points: weeklyEventRules.points,
+      referenceType: weeklyEventRules.referenceType,
+    })
+    .from(weeklyEventRules)
+    .leftJoin(weeklyEvents, and(
+      eq(weeklyEvents.rule, weeklyEventRules.id),
+      eq(weeklyEvents.member, memberId),
+      eq(weeklyEvents.episode, nextEpisode.episode)))
+    .where(and(
+      eq(weeklyEventRules.league, leagueId),
+      eq(weeklyEventRules.type, 'predict'),
+      isNull(weeklyEvents.id)));
+
+  // if the next episode is a merge or finale
+  // get relevant season predictions
+  if (nextEpisode.merge || nextEpisode.finale) {
+    const seasonPredictions = await db
+      .select({
+        name: seasonEventRules.name,
+        description: seasonEventRules.description,
+        points: seasonEventRules.points,
+        referenceType: seasonEventRules.referenceType,
+        timing: seasonEventRules.timing,
+      })
+      .from(seasonEventRules)
+      .leftJoin(seasonEvents, and(
+        eq(seasonEvents.rule, seasonEventRules.id),
+        eq(seasonEvents.member, memberId)))
+      .where(and(
+        eq(seasonEventRules.league, leagueId),
+        or(
+          eq(seasonEventRules.timing, 'merge'),
+          eq(seasonEventRules.timing, 'finale')),
+        isNull(seasonEvents.id)))
+      .then((res) => res.filter((rule) => rule.timing === (nextEpisode.merge ? 'merge' : 'finale')));
+
+    return {
+      weekly: { votes, predictions },
+      season: seasonPredictions
+    };
+  } else {
+    return {
+      weekly: { votes, predictions },
+      season: []
+    };
+  }
 }
