@@ -17,6 +17,7 @@ export default function compileScores(
   // sort for consistent elimination order
   const sortedCE = castawayEvents.sort((a, b) => a.episode - b.episode);
   for (const { castaway, name, episode } of sortedCE) {
+    if (name === 'otherNotes') continue;
     if (name === 'elim' || name === 'noVoteExit') {
       // this means they left the game
       elimList.push(castaway);
@@ -66,6 +67,7 @@ export default function compileScores(
     memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
   }
 
+
   for (const { tribe, points, episode } of altEvents.tribeEvents) {
     const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
 
@@ -78,6 +80,7 @@ export default function compileScores(
       memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
     }
   }
+
 
   for (const { member, points, episode } of altEvents.memberEvents) {
     scores[member] ??= [];
