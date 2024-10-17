@@ -2,9 +2,8 @@ import { getLeague } from '~/app/api/leagues/query';
 import LeagueDetails from './_components/leagueDetails';
 import LeagueScoring from './_components/events/leagueScoring';
 import DraftInfo from './_components/settings/draftInfo';
-import { LeaderBoard } from './_components/scores/leaderboard';
+import { Leaderboard } from './_components/scores/leaderboard';
 import { cn } from '~/lib/utils';
-import { getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
 
 interface PageProps {
   params: {
@@ -17,9 +16,6 @@ export default async function League({ params }: PageProps) {
   const { league, members, isFull } = await getLeague(leagueId);
 
   const ownerLoggedIn = members.some((member) => member.isOwner && member.loggedIn);
-
-  const events = await getMemberEpisodeEvents(leagueId);
-  console.log(JSON.stringify(events, null, 2));
 
   return (
     <main className='flex flex-col gap-0 text-center' >
@@ -37,7 +33,7 @@ export default async function League({ params }: PageProps) {
           Admin
         </a>
       </span>
-      <LeaderBoard
+      <Leaderboard
         leagueId={leagueId}
         members={members}
         ownerLoggedIn={ownerLoggedIn}

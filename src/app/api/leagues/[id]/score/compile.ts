@@ -8,7 +8,7 @@ export default function compileScores(
   { castawayEvents, tribeEvents, tribeUpdates }: Events,
   altEvents: AltEvents,
   memberCastaways: Record<number, Record<string, string>>,
-  rules: BaseEventRuleType
+  rules: BaseEventRuleType,
 ): Record<string, number[]> {
   const scores: Record<string, number[]> = {};
   const elimList: string[] = [];

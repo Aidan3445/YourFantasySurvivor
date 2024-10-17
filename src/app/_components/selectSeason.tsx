@@ -80,7 +80,7 @@ export function SelectCastaways<T extends FieldValues>(
     <Select onValueChange={field.onChange} {...field}>
       <SelectTrigger className='w-60'>
         <div className='flex-grow text-nowrap'>
-          <SelectValue placeholder='Choose your Survivor' />
+          <SelectValue placeholder='Choose a Castaway' />
         </div>
       </SelectTrigger>
       <SelectContent>
@@ -120,7 +120,7 @@ export function SelectTribes<T extends FieldValues>({ tribes, field }: SelectTri
     <Select onValueChange={field.onChange} {...field}>
       <SelectTrigger className='w-60'>
         <div className='flex-grow text-nowrap'>
-          <SelectValue placeholder='Choose your Tribe' />
+          <SelectValue placeholder='Choose a Tribe' />
         </div>
       </SelectTrigger>
       <SelectContent>
@@ -146,7 +146,7 @@ export function SelectMembers<T extends FieldValues>({ members, field }: SelectM
     <Select onValueChange={field.onChange} {...field}>
       <SelectTrigger className='w-60'>
         <div className='flex-grow text-nowrap'>
-          <SelectValue placeholder='Choose your Member' />
+          <SelectValue placeholder='Choose a Member' />
         </div>
       </SelectTrigger>
       <SelectContent>

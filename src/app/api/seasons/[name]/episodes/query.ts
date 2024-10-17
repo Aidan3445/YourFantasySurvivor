@@ -13,5 +13,5 @@ export async function getEpisodes(seasonName: string, includeFuture = false) {
 
   if (includeFuture) return eps;
 
-  return eps.filter((ep) => new Date(`${ep.airDate} -5:00`) < new Date());
+  return eps.filter((ep) => new Date(`${ep.airDate} -4:00`) <= new Date());
 }

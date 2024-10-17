@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, asc, desc, eq, inArray, isNull, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, inArray, isNull, lt, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/seasons/[name]/events/query';
 import { leagues } from '~/server/db/schema/leagues';
@@ -9,8 +9,8 @@ import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { castaways } from '~/server/db/schema/castaways';
 import { customCastaways, customEventRules, customEvents, customMembers, customTribes } from '~/server/db/schema/customEvents';
 import { tribes } from '~/server/db/schema/tribes';
-import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, weeklyEvents, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
-import { seasonCastawayResults, seasonCastaways, seasonEventRules, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
+import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEventRuleType, weeklyEvents, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
+import { seasonCastawayResults, seasonCastaways, seasonEventRules, type SeasonEventRuleType, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
 import { auth } from '@clerk/nextjs/server';
 
 async function eventAuth(leagueId: number): Promise<{ userId?: string, memberId?: number }> {
@@ -126,6 +126,8 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
   const { memberId } = await eventAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
+  const { currentEpisode } = await getCurrentNextEpisodes(leagueId);
+
   // weekly events are split in two, 
   // * predictions always earn points for the member directly
   // * votes are mapped to the castaway or tribe and them to members in scoring
@@ -203,79 +205,201 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
     // votes
     db
       .select({
+        count: count(),
         castaway: castaways.shortName,
         episode: episodes.number,
         points: weeklyEventRules.points,
         name: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
+        id: weeklyEventRules.id,
       })
-      .from(weeklyCastawayResults)
-      .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyCastawayResults.rule))
-      .innerJoin(weeklyEvents, eq(weeklyEvents.rule, weeklyEventRules.id))
-      .innerJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
-      .innerJoin(castaways, eq(castaways.id, weeklyCastawayResults.result))
-      .innerJoin(episodes, eq(episodes.id, weeklyCastawayResults.episode))
+      .from(weeklyCastaways)
+      .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyCastaways.event))
+      .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
+      .innerJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
+      .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'castaway'),
-        eq(weeklyCastawayResults.episode, weeklyEvents.episode),
-        eq(weeklyCastawayResults.result, weeklyCastaways.reference))),
+        lt(episodes.number, currentEpisode?.episode ?? -1)))
+      .groupBy(castaways.shortName, episodes.number, weeklyEventRules.points, weeklyEventRules.id,
+        weeklyEventRules.name, weeklyEventRules.description, weeklyEventRules.referenceType),
     db
       .select({
+        count: count(),
         tribe: tribes.name,
         episode: episodes.number,
         points: weeklyEventRules.points,
         name: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
+        id: weeklyEventRules.id,
       })
-      .from(weeklyTribeResults)
-      .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyTribeResults.rule))
-      .innerJoin(weeklyEvents, eq(weeklyEvents.rule, weeklyEventRules.id))
-      .innerJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
-      .innerJoin(tribes, eq(tribes.id, weeklyTribeResults.result))
-      .innerJoin(episodes, eq(episodes.id, weeklyTribeResults.episode))
+      .from(weeklyTribes)
+      .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyTribes.event))
+      .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
+      .innerJoin(tribes, eq(tribes.id, weeklyTribes.reference))
+      .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'tribe'),
-        eq(weeklyTribeResults.episode, weeklyEvents.episode),
-        eq(weeklyTribeResults.result, weeklyTribes.reference))),
+        lt(episodes.number, currentEpisode?.episode ?? -1)))
+      .groupBy(tribes.name, episodes.number, weeklyEventRules.points, weeklyEventRules.id,
+        weeklyEventRules.name, weeklyEventRules.description, weeklyEventRules.referenceType),
     db
       .select({
+        count: count(),
         member: leagueMembers.displayName,
         episode: episodes.number,
         points: weeklyEventRules.points,
         name: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
+        id: weeklyEventRules.id,
       })
-      .from(weeklyMemberResults)
-      .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyMemberResults.rule))
-      .innerJoin(weeklyEvents, eq(weeklyEvents.rule, weeklyEventRules.id))
-      .innerJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
-      .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyMemberResults.result))
-      .innerJoin(episodes, eq(episodes.id, weeklyMemberResults.episode))
+      .from(weeklyMembers)
+      .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyMembers.event))
+      .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
+      .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
+      .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'member'),
-        eq(weeklyMemberResults.episode, weeklyEvents.episode),
-        eq(weeklyMemberResults.result, weeklyMembers.reference))),
+        lt(episodes.number, currentEpisode?.episode ?? -1)))
+      .groupBy(leagueMembers.displayName, episodes.number, weeklyEventRules.points, weeklyEventRules.id,
+        weeklyEventRules.name, weeklyEventRules.description, weeklyEventRules.referenceType),
   ]);
 
+  // tally the votes for each event for each episode
+  const castawayVotes = events[3].reduce((lookup, vote) => {
+    lookup[vote.episode] ??= {};
+    lookup[vote.episode]![vote.id] ??= {};
+    lookup[vote.episode]![vote.id]![vote.castaway] ??= { ...vote, count: 0 };
+    lookup[vote.episode]![vote.id]![vote.castaway]!.count += vote.count;
+    return lookup;
+  }, {} as Record<number, Record<number, Record<string, {
+    count: number,
+    castaway: string,
+    episode: number,
+    points: number,
+    name: string,
+    description: string,
+    referenceType: string,
+    id: number,
+  }>>>);
+  // get the max votes for each event for each episode
+  const maxCastawayVotes = Object.values(castawayVotes).reduce((lookup, votes) => {
+    Object.entries(votes).forEach(([eventId, eventVotes]) => {
+      const eventIdNum = Number.parseInt(eventId);
+      lookup[eventIdNum] ??= [];
+      const maxVoteCount = Math.max(...[...lookup[eventIdNum], ...Object.values(eventVotes)]
+        .map((vote) => vote.count));
+      const maxVoted = Object.entries(eventVotes).filter(([_, vote]) => vote.count === maxVoteCount);
+      lookup[eventIdNum].push(...maxVoted.map(([castaway, vote]) => ({ ...vote, castaway })));
+    });
+    return lookup;
+  }, {} as Record<number, {
+    count: number,
+    castaway: string,
+    episode: number,
+    points: number,
+    name: string,
+    description: string,
+    referenceType: string,
+    id: number,
+  }[]>);
+
+  // do the same for tribe and member votes
+  const tribeVotes = events[4].reduce((lookup, vote) => {
+    lookup[vote.episode] ??= {};
+    lookup[vote.episode]![vote.id] ??= {};
+    lookup[vote.episode]![vote.id]![vote.tribe] ??= { ...vote, count: 0 };
+    lookup[vote.episode]![vote.id]![vote.tribe]!.count += vote.count;
+    return lookup;
+  }, {} as Record<number, Record<number, Record<string, {
+    count: number,
+    tribe: string,
+    episode: number,
+    points: number,
+    name: string,
+    description: string,
+    referenceType: string,
+    id: number,
+  }>>>);
+  const maxTribeVotes = Object.values(tribeVotes).reduce((lookup, votes) => {
+    Object.entries(votes).forEach(([eventId, eventVotes]) => {
+      const eventIdNum = Number.parseInt(eventId);
+      lookup[eventIdNum] ??= [];
+      const maxVoteCount = Math.max(...[...lookup[eventIdNum], ...Object.values(eventVotes)]
+        .map((vote) => vote.count));
+      const maxVoted = Object.entries(eventVotes).filter(([_, vote]) => vote.count === maxVoteCount);
+      lookup[eventIdNum].push(...maxVoted.map(([tribe, vote]) => ({ ...vote, tribe })));
+    });
+    return lookup;
+  }, {} as Record<number, {
+    count: number,
+    tribe: string,
+    episode: number,
+    points: number,
+    name: string,
+    description: string,
+    referenceType: string,
+    id: number,
+  }[]>);
+
+  const memberVotes = events[5].reduce((lookup, vote) => {
+    lookup[vote.episode] ??= {};
+    lookup[vote.episode]![vote.id] ??= {};
+    lookup[vote.episode]![vote.id]![vote.member] ??= { ...vote, count: 0 };
+    lookup[vote.episode]![vote.id]![vote.member]!.count += vote.count;
+    return lookup;
+  }, {} as Record<number, Record<number, Record<string, {
+    count: number,
+    member: string,
+    episode: number,
+    points: number,
+    name: string,
+    description: string,
+    referenceType: string,
+    id: number,
+  }>>>);
+  const maxMemberVotes = Object.values(memberVotes).reduce((lookup, votes) => {
+    Object.entries(votes).forEach(([eventId, eventVotes]) => {
+      const eventIdNum = Number.parseInt(eventId);
+      lookup[eventIdNum] ??= [];
+      const maxVoteCount = Math.max(...[...lookup[eventIdNum], ...Object.values(eventVotes)]
+        .map((vote) => vote.count));
+      const maxVoted = Object.entries(eventVotes).filter(([_, vote]) => vote.count === maxVoteCount);
+      lookup[eventIdNum].push(...maxVoted.map(([member, vote]) => ({ ...vote, member })));
+    });
+    return lookup;
+  }, {} as Record<number, {
+    count: number,
+    member: string,
+    episode: number,
+    points: number,
+    name: string,
+    description: string,
+    referenceType: string,
+    id: number,
+  }[]>);
+
+  //console.log(maxCastawayVotes, maxTribeVotes, maxMemberVotes);
+
   return {
-    castawayEvents: events[3],
-    tribeEvents: events[4],
-    memberEvents: [...events[0], ...events[1], ...events[2], ...events[5]]
+    castawayEvents: Object.values(maxCastawayVotes).flat(),
+    tribeEvents: Object.values(maxTribeVotes).flat(),
+    memberEvents: [...events[0], ...events[1], ...events[2], ...Object.values(maxMemberVotes).flat()],
   };
 }
 
@@ -392,15 +516,13 @@ export async function getEpisodes(leagueId: number) {
     .where(eq(leagues.id, leagueId))
     .orderBy(desc(episodes.number));
 
-  return eps.filter((ep) => new Date(`${ep.airDate} -5:00`) < new Date());
+  return eps.filter((ep) => new Date(`${ep.airDate} -4:00`) < new Date());
 }
 
-export async function getMemberEpisodeEvents(leagueId: number) {
-  const { memberId } = await eventAuth(leagueId);
-  if (!memberId) throw new Error('Not authorized');
-
+export async function getCurrentNextEpisodes(leagueId: number) {
   const { currentEpisode, nextEpisode } = await db
     .select({
+      id: episodes.id,
       episode: episodes.number,
       airDate: episodes.airDate,
       runtime: episodes.runtime,
@@ -413,28 +535,57 @@ export async function getMemberEpisodeEvents(leagueId: number) {
     .where(eq(leagues.id, leagueId))
     .orderBy(asc(episodes.number))
     .then((res) => ({
-      currentEpisode: res.reverse().find((ep) => new Date(`${ep.airDate} -5:00`) < new Date()),
-      nextEpisode: res.find((ep) => new Date(`${ep.airDate} -5:00`) > new Date()),
+      currentEpisode: res.reverse().find((ep) => new Date(`${ep.airDate} -4:00`).getTime() < new Date().getTime()),
+      nextEpisode: res.find((ep) => new Date(`${ep.airDate} -4:00`).getTime() > new Date().getTime())
     }));
+
+  return { currentEpisode, nextEpisode };
+}
+
+type MemberEpisodeEvents = {
+  weekly: {
+    votes: WeeklyEventRuleType[];
+    predictions: WeeklyEventRuleType[];
+  };
+  season: SeasonEventRuleType[];
+  count: number;
+};
+
+export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEpisodeEvents> {
+  const { memberId } = await eventAuth(leagueId);
+  if (!memberId) throw new Error('Not authorized');
+
+  const { currentEpisode, nextEpisode } = await getCurrentNextEpisodes(leagueId);
 
   if (!currentEpisode) return {
     weekly: { votes: [], predictions: [] },
-    season: []
+    season: [],
+    count: 0
+  };
+  const currentEpisodeDate = new Date(`${currentEpisode.airDate} -4:00`);
+  const currentEpisodeEnd = new Date(currentEpisodeDate.getTime() + currentEpisode.runtime * 60 * 1000);
+  if (currentEpisodeEnd > new Date()) return {
+    weekly: { votes: [], predictions: [] },
+    season: [],
+    count: 0
   };
 
   // get votes for the current episode that this member has not yet scored
   const votes = await db
     .select({
+      id: weeklyEventRules.id,
       name: weeklyEventRules.name,
       description: weeklyEventRules.description,
       points: weeklyEventRules.points,
       referenceType: weeklyEventRules.referenceType,
+      type: weeklyEventRules.type,
+      weeklyEventId: weeklyEvents.id,
     })
     .from(weeklyEventRules)
     .leftJoin(weeklyEvents, and(
       eq(weeklyEvents.rule, weeklyEventRules.id),
       eq(weeklyEvents.member, memberId),
-      eq(weeklyEvents.episode, currentEpisode.episode)))
+      eq(weeklyEvents.episode, currentEpisode.id)))
     .where(and(
       eq(weeklyEventRules.league, leagueId),
       eq(weeklyEventRules.type, 'vote'),
@@ -442,26 +593,29 @@ export async function getMemberEpisodeEvents(leagueId: number) {
 
   // only if the next episode is available
   // and the current episode is done airing
-  if (!nextEpisode || new Date(new Date(
-    `${currentEpisode.airDate} -5:00`).getTime() + currentEpisode.runtime * 60 * 1000
-  ) > new Date()) return {
+  if (!nextEpisode || currentEpisodeEnd > new Date()) return {
     weekly: { votes, predictions: [] },
-    season: []
+    season: [],
+    count: votes.length
   };
 
   // get predictions for the next episode
   const predictions = await db
     .select({
+      id: weeklyEventRules.id,
       name: weeklyEventRules.name,
       description: weeklyEventRules.description,
       points: weeklyEventRules.points,
       referenceType: weeklyEventRules.referenceType,
+      type: weeklyEventRules.type,
+      weeklyEventId: weeklyEvents.id,
+      episode: weeklyEvents.episode,
     })
     .from(weeklyEventRules)
     .leftJoin(weeklyEvents, and(
       eq(weeklyEvents.rule, weeklyEventRules.id),
       eq(weeklyEvents.member, memberId),
-      eq(weeklyEvents.episode, nextEpisode.episode)))
+      eq(weeklyEvents.episode, nextEpisode.id)))
     .where(and(
       eq(weeklyEventRules.league, leagueId),
       eq(weeklyEventRules.type, 'predict'),
@@ -472,6 +626,7 @@ export async function getMemberEpisodeEvents(leagueId: number) {
   if (nextEpisode.merge || nextEpisode.finale) {
     const seasonPredictions = await db
       .select({
+        id: seasonEventRules.id,
         name: seasonEventRules.name,
         description: seasonEventRules.description,
         points: seasonEventRules.points,
@@ -492,12 +647,14 @@ export async function getMemberEpisodeEvents(leagueId: number) {
 
     return {
       weekly: { votes, predictions },
-      season: seasonPredictions
+      season: seasonPredictions,
+      count: seasonPredictions.length + votes.length + predictions.length
     };
   } else {
     return {
       weekly: { votes, predictions },
-      season: []
+      season: [],
+      count: votes.length + predictions.length
     };
   }
 }

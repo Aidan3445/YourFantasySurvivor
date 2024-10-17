@@ -169,8 +169,6 @@ export default function NewEventResult({
       });
   };
 
-  console.log('refs', refs);
-
   return (
     <Form {...form}>
       <form className='flex flex-col gap-2 justify-center md:min-w-3/4' action={catchSubmit}>

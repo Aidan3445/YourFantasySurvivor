@@ -2,10 +2,11 @@ import { type Member } from '~/server/db/schema/members';
 import Members from './membersScores';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/rules/query';
-import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents } from '~/app/api/leagues/[id]/score/query';
+import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
 import compileScores from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
+import VotePredict from '../events/votePredict';
 
 interface MembersProps {
   leagueId: number;
@@ -14,15 +15,15 @@ interface MembersProps {
   isFull: boolean;
 }
 
-export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
+export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   const [
     rules, events, customEvents, weeklyEvents, seasonEvents,
-    memberCastaways, details,
+    memberCastaways, details, episodeEvents,
   ] = await Promise.all([
     getRules(leagueId), getBaseEvents(leagueId),
     getCustomEvents(leagueId), getWeeklyEvents(leagueId), getSeasonEvents(leagueId),
     getCastawayMemberEpisodeTable(members.map((m) => m.id)),
-    getDraftDetails(leagueId),
+    getDraftDetails(leagueId), getMemberEpisodeEvents(leagueId),
   ]);
 
   const altEvents = {
@@ -58,6 +59,7 @@ export async function LeaderBoard({ leagueId, members, ownerLoggedIn, isFull }: 
 
   return (
     <Tabs defaultValue='members'>
+      <VotePredict leagueId={leagueId} events={episodeEvents} castaways={details.remaining} tribes={details.tribes} members={members} />
       <TabsList>
         <TabsTrigger value='members'>Members</TabsTrigger>
         <TabsTrigger value='castaways'>Castaways</TabsTrigger>
