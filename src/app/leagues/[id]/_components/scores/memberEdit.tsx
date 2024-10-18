@@ -544,6 +544,7 @@ interface ChangeSurvivorProps extends UpdateProps {
   color: string;
   castaways: CastawayDetails[];
   otherChoices?: CastawayDetails[];
+  preventChange?: boolean;
 }
 
 const changeSurvivorSchema = z.object({
@@ -556,6 +557,7 @@ export function ChangeSurvivor({
   otherChoices,
   currentPick,
   color,
+  preventChange,
   className,
 }: ChangeSurvivorProps) {
   const form = useForm<z.infer<typeof changeSurvivorSchema>>({
@@ -563,7 +565,8 @@ export function ChangeSurvivor({
   });
   const router = useRouter();
 
-  const [changeOpen, setChangeOpen] = useState(false);
+  const current = otherChoices?.find((c) => c.more.shortName === currentPick);
+  const [changeOpen, setChangeOpen] = useState(current === undefined);
 
   const catchUpdate = () => {
     const update = changeSurvivorPick.bind(null, leagueId, form.getValues('newSurvivor'));
@@ -580,34 +583,35 @@ export function ChangeSurvivor({
       });
   };
 
-  const current = otherChoices?.find((c) => c.more.shortName === currentPick);
-
   return (
     <Popover open={changeOpen} onOpenChange={setChangeOpen}>
       <PopoverTrigger className={className}>
-        <RefreshCw size={16} color={color} />
+        <RefreshCw size={16} color={color} className={preventChange ? 'opacity-50' : ''} />
       </PopoverTrigger>
       <Popup>
-        <Form {...form}>
-          <form className='flex flex-col gap-1 text-center' action={catchUpdate}>
-            <FormField
-              control={form.control}
-              name='newSurvivor'
-              defaultValue={current?.name}
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <SelectCastaways
-                      castaways={castaways}
-                      otherChoices={otherChoices?.filter((c) => c.more.shortName !== currentPick)}
-                      field={field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            <Button type='submit'>Change</Button>
-          </form>
-        </Form >
+        {preventChange && current !== undefined ?
+          (<div> You cannot change your survivor right because someone&apos;s survivor was eliminated.
+            <br />Once they make their pick you can change yours too.</div>) :
+          (<Form {...form}>
+            <form className='flex flex-col gap-1 text-center' action={catchUpdate}>
+              <FormField
+                control={form.control}
+                name='newSurvivor'
+                defaultValue={current?.name}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <SelectCastaways
+                        castaways={castaways}
+                        otherChoices={otherChoices?.filter((c) => c.more.shortName !== currentPick)}
+                        field={field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              <Button type='submit'>Change</Button>
+            </form>
+          </Form>)}
       </Popup>
     </Popover>
   );

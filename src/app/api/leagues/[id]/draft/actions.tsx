@@ -1,6 +1,6 @@
 'use server';
 import { auth } from '@clerk/nextjs/server';
-import { and, asc, desc, eq, or, lt, inArray } from 'drizzle-orm';
+import { and, desc, eq, or, lt, inArray } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
 import { episodes } from '~/server/db/schema/episodes';
@@ -10,6 +10,8 @@ import { seasonCastaways, seasonEvents, seasonMembers, seasonTribes } from '~/se
 import { seasons } from '~/server/db/schema/seasons';
 import { getCurrentNextEpisodes } from '../score/query';
 import { weeklyCastaways, weeklyEvents, weeklyMembers, weeklyTribes } from '~/server/db/schema/weeklyEvents';
+import { getRemainingCastaways } from '~/app/api/seasons/[name]/castaways/query';
+import { getLeague } from '../../query';
 
 export interface Picks {
   firstPick?: number;
@@ -118,25 +120,32 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
   const { userId } = auth();
   if (!userId) throw new Error('User not authenticated');
 
-  const memberId = await db
-    .select({ id: leagueMembers.id })
+  const { memberId, season } = await db
+    .select({ memberId: leagueMembers.id, season: seasons.name })
     .from(leagueMembers)
+    .innerJoin(leagues, eq(leagues.id, leagueMembers.league))
+    .innerJoin(seasons, eq(seasons.id, leagues.season))
     .where(and(
       eq(leagueMembers.league, leagueId),
       eq(leagueMembers.userId, userId)))
-    .then((res) => res[0]?.id);
-  if (!memberId) throw new Error('Member not found');
+    .then((res) => res[0] ?? { memberId: undefined, season: undefined });
+  if (!memberId || !season) throw new Error('Member not found');
 
-  const eps = await db
-    .select({ id: episodes.id, airDate: episodes.airDate })
-    .from(episodes)
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(leagues, eq(leagues.season, seasons.id))
-    .where(eq(leagues.id, leagueId))
-    .orderBy(asc(episodes.number));
+  // check if changes are allowed block changes if:
+  // a) there are no remaining castaways that are not picked
+  // b) there is a member who's current pick was eliminated
+  const [league, remaining] = await Promise.all([
+    getLeague(leagueId),
+    getRemainingCastaways(season)
+  ]);
+  if (league.members.length >= remaining.length) throw new Error('No castaways remain.');
+  if (league.members.filter((m) => m.id !== memberId)
+    .some((m) => !remaining.some((r) => r.more.shortName === m.drafted.slice(-1)[0]))) {
+    throw new Error('You cannot change your survivor pick until all league members have one.');
+  }
 
-  const currentEp = eps.find((ep) => Date.now() < new Date(`${ep.airDate} -5:00`).getTime())?.id;
-  if (!currentEp) throw new Error('No future episodes');
+  const { nextEpisode } = await getCurrentNextEpisodes(leagueId);
+  if (!nextEpisode) throw new Error('No future episodes');
 
   const [newCastawayId, currentCastawayId] = await Promise.all([
     db
@@ -155,7 +164,7 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
       .innerJoin(castaways, eq(castaways.id, selectionUpdates.castaway))
       .where(and(
         eq(leagueMembers.id, memberId),
-        lt(selectionUpdates.episode, currentEp)))
+        lt(selectionUpdates.episode, nextEpisode.id)))
       .orderBy(desc(selectionUpdates.episode))
       .then((res) => res[0]?.castaway),
   ]);
@@ -166,14 +175,14 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
       .delete(selectionUpdates)
       .where(and(
         eq(selectionUpdates.member, memberId),
-        eq(selectionUpdates.episode, currentEp)));
+        eq(selectionUpdates.episode, nextEpisode.id)));
     return;
   }
 
 
   await db
     .insert(selectionUpdates)
-    .values({ member: memberId, episode: currentEp, castaway: newCastawayId })
+    .values({ member: memberId, episode: nextEpisode.id, castaway: newCastawayId })
     .onConflictDoUpdate({
       target: [selectionUpdates.member, selectionUpdates.episode],
       set: { castaway: newCastawayId },

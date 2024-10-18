@@ -8,6 +8,7 @@ import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
 import { Skull } from 'lucide-react';
 import { mouseOutLeaderboard, mouseOverLeaderboard } from '~/app/playground/_components/leaderboard';
+import { useMemo } from 'react';
 
 interface MembersProps {
   leagueId: number;
@@ -26,6 +27,11 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
   const showDrafted = members.some((m) => m.drafted);
 
   const memberDisplayNames = members.map((m) => m.displayName);
+
+  const preventChange = useMemo(() => members
+    .filter((m) => !m.loggedIn)
+    .some((m) => !details.remaining.some((r) => r.more.shortName === m.drafted.slice(-1)[0])),
+  [members, details.remaining]);
 
   return (
     <table className='space-x-1 space-y-2'>
@@ -78,8 +84,9 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                     <HoverCardTrigger>
                       <ColorRow color={sColor} className='py-1 text-xs flex gap-2'>
                         <h3 style={{ color: csColor }}>{member.drafted.slice(-1)[0]}</h3>
-                        {member.loggedIn &&
+                        {member.loggedIn && members.length < details.remaining.length &&
                           <ChangeSurvivor
+                            preventChange={preventChange}
                             className='ml-auto'
                             leagueId={leagueId}
                             color={csColor}
