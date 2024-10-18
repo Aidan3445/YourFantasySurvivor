@@ -22,7 +22,7 @@ export default async function WhoAreYou() {
         </AlertDialogHeader>
         <ul className='grid grid-cols-1 gap-4'>
           {members.filter((member) => member.userId.length == 2).map((member) => (
-            <AlertDialogAction className='h-0' key={member.id}>
+            <AlertDialogAction className='h-0' key={member.id} asChild>
               <AssignMember member={member} userId={userId} />
             </AlertDialogAction>
           ))}
