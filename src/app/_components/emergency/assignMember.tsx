@@ -24,7 +24,7 @@ export default function AssignMember({ member, userId }: AssignMemberProps) {
   return (
     <form action={resetMember}>
       <ColorRow
-        className='flex justify-between'
+        className='flex justify-between w-full'
         {...member}
         loggedIn={false}>
         {member.displayName}
