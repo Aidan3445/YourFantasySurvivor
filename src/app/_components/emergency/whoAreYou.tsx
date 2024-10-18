@@ -1,5 +1,5 @@
 import { auth } from '@clerk/nextjs/server';
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from '../commonUI/alert';
+import { AlertDialog, AlertDialogContent, AlertDialogHeader, AlertDialogTitle } from '../commonUI/alert';
 import { db } from '~/server/db';
 import { leagueMembers } from '~/server/db/schema/members';
 import { eq } from 'drizzle-orm';
@@ -22,9 +22,7 @@ export default async function WhoAreYou() {
         </AlertDialogHeader>
         <ul className='grid grid-cols-1 gap-4'>
           {members.filter((member) => member.userId.length == 2).map((member) => (
-            <AlertDialogAction className='h-0' key={member.id} asChild>
-              <AssignMember member={member} userId={userId} />
-            </AlertDialogAction>
+            <AssignMember member={member} userId={userId} key={member.id} />
           ))}
         </ul>
       </AlertDialogContent>

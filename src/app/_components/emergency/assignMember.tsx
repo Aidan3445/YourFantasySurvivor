@@ -2,8 +2,8 @@ import { ColorRow } from '~/app/leagues/[id]/_components/scores/membersScores';
 import { db } from '~/server/db';
 import { type LeagueMember, leagueMembers } from '~/server/db/schema/members';
 import { eq } from 'drizzle-orm';
-import { Button } from '../commonUI/button';
 import { redirect } from 'next/navigation';
+import { AlertDialogAction } from '../commonUI/alert';
 
 interface AssignMemberProps {
   member: LeagueMember;
@@ -28,7 +28,7 @@ export default function AssignMember({ member, userId }: AssignMemberProps) {
         {...member}
         loggedIn={false}>
         {member.displayName}
-        <Button className='p-1 text-xs h-3 m-1' type='submit'>That&apos;s Me</Button>
+        <AlertDialogAction className='p-1 text-xs h-3 m-1' type='submit'>That&apos;s Me</AlertDialogAction>
       </ColorRow>
     </form>
   );
