@@ -16,7 +16,7 @@ export default async function WhoAreYou() {
 
   return (
     <AlertDialog defaultOpen={members.every((m) => m.userId !== userId)}>
-      <AlertDialogContent className='w-44'>
+      <AlertDialogContent className='w-44 bg-white p-4'>
         <AlertDialogHeader>
           <AlertDialogTitle>Who are you?</AlertDialogTitle>
         </AlertDialogHeader>
