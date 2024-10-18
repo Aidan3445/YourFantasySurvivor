@@ -268,7 +268,7 @@ export default function NewBaseEvent({
             <section className='flex flex-col gap-1'>
               <span className='inline items-center'>
                 <h3 className='text-xl font-semibold '>Keywords and Notes </h3>
-                <h4 className='text-sm font-normal  ml-1'>(line seperated)</h4>
+                <h4 className='text-sm font-normal  ml-1'>(line separated)</h4>
               </span>
               <FormField name='keywords' render={({ field }) => (
                 <FormControl>
@@ -359,7 +359,7 @@ function AddNote({ form, index, children, className }: AddNoteProps) {
       </PopoverTrigger>
       <PopoverContent>
         <CardContainer className='p-4'>
-          <h3 className='text-xl font-semibold'>Add line seperated notes</h3>
+          <h3 className='text-xl font-semibold'>Add line separated notes</h3>
           <FormField name={`notes.${noteIndex}.note`} render={() => (
             <FormItem>
               <Textarea
