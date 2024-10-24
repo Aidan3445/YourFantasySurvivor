@@ -564,11 +564,37 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
   };
   const currentEpisodeDate = new Date(`${currentEpisode.airDate} -4:00`);
   const currentEpisodeEnd = new Date(currentEpisodeDate.getTime() + currentEpisode.runtime * 60 * 1000);
-  if (currentEpisodeEnd > new Date()) return {
-    weekly: { votes: [], predictions: [] },
-    season: [],
-    count: 0
-  };
+  if (currentEpisodeEnd > new Date()) {
+    if (currentEpisode.merge) {
+      const mergePredictions = await db
+        .select({
+          id: seasonEventRules.id,
+          name: seasonEventRules.name,
+          description: seasonEventRules.description,
+          points: seasonEventRules.points,
+          referenceType: seasonEventRules.referenceType,
+          timing: seasonEventRules.timing,
+        })
+        .from(seasonEventRules)
+        .leftJoin(seasonEvents, and(
+          eq(seasonEvents.rule, seasonEventRules.id),
+          eq(seasonEvents.member, memberId)))
+        .where(and(
+          eq(seasonEventRules.league, leagueId),
+          eq(seasonEventRules.timing, 'merge'),
+          isNull(seasonEvents.id)));
+      return {
+        weekly: { votes: [], predictions: [] },
+        season: mergePredictions,
+        count: mergePredictions.length
+      };
+    }
+    return {
+      weekly: { votes: [], predictions: [] },
+      season: [],
+      count: 0
+    };
+  }
 
   // get votes for the current episode that this member has not yet scored
   const votes = await db
