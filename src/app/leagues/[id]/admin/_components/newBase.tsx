@@ -41,8 +41,8 @@ interface NewBaseEventProps extends ComponentProps {
 const newBaseEventSchema = z.object({
   eventName: z.enum([...eventName.enumValues, '']),
   episodeId: z.string(),
-  keywords: z.array(z.string().min(3).max(32)).max(5),
-  notes: z.array(z.string().min(3).max(256)).max(5),
+  keywords: z.array(z.string().min(3).max(32)).max(17),
+  notes: z.array(z.string().min(3).max(256)).max(10),
   referenceType: z.enum(['castaway', 'tribe']),
   references: z.array(z.string().or(z.undefined())).refine((refs) => {
     if (refs.length === 0) return false;
@@ -97,6 +97,7 @@ export default function NewBaseEvent({
     try {
       newBaseEventSchema.parse(data);
     } catch (e) {
+      console.error(e);
       toast({
         title: 'Invalid data',
         description: 'Please check the form for errors',
