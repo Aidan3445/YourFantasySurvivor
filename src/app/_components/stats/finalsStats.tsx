@@ -11,7 +11,7 @@ export default function FinalsStats({ final, fireWin, soleSurvivor }: FinalsStat
 
   return (
     <figure className='flex flex-col h-44'>
-      <Stat title='Fire Making' content={fireWin!} />
+      <Stat title='Fire Making' content={fireWin} />
       <Stat title='Finalists' content={final?.join(', ') ?? ''} />
       <Stat title='Sole Survivor' content={soleSurvivor!} />
     </figure>
@@ -20,7 +20,7 @@ export default function FinalsStats({ final, fireWin, soleSurvivor }: FinalsStat
 
 interface StatProps {
   title: string;
-  content: string;
+  content?: string;
 }
 
 function Stat({ title, content }: StatProps) {

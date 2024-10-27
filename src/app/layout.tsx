@@ -5,8 +5,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 import TopNav from './_components/topNav';
 import { type ReactNode, StrictMode } from 'react';
 import { Toaster } from './_components/commonUI/toaster';
-import SideNav from './_components/sideNav';
-import { SidebarProvider, SidebarTrigger } from './_components/commonUI/sideBar';
+import SideNav, { CustomSidebarTrigger } from './_components/sideNav';
+import { SidebarProvider } from './_components/commonUI/sideBar';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,8 +30,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         }}>
         <html lang='en'>
           <body className={`font-sans ${inter.variable}`}>
-            <SidebarProvider className='page'>
-              {!oldNav && <SidebarTrigger className='md:hidden' />}
+            <SidebarProvider className='page flex flex-col'>
+              {!oldNav && <CustomSidebarTrigger />}
               {oldNav ? <TopNav /> : <SideNav />}
               {children}
               <Toaster />
