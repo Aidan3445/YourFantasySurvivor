@@ -21,7 +21,7 @@ export function EventQueue({ children, disabled }: EventQueueProps) {
         ))}
       </article>
       {!disabled && (
-        <div className='flex gap-2 items-center self-start mt-5'>
+        <div className='gap-2 items-center self-start mt-5 hidden lg:flex'>
           <Separator orientation='vertical' className='h-20' />
           <div className='flex flex-col gap-2'>
             <Button onClick={() => setCount(count + 1)}>Add</Button>
