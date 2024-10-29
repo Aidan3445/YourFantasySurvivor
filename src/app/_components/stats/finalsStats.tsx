@@ -13,7 +13,7 @@ export default function FinalsStats({ final, fireWin, soleSurvivor }: FinalsStat
     <figure className='flex flex-col h-44'>
       <Stat title='Fire Making' content={fireWin} />
       <Stat title='Finalists' content={final?.join(', ') ?? ''} />
-      <Stat title='Sole Survivor' content={soleSurvivor!} />
+      <Stat title='Sole Survivor' content={soleSurvivor} />
     </figure>
   );
 }

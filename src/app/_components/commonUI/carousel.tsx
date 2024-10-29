@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/prop-types */
 'use client';
 
@@ -226,7 +228,7 @@ const CarouselPrevious = React.forwardRef<
   return (
     <Button
       ref={ref}
-      variant={variant}
+      //variant={variant}
       size={size}
       className={cn(
         'h-8 w-8 rounded-full hs-in',
@@ -252,7 +254,7 @@ const CarouselNext = React.forwardRef<
   return (
     <Button
       ref={ref}
-      variant={variant}
+      //variant={variant}
       size={size}
       className={cn(
         'h-8 w-8 rounded-full hs-in',
