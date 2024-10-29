@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton, useUser } from '@clerk/nextjs';
 import { SidebarMenuButton, useSidebar } from './commonUI/sideBar';
-import { useRef, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { cn } from '~/lib/utils';
 import { LoaderCircle, LogIn, Menu, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
@@ -21,32 +21,32 @@ export function SideNavFooter() {
   const sidebar = useSidebar();
   const user = useUser();
 
-  const userButtonRef = useRef<HTMLButtonElement>(null);
-  const handleButtonClick = () => {
-    if (userButtonRef.current) {
-      userButtonRef.current.click();
-    }
-  };
-
   return (
-    <SidebarMenuButton className='mt-auto' onClick={handleButtonClick}>
+    <>
       <ClerkLoading>
-        <LoaderCircle className='self-center animate-spin' color='#7f633f' />
+        <SidebarMenuButton>
+          <LoaderCircle className='self-center animate-spin' color='#7f633f' />
+        </SidebarMenuButton>
       </ClerkLoading>
       <ClerkLoaded>
         <SignedOut>
           <SignInButton>
-            <LogIn />
+            <SidebarMenuButton>
+              <LogIn />
+              Sign In
+            </SidebarMenuButton>
           </SignInButton>
         </SignedOut>
         <SignedIn>
-          <div className='-ml-1.5 pt-1 z-50'>
-            <UserButton />
-          </div>
-          {(sidebar.open || sidebar.openMobile) && <span>{user.user?.fullName}</span>}
+          <SidebarMenuButton>
+            <div className='-ml-1.5 pt-1 z-50'>
+              <UserButton />
+            </div>
+            {(sidebar.open || sidebar.openMobile) && <span>{user.user?.fullName}</span>}
+          </SidebarMenuButton>
         </SignedIn>
       </ClerkLoaded>
-    </SidebarMenuButton>
+    </>
   );
 }
 

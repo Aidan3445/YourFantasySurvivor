@@ -4,6 +4,10 @@ import { getLeagues } from '~/app/api/leagues/query';
 export default async function SideNavLeagues() {
   const myLeagues = await getLeagues();
 
+  if (myLeagues.length === 0) {
+    return null;
+  }
+
   return (
     <SidebarMenuSub className='ml-[18px]'>
       {myLeagues.map((league) => (

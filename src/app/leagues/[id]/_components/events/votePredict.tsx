@@ -16,6 +16,8 @@ import { submitVotesPredicts, type VotePredicts } from '~/app/api/leagues/[id]/d
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { useState } from 'react';
 import { Button } from '~/app/_components/commonUI/button';
+import { useIsMobile } from '~/hooks/use-mobile';
+import { cn } from '~/lib/utils';
 
 interface VotePredictProps {
   leagueId: number;
@@ -49,6 +51,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   });
   const { toast } = useToast();
   const [alertOpen, setAlertOpen] = useState(true);
+  const mobile = useIsMobile();
 
   if (events.count === 0) return null;
   else if (!alertOpen) return (
@@ -144,7 +147,8 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   return (
     <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
       <AlertDialogContent>
-        <CardContainer className='flex flex-col p-4 items-center text-center max-h-[40rem] w-full'>
+        <CardContainer className={cn('flex flex-col p-4 items-center text-center max-h-[40rem] ',
+          mobile ? 'overflow-y-scroll' : 'overflow-hidden')}>
           <h2 className='text-xl font-semibold'>Vote & Predict</h2>
           <Form {...form}>
             <form action={handleSubmit} className='light-scroll'>
@@ -262,7 +266,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                   ))}
                 </section>
               )}
-              <AlertDialogFooter>
+              <AlertDialogFooter className={cn('w-full items-center justify-center', mobile ? 'flex-col' : 'flex-row')}>
                 <AlertDialogAction
                   onClick={handleSubmit}
                   className='w-1/2'
