@@ -64,7 +64,7 @@ export async function getLeague(leagueId: number) {
 
 export async function getLeagues() {
   const { userId } = auth();
-  if (!userId) throw new Error('User not authenticated');
+  if (!userId) return [];
 
   const userLeagues = await db
     .select({ name: leagues.name, season: seasons.name, id: leagues.id })
