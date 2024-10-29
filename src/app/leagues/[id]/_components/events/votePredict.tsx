@@ -144,7 +144,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   return (
     <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
       <AlertDialogContent>
-        <CardContainer className={'flex flex-col p-4 items-center text-center max-h-[40rem] w-full m-0'} >
+        <CardContainer className={'flex flex-col pb-2 items-center text-center max-h-[40rem] m-0 w-72'} >
           <h2 className='text-xl font-semibold'>Vote & Predict</h2>
           <Form {...form}>
             <form action={handleSubmit} className='light-scroll'>
@@ -262,7 +262,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                   ))}
                 </section>
               )}
-              <AlertDialogFooter className='w-full items-center justify-center flex-col md:flex-row'>
+              <AlertDialogFooter className='w-full items-center justify-center flex-row'>
                 <AlertDialogAction
                   onClick={handleSubmit}
                   className='w-1/2'
