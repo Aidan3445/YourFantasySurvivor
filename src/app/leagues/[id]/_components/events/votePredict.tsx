@@ -50,10 +50,10 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   const { toast } = useToast();
   const [alertOpen, setAlertOpen] = useState(true);
 
-  if (events.count === 2) return null;
+  if (events.count === 0) return null;
   else if (!alertOpen) return (
-    <div className='fixed top-2 right-2'>
-      <Button className='text-xl font-semibold' onClick={() => setAlertOpen(true)}>
+    <div className='mb-2 md:fixed md:top-2 md:right-2'>
+      <Button className='text-xs p-1 h-min font-semibold' onClick={() => setAlertOpen(true)}>
         Votes or predictions available
       </Button>
     </div>

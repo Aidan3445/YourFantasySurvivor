@@ -9,6 +9,8 @@ import { type EventsProps } from './eventForm';
 import { useState } from 'react';
 import { Label } from '~/app/_components/commonUI/label';
 
+type WeeklyTemplatesType = Omit<WeeklyEventRuleType, 'id'>;
+
 export default function WeeklyEvents({ className, form, freeze, setUnsaved }: EventsProps) {
   const weeklyEvents = form.watch('weekly');
 
@@ -16,11 +18,11 @@ export default function WeeklyEvents({ className, form, freeze, setUnsaved }: Ev
     event: WeeklyEventRuleType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => {
-    const newEvents = [...weeklyEvents];
+    const newEvents = [...weeklyEvents] as WeeklyTemplatesType[];
 
     switch (action) {
       case 'copy':
-        newEvents.push({ ...event, id: undefined, name: '' });
+        newEvents.push({ ...event, name: '' });
         break;
       case 'delete':
         newEvents.splice(eventIndex, 1);
@@ -30,11 +32,11 @@ export default function WeeklyEvents({ className, form, freeze, setUnsaved }: Ev
         break;
     }
 
-    form.setValue('weekly', newEvents);
+    form.setValue('weekly', newEvents as WeeklyEventRuleType[]);
   };
 
   const newEvent = (value: keyof typeof WeeklyTemplates) => {
-    form.setValue('weekly', [...weeklyEvents, { ...WeeklyTemplates[value] }]);
+    form.setValue('weekly', [...weeklyEvents, { ...WeeklyTemplates[value] } as WeeklyEventRuleType]);
     setUnsaved && setUnsaved();
   };
 
@@ -139,7 +141,8 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
         </div>
         <div className='w-full'>
           <Label>Reference Type</Label>
-          <Select value={event.referenceType} onValueChange={(value) => update(updateReferenceType(value))}>
+          <Select value={event.referenceType} onValueChange={(value) =>
+            update(updateReferenceType(value))}>
             <SelectTrigger className='w-full'>
               <SelectValue />
             </SelectTrigger>
@@ -154,21 +157,41 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
           </Select>
         </div>
       </span>
-      <div>
-        <Label>Type</Label>
-        <Select value={event.type} onValueChange={(value) => update({ ...newEvent, type: value as 'vote' | 'predict' })}>
-          <SelectTrigger className='mt-0 w-full'>
-            <SelectValue placeholder='Type' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Type</SelectLabel>
-              <SelectItem value='vote'>Vote</SelectItem>
-              <SelectItem value='predict'>Prediction</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+      <span className='grid gap-2 grid-cols-2'>
+        <div>
+          <Label>Type</Label>
+          <Select value={event.type} onValueChange={(value) =>
+            update({ ...newEvent, type: value as 'vote' | 'predict' })}>
+            <SelectTrigger className='mt-0 w-full'>
+              <SelectValue placeholder='Type' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Type</SelectLabel>
+                <SelectItem value='vote'>Vote</SelectItem>
+                <SelectItem value='predict'>Prediction</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Timing</Label>
+          <Select value={event.timing} onValueChange={(value) =>
+            update({ ...newEvent, timing: value as 'fullSeason' | 'preMerge' | 'postMerge' })}>
+            <SelectTrigger className='mt-0 w-full'>
+              <SelectValue placeholder='Timing' />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Timing</SelectLabel>
+                <SelectItem value='fullSeason'>Full Season</SelectItem>
+                <SelectItem value='preMerge'>Pre-Merge</SelectItem>
+                <SelectItem value='postMerge'>Post-Merge</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </span>
       <div>
         <Label>Description</Label>
         <Textarea
@@ -184,44 +207,49 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
 }
 
 // example event templates below
-const blankVoteEvent: WeeklyEventRuleType = {
+const blankVoteEvent: WeeklyTemplatesType = {
   name: '',
   points: 0,
   description: '',
   referenceType: 'castaway',
-  type: 'vote'
+  type: 'vote',
+  timing: 'fullSeason'
 };
 
-const blankPredictEvent: WeeklyEventRuleType = {
+const blankPredictEvent: WeeklyTemplatesType = {
   name: '',
   points: 0,
   description: '',
   referenceType: 'castaway',
-  type: 'predict'
+  type: 'predict',
+  timing: 'fullSeason'
 };
 
-const challengeMVPEvent: WeeklyEventRuleType = {
+const challengeMVPEvent: WeeklyTemplatesType = {
   name: 'Challenge MVP',
   points: 2,
   description: 'A castaway is the most valuable player in a challenge.',
   referenceType: 'castaway',
-  type: 'vote'
+  type: 'vote',
+  timing: 'preMerge'
 };
 
-const bestGCMemeEvent: WeeklyEventRuleType = {
+const bestGCMemeEvent: WeeklyTemplatesType = {
   name: 'Best GC Meme',
   points: 1,
   description: 'Which league member sent the best meme in the group chat this week?',
   referenceType: 'member',
-  type: 'vote'
+  type: 'vote',
+  timing: 'fullSeason'
 };
 
-const nextBootEvent: WeeklyEventRuleType = {
+const nextBootEvent: WeeklyTemplatesType = {
   name: 'Next Boot',
   points: 2,
   description: 'Predict the next castaway to be voted off.',
   referenceType: 'castaway',
-  type: 'predict'
+  type: 'predict',
+  timing: 'fullSeason'
 };
 
 const WeeklyTemplates = {

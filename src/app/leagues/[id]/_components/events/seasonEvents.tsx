@@ -10,6 +10,8 @@ import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 import { Label } from '~/app/_components/commonUI/label';
 
+type SeasonTemplatesType = Omit<SeasonEventRuleType, 'id'>;
+
 export default function SeasonEvents({ className, form, freeze, setUnsaved }: EventsProps) {
   const seasonEvents = form.watch('season');
 
@@ -17,11 +19,11 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
     event: SeasonEventRuleType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => {
-    const newEvents = [...seasonEvents];
+    const newEvents = [...seasonEvents] as SeasonTemplatesType[];
 
     switch (action) {
       case 'copy':
-        newEvents.push({ ...event, id: undefined, name: '' });
+        newEvents.push({ ...event, name: '' });
         break;
       case 'delete':
         newEvents.splice(eventIndex, 1);
@@ -31,11 +33,11 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
         break;
     }
 
-    form.setValue('season', newEvents);
+    form.setValue('season', newEvents as SeasonEventRuleType[]);
   };
 
   const newEvent = (value: keyof typeof SeasonTemplates) => {
-    form.setValue('season', [...seasonEvents, { ...SeasonTemplates[value] }]);
+    form.setValue('season', [...seasonEvents, { ...SeasonTemplates[value] } as SeasonEventRuleType]);
     setUnsaved && setUnsaved();
   };
 
@@ -174,7 +176,7 @@ export function SeasonEvent({ event, eventIndex, updateEvent, className }: Seaso
 }
 
 // example event templates below
-const blankEvent: SeasonEventRuleType = {
+const blankEvent: SeasonTemplatesType = {
   name: '',
   points: 0,
   description: '',
@@ -182,7 +184,7 @@ const blankEvent: SeasonEventRuleType = {
   timing: 'premiere',
 };
 
-const soleSurvivor: SeasonEventRuleType = {
+const soleSurvivor: SeasonTemplatesType = {
   name: 'Sole Survivor',
   points: 10,
   description: 'Predict the winner of the season.',
@@ -190,7 +192,7 @@ const soleSurvivor: SeasonEventRuleType = {
   timing: 'merge',
 };
 
-const firstBoot: SeasonEventRuleType = {
+const firstBoot: SeasonTemplatesType = {
   name: 'First Boot',
   points: 5,
   description: 'Predict the first boot of the season.',
@@ -198,7 +200,7 @@ const firstBoot: SeasonEventRuleType = {
   timing: 'premiere',
 };
 
-const firstLoser: SeasonEventRuleType = {
+const firstLoser: SeasonTemplatesType = {
   name: 'First Loser',
   points: 5,
   description: 'Predict the first league member to have their castaway eliminated.',
@@ -206,7 +208,7 @@ const firstLoser: SeasonEventRuleType = {
   timing: 'premiere',
 };
 
-const tribeBeast: SeasonEventRuleType = {
+const tribeBeast: SeasonTemplatesType = {
   name: 'Beast Tribe',
   points: 5,
   description: 'Predict the tribe that wins the most challenges.',
@@ -214,7 +216,7 @@ const tribeBeast: SeasonEventRuleType = {
   timing: 'premiere',
 };
 
-const individualBeast: SeasonEventRuleType = {
+const individualBeast: SeasonTemplatesType = {
   name: 'Beast Castaway',
   points: 5,
   description: 'Predict the castaway that wins the most individual challenges.',

@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { description, eventName } from './customEvents';
 
 export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
+export const weeklyEventTiming = pgEnum('event_weekly_timing', ['fullSeason', 'preMerge', 'postMerge']);
 
 export const weeklyEventRules = createTable(
   'event_weekly_rule',
@@ -23,6 +24,7 @@ export const weeklyEventRules = createTable(
     description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
     type: weeklyEventType('type').notNull(),
+    timing: weeklyEventTiming('timing').default('fullSeason').notNull(),
     referenceType: reference('reference_type').notNull(),
   }
 );
@@ -36,6 +38,7 @@ export const WeeklyEventRule = z.object({
   points: pointRange,
   referenceType: z.enum(reference.enumValues),
   type: z.enum(weeklyEventType.enumValues),
+  timing: z.enum(weeklyEventTiming.enumValues),
 });/*.refine((rule) => {
   const refAdmin = rule.customEvent !== null;
   const refBase = rule.baseEvent !== null;
