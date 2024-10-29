@@ -10,6 +10,8 @@ import { Separator } from '~/app/_components/commonUI/separator';
 import { type EventsProps } from './eventForm';
 import { Label } from '~/app/_components/commonUI/label';
 
+type CustomTemplatesType = Omit<CustomEventRuleType, 'id'>;
+
 export default function CustomEvents({ className, form, freeze, setUnsaved }: EventsProps) {
   const customEvents = form.watch('custom');
 
@@ -17,11 +19,11 @@ export default function CustomEvents({ className, form, freeze, setUnsaved }: Ev
     event: CustomEventRuleType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => {
-    const newEvents = [...customEvents];
+    const newEvents = [...customEvents] as CustomTemplatesType[];
 
     switch (action) {
       case 'copy':
-        newEvents.push({ ...event, id: undefined, name: '' });
+        newEvents.push({ ...event, name: '' });
         break;
       case 'delete':
         newEvents.splice(eventIndex, 1);
@@ -31,11 +33,11 @@ export default function CustomEvents({ className, form, freeze, setUnsaved }: Ev
         break;
     }
 
-    form.setValue('custom', newEvents);
+    form.setValue('custom', newEvents as CustomEventRuleType[]);
   };
 
   const newEvent = (value: keyof typeof CustomTemplates) => {
-    form.setValue('custom', [...customEvents, { ...CustomTemplates[value] }]);
+    form.setValue('custom', [...customEvents, { ...CustomTemplates[value] } as CustomEventRuleType]);
     setUnsaved && setUnsaved();
   };
 
@@ -168,28 +170,28 @@ function CustomEvent({ event, eventIndex, updateEvent, className }: CustomEventP
 }
 
 // example event templates below
-const blankEvent: CustomEventRuleType = {
+const blankEvent: CustomTemplatesType = {
   name: '',
   points: 0,
   description: '',
   referenceType: 'castaway'
 };
 
-const confessionalEvent: CustomEventRuleType = {
+const confessionalEvent: CustomTemplatesType = {
   name: 'Confessional',
   points: 1,
   description: 'A castaway records a confessional.',
   referenceType: 'castaway'
 };
 
-const liveTribalCouncilEvent: CustomEventRuleType = {
+const liveTribalCouncilEvent: CustomTemplatesType = {
   name: 'Live Tribal Council',
   points: 1,
   referenceType: 'tribe',
   description: 'Tribal council erupts into chaos (A.K.A. live tribal).'
 };
 
-const orchestrateBlindsideEvent: CustomEventRuleType = {
+const orchestrateBlindsideEvent: CustomTemplatesType = {
   name: 'Orchestrate Blindside',
   points: 3,
   description: 'A castaway orchestrates a blindside.',

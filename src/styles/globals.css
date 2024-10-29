@@ -14,13 +14,13 @@ body  {
 /* Responsive padding and margin */
 @media (min-width: 640px) { /* Adjust numbers based on your design preferences */
     .page {
-        @apply px-10; /* Horizontal padding for small screens */
+        @apply px-10 pl-14; /* Horizontal padding for small screens */
     }
 }
 
 @media (min-width: 1024px) {
     .page {
-        @apply px-40; /* Increased horizontal padding for larger screens */
+        @apply !pl-52; /* Increased horizontal padding for larger screens */
     }
 }
 
@@ -51,7 +51,7 @@ body  {
 
 /* Main container styles */
 main {
-   @apply flex flex-col items-center text-white gap-4 py-2;
+   @apply flex flex-col items-center text-white gap-6 py-2;
 }
 
 /* Scrollbar styles */
@@ -135,4 +135,27 @@ button, .hs-in {
 }
 .br-corner {
     @apply absolute bottom-0 right-0 -rotate-210 translate-y-3 translate-x-3;
+}
+
+@layer base {
+  :root {
+        --sidebar-background: 33 58% 84% / 0.95;
+        --sidebar-foreground: 240 5.3% 26.1%;
+        --sidebar-primary: 240 5.9% 10% / 0;
+        --sidebar-primary-foreground: 240 4.8% 95.9%;
+        --sidebar-accent: 33 61% 73%;
+        --sidebar-accent-foreground: 240 5.9% 10%;
+        --sidebar-border:  0;
+        --sidebar-ring: 0;
+    }
+  .dark {
+        --sidebar-background: 240 5.9% 10%;
+        --sidebar-foreground: 240 4.8% 95.9%;
+        --sidebar-primary: 224.3 76.3% 48%;
+        --sidebar-primary-foreground: 0 0% 100%;
+        --sidebar-accent: 240 3.7% 15.9%;
+        --sidebar-accent-foreground: 240 4.8% 95.9%;
+        --sidebar-border: 240 3.7% 15.9%;
+        --sidebar-ring: 217.2 91.2% 59.8%;
+    }
 }

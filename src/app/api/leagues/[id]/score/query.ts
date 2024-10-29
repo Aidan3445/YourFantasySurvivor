@@ -520,7 +520,7 @@ export async function getEpisodes(leagueId: number) {
 }
 
 export async function getCurrentNextEpisodes(leagueId: number) {
-  const { currentEpisode, nextEpisode } = await db
+  const { currentEpisode, nextEpisode, mergeEpisode } = await db
     .select({
       id: episodes.id,
       episode: episodes.number,
@@ -536,10 +536,11 @@ export async function getCurrentNextEpisodes(leagueId: number) {
     .orderBy(asc(episodes.number))
     .then((res) => ({
       currentEpisode: res.reverse().find((ep) => new Date(`${ep.airDate} -4:00`).getTime() < new Date().getTime()),
-      nextEpisode: res.find((ep) => new Date(`${ep.airDate} -4:00`).getTime() > new Date().getTime())
+      nextEpisode: res.find((ep) => new Date(`${ep.airDate} -4:00`).getTime() > new Date().getTime()),
+      mergeEpisode: res.find((ep) => ep.merge),
     }));
 
-  return { currentEpisode, nextEpisode };
+  return { currentEpisode, nextEpisode, mergeEpisode };
 }
 
 type MemberEpisodeEvents = {
@@ -555,7 +556,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
   const { memberId } = await eventAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
-  const { currentEpisode, nextEpisode } = await getCurrentNextEpisodes(leagueId);
+  const { currentEpisode, nextEpisode, mergeEpisode } = await getCurrentNextEpisodes(leagueId);
 
   if (!currentEpisode) return {
     weekly: { votes: [], predictions: [] },
@@ -605,6 +606,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
       points: weeklyEventRules.points,
       referenceType: weeklyEventRules.referenceType,
       type: weeklyEventRules.type,
+      timing: weeklyEventRules.timing,
       weeklyEventId: weeklyEvents.id,
     })
     .from(weeklyEventRules)
@@ -615,7 +617,12 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     .where(and(
       eq(weeklyEventRules.league, leagueId),
       eq(weeklyEventRules.type, 'vote'),
-      isNull(weeklyEvents.id)));
+      isNull(weeklyEvents.id)))
+    .then((res) => {
+      if (!mergeEpisode || mergeEpisode.episode > currentEpisode.episode)
+        return res.filter((rule) => rule.timing !== 'postMerge');
+      else return res.filter((rule) => rule.timing !== 'preMerge');
+    });
 
   // only if the next episode is available
   // and the current episode is done airing
@@ -634,6 +641,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
       points: weeklyEventRules.points,
       referenceType: weeklyEventRules.referenceType,
       type: weeklyEventRules.type,
+      timing: weeklyEventRules.timing,
       weeklyEventId: weeklyEvents.id,
       episode: weeklyEvents.episode,
     })
@@ -645,7 +653,12 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     .where(and(
       eq(weeklyEventRules.league, leagueId),
       eq(weeklyEventRules.type, 'predict'),
-      isNull(weeklyEvents.id)));
+      isNull(weeklyEvents.id)))
+    .then((res) => {
+      if (!mergeEpisode || mergeEpisode.episode > nextEpisode.episode)
+        return res.filter((rule) => rule.timing !== 'postMerge');
+      else return res.filter((rule) => rule.timing !== 'preMerge');
+    });
 
   // if the next episode is a merge or finale
   // get relevant season predictions

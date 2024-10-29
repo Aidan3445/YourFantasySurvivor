@@ -15,9 +15,9 @@ export type TribeChallengeStat = {
   tribe2nd: number
 };
 export type TitleStat = { name: string, count?: number };
-export type FinalStat = string[] | null;
-export type FireWinStat = string | null;
-export type SoleSurvivorStat = string | null;
+export type FinalStat = string[] | undefined;
+export type FireWinStat = string | undefined;
+export type SoleSurvivorStat = string | undefined;
 export type EliminationStat = { name: string, episode: number, votes: string[] };
 
 export type SeasonStats = {
@@ -35,9 +35,9 @@ export const emptyStats = (): SeasonStats => ({
   titles: [],
   castawayChallenges: [],
   tribeChallenges: [],
-  final: null,
-  fireWin: null,
-  soleSurvivor: null,
+  final: undefined,
+  fireWin: undefined,
+  soleSurvivor: undefined,
   eliminations: [],
 });
 

@@ -52,6 +52,7 @@ export async function getRules(leagueId: number):
       description: weeklyEventRules.description,
       points: weeklyEventRules.points,
       type: weeklyEventRules.type,
+      timing: weeklyEventRules.timing,
       referenceType: weeklyEventRules.referenceType,
     })
     .from(weeklyEventRules)

@@ -5,7 +5,9 @@ import { ClerkProvider } from '@clerk/nextjs';
 import TopNav from './_components/topNav';
 import { type ReactNode, StrictMode } from 'react';
 import { Toaster } from './_components/commonUI/toaster';
-import WhoAreYou from './_components/emergency/whoAreYou';
+import SideNav from './_components/sideNav';
+import { SidebarProvider } from './_components/commonUI/sideBar';
+import { CustomSidebarTrigger } from './_components/sideNavHelpers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -18,25 +20,21 @@ export const metadata = {
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: ReactNode
-}) {
+const oldNav = false;
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <StrictMode>
       <ClerkProvider
-        appearance={{
-          variables: { colorPrimary: '#684528', colorBackground: '#EED9BF' },
-        }}>
+        appearance={{ variables: { colorPrimary: '#684528', colorBackground: '#EED9BF' } }}>
         <html lang='en'>
           <body className={`font-sans ${inter.variable}`}>
-            <div className='page'>
-              <TopNav />
-              <WhoAreYou />
+            <SidebarProvider className='page flex flex-col'>
+              {!oldNav && <CustomSidebarTrigger />}
+              {oldNav ? <TopNav /> : <SideNav />}
               {children}
-            </div>
-            <Toaster />
+              <Toaster />
+            </SidebarProvider>
           </body>
         </html>
       </ClerkProvider>

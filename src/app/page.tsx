@@ -11,7 +11,7 @@ export default async function HomePage() {
       <CardContainer>
         <Image src='https://i.imgur.com/b6cHcaG.png' priority width={2100} height={2100} alt='Header Image' />
       </CardContainer>
-      <section className='grid grid-cols-1 gap-4 w-full sm:grid-cols-2 md:gap-8'>
+      <section className='grid grid-cols-1 gap-6 w-full sm:grid-cols-2'>
         <ClerkLoading>
           <SignInCardBase />
         </ClerkLoading>

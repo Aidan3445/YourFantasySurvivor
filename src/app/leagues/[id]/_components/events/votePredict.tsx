@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import CardContainer from '~/app/_components/cardContainer';
 import { Form, FormControl, FormField, FormLabel } from '~/app/_components/commonUI/form';
-import { AlertDialog, AlertDialogAction, AlertDialogContent } from '~/app/_components/commonUI/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter } from '~/app/_components/commonUI/alert';
 import { SelectCastaways, SelectMembers, SelectTribes } from '~/app/_components/selectSeason';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { type Member } from '~/server/db/schema/members';
@@ -14,6 +14,8 @@ import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
 import { PredictionCard } from '../settings/predictionCard';
 import { submitVotesPredicts, type VotePredicts } from '~/app/api/leagues/[id]/draft/actions';
 import { useToast } from '~/app/_components/commonUI/use-toast';
+import { useState } from 'react';
+import { Button } from '~/app/_components/commonUI/button';
 
 interface VotePredictProps {
   leagueId: number;
@@ -46,8 +48,16 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
     resolver: zodResolver(formSchema),
   });
   const { toast } = useToast();
+  const [alertOpen, setAlertOpen] = useState(true);
 
   if (events.count === 0) return null;
+  else if (!alertOpen) return (
+    <div className='mb-2 md:fixed md:top-2 md:right-2'>
+      <Button className='text-xs p-1 h-min font-semibold' onClick={() => setAlertOpen(true)}>
+        Votes or predictions available
+      </Button>
+    </div>
+  );
 
   const handleSubmit = () => {
     const data = form.getValues();
@@ -132,9 +142,9 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   };
 
   return (
-    <AlertDialog defaultOpen={true}>
+    <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
       <AlertDialogContent>
-        <CardContainer className='flex flex-col p-4 items-center text-center max-h-[40rem]'>
+        <CardContainer className={'flex flex-col pb-2 items-center text-center max-h-[40rem] m-0 w-72'} >
           <h2 className='text-xl font-semibold'>Vote & Predict</h2>
           <Form {...form}>
             <form action={handleSubmit} className='light-scroll'>
@@ -252,16 +262,19 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                   ))}
                 </section>
               )}
-              <AlertDialogAction
-                onClick={handleSubmit}
-                className='w-1/3'
-                disabled={!form.formState.isValid || form.formState.isSubmitting}>
-                Submit
-              </AlertDialogAction>
+              <AlertDialogFooter className='w-full items-center justify-center flex-row'>
+                <AlertDialogAction
+                  onClick={handleSubmit}
+                  className='w-1/2'
+                  disabled={!form.formState.isValid || form.formState.isSubmitting}>
+                  Submit
+                </AlertDialogAction>
+                <AlertDialogCancel className='w-1/2'>I&apos;ll do this Later</AlertDialogCancel>
+              </AlertDialogFooter>
             </form>
           </Form>
         </CardContainer>
       </AlertDialogContent>
-    </AlertDialog>
+    </AlertDialog >
   );
 }

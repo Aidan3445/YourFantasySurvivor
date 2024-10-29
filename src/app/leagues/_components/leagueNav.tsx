@@ -9,7 +9,7 @@ export default function LeagueNav() {
   const [joinOpen, setJoinOpen] = useState(false);
 
   return (
-    <nav className='grid absolute left-8 top-16 grid-cols-2 gap-2 p-2 text-black rounded-2xl border-2 border-black md:top-2 md:left-96 bg-b1 sm:left-[72px] lg:left-[504px] xl:left-[584px]'>
+    <nav className='grid absolute top-16 grid-cols-2 gap-2 p-2 text-black rounded-2xl border-2 border-black md:top-2 md:left-96 bg-b1 sm:left-[72px] lg:left-[504px] xl:left-[584px]'>
       <Popover open={createOpen} onOpenChange={setCreateOpen} defaultOpen={false}>
         <PopoverTrigger className='w-32 h-10 text-sm font-medium rounded-md hs-in'>
           Create League

@@ -45,9 +45,11 @@ export default function SeasonStats() {
     { title: 'Challenges', content: <ChallengesPodium castaways={stats.castawayChallenges} tribes={stats.tribeChallenges} />, noWrapper: true },
     { title: 'Advantages', content: <AdvantagesTable advantages={stats.advantages} /> },
     { title: 'Eliminations', content: <EliminationsTable eliminations={stats.eliminations} /> },
-    { title: 'Finals', content: <FinalsStats final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} />, noWrapper: true },
     { title: 'Titles', content: <TitlesTable titles={stats.titles} /> },
+    { title: 'Finals', content: <FinalsStats final={stats.final} fireWin={stats.fireWin} soleSurvivor={stats.soleSurvivor} />, noWrapper: true },
   ];
+
+  if (!stats.final && !stats.fireWin && !stats.soleSurvivor) carouselItems.pop();
 
   return (
     <CardContainer className='gap-0'>
