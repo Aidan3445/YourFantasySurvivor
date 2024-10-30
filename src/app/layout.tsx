@@ -8,6 +8,7 @@ import { Toaster } from './_components/commonUI/toaster';
 import SideNav from './_components/sideNav';
 import { SidebarProvider } from './_components/commonUI/sideBar';
 import { CustomSidebarTrigger } from './_components/sideNavHelpers';
+import WhoAreYou from './_components/emergency/whoAreYou';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <SidebarProvider className='page flex flex-col'>
               {!oldNav && <CustomSidebarTrigger />}
               {oldNav ? <TopNav /> : <SideNav />}
+              <WhoAreYou />
               {children}
               <Toaster />
             </SidebarProvider>

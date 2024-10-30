@@ -694,7 +694,7 @@ function filterWeeklyEventsTiming<T>(
   let filtered;
   if (!mergeEpisode || mergeEpisode.episode > currentEpisode.episode)
     filtered = ruleEvents.filter((rule) => rule.timing !== 'postMerge');
-  filtered = ruleEvents.filter((rule) => rule.timing !== 'preMerge');
+  else filtered = ruleEvents.filter((rule) => rule.timing !== 'preMerge');
 
   return filtered as T & { timing: 'fullSeason' | 'preMerge' | 'postMerge' }[];
 }

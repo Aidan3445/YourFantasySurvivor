@@ -18,7 +18,7 @@ export default function AssignMember({ member, userId }: AssignMemberProps) {
       .set({ userId })
       .where(eq(leagueMembers.id, member.id));
 
-    redirect('/leagues/draft');
+    redirect('/leagues/');
   };
 
   return (
