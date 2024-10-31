@@ -16,17 +16,26 @@ body  {
     .page {
         @apply px-10 pl-14; /* Horizontal padding for small screens */
     }
+    .sidebar-gap-div {
+        @apply transform -translate-x-14;
+    }
 }
 
 @media (min-width: 1024px) {
     .page {
         @apply !pl-52; /* Increased horizontal padding for larger screens */
     }
+    .sidebar-gap-div {
+        @apply transform -translate-x-52;
+    }
 }
 
 @media (min-width: 1280px) {
     .page {
         @apply px-60; /* Even more padding for extra large screens */
+    }
+    .sidebar-gap-div {
+        @apply transform -translate-x-60;
     }
 }
 
