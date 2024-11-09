@@ -388,8 +388,6 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
     id: number,
   })[]>);
 
-  //console.log(maxCastawayVotes, maxTribeVotes, maxMemberVotes);
-
   return {
     castawayEvents: Object.values(maxCastawayVotes).flat(),
     tribeEvents: Object.values(maxTribeVotes).flat(),
@@ -488,8 +486,6 @@ export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
     .leftJoin(episodes, eq(episodes.id, selectionUpdates.episode))
     .where(inArray(leagueMembers.id, memberIds));
 
-  if (!updates.some((update) => update.id === userId)) throw new Error('Not authorized');
-
   return updates.reduce((lookup, update) => {
     update.episode ??= 0;
     lookup[update.episode] ??= {};
@@ -540,7 +536,14 @@ export async function getCurrentNextEpisodes(leagueId: number) {
   return { currentEpisode, nextEpisode, mergeEpisode };
 }
 
-type WithPick = { pick: { castaway: string | null, tribe: string | null, member: string | null } };
+export type WithPick = {
+  pick: {
+    castaway: string | null,
+    tribe: string | null,
+    member: string | null,
+    color?: string | null
+  }
+};
 
 export type MemberEpisodeEvents = {
   weekly: {

@@ -3,10 +3,10 @@ import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettings } from '~/server/db/schema/leagues';
 import { leagueMembers } from '~/server/db/schema/members';
-import { leagueAuth } from '../score/actions';
+import { leagueAdminAuth } from '../score/actions';
 
 export async function updateDraftOrder(leagueId: number, order: string[]) {
-  const user = await leagueAuth(leagueId);
+  const user = await leagueAdminAuth(leagueId);
   if (!user.userId) throw new Error('User not authenticated');
 
   const ids = (await Promise.all(order.map((name) => db

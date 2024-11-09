@@ -26,8 +26,6 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
     getDraftDetails(leagueId), getMemberEpisodeEvents(leagueId),
   ]);
 
-  console.log(episodeEvents);
-
   const altEvents = {
     castawayEvents: [...customEvents.castawayEvents, ...weeklyEvents.castawayEvents, ...seasonEvents.castawayEvents],
     tribeEvents: [...customEvents.tribeEvents, ...weeklyEvents.tribeEvents, ...seasonEvents.tribeEvents],

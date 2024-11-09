@@ -1,6 +1,6 @@
 import CardContainer from '~/app/_components/cardContainer';
 import { Popover, PopoverCenter, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
-import { getLeagueSettings } from '~/app/api/leagues/[id]/settings/query';
+import { getLeagueSettings, getPremierPredictions } from '~/app/api/leagues/[id]/settings/query';
 import { cn } from '~/lib/utils';
 import { type LeagueOwnerProps } from '../leagueDetails';
 import { Button } from '~/app/_components/commonUI/button';
@@ -11,13 +11,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/comm
 import { PredictionCard } from './predictionCard';
 
 export default async function DraftInfo({ league, ownerLoggedIn, className }: LeagueOwnerProps) {
-  const [settings, { season }] = await Promise.all([
+  const [settings, { season }, predictions] = await Promise.all([
     getLeagueSettings(league.id),
-    getRules(league.id)
+    getRules(league.id),
+    getPremierPredictions(league.id),
   ]);
 
   const preseasonPredictions = season.filter((rule) => rule.timing === 'premiere');
-
   const orderLocked = !ownerLoggedIn || settings.draftDate < new Date();
 
   return (
@@ -40,6 +40,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
                 className='flex flex-col gap-1 w-full'
                 leagueId={league.id}
                 orderLocked={orderLocked}
+                predictions={predictions}
                 {...settings} />
             </TabsContent>
             <TabsContent value='predict'>

@@ -8,7 +8,7 @@ import { weeklyCastawayResults, type WeeklyEventRuleType, weeklyMemberResults, w
 import { leagues } from '~/server/db/schema/leagues';
 import { leagueMembers } from '~/server/db/schema/members';
 
-export async function leagueAuth(leagueId: number) {
+export async function leagueAdminAuth(leagueId: number) {
   const { userId } = auth();
   if (!userId) return { userId };
 
@@ -37,7 +37,7 @@ export async function submitCustomEvent(
   references: { id: number; /*notes: string[]*/ }[],
   //commonNotes: string[]
 ) {
-  const { userId } = await leagueAuth(leagueId);
+  const { userId } = await leagueAdminAuth(leagueId);
   if (!userId) throw new Error('Not authorized');
 
   // first insert the event
@@ -83,7 +83,7 @@ export async function submitWeeklyResult(
   rule: WeeklyEventRuleType,
   references: { id: number }[],
 ) {
-  const { userId } = await leagueAuth(leagueId);
+  const { userId } = await leagueAdminAuth(leagueId);
   if (!userId) throw new Error('Not authorized');
 
   let insertTable: typeof weeklyCastawayResults | typeof weeklyTribeResults | typeof weeklyMemberResults;
@@ -122,7 +122,7 @@ export async function submitSeasonResult(
   rule: SeasonEventRuleType,
   references: { id: number }[],
 ) {
-  const { userId } = await leagueAuth(leagueId);
+  const { userId } = await leagueAdminAuth(leagueId);
   if (!userId) throw new Error('Not authorized');
 
   let insertTable: typeof seasonCastawayResults | typeof seasonTribeResults | typeof weeklyMemberResults;
