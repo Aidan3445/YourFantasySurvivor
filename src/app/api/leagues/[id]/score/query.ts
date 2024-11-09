@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, count, desc, eq, inArray, isNull, lt, or } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, lt, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/seasons/[name]/events/query';
 import { leagues } from '~/server/db/schema/leagues';
@@ -540,13 +540,17 @@ export async function getCurrentNextEpisodes(leagueId: number) {
   return { currentEpisode, nextEpisode, mergeEpisode };
 }
 
-type MemberEpisodeEvents = {
+type WithPick = { pick: { castaway: string | null, tribe: string | null, member: string | null } };
+
+export type MemberEpisodeEvents = {
   weekly: {
-    votes: WeeklyEventRuleType[];
-    predictions: WeeklyEventRuleType[];
+    votes: (WeeklyEventRuleType & WithPick)[];
+    predictions: (WeeklyEventRuleType & WithPick)[];
   };
-  season: SeasonEventRuleType[];
+  season: (SeasonEventRuleType & WithPick)[];
   count: number;
+  picked: boolean;
+  locked: boolean;
 };
 
 export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEpisodeEvents> {
@@ -558,41 +562,12 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
   if (!currentEpisode) return {
     weekly: { votes: [], predictions: [] },
     season: [],
-    count: 0
+    count: 0,
+    picked: true,
+    locked: false
   };
   const currentEpisodeDate = new Date(`${currentEpisode.airDate} -4:00`);
   const currentEpisodeEnd = new Date(currentEpisodeDate.getTime() + currentEpisode.runtime * 60 * 1000);
-  if (currentEpisodeEnd > new Date()) {
-    if (currentEpisode.merge) {
-      const mergePredictions = await db
-        .select({
-          id: seasonEventRules.id,
-          name: seasonEventRules.name,
-          description: seasonEventRules.description,
-          points: seasonEventRules.points,
-          referenceType: seasonEventRules.referenceType,
-          timing: seasonEventRules.timing,
-        })
-        .from(seasonEventRules)
-        .leftJoin(seasonEvents, and(
-          eq(seasonEvents.rule, seasonEventRules.id),
-          eq(seasonEvents.member, memberId)))
-        .where(and(
-          eq(seasonEventRules.league, leagueId),
-          eq(seasonEventRules.timing, 'merge'),
-          isNull(seasonEvents.id)));
-      return {
-        weekly: { votes: [], predictions: [] },
-        season: mergePredictions,
-        count: mergePredictions.length
-      };
-    }
-    return {
-      weekly: { votes: [], predictions: [] },
-      season: [],
-      count: 0
-    };
-  }
 
   // get votes for the current episode that this member has not yet scored
   const votes = await db
@@ -605,23 +580,35 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
       type: weeklyEventRules.type,
       timing: weeklyEventRules.timing,
       weeklyEventId: weeklyEvents.id,
+      pick: {
+        castaway: castaways.name,
+        tribe: tribes.name,
+        member: leagueMembers.displayName,
+      },
     })
     .from(weeklyEventRules)
     .leftJoin(weeklyEvents, and(
       eq(weeklyEvents.rule, weeklyEventRules.id),
       eq(weeklyEvents.member, memberId),
       eq(weeklyEvents.episode, currentEpisode.id)))
+    .leftJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
+    .leftJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
+    .leftJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
+    .leftJoin(tribes, eq(tribes.id, weeklyTribes.reference))
+    .leftJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
+    .leftJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
     .where(and(
       eq(weeklyEventRules.league, leagueId),
-      eq(weeklyEventRules.type, 'vote'),
-      isNull(weeklyEvents.id)))
+      eq(weeklyEventRules.type, 'vote')))
     .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode));
   // only if the next episode is available
   // and the current episode is done airing
   if (!nextEpisode || currentEpisodeEnd > new Date()) return {
     weekly: { votes, predictions: [] },
     season: [],
-    count: votes.length
+    count: votes.length,
+    picked: votes.filter(pickMade).length === votes.length,
+    locked: currentEpisodeEnd > new Date()
   };
 
   // get predictions for the next episode
@@ -636,16 +623,26 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
       timing: weeklyEventRules.timing,
       weeklyEventId: weeklyEvents.id,
       episode: weeklyEvents.episode,
+      pick: {
+        castaway: castaways.name,
+        tribe: tribes.name,
+        member: leagueMembers.displayName,
+      },
     })
     .from(weeklyEventRules)
     .leftJoin(weeklyEvents, and(
       eq(weeklyEvents.rule, weeklyEventRules.id),
       eq(weeklyEvents.member, memberId),
       eq(weeklyEvents.episode, nextEpisode.id)))
+    .leftJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
+    .leftJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
+    .leftJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
+    .leftJoin(tribes, eq(tribes.id, weeklyTribes.reference))
+    .leftJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
+    .leftJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
     .where(and(
       eq(weeklyEventRules.league, leagueId),
-      eq(weeklyEventRules.type, 'predict'),
-      isNull(weeklyEvents.id)))
+      eq(weeklyEventRules.type, 'predict')))
     .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode));
   // if the next episode is a merge or finale
   // get relevant season predictions
@@ -658,33 +655,51 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
         points: seasonEventRules.points,
         referenceType: seasonEventRules.referenceType,
         timing: seasonEventRules.timing,
+        pick: {
+          castaway: castaways.name,
+          tribe: tribes.name,
+          member: leagueMembers.displayName,
+        },
       })
       .from(seasonEventRules)
       .leftJoin(seasonEvents, and(
         eq(seasonEvents.rule, seasonEventRules.id),
         eq(seasonEvents.member, memberId)))
+      .leftJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
+      .leftJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
+      .leftJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
+      .leftJoin(tribes, eq(tribes.id, weeklyTribes.reference))
+      .leftJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
+      .leftJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
       .where(and(
         eq(seasonEventRules.league, leagueId),
         or(
           eq(seasonEventRules.timing, 'merge'),
-          eq(seasonEventRules.timing, 'finale')),
-        isNull(seasonEvents.id)))
+          eq(seasonEventRules.timing, 'finale'))))
       .then((res) => res.filter((rule) =>
         rule.timing === (nextEpisode.merge ? 'merge' : 'finale')));
 
     return {
       weekly: { votes, predictions },
       season: seasonPredictions,
-      count: seasonPredictions.length + votes.length + predictions.length
+      count: seasonPredictions.length + votes.length + predictions.length,
+      picked: [...seasonPredictions, ...votes, ...predictions]
+        .filter(pickMade).length ===
+        seasonPredictions.length + votes.length + predictions.length,
+      locked: currentEpisodeEnd > new Date()
     };
   } else {
     return {
       weekly: { votes, predictions },
       season: [],
-      count: votes.length + predictions.length
+      count: votes.length + predictions.length,
+      picked: [...votes, ...predictions]
+        .filter(pickMade).length === votes.length + predictions.length,
+      locked: currentEpisodeEnd > new Date()
     };
   }
 }
+
 
 function filterWeeklyEventsTiming<T>(
   ruleEvents: T & { timing: 'fullSeason' | 'preMerge' | 'postMerge' }[],
@@ -697,4 +712,8 @@ function filterWeeklyEventsTiming<T>(
   else filtered = ruleEvents.filter((rule) => rule.timing !== 'preMerge');
 
   return filtered as T & { timing: 'fullSeason' | 'preMerge' | 'postMerge' }[];
+}
+
+function pickMade<T extends WithPick>(pick: T & WithPick) {
+  return pick.pick.castaway !== null || pick.pick.tribe !== null;
 }

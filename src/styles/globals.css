@@ -14,7 +14,7 @@ body  {
 /* Responsive padding and margin */
 @media (min-width: 640px) { /* Adjust numbers based on your design preferences */
     .page {
-        @apply px-10 pl-14; /* Horizontal padding for small screens */
+        @apply px-14;  /* Horizontal padding for small screens */
     }
     .sidebar-gap-div {
         @apply transform -translate-x-14;
@@ -23,7 +23,7 @@ body  {
 
 @media (min-width: 1024px) {
     .page {
-        @apply !pl-52; /* Increased horizontal padding for larger screens */
+        @apply px-24; /* Horizontal padding for medium screens */
     }
     .sidebar-gap-div {
         @apply transform -translate-x-52;

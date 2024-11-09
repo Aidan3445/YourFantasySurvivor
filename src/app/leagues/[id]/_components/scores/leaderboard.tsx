@@ -26,6 +26,8 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
     getDraftDetails(leagueId), getMemberEpisodeEvents(leagueId),
   ]);
 
+  console.log(episodeEvents);
+
   const altEvents = {
     castawayEvents: [...customEvents.castawayEvents, ...weeklyEvents.castawayEvents, ...seasonEvents.castawayEvents],
     tribeEvents: [...customEvents.tribeEvents, ...weeklyEvents.tribeEvents, ...seasonEvents.tribeEvents],
@@ -58,12 +60,19 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
   });
 
   return (
-    <Tabs defaultValue='members'>
-      <VotePredict leagueId={leagueId} events={episodeEvents} castaways={details.remaining} tribes={details.tribes} members={members} />
-      <TabsList>
-        <TabsTrigger value='members'>Members</TabsTrigger>
-        <TabsTrigger value='castaways'>Castaways</TabsTrigger>
-      </TabsList>
+    <Tabs defaultValue='members' className='flex flex-col items-center'>
+      <section className='flex flex-col w-min'>
+        <VotePredict
+          leagueId={leagueId}
+          events={episodeEvents}
+          castaways={details.remaining}
+          tribes={details.tribes}
+          members={members} />
+        <TabsList>
+          <TabsTrigger value='members'>Members</TabsTrigger>
+          <TabsTrigger value='castaways'>Castaways</TabsTrigger>
+        </TabsList>
+      </section>
       <TabsContent value='members'>
         <span className='flex flex-wrap gap-4 w-full justify-center'>
           <Members

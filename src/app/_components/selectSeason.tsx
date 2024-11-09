@@ -68,17 +68,18 @@ export default function SelectSeason({ className, initSeason }: SelectSeasonProp
 interface SelectCastawaysProps<T extends FieldValues> {
   castaways: CastawayDetails[];
   otherChoices?: CastawayDetails[];
+  locked?: boolean;
   field: ControllerRenderProps<T, Path<T>>;
 }
 
 export function SelectCastaways<T extends FieldValues>(
-  { castaways, otherChoices, field }:
+  { castaways, otherChoices, locked, field }:
     SelectCastawaysProps<T>) {
   const byTribe = castawaysByTribe(castaways);
 
   return (
-    <Select onValueChange={field.onChange} {...field}>
-      <SelectTrigger className='w-60'>
+    <Select onValueChange={field.onChange} {...field} disabled={locked}>
+      <SelectTrigger className='w-60' >
         <div className='flex-grow text-nowrap'>
           <SelectValue placeholder='Choose a Castaway' />
         </div>
@@ -106,18 +107,19 @@ export function SelectCastaways<T extends FieldValues>(
           );
         })}
       </SelectContent>
-    </Select>
+    </Select >
   );
 }
 
 interface SelectTribesProps<T extends FieldValues> {
   tribes: Tribe[];
+  locked?: boolean;
   field: ControllerRenderProps<T, Path<T>>;
 }
 
-export function SelectTribes<T extends FieldValues>({ tribes, field }: SelectTribesProps<T>) {
+export function SelectTribes<T extends FieldValues>({ tribes, locked, field }: SelectTribesProps<T>) {
   return (
-    <Select onValueChange={field.onChange} {...field}>
+    <Select onValueChange={field.onChange} {...field} disabled={locked}>
       <SelectTrigger className='w-60'>
         <div className='flex-grow text-nowrap'>
           <SelectValue placeholder='Choose a Tribe' />
@@ -138,12 +140,13 @@ export function SelectTribes<T extends FieldValues>({ tribes, field }: SelectTri
 
 interface SelectMembersProps<T extends FieldValues> {
   members: Member[];
+  locked?: boolean;
   field: ControllerRenderProps<T, Path<T>>;
 }
 
-export function SelectMembers<T extends FieldValues>({ members, field }: SelectMembersProps<T>) {
+export function SelectMembers<T extends FieldValues>({ members, locked, field }: SelectMembersProps<T>) {
   return (
-    <Select onValueChange={field.onChange} {...field}>
+    <Select onValueChange={field.onChange} {...field} disabled={locked}>
       <SelectTrigger className='w-60'>
         <div className='flex-grow text-nowrap'>
           <SelectValue placeholder='Choose a Member' />

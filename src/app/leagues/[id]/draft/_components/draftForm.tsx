@@ -2,23 +2,20 @@
 import { z } from 'zod';
 import { type ComponentProps } from '~/lib/utils';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/app/_components/commonUI/select';
 import { type Tribe } from '~/server/db/schema/tribes';
 import { type Member } from '~/server/db/schema/members';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/app/_components/commonUI/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '~/app/_components/commonUI/form';
 import { Button } from '~/app/_components/commonUI/button';
-import { ColorRow } from '../../_components/scores/membersScores';
-import { getContrastingColor } from '@uiw/color-convert';
 import { type Picks, submitDraft } from '~/app/api/leagues/[id]/draft/actions';
 import { useRouter } from 'next/navigation';
 import { type Predictions } from '~/app/api/leagues/[id]/draft/query';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { AlertDialog, AlertDialogContent, AlertDialogCancel, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription } from '~/app/_components/commonUI/alert';
 import { PredictionCard } from '../../_components/settings/predictionCard';
-import { SelectCastaways } from '~/app/_components/selectSeason';
+import { SelectCastaways, SelectMembers, SelectTribes } from '~/app/_components/selectSeason';
 
 export interface DraftFormProps extends ComponentProps {
   leagueId: number;
@@ -162,6 +159,7 @@ export default function DraftForm({
                   <SelectCastaways
                     castaways={options.castaways}
                     otherChoices={currentPicks.firstPick ? undefined : options.unavailable}
+                    locked={currentPicks.firstPick ? true : false}
                     field={field} />
                 </FormControl>
               </PredictionCard>
@@ -181,6 +179,7 @@ export default function DraftForm({
                         render={({ field }) => (
                           <SelectCastaways
                             castaways={options.castaways}
+                            locked={draftOver}
                             field={field} />)} />
                     </FormControl>
                   </PredictionCard>
@@ -200,23 +199,10 @@ export default function DraftForm({
                         name={`tribe[${index}]`}
                         defaultValue={currentPicks.tribePicks?.[index]}
                         render={({ field }) => (
-                          <Select onValueChange={field.onChange} {...field} >
-                            <SelectTrigger className='w-full' disabled={draftOver}>
-                              <div className='flex-grow text-nowrap'>
-                                <SelectValue placeholder='Choose a Tribe' />
-                                <FormMessage className='pl-12 text-left'>{form.formState.errors.tribe?.[index]?.message}</FormMessage>
-                              </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {options.tribes.map((pick) => (
-                                <SelectItem key={pick.name} className='block pr-6 w-full' value={pick.name}>
-                                  <ColorRow color={pick.color}>
-                                    <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.name}</h3>
-                                  </ColorRow>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>)} />
+                          <SelectTribes
+                            tribes={options.tribes}
+                            locked={draftOver}
+                            field={field} />)} />
                     </FormControl>
                   </PredictionCard>
                 </FormItem>))}
@@ -235,26 +221,10 @@ export default function DraftForm({
                         name={`member[${index}]`}
                         defaultValue={currentPicks.memberPicks?.[index]}
                         render={({ field }) => (
-                          <Select onValueChange={field.onChange} {...field}>
-                            <SelectTrigger className='w-full' disabled={draftOver}>
-                              <div className='flex-grow text-nowrap'>
-                                <SelectValue placeholder='Choose a Member' />
-                                <FormMessage className='text-left pl-[38px]'>{form.formState.errors.member?.[index]?.message}</FormMessage>
-                              </div>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {options.members.map((pick) => {
-                                if (pick.loggedIn) return null;
-                                return (
-                                  <SelectItem key={pick.displayName} className='block pr-6 w-full' value={pick.displayName}>
-                                    <ColorRow color={pick.color}>
-                                      <h3 style={{ color: getContrastingColor(pick.color) }}>{pick.displayName}</h3>
-                                    </ColorRow>
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>)} />
+                          <SelectMembers
+                            members={options.members}
+                            locked={draftOver}
+                            field={field} />)} />
                     </FormControl>
                   </PredictionCard>
                 </FormItem>))}

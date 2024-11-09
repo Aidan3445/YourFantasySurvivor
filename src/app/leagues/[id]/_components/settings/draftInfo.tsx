@@ -23,17 +23,18 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
   return (
     <Popover>
       <PopoverCenter />
-      <PopoverTrigger className={cn(className, 'hs-in rounded-md')}>
-        {settings.draftOver && 'View'} Draft
-      </PopoverTrigger>
+      <PopoverTrigger className={cn(className, 'hs-in rounded-md')}>Draft</PopoverTrigger>
       <PopoverContent>
         <CardContainer className='flex flex-col gap-1 p-6 min-w-80'>
-          <h2 className='text-2xl font-semibold text-center'>Draft Info</h2>
+          <h2 className='text-2xl font-semibold text-center'>
+            {settings.draftOver ? 'Draft Order' : 'Draft Info'}
+          </h2>
           <Tabs defaultValue='order'>
-            <TabsList className='grid grid-flow-col auto-cols-fr w-full'>
-              <TabsTrigger value='order'>Order</TabsTrigger>
-              <TabsTrigger value='predictions'>Predictions</TabsTrigger>
-            </TabsList>
+            {!settings.draftOver &&
+              <TabsList className='grid grid-flow-col auto-cols-fr w-full'>
+                <TabsTrigger value='order'>Order</TabsTrigger>
+                <TabsTrigger value='predict'>Predictions</TabsTrigger>
+              </TabsList>}
             <TabsContent value='order'>
               <DraftOrder
                 className='flex flex-col gap-1 w-full'
@@ -41,7 +42,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
                 orderLocked={orderLocked}
                 {...settings} />
             </TabsContent>
-            <TabsContent value='predictions'>
+            <TabsContent value='predict'>
               <section className='flex flex-col gap-1 h-80 light-scroll'>
                 {preseasonPredictions.map((rule, index) => (
                   <PredictionCard key={index} prediction={rule} parity={index % 2 === 0} />
@@ -49,11 +50,12 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
               </section>
             </TabsContent>
           </Tabs>
-          <Countdown className='p-1 text-center rounded-md cursor-default bg-b4' endDate={settings.draftDate}>
-            <a href={`/leagues/${league.id}/draft`}>
-              <Button className='w-full'>Go To Draft</Button>
-            </a>
-          </Countdown>
+          {!settings.draftOver &&
+            <Countdown className='p-1 text-center rounded-md cursor-default bg-b4' endDate={settings.draftDate}>
+              <a href={`/leagues/${league.id}/draft`}>
+                <Button className='w-full'>Go To Draft</Button>
+              </a>
+            </Countdown>}
         </CardContainer>
       </PopoverContent>
     </Popover>
