@@ -15,6 +15,7 @@ import { useToast } from '~/app/_components/commonUI/use-toast';
 import { useState } from 'react';
 import { Button } from '~/app/_components/commonUI/button';
 import { type MemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
+import { CircleAlert, Lock, Pencil } from 'lucide-react';
 
 interface VotePredictProps {
   leagueId: number;
@@ -133,11 +134,12 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   return (
     <article>
       <Button className='text-xs p-1 h-min font-semibold mb-2 w-full' onClick={() => setAlertOpen(true)}>
+        Weekly Picks
         {events.locked ?
-          'Weekly picks are locked' :
+          <Lock className='w-4 h-4 ml-1' /> :
           events.picked ?
-            'Edit weekly picks' :
-            'Weekly picks available'}
+            <Pencil className='w-4 h-4 ml-1' /> :
+            <CircleAlert className='w-4 h-4 ml-1' />}
       </Button>
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
@@ -264,9 +266,11 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                     onClick={handleSubmit}
                     className='w-1/2'
                     disabled={!form.formState.isValid || form.formState.isSubmitting}>
-                    Submit
+                    {events.picked ? 'Update' : 'Submit'}
                   </AlertDialogAction>
-                  <AlertDialogCancel className='w-1/2'>I&apos;ll do this Later</AlertDialogCancel>
+                  <AlertDialogCancel className='w-1/2'>
+                    {events.picked ? 'Cancel' : 'I\'ll do this Later'}
+                  </AlertDialogCancel>
                 </AlertDialogFooter>
               </form>
             </Form>

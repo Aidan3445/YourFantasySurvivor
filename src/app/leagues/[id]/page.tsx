@@ -16,6 +16,7 @@ export default async function League({ params }: PageProps) {
   const { league, members, isFull } = await getLeague(leagueId);
 
   const ownerLoggedIn = members.some((member) => member.isOwner && member.loggedIn);
+  const adminLoggedIn = members.some((member) => member.isAdmin && member.loggedIn);
 
   return (
     <main className='flex flex-col gap-0 text-center' >
@@ -28,10 +29,14 @@ export default async function League({ params }: PageProps) {
           league={league}
           ownerLoggedIn={ownerLoggedIn}
           openDefault={ownerLoggedIn && members.length === 1} />
-        <DraftInfo className={cn('text-black px-1', !ownerLoggedIn && 'col-span-2')} league={league} ownerLoggedIn={ownerLoggedIn} />
-        <a className='hs-in rounded-md text-base font-normal flex justify-center items-center' href={`/leagues/${leagueId}/admin`}>
-          Admin
-        </a>
+        <DraftInfo
+          className={cn('text-black px-1', !(ownerLoggedIn || adminLoggedIn) && 'col-span-2')}
+          league={league}
+          ownerLoggedIn={ownerLoggedIn} />
+        {(ownerLoggedIn || adminLoggedIn) &&
+          <a className='hs-in rounded-md text-base font-normal flex justify-center items-center' href={`/leagues/${leagueId}/admin`}>
+            Admin
+          </a>}
       </span>
       <Leaderboard
         leagueId={leagueId}

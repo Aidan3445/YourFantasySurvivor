@@ -2,33 +2,25 @@
 import { auth } from '@clerk/nextjs/server';
 import { and, eq, inArray, or } from 'drizzle-orm';
 import { db } from '~/server/db';
-import { customCastaways, customEventRules, type CustomEventRuleType, customEvents, customMembers, customTribes } from '~/server/db/schema/customEvents';
+import { customCastaways, type CustomEventRuleType, customEvents, customMembers, customTribes } from '~/server/db/schema/customEvents';
 import { seasonCastawayResults, seasonTribeResults, type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
 import { weeklyCastawayResults, type WeeklyEventRuleType, weeklyMemberResults, weeklyTribeResults } from '~/server/db/schema/weeklyEvents';
-import { episodes } from '~/server/db/schema/episodes';
 import { leagues } from '~/server/db/schema/leagues';
 import { leagueMembers } from '~/server/db/schema/members';
-import { seasons } from '~/server/db/schema/seasons';
 
-async function eventAuth(leagueId: number, episodeId: number,
-  rule: CustomEventRuleType | WeeklyEventRuleType | SeasonEventRuleType) {
+export async function leagueAuth(leagueId: number) {
   const { userId } = auth();
-  if (!userId) return { userId: null };
+  if (!userId) return { userId };
 
   // ensure user is league admin or owner 
   // with the correct league, season for the episode, and rule
   await db
     .select()
     .from(leagueMembers)
-    .innerJoin(customEventRules, eq(customEventRules.league, leagueMembers.league))
     .innerJoin(leagues, eq(leagues.id, leagueMembers.league))
-    .innerJoin(seasons, eq(seasons.id, leagues.season))
-    .innerJoin(episodes, eq(episodes.season, seasons.id))
     .where(and(
       eq(leagueMembers.userId, userId),
       eq(leagueMembers.league, leagueId),
-      eq(customEventRules.id, rule.id),
-      eq(episodes.id, episodeId),
       or(eq(leagueMembers.isAdmin, true), eq(leagueMembers.isOwner, true))))
     .then((members) => {
       if (members.length === 0) return { userId: null };
@@ -45,7 +37,7 @@ export async function submitCustomEvent(
   references: { id: number; /*notes: string[]*/ }[],
   //commonNotes: string[]
 ) {
-  const { userId } = await eventAuth(leagueId, episodeId, rule);
+  const { userId } = await leagueAuth(leagueId);
   if (!userId) throw new Error('Not authorized');
 
   // first insert the event
@@ -91,7 +83,7 @@ export async function submitWeeklyResult(
   rule: WeeklyEventRuleType,
   references: { id: number }[],
 ) {
-  const { userId } = await eventAuth(leagueId, episodeId, rule);
+  const { userId } = await leagueAuth(leagueId);
   if (!userId) throw new Error('Not authorized');
 
   let insertTable: typeof weeklyCastawayResults | typeof weeklyTribeResults | typeof weeklyMemberResults;
@@ -130,7 +122,7 @@ export async function submitSeasonResult(
   rule: SeasonEventRuleType,
   references: { id: number }[],
 ) {
-  const { userId } = await eventAuth(leagueId, episodeId, rule);
+  const { userId } = await leagueAuth(leagueId);
   if (!userId) throw new Error('Not authorized');
 
   let insertTable: typeof seasonCastawayResults | typeof seasonTribeResults | typeof weeklyMemberResults;
