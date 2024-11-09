@@ -29,6 +29,8 @@ export default function Chart({ data, label, bounded, className }: ScoreChartPro
     (a, b) => b.episodeScores.length - a.episodeScores.length,
   );
 
+  const highestScore = sortedData[0]?.episodeScores[sortedData[0]?.episodeScores?.length - 1] ?? 0;
+
   return (
     <div className={cn(className, 'rounded-lg border border-black bg-b4/50')}>
       <ResponsiveContainer>
@@ -38,8 +40,10 @@ export default function Chart({ data, label, bounded, className }: ScoreChartPro
           margin={{
             top: 10,
             right: 10,
-            left: -20,
-            bottom: 10,
+            // add padding depending on the length of the highest score
+            // we multiply by 0.6 to get the value near the label where numbers may overlap
+            left: Math.floor(highestScore * 0.6).toString().length * 10 - 30,
+            bottom: 12,
           }}>
           <CartesianGrid stroke='#4D4D4D' />
           <XAxis
