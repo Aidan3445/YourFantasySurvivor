@@ -12,7 +12,7 @@ import WeeklyEvents from './weeklyEvents';
 import { Rules, type RulesType } from '~/server/db/schema/rules';
 import { defaultBaseRules } from '~/server/db/schema/leagues';
 import SeasonEvents from './seasonEvents';
-import { updateRules } from '~/app/api/leagues/[id]/rules/actions';
+import { updateRules } from '~/app/api/leagues/[id]/events/actions';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { useRouter } from 'next/navigation';
 

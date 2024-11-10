@@ -163,7 +163,10 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
             {groups.premiere.length > 0 &&
               <h3 className='text-center font-semibold'>Premiere</h3>}
             {groups.premiere.map((p, index) => (
-              <PredictionCard key={index} prediction={p} parity={index % 2 === 0}>
+              <PredictionCard
+                key={index}
+                prediction={p}
+                parity={index % 2 === 0}>
                 <ColorRow color={p.pick.color ?? 'white'} className='p-1 mt-1'>
                   <h3 style={{ color: getContrastingColor(p.pick.color ?? 'white') }}>
                     {p.pick.castaway ?? p.pick.tribe ?? p.pick.member}
@@ -174,7 +177,10 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
             {groups.merge.length > 0 &&
               <h3 className='text-center font-semibold'>Merge</h3>}
             {groups.merge.map((p, index) => (
-              <PredictionCard key={index} prediction={p} parity={index % 2 === 0}>
+              <PredictionCard
+                key={index}
+                prediction={p}
+                parity={(groups.premiere.length + index) % 2 === 0}>
                 <ColorRow color={p.pick.color ?? 'white'} className='p-1 mt-1'>
                   <h3 style={{ color: getContrastingColor(p.pick.color ?? 'white') }}>
                     {p.pick.castaway ?? p.pick.tribe ?? p.pick.member}
@@ -185,7 +191,10 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
             {groups.finale.length > 0 &&
               <h3 className='text-center font-semibold'>Finale</h3>}
             {groups.finale.map((p, index) => (
-              <PredictionCard key={index} prediction={p} parity={index % 2 === 0}>
+              <PredictionCard
+                key={index}
+                prediction={p}
+                parity={(groups.premiere.length + groups.merge.length + index) % 2 === 0}>
                 <ColorRow color={p.pick.color ?? 'white'} className='p-1 mt-1'>
                   <h3 style={{ color: getContrastingColor(p.pick.color ?? 'white') }}>
                     {p.pick.castaway ?? p.pick.tribe ?? p.pick.member}

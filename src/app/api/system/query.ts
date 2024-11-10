@@ -5,7 +5,7 @@ import { db } from '~/server/db';
 import { system } from '~/server/db/schema/system';
 
 export async function sysAuth() {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('Not authenticated');
 
   const sys = await db.select().from(system).where(eq(system.userId, userId));

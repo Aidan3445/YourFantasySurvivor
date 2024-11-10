@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
-import { getRules } from '~/app/api/leagues/[id]/rules/query';
+import { getRules } from '~/app/api/leagues/[id]/events/query';
 import { getBaseEvents, getCustomEvents, getEpisodes, getWeeklyEvents } from '~/app/api/leagues/[id]/score/query';
 import { sysAuth } from '~/app/api/system/query';
 import NewCustomEvent from './_components/newCustom';
@@ -53,7 +53,7 @@ export default async function Admin({ params }: AdminPageProps) {
               castaways={castaways}
               tribes={tribes}
               remaining={remaining}
-              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]}
+              episodes={episodes}
               events={events} />
           </EventQueue>
         </TabsContent>}
@@ -67,7 +67,7 @@ export default async function Admin({ params }: AdminPageProps) {
               tribes={tribes}
               members={league.members}
               remaining={remaining}
-              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]} />
+              episodes={episodes} />
           </EventQueue>
         </TabsContent>
         <TabsContent value='weekly'>
@@ -81,7 +81,7 @@ export default async function Admin({ params }: AdminPageProps) {
               tribes={tribes}
               members={league.members}
               remaining={remaining}
-              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]} />
+              episodes={episodes} />
           </EventQueue>
         </TabsContent>
         <TabsContent value='season'>
@@ -95,7 +95,7 @@ export default async function Admin({ params }: AdminPageProps) {
               tribes={tribes}
               members={league.members}
               remaining={remaining}
-              episodes={episodes as [{ id: number, title: string, number: number, airDate: string }]} />
+              episodes={episodes} />
           </EventQueue>
         </TabsContent>
       </Tabs>

@@ -29,7 +29,7 @@ interface NewBaseEventProps extends ComponentProps {
   castaways: CastawayDetails[];
   tribes: Tribe[];
   remaining: CastawayDetails[];
-  episodes: [{ id: number; title: string, number: number, airDate: string }];
+  episodes: { id: number; title: string, number: number, airDate: string }[];
   events: Awaited<ReturnType<typeof getBaseEvents>> | null;
   otherRules?: {
     custom: CustomEventRuleType[];
@@ -70,7 +70,7 @@ export default function NewBaseEvent({
       references: [],
       keywords: [],
       notes: [],
-      episodeId: episodes[0].id.toString(),
+      episodeId: episodes[0]?.id.toString(),
     },
     resolver: zodResolver(newBaseEventSchema),
   });

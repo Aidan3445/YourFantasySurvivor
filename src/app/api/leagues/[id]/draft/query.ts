@@ -1,6 +1,6 @@
 import 'server-only';
 import { getLeagueSettings } from '~/app/api/leagues/[id]/settings/query';
-import { getRules } from '~/app/api/leagues/[id]/rules/query';
+import { getRules } from '~/app/api/leagues/[id]/events/query';
 import { getCastaways, getRemainingCastaways } from '~/app/api/seasons/[name]/castaways/query';
 import { getLeague } from '~/app/api/leagues/query';
 import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
@@ -13,7 +13,7 @@ import { aliasedTable, and, asc, eq } from 'drizzle-orm';
 import { tribes } from '~/server/db/schema/tribes';
 
 export async function getDraftDetails(leagueId: number) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
   const [league, settings, { season }] = await Promise.all([
@@ -75,7 +75,7 @@ export async function getCurrentPredictions(
   castaway?: SeasonEventRuleType[],
   tribe?: SeasonEventRuleType[],
   member?: SeasonEventRuleType[]) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
   const [firstPick, castawayPicks, tribePicks, memberPicks] = await Promise.all([

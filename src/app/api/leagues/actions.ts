@@ -6,7 +6,7 @@ import { leagueMembers } from '~/server/db/schema/members';
 import { leagues, leagueSettings } from '~/server/db/schema/leagues';
 
 export async function updateDisplayName(leagueId: number, newName?: string) {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   if (!newName) throw new Error('Display name is required');
@@ -31,7 +31,7 @@ export async function updateDisplayName(leagueId: number, newName?: string) {
 }
 
 export async function updateColor(leagueId: number, newColor?: string) {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   if (!newColor) throw new Error('Color is required');
@@ -51,7 +51,7 @@ export async function updateColor(leagueId: number, newColor?: string) {
 }
 
 export async function leaveLeague(leagueId: number) {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const member = await db
@@ -80,7 +80,7 @@ export async function leaveLeague(leagueId: number) {
 }
 
 export async function deleteLeague(leagueId: number) {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   await db.delete(leagues).where(
@@ -197,7 +197,7 @@ async function bootMember(
 }
 
 export async function promoteMember(leagueId: number, displayName: string) {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const userStatus = await db
@@ -218,7 +218,7 @@ export async function promoteMember(leagueId: number, displayName: string) {
 }
 
 export async function demoteMember(leagueId: number, displayName: string) {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const userStatus = await db

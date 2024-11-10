@@ -10,7 +10,7 @@ export default async function WhoAreYou() {
     .select()
     .from(leagueMembers)
     .where(eq(leagueMembers.league, 120));
-  const { userId } = auth();
+  const { userId } = await auth();
 
   if (!userId) return null;
 

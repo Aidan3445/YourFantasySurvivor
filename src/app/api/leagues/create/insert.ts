@@ -7,7 +7,7 @@ import { newLeagueSettings } from '../[id]/settings/insert';
 import { eq } from 'drizzle-orm';
 
 export async function insertLeague(league: LeagueInsert, displayName: string): Promise<number> {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const leagueId = await db

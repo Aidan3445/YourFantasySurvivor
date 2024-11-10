@@ -5,7 +5,7 @@ import { db } from '~/server/db';
 import { leagueSettings } from '~/server/db/schema/leagues';
 
 export async function newLeagueSettings(leagueId: number): Promise<void> {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   // get premier date and set default to 1 week before

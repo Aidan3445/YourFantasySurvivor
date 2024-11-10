@@ -1,19 +1,15 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { aliasedTable, and, asc, eq, or } from 'drizzle-orm';
+import { and, asc, eq, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
 import { leagues, leagueSettings } from '~/server/db/schema/leagues';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { episodes } from '~/server/db/schema/episodes';
-import { seasonCastaways, seasonEventRules, seasonEvents, seasonMembers, seasonTribes } from '~/server/db/schema/seasonEvents';
-import { tribes } from '~/server/db/schema/tribes';
-import { getCastaway } from '~/app/api/seasons/[name]/castaways/[castaway]/query';
-import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
 
 export async function getLeagueSettings(leagueId: number) {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const settings = await db
@@ -72,54 +68,6 @@ export async function getSurvivorsList(leagueId: number, memberId: number) {
       eq(leagueMembers.id, memberId)))
     .orderBy(asc(episodes.number))
     .then((res) => res.map((castaway) => castaway.name));
-}
-
-const members = aliasedTable(leagueMembers, 'member');
-
-export async function getPremierPredictions(leagueId: number) {
-  const predictions = await db
-    .select({
-      id: seasonEventRules.id,
-      name: seasonEventRules.name,
-      description: seasonEventRules.description,
-      points: seasonEventRules.points,
-      referenceType: seasonEventRules.referenceType,
-      timing: seasonEventRules.timing,
-      pick: {
-        castaway: castaways.name,
-        tribe: tribes.name,
-        member: leagueMembers.displayName,
-        color: leagueMembers.color
-      },
-      member: members.displayName,
-      premiere: seasons.premierDate,
-      season: seasons.name,
-    })
-    .from(seasonEventRules)
-    .innerJoin(leagues, eq(seasonEventRules.league, leagues.id))
-    .innerJoin(seasons, eq(leagues.season, seasons.id))
-    .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
-    .leftJoin(members, eq(members.id, seasonEvents.member))
-    .leftJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
-    .leftJoin(castaways, eq(seasonCastaways.reference, castaways.id))
-    .leftJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
-    .leftJoin(tribes, eq(seasonTribes.reference, tribes.id))
-    .leftJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
-    .leftJoin(leagueMembers, eq(seasonMembers.reference, leagueMembers.id))
-    .where(eq(seasonEventRules.league, leagueId))
-    .then((res) => res
-      .some((prediction) =>
-        new Date(`${prediction.premiere} -4:00`) < new Date()) ? res : []);
-
-  // get color for each prediction
-  return await Promise.all(predictions.map(async (p) => {
-    p.pick.color = await (p.pick.castaway ? getCastaway(p.season, p.pick.castaway)
-      .then((castaway) => castaway.details.startingTribe.color) :
-      p.pick.tribe ? getTribes(p.season)
-        .then((tribes) => tribes
-          .find((t) => t.name === p.pick.tribe)!.color) : p.pick.color);
-    return p;
-  }));
 }
 
 export async function isOwner(leagueId: number, userId: string) {

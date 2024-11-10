@@ -9,7 +9,7 @@ import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
 import { seasonEventRules } from '~/server/db/schema/seasonEvents';
 
 export async function updateRules(leagueId: number, rules: RulesType) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
   // base rules

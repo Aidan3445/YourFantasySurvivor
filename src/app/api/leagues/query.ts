@@ -11,7 +11,7 @@ import { getSurvivorsList } from './[id]/settings/query';
 
 
 export async function getLeague(leagueId: number) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
   const leagueFetch = db
@@ -52,18 +52,18 @@ export async function getLeague(leagueId: number) {
 
 
   const isFull = new Date(league[0]!.draftDate) < new Date() ||
-    await db
+    (await db
       .select({ count: count() })
       .from(castaways)
       .innerJoin(seasons, eq(castaways.season, seasons.id))
       .where(eq(seasons.name, league[0]!.season))
-      .then((count) => count[0]!.count <= safeMembers.length);
+      .then((count) => count[0]!.count <= safeMembers.length));
 
   return { league: league[0]!, members: safeMembers, isFull };
 }
 
 export async function getLeagues() {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return [];
 
   const userLeagues = await db

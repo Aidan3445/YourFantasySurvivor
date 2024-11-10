@@ -2,7 +2,7 @@ import { Popover, PopoverCenter, PopoverContent, PopoverTrigger } from '~/app/_c
 import CardContainer from '~/app/_components/cardContainer';
 import { cn } from '~/lib/utils';
 import { type LeagueOwnerProps } from '../leagueDetails';
-import { getRules } from '~/app/api/leagues/[id]/rules/query';
+import { getRules } from '~/app/api/leagues/[id]/events/query';
 import { Tabs, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import EventsForm from './eventForm';
 

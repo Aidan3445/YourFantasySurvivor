@@ -22,7 +22,7 @@ export interface Picks {
 }
 
 export async function submitDraft(leagueId: number, picks: Picks) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
   const firstEp = await db
@@ -117,7 +117,7 @@ export async function submitDraft(leagueId: number, picks: Picks) {
 }
 
 export async function changeSurvivorPick(leagueId: number, castaway: string) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
   const { memberId, season } = await db
@@ -211,7 +211,7 @@ export async function submitVotesPredicts(
   leagueId: number,
   data: VotePredicts,
 ) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
   const memberId = await db

@@ -9,7 +9,7 @@ import { leagues } from '~/server/db/schema/leagues';
 import { leagueMembers } from '~/server/db/schema/members';
 
 export async function leagueAdminAuth(leagueId: number) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) return { userId };
 
   // ensure user is league admin or owner 

@@ -31,7 +31,7 @@ interface NewEventProps extends ComponentProps {
   tribes: Tribe[];
   members: Member[];
   remaining: CastawayDetails[];
-  episodes: [{ id: number; title: string, number: number, airDate: string }];
+  episodes: { id: number; title: string, number: number, airDate: string }[];
 }
 
 export const newEventSchema = z.object({
@@ -65,7 +65,7 @@ export default function NewEventResult({
     defaultValues: {
       references: [],
       //notes: [],
-      episodeId: episodes[0].id.toString(),
+      episodeId: episodes[0]?.id.toString(),
     },
     resolver: zodResolver(newEventSchema),
   });

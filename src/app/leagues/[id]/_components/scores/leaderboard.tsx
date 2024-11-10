@@ -1,7 +1,7 @@
 import { type Member } from '~/server/db/schema/members';
 import Members from './membersScores';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
-import { getRules } from '~/app/api/leagues/[id]/rules/query';
+import { getRules } from '~/app/api/leagues/[id]/events/query';
 import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
 import compileScores from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';

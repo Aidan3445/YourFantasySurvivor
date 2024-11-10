@@ -4,7 +4,7 @@
 
 /* styles */
 body  {
-    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen overflow-x-clip;
+    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen overflow-x-clip bg-fixed overscroll-none;
 }
 
 * {
@@ -67,11 +67,11 @@ main {
 
 /* Main scroll */
 ::-webkit-scrollbar {
-    @apply w-2;
+    @apply w-2 h-2;
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-gradient-to-b from-b3 to-b1;
+    @apply bg-zinc-700/50;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -94,13 +94,12 @@ main {
 
 /* Light scroll */
 .light-scroll {
-    @apply overscroll-contain;
     overflow: auto;
 }
 
 .light-scroll::-webkit-scrollbar-track {
     background: transparent;
-    @apply bg-white/20 rounded-md my-2;
+    @apply bg-white/20 rounded-md m-2;
 }
 
 /* on hover and selected indent */

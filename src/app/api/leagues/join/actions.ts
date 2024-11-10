@@ -8,7 +8,7 @@ import { auth } from '@clerk/nextjs/server';
 import { castaways } from '~/server/db/schema/castaways';
 
 export async function joinLeague(name: string, password: string, displayName: string): Promise<number> {
-  const user = auth();
+  const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
   const league = await db

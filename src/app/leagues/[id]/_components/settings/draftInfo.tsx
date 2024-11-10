@@ -1,11 +1,11 @@
 import CardContainer from '~/app/_components/cardContainer';
 import { Popover, PopoverCenter, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
-import { getLeagueSettings, getPremierPredictions } from '~/app/api/leagues/[id]/settings/query';
+import { getLeagueSettings } from '~/app/api/leagues/[id]/settings/query';
 import { cn } from '~/lib/utils';
 import { type LeagueOwnerProps } from '../leagueDetails';
 import { Button } from '~/app/_components/commonUI/button';
 import Countdown from '~/app/_components/countdown';
-import { getRules } from '~/app/api/leagues/[id]/rules/query';
+import { getRules, getPremierPredictions } from '~/app/api/leagues/[id]/events/query';
 import DraftOrder from './draftOrder';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { PredictionCard } from './predictionCard';

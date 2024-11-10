@@ -73,7 +73,8 @@ export async function getTribeEvents(
         not(eq(baseEvents.eventName, 'tribeUpdate')),
         eq(tribes.name, tribeName ?? tribes.name),
       ),
-    );
+    )
+    .orderBy(desc(episodes.number));
 }
 
 export type TribeUpdates = Record<number, Record<string, string[]>>;
@@ -96,7 +97,8 @@ export async function getTribeUpdates(
     .innerJoin(castaways, eq(castaways.id, baseEventCastaways.reference))
     .where(
       and(eq(seasons.name, seasonName), eq(baseEvents.eventName, 'tribeUpdate')),
-    );
+    )
+    .orderBy(desc(episodes.number));
 
   return rows.reduce((acc, { tribe, castaway, episode }) => {
     // initialize the episode if it doesn't exist

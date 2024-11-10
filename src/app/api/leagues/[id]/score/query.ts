@@ -13,8 +13,8 @@ import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEv
 import { seasonCastawayResults, seasonCastaways, seasonEventRules, type SeasonEventRuleType, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
 import { auth } from '@clerk/nextjs/server';
 
-async function eventAuth(leagueId: number): Promise<{ userId?: string, memberId?: number }> {
-  const { userId } = auth();
+export async function leagueMemberAuth(leagueId: number): Promise<{ userId?: string, memberId?: number }> {
+  const { userId } = await auth();
   if (!userId) return {};
 
   // ensure user is in the league
@@ -28,7 +28,7 @@ async function eventAuth(leagueId: number): Promise<{ userId?: string, memberId?
 }
 
 export async function getBaseEvents(leagueId: number) {
-  const { memberId } = await eventAuth(leagueId);
+  const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
   const seasonName = await db
@@ -63,7 +63,7 @@ export interface AltEvents {
 }
 
 export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
-  const { memberId } = await eventAuth(leagueId);
+  const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
   const events = await Promise.all([
@@ -83,7 +83,8 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
       .innerJoin(castaways, eq(castaways.id, customCastaways.reference))
-      .where(eq(leagues.id, leagueId)),
+      .where(eq(leagues.id, leagueId))
+      .orderBy(desc(episodes.number)),
     db
       .select({
         tribe: tribes.name,
@@ -100,7 +101,8 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
       .innerJoin(tribes, eq(tribes.id, customTribes.reference))
-      .where(eq(leagues.id, leagueId)),
+      .where(eq(leagues.id, leagueId))
+      .orderBy(desc(episodes.number)),
     db
       .select({
         member: leagueMembers.displayName,
@@ -117,14 +119,15 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, customMembers.reference))
-      .where(eq(leagues.id, leagueId)),
+      .where(eq(leagues.id, leagueId))
+      .orderBy(desc(episodes.number)),
   ]);
 
   return { castawayEvents: events[0], tribeEvents: events[1], memberEvents: events[2] };
 }
 
 export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
-  const { memberId } = await eventAuth(leagueId);
+  const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
   const { currentEpisode, mergeEpisode } = await getCurrentNextEpisodes(leagueId);
@@ -164,6 +167,7 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
         eq(weeklyEventRules.referenceType, 'castaway'),
         eq(weeklyCastawayResults.episode, weeklyEvents.episode),
         eq(weeklyCastawayResults.result, weeklyCastaways.reference)))
+      .orderBy(desc(episodes.number))
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
     db
       .select({
@@ -189,6 +193,7 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
         eq(weeklyEventRules.referenceType, 'tribe'),
         eq(weeklyTribeResults.episode, weeklyEvents.episode),
         eq(weeklyTribeResults.result, weeklyTribes.reference)))
+      .orderBy(desc(episodes.number))
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
     db
       .select({
@@ -214,6 +219,7 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
         eq(weeklyEventRules.referenceType, 'member'),
         eq(weeklyMemberResults.episode, weeklyEvents.episode),
         eq(weeklyMemberResults.result, weeklyMembers.reference)))
+      .orderBy(desc(episodes.number))
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
     // votes
     db
@@ -239,8 +245,9 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'castaway'),
-        lt(episodes.number, currentEpisode?.episode ?? -1)))
-      .groupBy(castaways.shortName, episodes.number, weeklyEventRules.id),
+        lt(episodes.number, currentEpisode?.number ?? -1)))
+      .groupBy(castaways.shortName, episodes.number, weeklyEventRules.id)
+      .orderBy(desc(episodes.number)),
     db
       .select({
         count: count(),
@@ -264,8 +271,9 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'tribe'),
-        lt(episodes.number, currentEpisode?.episode ?? -1)))
-      .groupBy(tribes.name, episodes.number, weeklyEventRules.id),
+        lt(episodes.number, currentEpisode?.number ?? -1)))
+      .groupBy(tribes.name, episodes.number, weeklyEventRules.id)
+      .orderBy(desc(episodes.number)),
     db
       .select({
         count: count(),
@@ -289,14 +297,15 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'member'),
-        lt(episodes.number, currentEpisode?.episode ?? -1)))
-      .groupBy(leagueMembers.displayName, episodes.number, weeklyEventRules.id),
+        lt(episodes.number, currentEpisode?.number ?? -1)))
+      .groupBy(leagueMembers.displayName, episodes.number, weeklyEventRules.id)
+      .orderBy(desc(episodes.number)),
   ]);
 
   const skipVote = (episode: { episode: number, timing?: 'fullSeason' | 'preMerge' | 'postMerge' }) => {
     if (episode.timing === 'fullSeason') return false;
-    if (!mergeEpisode || episode.episode < mergeEpisode.episode) return episode.timing === 'postMerge';
-    if (episode.episode >= mergeEpisode.episode) return episode.timing === 'preMerge';
+    if (!mergeEpisode || episode.episode < mergeEpisode.number) return episode.timing === 'postMerge';
+    if (episode.episode >= mergeEpisode.number) return episode.timing === 'preMerge';
   };
 
   // tally the votes for each event for each episode
@@ -396,7 +405,7 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
 }
 
 export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
-  const { memberId } = await eventAuth(leagueId);
+  const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
   // season events are all predictions and get mapped directly to members
@@ -421,7 +430,8 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .where(and(
         eq(leagues.id, leagueId),
         eq(seasonEventRules.referenceType, 'castaway'),
-        eq(seasonCastawayResults.result, seasonCastaways.reference))),
+        eq(seasonCastawayResults.result, seasonCastaways.reference)))
+      .orderBy(desc(episodes.number)),
     db
       .select({
         member: leagueMembers.displayName,
@@ -442,7 +452,8 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .where(and(
         eq(leagues.id, leagueId),
         eq(seasonEventRules.referenceType, 'tribe'),
-        eq(seasonTribeResults.result, seasonTribes.reference))),
+        eq(seasonTribeResults.result, seasonTribes.reference)))
+      .orderBy(desc(episodes.number)),
     db
       .select({
         member: leagueMembers.displayName,
@@ -463,14 +474,15 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .where(and(
         eq(leagues.id, leagueId),
         eq(seasonEventRules.referenceType, 'member'),
-        eq(seasonMemberResults.result, seasonMembers.reference))),
+        eq(seasonMemberResults.result, seasonMembers.reference)))
+      .orderBy(desc(episodes.number)),
   ]);
 
   return { castawayEvents: [], tribeEvents: [], memberEvents: events.flat() };
 }
 
 export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
-  const { userId } = auth();
+  const { userId } = await auth();
   if (!userId) throw new Error('Not authorized');
 
   const updates = await db
@@ -484,7 +496,8 @@ export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
     .innerJoin(leagueMembers, eq(leagueMembers.id, selectionUpdates.member))
     .innerJoin(castaways, eq(castaways.id, selectionUpdates.castaway))
     .leftJoin(episodes, eq(episodes.id, selectionUpdates.episode))
-    .where(inArray(leagueMembers.id, memberIds));
+    .where(inArray(leagueMembers.id, memberIds))
+    .orderBy(desc(episodes.number));
 
   return updates.reduce((lookup, update) => {
     update.episode ??= 0;
@@ -499,7 +512,15 @@ export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
 
 export async function getEpisodes(leagueId: number) {
   const eps = await db
-    .select({ id: episodes.id, number: episodes.number, title: episodes.title, airDate: episodes.airDate })
+    .select({
+      id: episodes.id,
+      title: episodes.title,
+      number: episodes.number,
+      airDate: episodes.airDate,
+      runtime: episodes.runtime,
+      merge: episodes.merge,
+      finale: episodes.finale,
+    })
     .from(episodes)
     .innerJoin(seasons, eq(seasons.id, episodes.season))
     .innerJoin(leagues, eq(leagues.season, seasons.id))
@@ -510,22 +531,8 @@ export async function getEpisodes(leagueId: number) {
 }
 
 export async function getCurrentNextEpisodes(leagueId: number) {
-  const { currentEpisode, nextEpisode, mergeEpisode } = await db
-    .select({
-      id: episodes.id,
-      episode: episodes.number,
-      airDate: episodes.airDate,
-      runtime: episodes.runtime,
-      merge: episodes.merge,
-      finale: episodes.finale,
-    })
-    .from(episodes)
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(leagues, eq(leagues.season, seasons.id))
-    .where(eq(leagues.id, leagueId))
-    .orderBy(desc(episodes.number))
+  const { currentEpisode, nextEpisode, mergeEpisode } = await getEpisodes(leagueId)
     .then((res) => {
-
       return {
         currentEpisode: res.find((ep) => new Date(`${ep.airDate} -4:00`).getTime() < new Date().getTime()),
         nextEpisode: res.reverse().find((ep) => new Date(`${ep.airDate} -4:00`).getTime() > new Date().getTime()),
@@ -557,7 +564,7 @@ export type MemberEpisodeEvents = {
 };
 
 export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEpisodeEvents> {
-  const { memberId } = await eventAuth(leagueId);
+  const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
   const { currentEpisode, nextEpisode, mergeEpisode } = await getCurrentNextEpisodes(leagueId);
@@ -703,14 +710,13 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
   }
 }
 
-
 function filterWeeklyEventsTiming<T>(
   ruleEvents: T & { timing: 'fullSeason' | 'preMerge' | 'postMerge' }[],
-  currentEpisode: { episode: number },
-  mergeEpisode?: { episode: number },
+  currentEpisode: { number: number },
+  mergeEpisode?: { number: number },
 ) {
   let filtered;
-  if (!mergeEpisode || mergeEpisode.episode > currentEpisode.episode)
+  if (!mergeEpisode || mergeEpisode.number > currentEpisode.number)
     filtered = ruleEvents.filter((rule) => rule.timing !== 'postMerge');
   else filtered = ruleEvents.filter((rule) => rule.timing !== 'preMerge');
 
