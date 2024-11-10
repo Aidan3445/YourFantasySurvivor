@@ -10,12 +10,13 @@ import { EventQueue } from './_components/eventsQueue';
 import NewWeeklySeasonResult from './_components/newWeeklySeason';
 
 interface AdminPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default async function Admin({ params }: AdminPageProps) {
+export default async function Admin(props: AdminPageProps) {
+  const params = await props.params;
   const leagueId = parseInt(params.id);
   const { userId, sys } = await sysAuth();
   if (!userId) throw new Error('Not authenticated');

@@ -8,10 +8,11 @@ import NewBaseEvent from '~/app/leagues/[id]/admin/_components/newBase';
 import { EventQueue } from '../leagues/[id]/admin/_components/eventsQueue';
 
 interface AdminPageProps {
-  searchParams: { season: string };
+  searchParams: Promise<{ season: string }>;
 }
 
-export default async function AdminPage({ searchParams: params }: AdminPageProps) {
+export default async function AdminPage(props: AdminPageProps) {
+  const params = await props.searchParams;
   const { sys } = await sysAuth();
   if (!sys) throw new Error('Not authorized');
 

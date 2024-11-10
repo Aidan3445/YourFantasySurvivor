@@ -7,12 +7,13 @@ import { cn } from '~/lib/utils';
 import { Timeline } from './_components/events/timeline/timeline';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default async function League({ params }: PageProps) {
+export default async function League(props: PageProps) {
+  const params = await props.params;
   const leagueId = parseInt(params.id);
   const { league, members, isFull } = await getLeague(leagueId);
 

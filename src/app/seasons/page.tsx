@@ -2,10 +2,11 @@ import SelectSeason from '../_components/selectSeason';
 import Castaways from './_components/castaways';
 
 interface SeasonProps {
-  searchParams: { season: string };
+  searchParams: Promise<{ season: string }>;
 }
 
-export default function SeasonPage({ searchParams }: SeasonProps) {
+export default async function SeasonPage(props: SeasonProps) {
+  const searchParams = await props.searchParams;
   const season = searchParams.season;
 
   return (

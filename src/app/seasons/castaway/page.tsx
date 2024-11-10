@@ -9,10 +9,11 @@ import { type CastawayEvent } from '~/app/api/seasons/[name]/events/query';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 
 interface CastawayPageProps {
-  searchParams: { season?: string, castaway?: string };
+  searchParams: Promise<{ season?: string, castaway?: string }>;
 }
 
-export default async function CastawayPage({ searchParams }: CastawayPageProps) {
+export default async function CastawayPage(props: CastawayPageProps) {
+  const searchParams = await props.searchParams;
 
   if (!searchParams.castaway || !searchParams.season) redirect('/seasons');
   const { details, events } = await getCastaway(searchParams.season, searchParams.castaway);

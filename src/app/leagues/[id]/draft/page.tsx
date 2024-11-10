@@ -3,12 +3,13 @@ import DraftForm, { type DraftFormProps } from './_components/draftForm';
 import { getCurrentPredictions, getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default async function League({ params }: PageProps) {
+export default async function League(props: PageProps) {
+  const params = await props.params;
   const leagueId = parseInt(params.id);
   const {
     league,
