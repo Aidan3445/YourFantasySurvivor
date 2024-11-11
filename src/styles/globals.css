@@ -11,6 +11,10 @@ body  {
     @apply text-black;
 }
 
+.page {
+    @apply px-14;
+}
+
 /* Responsive padding and margin */
 @media (min-width: 640px) { /* Adjust numbers based on your design preferences */
     .page {
@@ -93,13 +97,18 @@ main {
 }
 
 /* Light scroll */
-.light-scroll {
+.light-scroll, dark-scroll {
     overflow: auto;
 }
 
 .light-scroll::-webkit-scrollbar-track {
     background: transparent;
     @apply bg-white/20 rounded-md m-2;
+}
+
+/* Dark scroll */
+.dark-scroll::-webkit-scrollbar-track {
+    @apply bg-black/20 rounded-md m-2;
 }
 
 /* on hover and selected indent */

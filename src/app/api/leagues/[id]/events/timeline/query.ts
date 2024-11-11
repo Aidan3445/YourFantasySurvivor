@@ -39,5 +39,4 @@ export async function getBaseEventsTimeline(leagueId: number) {
       timeline[episodeId][event.name].push(event);
       return timeline;
     }, {} as Record<string, Record<EventName, typeof events>>));
-
 }

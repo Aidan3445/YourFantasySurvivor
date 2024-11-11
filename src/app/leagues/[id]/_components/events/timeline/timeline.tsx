@@ -18,7 +18,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
         .map(([episode, events]) => (
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
-            <span className='flex gap-2 px-24 overflow-x-auto light-scroll pb-1'>
+            <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
               {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} />}
               {events.finalists && <EventCard eventName='Finalists' events={events.finalists} />}
               {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} />}
@@ -27,7 +27,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
                   <h3 className='text-lg font-semibold'>Voted Out</h3>
                   <HoverCard>
                     <HoverCardTrigger>
-                      <h3 className='text-base flex items-center justify-center cursor-help text-nowrap'>
+                      <h3 className='text-base flex items-center justify-center cursor-help text-nowrap px-1'>
                         {event.reference.castaway ?? event.reference.tribe ?? 'NOT FOUND'} - {event.keywords.length}
                         <Flame className='w-4 h-4 ml-0.5' />
                       </h3>
@@ -36,7 +36,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
                       <article className='flex flex-col gap-1'>
                         <h3 className='text-lg font-semibold'>Votes</h3>
                         {event.keywords.map((vote, index) => (
-                          <p key={index} className='text-sm'>{vote}</p>
+                          <p key={index} className='text-sm text-nowrap px-1'>{vote}</p>
                         ))}
                       </article>
                     </HoverCardContent>
@@ -53,13 +53,56 @@ export async function Timeline({ leagueId }: TimelineProps) {
               {events.indivReward && <EventCard eventName='Individual Reward' events={events.indivReward} />}
               {events.tribe1st && <EventCard eventName='Tribe Win' events={events.tribe1st} />}
               {events.tribe2nd && <EventCard eventName='Tribe Runner Up' events={events.tribe2nd} />}
-              {events.tribeUpdate && <EventCard
-                eventName={events.tribeUpdate[0]?.merge ? 'Merge' : 'Tribe Swap'}
-                events={events.tribeUpdate[0]?.merge ? events.tribeUpdate.slice(0, 1) : events.tribeUpdate}
-                castaway={!events.tribeUpdate[0]?.merge} />}
+              {events.tribeUpdate && (
+                <article className='p-1 rounded-md bg-b4'>
+                  <h3 className='text-lg font-semibold'>{events.tribeUpdate[0]?.merge ? 'Merge' : 'Tribe Swap'}</h3>
+                  <div className='max-h-24 min-w-32 overflow-y-auto dark-scroll overflow-x-clip'>
+                    {Object.entries(events.tribeUpdate.reduce((tribes, update) => {
+                      if (!update.reference.tribe && !update.reference.castaway) return tribes;
+                      tribes[update.reference.tribe!] ??= [] as string[];
+                      tribes[update.reference.tribe!]!.push(update.reference.castaway!);
+                      return tribes;
+                    }, {} as Record<string, string[]>)).map(([tribe, castaways], index) => (
+                      <div key={index} className='px-1'>
+                        <div className='sticky top-0 bg-b4 rounded-b-md'>
+                          <h4 className='text-xs font-semibold bg-b3 rounded-md'>{tribe}</h4>
+                        </div>
+                        <div>
+                          {castaways.map((castaway, index) => (
+                            <p key={index} className='text-sm text-nowrap'>{castaway}</p>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </article>)}
+              {events.otherNotes && (
+                <article className='p-1 rounded-md bg-b4'>
+                  <h3 className='text-lg font-semibold'>Other Notes</h3>
+                  <div className='max-h-24 min-w-80 md:min-w-96 overflow-y-auto dark-scroll overflow-x-clip'>
+                    {Object.entries(events.otherNotes.reduce((notes, note) => {
+                      const noteFor = note.reference.castaway ?? note.reference.tribe ?? 'NOT FOUND';
+                      notes[noteFor] ??= [] as string[];
+                      notes[noteFor].push(...note.notes);
+                      return notes;
+                    }, {} as Record<string, string[]>)).map(([name, texts]) => (
+                      <div key={name} className='px-1'>
+                        <div className='sticky top-0 bg-b4 rounded-b-md'>
+                          <h4 className='text-xs font-semibold bg-b3 rounded-md'>{name}</h4>
+                        </div>
+                        <ul className='marker:text-black list-outside list-disc'>
+                          {texts.map((text, index) => (
+                            <li key={index} className='text-sm'>{text}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </article>)}
             </span>
-          </article>))}
-    </section>
+          </article >))
+      }
+    </section >
   );
 }
 
@@ -74,9 +117,9 @@ function EventCard({ eventName, events, castaway = true, tribe = true }: EventCa
   return (
     <article className='p-1 rounded-md bg-b4'>
       <h3 className='text-lg font-semibold text-nowrap'>{eventName}</h3>
-      <div className='max-h-24 min-w-32 overflow-y-auto light-scroll'>
+      <div className='max-h-24 min-w-32 overflow-y-auto dark-scroll overflow-x-clip'>
         {events.map((event, index) => (
-          <p key={index} className='text-sm text-nowrap'>
+          <p key={index} className='text-sm text-nowrap px-1'>
             {(castaway ? event.reference.castaway : null) ??
               (tribe ? event.reference.tribe : 'NOT FOUND')}
           </p>
