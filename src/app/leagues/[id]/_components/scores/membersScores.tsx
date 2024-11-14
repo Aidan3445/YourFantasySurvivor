@@ -30,8 +30,8 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
 
   const preventChange = useMemo(() => members
     .filter((m) => !m.loggedIn)
-    .some((m) => !details.remaining.some((r) => r.more.shortName === m.drafted.slice(-1)[0])),
-  [members, details.remaining]);
+    .some((m) => !details.remaining
+      .some((r) => r.more.shortName === m.drafted.slice(-1)[0])), [members, details.remaining]);
 
   return (
     <table className='space-x-1 space-y-2'>
@@ -84,15 +84,18 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                     <HoverCardTrigger>
                       <ColorRow color={sColor} className='py-1 text-xs flex gap-2'>
                         <h3 style={{ color: csColor }}>{member.drafted.slice(-1)[0]}</h3>
-                        {member.loggedIn && members.length < details.remaining.length &&
-                          <ChangeSurvivor
-                            preventChange={preventChange}
-                            className='ml-auto'
-                            leagueId={leagueId}
-                            color={csColor}
-                            castaways={details.remaining}
-                            otherChoices={details.unavailable}
-                            currentPick={member.drafted.slice(-1)[0]} />}
+                        {member.loggedIn && (members.length < details.remaining.length ||
+                          details.unavailable.length < members.length) &&
+                          (
+                            <ChangeSurvivor
+                              preventChange={preventChange}
+                              className='ml-auto'
+                              leagueId={leagueId}
+                              color={csColor}
+                              castaways={details.remaining}
+                              otherChoices={details.unavailable}
+                              currentPick={member.drafted.slice(-1)[0]} />
+                          )}
                       </ColorRow>
                     </HoverCardTrigger>
                     <HoverCardContent className='w-min p-1 grid gap-1' side='right'>

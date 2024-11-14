@@ -510,7 +510,7 @@ export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
   }, {} as Record<number, Record<string, string>>);
 }
 
-export async function getEpisodes(leagueId: number) {
+export async function getEpisodes(leagueId: number, includeFuture = false) {
   const eps = await db
     .select({
       id: episodes.id,
@@ -527,11 +527,13 @@ export async function getEpisodes(leagueId: number) {
     .where(eq(leagues.id, leagueId))
     .orderBy(desc(episodes.number));
 
+  if (includeFuture) return eps;
+
   return eps.filter((ep) => new Date(`${ep.airDate} -4:00`) < new Date());
 }
 
 export async function getCurrentNextEpisodes(leagueId: number) {
-  const { currentEpisode, nextEpisode, mergeEpisode } = await getEpisodes(leagueId)
+  const { currentEpisode, nextEpisode, mergeEpisode } = await getEpisodes(leagueId, true)
     .then((res) => {
       return {
         currentEpisode: res.find((ep) => new Date(`${ep.airDate} -4:00`).getTime() < new Date().getTime()),
