@@ -4,6 +4,7 @@ import CardContainer from './_components/cardContainer';
 import LeaguesCard from './_components/leaguesCard';
 import SeasonStats from './_components/stats/seasonStats';
 import Image from 'next/image';
+import { Suspense } from 'react';
 
 export default async function HomePage() {
   return (
@@ -23,7 +24,9 @@ export default async function HomePage() {
             <LeaguesCard />
           </SignedIn>
         </ClerkLoaded>
-        <SeasonStats />
+        <Suspense fallback={<div>Loading...</div>}>
+          <SeasonStats />
+        </Suspense>
       </section>
     </main >
   );

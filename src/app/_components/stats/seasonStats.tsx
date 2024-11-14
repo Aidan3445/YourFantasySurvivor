@@ -1,6 +1,6 @@
 'use client';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { Carousel, CarouselContent, CarouselItem, DotButtons } from '../commonUI/carousel';
 import compileStats, { type SeasonStats as SS, emptyStats } from '~/app/api/seasons/[name]/events/stats';
 import ChallengesPodium from './challengesPodium';
@@ -53,7 +53,9 @@ export default function SeasonStats() {
 
   return (
     <CardContainer className='gap-0'>
-      <SelectSeason className='mt-2' initSeason={setSeason} />
+      <Suspense fallback={<div>Loading...</div>} >
+        <SelectSeason className='mt-2' initSeason={setSeason} />
+      </Suspense>
       <Carousel>
         <span className='pb-2 text-center'>
           <h2 className='text-2xl font-semibold'>Season Stats</h2>

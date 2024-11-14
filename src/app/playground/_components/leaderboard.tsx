@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import CardContainer from '~/app/_components/cardContainer';
@@ -108,7 +108,9 @@ export function Leaderboard({ className }: LeaderboardProps) {
     <CardContainer className={cn('justify-start items-center p-4', className)}>
       <h3 className='text-2xl font-medium'>Leaderboard</h3>
       <span className='flex justify-between items-center w-full'>
-        <SelectSeason className='mx-0' initSeason={setSeason} />
+        <Suspense fallback={<div>Loading...</div>}>
+          <SelectSeason className='mx-0' initSeason={setSeason} />
+        </Suspense>
         <HoverCard openDelay={300}>
           <HoverCardTrigger>
             <Button className='left-auto p-0.5 w-min h-min' onClick={copyUrl}>

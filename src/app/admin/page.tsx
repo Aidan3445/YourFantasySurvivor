@@ -6,6 +6,7 @@ import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
 import { sysAuth } from '~/app/api/system/query';
 import NewBaseEvent from '~/app/leagues/[id]/admin/_components/newBase';
 import { EventQueue } from '../leagues/[id]/admin/_components/eventsQueue';
+import { Suspense } from 'react';
 
 interface AdminPageProps {
   searchParams: Promise<{ season: string }>;
@@ -26,7 +27,9 @@ export default async function AdminPage(props: AdminPageProps) {
   return (
     <main>
       <h1 className='text-5xl font-bold text-black'>Admin Page</h1>
-      <SelectSeason />
+      <Suspense fallback={<div>Loading...</div>}>
+        <SelectSeason />
+      </Suspense>
       {season &&
         <EventQueue>
           <NewBaseEvent
