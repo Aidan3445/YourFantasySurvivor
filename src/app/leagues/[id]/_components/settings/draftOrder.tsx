@@ -9,7 +9,7 @@ import { closestCenter, DndContext, PointerSensor, type UniqueIdentifier, useSen
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import SortableItem, { handleDragEnd } from '~/app/_components/commonUI/sortableItem';
-import { ChevronRight, GripVertical } from 'lucide-react';
+import { ChevronDown, ChevronRight, GripVertical } from 'lucide-react';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { useRouter } from 'next/navigation';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
@@ -17,6 +17,7 @@ import { type WithPick } from '~/app/api/leagues/[id]/score/query';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
 import { PredictionCard } from './predictionCard';
 import { HoverCardArrow, HoverCardPortal } from '@radix-ui/react-hover-card';
+import { useIsMobile } from '~/hooks/use-mobile';
 
 interface DraftOrderProps extends ComponentProps {
   leagueId: number;
@@ -136,6 +137,9 @@ interface PredictionHoverProps extends ComponentProps {
 }
 
 function PredictionHover({ predictions, children, className }: PredictionHoverProps) {
+  const [open, setOpen] = useState(false);
+  const mobile = useIsMobile();
+
   if (predictions.length === 0) return children;
 
   //split the predictions into premier, merge, and finale
@@ -151,13 +155,18 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
   });
 
   return (
-    <HoverCard openDelay={100} closeDelay={0}>
-      <HoverCardTrigger className={className}>
+    <HoverCard openDelay={100} closeDelay={0} open={open} onOpenChange={setOpen}>
+      <HoverCardTrigger className={className} onClick={() => setOpen(!open)}>
         {children}
-        <ChevronRight />
+        {!mobile ?
+          <ChevronRight /> :
+          <ChevronDown />}
       </HoverCardTrigger>
       <HoverCardPortal>
-        <HoverCardContent side='right' sideOffset={10} className='w-72 max-h-80 light-scroll py-1'>
+        <HoverCardContent
+          side={mobile ? 'bottom' : 'right'}
+          sideOffset={mobile ? 0 : 10}
+          className='w-72 max-h-80 light-scroll py-1'>
           <HoverCardArrow />
           <section className='flex flex-col gap-1'>
             {groups.premiere.length > 0 &&
