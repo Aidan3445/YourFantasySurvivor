@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import CardContainer from '~/app/_components/cardContainer';
 import { Form, FormControl, FormField, FormLabel } from '~/app/_components/commonUI/form';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter } from '~/app/_components/commonUI/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogTitle } from '~/app/_components/commonUI/alert';
 import { SelectCastaways, SelectMembers, SelectTribes } from '~/app/_components/selectSeason';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { type Member } from '~/server/db/schema/members';
@@ -44,6 +44,8 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   const { toast } = useToast();
   const [alertOpen, setAlertOpen] = useState(
     events.count > 0 && !events.locked && !events.picked);
+
+  if (events.count === 0) return null;
 
   const handleSubmit = () => {
     const data = form.getValues();
@@ -129,8 +131,6 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
       });
   };
 
-  if (events.count === 0) return null;
-
   return (
     <article>
       <Button className='text-xs p-1 h-min font-semibold mb-2 w-full' onClick={() => setAlertOpen(true)}>
@@ -144,7 +144,9 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
           <CardContainer className={'flex flex-col pb-2 items-center text-center max-h-[40rem] m-0 w-72'} >
-            <h2 className='text-xl font-semibold'>Vote & Predict</h2>
+            <AlertDialogTitle>
+              <h2 className='text-xl font-semibold'>Vote & Predict</h2>
+            </AlertDialogTitle>
             <Form {...form}>
               <form action={handleSubmit} className='light-scroll'>
                 {events.weekly.votes.length > 0 && (
@@ -161,7 +163,10 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                                   return (
                                     <span className='flex gap-2 justify-center items-center'>
                                       <FormControl>
-                                        <SelectCastaways castaways={castaways} field={field} />
+                                        <SelectCastaways
+                                          castaways={castaways}
+                                          field={field}
+                                          locked={events.locked} />
                                       </FormControl>
                                       {/*<AddNote form={form} index={index} />*/}
                                     </span>
@@ -169,13 +174,19 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                                 case 'tribe':
                                   return (
                                     <FormControl>
-                                      <SelectTribes tribes={tribes} field={field} />
+                                      <SelectTribes
+                                        tribes={tribes}
+                                        field={field}
+                                        locked={events.locked} />
                                     </FormControl>
                                   );
                                 case 'member':
                                   return (
                                     <FormControl>
-                                      <SelectMembers members={members} field={field} />
+                                      <SelectMembers
+                                        members={members}
+                                        field={field}
+                                        locked={events.locked} />
                                     </FormControl>
                                   );
                               }
@@ -199,7 +210,10 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                                   return (
                                     <span className='flex gap-2 justify-center items-center'>
                                       <FormControl>
-                                        <SelectCastaways castaways={castaways} field={field} />
+                                        <SelectCastaways
+                                          castaways={castaways}
+                                          field={field}
+                                          locked={events.locked} />
                                       </FormControl>
                                       {/*<AddNote form={form} index={index} />*/}
                                     </span>
@@ -207,13 +221,19 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                                 case 'tribe':
                                   return (
                                     <FormControl>
-                                      <SelectTribes tribes={tribes} field={field} />
+                                      <SelectTribes
+                                        tribes={tribes}
+                                        field={field}
+                                        locked={events.locked} />
                                     </FormControl>
                                   );
                                 case 'member':
                                   return (
                                     <FormControl>
-                                      <SelectMembers members={members} field={field} />
+                                      <SelectMembers
+                                        members={members}
+                                        field={field}
+                                        locked={events.locked} />
                                     </FormControl>
                                   );
                               }
@@ -237,7 +257,10 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                                   return (
                                     <span className='flex gap-2 justify-center items-center'>
                                       <FormControl>
-                                        <SelectCastaways castaways={castaways} field={field} />
+                                        <SelectCastaways
+                                          castaways={castaways}
+                                          field={field}
+                                          locked={events.locked} />
                                       </FormControl>
                                       {/*<AddNote form={form} index={index} />*/}
                                     </span>
@@ -245,13 +268,19 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                                 case 'tribe':
                                   return (
                                     <FormControl>
-                                      <SelectTribes tribes={tribes} field={field} />
+                                      <SelectTribes
+                                        tribes={tribes}
+                                        field={field}
+                                        locked={events.locked} />
                                     </FormControl>
                                   );
                                 case 'member':
                                   return (
                                     <FormControl>
-                                      <SelectMembers members={members} field={field} />
+                                      <SelectMembers
+                                        members={members}
+                                        field={field}
+                                        locked={events.locked} />
                                     </FormControl>
                                   );
                               }
@@ -262,14 +291,15 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                   </section>
                 )}
                 <AlertDialogFooter className='w-full items-center justify-center flex-row'>
-                  <AlertDialogAction
-                    onClick={handleSubmit}
-                    className='w-1/2'
-                    disabled={!form.formState.isValid || form.formState.isSubmitting}>
-                    {events.picked ? 'Update' : 'Submit'}
-                  </AlertDialogAction>
-                  <AlertDialogCancel className='w-1/2'>
-                    {events.picked ? 'Cancel' : 'I\'ll do this Later'}
+                  {!events.locked &&
+                    <AlertDialogAction
+                      onClick={handleSubmit}
+                      className='w-1/2'
+                      disabled={!form.formState.isValid || form.formState.isSubmitting}>
+                      {events.picked ? 'Update' : 'Submit'}
+                    </AlertDialogAction>}
+                  <AlertDialogCancel className={events.locked ? 'w-full' : 'w-1/2'}>
+                    {events.locked ? 'Close' : events.picked ? 'Cancel' : 'I\'ll do this Later'}
                   </AlertDialogCancel>
                 </AlertDialogFooter>
               </form>

@@ -613,13 +613,17 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode));
   // only if the next episode is available
   // and the current episode is done airing
-  if (!nextEpisode || currentEpisodeEnd > new Date()) return {
-    weekly: { votes, predictions: [] },
-    season: [],
-    count: votes.length,
-    picked: votes.filter(pickMade).length === votes.length,
-    locked: currentEpisodeEnd > new Date()
-  };
+  if (!nextEpisode && currentEpisodeEnd < new Date()) {
+    return {
+      weekly: { votes, predictions: [] },
+      season: [],
+      count: votes.length,
+      picked: votes.filter(pickMade).length === votes.length,
+      locked: currentEpisodeEnd > new Date()
+    };
+  }
+
+  const predictionEpisode = nextEpisode ?? currentEpisode;
 
   // get predictions for the next episode
   const predictions = await db
@@ -643,7 +647,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     .leftJoin(weeklyEvents, and(
       eq(weeklyEvents.rule, weeklyEventRules.id),
       eq(weeklyEvents.member, memberId),
-      eq(weeklyEvents.episode, nextEpisode.id)))
+      eq(weeklyEvents.episode, predictionEpisode.id)))
     .leftJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
     .leftJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
     .leftJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
@@ -656,7 +660,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode));
   // if the next episode is a merge or finale
   // get relevant season predictions
-  if (nextEpisode.merge || nextEpisode.finale) {
+  if (predictionEpisode.merge || predictionEpisode.finale) {
     const seasonPredictions = await db
       .select({
         id: seasonEventRules.id,
@@ -687,7 +691,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
           eq(seasonEventRules.timing, 'merge'),
           eq(seasonEventRules.timing, 'finale'))))
       .then((res) => res.filter((rule) =>
-        rule.timing === (nextEpisode.merge ? 'merge' : 'finale')));
+        rule.timing === (predictionEpisode.merge ? 'merge' : 'finale')));
 
     return {
       weekly: { votes, predictions },
