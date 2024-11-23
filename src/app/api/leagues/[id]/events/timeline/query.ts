@@ -1,11 +1,13 @@
-import { eq } from 'drizzle-orm';
 import 'server-only';
+import { eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
 import { baseEventCastaways, baseEvents, baseEventTribes, episodes, type EventName } from '~/server/db/schema/episodes';
 import { leagues } from '~/server/db/schema/leagues';
 import { tribes } from '~/server/db/schema/tribes';
-import { leagueMemberAuth } from '../../score/query';
+import { getWeeklyEventsRaw, leagueMemberAuth } from '../../score/query';
+import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
+import { leagueMembers } from '~/server/db/schema/members';
 
 export async function getBaseEventsTimeline(leagueId: number) {
   const { memberId } = await leagueMemberAuth(leagueId);
@@ -23,6 +25,7 @@ export async function getBaseEventsTimeline(leagueId: number) {
         castaway: castaways.name,
         tribe: tribes.name,
       },
+      id: baseEvents.id,
     })
     .from(baseEvents)
     .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
@@ -39,4 +42,10 @@ export async function getBaseEventsTimeline(leagueId: number) {
       timeline[episodeId][event.name].push(event);
       return timeline;
     }, {} as Record<string, Record<EventName, typeof events>>));
+}
+
+export async function getWeeklyEventsTimeline(leagueId: number) {
+  const events = await getWeeklyEventsRaw(leagueId);
+
+  return events;
 }

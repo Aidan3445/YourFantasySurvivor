@@ -206,7 +206,7 @@ export default function compileStats({ castawayEvents, tribeEvents, tribeUpdates
         stats.soleSurvivor = event.castaway;
         break;
       case 'elim': {
-        const newElim = { name: castawayName, episode: event.episode, votes: ['????'] };
+        const newElim = { name: castawayName, episode: event.episode, votes: event.keywords };
         stats.eliminations.push(newElim);
       }
         break;

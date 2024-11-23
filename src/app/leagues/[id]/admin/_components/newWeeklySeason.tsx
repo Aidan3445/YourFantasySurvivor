@@ -59,7 +59,7 @@ export default function NewEventResult({
   episodes,
 }: NewEventProps) {
   const [selectedRule, setSelectedRule] = useState<WeeklyEventRuleType | SeasonEventRuleType | null>(null);
-  const [remainingOnly, setRemainingOnly] = useState(true);
+  const [showEliminated, setShowEliminated] = useState(false);
 
   const form = useForm<z.infer<typeof newEventSchema>>({
     defaultValues: {
@@ -222,10 +222,10 @@ export default function NewEventResult({
             </div>
             <div className='flex flex-col justify-center gap-2'>
               <span className='flex gap-2 items-center justify-center'>
-                {selectedRule.referenceType === 'castaway' && remaining.length == castaways.length && (
+                {selectedRule.referenceType === 'castaway' && remaining.length !== castaways.length && (
                   <>
-                    <label className='text-xs' htmlFor='remainingOnly'>Show Eliminated</label>
-                    <Switch checked={remainingOnly} onCheckedChange={setRemainingOnly} />
+                    <label className='text-xs' htmlFor='showEliminated'>Show Eliminated</label>
+                    <Switch checked={showEliminated} onCheckedChange={setShowEliminated} />
                   </>
                 )}
                 {/*<AddNote form={form} index={null}>
@@ -239,7 +239,7 @@ export default function NewEventResult({
                       return (
                         <span className='flex gap-2 justify-center items-center'>
                           <FormControl>
-                            <SelectCastaways castaways={remainingOnly ? remaining : castaways} field={field} />
+                            <SelectCastaways castaways={showEliminated ? castaways : remaining} field={field} />
                           </FormControl>
                           {/*<AddNote form={form} index={index} />*/}
                         </span>

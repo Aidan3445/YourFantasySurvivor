@@ -1,5 +1,5 @@
 import { type Member } from '~/server/db/schema/members';
-import Members from './membersScores';
+import Members, { MembersSkeleton } from './membersScores';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
 import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
@@ -7,6 +7,7 @@ import compileScores from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
 import VotePredict from '../events/votePredict';
+import { Skeleton } from '~/app/_components/commonUI/skeleton';
 
 interface MembersProps {
   leagueId: number;
@@ -90,3 +91,17 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
   );
 }
 
+export function LeaderboardSkeleton() {
+  return (
+    <section className='flex flex-col items-center'>
+      <div className='flex flex-col gap-2 justify-center'>
+        <Skeleton className='w-48 h-6 p-1' />
+        <Skeleton className='w-48 h-10 p-1' />
+      </div>
+      <span className='flex mt-2 flex-wrap gap-4 w-full justify-center'>
+        <MembersSkeleton />
+        <Skeleton className='w-96 h-[280px]' />
+      </span>
+    </section>
+  );
+}

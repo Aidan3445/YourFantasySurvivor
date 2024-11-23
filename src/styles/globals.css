@@ -97,7 +97,7 @@ main {
 }
 
 /* Light scroll */
-.light-scroll, dark-scroll {
+.light-scroll, .dark-scroll {
     overflow: auto;
 }
 
@@ -110,6 +110,12 @@ main {
 .dark-scroll::-webkit-scrollbar-track {
     @apply bg-black/20 rounded-md m-2;
 }
+
+/* scroll padding */
+.pad-scroll::-webkit-scrollbar-track {
+    @apply md:!m-14;
+}
+  
 
 /* on hover and selected indent */
 .hs-in {

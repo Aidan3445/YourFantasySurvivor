@@ -37,6 +37,13 @@ export default async function Admin(props: AdminPageProps) {
 
   if (episodes.length === 0) throw new Error('No episodes found');
 
+  castaways.map((c) => {
+    if (!remaining.some((r) => r.name === c.name)) {
+      c.startingTribe.color = '#AAAAAA';
+    }
+    return c;
+  });
+
   return (
     <main className='flex flex-col gap-0 text-center' >
       <h1 className='text-2xl font-semibold'>ADMIN</h1>

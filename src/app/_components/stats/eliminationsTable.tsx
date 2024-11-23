@@ -1,4 +1,5 @@
-import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardPortal, HoverCardTrigger } from '@radix-ui/react-hover-card';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
+import { HoverCardArrow, HoverCardPortal } from '@radix-ui/react-hover-card';
 import { type EliminationStat } from '~/app/api/seasons/[name]/events/stats';
 
 type EliminationsTableProps = {
@@ -27,13 +28,14 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
                 <h4 >{elim.votes.length} vote{elim.votes.length > 1 ? 's' : ''}</h4>
               </HoverCardTrigger>
               <HoverCardPortal>
-                <HoverCardContent className='rounded border border-black shadow-md bg-b2 w-50 text-nowrap shadow-zinc-700' side='top'>
+                <HoverCardContent className='w-min px-1 py-0' side='top' sideOffset={-2}>
                   <HoverCardArrow />
-                  <div className='flex flex-col gap-1 p-1 text-sm'>
-                    Votes:
-                    <br />
-                    {elim.votes.join(', ')}
-                  </div>
+                  <article className='flex flex-col gap-1'>
+                    <h3 className='text-lg font-semibold'>Votes</h3>
+                    {elim.votes.map((vote, index) => (
+                      <p key={index} className='text-sm text-nowrap px-1'>{vote}</p>
+                    ))}
+                  </article>
                 </HoverCardContent>
               </HoverCardPortal>
             </HoverCard>}

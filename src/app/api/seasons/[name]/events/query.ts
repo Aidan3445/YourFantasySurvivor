@@ -16,6 +16,8 @@ export type CastawayEvent = {
   castaway: string;
   name: EventName;
   episode: number;
+  notes: string[];
+  keywords: string[];
 };
 
 export async function getCastawayEvents(
@@ -27,6 +29,8 @@ export async function getCastawayEvents(
       castaway: castaways.shortName,
       name: baseEvents.eventName,
       episode: episodes.number,
+      notes: baseEvents.notes,
+      keywords: baseEvents.keywords,
     })
     .from(baseEventCastaways)
     .innerJoin(baseEvents, eq(baseEvents.id, baseEventCastaways.event))
@@ -50,6 +54,8 @@ export type TribeEvent = {
   tribe: string;
   name: EventName;
   episode: number;
+  notes: string[];
+  keywords: string[];
 };
 
 export async function getTribeEvents(
@@ -61,6 +67,8 @@ export async function getTribeEvents(
       tribe: tribes.name,
       name: baseEvents.eventName,
       episode: episodes.number,
+      notes: baseEvents.notes,
+      keywords: baseEvents.keywords,
     })
     .from(baseEventTribes)
     .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))

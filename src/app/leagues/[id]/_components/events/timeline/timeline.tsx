@@ -1,14 +1,18 @@
 import { Flame } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
-import { getBaseEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
+import { getBaseEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
+import { EventCard } from './eventCard';
+import { Skeleton } from '~/app/_components/commonUI/skeleton';
+import { getWeeklyEvents } from '~/app/api/leagues/[id]/score/query';
 
 interface TimelineProps {
   leagueId: number;
 }
 
 export async function Timeline({ leagueId }: TimelineProps) {
-  const [baseEventsTimeline] = await Promise.all([
+  const [baseEventsTimeline, weeklyEventsTimeline] = await Promise.all([
     getBaseEventsTimeline(leagueId),
+    getWeeklyEventsTimeline(leagueId),
   ]);
 
   return (
@@ -18,14 +22,13 @@ export async function Timeline({ leagueId }: TimelineProps) {
         .map(([episode, events]) => (
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
-            <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
+            <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1 pad-scroll'>
               {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} />}
               {events.finalists && <EventCard eventName='Finalists' events={events.finalists} />}
               {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} />}
-              {events.elim?.map((event, index) => (
-                <article key={index} className='p-1 rounded-md bg-b4'>
-                  <h3 className='text-lg font-semibold'>Voted Out</h3>
-                  <HoverCard>
+              {events.elim && <EventCard eventName='Voted Out' events={events.elim}>
+                {events.elim.map((event, index) => (
+                  <HoverCard key={index}>
                     <HoverCardTrigger>
                       <h3 className='text-base flex items-center justify-center cursor-help text-nowrap px-1'>
                         {event.reference.castaway ?? event.reference.tribe ?? 'NOT FOUND'} - {event.keywords.length}
@@ -41,8 +44,8 @@ export async function Timeline({ leagueId }: TimelineProps) {
                       </article>
                     </HoverCardContent>
                   </HoverCard>
-                </article>
-              ))}
+                ))}
+              </EventCard>}
               {events.noVoteExit && <EventCard eventName='Left The Game' events={events.noVoteExit} />}
               {events.advElim && <EventCard eventName='Advantage Souvenir' events={events.advElim} />}
               {events.advPlay && <EventCard eventName='Advantage Played' events={events.advPlay} />}
@@ -81,18 +84,40 @@ export async function Timeline({ leagueId }: TimelineProps) {
                   <h3 className='text-lg font-semibold'>Other Notes</h3>
                   <div className='max-h-24 min-w-80 md:min-w-96 overflow-y-auto dark-scroll overflow-x-clip'>
                     {Object.entries(events.otherNotes.reduce((notes, note) => {
+                      const sameNote = notes.findIndex((noteEvent) => noteEvent.id === note.id);
+                      if (sameNote === -1) notes.push(note);
+                      else {
+                        if (note.reference.castaway) {
+                          notes[sameNote]!.reference.castaway ??= '';
+                          notes[sameNote]!.reference.castaway += `, ${note.reference.castaway}`;
+                        }
+                        if (note.reference.tribe) {
+                          notes[sameNote]!.reference.tribe ??= '';
+                          notes[sameNote]!.reference.tribe += `, ${note.reference.tribe}`;
+                        }
+                      }
+                      return notes;
+                    }, [] as typeof events.otherNotes).reduce((notes, note) => {
                       const noteFor = note.reference.castaway ?? note.reference.tribe ?? 'NOT FOUND';
                       notes[noteFor] ??= [] as string[];
                       notes[noteFor].push(...note.notes);
                       return notes;
-                    }, {} as Record<string, string[]>)).map(([name, texts]) => (
-                      <div key={name} className='px-1'>
+                    }, {} as Record<string, string[]>)).map(([names, texts]) => (
+                      <div key={names} className='px-1 pt-0.5'>
                         <div className='sticky top-0 bg-b4 rounded-b-md'>
-                          <h4 className='text-xs font-semibold bg-b3 rounded-md'>{name}</h4>
+                          <h4 className='text-xs px-2 font-semibold bg-b3 rounded-md text-wrap mr-1'>
+                            {names.split(', ').map((name, index) => (
+                              <div key={index} className='text-nowrap inline-block ml-1'>
+                                {name}{!names.endsWith(name) && ','}
+                              </div>
+                            ))}
+                          </h4>
                         </div>
-                        <ul className='marker:text-black list-outside list-disc'>
+                        <ul className='list-disc ml-4'>
                           {texts.map((text, index) => (
-                            <li key={index} className='text-sm'>{text}</li>
+                            <li key={index} className='text-left text-sm list-item'>
+                              {text}
+                            </li>
                           ))}
                         </ul>
                       </div>
@@ -106,43 +131,39 @@ export async function Timeline({ leagueId }: TimelineProps) {
   );
 }
 
-interface EventCardProps {
-  eventName: string;
-  events: { reference: { castaway: string | null, tribe: string | null } }[];
-  castaway?: boolean;
-  tribe?: boolean;
-}
-
-function EventCard({ eventName, events, castaway = true, tribe = true }: EventCardProps) {
+export function TimelineSkeleton() {
   return (
-    <article className='p-1 rounded-md bg-b4'>
-      <h3 className='text-lg font-semibold text-nowrap'>{eventName}</h3>
-      <div className='max-h-24 min-w-32 overflow-y-auto dark-scroll overflow-x-clip'>
-        {events.map((event, index) => (
-          <p key={index} className='text-sm text-nowrap px-1'>
-            {(castaway ? event.reference.castaway : null) ??
-              (tribe ? event.reference.tribe : 'NOT FOUND')}
-          </p>
-        ))}
-      </div>
-    </article>
+    <section className='flex flex-col gap-1 pt-2 w-svw'>
+      <h1 className='text-2xl font-semibold'>Timeline</h1>
+      <article>
+        <h2 className='text-xl'>Episode</h2>
+        <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
+          <Skeleton className='min-w-48 h-32' />
+          <Skeleton className='min-w-64 h-32' />
+          <Skeleton className='min-w-48 h-32' />
+          <Skeleton className='min-w-48 h-32' />
+          <Skeleton className='min-w-72 h-32' />
+        </span>
+      </article>
+      <article>
+        <h2 className='text-xl'>Episode</h2>
+        <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
+          <Skeleton className='min-w-56 h-32' />
+          <Skeleton className='min-w-48 h-32' />
+          <Skeleton className='min-w-44 h-32' />
+          <Skeleton className='min-w-72 h-32' />
+        </span>
+      </article>
+      <article>
+        <h2 className='text-xl'>Episode</h2>
+        <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
+          <Skeleton className='min-w-48 h-32' />
+          <Skeleton className='min-w-56 h-32' />
+          <Skeleton className='min-w-72 h-32' />
+          <Skeleton className='min-w-52 h-32' />
+          <Skeleton className='min-w-80 h-32' />
+        </span>
+      </article>
+    </section>
   );
 }
-
-/*
-
-      {baseEventsTimeline.map((event, index) => (
-        <div>
-        {(index === 0 || baseEventsTimeline[index - 1]?.episode 
-        <article key={index} className={cn('p-1 rounded-md', index % 2 === 0 ? 'bg-b2' : 'bg-b4')}>
-          <h2 className='text-lg font-semibold'>{event.name}</h2>
-          <h3 className='text-base font-semibold'>
-            {event.reference.castaway ?? event.reference.tribe ?? 'NOT FOUND'}
-          </h3>
-          <div className='flex flex-col gap-1'>
-            {event.notes.map((note, index) => (
-              <p key={index} className='text-sm'>{note}</p>
-            ))}
-          </div>
-        </article>))}
-        */

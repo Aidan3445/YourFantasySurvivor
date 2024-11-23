@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { Button } from '~/app/_components/commonUI/button';
 import { type MemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
 import { CircleAlert, Lock, Pencil } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface VotePredictProps {
   leagueId: number;
@@ -42,6 +43,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
   });
 
   const { toast } = useToast();
+  const router = useRouter();
   const [alertOpen, setAlertOpen] = useState(
     events.count > 0 && !events.locked && !events.picked);
 
@@ -119,6 +121,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
           ${events.weekly.predictions.length + events.season.length > 0 ? 'predictions' : ''} 
           have been submitted.`,
         });
+        router.refresh();
       })
       .catch((e) => {
         if (e instanceof Error) {
@@ -145,7 +148,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
         <AlertDialogContent>
           <CardContainer className={'flex flex-col pb-2 items-center text-center max-h-[40rem] m-0 w-72'} >
             <AlertDialogTitle>
-              <h2 className='text-xl font-semibold'>Vote & Predict</h2>
+              Vote & Predict
             </AlertDialogTitle>
             <Form {...form}>
               <form action={handleSubmit} className='light-scroll'>

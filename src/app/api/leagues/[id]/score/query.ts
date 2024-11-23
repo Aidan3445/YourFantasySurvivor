@@ -126,16 +126,17 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
   return { castawayEvents: events[0], tribeEvents: events[1], memberEvents: events[2] };
 }
 
-export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
+export async function getWeeklyEventsRaw(leagueId: number) {
   const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
   const { currentEpisode, mergeEpisode } = await getCurrentNextEpisodes(leagueId);
 
   if (!currentEpisode) return {
-    castawayEvents: [],
-    tribeEvents: [],
-    memberEvents: [],
+    castawayVotes: [],
+    tribeVotes: [],
+    memberVotes: [],
+    predictions: [],
   };
 
   // weekly events are split in two, 
@@ -302,14 +303,27 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
       .orderBy(desc(episodes.number)),
   ]);
 
+  return {
+    castawayVotes: events[3],
+    tribeVotes: events[4],
+    memberVotes: events[5],
+    predictions: [...events[0], ...events[1], ...events[2]],
+    currentEpisode,
+    mergeEpisode,
+  };
+}
+
+export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
+  const events = await getWeeklyEventsRaw(leagueId);
+
   const skipVote = (episode: { episode: number, timing?: 'fullSeason' | 'preMerge' | 'postMerge' }) => {
     if (episode.timing === 'fullSeason') return false;
-    if (!mergeEpisode || episode.episode < mergeEpisode.number) return episode.timing === 'postMerge';
-    if (episode.episode >= mergeEpisode.number) return episode.timing === 'preMerge';
+    if (!events.mergeEpisode || episode.episode < events.mergeEpisode.number) return episode.timing === 'postMerge';
+    if (episode.episode >= events.mergeEpisode.number) return episode.timing === 'preMerge';
   };
 
   // tally the votes for each event for each episode
-  const castawayVotes = events[3].reduce((lookup, vote) => {
+  const castawayVotes = events.castawayVotes.reduce((lookup, vote) => {
     if (skipVote(vote)) return lookup;
 
     lookup[vote.episode] ??= {};
@@ -340,7 +354,7 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
   })[]>);
 
   // do the same for tribe and member votes
-  const tribeVotes = events[4].reduce((lookup, vote) => {
+  const tribeVotes = events.tribeVotes.reduce((lookup, vote) => {
     if (skipVote(vote)) return lookup;
 
     lookup[vote.episode] ??= {};
@@ -368,7 +382,7 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
     tribe: string,
     id: number,
   })[]>);
-  const memberVotes = events[5].reduce((lookup, vote) => {
+  const memberVotes = events.memberVotes.reduce((lookup, vote) => {
     if (skipVote(vote)) return lookup;
 
     lookup[vote.episode] ??= {};
@@ -400,7 +414,7 @@ export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
   return {
     castawayEvents: Object.values(maxCastawayVotes).flat(),
     tribeEvents: Object.values(maxTribeVotes).flat(),
-    memberEvents: [...events[0], ...events[1], ...events[2], ...Object.values(maxMemberVotes).flat()],
+    memberEvents: [...events.predictions, ...Object.values(maxMemberVotes).flat()],
   };
 }
 

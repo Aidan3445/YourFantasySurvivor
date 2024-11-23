@@ -11,10 +11,11 @@ import { castaways } from '~/server/db/schema/castaways';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { aliasedTable, and, asc, eq } from 'drizzle-orm';
 import { tribes } from '~/server/db/schema/tribes';
+import { leagueMemberAuth } from '../score/query';
 
 export async function getDraftDetails(leagueId: number) {
-  const { userId } = await auth();
-  if (!userId) throw new Error('User not authenticated');
+  const { userId, memberId } = await leagueMemberAuth(leagueId);
+  if (!userId || !memberId) throw new Error('User not authenticated');
 
   const [league, settings, { season }] = await Promise.all([
     getLeague(leagueId),
@@ -66,7 +67,7 @@ export async function getDraftDetails(leagueId: number) {
     tribes,
     yourTurn,
     unavailable,
-    remaining: castaways.filter((c) => remaining.some((r) => r.name === c.name)),
+    remaining: castaways.filter((c) => remaining.some((r) => r.name === c.name))
   };
 }
 

@@ -2,9 +2,10 @@ import { getLeague } from '~/app/api/leagues/query';
 import LeagueDetails from './_components/leagueDetails';
 import LeagueScoring from './_components/events/leagueScoring';
 import DraftInfo from './_components/settings/draftInfo';
-import { Leaderboard } from './_components/scores/leaderboard';
+import { Leaderboard, LeaderboardSkeleton } from './_components/scores/leaderboard';
 import { cn } from '~/lib/utils';
-import { Timeline } from './_components/events/timeline/timeline';
+import { Timeline, TimelineSkeleton } from './_components/events/timeline/timeline';
+import { Suspense } from 'react';
 
 interface PageProps {
   params: Promise<{
@@ -39,12 +40,16 @@ export default async function League(props: PageProps) {
             Admin
           </a>}
       </span>
-      <Leaderboard
-        leagueId={leagueId}
-        members={members}
-        ownerLoggedIn={ownerLoggedIn}
-        isFull={isFull} />
-      <Timeline leagueId={leagueId} />
+      <Suspense fallback={<LeaderboardSkeleton />}>
+        <Leaderboard
+          leagueId={leagueId}
+          members={members}
+          ownerLoggedIn={ownerLoggedIn}
+          isFull={isFull} />
+      </Suspense>
+      <Suspense fallback={<TimelineSkeleton />}>
+        <Timeline leagueId={leagueId} />
+      </Suspense>
     </main >
   );
 }
