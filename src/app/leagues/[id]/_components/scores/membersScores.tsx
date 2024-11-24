@@ -1,7 +1,7 @@
 'use client';
 import { getContrastingColor } from '@uiw/color-convert';
 import EditMember, { ChangeSurvivor, InviteMember, ManageMember, RoleHover } from './memberEdit';
-import { cn, getCurrentTribe, getTribeGradient, type ComponentProps } from '~/lib/utils';
+import { cn, getCurrentTribe, type ComponentProps } from '~/lib/utils';
 import { type Member } from '~/server/db/schema/members';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type CastawayDetails } from '~/server/db/schema/castaways';

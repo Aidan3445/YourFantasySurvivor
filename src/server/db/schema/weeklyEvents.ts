@@ -72,16 +72,16 @@ export const weeklyCastaways = createTable(
   'event_weekly_castaway',
   {
     id: serial('event_weekly_castaway_id').notNull().primaryKey(),
-    event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     reference: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
-  }
+  },
 );
 
 export const weeklyTribes = createTable(
   'event_weekly_tribe',
   {
     id: serial('event_weekly_tribe_id').notNull().primaryKey(),
-    event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
+    event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull().unique(),
     reference: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
   }
 );
@@ -91,7 +91,7 @@ export const weeklyMembers = createTable(
   {
     id: serial('event_weekly_member_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull().unique(),
   }
 );
 

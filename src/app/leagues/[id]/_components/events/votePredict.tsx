@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import CardContainer from '~/app/_components/cardContainer';
 import { Form, FormControl, FormField, FormLabel } from '~/app/_components/commonUI/form';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogTitle } from '~/app/_components/commonUI/alert';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle } from '~/app/_components/commonUI/alert';
 import { SelectCastaways, SelectMembers, SelectTribes } from '~/app/_components/selectSeason';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { type Member } from '~/server/db/schema/members';
@@ -154,7 +154,9 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
               <form action={handleSubmit} className='light-scroll'>
                 {events.weekly.votes.length > 0 && (
                   <section className='flex flex-col gap-2 pb-4'>
-                    <FormLabel className='text-base'>Vote on this week&apos;s episode</FormLabel>
+                    <AlertDialogDescription>
+                      <FormLabel className='text-base'>Vote on this week&apos;s episode</FormLabel>
+                    </AlertDialogDescription>
                     {events.weekly.votes.map((event, index) => (
                       <FormControl key={index}>
                         <PredictionCard prediction={event} vote>
@@ -201,7 +203,9 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                 )}
                 {events.weekly.predictions.length > 0 && (
                   <section className='flex flex-col gap-2 pb-4'>
-                    <FormLabel className='text-base'>Predict next week&apos;s episode</FormLabel>
+                    <AlertDialogDescription>
+                      <FormLabel className='text-base'>Predict next week&apos;s episode</FormLabel>
+                    </AlertDialogDescription>
                     {events.weekly.predictions.map((event, index) => (
                       <FormControl key={index}>
                         <PredictionCard prediction={event}>
@@ -310,6 +314,6 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
           </CardContainer>
         </AlertDialogContent>
       </AlertDialog >
-    </article>
+    </article >
   );
 }

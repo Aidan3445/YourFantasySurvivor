@@ -47,5 +47,8 @@ export async function getBaseEventsTimeline(leagueId: number) {
 export async function getWeeklyEventsTimeline(leagueId: number) {
   const events = await getWeeklyEventsRaw(leagueId);
 
+  const votes = [...events.castawayVotes, ...events.tribeVotes, ...events.memberVotes];
+
+  //console.log(events);
   return events;
 }

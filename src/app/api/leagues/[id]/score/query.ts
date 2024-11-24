@@ -153,6 +153,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
+        result: castaways.name,
       })
       .from(weeklyCastawayResults)
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyCastawayResults.rule))
@@ -162,6 +163,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       .innerJoin(episodes, eq(episodes.id, weeklyCastawayResults.episode))
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(castaways, eq(castaways.id, weeklyCastawayResults.result))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'predict'),
@@ -179,6 +181,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
+        result: tribes.name,
       })
       .from(weeklyTribeResults)
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyTribeResults.rule))
@@ -188,6 +191,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       .innerJoin(episodes, eq(episodes.id, weeklyTribeResults.episode))
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(tribes, eq(tribes.id, weeklyTribeResults.result))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'predict'),
@@ -205,6 +209,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
+        result: leagueMembers.displayName,
       })
       .from(weeklyMemberResults)
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyMemberResults.rule))
@@ -214,6 +219,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       .innerJoin(episodes, eq(episodes.id, weeklyMemberResults.episode))
       .innerJoin(seasons, eq(seasons.id, episodes.season))
       .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(tribes, eq(tribes.id, weeklyMemberResults.result))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'predict'),
