@@ -6,8 +6,8 @@ import { baseEventCastaways, baseEvents, baseEventTribes, episodes, type EventNa
 import { leagues } from '~/server/db/schema/leagues';
 import { tribes } from '~/server/db/schema/tribes';
 import { getWeeklyEventsRaw, leagueMemberAuth } from '../../score/query';
-import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
-import { leagueMembers } from '~/server/db/schema/members';
+//import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
+//import { leagueMembers } from '~/server/db/schema/members';
 
 export async function getBaseEventsTimeline(leagueId: number) {
   const { memberId } = await leagueMemberAuth(leagueId);
@@ -47,7 +47,7 @@ export async function getBaseEventsTimeline(leagueId: number) {
 export async function getWeeklyEventsTimeline(leagueId: number) {
   const events = await getWeeklyEventsRaw(leagueId);
 
-  const votes = [...events.castawayVotes, ...events.tribeVotes, ...events.memberVotes];
+  //const votes = [...events.castawayVotes, ...events.tribeVotes, ...events.memberVotes];
 
   //console.log(events);
   return events;

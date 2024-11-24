@@ -3,7 +3,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components
 import { getBaseEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
 import { EventCard } from './eventCard';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
-import { getWeeklyEvents } from '~/app/api/leagues/[id]/score/query';
+//import { getWeeklyEvents } from '~/app/api/leagues/[id]/score/query';
 
 interface TimelineProps {
   leagueId: number;
@@ -14,6 +14,8 @@ export async function Timeline({ leagueId }: TimelineProps) {
     getBaseEventsTimeline(leagueId),
     getWeeklyEventsTimeline(leagueId),
   ]);
+
+  weeklyEventsTimeline;
 
   return (
     <section className='flex flex-col gap-1 pt-2 w-svw'>
