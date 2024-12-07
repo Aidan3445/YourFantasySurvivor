@@ -5,7 +5,7 @@ import { cn } from '~/lib/utils';
 import { type LeagueOwnerProps } from '../leagueDetails';
 import { Button } from '~/app/_components/commonUI/button';
 import Countdown from '~/app/_components/countdown';
-import { getRules, getPremierPredictions } from '~/app/api/leagues/[id]/events/query';
+import { getRules, getSeasonPredictions } from '~/app/api/leagues/[id]/events/query';
 import DraftOrder from './draftOrder';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { PredictionCard } from './predictionCard';
@@ -14,12 +14,13 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
   const [settings, { season }, predictions] = await Promise.all([
     getLeagueSettings(league.id),
     getRules(league.id),
-    getPremierPredictions(league.id),
+    getSeasonPredictions(league.id),
   ]);
 
   const preseasonPredictions = season.filter((rule) => rule.timing === 'premiere');
   const orderLocked = !ownerLoggedIn || settings.draftDate < new Date();
 
+  console.log(predictions);
   return (
     <Popover>
       <PopoverCenter />

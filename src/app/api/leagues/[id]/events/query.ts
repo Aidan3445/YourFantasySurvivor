@@ -5,8 +5,7 @@ import { baseEventRules, leagues } from '~/server/db/schema/leagues';
 import { auth } from '@clerk/nextjs/server';
 import { customEventRules } from '~/server/db/schema/customEvents';
 import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
-import { seasonCastaways, seasonEventRules, seasonEvents, seasonMembers, seasonTribes } from '~/server/db/schema/seasonEvents';
-import { type RulesType } from '~/server/db/schema/rules';
+import { seasonCastawayResults, seasonCastaways, seasonEventRules, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
 import { leagueMembers } from '~/server/db/schema/members';
 import { castaways } from '~/server/db/schema/castaways';
 import { tribes } from '~/server/db/schema/tribes';
@@ -14,8 +13,7 @@ import { seasons } from '~/server/db/schema/seasons';
 import { getCastaway } from '~/app/api/seasons/[name]/castaways/[castaway]/query';
 import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
 
-export async function getRules(leagueId: number):
-  Promise<RulesType> {
+export async function getRules(leagueId: number) {
   // get event rules
   const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
@@ -85,8 +83,11 @@ export async function getRules(leagueId: number):
 }
 
 const members = aliasedTable(leagueMembers, 'member');
+const resultCastaways = aliasedTable(castaways, 'resultCastaway');
+const resultTribes = aliasedTable(tribes, 'resultTribe');
+const resultMembers = aliasedTable(leagueMembers, 'resultMember');
 
-export async function getPremierPredictions(leagueId: number) {
+export async function getSeasonPredictions(leagueId: number) {
   const predictions = await db
     .select({
       id: seasonEventRules.id,
@@ -104,6 +105,12 @@ export async function getPremierPredictions(leagueId: number) {
       member: members.displayName,
       premiere: seasons.premierDate,
       season: seasons.name,
+      result: {
+        castaway: resultCastaways.name,
+        tribe: resultTribes.name,
+        member: resultMembers.displayName,
+        color: resultMembers.color
+      }
     })
     .from(seasonEventRules)
     .innerJoin(leagues, eq(seasonEventRules.league, leagues.id))
@@ -116,6 +123,12 @@ export async function getPremierPredictions(leagueId: number) {
     .leftJoin(tribes, eq(seasonTribes.reference, tribes.id))
     .leftJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
     .leftJoin(leagueMembers, eq(seasonMembers.reference, leagueMembers.id))
+    .leftJoin(seasonCastawayResults, eq(seasonCastawayResults.rule, seasonEventRules.id))
+    .leftJoin(resultCastaways, eq(seasonCastawayResults.result, resultCastaways.id))
+    .leftJoin(seasonTribeResults, eq(seasonTribeResults.rule, seasonEventRules.id))
+    .leftJoin(resultTribes, eq(seasonTribeResults.result, resultTribes.id))
+    .leftJoin(seasonMemberResults, eq(seasonMemberResults.rule, seasonEventRules.id))
+    .leftJoin(resultMembers, eq(seasonMemberResults.result, resultMembers.id))
     .where(eq(seasonEventRules.league, leagueId))
     .then((res) => res
       .some((prediction) =>
@@ -123,11 +136,21 @@ export async function getPremierPredictions(leagueId: number) {
 
   // get color for each prediction
   return await Promise.all(predictions.map(async (p) => {
-    p.pick.color = await (p.pick.castaway ? getCastaway(p.season, p.pick.castaway)
-      .then((castaway) => castaway.details.startingTribe.color) :
-      p.pick.tribe ? getTribes(p.season)
-        .then((tribes) => tribes
-          .find((t) => t.name === p.pick.tribe)!.color) : p.pick.color);
+    if (p.pick.castaway) p.pick.color = await getCastaway(p.season, p.pick.castaway)
+      .then((c) => c.details.startingTribe.color);
+    else if (p.pick.tribe) p.pick.color = (await getTribes(p.season))
+      .find((t) => t.name === p.pick.tribe)!.color;
+
+    if (Object.values(p.result).some((r) => r)) {
+      if (p.result.castaway) p.result.color = await getCastaway(p.season, p.result.castaway)
+        .then((c) => c.details.startingTribe.color);
+      else if (p.result.tribe) p.result.color = (await getTribes(p.season))
+        .find((t) => t.name === p.result.tribe)!.color;
+    } else if (!p.result.member) {
+      p.result.member = 'TBD';
+      p.result.color = '#aaaaaa';
+    }
+
     return p;
   }));
 }

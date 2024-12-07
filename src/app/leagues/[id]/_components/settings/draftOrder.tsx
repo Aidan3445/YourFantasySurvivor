@@ -13,7 +13,7 @@ import { ChevronDown, ChevronRight, GripVertical } from 'lucide-react';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { useRouter } from 'next/navigation';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
-import { type WithPick } from '~/app/api/leagues/[id]/score/query';
+import type { WithPick, WithResult } from '~/app/api/leagues/[id]/score/query';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
 import { PredictionCard } from './predictionCard';
 import { HoverCardArrow, HoverCardPortal } from '@radix-ui/react-hover-card';
@@ -22,7 +22,7 @@ import { useIsMobile } from '~/hooks/use-mobile';
 interface DraftOrderProps extends ComponentProps {
   leagueId: number;
   draftOrder: { name: string, color: string, drafted: string[] }[];
-  predictions?: (SeasonEventRuleType & WithPick & { member: string | null })[];
+  predictions?: (SeasonEventRuleType & WithPick & WithResult & { member: string | null })[];
   orderLocked: boolean;
   draftOver: boolean;
 }
@@ -133,7 +133,7 @@ export default function DraftOrder({
 }
 
 interface PredictionHoverProps extends ComponentProps {
-  predictions: (SeasonEventRuleType & WithPick & { member: string | null })[];
+  predictions: (SeasonEventRuleType & WithPick & WithResult & { member: string | null })[];
 }
 
 function PredictionHover({ predictions, children, className }: PredictionHoverProps) {
@@ -149,9 +149,9 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
     else acc.finale.push(rule);
     return acc;
   }, { premiere: [], merge: [], finale: [] } as {
-    premiere: (SeasonEventRuleType & WithPick)[];
-    merge: (SeasonEventRuleType & WithPick)[];
-    finale: (SeasonEventRuleType & WithPick)[];
+    premiere: (SeasonEventRuleType & WithPick & WithResult)[];
+    merge: (SeasonEventRuleType & WithPick & WithResult)[];
+    finale: (SeasonEventRuleType & WithPick & WithResult)[];
   });
 
   return (
@@ -169,18 +169,15 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
           className='w-72 max-h-80 light-scroll py-1'>
           <HoverCardArrow />
           <section className='flex flex-col gap-1'>
-            {groups.premiere.length > 0 &&
-              <h3 className='text-center font-semibold'>Premiere</h3>}
-            {groups.premiere.map((p, index) => (
+            {groups.finale.length > 0 &&
+              <h3 className='text-center font-semibold'>Finale</h3>}
+            {groups.finale.map((p, index) => (
               <PredictionCard
                 key={index}
                 prediction={p}
-                parity={index % 2 === 0}>
-                <ColorRow color={p.pick.color ?? 'white'} className='p-1 mt-1'>
-                  <h3 style={{ color: getContrastingColor(p.pick.color ?? 'white') }}>
-                    {p.pick.castaway ?? p.pick.tribe ?? p.pick.member}
-                  </h3>
-                </ColorRow>
+                parity={(index) % 2 === 0}
+                className={pickBgColor(p)}>
+                <PredictionEntries prediction={p} />
               </PredictionCard>
             ))}
             {groups.merge.length > 0 &&
@@ -189,26 +186,20 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
               <PredictionCard
                 key={index}
                 prediction={p}
-                parity={(groups.premiere.length + index) % 2 === 0}>
-                <ColorRow color={p.pick.color ?? 'white'} className='p-1 mt-1'>
-                  <h3 style={{ color: getContrastingColor(p.pick.color ?? 'white') }}>
-                    {p.pick.castaway ?? p.pick.tribe ?? p.pick.member}
-                  </h3>
-                </ColorRow>
+                parity={(groups.finale.length + index) % 2 === 0}
+                className={pickBgColor(p)}>
+                <PredictionEntries prediction={p} />
               </PredictionCard>
             ))}
-            {groups.finale.length > 0 &&
-              <h3 className='text-center font-semibold'>Finale</h3>}
-            {groups.finale.map((p, index) => (
+            {groups.premiere.length > 0 &&
+              <h3 className='text-center font-semibold'>Premiere</h3>}
+            {groups.premiere.map((p, index) => (
               <PredictionCard
                 key={index}
                 prediction={p}
-                parity={(groups.premiere.length + groups.merge.length + index) % 2 === 0}>
-                <ColorRow color={p.pick.color ?? 'white'} className='p-1 mt-1'>
-                  <h3 style={{ color: getContrastingColor(p.pick.color ?? 'white') }}>
-                    {p.pick.castaway ?? p.pick.tribe ?? p.pick.member}
-                  </h3>
-                </ColorRow>
+                parity={(groups.finale.length + groups.merge.length + index) % 2 === 0}
+                className={pickBgColor(p)}>
+                <PredictionEntries prediction={p} />
               </PredictionCard>
             ))}
           </section>
@@ -216,4 +207,43 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
       </HoverCardPortal>
     </HoverCard>
   );
+}
+
+interface PredictionProps {
+  prediction: SeasonEventRuleType & WithPick & WithResult;
+}
+
+function PredictionEntries({ prediction }: PredictionProps) {
+  return (
+    <div className='mt-1'>
+      {prediction.result.color !== '#aaaaaa' &&
+        <h3 className='text-center italic'>Prediction</h3>
+      }
+      <ColorRow color={prediction.pick.color ?? 'white'} className='p-1 mt-1'>
+        <h3 style={{ color: getContrastingColor(prediction.pick.color ?? 'white') }}>
+          {prediction.pick.castaway ?? prediction.pick.tribe ?? prediction.pick.member}
+        </h3>
+      </ColorRow>
+      {prediction.result.color !== '#aaaaaa' &&
+        <>
+          <h3 className='text-center italic mt-1'>Result</h3>
+          <ColorRow color={prediction.result.color ?? 'white'} className='p-1 mt-1'>
+            <h3 style={{ color: getContrastingColor(prediction.result.color ?? 'white') }}>
+              {prediction.result.castaway ?? prediction.result.tribe ?? prediction.result.member}
+            </h3>
+          </ColorRow>
+        </>}
+    </div>
+  );
+}
+
+function pickBgColor(prediction: SeasonEventRuleType & WithPick & WithResult) {
+  if (prediction.pick.castaway === prediction.result.castaway &&
+    prediction.pick.tribe === prediction.result.tribe &&
+    prediction.pick.member === prediction.result.member) {
+    return 'bg-green-300';
+  } else if (prediction.result.color !== '#aaaaaa') {
+    return 'bg-red-300';
+  }
+  return '';
 }

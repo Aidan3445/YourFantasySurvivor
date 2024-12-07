@@ -574,6 +574,15 @@ export type WithPick = {
   }
 };
 
+export type WithResult = {
+  result: {
+    castaway: string | null,
+    tribe: string | null,
+    member: string | null,
+    color?: string | null
+  }
+};
+
 export type MemberEpisodeEvents = {
   weekly: {
     votes: (WeeklyEventRuleType & WithPick)[];
