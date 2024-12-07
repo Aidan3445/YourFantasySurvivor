@@ -16,7 +16,7 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
   const seasonEvents = form.watch('season');
 
   const updateEvent = (
-    event: SeasonEventRuleType,
+    event: SeasonTemplatesType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => {
     const newEvents = [...seasonEvents] as SeasonTemplatesType[];
@@ -71,10 +71,10 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
 }
 
 interface SeasonEventProps extends ComponentProps {
-  event: SeasonEventRuleType;
+  event: SeasonTemplatesType;
   eventIndex: number;
   updateEvent?: (
-    event: SeasonEventRuleType,
+    event: SeasonTemplatesType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => void;
 }
@@ -82,7 +82,7 @@ interface SeasonEventProps extends ComponentProps {
 export function SeasonEvent({ event, eventIndex, updateEvent, className }: SeasonEventProps) {
   const [newEvent, setNewEvent] = useState(event);
 
-  const updateReferenceType = (value: string): SeasonEventRuleType => {
+  const updateReferenceType = (value: string): SeasonTemplatesType => {
     if (value === 'castaway' || value === 'tribe' || value === 'member') {
       return { ...newEvent, referenceType: value };
     }
@@ -90,7 +90,7 @@ export function SeasonEvent({ event, eventIndex, updateEvent, className }: Seaso
     return newEvent;
   };
 
-  const saveEvent = (changedEvent: SeasonEventRuleType) => {
+  const saveEvent = (changedEvent: SeasonTemplatesType) => {
     updateEvent?.(changedEvent, 'update', eventIndex);
     setNewEvent(changedEvent);
   };

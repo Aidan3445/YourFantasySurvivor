@@ -26,8 +26,9 @@ export async function getDraftDetails(leagueId: number) {
   const predictions = season
     .filter((rule) => rule.timing === 'premiere')
     .reduce((preds, rule) => {
+      if (!rule.id) return preds;
       if (!preds[rule.referenceType]) preds[rule.referenceType] = [];
-      preds[rule.referenceType]!.push(rule);
+      preds[rule.referenceType]!.push(rule as SeasonEventRuleType);
       return preds;
     }, {} as {
       castaway?: SeasonEventRuleType[];

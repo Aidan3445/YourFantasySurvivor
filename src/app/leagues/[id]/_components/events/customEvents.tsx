@@ -16,7 +16,7 @@ export default function CustomEvents({ className, form, freeze, setUnsaved }: Ev
   const customEvents = form.watch('custom');
 
   const updateEvent = (
-    event: CustomEventRuleType,
+    event: CustomTemplatesType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => {
     const newEvents = [...customEvents] as CustomTemplatesType[];
@@ -69,10 +69,10 @@ export default function CustomEvents({ className, form, freeze, setUnsaved }: Ev
 }
 
 export interface CustomEventProps extends ComponentProps {
-  event: CustomEventRuleType;
+  event: CustomTemplatesType;
   eventIndex: number;
   updateEvent?: (
-    event: CustomEventRuleType,
+    event: CustomTemplatesType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => void;
 }
@@ -81,14 +81,14 @@ function CustomEvent({ event, eventIndex, updateEvent, className }: CustomEventP
   const [newEvent, setNewEvent] = useState(event);
   const [nameError, setNameError] = useState('');
 
-  const updateReferenceType = (value: string): CustomEventRuleType => {
+  const updateReferenceType = (value: string): CustomTemplatesType => {
     if (value === 'castaway' || value === 'tribe' || value === 'member') {
       return { ...newEvent, referenceType: value };
     }
     return newEvent;
   };
 
-  const update = (changedEvent: CustomEventRuleType) => {
+  const update = (changedEvent: CustomTemplatesType) => {
     // validate change and update error message
     try {
       CustomEventRule.parse(changedEvent);

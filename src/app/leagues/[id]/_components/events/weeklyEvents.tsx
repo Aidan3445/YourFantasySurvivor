@@ -15,7 +15,7 @@ export default function WeeklyEvents({ className, form, freeze, setUnsaved }: Ev
   const weeklyEvents = form.watch('weekly');
 
   const updateEvent = (
-    event: WeeklyEventRuleType,
+    event: WeeklyTemplatesType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => {
     const newEvents = [...weeklyEvents] as WeeklyTemplatesType[];
@@ -69,10 +69,10 @@ export default function WeeklyEvents({ className, form, freeze, setUnsaved }: Ev
 }
 
 interface WeeklyEventProps extends ComponentProps {
-  event: WeeklyEventRuleType;
+  event: WeeklyTemplatesType;
   eventIndex: number;
   updateEvent?: (
-    event: WeeklyEventRuleType,
+    event: WeeklyTemplatesType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => void;
 }
@@ -81,7 +81,7 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
   const [newEvent, setNewEvent] = useState(event);
   const [nameError, setNameError] = useState('');
 
-  const updateReferenceType = (value: string): WeeklyEventRuleType => {
+  const updateReferenceType = (value: string): WeeklyTemplatesType => {
     if (value === 'castaway' || value === 'tribe' || value === 'member') {
       return { ...newEvent, referenceType: value };
     }
@@ -89,7 +89,7 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
     return newEvent;
   };
 
-  const update = (changedEvent: WeeklyEventRuleType) => {
+  const update = (changedEvent: WeeklyTemplatesType) => {
     // validate change and update error message
     try {
       WeeklyEventRule.parse(changedEvent);
@@ -141,8 +141,7 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
         </div>
         <div className='w-full'>
           <Label>Reference Type</Label>
-          <Select value={event.referenceType} onValueChange={(value) =>
-            update(updateReferenceType(value))}>
+          <Select value={event.referenceType} onValueChange={(value) => update(updateReferenceType(value))}>
             <SelectTrigger className='w-full'>
               <SelectValue />
             </SelectTrigger>
