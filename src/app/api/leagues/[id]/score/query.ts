@@ -701,12 +701,12 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
       .leftJoin(seasonEvents, and(
         eq(seasonEvents.rule, seasonEventRules.id),
         eq(seasonEvents.member, memberId)))
-      .leftJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
-      .leftJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
-      .leftJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
-      .leftJoin(tribes, eq(tribes.id, weeklyTribes.reference))
-      .leftJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
-      .leftJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
+      .leftJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
+      .leftJoin(castaways, eq(castaways.id, seasonCastaways.reference))
+      .leftJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
+      .leftJoin(tribes, eq(tribes.id, seasonTribes.reference))
+      .leftJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
+      .leftJoin(leagueMembers, eq(leagueMembers.id, seasonMembers.reference))
       .where(and(
         eq(seasonEventRules.league, leagueId),
         or(
