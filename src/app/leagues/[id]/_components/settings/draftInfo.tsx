@@ -20,7 +20,6 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
   const preseasonPredictions = season.filter((rule) => rule.timing === 'premiere');
   const orderLocked = !ownerLoggedIn || settings.draftDate < new Date();
 
-  console.log(predictions);
   return (
     <Popover>
       <PopoverCenter />

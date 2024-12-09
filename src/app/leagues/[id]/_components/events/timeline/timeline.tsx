@@ -3,6 +3,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components
 import { getBaseEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
 import { EventCard } from './eventCard';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
+import { getRules } from '~/app/api/leagues/[id]/events/query';
 //import { getWeeklyEvents } from '~/app/api/leagues/[id]/score/query';
 
 interface TimelineProps {
@@ -10,9 +11,10 @@ interface TimelineProps {
 }
 
 export async function Timeline({ leagueId }: TimelineProps) {
-  const [baseEventsTimeline, weeklyEventsTimeline] = await Promise.all([
+  const [baseEventsTimeline, weeklyEventsTimeline, rules] = await Promise.all([
     getBaseEventsTimeline(leagueId),
     getWeeklyEventsTimeline(leagueId),
+    getRules(leagueId),
   ]);
 
   weeklyEventsTimeline;
@@ -25,9 +27,9 @@ export async function Timeline({ leagueId }: TimelineProps) {
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
             <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1 pad-scroll'>
-              {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} />}
-              {events.finalists && <EventCard eventName='Finalists' events={events.finalists} />}
-              {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} />}
+              {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} points={rules.soleSurvivor} />}
+              {events.finalists && <EventCard eventName='Finalists' events={events.finalists} points={rules.finalists} />}
+              {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} points={rules.fireWin} />}
               {events.elim && <EventCard eventName='Voted Out' events={events.elim}>
                 {events.elim.map((event, index) => (
                   <HoverCard key={index}>
@@ -49,15 +51,15 @@ export async function Timeline({ leagueId }: TimelineProps) {
                 ))}
               </EventCard>}
               {events.noVoteExit && <EventCard eventName='Left The Game' events={events.noVoteExit} />}
-              {events.advElim && <EventCard eventName='Advantage Souvenir' events={events.advElim} />}
-              {events.advPlay && <EventCard eventName='Advantage Played' events={events.advPlay} />}
-              {events.badAdvPlay && <EventCard eventName='Advantage Misplayed' events={events.badAdvPlay} />}
-              {events.advFound && <EventCard eventName='Advantage Found' events={events.advFound} />}
-              {events.spokeEpTitle && <EventCard eventName='Spoke Episode Title' events={events.spokeEpTitle} />}
-              {events.indivWin && <EventCard eventName='Individual Immunity' events={events.indivWin} />}
-              {events.indivReward && <EventCard eventName='Individual Reward' events={events.indivReward} />}
-              {events.tribe1st && <EventCard eventName='Tribe Win' events={events.tribe1st} />}
-              {events.tribe2nd && <EventCard eventName='Tribe Runner Up' events={events.tribe2nd} />}
+              {events.advElim && <EventCard eventName='Advantage Souvenir' events={events.advElim} points={rules.advElim} />}
+              {events.advPlay && <EventCard eventName='Advantage Played' events={events.advPlay} points={rules.advPlay} />}
+              {events.badAdvPlay && <EventCard eventName='Advantage Misplayed' events={events.badAdvPlay} points={rules.badAdvPlay} />}
+              {events.advFound && <EventCard eventName='Advantage Found' events={events.advFound} points={rules.advFound} />}
+              {events.spokeEpTitle && <EventCard eventName='Spoke Episode Title' events={events.spokeEpTitle} points={rules.spokeEpTitle} />}
+              {events.indivWin && <EventCard eventName='Individual Immunity' events={events.indivWin} points={rules.indivWin} />}
+              {events.indivReward && <EventCard eventName='Individual Reward' events={events.indivReward} points={rules.indivReward} />}
+              {events.tribe1st && <EventCard eventName='Tribe Win' events={events.tribe1st} points={rules.tribe1st} />}
+              {events.tribe2nd && <EventCard eventName='Tribe Runner Up' events={events.tribe2nd} points={rules.tribe2nd} />}
               {events.tribeUpdate && (
                 <article className='p-1 rounded-md bg-b4'>
                   <h3 className='text-lg font-semibold'>{events.tribeUpdate[0]?.merge ? 'Merge' : 'Tribe Swap'}</h3>

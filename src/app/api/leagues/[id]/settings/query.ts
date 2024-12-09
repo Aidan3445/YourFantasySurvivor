@@ -1,12 +1,12 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { and, asc, eq, or } from 'drizzle-orm';
+import { aliasedTable, and, asc, eq, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { castaways } from '~/server/db/schema/castaways';
 import { leagues, leagueSettings } from '~/server/db/schema/leagues';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
-import { episodes } from '~/server/db/schema/episodes';
+import { baseEventCastaways, baseEvents, episodes } from '~/server/db/schema/episodes';
 
 export async function getLeagueSettings(leagueId: number) {
   const user = await auth();
@@ -38,7 +38,9 @@ export async function getLeagueSettings(leagueId: number) {
 
   const draftOrder = (await Promise.all(settings.draftOrder
     .map((memberId: number) => Promise.all([
-      getMember(memberId), getSurvivorsList(leagueId, memberId)
+      getMember(memberId),
+      getSurvivorsListEDITING(leagueId, memberId)
+        .then((picks) => picks.map((pick) => pick.name))
     ]))))
     .map(([member, drafted]) => ({ ...member, drafted }))
     .filter((draft): draft is { name: string, color: string, drafted: string[] } => !!draft);
@@ -56,18 +58,47 @@ async function getMember(memberId: number) {
     .then((res) => res[0]);
 }
 
-export async function getSurvivorsList(leagueId: number, memberId: number) {
+const elimEps = aliasedTable(episodes, 'elimEps');
+export async function getSurvivorsListEDITING(leagueId: number, memberId: number) {
+  const elimEvents = db.select({
+    episode: elimEps.number,
+    castawayId: baseEventCastaways.reference,
+  })
+    .from(baseEvents)
+    .innerJoin(baseEventCastaways, eq(baseEventCastaways.event, baseEvents.id))
+    .innerJoin(elimEps, eq(elimEps.id, baseEvents.episode))
+    .innerJoin(seasons, eq(seasons.id, elimEps.season))
+    .innerJoin(leagues, and(
+      eq(leagues.id, leagueId),
+      eq(leagues.season, seasons.id)))
+    .where(or(
+      eq(baseEvents.eventName, 'elim'),
+      eq(baseEvents.eventName, 'noVoteExit')))
+    .as('elimEvents');
+
   return db
-    .select({ name: castaways.shortName })
+    .select({
+      name: castaways.shortName,
+      pickedEpisode: episodes.number,
+      elimEpisode: elimEvents.episode,
+    })
     .from(leagueMembers)
     .innerJoin(selectionUpdates, eq(selectionUpdates.member, leagueMembers.id))
     .innerJoin(episodes, eq(selectionUpdates.episode, episodes.id))
     .innerJoin(castaways, eq(selectionUpdates.castaway, castaways.id))
+    .leftJoin(elimEvents, eq(castaways.id, elimEvents.castawayId))
     .where(and(
       eq(leagueMembers.league, leagueId),
       eq(leagueMembers.id, memberId)))
     .orderBy(asc(episodes.number))
-    .then((res) => res.map((castaway) => castaway.name));
+    .then((res) => {
+      console.log(res);
+      return res.map((castaway, i) => ({
+        name: castaway.name,
+        elimWhilePicked: castaway.elimEpisode !== null &&
+          (i + 1 === res.length || castaway.elimEpisode < res[i + 1]!.pickedEpisode)
+      }));
+    });
 }
 
 export async function isOwner(leagueId: number, userId: string) {

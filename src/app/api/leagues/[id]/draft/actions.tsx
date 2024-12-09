@@ -141,7 +141,7 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
 
   if (league.members.length > remaining.length) throw new Error('No castaways remain.');
   if (league.members.filter((m) => m.id !== memberId)
-    .some((m) => !remaining.some((r) => r.more.shortName === m.drafted.slice(-1)[0]))) {
+    .some((m) => !remaining.some((r) => r.more.shortName === m.picks.slice(-1)[0]?.name))) {
     throw new Error('You cannot change your survivor pick until all league members have one.');
   }
 

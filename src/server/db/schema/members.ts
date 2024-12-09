@@ -29,7 +29,10 @@ export interface Member {
   isAdmin: boolean;
   isOwner: boolean;
   loggedIn: boolean;
-  drafted: string[];
+  picks: {
+    name: string;
+    elimWhilePicked: boolean;
+  }[];
 }
 
 export const selectionUpdates = createTable(

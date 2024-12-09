@@ -25,21 +25,21 @@ interface MembersProps {
 
 export default function Members({ leagueId, members, ownerLoggedIn, isFull, details }: MembersProps) {
   const showPointsPlace = members.some((m) => m.points > 0);
-  const showDrafted = members.some((m) => m.drafted);
+  const showDrafted = members.some((m) => m.picks);
 
   const memberDisplayNames = members.map((m) => m.displayName);
 
   const preventChange = useMemo(() => members
-    .filter((m) => !m.loggedIn)
-    .some((m) => !details.remaining
-      .some((r) => r.more.shortName === m.drafted.slice(-1)[0])), [members, details.remaining]);
+    .filter((member) => !member.loggedIn)
+    .some((member) => !details.remaining
+      .some((r) => r.more.shortName === member.picks.slice(-1)[0]!.name)), [members, details.remaining]);
 
   return (
     <table className='space-x-1 space-y-2 h-min'>
       <HeaderRow showPointsPlace={showPointsPlace} showDrafted={showDrafted} />
       <tbody>
         {members.map((member, index) => {
-          const currentPick = member.drafted.slice(-1)[0];
+          const currentPick = member.picks.slice(-1)[0]?.name ?? 'None';
           const cColor = getContrastingColor(member.color);
           const sColor = getCurrentTribe(details.remaining
             .find((c) => c.more.shortName === currentPick))?.color
@@ -80,15 +80,19 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                     color={cColor} />
                 </ColorRow>
               </td>
-              {!!member.drafted.length &&
+              {!!member.picks.length &&
                 <td>
                   <HoverCard>
                     <HoverCardTrigger>
-                      <ColorRow color={sColor} gradient className='py-1 text-xs flex gap-2' >
+                      <ColorRow color={sColor} className='py-1 text-xs flex gap-2' >
                         <h3 className='flex justify-between w-full' style={{ color: csColor }}>{currentPick}
-                          <span className='flex'>
-                            {details.castaways.find((c) => c.more.shortName === currentPick)?.tribes
-                              .map((t) => (<ChevronRight key={t.name} strokeWidth={5} size={16} color={t.color} />))}
+                          <span className='flex ml-2 gap-0'>
+                            {details.castaways.find((c) => c.more.shortName === currentPick)?.tribes.slice(sColor === '#AAAAAA' ? 0 : 1)
+                              .map((t) => (
+                                <div key={t.name} className='relative inline-block'>
+                                  <ChevronRight className='absolute top-0 left-0' strokeWidth={8} size={16} color='black' />
+                                  <ChevronRight className='relative' strokeWidth={5} size={16} color={t.color} />
+                                </div>))}
                           </span>
                         </h3>
                         {member.loggedIn && (members.length < details.remaining.length ||
@@ -106,20 +110,19 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                       </ColorRow>
                     </HoverCardTrigger>
                     <HoverCardContent className='w-min p-1 grid gap-1' side='right'>
-                      {member.drafted.map((d, i) => {
-                        const castaway = details.castaways.find((c) => c.more.shortName === d);
+                      {member.picks.map(({ name, elimWhilePicked }, i) => {
+                        const castaway = details.castaways.find((c) => c.more.shortName === name);
                         const dColor = getCurrentTribe(castaway)?.color ?? '#AAAAAA';
                         const cdColor = getContrastingColor(dColor);
-                        const eliminated = !details.remaining.some((c) => c.more.shortName === d);
                         return (
-                          <a key={i} href={`/seasons/castaway?season=${castaway?.more.season}&castaway=${d}`}>
+                          <a key={i} href={`/seasons/castaway?season=${castaway?.more.season}&castaway=${name}`}>
                             <ColorRow
                               color={dColor}
                               className='py-1 text-xs flex justify-center cursor-pointer'>
                               <h3 style={{ color: cdColor }}>
-                                {d}
+                                {name}
                               </h3>
-                              {eliminated && <Skull className='inline' size={16} color={cdColor} />}
+                              {elimWhilePicked && <Skull className='inline' size={16} color={cdColor} />}
                             </ColorRow>
                           </a>
                         );
@@ -144,19 +147,17 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
 
 export interface ColorRowProps extends ComponentProps {
   color: string;
-  gradient?: boolean;
   loggedIn?: boolean;
 }
 
-export function ColorRow({ children, className, color, gradient, loggedIn }: ColorRowProps) {
+export function ColorRow({ children, className, color, loggedIn }: ColorRowProps) {
   return (
     <div
       className={cn(
         'px-2 gap-1 rounded border border-black flex items-center text-nowrap transition-all duration-500',
         loggedIn && 'border ring-2 ring-white',
         className)}
-      style={gradient ? { backgroundImage: `linear-gradient(90deg, ${color} 70%, white  100%)` } :
-        { backgroundColor: color }}>
+      style={{ backgroundColor: color }}>
       {children}
     </div>
   );

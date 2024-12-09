@@ -207,7 +207,7 @@ export default function NewEventResult({
                 </SelectTrigger>
                 <SelectContent>
                   {rules.map((rule) => (
-                    <SelectItem value={rule.id.toString()} key={rule.id}>{rule.name}</SelectItem>
+                    <SelectItem value={rule.id.toString()} key={rule.id}>{rule.name} ({rule.timing})</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

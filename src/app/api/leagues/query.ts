@@ -7,7 +7,7 @@ import { auth } from '@clerk/nextjs/server';
 import { leagueMembers, type Member } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { castaways } from '~/server/db/schema/castaways';
-import { getSurvivorsList } from './[id]/settings/query';
+import { getSurvivorsListEDITING } from './[id]/settings/query';
 
 
 export async function getLeague(leagueId: number) {
@@ -46,7 +46,7 @@ export async function getLeague(leagueId: number) {
     };
     return {
       ...safeMember,
-      drafted: (await getSurvivorsList(leagueId, member.id))
+      picks: (await getSurvivorsListEDITING(leagueId, member.id))
     } as Member;
   }));
 
