@@ -4,7 +4,6 @@ import { getBaseEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/league
 import { EventCard } from './eventCard';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
-//import { getWeeklyEvents } from '~/app/api/leagues/[id]/score/query';
 
 interface TimelineProps {
   leagueId: number;
@@ -76,11 +75,9 @@ export async function Timeline({ leagueId }: TimelineProps) {
                         </div>
                         <div>
                           {castaways.map((castaway, index) => (
-                            <p key={index} className='text-sm text-nowrap'>{castaway}</p>
-                          ))}
+                            <p key={index} className='text-sm text-nowrap'>{castaway}</p>))}
                         </div>
-                      </div>
-                    ))}
+                      </div>))}
                   </div>
                 </article>)}
               {events.otherNotes && (
@@ -113,24 +110,20 @@ export async function Timeline({ leagueId }: TimelineProps) {
                             {names.split(', ').map((name, index) => (
                               <div key={index} className='text-nowrap inline-block ml-1'>
                                 {name}{!names.endsWith(name) && ','}
-                              </div>
-                            ))}
+                              </div>))}
                           </h4>
                         </div>
                         <ul className='list-disc ml-4'>
                           {texts.map((text, index) => (
                             <li key={index} className='text-left text-sm list-item'>
                               {text}
-                            </li>
-                          ))}
+                            </li>))}
                         </ul>
-                      </div>
-                    ))}
+                      </div>))}
                   </div>
                 </article>)}
             </span>
-          </article >))
-      }
+          </article >))}
     </section >
   );
 }

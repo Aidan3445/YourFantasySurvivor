@@ -23,7 +23,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
   return (
     <Popover>
       <PopoverCenter />
-      <PopoverTrigger className={cn(className, 'hs-in rounded-md')}>Draft</PopoverTrigger>
+      <PopoverTrigger className={cn(className, 'hs-in rounded-md')}>Season</PopoverTrigger>
       <PopoverContent>
         <CardContainer className='flex flex-col gap-1 p-6 min-w-80'>
           <h2 className='text-2xl font-semibold text-center'>

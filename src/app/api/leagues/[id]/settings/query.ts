@@ -91,14 +91,11 @@ export async function getSurvivorsListEDITING(leagueId: number, memberId: number
       eq(leagueMembers.league, leagueId),
       eq(leagueMembers.id, memberId)))
     .orderBy(asc(episodes.number))
-    .then((res) => {
-      console.log(res);
-      return res.map((castaway, i) => ({
-        name: castaway.name,
-        elimWhilePicked: castaway.elimEpisode !== null &&
-          (i + 1 === res.length || castaway.elimEpisode < res[i + 1]!.pickedEpisode)
-      }));
-    });
+    .then((res) => res.map((castaway, i) => ({
+      name: castaway.name,
+      elimWhilePicked: castaway.elimEpisode !== null &&
+        (i + 1 === res.length || castaway.elimEpisode < res[i + 1]!.pickedEpisode)
+    })));
 }
 
 export async function isOwner(leagueId: number, userId: string) {

@@ -215,24 +215,19 @@ interface PredictionProps {
 
 function PredictionEntries({ prediction }: PredictionProps) {
   return (
-    <div className='mt-1'>
-      {prediction.result.color !== '#aaaaaa' &&
-        <h3 className='text-center italic'>Prediction</h3>
-      }
-      <ColorRow color={prediction.pick.color ?? 'white'} className='p-1 mt-1'>
+    <div className='grid grid-cols-2 gap-1 mt-1'>
+      <h3 className='text-center italic h-min'>Prediction</h3>
+      <h3 className='text-center italic h-min'>Result</h3>
+      <ColorRow color={prediction.pick.color ?? 'white'} className='p-1'>
         <h3 style={{ color: getContrastingColor(prediction.pick.color ?? 'white') }}>
           {prediction.pick.castaway ?? prediction.pick.tribe ?? prediction.pick.member}
         </h3>
       </ColorRow>
-      {prediction.result.color !== '#aaaaaa' &&
-        <>
-          <h3 className='text-center italic mt-1'>Result</h3>
-          <ColorRow color={prediction.result.color ?? 'white'} className='p-1 mt-1'>
-            <h3 style={{ color: getContrastingColor(prediction.result.color ?? 'white') }}>
-              {prediction.result.castaway ?? prediction.result.tribe ?? prediction.result.member}
-            </h3>
-          </ColorRow>
-        </>}
+      <ColorRow color={prediction.result.color ?? 'white'} className='p-1'>
+        <h3 style={{ color: getContrastingColor(prediction.result.color ?? 'white') }}>
+          {prediction.result.castaway ?? prediction.result.tribe ?? prediction.result.member}
+        </h3>
+      </ColorRow>
     </div>
   );
 }
