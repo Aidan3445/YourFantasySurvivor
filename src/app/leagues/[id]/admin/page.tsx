@@ -47,7 +47,7 @@ export default async function Admin(props: AdminPageProps) {
   return (
     <main className='flex flex-col gap-0 text-center' >
       <h1 className='text-2xl font-semibold'>ADMIN</h1>
-      <a href={`/leagues/${leagueId}`} className='hs-in rounded-md text-black p-1 px-6 m-1'>Back</a>
+      <a href={`/leagues/${leagueId}`} className='p-1 px-6 m-1 text-black rounded-md hs-in'>Back</a>
       <Tabs defaultValue={sys ? 'base' : 'custom'}>
         <TabsList>
           {sys && <TabsTrigger value='base'>Base</TabsTrigger>}

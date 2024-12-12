@@ -28,7 +28,7 @@ export default function AssignMember({ member, userId }: AssignMemberProps) {
         {...member}
         loggedIn={false}>
         {member.displayName}
-        <AlertDialogAction className='p-1 text-xs h-3 m-1' type='submit'>That&apos;s Me</AlertDialogAction>
+        <AlertDialogAction className='p-1 m-1 h-3 text-xs' type='submit'>That&apos;s Me</AlertDialogAction>
       </ColorRow>
     </form>
   );

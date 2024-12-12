@@ -28,12 +28,12 @@ export default function EliminationsTable({ eliminations }: EliminationsTablePro
                 <h4 >{elim.votes.length} vote{elim.votes.length > 1 ? 's' : ''}</h4>
               </HoverCardTrigger>
               <HoverCardPortal>
-                <HoverCardContent className='w-min px-1 py-0' side='top' sideOffset={-2}>
+                <HoverCardContent className='py-0 px-1 w-min' side='top' sideOffset={-2}>
                   <HoverCardArrow />
                   <article className='flex flex-col gap-1'>
                     <h3 className='text-lg font-semibold'>Votes</h3>
                     {elim.votes.map((vote, index) => (
-                      <p key={index} className='text-sm text-nowrap px-1'>{vote}</p>
+                      <p key={index} className='px-1 text-sm text-nowrap'>{vote}</p>
                     ))}
                   </article>
                 </HoverCardContent>

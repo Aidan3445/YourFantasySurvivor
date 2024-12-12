@@ -142,11 +142,11 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
       <div>Episode {label}:</div>
       <Separator className='mb-1' />
       <div className='flex gap-2'>
-        <div className='grid grid-cols-min gap-1'>
+        <div className='grid gap-1 grid-cols-min'>
           {firstSet.map((p) => (
             <span
               key={p.dataKey}
-              className='grid grid-cols-subgrid col-span-2 opacity-60'
+              className='grid col-span-2 opacity-60 grid-cols-subgrid'
               style={{ color: p.stroke, stroke: p.stroke }}>
               <ColorRow className='col-start-1' color={p.stroke}>
                 <h3 className='col-start-2'>{p.dataKey}</h3>
@@ -158,11 +158,11 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
           ))}
         </div>
         {secondSet.length > 0 && (
-          <div className='grid grid-cols-min gap-1'>
+          <div className='grid gap-1 grid-cols-min'>
             {secondSet.map((p) => (
               <span
                 key={p.dataKey}
-                className='grid grid-cols-subgrid col-span-2 opacity-60'
+                className='grid col-span-2 opacity-60 grid-cols-subgrid'
                 style={{ color: p.stroke, stroke: p.stroke }}>
                 <ColorRow className='col-start-1' color={p.stroke}>
                   <h3 className='col-start-2'>{p.dataKey}</h3>

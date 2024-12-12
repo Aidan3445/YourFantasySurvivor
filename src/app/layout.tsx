@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         appearance={{ variables: { colorPrimary: '#684528', colorBackground: '#EED9BF' } }}>
         <html lang='en'>
           <body className={`font-sans ${inter.variable}`}>
-            <SidebarProvider className='page flex flex-col' defaultOpen={false}>
+            <SidebarProvider className='flex flex-col page' defaultOpen={false}>
               {!oldNav && <CustomSidebarTrigger />}
               {oldNav ? <TopNav /> : <SideNav />}
               {children}

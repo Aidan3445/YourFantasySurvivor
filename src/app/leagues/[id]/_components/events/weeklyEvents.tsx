@@ -156,7 +156,7 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
           </Select>
         </div>
       </span>
-      <span className='grid gap-2 grid-cols-2'>
+      <span className='grid grid-cols-2 gap-2'>
         <div>
           <Label>Type</Label>
           <Select value={event.type} onValueChange={(value) =>

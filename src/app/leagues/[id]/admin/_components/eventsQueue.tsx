@@ -12,16 +12,16 @@ export function EventQueue({ children, disabled }: EventQueueProps) {
   const [count, setCount] = useState(1);
 
   return (
-    <section className='flex gap-2 justify-center w-svw md:px-10'>
-      <article className='flex gap-2 overflow-x-auto light-scroll'>
+    <section className='flex gap-2 justify-center md:px-10 w-svw'>
+      <article className='flex overflow-x-auto gap-2 light-scroll'>
         {Array.from({ length: count }).map((_, i) => (
-          <div key={i} className='min-w-72 mb-2'>
+          <div key={i} className='mb-2 min-w-72'>
             {children}
           </div>
         ))}
       </article>
       {!disabled && (
-        <div className='gap-2 items-center self-start mt-5 hidden lg:flex'>
+        <div className='hidden gap-2 items-center self-start mt-5 lg:flex'>
           <Separator orientation='vertical' className='h-20' />
           <div className='flex flex-col gap-2'>
             <Button onClick={() => setCount(count + 1)}>Add</Button>

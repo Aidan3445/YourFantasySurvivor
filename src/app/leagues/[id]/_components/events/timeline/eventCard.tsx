@@ -17,10 +17,10 @@ export function EventCard({ eventName, points = 0, events, castaway = true, trib
   return (
     <article className='p-1 rounded-md bg-b4'>
       <h3 className='text-lg font-semibold text-nowrap'>{eventName} {pointValue}</h3>
-      <div className='max-h-24 min-w-32 overflow-y-auto dark-scroll overflow-x-clip'>
+      <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
         {children}
         {!children && events?.map((event, index) => (
-          <p key={index} className='text-sm text-nowrap px-1'>
+          <p key={index} className='px-1 text-sm text-nowrap'>
             {(castaway ? event.reference.castaway : null) ??
               (tribe ? event.reference.tribe : 'NOT FOUND')}
           </p>

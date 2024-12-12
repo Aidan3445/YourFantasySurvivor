@@ -35,7 +35,7 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
       .some((r) => r.more.shortName === member.picks.slice(-1)[0]!.name)), [members, details.remaining]);
 
   return (
-    <table className='space-x-1 space-y-2 h-min'>
+    <table className='space-y-2 space-x-1 h-min'>
       <HeaderRow showPointsPlace={showPointsPlace} showDrafted={showDrafted} />
       <tbody>
         {members.map((member, index) => {
@@ -53,13 +53,13 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
               onMouseOut={() => mouseOutLeaderboard(member.displayName, member.color, memberDisplayNames)}>
               {showPointsPlace &&
                 <td>
-                  <ColorRow color={member.color} className='py-1 text-xs flex justify-center'>
+                  <ColorRow color={member.color} className='flex justify-center py-1 text-xs'>
                     <h3 style={{ color: cColor }}>{index + 1}</h3>
                   </ColorRow>
                 </td>}
               {showPointsPlace &&
                 <td>
-                  <ColorRow color={member.color} className='py-1 text-xs flex justify-center'>
+                  <ColorRow color={member.color} className='flex justify-center py-1 text-xs'>
                     <h3 style={{ color: cColor }}>{member.points}</h3>
                   </ColorRow>
                 </td>}
@@ -84,12 +84,12 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                 <td>
                   <HoverCard>
                     <HoverCardTrigger>
-                      <ColorRow color={sColor} className='py-1 text-xs flex gap-2' >
+                      <ColorRow color={sColor} className='flex gap-2 py-1 text-xs' >
                         <h3 className='flex justify-between w-full' style={{ color: csColor }}>{currentPick}
-                          <span className='flex ml-2 gap-0'>
+                          <span className='flex gap-0 ml-2'>
                             {details.castaways.find((c) => c.more.shortName === currentPick)?.tribes.slice(sColor === '#AAAAAA' ? 0 : 1)
                               .map((t) => (
-                                <div key={t.name} className='relative inline-block'>
+                                <div key={t.name} className='inline-block relative'>
                                   <ChevronRight className='absolute top-0 left-0' strokeWidth={8} size={16} color='black' />
                                   <ChevronRight className='relative' strokeWidth={5} size={16} color={t.color} />
                                 </div>))}
@@ -109,7 +109,7 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                           )}
                       </ColorRow>
                     </HoverCardTrigger>
-                    <HoverCardContent className='w-min p-1 grid gap-1' side='right'>
+                    <HoverCardContent className='grid gap-1 p-1 w-min' side='right'>
                       {member.picks.map(({ name, elimWhilePicked }, i) => {
                         const castaway = details.castaways.find((c) => c.more.shortName === name);
                         const dColor = getCurrentTribe(castaway)?.color ?? '#AAAAAA';
@@ -118,7 +118,7 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                           <a key={i} href={`/seasons/castaway?season=${castaway?.more.season}&castaway=${name}`}>
                             <ColorRow
                               color={dColor}
-                              className='py-1 text-xs flex justify-center cursor-pointer'>
+                              className='flex justify-center py-1 text-xs cursor-pointer'>
                               <h3 style={{ color: cdColor }}>
                                 {name}
                               </h3>
@@ -174,13 +174,13 @@ function HeaderRow({ showPointsPlace, showDrafted }: HeaderRowProps) {
       <tr>
         {showPointsPlace &&
           <th>
-            <ColorRow key='header-pl' color={'white'} className='py-1 text-xs col-start-1 flex justify-center'>
+            <ColorRow key='header-pl' color={'white'} className='flex col-start-1 justify-center py-1 text-xs'>
               <h3>Place</h3>
             </ColorRow>
           </th>}
         {showPointsPlace &&
           <th>
-            <ColorRow key='header-po' color={'white'} className='py-1 text-xs col-start-2 flex justify-center'>
+            <ColorRow key='header-po' color={'white'} className='flex col-start-2 justify-center py-1 text-xs'>
               <h3>Points</h3>
             </ColorRow>
           </th>}
@@ -191,7 +191,7 @@ function HeaderRow({ showPointsPlace, showDrafted }: HeaderRowProps) {
         </th>
         {showDrafted &&
           <th>
-            <ColorRow key='header-d' color={'white'} className='py-1 text-xs col-start-4 flex justify-center'>
+            <ColorRow key='header-d' color={'white'} className='flex col-start-4 justify-center py-1 text-xs'>
               <h3>Survivor</h3>
             </ColorRow>
           </th>}
@@ -202,7 +202,7 @@ function HeaderRow({ showPointsPlace, showDrafted }: HeaderRowProps) {
 
 export function MembersSkeleton() {
   return (
-    <table className='h-min space-x-1 space-y-2'>
+    <table className='space-y-2 space-x-1 h-min'>
       <HeaderRow showPointsPlace showDrafted />
       <tbody>
         {Array.from({ length: 9 }).map((_, index) => (

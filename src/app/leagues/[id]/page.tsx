@@ -23,8 +23,8 @@ export default async function League(props: PageProps) {
 
   return (
     <main className='flex flex-col gap-0 text-center' >
-      <h1 className='text-4xl font-semibold mb-2'>{league?.name}</h1>
-      <span className='grid grid-cols-2 gap-1 mb-2 grid-rows-2'>
+      <h1 className='mb-2 text-4xl font-semibold'>{league?.name}</h1>
+      <span className='grid grid-cols-2 grid-rows-2 gap-1 mb-2'>
         <LeagueDetails className='text-black' league={league} ownerLoggedIn={ownerLoggedIn} />
         <LeagueScoring
           className='text-black'
@@ -36,7 +36,7 @@ export default async function League(props: PageProps) {
           league={league}
           ownerLoggedIn={ownerLoggedIn} />
         {(ownerLoggedIn || adminLoggedIn) &&
-          <a className='hs-in rounded-md text-base font-normal flex justify-center items-center' href={`/leagues/${leagueId}/admin`}>
+          <a className='flex justify-center items-center text-base font-normal rounded-md hs-in' href={`/leagues/${leagueId}/admin`}>
             Admin
           </a>}
       </span>

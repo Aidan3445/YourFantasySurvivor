@@ -177,7 +177,7 @@ export default function NewBaseEvent({
           <Button
             type='submit'
             disabled={refs.some((ref) => ref === '') || refs.length === 0 || form.formState.isSubmitting}
-            className='px-1 right-0'>
+            className='right-0 px-1'>
             Score Event
           </Button>
         </span>
@@ -198,9 +198,9 @@ export default function NewBaseEvent({
           </FormControl>
         )} />
         {selectedEvent && (
-          <article className='bg-b3/80 rounded-md p-2 flex flex-col gap-3 justify-center'>
+          <article className='flex flex-col gap-3 justify-center p-2 rounded-md bg-b3/80'>
             <h3 className='text-xl font-semibold'>{form.watch('eventName')}</h3>
-            <div className='flex flex-col justify-center gap-2'>
+            <div className='flex flex-col gap-2 justify-center'>
               <FormField name='referenceType' render={({ field }) => (
                 <FormControl className='flex justify-center'>
                   <FormItem>
@@ -216,7 +216,7 @@ export default function NewBaseEvent({
                   </FormItem>
                 </FormControl>
               )} />
-              <span className='flex gap-2 items-center justify-center'>
+              <span className='flex gap-2 justify-center items-center'>
                 {selectedReferenceType === 'castaway' && remaining.length !== castaways.length && (
                   <>
                     <label className='text-xs' htmlFor='remainingOnly'>Show Eliminated</label>
@@ -224,7 +224,7 @@ export default function NewBaseEvent({
                   </>
                 )}
                 {/*<AddNote form={form} index={null}>
-                    <div className='cursor-pointer hs-in rounded-md p-1 px-2'>Common Notes</div>
+                    <div className='p-1 px-2 rounded-md cursor-pointer hs-in'>Common Notes</div>
                   </AddNote>*/}
               </span>
               {refs.map((_, index) => (
@@ -268,8 +268,8 @@ export default function NewBaseEvent({
               </span>)}
             <section className='flex flex-col gap-1'>
               <span className='inline items-center'>
-                <h3 className='text-xl font-semibold '>Keywords and Notes </h3>
-                <h4 className='text-sm font-normal  ml-1'>(line separated)</h4>
+                <h3 className='text-xl font-semibold'>Keywords and Notes </h3>
+                <h4 className='ml-1 text-sm font-normal'>(line separated)</h4>
               </span>
               <FormField name='keywords' render={({ field }) => (
                 <FormControl>
@@ -316,7 +316,7 @@ export default function NewBaseEvent({
   <section>
 <h2>Castaway events</h2>
 {events.castawayEvents.map((e) => (
-  <article key={e.name} className='bg-b3/80 rounded-md'>
+  <article key={e.name} className='rounded-md bg-b3/80'>
   <h3 className='text-xl font-semibold'>{e.name}</h3>
   <p>Castaway: {e.castaway}</p>
   <p>Episode: {e.episode}</p>
@@ -326,7 +326,7 @@ export default function NewBaseEvent({
     <section>
   <h2>Tribe events</h2>
   {events.tribeEvents.map((e) => (
-    <article key={e.name} className='bg-b3/80 rounded-md'>
+    <article key={e.name} className='rounded-md bg-b3/80'>
     <h3 className='text-xl font-semibold'>{e.name}</h3>
     <p>Tribe: {e.tribe}</p>
     <p>Episode: {e.episode}</p>
@@ -344,7 +344,7 @@ function AddNote({ form, index, children, className }: AddNoteProps) {
   const noteIndex = index !== null ? index + 1 : 0;
   const ref = noteIndex ? form.getValues(`references.${index!}`) : null;
 
-  if (!ref && noteIndex) return (children ?? <NotepadText className='cursor-not-allowed opacity-30' />);
+  if (!ref && noteIndex) return (children ?? <NotepadText className='opacity-30 cursor-not-allowed' />);
 
   const updateNotes = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const notes = form.getValues('notes');

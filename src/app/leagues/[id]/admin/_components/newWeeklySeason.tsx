@@ -194,7 +194,7 @@ export default function NewEventResult({
           <Button
             type='submit'
             disabled={refs.some((ref) => ref === '') || refs.length === 0 || form.formState.isSubmitting}
-            className='px-1 right-0'>
+            className='right-0 px-1'>
             Score Event
           </Button>
         </span>
@@ -215,13 +215,13 @@ export default function NewEventResult({
           </FormControl>
         )} />
         {selectedRule && (
-          <article className='bg-b3/80 rounded-md p-2 flex flex-col gap-3 items-center'>
+          <article className='flex flex-col gap-3 items-center p-2 rounded-md bg-b3/80'>
             <div className='max-w-sm'>
               <h3 className='text-xl font-semibold'>{selectedRule.name}</h3>
               <p>{selectedRule.description}</p>
             </div>
-            <div className='flex flex-col justify-center gap-2'>
-              <span className='flex gap-2 items-center justify-center'>
+            <div className='flex flex-col gap-2 justify-center'>
+              <span className='flex gap-2 justify-center items-center'>
                 {selectedRule.referenceType === 'castaway' && remaining.length !== castaways.length && (
                   <>
                     <label className='text-xs' htmlFor='showEliminated'>Show Eliminated</label>
@@ -229,7 +229,7 @@ export default function NewEventResult({
                   </>
                 )}
                 {/*<AddNote form={form} index={null}>
-                    <div className='cursor-pointer hs-in rounded-md p-1 px-2'>Common Notes</div>
+                    <div className='p-1 px-2 rounded-md cursor-pointer hs-in'>Common Notes</div>
                   </AddNote>*/}
               </span>
               {refs.map((_, index) => (

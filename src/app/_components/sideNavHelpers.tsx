@@ -39,7 +39,7 @@ export function SideNavFooter() {
         </SignedOut>
         <SignedIn>
           <SidebarMenuButton>
-            <div className='-ml-1.5 pt-1 z-50'>
+            <div className='z-50 pt-1 -ml-1.5'>
               <UserButton />
             </div>
             {(sidebar.open || sidebar.openMobile) && <span>{user.user?.fullName}</span>}
@@ -56,12 +56,12 @@ export function CustomSidebarTrigger() {
   if (!sidebar.isMobile) return null;
 
   return (
-    <span className='flex items-center w-full my-2'>
+    <span className='flex items-center my-2 w-full'>
       <Menu
         onClick={sidebar.toggleSidebar}
         className={cn('ml-1 h-6 p-0 z-[1000] transition-all',
           sidebar.openMobile ? 'opacity-0' : 'opacity-100')} />
-      <h1 className='text-2xl font-bold absolute left-1/2 transform -translate-x-1/2 text-nowrap'>Your Fantasy Survivor</h1>
+      <h1 className='absolute left-1/2 text-2xl font-bold transform -translate-x-1/2 text-nowrap'>Your Fantasy Survivor</h1>
     </span>
   );
 }

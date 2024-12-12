@@ -73,7 +73,7 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
         </TabsList>
       </section>
       <TabsContent value='members'>
-        <span className='flex flex-wrap gap-4 w-full justify-center'>
+        <span className='flex flex-wrap gap-4 justify-center w-full'>
           <Members
             leagueId={leagueId}
             members={membersWithScores}
@@ -95,10 +95,10 @@ export function LeaderboardSkeleton() {
   return (
     <section className='flex flex-col items-center'>
       <div className='flex flex-col gap-2 justify-center'>
-        <Skeleton className='w-48 h-6 p-1' />
-        <Skeleton className='w-48 h-10 p-1' />
+        <Skeleton className='p-1 w-48 h-6' />
+        <Skeleton className='p-1 w-48 h-10' />
       </div>
-      <span className='flex mt-2 flex-wrap gap-4 w-full justify-center'>
+      <span className='flex flex-wrap gap-4 justify-center mt-2 w-full'>
         <MembersSkeleton />
         <Skeleton className='w-96 h-[280px]' />
       </span>

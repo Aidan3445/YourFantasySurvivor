@@ -29,17 +29,17 @@ export default function Scores({ data }: ScoresProps) {
       <thead>
         <tr>
           <th>
-            <ColorRow color='white' className='py-1 text-xs flex justify-center'>
+            <ColorRow color='white' className='flex justify-center py-1 text-xs'>
               <h3>Place</h3>
             </ColorRow>
           </th>
           <th>
-            <ColorRow color='white' className='py-1 text-xs flex justify-center'>
+            <ColorRow color='white' className='flex justify-center py-1 text-xs'>
               <h3>Member</h3>
             </ColorRow>
           </th>
           <th>
-            <ColorRow color='white' className='py-1 text-xs flex justify-center'>
+            <ColorRow color='white' className='flex justify-center py-1 text-xs'>
               <h3>Points</h3>
             </ColorRow>
           </th>
@@ -96,7 +96,7 @@ export function ColorRowWrapper({ name, url, names, color, children }: ColorRowW
       href={url}
       onMouseOver={() => mouseOverLeaderboard(name, names)}
       onMouseOut={() => mouseOutLeaderboard(name, color, names)}>
-      <ColorRow color={color} className='py-1 text-xs flex justify-center'>
+      <ColorRow color={color} className='flex justify-center py-1 text-xs'>
         <h3 className='text-white'>{children}</h3>
       </ColorRow>
     </a>

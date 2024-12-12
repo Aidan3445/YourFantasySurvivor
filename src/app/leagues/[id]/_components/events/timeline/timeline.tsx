@@ -25,7 +25,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
         .map(([episode, events]) => (
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
-            <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1 pad-scroll'>
+            <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll pad-scroll'>
               {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} points={rules.soleSurvivor} />}
               {events.finalists && <EventCard eventName='Finalists' events={events.finalists} points={rules.finalists} />}
               {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} points={rules.fireWin} />}
@@ -33,16 +33,16 @@ export async function Timeline({ leagueId }: TimelineProps) {
                 {events.elim.map((event, index) => (
                   <HoverCard key={index}>
                     <HoverCardTrigger>
-                      <h3 className='text-base flex items-center justify-center cursor-help text-nowrap px-1'>
+                      <h3 className='flex justify-center items-center px-1 text-base cursor-help text-nowrap'>
                         {event.reference.castaway ?? event.reference.tribe ?? 'NOT FOUND'} - {event.keywords.length}
-                        <Flame className='w-4 h-4 ml-0.5' />
+                        <Flame className='ml-0.5 w-4 h-4' />
                       </h3>
                     </HoverCardTrigger>
-                    <HoverCardContent className='w-min px-1 py-0'>
+                    <HoverCardContent className='py-0 px-1 w-min'>
                       <article className='flex flex-col gap-1'>
                         <h3 className='text-lg font-semibold'>Votes</h3>
                         {event.keywords.map((vote, index) => (
-                          <p key={index} className='text-sm text-nowrap px-1'>{vote}</p>
+                          <p key={index} className='px-1 text-sm text-nowrap'>{vote}</p>
                         ))}
                       </article>
                     </HoverCardContent>
@@ -62,7 +62,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
               {events.tribeUpdate && (
                 <article className='p-1 rounded-md bg-b4'>
                   <h3 className='text-lg font-semibold'>{events.tribeUpdate[0]?.merge ? 'Merge' : 'Tribe Swap'}</h3>
-                  <div className='max-h-24 min-w-32 overflow-y-auto dark-scroll overflow-x-clip'>
+                  <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
                     {Object.entries(events.tribeUpdate.reduce((tribes, update) => {
                       if (!update.reference.tribe && !update.reference.castaway) return tribes;
                       tribes[update.reference.tribe!] ??= [] as string[];
@@ -70,8 +70,8 @@ export async function Timeline({ leagueId }: TimelineProps) {
                       return tribes;
                     }, {} as Record<string, string[]>)).map(([tribe, castaways], index) => (
                       <div key={index} className='px-1'>
-                        <div className='sticky top-0 bg-b4 rounded-b-md'>
-                          <h4 className='text-xs font-semibold bg-b3 rounded-md'>{tribe}</h4>
+                        <div className='sticky top-0 rounded-b-md bg-b4'>
+                          <h4 className='text-xs font-semibold rounded-md bg-b3'>{tribe}</h4>
                         </div>
                         <div>
                           {castaways.map((castaway, index) => (
@@ -83,7 +83,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
               {events.otherNotes && (
                 <article className='p-1 rounded-md bg-b4'>
                   <h3 className='text-lg font-semibold'>Other Notes</h3>
-                  <div className='max-h-24 min-w-80 md:min-w-96 overflow-y-auto dark-scroll overflow-x-clip'>
+                  <div className='overflow-y-auto max-h-24 min-w-80 overflow-x-clip md:min-w-96 dark-scroll'>
                     {Object.entries(events.otherNotes.reduce((notes, note) => {
                       const sameNote = notes.findIndex((noteEvent) => noteEvent.id === note.id);
                       if (sameNote === -1) notes.push(note);
@@ -105,17 +105,17 @@ export async function Timeline({ leagueId }: TimelineProps) {
                       return notes;
                     }, {} as Record<string, string[]>)).map(([names, texts]) => (
                       <div key={names} className='px-1 pt-0.5'>
-                        <div className='sticky top-0 bg-b4 rounded-b-md'>
-                          <h4 className='text-xs px-2 font-semibold bg-b3 rounded-md text-wrap mr-1'>
+                        <div className='sticky top-0 rounded-b-md bg-b4'>
+                          <h4 className='px-2 mr-1 text-xs font-semibold rounded-md bg-b3 text-wrap'>
                             {names.split(', ').map((name, index) => (
-                              <div key={index} className='text-nowrap inline-block ml-1'>
+                              <div key={index} className='inline-block ml-1 text-nowrap'>
                                 {name}{!names.endsWith(name) && ','}
                               </div>))}
                           </h4>
                         </div>
-                        <ul className='list-disc ml-4'>
+                        <ul className='ml-4 list-disc'>
                           {texts.map((text, index) => (
-                            <li key={index} className='text-left text-sm list-item'>
+                            <li key={index} className='text-sm text-left list-item'>
                               {text}
                             </li>))}
                         </ul>
@@ -134,31 +134,31 @@ export function TimelineSkeleton() {
       <h1 className='text-2xl font-semibold'>Timeline</h1>
       <article>
         <h2 className='text-xl'>Episode</h2>
-        <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
-          <Skeleton className='min-w-48 h-32' />
-          <Skeleton className='min-w-64 h-32' />
-          <Skeleton className='min-w-48 h-32' />
-          <Skeleton className='min-w-48 h-32' />
-          <Skeleton className='min-w-72 h-32' />
+        <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll'>
+          <Skeleton className='h-32 min-w-48' />
+          <Skeleton className='h-32 min-w-64' />
+          <Skeleton className='h-32 min-w-48' />
+          <Skeleton className='h-32 min-w-48' />
+          <Skeleton className='h-32 min-w-72' />
         </span>
       </article>
       <article>
         <h2 className='text-xl'>Episode</h2>
-        <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
-          <Skeleton className='min-w-56 h-32' />
-          <Skeleton className='min-w-48 h-32' />
-          <Skeleton className='min-w-44 h-32' />
-          <Skeleton className='min-w-72 h-32' />
+        <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll'>
+          <Skeleton className='h-32 min-w-56' />
+          <Skeleton className='h-32 min-w-48' />
+          <Skeleton className='h-32 min-w-44' />
+          <Skeleton className='h-32 min-w-72' />
         </span>
       </article>
       <article>
         <h2 className='text-xl'>Episode</h2>
-        <span className='flex gap-2 px-2 md:px-14 overflow-x-auto light-scroll pb-1'>
-          <Skeleton className='min-w-48 h-32' />
-          <Skeleton className='min-w-56 h-32' />
-          <Skeleton className='min-w-72 h-32' />
-          <Skeleton className='min-w-52 h-32' />
-          <Skeleton className='min-w-80 h-32' />
+        <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll'>
+          <Skeleton className='h-32 min-w-48' />
+          <Skeleton className='h-32 min-w-56' />
+          <Skeleton className='h-32 min-w-72' />
+          <Skeleton className='h-32 min-w-52' />
+          <Skeleton className='h-32 min-w-80' />
         </span>
       </article>
     </section>

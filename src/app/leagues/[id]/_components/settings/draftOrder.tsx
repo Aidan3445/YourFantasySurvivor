@@ -106,7 +106,7 @@ export default function DraftOrder({
                   predictions={predictions.filter((rule) => rule.member === member.name)}>
                   <SortableItem
                     id={member.id}
-                    className='grid grid-cols-subgrid col-span-3'
+                    className='grid col-span-3 grid-cols-subgrid'
                     disabled={orderLocked}>
                     <ColorRow
                       className={cn('w-full tabular-nums', member.drafted ? 'col-span-2' : 'col-span-3')}
@@ -118,7 +118,7 @@ export default function DraftOrder({
                           color={getContrastingColor(color)} />}
                     </ColorRow>
                     {member.drafted &&
-                      <ColorRow className='p-1 text-xs flex justify-center' color={color}>
+                      <ColorRow className='flex justify-center p-1 text-xs' color={color}>
                         <h3 style={{ color: getContrastingColor(color) }}>{member.drafted[0]}</h3>
                       </ColorRow>}
                   </SortableItem>
@@ -166,11 +166,11 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
         <HoverCardContent
           side={mobile ? 'bottom' : 'right'}
           sideOffset={mobile ? 0 : 10}
-          className='w-72 max-h-80 light-scroll py-1'>
+          className='py-1 w-72 max-h-80 light-scroll'>
           <HoverCardArrow />
           <section className='flex flex-col gap-1'>
             {groups.finale.length > 0 &&
-              <h3 className='text-center font-semibold'>Finale</h3>}
+              <h3 className='font-semibold text-center'>Finale</h3>}
             {groups.finale.map((p, index) => (
               <PredictionCard
                 key={index}
@@ -181,7 +181,7 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
               </PredictionCard>
             ))}
             {groups.merge.length > 0 &&
-              <h3 className='text-center font-semibold'>Merge</h3>}
+              <h3 className='font-semibold text-center'>Merge</h3>}
             {groups.merge.map((p, index) => (
               <PredictionCard
                 key={index}
@@ -192,7 +192,7 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
               </PredictionCard>
             ))}
             {groups.premiere.length > 0 &&
-              <h3 className='text-center font-semibold'>Premiere</h3>}
+              <h3 className='font-semibold text-center'>Premiere</h3>}
             {groups.premiere.map((p, index) => (
               <PredictionCard
                 key={index}
@@ -216,8 +216,8 @@ interface PredictionProps {
 function PredictionEntries({ prediction }: PredictionProps) {
   return (
     <div className='grid grid-cols-2 gap-1 mt-1'>
-      <h3 className='text-center italic h-min'>Prediction</h3>
-      <h3 className='text-center italic h-min'>Result</h3>
+      <h3 className='italic text-center h-min'>Prediction</h3>
+      <h3 className='italic text-center h-min'>Result</h3>
       <ColorRow color={prediction.pick.color ?? 'white'} className='p-1'>
         <h3 style={{ color: getContrastingColor(prediction.pick.color ?? 'white') }}>
           {prediction.pick.castaway ?? prediction.pick.tribe ?? prediction.pick.member}

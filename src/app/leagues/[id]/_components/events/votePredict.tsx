@@ -136,13 +136,13 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
 
   return (
     <article>
-      <Button className='text-xs p-1 h-min font-semibold mb-2 w-full' onClick={() => setAlertOpen(true)}>
+      <Button className='p-1 mb-2 w-full text-xs font-semibold h-min' onClick={() => setAlertOpen(true)}>
         Weekly Picks
         {events.locked ?
-          <Lock className='w-4 h-4 ml-1' /> :
+          <Lock className='ml-1 w-4 h-4' /> :
           events.picked ?
-            <Pencil className='w-4 h-4 ml-1' /> :
-            <CircleAlert className='w-4 h-4 ml-1' />}
+            <Pencil className='ml-1 w-4 h-4' /> :
+            <CircleAlert className='ml-1 w-4 h-4' />}
       </Button>
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
         <AlertDialogContent>
@@ -297,7 +297,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
                     ))}
                   </section>
                 )}
-                <AlertDialogFooter className='w-full items-center justify-center flex-row'>
+                <AlertDialogFooter className='flex-row justify-center items-center w-full'>
                   {!events.locked &&
                     <AlertDialogAction
                       onClick={handleSubmit}
