@@ -6,7 +6,7 @@ import { type Member } from '~/server/db/schema/members';
 import { Separator } from '~/app/_components/commonUI/separator';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
-import { ChevronRight, Skull } from 'lucide-react';
+import { Circle, Skull } from 'lucide-react';
 import { mouseOutLeaderboard, mouseOverLeaderboard } from '~/app/playground/_components/leaderboard';
 import { useMemo } from 'react';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
@@ -86,12 +86,11 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                     <HoverCardTrigger>
                       <ColorRow color={sColor} className='flex gap-2 py-1 text-xs' >
                         <h3 className='flex justify-between w-full' style={{ color: csColor }}>{currentPick}
-                          <span className='flex gap-0 ml-2'>
+                          <span className='flex gap-0.5 ml-2 items-center'>
                             {details.castaways.find((c) => c.more.shortName === currentPick)?.tribes.slice(sColor === '#AAAAAA' ? 0 : 1)
                               .map((t) => (
                                 <div key={t.name} className='inline-block relative'>
-                                  <ChevronRight className='absolute top-0 left-0' strokeWidth={8} size={16} color='black' />
-                                  <ChevronRight className='relative' strokeWidth={5} size={16} color={t.color} />
+                                  <Circle className='relative' strokeWidth={3} stroke='black' size={14} color={t.color} fill={t.color} />
                                 </div>))}
                           </span>
                         </h3>
