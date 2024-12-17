@@ -1,5 +1,5 @@
 import 'server-only';
-import { and, count, desc, eq, inArray, lt, or } from 'drizzle-orm';
+import { aliasedTable, and, desc, eq, inArray, lt, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/seasons/[name]/events/query';
 import { leagues } from '~/server/db/schema/leagues';
@@ -9,7 +9,7 @@ import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { castaways } from '~/server/db/schema/castaways';
 import { customCastaways, customEventRules, customEvents, customMembers, customTribes } from '~/server/db/schema/customEvents';
 import { tribes } from '~/server/db/schema/tribes';
-import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEventRuleType, weeklyEvents, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
+import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEventRuleType, weeklyEvents, type WeeklyEventTiming, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
 import { seasonCastawayResults, seasonCastaways, seasonEventRules, type SeasonEventRuleType, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
 import { auth } from '@clerk/nextjs/server';
 
@@ -50,16 +50,19 @@ export async function getBaseEvents(leagueId: number) {
 type Event = {
   episode: number;
   points: number;
-  name: string;
+  eventName: string;
   description: string;
   referenceType: 'castaway' | 'tribe' | 'member';
   timing?: 'fullSeason' | 'preMerge' | 'postMerge';
 };
 
+export type EventResult = { name: string, displayName?: string } & Event
+
+
 export interface AltEvents {
-  castawayEvents: ({ castaway: string } & Event)[];
-  tribeEvents: ({ tribe: string } & Event)[];
-  memberEvents: ({ member: string } & Event)[];
+  castawayEvents: EventResult[];
+  tribeEvents: EventResult[];
+  memberEvents: EventResult[];
 }
 
 export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
@@ -69,10 +72,10 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
   const events = await Promise.all([
     db
       .select({
-        castaway: castaways.shortName,
+        name: castaways.shortName,
         episode: episodes.number,
         points: customEventRules.points,
-        name: customEventRules.name,
+        eventName: customEventRules.name,
         description: customEventRules.description,
         referenceType: customEventRules.referenceType,
       })
@@ -87,10 +90,11 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .orderBy(desc(episodes.number)),
     db
       .select({
-        tribe: tribes.name,
+        name: tribes.name,
+        displayName: tribes.name,
         episode: episodes.number,
         points: customEventRules.points,
-        name: customEventRules.name,
+        eventName: customEventRules.name,
         description: customEventRules.description,
         referenceType: customEventRules.referenceType,
       })
@@ -105,10 +109,10 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .orderBy(desc(episodes.number)),
     db
       .select({
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
         episode: episodes.number,
         points: customEventRules.points,
-        name: customEventRules.name,
+        eventName: customEventRules.name,
         description: customEventRules.description,
         referenceType: customEventRules.referenceType,
       })
@@ -126,7 +130,40 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
   return { castawayEvents: events[0], tribeEvents: events[1], memberEvents: events[2] };
 }
 
-export async function getWeeklyEventsRaw(leagueId: number) {
+export type PredictionResult = (
+  EventResult & {
+    timing: WeeklyEventTiming,
+    result: string,
+  }
+);
+
+export type Vote = (
+  EventResult & {
+    voter: string,
+    timing: WeeklyEventTiming,
+    id: number,
+  }
+);
+
+export type VoteResult = (
+  EventResult & {
+    voters: string[],
+    id: number,
+  }
+);
+
+type WeeklyEventsRaw = {
+  castawayVotes: Vote[]
+  tribeVotes: Vote[]
+  memberVotes: Vote[]
+  predictions: PredictionResult[]
+  currentEpisode?: { number: number, merge?: boolean, finale?: boolean, season: string };
+  mergeEpisode?: { number: number, merge?: boolean, finale?: boolean, season: string };
+};
+
+const voter = aliasedTable(leagueMembers, 'voter');
+
+export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEventsRaw> {
   const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
@@ -146,10 +183,10 @@ export async function getWeeklyEventsRaw(leagueId: number) {
     // predictions
     db
       .select({
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
         episode: episodes.number,
         points: weeklyEventRules.points,
-        name: weeklyEventRules.name,
+        eventName: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
@@ -174,10 +211,10 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
     db
       .select({
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
         episode: episodes.number,
         points: weeklyEventRules.points,
-        name: weeklyEventRules.name,
+        eventName: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
@@ -202,10 +239,10 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
     db
       .select({
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
         episode: episodes.number,
         points: weeklyEventRules.points,
-        name: weeklyEventRules.name,
+        eventName: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
@@ -231,11 +268,12 @@ export async function getWeeklyEventsRaw(leagueId: number) {
     // votes
     db
       .select({
-        count: count(),
-        castaway: castaways.shortName,
+        name: castaways.shortName,
+        displayName: castaways.name,
+        voter: voter.displayName,
         episode: episodes.number,
         points: weeklyEventRules.points,
-        name: weeklyEventRules.name,
+        eventName: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
@@ -243,6 +281,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       })
       .from(weeklyCastaways)
       .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyCastaways.event))
+      .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
       .innerJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
       .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
@@ -253,15 +292,15 @@ export async function getWeeklyEventsRaw(leagueId: number) {
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'castaway'),
         lt(episodes.number, currentEpisode?.number ?? -1)))
-      .groupBy(castaways.shortName, episodes.number, weeklyEventRules.id)
+      .groupBy(castaways.shortName, castaways.name, voter.displayName, episodes.number, weeklyEventRules.id)
       .orderBy(desc(episodes.number)),
     db
       .select({
-        count: count(),
-        tribe: tribes.name,
+        name: tribes.name,
+        voter: voter.displayName,
         episode: episodes.number,
         points: weeklyEventRules.points,
-        name: weeklyEventRules.name,
+        eventName: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
@@ -269,6 +308,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       })
       .from(weeklyTribes)
       .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyTribes.event))
+      .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
       .innerJoin(tribes, eq(tribes.id, weeklyTribes.reference))
       .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
@@ -279,15 +319,15 @@ export async function getWeeklyEventsRaw(leagueId: number) {
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'tribe'),
         lt(episodes.number, currentEpisode?.number ?? -1)))
-      .groupBy(tribes.name, episodes.number, weeklyEventRules.id)
+      .groupBy(tribes.name, voter.displayName, episodes.number, weeklyEventRules.id)
       .orderBy(desc(episodes.number)),
     db
       .select({
-        count: count(),
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
+        voter: voter.displayName,
         episode: episodes.number,
         points: weeklyEventRules.points,
-        name: weeklyEventRules.name,
+        eventName: weeklyEventRules.name,
         description: weeklyEventRules.description,
         referenceType: weeklyEventRules.referenceType,
         timing: weeklyEventRules.timing,
@@ -295,6 +335,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
       })
       .from(weeklyMembers)
       .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyMembers.event))
+      .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
       .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
@@ -305,7 +346,7 @@ export async function getWeeklyEventsRaw(leagueId: number) {
         eq(weeklyEventRules.type, 'vote'),
         eq(weeklyEventRules.referenceType, 'member'),
         lt(episodes.number, currentEpisode?.number ?? -1)))
-      .groupBy(leagueMembers.displayName, episodes.number, weeklyEventRules.id)
+      .groupBy(leagueMembers.displayName, voter.displayName, episodes.number, weeklyEventRules.id)
       .orderBy(desc(episodes.number)),
   ]);
 
@@ -319,108 +360,59 @@ export async function getWeeklyEventsRaw(leagueId: number) {
   };
 }
 
+// @JeffProbst
+export function tallyTheVotes(votes: Vote[]) {
+  const tallied = votes.reduce((collection, vote) => {
+    collection[vote.episode] ??= {};
+    collection[vote.episode]![vote.eventName] ??= [{ ...vote, name: vote.name, points: vote.points, voters: [] }];
+    const voteIndex = collection[vote.episode]![vote.eventName]!.findIndex((v) => v.name === vote.name);
+    if (voteIndex === -1) // if there is no vote for this name, add it
+      collection[vote.episode]![vote.eventName]!.push(
+        { ...vote, name: vote.name, points: vote.points, voters: [vote.voter] });
+    else // if there is a vote for this name, add the voter
+      collection[vote.episode]![vote.eventName]![voteIndex]!.voters.push(vote.voter);
+
+    // ensure sorted order of votes by vote count so that the most voted for is first
+    collection[vote.episode]![vote.eventName]!.sort((a, b) => b.voters.length - a.voters.length);
+
+    return collection;
+    //           episode      event name    
+  }, {} as Record<number, Record<string, [VoteResult]>>);
+
+  return tallied;
+}
+
+
 export async function getWeeklyEvents(leagueId: number): Promise<AltEvents> {
   const events = await getWeeklyEventsRaw(leagueId);
 
-  const skipVote = (episode: { episode: number, timing?: 'fullSeason' | 'preMerge' | 'postMerge' }) => {
-    if (episode.timing === 'fullSeason') return false;
-    if (!events.mergeEpisode || episode.episode < events.mergeEpisode.number) return episode.timing === 'postMerge';
-    if (episode.episode >= events.mergeEpisode.number) return episode.timing === 'preMerge';
+  // protection against votes that were cast incorrectly
+  const filterVotes = (votes: Vote[]) => votes.filter((vote) => {
+    if (vote.timing === 'fullSeason') return true;
+    if (events.mergeEpisode && vote.episode >= events.mergeEpisode.number) return vote.timing === 'postMerge';
+    return vote.timing === 'preMerge';
+  });
+
+  const getWinners = (talliedVotes: ReturnType<typeof tallyTheVotes>) => {
+    return Object.values(talliedVotes).reduce((winners, votes) => {
+      winners.push(...Object.values(votes).map((vote) => {
+        const maxVoteCount = vote[0].voters.length;
+        return vote.filter((v) => v.voters.length === maxVoteCount);
+      }).flat());
+      return winners;
+    }, [] as VoteResult[]);
   };
 
   // tally the votes for each event for each episode
-  const castawayVotes = events.castawayVotes.reduce((lookup, vote) => {
-    if (skipVote(vote)) return lookup;
+  const castawayVotes = getWinners(tallyTheVotes(filterVotes(events.castawayVotes)));
+  const tribeVotes = getWinners(tallyTheVotes(filterVotes(events.tribeVotes)));
+  const memberVotes = getWinners(tallyTheVotes(filterVotes(events.memberVotes)));
 
-    lookup[vote.episode] ??= {};
-    lookup[vote.episode]![vote.id] ??= {};
-    lookup[vote.episode]![vote.id]![vote.castaway] ??= { ...vote, count: 0 };
-    lookup[vote.episode]![vote.id]![vote.castaway]!.count += vote.count;
-    return lookup;
-  }, {} as Record<number, Record<number, Record<string, Event & {
-    count: number,
-    castaway: string,
-    id: number,
-  }>>>);
-  // get the max votes for each event for each episode
-  const maxCastawayVotes = Object.values(castawayVotes).reduce((lookup, votes) => {
-    Object.entries(votes).forEach(([eventId, eventVotes]) => {
-      const eventIdNum = Number.parseInt(eventId);
-      lookup[eventIdNum] ??= [];
-      const maxVoteCount = Math.max(...[...lookup[eventIdNum], ...Object.values(eventVotes)]
-        .map((vote) => vote.count));
-      const maxVoted = Object.entries(eventVotes).filter(([_, vote]) => vote.count === maxVoteCount);
-      lookup[eventIdNum].push(...maxVoted.map(([castaway, vote]) => ({ ...vote, castaway })));
-    });
-    return lookup;
-  }, {} as Record<number, (Event & {
-    count: number,
-    castaway: string,
-    id: number,
-  })[]>);
-
-  // do the same for tribe and member votes
-  const tribeVotes = events.tribeVotes.reduce((lookup, vote) => {
-    if (skipVote(vote)) return lookup;
-
-    lookup[vote.episode] ??= {};
-    lookup[vote.episode]![vote.id] ??= {};
-    lookup[vote.episode]![vote.id]![vote.tribe] ??= { ...vote, count: 0 };
-    lookup[vote.episode]![vote.id]![vote.tribe]!.count += vote.count;
-    return lookup;
-  }, {} as Record<number, Record<number, Record<string, Event & {
-    count: number,
-    tribe: string,
-    id: number,
-  }>>>);
-  const maxTribeVotes = Object.values(tribeVotes).reduce((lookup, votes) => {
-    Object.entries(votes).forEach(([eventId, eventVotes]) => {
-      const eventIdNum = Number.parseInt(eventId);
-      lookup[eventIdNum] ??= [];
-      const maxVoteCount = Math.max(...[...lookup[eventIdNum], ...Object.values(eventVotes)]
-        .map((vote) => vote.count));
-      const maxVoted = Object.entries(eventVotes).filter(([_, vote]) => vote.count === maxVoteCount);
-      lookup[eventIdNum].push(...maxVoted.map(([tribe, vote]) => ({ ...vote, tribe })));
-    });
-    return lookup;
-  }, {} as Record<number, (Event & {
-    count: number,
-    tribe: string,
-    id: number,
-  })[]>);
-  const memberVotes = events.memberVotes.reduce((lookup, vote) => {
-    if (skipVote(vote)) return lookup;
-
-    lookup[vote.episode] ??= {};
-    lookup[vote.episode]![vote.id] ??= {};
-    lookup[vote.episode]![vote.id]![vote.member] ??= { ...vote, count: 0 };
-    lookup[vote.episode]![vote.id]![vote.member]!.count += vote.count;
-    return lookup;
-  }, {} as Record<number, Record<number, Record<string, Event & {
-    count: number,
-    member: string,
-    id: number,
-  }>>>);
-  const maxMemberVotes = Object.values(memberVotes).reduce((lookup, votes) => {
-    Object.entries(votes).forEach(([eventId, eventVotes]) => {
-      const eventIdNum = Number.parseInt(eventId);
-      lookup[eventIdNum] ??= [];
-      const maxVoteCount = Math.max(...[...lookup[eventIdNum], ...Object.values(eventVotes)]
-        .map((vote) => vote.count));
-      const maxVoted = Object.entries(eventVotes).filter(([_, vote]) => vote.count === maxVoteCount);
-      lookup[eventIdNum].push(...maxVoted.map(([member, vote]) => ({ ...vote, member })));
-    });
-    return lookup;
-  }, {} as Record<number, (Event & {
-    count: number,
-    member: string,
-    id: number,
-  })[]>);
 
   return {
-    castawayEvents: Object.values(maxCastawayVotes).flat(),
-    tribeEvents: Object.values(maxTribeVotes).flat(),
-    memberEvents: [...events.predictions, ...Object.values(maxMemberVotes).flat()],
+    castawayEvents: castawayVotes,
+    tribeEvents: tribeVotes,
+    memberEvents: [...events.predictions, ...memberVotes],
   };
 }
 
@@ -432,10 +424,10 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
   const events = await Promise.all([
     db
       .select({
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
         episode: episodes.number,
         points: seasonEventRules.points,
-        name: seasonEventRules.name,
+        eventName: seasonEventRules.name,
         description: seasonEventRules.description,
         referenceType: seasonEventRules.referenceType,
       })
@@ -454,10 +446,10 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .orderBy(desc(episodes.number)),
     db
       .select({
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
         episode: episodes.number,
         points: seasonEventRules.points,
-        name: seasonEventRules.name,
+        eventName: seasonEventRules.name,
         description: seasonEventRules.description,
         referenceType: seasonEventRules.referenceType,
       })
@@ -476,10 +468,10 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .orderBy(desc(episodes.number)),
     db
       .select({
-        member: leagueMembers.displayName,
+        name: leagueMembers.displayName,
         episode: episodes.number,
         points: seasonEventRules.points,
-        name: seasonEventRules.name,
+        eventName: seasonEventRules.name,
         description: seasonEventRules.description,
         referenceType: seasonEventRules.referenceType,
       })
@@ -540,6 +532,7 @@ export async function getEpisodes(leagueId: number, includeFuture = false) {
       runtime: episodes.runtime,
       merge: episodes.merge,
       finale: episodes.finale,
+      season: seasons.name,
     })
     .from(episodes)
     .innerJoin(seasons, eq(seasons.id, episodes.season))

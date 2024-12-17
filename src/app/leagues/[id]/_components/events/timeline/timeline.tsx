@@ -16,7 +16,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
     getRules(leagueId),
   ]);
 
-  weeklyEventsTimeline;
+  const { votes } = weeklyEventsTimeline;
 
   return (
     <section className='flex flex-col gap-1 pt-2 w-svw'>
@@ -50,6 +50,28 @@ export async function Timeline({ leagueId }: TimelineProps) {
                 ))}
               </EventCard>}
               {events.noVoteExit && <EventCard eventName='Left The Game' events={events.noVoteExit} />}
+              {/* Weekly Events */}
+              {votes[parseInt(episode)] && <EventCard eventName='League Votes'>
+                {Object.entries(votes[parseInt(episode)]!).map(([eventName, votes]) => {
+                  const maxVoteCount = votes[0].voters.length;
+                  return (
+                    <div key={eventName} className='px-1 pt-0.5'>
+                      <div className='sticky top-0 rounded-b-md bg-b4'>
+                        <h4 className='px-2 mr-1 text-xs font-semibold rounded-md bg-b3 text-nowrap'>
+                          {eventName} (+{votes[0].points})
+                        </h4>
+                      </div>
+                      <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
+                        <p className='px-1 text-sm inline'>
+                          {votes.filter((vote) => vote.voters.length === maxVoteCount)
+                            .map((vote) => vote.displayName ?? vote.name).join(', ')}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </EventCard>}
+              {/* END Weekly Events */}
               {events.advElim && <EventCard eventName='Advantage Souvenir' events={events.advElim} points={rules.advElim} />}
               {events.advPlay && <EventCard eventName='Advantage Played' events={events.advPlay} points={rules.advPlay} />}
               {events.badAdvPlay && <EventCard eventName='Advantage Misplayed' events={events.badAdvPlay} points={rules.badAdvPlay} />}
@@ -123,7 +145,8 @@ export async function Timeline({ leagueId }: TimelineProps) {
                   </div>
                 </article>)}
             </span>
-          </article >))}
+          </article >))
+      }
     </section >
   );
 }

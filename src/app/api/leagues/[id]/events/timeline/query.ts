@@ -5,7 +5,7 @@ import { castaways } from '~/server/db/schema/castaways';
 import { baseEventCastaways, baseEvents, baseEventTribes, episodes, type EventName } from '~/server/db/schema/episodes';
 import { leagues } from '~/server/db/schema/leagues';
 import { tribes } from '~/server/db/schema/tribes';
-import { getWeeklyEventsRaw, leagueMemberAuth } from '../../score/query';
+import { getWeeklyEventsRaw, leagueMemberAuth, tallyTheVotes } from '../../score/query';
 //import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
 //import { leagueMembers } from '~/server/db/schema/members';
 
@@ -47,8 +47,8 @@ export async function getBaseEventsTimeline(leagueId: number) {
 export async function getWeeklyEventsTimeline(leagueId: number) {
   const events = await getWeeklyEventsRaw(leagueId);
 
-  //const votes = [...events.castawayVotes, ...events.tribeVotes, ...events.memberVotes];
+  const votes = [...events.castawayVotes, ...events.tribeVotes, ...events.memberVotes];
+  const tallied = tallyTheVotes(votes);
 
-  //console.log(events);
-  return events;
+  return { votes: tallied, predictions: events.predictions };
 }

@@ -8,8 +8,10 @@ import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { description, eventName } from './customEvents';
 
-export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
-export const weeklyEventTiming = pgEnum('event_weekly_timing', ['fullSeason', 'preMerge', 'postMerge']);
+const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
+export type WeeklyEventType = (typeof weeklyEventType.enumValues)[number];
+const weeklyEventTiming = pgEnum('event_weekly_timing', ['fullSeason', 'preMerge', 'postMerge']);
+export type WeeklyEventTiming = (typeof weeklyEventTiming.enumValues)[number];
 
 export const weeklyEventRules = createTable(
   'event_weekly_rule',
