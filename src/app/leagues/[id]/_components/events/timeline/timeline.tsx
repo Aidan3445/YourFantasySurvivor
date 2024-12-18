@@ -16,7 +16,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
     getRules(leagueId),
   ]);
 
-  const { votes } = weeklyEventsTimeline;
+  const { votes, predictions } = weeklyEventsTimeline;
 
   return (
     <section className='flex flex-col gap-1 pt-2 w-svw'>
@@ -58,18 +58,39 @@ export async function Timeline({ leagueId }: TimelineProps) {
                     <div key={eventName} className='px-1 pt-0.5'>
                       <div className='sticky top-0 rounded-b-md bg-b4'>
                         <h4 className='px-2 mr-1 text-xs font-semibold rounded-md bg-b3 text-nowrap'>
-                          {eventName} (+{votes[0].points})
+                          {eventName} ({votes[0].points > 0 ? '+' : ''}{votes[0].points})
                         </h4>
                       </div>
                       <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
-                        <p className='px-1 text-sm inline'>
-                          {votes.filter((vote) => vote.voters.length === maxVoteCount)
-                            .map((vote) => vote.displayName ?? vote.name).join(', ')}
-                        </p>
+                        {votes
+                          .filter((vote) => vote.voters.length === maxVoteCount)
+                          .map((vote, index) => (
+                            <p key={index} className='px-1 text-sm text-nowrap'>
+                              {vote.displayName ?? vote.name}
+                            </p>))}
                       </div>
                     </div>
                   );
                 })}
+              </EventCard>}
+              {predictions[parseInt(episode)] && <EventCard eventName='League Predictions'>
+                {Object.entries(predictions[parseInt(episode)]!).map(([eventName, prediction]) => (
+                  <div key={eventName} className='px-1 pt-0.5'>
+                    <div className='sticky top-0 rounded-b-md bg-b4'>
+                      <h4 className='px-2 mr-1 text-xs font-semibold rounded-md bg-b3 text-nowrap'>
+                        {eventName} ({prediction[0].points > 0 ? '+' : ''}{prediction[0].points})
+                      </h4>
+                    </div>
+                    <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
+                      {prediction.map((predict, index) => (
+                        <div key={index} className='px-1 text-sm text-nowrap items-center'>
+                          <p>{`${predict.result}:`}</p>
+                          <p key={index} className='text-xs text-nowrap'>
+                            {predict.hits.join(', ')}
+                          </p>
+                        </div>))}
+                    </div>
+                  </div>))}
               </EventCard>}
               {/* END Weekly Events */}
               {events.advElim && <EventCard eventName='Advantage Souvenir' events={events.advElim} points={rules.advElim} />}

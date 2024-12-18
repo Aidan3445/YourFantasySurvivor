@@ -58,14 +58,13 @@ export default function compileScores(
   }
 
   // alt events
-  for (const { name: castaway, points, episode, eventName } of altEvents.castawayEvents) {
+  for (const { name: castaway, points, episode } of altEvents.castawayEvents) {
     const member = findMember(memberCastaways, castaway, episode);
     if (!member) continue;
 
     scores[member] ??= [];
     const memberPoints = scores[member];
     memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
-    console.log('added', points, 'points to', member, '/', castaway, 'for', eventName, 'in episode', episode);
   }
 
 

@@ -9,7 +9,7 @@ import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { castaways } from '~/server/db/schema/castaways';
 import { customCastaways, customEventRules, customEvents, customMembers, customTribes } from '~/server/db/schema/customEvents';
 import { tribes } from '~/server/db/schema/tribes';
-import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEventRuleType, weeklyEvents, type WeeklyEventTiming, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
+import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEventRuleType, weeklyEvents, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
 import { seasonCastawayResults, seasonCastaways, seasonEventRules, type SeasonEventRuleType, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
 import { auth } from '@clerk/nextjs/server';
 
@@ -132,7 +132,6 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
 
 export type PredictionResult = (
   EventResult & {
-    timing: WeeklyEventTiming,
     result: string,
   }
 );
@@ -140,15 +139,12 @@ export type PredictionResult = (
 export type Vote = (
   EventResult & {
     voter: string,
-    timing: WeeklyEventTiming,
-    id: number,
   }
 );
 
 export type VoteResult = (
   EventResult & {
     voters: string[],
-    id: number,
   }
 );
 
@@ -364,13 +360,14 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
 export function tallyTheVotes(votes: Vote[]) {
   const tallied = votes.reduce((collection, vote) => {
     collection[vote.episode] ??= {};
-    collection[vote.episode]![vote.eventName] ??= [{ ...vote, name: vote.name, points: vote.points, voters: [] }];
+    collection[vote.episode]![vote.eventName] ??= [{ ...vote, voters: [] }];
     const voteIndex = collection[vote.episode]![vote.eventName]!.findIndex((v) => v.name === vote.name);
-    if (voteIndex === -1) // if there is no vote for this name, add it
+    if (voteIndex === -1) { // if there is no vote for this name, add it
       collection[vote.episode]![vote.eventName]!.push(
         { ...vote, name: vote.name, points: vote.points, voters: [vote.voter] });
-    else // if there is a vote for this name, add the voter
+    } else { // if there is a vote for this name, add the voter
       collection[vote.episode]![vote.eventName]![voteIndex]!.voters.push(vote.voter);
+    }
 
     // ensure sorted order of votes by vote count so that the most voted for is first
     collection[vote.episode]![vote.eventName]!.sort((a, b) => b.voters.length - a.voters.length);
@@ -637,7 +634,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode));
   // only if the next episode is available
   // and the current episode is done airing
-  if (!nextEpisode && currentEpisodeEnd < new Date()) {
+  if (!nextEpisode) {
     return {
       weekly: { votes, predictions: [] },
       season: [],
@@ -647,7 +644,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     };
   }
 
-  const predictionEpisode = nextEpisode ?? currentEpisode;
+  const predictionEpisode = nextEpisode;
 
   // get predictions for the next episode
   const predictions = await db

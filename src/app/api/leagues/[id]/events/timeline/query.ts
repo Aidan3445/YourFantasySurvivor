@@ -5,7 +5,7 @@ import { castaways } from '~/server/db/schema/castaways';
 import { baseEventCastaways, baseEvents, baseEventTribes, episodes, type EventName } from '~/server/db/schema/episodes';
 import { leagues } from '~/server/db/schema/leagues';
 import { tribes } from '~/server/db/schema/tribes';
-import { getWeeklyEventsRaw, leagueMemberAuth, tallyTheVotes } from '../../score/query';
+import { getWeeklyEventsRaw, leagueMemberAuth, type PredictionResult, tallyTheVotes } from '../../score/query';
 //import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
 //import { leagueMembers } from '~/server/db/schema/members';
 
@@ -44,11 +44,31 @@ export async function getBaseEventsTimeline(leagueId: number) {
     }, {} as Record<string, Record<EventName, typeof events>>));
 }
 
+type TimelinePredictionResult = PredictionResult & {
+  hits: string[];
+};
+
 export async function getWeeklyEventsTimeline(leagueId: number) {
   const events = await getWeeklyEventsRaw(leagueId);
 
-  const votes = [...events.castawayVotes, ...events.tribeVotes, ...events.memberVotes];
-  const tallied = tallyTheVotes(votes);
+  const rawVotes = [...events.castawayVotes, ...events.tribeVotes, ...events.memberVotes];
+  const votes = tallyTheVotes(rawVotes);
 
-  return { votes: tallied, predictions: events.predictions };
+
+  const predictions = events.predictions.reduce((timeline, pred) => {
+    timeline[pred.episode] ??= {};
+    timeline[pred.episode]![pred.eventName] ??= [{ ...pred, hits: [] }];
+    const predIndex = timeline[pred.episode]![pred.eventName]!.findIndex((p) => p.result === pred.result);
+    if (predIndex === -1) {
+      timeline[pred.episode]![pred.eventName]!.push({ ...pred, hits: [pred.name] });
+    } else {
+      timeline[pred.episode]![pred.eventName]![predIndex]!.hits.push(pred.name);
+    }
+
+    return timeline;
+    //           episode      event name
+  }, {} as Record<number, Record<string, [TimelinePredictionResult]>>);
+
+  console.log(predictions);
+  return { votes, predictions };
 }
