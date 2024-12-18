@@ -42,6 +42,8 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
     resolver: zodResolver(formSchema),
   });
 
+  //console.log(events);
+
   const { toast } = useToast();
   const router = useRouter();
   const [alertOpen, setAlertOpen] = useState(

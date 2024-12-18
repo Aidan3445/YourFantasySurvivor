@@ -215,6 +215,8 @@ export async function submitVotesPredicts(
   const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
+  console.log(data);
+
   const memberId = await db
     .select({ id: leagueMembers.id })
     .from(leagueMembers)
@@ -255,6 +257,10 @@ export async function submitVotesPredicts(
         return db
           .insert(weeklyCastaways)
           .values({ event: event.id, reference: castaway })
+          .onConflictDoUpdate({
+            target: weeklyCastaways.event,
+            set: { reference: castaway },
+          })
           .returning({ id: weeklyCastaways.id });
       }),
       ...Object.entries(data.weeklyVotes.tribe).map(([ruleId, tribe]) => {
@@ -263,6 +269,10 @@ export async function submitVotesPredicts(
         return db
           .insert(weeklyTribes)
           .values({ event: event.id, reference: tribe })
+          .onConflictDoUpdate({
+            target: weeklyTribes.event,
+            set: { reference: tribe },
+          })
           .returning({ id: weeklyTribes.id });
       }),
       ...Object.entries(data.weeklyVotes.member).map(([ruleId, member]) => {
@@ -271,6 +281,10 @@ export async function submitVotesPredicts(
         return db
           .insert(weeklyMembers)
           .values({ event: event.id, reference: member })
+          .onConflictDoUpdate({
+            target: weeklyMembers.event,
+            set: { reference: member },
+          })
           .returning({ id: weeklyMembers.id });
       }),
     ]);
@@ -323,6 +337,10 @@ export async function submitVotesPredicts(
       return db
         .insert(weeklyCastaways)
         .values({ event: event.id, reference: castaway })
+        .onConflictDoUpdate({
+          target: weeklyCastaways.event,
+          set: { reference: castaway },
+        })
         .returning({ id: weeklyCastaways.id });
     }),
     ...Object.entries(data.weeklyPredicts.tribe).map(([ruleId, tribe]) => {
@@ -331,6 +349,10 @@ export async function submitVotesPredicts(
       return db
         .insert(weeklyTribes)
         .values({ event: event.id, reference: tribe })
+        .onConflictDoUpdate({
+          target: weeklyTribes.event,
+          set: { reference: tribe },
+        })
         .returning({ id: weeklyTribes.id });
     }),
     ...Object.entries(data.weeklyPredicts.member).map(([ruleId, member]) => {
@@ -339,6 +361,10 @@ export async function submitVotesPredicts(
       return db
         .insert(weeklyMembers)
         .values({ event: event.id, reference: member })
+        .onConflictDoUpdate({
+          target: weeklyMembers.event,
+          set: { reference: member },
+        })
         .returning({ id: weeklyMembers.id });
     }),
     ...Object.entries(data.seasonPredicts.castaway).map(([ruleId, castaway]) => {
@@ -347,6 +373,10 @@ export async function submitVotesPredicts(
       return db
         .insert(seasonCastaways)
         .values({ event: event.id, reference: castaway })
+        .onConflictDoUpdate({
+          target: seasonCastaways.event,
+          set: { reference: castaway },
+        })
         .returning({ id: seasonCastaways.id });
     }),
     ...Object.entries(data.seasonPredicts.tribe).map(([ruleId, tribe]) => {
@@ -355,6 +385,10 @@ export async function submitVotesPredicts(
       return db
         .insert(seasonTribes)
         .values({ event: event.id, reference: tribe })
+        .onConflictDoUpdate({
+          target: seasonTribes.event,
+          set: { reference: tribe },
+        })
         .returning({ id: seasonTribes.id });
     }),
     ...Object.entries(data.seasonPredicts.member).map(([ruleId, member]) => {
@@ -363,6 +397,10 @@ export async function submitVotesPredicts(
       return db
         .insert(seasonMembers)
         .values({ event: event.id, reference: member })
+        .onConflictDoUpdate({
+          target: seasonMembers.event,
+          set: { reference: member },
+        })
         .returning({ id: seasonMembers.id });
     }),
   ])));

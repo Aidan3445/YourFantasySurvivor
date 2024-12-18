@@ -69,6 +69,5 @@ export async function getWeeklyEventsTimeline(leagueId: number) {
     //           episode      event name
   }, {} as Record<number, Record<string, [TimelinePredictionResult]>>);
 
-  console.log(predictions);
   return { votes, predictions };
 }

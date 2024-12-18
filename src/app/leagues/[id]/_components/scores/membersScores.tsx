@@ -87,7 +87,7 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                       <ColorRow color={sColor} className='flex gap-2 py-1 text-xs' >
                         <h3 className='flex justify-between w-full' style={{ color: csColor }}>{currentPick}
                           <span className='flex gap-0.5 ml-2 items-center'>
-                            {details.castaways.find((c) => c.more.shortName === currentPick)?.tribes.slice(sColor === '#AAAAAA' ? 0 : 1)
+                            {details.castaways.find((c) => c.more.shortName === currentPick)?.tribes
                               .map((t) => (
                                 <div key={t.name} className='inline-block relative'>
                                   <Circle className='relative' strokeWidth={3} stroke='black' size={14} color={t.color} fill={t.color} />
