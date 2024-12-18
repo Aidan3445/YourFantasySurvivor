@@ -224,3 +224,44 @@ export function MembersSkeleton() {
     </table>
   );
 }
+
+export function CastawaysSkeleton() {
+  return (
+    <table className='space-y-2 space-x-1 h-min'>
+      <thead>
+        <tr>
+          <th>
+            <ColorRow key='header-pl' color={'white'} className='flex col-start-1 justify-center py-1 text-xs'>
+              <h3>Place</h3>
+            </ColorRow>
+          </th>
+          <th>
+            <ColorRow key='header-po' color={'white'} className='flex col-start-2 justify-center py-1 text-xs'>
+              <h3>Points</h3>
+            </ColorRow>
+          </th>
+          <th>
+            <ColorRow key='header-d' color={'white'} className='flex col-start-4 justify-center py-1 text-xs'>
+              <h3>Castaway</h3>
+            </ColorRow>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: 9 }).map((_, index) => (
+          <tr key={index}>
+            <td>
+              <Skeleton className='min-w-8 h-[26px]' />
+            </td>
+            <td>
+              <Skeleton className='min-w-8 h-[26px]' />
+            </td>
+            <td>
+              <Skeleton className='min-w-24 h-[26px]' />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}

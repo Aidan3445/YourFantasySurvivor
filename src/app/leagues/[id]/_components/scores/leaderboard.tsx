@@ -1,5 +1,5 @@
 import { type Member } from '~/server/db/schema/members';
-import Members, { MembersSkeleton } from './membersScores';
+import Members, { CastawaysSkeleton, MembersSkeleton } from './membersScores';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
 import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
@@ -86,6 +86,10 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
       <TabsContent value='castaways'>
         <h2>Castaways scoreboard</h2>
         <p>Coming soon</p>
+        <span className='flex flex-wrap gap-4 justify-center mt-2 w-full'>
+          <CastawaysSkeleton />
+          <Skeleton className='w-96 h-[280px]' />
+        </span>
       </TabsContent>
     </Tabs>
   );
