@@ -40,7 +40,7 @@ export default async function DraftInfo({ league, ownerLoggedIn, className }: Le
                 className='flex flex-col gap-1 w-full'
                 leagueId={league.id}
                 orderLocked={orderLocked}
-                predictions={predictions}
+                //predictions={predictions}
                 {...settings} />
             </TabsContent>
             <TabsContent value='predict'>

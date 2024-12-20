@@ -3,20 +3,23 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components
 import { getBaseEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
 import { EventCard } from './eventCard';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
-import { getRules } from '~/app/api/leagues/[id]/events/query';
+import { getRules, getSeasonPredictions } from '~/app/api/leagues/[id]/events/query';
 
 interface TimelineProps {
   leagueId: number;
 }
 
 export async function Timeline({ leagueId }: TimelineProps) {
-  const [baseEventsTimeline, weeklyEventsTimeline, rules] = await Promise.all([
+  const [baseEventsTimeline, weeklyEventsTimeline, seasonPredictions, rules] = await Promise.all([
     getBaseEventsTimeline(leagueId),
     getWeeklyEventsTimeline(leagueId),
+    getSeasonPredictions(leagueId),
     getRules(leagueId),
   ]);
 
   const { votes, predictions } = weeklyEventsTimeline;
+
+
 
   return (
     <section className='flex flex-col gap-1 pt-2 w-svw'>
@@ -26,31 +29,6 @@ export async function Timeline({ leagueId }: TimelineProps) {
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
             <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll pad-scroll'>
-              {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} points={rules.soleSurvivor} />}
-              {events.finalists && <EventCard eventName='Finalists' events={events.finalists} points={rules.finalists} />}
-              {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} points={rules.fireWin} />}
-              {events.elim && <EventCard eventName='Voted Out' events={events.elim}>
-                {events.elim.map((event, index) => (
-                  <HoverCard key={index}>
-                    <HoverCardTrigger>
-                      <h3 className='flex justify-center items-center px-1 text-base cursor-help text-nowrap'>
-                        {event.reference.castaway ?? event.reference.tribe ?? 'NOT FOUND'} - {event.keywords.length}
-                        <Flame className='ml-0.5 w-4 h-4' />
-                      </h3>
-                    </HoverCardTrigger>
-                    <HoverCardContent className='py-0 px-1 w-min'>
-                      <article className='flex flex-col gap-1'>
-                        <h3 className='text-lg font-semibold'>Votes</h3>
-                        {event.keywords.map((vote, index) => (
-                          <p key={index} className='px-1 text-sm text-nowrap'>{vote}</p>
-                        ))}
-                      </article>
-                    </HoverCardContent>
-                  </HoverCard>
-                ))}
-              </EventCard>}
-              {events.noVoteExit && <EventCard eventName='Left The Game' events={events.noVoteExit} />}
-              {/* Weekly Events */}
               {votes[parseInt(episode)] && <EventCard eventName='League Votes'>
                 {Object.entries(votes[parseInt(episode)]!).map(([eventName, votes]) => {
                   const maxVoteCount = votes[0].voters.length;
@@ -92,7 +70,45 @@ export async function Timeline({ leagueId }: TimelineProps) {
                     </div>
                   </div>))}
               </EventCard>}
-              {/* END Weekly Events */}
+              {/*seasonPredictions.length > 0 && <EventCard eventName='Season Predictions'>
+                {seasonPredictionResults.map((prediction) => (
+                  <div key={prediction.id} className='px-1 pt-0.5'>
+                    <div className='sticky top-0 rounded-b-md bg-b4'>
+                      <h4 className='px-2 mr-1 text-xs font-semibold rounded-md bg-b3 text-nowrap'>
+                        {prediction.name} ({prediction.points > 0 ? '+' : ''}{prediction.points})
+                      </h4>
+                    </div>
+                    <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
+                      <p className='px-1 text-sm text-nowrap'>
+                        {prediction.result.castaway ?? prediction.result.tribe ?? prediction.result.member}
+                      </p>
+                    </div>
+                  </div>))}
+              </EventCard>*/}
+              {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} points={rules.soleSurvivor} />}
+              {events.finalists && <EventCard eventName='Finalists' events={events.finalists} points={rules.finalists} />}
+              {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} points={rules.fireWin} />}
+              {events.elim && <EventCard eventName='Voted Out' events={events.elim}>
+                {events.elim.map((event, index) => (
+                  <HoverCard key={index}>
+                    <HoverCardTrigger>
+                      <h3 className='flex justify-center items-center px-1 text-base cursor-help text-nowrap'>
+                        {event.reference.castaway ?? event.reference.tribe ?? 'NOT FOUND'} - {event.keywords.length}
+                        <Flame className='ml-0.5 w-4 h-4' />
+                      </h3>
+                    </HoverCardTrigger>
+                    <HoverCardContent className='py-0 px-1 w-min'>
+                      <article className='flex flex-col gap-1'>
+                        <h3 className='text-lg font-semibold'>Votes</h3>
+                        {event.keywords.map((vote, index) => (
+                          <p key={index} className='px-1 text-sm text-nowrap'>{vote}</p>
+                        ))}
+                      </article>
+                    </HoverCardContent>
+                  </HoverCard>
+                ))}
+              </EventCard>}
+              {events.noVoteExit && <EventCard eventName='Left The Game' events={events.noVoteExit} />}
               {events.advElim && <EventCard eventName='Advantage Souvenir' events={events.advElim} points={rules.advElim} />}
               {events.advPlay && <EventCard eventName='Advantage Played' events={events.advPlay} points={rules.advPlay} />}
               {events.badAdvPlay && <EventCard eventName='Advantage Misplayed' events={events.badAdvPlay} points={rules.badAdvPlay} />}

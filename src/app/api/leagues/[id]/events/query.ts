@@ -1,6 +1,6 @@
 import 'server-only';
 import { db } from '~/server/db';
-import { aliasedTable, eq } from 'drizzle-orm';
+import { aliasedTable, and, asc, desc, eq } from 'drizzle-orm';
 import { baseEventRules, leagues } from '~/server/db/schema/leagues';
 import { auth } from '@clerk/nextjs/server';
 import { customEventRules } from '~/server/db/schema/customEvents';
@@ -12,6 +12,8 @@ import { tribes } from '~/server/db/schema/tribes';
 import { seasons } from '~/server/db/schema/seasons';
 import { getCastaway } from '~/app/api/seasons/[name]/castaways/[castaway]/query';
 import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
+import { episodes } from '~/server/db/schema/episodes';
+import { EventResult } from '../score/query';
 
 export async function getRules(leagueId: number) {
   // get event rules
@@ -82,75 +84,164 @@ export async function getRules(leagueId: number) {
   return { ...base[0]!, custom, weekly, season };
 }
 
-const members = aliasedTable(leagueMembers, 'member');
 const resultCastaways = aliasedTable(castaways, 'resultCastaway');
 const resultTribes = aliasedTable(tribes, 'resultTribe');
 const resultMembers = aliasedTable(leagueMembers, 'resultMember');
+const pickMembers = aliasedTable(leagueMembers, 'pickMember');
+
 
 export async function getSeasonPredictions(leagueId: number) {
-  const predictions = await db
-    .select({
-      id: seasonEventRules.id,
-      name: seasonEventRules.name,
-      description: seasonEventRules.description,
+  await db.select({
+    episode: episodes.number,
+    points: seasonEventRules.points,
+    eventName: seasonEventRules.name,
+    description: seasonEventRules.description,
+    referenceType: seasonEventRules.referenceType,
+    timing: seasonEventRules.timing,
+    name: leagueMembers.displayName,
+    pick: {
+      name: castaways.name,
+      color: leagueMembers.color,
+    },
+    result: {
+      name: resultCastaways.name,
+      color: leagueMembers.color,
+    },
+
+    season: seasons.name,
+  })
+    .from(seasonEvents)
+    .innerJoin(leagueMembers, eq(leagueMembers.id, seasonEvents.member))
+    .innerJoin(seasonEventRules, eq(seasonEventRules.id, seasonEvents.rule))
+    .innerJoin(leagues, eq(leagues.id, seasonEventRules.league))
+    .innerJoin(seasons, eq(seasons.id, leagues.season))
+    .innerJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
+    .innerJoin(castaways, eq(castaways.id, seasonCastaways.reference))
+    .leftJoin(seasonCastawayResults, eq(seasonCastawayResults.rule, seasonEventRules.id))
+    .leftJoin(episodes, eq(episodes.id, seasonCastawayResults.episode))
+    .leftJoin(resultCastaways, eq(resultCastaways.id, seasonCastawayResults.result))
+    .where(and(
+      eq(leagues.id, leagueId),
+      eq(seasonEventRules.referenceType, 'castaway')));
+
+
+  const predictions = await Promise.all([
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
       points: seasonEventRules.points,
+      eventName: seasonEventRules.name,
+      description: seasonEventRules.description,
       referenceType: seasonEventRules.referenceType,
       timing: seasonEventRules.timing,
-      pick: {
-        castaway: castaways.name,
-        tribe: tribes.name,
-        member: leagueMembers.displayName,
-        color: leagueMembers.color
-      },
-      member: members.displayName,
-      premiere: seasons.premierDate,
+      pick: castaways.name,
+      result: resultCastaways.name,
+
       season: seasons.name,
-      result: {
-        castaway: resultCastaways.name,
-        tribe: resultTribes.name,
-        member: resultMembers.displayName,
-        color: resultMembers.color
-      }
+      pickColor: leagueMembers.color,
+      resultColor: leagueMembers.color,
     })
-    .from(seasonEventRules)
-    .innerJoin(leagues, eq(seasonEventRules.league, leagues.id))
-    .innerJoin(seasons, eq(leagues.season, seasons.id))
-    .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
-    .leftJoin(members, eq(members.id, seasonEvents.member))
-    .leftJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
-    .leftJoin(castaways, eq(seasonCastaways.reference, castaways.id))
-    .leftJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
-    .leftJoin(tribes, eq(seasonTribes.reference, tribes.id))
-    .leftJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
-    .leftJoin(leagueMembers, eq(seasonMembers.reference, leagueMembers.id))
-    .leftJoin(seasonCastawayResults, eq(seasonCastawayResults.rule, seasonEventRules.id))
-    .leftJoin(resultCastaways, eq(seasonCastawayResults.result, resultCastaways.id))
-    .leftJoin(seasonTribeResults, eq(seasonTribeResults.rule, seasonEventRules.id))
-    .leftJoin(resultTribes, eq(seasonTribeResults.result, resultTribes.id))
-    .leftJoin(seasonMemberResults, eq(seasonMemberResults.rule, seasonEventRules.id))
-    .leftJoin(resultMembers, eq(seasonMemberResults.result, resultMembers.id))
-    .where(eq(seasonEventRules.league, leagueId))
-    .then((res) => res
-      .some((prediction) =>
-        new Date(`${prediction.premiere} -4:00`) < new Date()) ? res : []);
+      .from(seasonEvents)
+      .innerJoin(leagueMembers, eq(leagueMembers.id, seasonEvents.member))
+      .innerJoin(seasonEventRules, eq(seasonEventRules.id, seasonEvents.rule))
+      .innerJoin(leagues, eq(leagues.id, seasonEventRules.league))
+      .innerJoin(seasons, eq(seasons.id, leagues.season))
+      .innerJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
+      .innerJoin(castaways, eq(castaways.id, seasonCastaways.reference))
+      .leftJoin(seasonCastawayResults, eq(seasonCastawayResults.rule, seasonEventRules.id))
+      .leftJoin(episodes, eq(episodes.id, seasonCastawayResults.episode))
+      .leftJoin(resultCastaways, eq(resultCastaways.id, seasonCastawayResults.result))
+      .where(and(
+        eq(leagues.id, leagueId),
+        eq(seasonEventRules.referenceType, 'castaway')))
+      .orderBy(desc(seasonEventRules.timing)),
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: seasonEventRules.points,
+      eventName: seasonEventRules.name,
+      description: seasonEventRules.description,
+      referenceType: seasonEventRules.referenceType,
+      timing: seasonEventRules.timing,
+      pick: tribes.name,
+      result: resultTribes.name,
 
-  // get color for each prediction
-  return await Promise.all(predictions.map(async (p) => {
-    if (p.pick.castaway) p.pick.color = await getCastaway(p.season, p.pick.castaway)
-      .then((c) => c.details.startingTribe.color);
-    else if (p.pick.tribe) p.pick.color = (await getTribes(p.season))
-      .find((t) => t.name === p.pick.tribe)!.color;
+      season: seasons.name,
+      pickColor: leagueMembers.color,
+      resultColor: leagueMembers.color,
+    })
+      .from(seasonEvents)
+      .innerJoin(leagueMembers, eq(leagueMembers.id, seasonEvents.member))
+      .innerJoin(seasonEventRules, eq(seasonEventRules.id, seasonEvents.rule))
+      .innerJoin(leagues, eq(leagues.id, seasonEventRules.league))
+      .innerJoin(seasons, eq(seasons.id, leagues.season))
+      .innerJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
+      .innerJoin(tribes, eq(tribes.id, seasonTribes.reference))
+      .leftJoin(seasonTribeResults, eq(seasonTribeResults.rule, seasonEventRules.id))
+      .leftJoin(episodes, eq(episodes.id, seasonTribeResults.episode))
+      .leftJoin(resultTribes, eq(resultTribes.id, seasonTribeResults.result))
+      .where(and(
+        eq(leagues.id, leagueId),
+        eq(seasonEventRules.referenceType, 'tribe')))
+      .orderBy(desc(seasonEventRules.timing)),
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: seasonEventRules.points,
+      eventName: seasonEventRules.name,
+      description: seasonEventRules.description,
+      referenceType: seasonEventRules.referenceType,
+      timing: seasonEventRules.timing,
+      pick: pickMembers.displayName,
+      result: resultMembers.displayName,
 
-    if (Object.values(p.result).some((r) => r)) {
-      if (p.result.castaway) p.result.color = await getCastaway(p.season, p.result.castaway)
-        .then((c) => c.details.startingTribe.color);
-      else if (p.result.tribe) p.result.color = (await getTribes(p.season))
-        .find((t) => t.name === p.result.tribe)!.color;
-    } else if (!p.result.member) {
-      p.result.member = 'TBD';
-      p.result.color = '#aaaaaa';
-    }
+      season: seasons.name,
+      pickColor: pickMembers.color,
+      resultColor: resultMembers.color,
+    })
+      .from(seasonEvents)
+      .innerJoin(leagueMembers, eq(leagueMembers.id, seasonEvents.member))
+      .innerJoin(seasonEventRules, eq(seasonEventRules.id, seasonEvents.rule))
+      .innerJoin(leagues, eq(leagues.id, seasonEventRules.league))
+      .innerJoin(seasons, eq(seasons.id, leagues.season))
+      .innerJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
+      .innerJoin(pickMembers, eq(pickMembers.id, seasonMembers.reference))
+      .leftJoin(seasonMemberResults, eq(seasonMemberResults.rule, seasonEventRules.id))
+      .leftJoin(episodes, eq(episodes.id, seasonMemberResults.episode))
+      .leftJoin(resultMembers, eq(resultMembers.id, seasonMemberResults.result))
+      .where(and(
+        eq(leagues.id, leagueId),
+        eq(seasonEventRules.referenceType, 'member')))
+      .orderBy(desc(seasonEventRules.timing))
+  ]);
 
-    return p;
-  }));
+  console.log(predictions[0].filter((p) => p.name === 'Aidan'));
+
+  /*/ get color for each prediction
+  return await Promise.all([
+    ...predictions[0].map(async (p) => {
+      const castaway = await getCastaway
+
+      await Promise.all(predictions.map(async (p) => {
+        if (p.) p.pick.color = await getCastaway(p.season, p.pick.castaway)
+          .then((c) => c.details.startingTribe.color);
+        else if (p.pick.tribe) p.pick.color = (await getTribes(p.season))
+          .find((t) => t.name === p.pick.tribe)!.color;
+    
+        if (Object.values(p.result).some((r) => r)) {
+          if (p.result.castaway) {
+            p.result.color = await getCastaway(p.season, p.result.castaway).then((c) => c.details.startingTribe.color);
+            p.result.episode = p.result.episodeC;
+          } else if (p.result.tribe) {
+            p.result.color = (await getTribes(p.season)).find((t) => t.name === p.result.tribe)!.color;
+            p.result.episode = p.result.episodeT;
+          }
+        } else if (!p.result.member) {
+          p.result.member = 'TBD';
+          p.result.color = '#aaaaaa';
+          p.result.episode = null;
+        }
+    
+        return p;
+      }));*/
 }

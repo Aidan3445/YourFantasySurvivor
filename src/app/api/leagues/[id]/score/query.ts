@@ -177,53 +177,52 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
   // * votes are mapped to the castaway or tribe and them to members in scoring
   const events = await Promise.all([
     // predictions
-    db
-      .select({
-        name: leagueMembers.displayName,
-        episode: episodes.number,
-        points: weeklyEventRules.points,
-        eventName: weeklyEventRules.name,
-        description: weeklyEventRules.description,
-        referenceType: weeklyEventRules.referenceType,
-        timing: weeklyEventRules.timing,
-        result: castaways.name,
-      })
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: weeklyEventRules.points,
+      eventName: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      referenceType: weeklyEventRules.referenceType,
+      timing: weeklyEventRules.timing,
+      result: castaways.name,
+    })
       .from(weeklyCastawayResults)
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyCastawayResults.rule))
+      .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
       .innerJoin(weeklyEvents, eq(weeklyEvents.rule, weeklyEventRules.id))
       .innerJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyEvents.member))
-      .innerJoin(episodes, eq(episodes.id, weeklyCastawayResults.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(episodes, and(
+        eq(episodes.id, weeklyCastawayResults.episode),
+        eq(episodes.id, weeklyEvents.episode)))
       .innerJoin(castaways, eq(castaways.id, weeklyCastawayResults.result))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'predict'),
         eq(weeklyEventRules.referenceType, 'castaway'),
-        eq(weeklyCastawayResults.episode, weeklyEvents.episode),
         eq(weeklyCastawayResults.result, weeklyCastaways.reference)))
       .orderBy(desc(episodes.number))
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
-    db
-      .select({
-        name: leagueMembers.displayName,
-        episode: episodes.number,
-        points: weeklyEventRules.points,
-        eventName: weeklyEventRules.name,
-        description: weeklyEventRules.description,
-        referenceType: weeklyEventRules.referenceType,
-        timing: weeklyEventRules.timing,
-        result: tribes.name,
-      })
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: weeklyEventRules.points,
+      eventName: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      referenceType: weeklyEventRules.referenceType,
+      timing: weeklyEventRules.timing,
+      result: tribes.name,
+    })
       .from(weeklyTribeResults)
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyTribeResults.rule))
+      .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
       .innerJoin(weeklyEvents, eq(weeklyEvents.rule, weeklyEventRules.id))
       .innerJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyEvents.member))
-      .innerJoin(episodes, eq(episodes.id, weeklyTribeResults.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(episodes, and(
+        eq(episodes.id, weeklyTribeResults.episode),
+        eq(episodes.id, weeklyEvents.episode)))
       .innerJoin(tribes, eq(tribes.id, weeklyTribeResults.result))
       .where(and(
         eq(leagues.id, leagueId),
@@ -233,25 +232,25 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
         eq(weeklyTribeResults.result, weeklyTribes.reference)))
       .orderBy(desc(episodes.number))
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
-    db
-      .select({
-        name: leagueMembers.displayName,
-        episode: episodes.number,
-        points: weeklyEventRules.points,
-        eventName: weeklyEventRules.name,
-        description: weeklyEventRules.description,
-        referenceType: weeklyEventRules.referenceType,
-        timing: weeklyEventRules.timing,
-        result: leagueMembers.displayName,
-      })
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: weeklyEventRules.points,
+      eventName: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      referenceType: weeklyEventRules.referenceType,
+      timing: weeklyEventRules.timing,
+      result: leagueMembers.displayName,
+    })
       .from(weeklyMemberResults)
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyMemberResults.rule))
+      .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
       .innerJoin(weeklyEvents, eq(weeklyEvents.rule, weeklyEventRules.id))
       .innerJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyEvents.member))
-      .innerJoin(episodes, eq(episodes.id, weeklyMemberResults.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(episodes, and(
+        eq(episodes.id, weeklyMemberResults.episode),
+        eq(episodes.id, weeklyEvents.episode)))
       .innerJoin(tribes, eq(tribes.id, weeklyMemberResults.result))
       .where(and(
         eq(leagues.id, leagueId),
@@ -262,27 +261,25 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       .orderBy(desc(episodes.number))
       .then((res) => filterWeeklyEventsTiming(res, currentEpisode, mergeEpisode)),
     // votes
-    db
-      .select({
-        name: castaways.shortName,
-        displayName: castaways.name,
-        voter: voter.displayName,
-        episode: episodes.number,
-        points: weeklyEventRules.points,
-        eventName: weeklyEventRules.name,
-        description: weeklyEventRules.description,
-        referenceType: weeklyEventRules.referenceType,
-        timing: weeklyEventRules.timing,
-        id: weeklyEventRules.id,
-      })
+    db.select({
+      name: castaways.shortName,
+      displayName: castaways.name,
+      voter: voter.displayName,
+      episode: episodes.number,
+      points: weeklyEventRules.points,
+      eventName: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      referenceType: weeklyEventRules.referenceType,
+      timing: weeklyEventRules.timing,
+      id: weeklyEventRules.id,
+    })
       .from(weeklyCastaways)
       .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyCastaways.event))
       .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
+      .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
       .innerJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
       .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
@@ -290,26 +287,24 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
         lt(episodes.number, currentEpisode?.number ?? -1)))
       .groupBy(castaways.shortName, castaways.name, voter.displayName, episodes.number, weeklyEventRules.id)
       .orderBy(desc(episodes.number)),
-    db
-      .select({
-        name: tribes.name,
-        voter: voter.displayName,
-        episode: episodes.number,
-        points: weeklyEventRules.points,
-        eventName: weeklyEventRules.name,
-        description: weeklyEventRules.description,
-        referenceType: weeklyEventRules.referenceType,
-        timing: weeklyEventRules.timing,
-        id: weeklyEventRules.id,
-      })
+    db.select({
+      name: tribes.name,
+      voter: voter.displayName,
+      episode: episodes.number,
+      points: weeklyEventRules.points,
+      eventName: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      referenceType: weeklyEventRules.referenceType,
+      timing: weeklyEventRules.timing,
+      id: weeklyEventRules.id,
+    })
       .from(weeklyTribes)
       .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyTribes.event))
       .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
+      .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
       .innerJoin(tribes, eq(tribes.id, weeklyTribes.reference))
       .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
@@ -317,26 +312,24 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
         lt(episodes.number, currentEpisode?.number ?? -1)))
       .groupBy(tribes.name, voter.displayName, episodes.number, weeklyEventRules.id)
       .orderBy(desc(episodes.number)),
-    db
-      .select({
-        name: leagueMembers.displayName,
-        voter: voter.displayName,
-        episode: episodes.number,
-        points: weeklyEventRules.points,
-        eventName: weeklyEventRules.name,
-        description: weeklyEventRules.description,
-        referenceType: weeklyEventRules.referenceType,
-        timing: weeklyEventRules.timing,
-        id: weeklyEventRules.id,
-      })
+    db.select({
+      name: leagueMembers.displayName,
+      voter: voter.displayName,
+      episode: episodes.number,
+      points: weeklyEventRules.points,
+      eventName: weeklyEventRules.name,
+      description: weeklyEventRules.description,
+      referenceType: weeklyEventRules.referenceType,
+      timing: weeklyEventRules.timing,
+      id: weeklyEventRules.id,
+    })
       .from(weeklyMembers)
       .innerJoin(weeklyEvents, eq(weeklyEvents.id, weeklyMembers.event))
       .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
+      .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
       .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
