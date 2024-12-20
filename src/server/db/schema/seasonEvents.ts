@@ -8,7 +8,8 @@ import { z } from 'zod';
 import { description, eventName } from './customEvents';
 import { episodes } from './episodes';
 
-export const eventTiming = pgEnum('event_season_timing', ['premiere', 'merge', 'finale']);
+const seasonEventTiming = pgEnum('event_season_timing', ['premiere', 'merge', 'finale']);
+export type SeasonEventTiming = (typeof seasonEventTiming.enumValues)[number];
 
 export const seasonEventRules = createTable(
   'event_season_rule',
@@ -23,7 +24,7 @@ export const seasonEventRules = createTable(
     description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
     referenceType: reference('reference_type').notNull(),
-    timing: eventTiming('timing').notNull(),
+    timing: seasonEventTiming('timing').notNull(),
   }
 );
 
@@ -37,7 +38,7 @@ export const SeasonEventRule = z.object({
   referenceType: z.enum(reference.enumValues),
   // nullable internally but not in the database
   // the database will enforce a value
-  timing: z.enum(eventTiming.enumValues)
+  timing: z.enum(seasonEventTiming.enumValues)
 });/*.refine((rule) => {
   const refAdmin = rule.adminEvent !== null;
   const refBase = rule.baseEvent !== null;

@@ -76,6 +76,9 @@ export async function getWeeklyEventsTimeline(leagueId: number) {
 export async function getSeasonEventsTimeline(leagueId: number) {
   const events = await getSeasonPredictions(leagueId);
 
-  return events;
+  return events.reduce((timeline, event) => {
+    return timeline;
+    //           episode      event name
+  }, {} as Record<number, Record<string, [TimelinePredictionResult]>>);
 
 }

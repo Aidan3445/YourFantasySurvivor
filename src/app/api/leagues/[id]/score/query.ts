@@ -412,15 +412,14 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
 
   // season events are all predictions and get mapped directly to members
   const events = await Promise.all([
-    db
-      .select({
-        name: leagueMembers.displayName,
-        episode: episodes.number,
-        points: seasonEventRules.points,
-        eventName: seasonEventRules.name,
-        description: seasonEventRules.description,
-        referenceType: seasonEventRules.referenceType,
-      })
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: seasonEventRules.points,
+      eventName: seasonEventRules.name,
+      description: seasonEventRules.description,
+      referenceType: seasonEventRules.referenceType,
+    })
       .from(seasonCastawayResults)
       .innerJoin(seasonEventRules, eq(seasonEventRules.id, seasonCastawayResults.rule))
       .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
@@ -434,15 +433,14 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
         eq(seasonEventRules.referenceType, 'castaway'),
         eq(seasonCastawayResults.result, seasonCastaways.reference)))
       .orderBy(desc(episodes.number)),
-    db
-      .select({
-        name: leagueMembers.displayName,
-        episode: episodes.number,
-        points: seasonEventRules.points,
-        eventName: seasonEventRules.name,
-        description: seasonEventRules.description,
-        referenceType: seasonEventRules.referenceType,
-      })
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: seasonEventRules.points,
+      eventName: seasonEventRules.name,
+      description: seasonEventRules.description,
+      referenceType: seasonEventRules.referenceType,
+    })
       .from(seasonTribeResults)
       .innerJoin(seasonEventRules, eq(seasonEventRules.id, seasonTribeResults.rule))
       .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
@@ -456,15 +454,14 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
         eq(seasonEventRules.referenceType, 'tribe'),
         eq(seasonTribeResults.result, seasonTribes.reference)))
       .orderBy(desc(episodes.number)),
-    db
-      .select({
-        name: leagueMembers.displayName,
-        episode: episodes.number,
-        points: seasonEventRules.points,
-        eventName: seasonEventRules.name,
-        description: seasonEventRules.description,
-        referenceType: seasonEventRules.referenceType,
-      })
+    db.select({
+      name: leagueMembers.displayName,
+      episode: episodes.number,
+      points: seasonEventRules.points,
+      eventName: seasonEventRules.name,
+      description: seasonEventRules.description,
+      referenceType: seasonEventRules.referenceType,
+    })
       .from(seasonMemberResults)
       .innerJoin(seasonEventRules, eq(seasonEventRules.id, seasonMemberResults.rule))
       .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
