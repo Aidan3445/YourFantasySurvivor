@@ -23,7 +23,7 @@ export default function CustomEvents({ className, form, freeze, setUnsaved }: Ev
 
     switch (action) {
       case 'copy':
-        newEvents.push({ ...event, name: '' });
+        newEvents.push({ ...event, eventName: '' });
         break;
       case 'delete':
         newEvents.splice(eventIndex, 1);
@@ -120,8 +120,8 @@ function CustomEvent({ event, eventIndex, updateEvent, className }: CustomEventP
           <Input
             type='text'
             placeholder='Event Name'
-            value={newEvent.name}
-            onChange={(e) => update({ ...newEvent, name: e.target.value })} />
+            value={newEvent.eventName}
+            onChange={(e) => update({ ...newEvent, eventName: e.target.value })} />
         </div>
         {updateEvent &&
           <span className='flex gap-2'>
@@ -171,28 +171,28 @@ function CustomEvent({ event, eventIndex, updateEvent, className }: CustomEventP
 
 // example event templates below
 const blankEvent: CustomTemplatesType = {
-  name: '',
+  eventName: '',
   points: 0,
   description: '',
   referenceType: 'castaway'
 };
 
 const confessionalEvent: CustomTemplatesType = {
-  name: 'Confessional',
+  eventName: 'Confessional',
   points: 1,
   description: 'A castaway records a confessional.',
   referenceType: 'castaway'
 };
 
 const liveTribalCouncilEvent: CustomTemplatesType = {
-  name: 'Live Tribal Council',
+  eventName: 'Live Tribal Council',
   points: 1,
   referenceType: 'tribe',
   description: 'Tribal council erupts into chaos (A.K.A. live tribal).'
 };
 
 const orchestrateBlindsideEvent: CustomTemplatesType = {
-  name: 'Orchestrate Blindside',
+  eventName: 'Orchestrate Blindside',
   points: 3,
   description: 'A castaway orchestrates a blindside.',
   referenceType: 'castaway'

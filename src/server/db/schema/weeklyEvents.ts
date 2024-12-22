@@ -8,9 +8,9 @@ import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { description, eventName } from './customEvents';
 
-const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
+export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
 export type WeeklyEventType = (typeof weeklyEventType.enumValues)[number];
-const weeklyEventTiming = pgEnum('event_weekly_timing', ['fullSeason', 'preMerge', 'postMerge']);
+export const weeklyEventTiming = pgEnum('event_weekly_timing', ['fullSeason', 'preMerge', 'postMerge']);
 export type WeeklyEventTiming = (typeof weeklyEventTiming.enumValues)[number];
 
 export const weeklyEventRules = createTable(
@@ -18,7 +18,7 @@ export const weeklyEventRules = createTable(
   {
     id: serial('weekly_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
-    name: varchar('name', { length: 32 }).notNull(),
+    eventName: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own
     // or are tied to an admin or base event
     //adminEvent: integer('admin_event_id').references(() => adminEventRules.id),
@@ -33,7 +33,7 @@ export const weeklyEventRules = createTable(
 
 export const WeeklyEventRule = z.object({
   id: z.number(),
-  name: eventName,
+  eventName: eventName,
   //customEvent: z.number().nullable(),
   //baseEvent: z.number().nullable(),
   description: description,
@@ -64,9 +64,9 @@ export const weeklyEvents = createTable(
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
-  (table) => ({
-    unique: unique().on(table.rule, table.episode, table.member),
-  })
+  (table) => [
+    unique().on(table.rule, table.episode, table.member),
+  ]
 );
 export type WeeklyEvent = typeof weeklyEvents.$inferSelect;
 

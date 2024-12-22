@@ -19,7 +19,7 @@ export function PredictionCard({ prediction, parity, vote, className, children }
   return (
     <div className={cn(parity ? 'bg-b4/70' : 'bg-b3/80', 'p-2 rounded-md', className)}>
       <span className='flex gap-2 justify-between text-xs'>
-        <p>{vote ? 'Vote for' : 'Predict'} {prediction.name} {prediction.points != 0 ? `for ${prediction.points} points.` : ''}</p>
+        <p>{vote ? 'Vote for' : 'Predict'} {prediction.eventName} {prediction.points != 0 ? `for ${prediction.points} points.` : ''}</p>
         <HoverCard open={open} onOpenChange={() => setOpen(!open)}>
           <HoverCardTrigger onClick={() => setOpen(!open)}>
             <Info size={16} />

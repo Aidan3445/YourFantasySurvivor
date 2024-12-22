@@ -1,9 +1,9 @@
 import { Flame } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
-import { getBaseEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
+import { getBaseEventsTimeline, getSeasonEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
 import { EventCard } from './eventCard';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
-import { getRules, getSeasonPredictions } from '~/app/api/leagues/[id]/events/query';
+import { getRules } from '~/app/api/leagues/[id]/events/query';
 
 interface TimelineProps {
   leagueId: number;
@@ -13,12 +13,11 @@ export async function Timeline({ leagueId }: TimelineProps) {
   const [baseEventsTimeline, weeklyEventsTimeline, seasonPredictions, rules] = await Promise.all([
     getBaseEventsTimeline(leagueId),
     getWeeklyEventsTimeline(leagueId),
-    getSeasonPredictions(leagueId),
+    getSeasonEventsTimeline(leagueId),
     getRules(leagueId),
   ]);
 
-  const { votes, predictions } = weeklyEventsTimeline;
-
+  const { votes: weeklyVotes, predictions: weeklyPredictions } = weeklyEventsTimeline;
 
 
   return (
@@ -29,8 +28,8 @@ export async function Timeline({ leagueId }: TimelineProps) {
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
             <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll pad-scroll'>
-              {votes[parseInt(episode)] && <EventCard eventName='League Votes'>
-                {Object.entries(votes[parseInt(episode)]!).map(([eventName, votes]) => {
+              {weeklyVotes[parseInt(episode)] && <EventCard eventName='League Votes'>
+                {Object.entries(weeklyVotes[parseInt(episode)]!).map(([eventName, votes]) => {
                   const maxVoteCount = votes[0].voters.length;
                   return (
                     <div key={eventName} className='px-1 pt-0.5'>
@@ -51,8 +50,8 @@ export async function Timeline({ leagueId }: TimelineProps) {
                   );
                 })}
               </EventCard>}
-              {predictions[parseInt(episode)] && <EventCard eventName='League Predictions'>
-                {Object.entries(predictions[parseInt(episode)]!).map(([eventName, prediction]) => (
+              {weeklyPredictions[parseInt(episode)] && <EventCard eventName='League Predictions'>
+                {Object.entries(weeklyPredictions[parseInt(episode)]!).map(([eventName, prediction]) => (
                   <div key={eventName} className='px-1 pt-0.5'>
                     <div className='sticky top-0 rounded-b-md bg-b4'>
                       <h4 className='px-2 mr-1 text-xs font-semibold rounded-md bg-b3 text-nowrap'>
@@ -70,21 +69,25 @@ export async function Timeline({ leagueId }: TimelineProps) {
                     </div>
                   </div>))}
               </EventCard>}
-              {/*seasonPredictions.length > 0 && <EventCard eventName='Season Predictions'>
-                {seasonPredictionResults.map((prediction) => (
-                  <div key={prediction.id} className='px-1 pt-0.5'>
+              {seasonPredictions[parseInt(episode)] && <EventCard eventName='Season Predictions'>
+                {Object.entries(seasonPredictions[parseInt(episode)]!).map(([eventName, prediction]) => (
+                  <div key={eventName} className='px-1 pt-0.5'>
                     <div className='sticky top-0 rounded-b-md bg-b4'>
                       <h4 className='px-2 mr-1 text-xs font-semibold rounded-md bg-b3 text-nowrap'>
-                        {prediction.name} ({prediction.points > 0 ? '+' : ''}{prediction.points})
+                        {eventName} ({prediction[0].points > 0 ? '+' : ''}{prediction[0].points})
                       </h4>
                     </div>
                     <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
-                      <p className='px-1 text-sm text-nowrap'>
-                        {prediction.result.castaway ?? prediction.result.tribe ?? prediction.result.member}
-                      </p>
+                      {prediction.map((predict, index) => (
+                        <div key={index} className='px-1 text-sm text-nowrap items-center'>
+                          <p>{`${predict.result}:`}</p>
+                          <p key={index} className='text-xs text-nowrap'>
+                            {predict.hits.join(', ')}
+                          </p>
+                        </div>))}
                     </div>
                   </div>))}
-              </EventCard>*/}
+              </EventCard>}
               {events.soleSurvivor && <EventCard eventName='Sole Survivor' events={events.soleSurvivor} points={rules.soleSurvivor} />}
               {events.finalists && <EventCard eventName='Finalists' events={events.finalists} points={rules.finalists} />}
               {events.fireWin && <EventCard eventName='Fire Making Winner' events={events.fireWin} points={rules.fireWin} />}

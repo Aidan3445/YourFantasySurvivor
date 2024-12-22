@@ -16,9 +16,9 @@ export const episodes = createTable(
     merge: boolean('merge').default(false).notNull(),
     finale: boolean('finale').default(false).notNull(),
   },
-  (table) => ({
-    unique: unique().on(table.season, table.number),
-  })
+  (table) => [
+    unique().on(table.season, table.number),
+  ]
 );
 export type Episode = typeof episodes.$inferSelect;
 

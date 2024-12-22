@@ -8,7 +8,7 @@ import { leagues } from '~/server/db/schema/leagues';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { seasonCastaways, seasonEvents, seasonMembers, seasonTribes } from '~/server/db/schema/seasonEvents';
 import { seasons } from '~/server/db/schema/seasons';
-import { getCurrentNextEpisodes } from '../score/query';
+import { getKeyEpisodes } from '../score/query';
 import { weeklyCastaways, weeklyEvents, weeklyMembers, weeklyTribes } from '~/server/db/schema/weeklyEvents';
 import { getRemainingCastaways } from '~/app/api/seasons/[name]/castaways/query';
 import { getLeague } from '../../query';
@@ -145,7 +145,7 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
     throw new Error('You cannot change your survivor pick until all league members have one.');
   }
 
-  const { nextEpisode } = await getCurrentNextEpisodes(leagueId);
+  const { nextEpisode } = await getKeyEpisodes(leagueId);
   if (!nextEpisode) throw new Error('No future episodes');
 
   const [newCastawayId, currentCastawayId] = await Promise.all([
@@ -226,7 +226,7 @@ export async function submitVotesPredicts(
     .then((res) => res[0]?.id);
   if (!memberId) throw new Error('Member not found');
 
-  const { currentEpisode, nextEpisode } = await getCurrentNextEpisodes(leagueId);
+  const { currentEpisode, nextEpisode } = await getKeyEpisodes(leagueId);
   if (!currentEpisode) throw new Error('No current episode');
 
   const weeklyVoteRules = [

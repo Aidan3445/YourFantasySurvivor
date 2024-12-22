@@ -74,9 +74,24 @@ export async function getWeeklyEventsTimeline(leagueId: number) {
 }
 
 export async function getSeasonEventsTimeline(leagueId: number) {
-  const events = await getSeasonPredictions(leagueId);
+  const predictions = await getSeasonPredictions(leagueId, true);
 
-  return events.reduce((timeline, event) => {
+  return predictions.reduce((timeline, pred) => {
+    // safe since we're filtering out non-hits in the query
+    timeline[pred.result.episode!] ??= {};
+    timeline[pred.result.episode!]![pred.eventName] ??= [{
+      ...pred, name: pred.result.name!, result: pred.result.name!, episode: pred.result.episode!, hits: [],
+    }];
+    const predIndex = timeline[pred.result.episode!]![pred.eventName]!.findIndex((p) => p.result === pred.result.name);
+    const memberTiming = `${pred.member} (${pred.timing})`;
+    if (predIndex === -1) {
+      timeline[pred.result.episode!]![pred.eventName]!.push({
+        ...pred, name: pred.result.name!, result: pred.result.name!, episode: pred.result.episode!, hits: [memberTiming],
+      });
+    } else {
+      timeline[pred.result.episode!]![pred.eventName]![predIndex]!.hits.push(memberTiming);
+    }
+
     return timeline;
     //           episode      event name
   }, {} as Record<number, Record<string, [TimelinePredictionResult]>>);

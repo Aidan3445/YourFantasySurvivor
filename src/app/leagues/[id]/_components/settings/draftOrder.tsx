@@ -12,17 +12,16 @@ import SortableItem, { handleDragEnd } from '~/app/_components/commonUI/sortable
 import { ChevronDown, ChevronRight, GripVertical } from 'lucide-react';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { useRouter } from 'next/navigation';
-import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
-import type { WithPick, WithResult } from '~/app/api/leagues/[id]/score/query';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
 import { PredictionCard } from './predictionCard';
 import { HoverCardArrow, HoverCardPortal } from '@radix-ui/react-hover-card';
 import { useIsMobile } from '~/hooks/use-mobile';
+import { type SeasonPrediction } from '~/app/api/leagues/[id]/events/query';
 
 interface DraftOrderProps extends ComponentProps {
   leagueId: number;
   draftOrder: { name: string, color: string, drafted: string[] }[];
-  predictions?: (SeasonEventRuleType & WithPick & WithResult & { member: string | null })[];
+  predictions?: SeasonPrediction[];
   orderLocked: boolean;
   draftOver: boolean;
 }
@@ -133,7 +132,7 @@ export default function DraftOrder({
 }
 
 interface PredictionHoverProps extends ComponentProps {
-  predictions: (SeasonEventRuleType & WithPick & WithResult & { member: string | null })[];
+  predictions: SeasonPrediction[];
 }
 
 function PredictionHover({ predictions, children, className }: PredictionHoverProps) {
@@ -149,9 +148,9 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
     else acc.finale.push(rule);
     return acc;
   }, { premiere: [], merge: [], finale: [] } as {
-    premiere: (SeasonEventRuleType & WithPick & WithResult)[];
-    merge: (SeasonEventRuleType & WithPick & WithResult)[];
-    finale: (SeasonEventRuleType & WithPick & WithResult)[];
+    premiere: SeasonPrediction[];
+    merge: SeasonPrediction[];
+    finale: SeasonPrediction[];
   });
 
   return (
@@ -210,7 +209,7 @@ function PredictionHover({ predictions, children, className }: PredictionHoverPr
 }
 
 interface PredictionProps {
-  prediction: SeasonEventRuleType & WithPick & WithResult;
+  prediction: SeasonPrediction;
 }
 
 function PredictionEntries({ prediction }: PredictionProps) {
@@ -220,25 +219,22 @@ function PredictionEntries({ prediction }: PredictionProps) {
       <h3 className='italic text-center h-min'>Result</h3>
       <ColorRow color={prediction.pick.color ?? 'white'} className='p-1'>
         <h3 style={{ color: getContrastingColor(prediction.pick.color ?? 'white') }}>
-          {prediction.pick.castaway ?? prediction.pick.tribe ?? prediction.pick.member}
+          {prediction.pick.name}
         </h3>
       </ColorRow>
       <ColorRow color={prediction.result.color ?? 'white'} className='p-1'>
         <h3 style={{ color: getContrastingColor(prediction.result.color ?? 'white') }}>
-          {prediction.result.castaway ?? prediction.result.tribe ?? prediction.result.member}
+          {prediction.result.name}
         </h3>
       </ColorRow>
     </div>
   );
 }
 
-function pickBgColor(prediction: SeasonEventRuleType & WithPick & WithResult) {
-  if (prediction.pick.castaway === prediction.result.castaway &&
-    prediction.pick.tribe === prediction.result.tribe &&
-    prediction.pick.member === prediction.result.member) {
+function pickBgColor(prediction: SeasonPrediction) {
+  if (prediction.pick.name === prediction.result.name)
     return 'bg-green-300';
-  } else if (prediction.result.color !== '#aaaaaa') {
+  else if (prediction.result.color !== '#aaaaaa')
     return 'bg-red-300';
-  }
   return '';
 }

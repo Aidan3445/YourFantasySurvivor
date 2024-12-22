@@ -194,7 +194,7 @@ export default function NewCustomEvent({
                 </SelectTrigger>
                 <SelectContent>
                   {rules.map((rule) => (
-                    <SelectItem value={rule.id.toString()} key={rule.id}>{rule.name}</SelectItem>
+                    <SelectItem value={rule.id.toString()} key={rule.id}>{rule.eventName}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -204,7 +204,7 @@ export default function NewCustomEvent({
         {selectedRule && (
           <article className='flex flex-col gap-3 p-2 rounded-md bg-b3/80'>
             <div>
-              <h3 className='text-xl font-semibold'>{selectedRule.name}</h3>
+              <h3 className='text-xl font-semibold'>{selectedRule.eventName}</h3>
               <p>{selectedRule.description}</p>
             </div>
             <div className='flex flex-col gap-2 justify-center'>

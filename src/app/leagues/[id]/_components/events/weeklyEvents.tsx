@@ -22,7 +22,7 @@ export default function WeeklyEvents({ className, form, freeze, setUnsaved }: Ev
 
     switch (action) {
       case 'copy':
-        newEvents.push({ ...event, name: '' });
+        newEvents.push({ ...event, eventName: '' });
         break;
       case 'delete':
         newEvents.splice(eventIndex, 1);
@@ -121,8 +121,8 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
           <Input
             type='text'
             placeholder='Event Name'
-            value={newEvent.name}
-            onChange={(e) => update({ ...newEvent, name: e.target.value })} />
+            value={newEvent.eventName}
+            onChange={(e) => update({ ...newEvent, eventName: e.target.value })} />
         </div>
         {updateEvent &&
           <span className='flex gap-2'>
@@ -207,7 +207,7 @@ function WeeklyEvent({ event, updateEvent, eventIndex, className }: WeeklyEventP
 
 // example event templates below
 const blankVoteEvent: WeeklyTemplatesType = {
-  name: '',
+  eventName: '',
   points: 0,
   description: '',
   referenceType: 'castaway',
@@ -216,7 +216,7 @@ const blankVoteEvent: WeeklyTemplatesType = {
 };
 
 const blankPredictEvent: WeeklyTemplatesType = {
-  name: '',
+  eventName: '',
   points: 0,
   description: '',
   referenceType: 'castaway',
@@ -225,7 +225,7 @@ const blankPredictEvent: WeeklyTemplatesType = {
 };
 
 const challengeMVPEvent: WeeklyTemplatesType = {
-  name: 'Challenge MVP',
+  eventName: 'Challenge MVP',
   points: 2,
   description: 'A castaway is the most valuable player in a challenge.',
   referenceType: 'castaway',
@@ -234,7 +234,7 @@ const challengeMVPEvent: WeeklyTemplatesType = {
 };
 
 const bestGCMemeEvent: WeeklyTemplatesType = {
-  name: 'Best GC Meme',
+  eventName: 'Best GC Meme',
   points: 1,
   description: 'Which league member sent the best meme in the group chat this week?',
   referenceType: 'member',
@@ -243,7 +243,7 @@ const bestGCMemeEvent: WeeklyTemplatesType = {
 };
 
 const nextBootEvent: WeeklyTemplatesType = {
-  name: 'Next Boot',
+  eventName: 'Next Boot',
   points: 2,
   description: 'Predict the next castaway to be voted off.',
   referenceType: 'castaway',

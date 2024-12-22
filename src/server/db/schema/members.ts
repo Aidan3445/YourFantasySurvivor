@@ -15,11 +15,11 @@ export const leagueMembers = createTable(
     isOwner: boolean('is_owner').notNull().default(false),
     isAdmin: boolean('is_admin').notNull().default(false),
   },
-  (table) => ({
-    singleJoin: unique().on(table.league, table.userId),
-    uniqueDisplayName: unique().on(table.league, table.displayName),
-    uniqueColor: unique().on(table.league, table.color),
-  })
+  (table) => [
+    unique().on(table.league, table.userId),
+    unique().on(table.league, table.displayName),
+    unique().on(table.league, table.color),
+  ]
 );
 export type LeagueMember = typeof leagueMembers.$inferSelect;
 export interface Member {
@@ -42,9 +42,9 @@ export const selectionUpdates = createTable(
     episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
     castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
   },
-  (table) => ({
-    uniqueEp: unique().on(table.member, table.episode),
-  })
+  (table) => [
+    unique().on(table.member, table.episode),
+  ]
 );
 export type SelectionUpdate = typeof selectionUpdates.$inferSelect;
 export interface Selection {

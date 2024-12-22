@@ -2,15 +2,15 @@ import 'server-only';
 import { aliasedTable, and, desc, eq, inArray, lt, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/seasons/[name]/events/query';
-import { leagues } from '~/server/db/schema/leagues';
+import { leagues, type Reference } from '~/server/db/schema/leagues';
 import { seasons } from '~/server/db/schema/seasons';
 import { episodes } from '~/server/db/schema/episodes';
 import { leagueMembers, selectionUpdates } from '~/server/db/schema/members';
 import { castaways } from '~/server/db/schema/castaways';
 import { customCastaways, customEventRules, customEvents, customMembers, customTribes } from '~/server/db/schema/customEvents';
 import { tribes } from '~/server/db/schema/tribes';
-import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEventRuleType, weeklyEvents, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
-import { seasonCastawayResults, seasonCastaways, seasonEventRules, type SeasonEventRuleType, seasonEvents, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
+import { weeklyCastawayResults, weeklyCastaways, weeklyEventRules, type WeeklyEventRuleType, weeklyEvents, type WeeklyEventTiming, weeklyMemberResults, weeklyMembers, weeklyTribeResults, weeklyTribes } from '~/server/db/schema/weeklyEvents';
+import { seasonCastawayResults, seasonCastaways, seasonEventRules, type SeasonEventRuleType, seasonEvents, type SeasonEventTiming, seasonMemberResults, seasonMembers, seasonTribeResults, seasonTribes } from '~/server/db/schema/seasonEvents';
 import { auth } from '@clerk/nextjs/server';
 
 export async function leagueMemberAuth(leagueId: number): Promise<{ userId?: string, memberId?: number }> {
@@ -52,8 +52,8 @@ type Event = {
   points: number;
   eventName: string;
   description: string;
-  referenceType: 'castaway' | 'tribe' | 'member';
-  timing?: 'fullSeason' | 'preMerge' | 'postMerge';
+  referenceType: Reference;
+  timing?: WeeklyEventTiming | SeasonEventTiming;
 };
 
 export type EventResult = { name: string, displayName?: string } & Event
@@ -163,7 +163,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
   const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
-  const { currentEpisode, mergeEpisode } = await getCurrentNextEpisodes(leagueId);
+  const { currentEpisode, mergeEpisode } = await getKeyEpisodes(leagueId);
 
   if (!currentEpisode) return {
     castawayVotes: [],
@@ -181,7 +181,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       name: leagueMembers.displayName,
       episode: episodes.number,
       points: weeklyEventRules.points,
-      eventName: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       referenceType: weeklyEventRules.referenceType,
       timing: weeklyEventRules.timing,
@@ -208,7 +208,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       name: leagueMembers.displayName,
       episode: episodes.number,
       points: weeklyEventRules.points,
-      eventName: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       referenceType: weeklyEventRules.referenceType,
       timing: weeklyEventRules.timing,
@@ -236,7 +236,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       name: leagueMembers.displayName,
       episode: episodes.number,
       points: weeklyEventRules.points,
-      eventName: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       referenceType: weeklyEventRules.referenceType,
       timing: weeklyEventRules.timing,
@@ -267,7 +267,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       voter: voter.displayName,
       episode: episodes.number,
       points: weeklyEventRules.points,
-      eventName: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       referenceType: weeklyEventRules.referenceType,
       timing: weeklyEventRules.timing,
@@ -292,7 +292,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       voter: voter.displayName,
       episode: episodes.number,
       points: weeklyEventRules.points,
-      eventName: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       referenceType: weeklyEventRules.referenceType,
       timing: weeklyEventRules.timing,
@@ -317,7 +317,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       voter: voter.displayName,
       episode: episodes.number,
       points: weeklyEventRules.points,
-      eventName: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       referenceType: weeklyEventRules.referenceType,
       timing: weeklyEventRules.timing,
@@ -416,7 +416,7 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       name: leagueMembers.displayName,
       episode: episodes.number,
       points: seasonEventRules.points,
-      eventName: seasonEventRules.name,
+      eventName: seasonEventRules.eventName,
       description: seasonEventRules.description,
       referenceType: seasonEventRules.referenceType,
     })
@@ -437,7 +437,7 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       name: leagueMembers.displayName,
       episode: episodes.number,
       points: seasonEventRules.points,
-      eventName: seasonEventRules.name,
+      eventName: seasonEventRules.eventName,
       description: seasonEventRules.description,
       referenceType: seasonEventRules.referenceType,
     })
@@ -458,7 +458,7 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       name: leagueMembers.displayName,
       episode: episodes.number,
       points: seasonEventRules.points,
-      eventName: seasonEventRules.name,
+      eventName: seasonEventRules.eventName,
       description: seasonEventRules.description,
       referenceType: seasonEventRules.referenceType,
     })
@@ -532,17 +532,17 @@ export async function getEpisodes(leagueId: number, includeFuture = false) {
   return eps.filter((ep) => new Date(`${ep.airDate} -4:00`) < new Date());
 }
 
-export async function getCurrentNextEpisodes(leagueId: number) {
-  const { currentEpisode, nextEpisode, mergeEpisode } = await getEpisodes(leagueId, true)
+export async function getKeyEpisodes(leagueId: number) {
+  return await getEpisodes(leagueId, true)
     .then((res) => {
       return {
         currentEpisode: res.find((ep) => new Date(`${ep.airDate} -4:00`).getTime() < new Date().getTime()),
         nextEpisode: res.reverse().find((ep) => new Date(`${ep.airDate} -4:00`).getTime() > new Date().getTime()),
+        premierEpisode: res.find((ep) => ep.number === 1),
         mergeEpisode: res.find((ep) => ep.merge),
+        finaleEpisode: res.find((ep) => ep.finale),
       };
     });
-
-  return { currentEpisode, nextEpisode, mergeEpisode };
 }
 
 export type WithPick = {
@@ -578,7 +578,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
   const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) throw new Error('Not authorized');
 
-  const { currentEpisode, nextEpisode, mergeEpisode } = await getCurrentNextEpisodes(leagueId);
+  const { currentEpisode, nextEpisode, mergeEpisode } = await getKeyEpisodes(leagueId);
 
   if (!currentEpisode) return {
     weekly: { votes: [], predictions: [] },
@@ -594,7 +594,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
   const votes = await db
     .select({
       id: weeklyEventRules.id,
-      name: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       points: weeklyEventRules.points,
       referenceType: weeklyEventRules.referenceType,
@@ -640,7 +640,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
   const predictions = await db
     .select({
       id: weeklyEventRules.id,
-      name: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       description: weeklyEventRules.description,
       points: weeklyEventRules.points,
       referenceType: weeklyEventRules.referenceType,
@@ -675,7 +675,7 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
     const seasonPredictions = await db
       .select({
         id: seasonEventRules.id,
-        name: seasonEventRules.name,
+        eventName: seasonEventRules.eventName,
         description: seasonEventRules.description,
         points: seasonEventRules.points,
         referenceType: seasonEventRules.referenceType,

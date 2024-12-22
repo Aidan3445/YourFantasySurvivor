@@ -23,7 +23,7 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
 
     switch (action) {
       case 'copy':
-        newEvents.push({ ...event, name: '' });
+        newEvents.push({ ...event, eventName: '' });
         break;
       case 'delete':
         newEvents.splice(eventIndex, 1);
@@ -111,8 +111,8 @@ export function SeasonEvent({ event, eventIndex, updateEvent, className }: Seaso
           <Input
             type='text'
             placeholder='Event Name'
-            value={newEvent.name}
-            onChange={(e) => saveEvent({ ...newEvent, name: e.target.value })} />
+            value={newEvent.eventName}
+            onChange={(e) => saveEvent({ ...newEvent, eventName: e.target.value })} />
         </div>
         {updateEvent &&
           <span className='flex gap-2'>
@@ -177,7 +177,7 @@ export function SeasonEvent({ event, eventIndex, updateEvent, className }: Seaso
 
 // example event templates below
 const blankEvent: SeasonTemplatesType = {
-  name: '',
+  eventName: '',
   points: 0,
   description: '',
   referenceType: 'castaway',
@@ -185,7 +185,7 @@ const blankEvent: SeasonTemplatesType = {
 };
 
 const soleSurvivor: SeasonTemplatesType = {
-  name: 'Sole Survivor',
+  eventName: 'Sole Survivor',
   points: 10,
   description: 'Predict the winner of the season.',
   referenceType: 'castaway',
@@ -193,7 +193,7 @@ const soleSurvivor: SeasonTemplatesType = {
 };
 
 const firstBoot: SeasonTemplatesType = {
-  name: 'First Boot',
+  eventName: 'First Boot',
   points: 5,
   description: 'Predict the first boot of the season.',
   referenceType: 'castaway',
@@ -201,7 +201,7 @@ const firstBoot: SeasonTemplatesType = {
 };
 
 const firstLoser: SeasonTemplatesType = {
-  name: 'First Loser',
+  eventName: 'First Loser',
   points: 5,
   description: 'Predict the first league member to have their castaway eliminated.',
   referenceType: 'member',
@@ -209,7 +209,7 @@ const firstLoser: SeasonTemplatesType = {
 };
 
 const tribeBeast: SeasonTemplatesType = {
-  name: 'Beast Tribe',
+  eventName: 'Beast Tribe',
   points: 5,
   description: 'Predict the tribe that wins the most challenges.',
   referenceType: 'tribe',
@@ -217,7 +217,7 @@ const tribeBeast: SeasonTemplatesType = {
 };
 
 const individualBeast: SeasonTemplatesType = {
-  name: 'Beast Castaway',
+  eventName: 'Beast Castaway',
   points: 5,
   description: 'Predict the castaway that wins the most individual challenges.',
   referenceType: 'castaway',

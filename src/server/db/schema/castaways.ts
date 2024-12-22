@@ -16,10 +16,10 @@ export const castaways = createTable(
     season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
   },
   // uniquie name and shortname for each season
-  (table) => ({
-    uniqueName: unique().on(table.name, table.season),
-    uniqueShortName: unique().on(table.shortName, table.season)
-  })
+  (table) => [
+    unique().on(table.name, table.season),
+    unique().on(table.shortName, table.season)
+  ]
 );
 export type Castaway = typeof castaways.$inferSelect;
 

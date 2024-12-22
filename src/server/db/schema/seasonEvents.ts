@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { description, eventName } from './customEvents';
 import { episodes } from './episodes';
 
-const seasonEventTiming = pgEnum('event_season_timing', ['premiere', 'merge', 'finale']);
+export const seasonEventTiming = pgEnum('event_season_timing', ['premiere', 'merge', 'finale']);
 export type SeasonEventTiming = (typeof seasonEventTiming.enumValues)[number];
 
 export const seasonEventRules = createTable(
@@ -16,7 +16,7 @@ export const seasonEventRules = createTable(
   {
     id: serial('season_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
-    name: varchar('name', { length: 32 }).notNull(),
+    eventName: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own
     // or are tied to an admin or base event
     //adminEvent: integer('admin_event_id').references(() => customEventRules.id),
@@ -30,7 +30,7 @@ export const seasonEventRules = createTable(
 
 export const SeasonEventRule = z.object({
   id: z.number(),
-  name: eventName,
+  eventName: eventName,
   //adminEvent: z.number().nullable(),
   //baseEvent: z.number().nullable(),
   description: description,
@@ -61,9 +61,9 @@ export const seasonEvents = createTable(
     rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
-  (table) => ({
-    unique: unique().on(table.rule, table.member),
-  })
+  (table) => [
+    unique().on(table.rule, table.member),
+  ]
 );
 
 export const seasonCastaways = createTable(

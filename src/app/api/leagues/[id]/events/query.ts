@@ -1,6 +1,6 @@
 import 'server-only';
 import { db } from '~/server/db';
-import { aliasedTable, and, asc, desc, eq } from 'drizzle-orm';
+import { aliasedTable, and, desc, eq, isNotNull } from 'drizzle-orm';
 import { baseEventRules, leagues, type Reference } from '~/server/db/schema/leagues';
 import { auth } from '@clerk/nextjs/server';
 import { customEventRules } from '~/server/db/schema/customEvents';
@@ -13,7 +13,6 @@ import { seasons } from '~/server/db/schema/seasons';
 import { getCastaway } from '~/app/api/seasons/[name]/castaways/[castaway]/query';
 import { getTribes } from '~/app/api/seasons/[name]/tribes/query';
 import { episodes } from '~/server/db/schema/episodes';
-import { type EventResult } from '../score/query';
 import { unionAll } from 'drizzle-orm/pg-core';
 
 export async function getRules(leagueId: number) {
@@ -42,7 +41,7 @@ export async function getRules(leagueId: number) {
   const customEvents = db
     .select({
       id: customEventRules.id,
-      name: customEventRules.name,
+      eventName: customEventRules.name,
       description: customEventRules.description,
       points: customEventRules.points,
       referenceType: customEventRules.referenceType,
@@ -53,7 +52,7 @@ export async function getRules(leagueId: number) {
   const weeklyEvents = db
     .select({
       id: weeklyEventRules.id,
-      name: weeklyEventRules.name,
+      eventName: weeklyEventRules.eventName,
       //adminEvent: weeklyEventRules.adminEvent,
       //baseEvent: weeklyEventRules.baseEvent,
       description: weeklyEventRules.description,
@@ -68,7 +67,7 @@ export async function getRules(leagueId: number) {
   const seasonEvents = db
     .select({
       id: seasonEventRules.id,
-      name: seasonEventRules.name,
+      eventName: seasonEventRules.eventName,
       //adminEvent: seasonRules.adminEvent,
       //baseEvent: seasonRules.baseEvent,
       description: seasonEventRules.description,
@@ -90,7 +89,7 @@ const resultTribes = aliasedTable(tribes, 'resultTribe');
 const resultMembers = aliasedTable(leagueMembers, 'resultMember');
 const pickMembers = aliasedTable(leagueMembers, 'pickMember');
 
-type Prediction = {
+export type SeasonPrediction = {
   id: number
   eventName: string;
   points: number;
@@ -110,11 +109,11 @@ type Prediction = {
   season: string;
 };
 
-export async function getSeasonPredictions(leagueId: number) {
+export async function getSeasonPredictions(leagueId: number, hitsOnly = false) {
   const castawayPredictions = db
     .select({
       id: seasonEventRules.id,
-      eventName: seasonEventRules.name,
+      eventName: seasonEventRules.eventName,
       points: seasonEventRules.points,
       description: seasonEventRules.description,
       referenceType: seasonEventRules.referenceType,
@@ -142,13 +141,16 @@ export async function getSeasonPredictions(leagueId: number) {
     .leftJoin(resultCastaways, eq(resultCastaways.id, seasonCastawayResults.result))
     .where(and(
       eq(leagues.id, leagueId),
-      eq(seasonEventRules.referenceType, 'castaway')))
+      eq(seasonEventRules.referenceType, 'castaway'),
+      hitsOnly ? and(
+        isNotNull(resultCastaways.name),
+        eq(resultCastaways.name, castaways.name)) : undefined))
     .orderBy(desc(seasonEventRules.timing));
 
   const tribePredictions = db
     .select({
       id: seasonEventRules.id,
-      eventName: seasonEventRules.name,
+      eventName: seasonEventRules.eventName,
       points: seasonEventRules.points,
       description: seasonEventRules.description,
       referenceType: seasonEventRules.referenceType,
@@ -177,13 +179,16 @@ export async function getSeasonPredictions(leagueId: number) {
     .leftJoin(resultTribes, eq(resultTribes.id, seasonTribeResults.result))
     .where(and(
       eq(leagues.id, leagueId),
-      eq(seasonEventRules.referenceType, 'tribe')))
+      eq(seasonEventRules.referenceType, 'tribe'),
+      hitsOnly ? and(
+        isNotNull(resultTribes.name),
+        eq(resultTribes.name, tribes.name)) : undefined))
     .orderBy(desc(seasonEventRules.timing));
 
   const memberPredictions = db
     .select({
       id: seasonEventRules.id,
-      eventName: seasonEventRules.name,
+      eventName: seasonEventRules.eventName,
       points: seasonEventRules.points,
       description: seasonEventRules.description,
       referenceType: seasonEventRules.referenceType,
@@ -212,10 +217,13 @@ export async function getSeasonPredictions(leagueId: number) {
     .leftJoin(resultMembers, eq(resultMembers.id, seasonMemberResults.result))
     .where(and(
       eq(leagues.id, leagueId),
-      eq(seasonEventRules.referenceType, 'member')))
+      eq(seasonEventRules.referenceType, 'member'),
+      hitsOnly ? and(
+        isNotNull(resultMembers.displayName),
+        eq(resultMembers.displayName, pickMembers.displayName)) : undefined))
     .orderBy(desc(seasonEventRules.timing));
 
-  const predictions: Prediction[] = await unionAll(castawayPredictions,
+  const predictions: SeasonPrediction[] = await unionAll(castawayPredictions,
     unionAll(tribePredictions, memberPredictions as never) as never);
 
   return await Promise.all(predictions.map(async (pred) => {
