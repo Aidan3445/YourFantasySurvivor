@@ -17,6 +17,7 @@ import { Switch } from '~/app/_components/commonUI/switch';
 import { useToast } from '~/app/_components/commonUI/use-toast';
 import { submitCustomEvent } from '~/app/api/leagues/[id]/score/actions';
 import { useRouter } from 'next/navigation';
+import { SquareX } from 'lucide-react';
 /*import { Popover, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
 import { NotepadText } from 'lucide-react';
 import { Textarea } from '~/app/_components/commonUI/textArea';
@@ -89,8 +90,8 @@ export default function NewCustomEvent({
     form.setValue('ruleId', rule.id);
   };
 
-  const popRef = () => {
-    form.setValue('references', refs.slice(0, refs.length - 1));
+  const popRef = (index: number) => {
+    form.setValue('references', refs.filter((_, i) => i !== index));
     //form.setValue('notes', form.watch('notes').slice(0, refs.length - 1));
   };
 
@@ -220,47 +221,45 @@ export default function NewCustomEvent({
                   </AddNote>*/}
               </span>
               {refs.map((_, index) => (
-                <FormField key={index} name={`references.${index}`} render={({ field }) => {
+                <FormField key={`${refs[index]}-${index}`} name={`references.${index}`} render={({ field }) => {
                   switch (selectedRule.referenceType) {
                     case 'castaway':
                       return (
-                        <span className='flex gap-2 justify-center items-center'>
-                          <FormControl>
+                        <FormControl>
+                          <span className='flex gap-2 justify-center items-center'>
                             <SelectCastaways castaways={remainingOnly ? remaining : castaways} field={field} />
-                          </FormControl>
-                          {/*<AddNote form={form} index={index} />*/}
-                        </span>
+                            <SquareX className='cursor-pointer' onClick={() => popRef(index)} />
+                          </span>
+                        </FormControl>
                       );
                     case 'tribe':
                       return (
                         <FormControl>
-                          <SelectTribes tribes={tribes} field={field} />
+                          <span className='flex gap-2 justify-center items-center'>
+                            <SelectTribes tribes={tribes} field={field} />
+                            <SquareX className='cursor-pointer' onClick={() => popRef(index)} />
+                          </span>
                         </FormControl>
                       );
                     case 'member':
                       return (
                         <FormControl>
-                          <SelectMembers members={members} field={field} />
+                          <span className='flex gap-2 justify-center items-center'>
+                            <SelectMembers members={members} field={field} />
+                            <SquareX className='cursor-pointer' onClick={() => popRef(index)} />
+                          </span>
                         </FormControl>
                       );
                   }
                 }} />
               ))}
             </div>
-            <span className='grid grid-cols-2 gap-2'>
-              <Button
-                type='button'
-                className='px-1'
-                onClick={() => form.setValue('references', [...refs, ''])}>
-                Add {selectedRule.referenceType}
-              </Button>
-              <Button
-                type='button'
-                className='px-1'
-                onClick={popRef}>
-                Remove {selectedRule.referenceType}
-              </Button>
-            </span>
+            <Button
+              type='button'
+              className='px-1'
+              onClick={() => form.setValue('references', [...refs, ''])}>
+              Add {selectedRule.referenceType}
+            </Button>
           </article>)}
       </form>
     </Form>
