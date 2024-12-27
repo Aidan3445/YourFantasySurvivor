@@ -260,7 +260,7 @@ export default function NewBaseEvent({
             {selectedReferenceType && (
               <Button
                 type='button'
-                className='px-1'
+                className='w-full'
                 onClick={() => form.setValue('references', [...refs, ''])}>
                 Add {selectedReferenceType}
               </Button>)}

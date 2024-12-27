@@ -1,5 +1,5 @@
 'use client';
-import { type ComponentProps } from '~/lib/utils';
+import { camelToTitle, type ComponentProps } from '~/lib/utils';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { type Member } from '~/server/db/schema/members';
 import { type Tribe } from '~/server/db/schema/tribes';
@@ -208,7 +208,9 @@ export default function NewEventResult({
                 </SelectTrigger>
                 <SelectContent>
                   {rules.map((rule) => (
-                    <SelectItem value={rule.id.toString()} key={rule.id}>{rule.eventName} ({rule.timing})</SelectItem>
+                    <SelectItem value={rule.id.toString()} key={rule.id}>
+                      {rule.eventName} ({camelToTitle(rule.timing)})
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -269,7 +271,7 @@ export default function NewEventResult({
             </div>
             <Button
               type='button'
-              className='px-1'
+              className='w-full'
               onClick={() => form.setValue('references', [...refs, undefined])}>
               Add {selectedRule.referenceType}
             </Button>

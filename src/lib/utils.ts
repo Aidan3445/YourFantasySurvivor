@@ -27,4 +27,8 @@ export function getCurrentTribe(castaway?: CastawayDetails, episode?: number) {
   return [...castaway.tribes].find((t) => t.episode <= (episode ?? 0)) ?? castaway.startingTribe;
 }
 
-
+export function camelToTitle(str: string) {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
+}

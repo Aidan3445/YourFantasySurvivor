@@ -3,7 +3,7 @@ import Members, { CastawaysSkeleton, MembersSkeleton } from './membersScores';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
 import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
-import compileScores from '~/app/api/leagues/[id]/score/compile';
+import { scoreMembers } from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
 import VotePredict from '../events/votePredict';
@@ -33,7 +33,7 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
     memberEvents: [...customEvents.memberEvents, ...weeklyEvents.memberEvents, ...seasonEvents.memberEvents],
   };
 
-  const baseScores = compileScores(events, altEvents, memberCastaways, rules);
+  const baseScores = scoreMembers(events, altEvents, memberCastaways, rules);
 
   const membersWithScores = members.map((member) => {
     const points = baseScores[member.displayName] ?? [0, 0];

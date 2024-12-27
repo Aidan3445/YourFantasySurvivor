@@ -4,11 +4,12 @@ import { type BaseEventRuleType } from '~/server/db/schema/leagues';
 import { type AltEvents } from './query';
 import { findTribeCastaways } from '~/app/api/seasons/[name]/events/scores';
 
-export default function compileScores(
+function compileScores(
   { castawayEvents, tribeEvents, tribeUpdates }: Events,
   altEvents: AltEvents,
   memberCastaways: Record<number, Record<string, string>>,
   rules: BaseEventRuleType,
+  nameMapper: typeof findMember
 ): Record<string, number[]> {
   const scores: Record<string, number[]> = {};
   const elimList: string[] = [];
@@ -24,7 +25,7 @@ export default function compileScores(
       continue;
     }
 
-    const member = findMember(memberCastaways, castaway, episode);
+    const member = nameMapper(memberCastaways, castaway, episode);
     if (!member) continue;
 
     scores[member] ??= [];
@@ -38,7 +39,7 @@ export default function compileScores(
     const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
 
     for (const castaway of castaways) {
-      const member = findMember(memberCastaways, castaway, episode);
+      const member = nameMapper(memberCastaways, castaway, episode);
       if (!member) continue;
 
       scores[member] ??= [];
@@ -59,7 +60,7 @@ export default function compileScores(
 
   // alt events
   for (const { name: castaway, points, episode } of altEvents.castawayEvents) {
-    const member = findMember(memberCastaways, castaway, episode);
+    const member = nameMapper(memberCastaways, castaway, episode);
     if (!member) continue;
 
     scores[member] ??= [];
@@ -72,7 +73,7 @@ export default function compileScores(
     const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
 
     for (const castaway of castaways) {
-      const member = findMember(memberCastaways, castaway, episode);
+      const member = nameMapper(memberCastaways, castaway, episode);
       if (!member) continue;
 
       scores[member] ??= [];
@@ -101,7 +102,7 @@ export default function compileScores(
     const elminated = elimList[i - 1]!;
 
     for (const member in survivalTable) {
-      if (findMember(memberCastaways, elminated, i) === member) {
+      if (nameMapper(memberCastaways, elminated, i) === member) {
         survivalTable[member] = 0;
       } else {
         scores[member] ??= [];
@@ -140,3 +141,20 @@ function findMember(memberCastaways: Record<number, Record<string, string>>, cas
   return member;
 }
 
+export function scoreMembers(
+  events: Events,
+  altEvents: AltEvents,
+  memberCastaways: Record<number, Record<string, string>>,
+  rules: BaseEventRuleType
+): Record<string, number[]> {
+  return compileScores(events, altEvents, memberCastaways, rules, findMember);
+}
+
+export function scoreCastaways(
+  events: Events,
+  altEvents: AltEvents,
+  memberCastaways: Record<number, Record<string, string>>,
+  rules: BaseEventRuleType
+): Record<string, number[]> {
+  return compileScores(events, altEvents, memberCastaways, rules, (_, castaway, __) => castaway);
+}
