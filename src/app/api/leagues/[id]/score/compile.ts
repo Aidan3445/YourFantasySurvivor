@@ -153,8 +153,7 @@ export function scoreMembers(
 export function scoreCastaways(
   events: Events,
   altEvents: AltEvents,
-  memberCastaways: Record<number, Record<string, string>>,
   rules: BaseEventRuleType
 ): Record<string, number[]> {
-  return compileScores(events, altEvents, memberCastaways, rules, (_, castaway, __) => castaway);
+  return compileScores(events, altEvents, {}, rules, (_, castaway, __) => castaway);
 }

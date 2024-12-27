@@ -36,7 +36,7 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
 
   return (
     <table className='space-y-2 space-x-1 h-min'>
-      <HeaderRow showPointsPlace={showPointsPlace} showDrafted={showDrafted} />
+      <MemberHeaders showPointsPlace={showPointsPlace} showDrafted={showDrafted} />
       <tbody>
         {members.map((member, index) => {
           const currentPick = member.picks.slice(-1)[0]?.name ?? 'None';
@@ -90,7 +90,7 @@ export default function Members({ leagueId, members, ownerLoggedIn, isFull, deta
                             {details.castaways.find((c) => c.more.shortName === currentPick)?.tribes
                               .map((t) => (
                                 <div key={t.name} className='inline-block relative'>
-                                  <Circle className='relative' strokeWidth={3} stroke='black' size={14} color={t.color} fill={t.color} />
+                                  <Circle className='relative' strokeWidth={3} stroke='black' size={14} fill={t.color} />
                                 </div>))}
                           </span>
                         </h3>
@@ -149,25 +149,25 @@ export interface ColorRowProps extends ComponentProps {
   loggedIn?: boolean;
 }
 
-export function ColorRow({ children, className, color, loggedIn }: ColorRowProps) {
+export function ColorRow({ children, className, color, loggedIn, style }: ColorRowProps) {
   return (
     <div
       className={cn(
         'px-2 gap-1 rounded border border-black flex items-center text-nowrap transition-all duration-500',
         loggedIn && 'border ring-2 ring-white',
         className)}
-      style={{ backgroundColor: color }}>
+      style={{ backgroundColor: color, ...style }}>
       {children}
     </div>
   );
 }
 
-interface HeaderRowProps {
+export interface HeaderRowProps {
   showPointsPlace?: boolean;
   showDrafted?: boolean;
 }
 
-function HeaderRow({ showPointsPlace, showDrafted }: HeaderRowProps) {
+function MemberHeaders({ showPointsPlace, showDrafted }: HeaderRowProps) {
   return (
     <thead>
       <tr>
@@ -202,7 +202,7 @@ function HeaderRow({ showPointsPlace, showDrafted }: HeaderRowProps) {
 export function MembersSkeleton() {
   return (
     <table className='space-y-2 space-x-1 h-min'>
-      <HeaderRow showPointsPlace showDrafted />
+      <MemberHeaders showPointsPlace showDrafted />
       <tbody>
         {Array.from({ length: 9 }).map((_, index) => (
           <tr key={index}>
@@ -217,47 +217,6 @@ export function MembersSkeleton() {
             </td>
             <td>
               <Skeleton className='min-w-8 h-[26px]' />
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-export function CastawaysSkeleton() {
-  return (
-    <table className='space-y-2 space-x-1 h-min'>
-      <thead>
-        <tr>
-          <th>
-            <ColorRow key='header-pl' color={'white'} className='flex col-start-1 justify-center py-1 text-xs'>
-              <h3>Place</h3>
-            </ColorRow>
-          </th>
-          <th>
-            <ColorRow key='header-po' color={'white'} className='flex col-start-2 justify-center py-1 text-xs'>
-              <h3>Points</h3>
-            </ColorRow>
-          </th>
-          <th>
-            <ColorRow key='header-d' color={'white'} className='flex col-start-4 justify-center py-1 text-xs'>
-              <h3>Castaway</h3>
-            </ColorRow>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {Array.from({ length: 9 }).map((_, index) => (
-          <tr key={index}>
-            <td>
-              <Skeleton className='min-w-8 h-[26px]' />
-            </td>
-            <td>
-              <Skeleton className='min-w-8 h-[26px]' />
-            </td>
-            <td>
-              <Skeleton className='min-w-24 h-[26px]' />
             </td>
           </tr>
         ))}

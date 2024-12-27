@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from 'clsx';
-import { type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 
@@ -10,6 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 export interface ComponentProps {
   className?: string;
   children?: ReactNode;
+  style?: CSSProperties;
 }
 
 export function castawaysByTribe(options: CastawayDetails[]): Record<string, CastawayDetails[]> {
@@ -31,4 +32,8 @@ export function camelToTitle(str: string) {
   return str
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase());
+}
+
+export function getHslIndex(index: number, total: number) {
+  return `hsl(${300 * index / total}, ${index & 1 ? '50%' : '80%'}, 50%)`;
 }
