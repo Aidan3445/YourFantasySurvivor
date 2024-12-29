@@ -4,21 +4,25 @@ import { getBaseEventsTimeline, getSeasonEventsTimeline, getWeeklyEventsTimeline
 import { EventCard } from './eventCard';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
+import { getSelectionUpdates } from '~/app/api/leagues/[id]/score/query';
 
 interface TimelineProps {
   leagueId: number;
 }
 
 export async function Timeline({ leagueId }: TimelineProps) {
-  const [baseEventsTimeline, weeklyEventsTimeline, seasonPredictions, rules] = await Promise.all([
-    getBaseEventsTimeline(leagueId),
-    getWeeklyEventsTimeline(leagueId),
-    getSeasonEventsTimeline(leagueId),
-    getRules(leagueId),
-  ]);
+  const [baseEventsTimeline, weeklyEventsTimeline, seasonPredictions, selectionUpdates, rules] =
+    await Promise.all([
+      getBaseEventsTimeline(leagueId),
+      getWeeklyEventsTimeline(leagueId),
+      getSeasonEventsTimeline(leagueId),
+      getSelectionUpdates(leagueId),
+      getRules(leagueId),
+    ]);
 
   const { votes: weeklyVotes, predictions: weeklyPredictions } = weeklyEventsTimeline;
 
+  console.log(selectionUpdates);
 
   return (
     <section className='flex flex-col gap-1 pt-2 w-svw'>
@@ -28,6 +32,14 @@ export async function Timeline({ leagueId }: TimelineProps) {
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
             <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll pad-scroll'>
+              {/*selectionUpdates[parseInt(episode)] && <EventCard eventName='Castaway Selections'>
+                {Object.entries(selectionUpdates[parseInt(episode)]!).map(([castaway, member]) =>
+                  <div key={member} className='flex justify-center gap-1 items-center'>
+                    <p>{member}:</p>
+                    <p className='text-xs text-nowrap'>{castaway}</p>
+                  </div>)
+                }
+              </EventCard>*/}
               {weeklyVotes[parseInt(episode)] && <EventCard eventName='League Votes'>
                 {Object.entries(weeklyVotes[parseInt(episode)]!).map(([eventName, votes]) => {
                   const maxVoteCount = votes[0].voters.length;

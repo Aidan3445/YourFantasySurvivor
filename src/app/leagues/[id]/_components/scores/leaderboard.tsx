@@ -2,7 +2,7 @@ import { type Member } from '~/server/db/schema/members';
 import Members, { MembersSkeleton } from './membersScores';
 import { TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
-import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
+import { getSelectionUpdates, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
 import { scoreCastaways, scoreMembers } from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
@@ -21,11 +21,11 @@ interface MembersProps {
 export async function LeaderboardTabs({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   const [
     rules, events, customEvents, weeklyEvents, seasonEvents,
-    memberCastaways, details, episodeEvents,
+    { memberCastaways, castawayMembers }, details, episodeEvents,
   ] = await Promise.all([
     getRules(leagueId), getBaseEvents(leagueId),
     getCustomEvents(leagueId), getWeeklyEvents(leagueId), getSeasonEvents(leagueId),
-    getCastawayMemberEpisodeTable(members.map((m) => m.id)),
+    getSelectionUpdates(leagueId),
     getDraftDetails(leagueId), getMemberEpisodeEvents(leagueId),
   ]);
 
@@ -35,7 +35,7 @@ export async function LeaderboardTabs({ leagueId, members, ownerLoggedIn, isFull
     memberEvents: [...customEvents.memberEvents, ...weeklyEvents.memberEvents, ...seasonEvents.memberEvents],
   };
 
-  const membersScores = scoreMembers(events, altEvents, memberCastaways, rules);
+  const membersScores = scoreMembers(events, altEvents, rules, memberCastaways, castawayMembers);
   const membersWithScores = members.map((member) => {
     const points = membersScores[member.displayName] ?? [0, 0];
     return {

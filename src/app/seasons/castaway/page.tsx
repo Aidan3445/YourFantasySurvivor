@@ -94,9 +94,9 @@ interface EventCardProps {
 function EventCard({ event }: EventCardProps) {
   return (
     <CardContainer className='px-6 w-full h-full'>
-      <h3 className='w-full text-xl font-semibold text-center'>{event.name}</h3>
+      <h3 className='w-full text-xl font-semibold text-center'>{event.eventName}</h3>
       <div className='flex flex-col gap-2'>
-        <p className='text-sm'>{event.name}</p>
+        <p className='text-sm'>{event.eventName}</p>
         <p className='text-sm'>Episode: {event.episode}</p>
       </div>
     </CardContainer>

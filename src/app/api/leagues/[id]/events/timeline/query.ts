@@ -15,6 +15,7 @@ export async function getBaseEventsTimeline(leagueId: number) {
   const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) return {};
 
+
   return await db
     .select({
       episode: episodes.number,

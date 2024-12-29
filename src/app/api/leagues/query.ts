@@ -8,11 +8,12 @@ import { leagueMembers, type Member } from '~/server/db/schema/members';
 import { seasons } from '~/server/db/schema/seasons';
 import { castaways } from '~/server/db/schema/castaways';
 import { getSurvivorsListEDITING } from './[id]/settings/query';
+import { leagueMemberAuth } from './[id]/score/query';
 
 
 export async function getLeague(leagueId: number) {
-  const { userId } = await auth();
-  if (!userId) throw new Error('User not authenticated');
+  const { memberId, userId } = await leagueMemberAuth(leagueId);
+  if (!memberId) throw new Error('User not authenticated');
 
   const leagueFetch = db
     .select({

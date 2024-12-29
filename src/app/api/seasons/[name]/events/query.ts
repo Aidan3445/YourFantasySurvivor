@@ -14,7 +14,7 @@ import { castaways } from '~/server/db/schema/castaways';
 
 export type CastawayEvent = {
   castaway: string;
-  name: EventName;
+  eventName: EventName;
   episode: number;
   notes: string[];
   keywords: string[];
@@ -27,7 +27,7 @@ export async function getCastawayEvents(
   return db
     .select({
       castaway: castaways.shortName,
-      name: baseEvents.eventName,
+      eventName: baseEvents.eventName,
       episode: episodes.number,
       notes: baseEvents.notes,
       keywords: baseEvents.keywords,
@@ -52,7 +52,7 @@ export async function getCastawayEvents(
 
 export type TribeEvent = {
   tribe: string;
-  name: EventName;
+  eventName: EventName;
   episode: number;
   notes: string[];
   keywords: string[];
@@ -65,7 +65,7 @@ export async function getTribeEvents(
   return db
     .select({
       tribe: tribes.name,
-      name: baseEvents.eventName,
+      eventName: baseEvents.eventName,
       episode: episodes.number,
       notes: baseEvents.notes,
       keywords: baseEvents.keywords,
