@@ -6,7 +6,7 @@ export default function compileScores(
   rules: BaseEventRuleType
 ): Record<string, number[]> {
   const scores: Record<string, number[]> = {};
-  const elims: Record<number, string[]> = {};
+  const elims: string[][] = [];
 
   // init castaway scores
   Object.entries(tribeUpdates[1]!).forEach(([_, castaways]) => {
@@ -63,7 +63,7 @@ export default function compileScores(
 // find the castaways on a tribe at a given episode
 export function findTribeCastaways(
   tribeUpdates: Record<number, Record<string, string[]>>,
-  elims: Record<number, string[]>,
+  elims: string[][],
   tribe: string,
   episode: number) {
   const onTribe = new Set(tribeUpdates[1]?.[tribe] ?? []);
