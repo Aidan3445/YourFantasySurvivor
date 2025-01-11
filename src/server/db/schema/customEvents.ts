@@ -12,7 +12,7 @@ export const customEventRules = createTable(
   {
     id: serial('custom_rule_id').notNull().primaryKey(),
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
-    name: varchar('name', { length: 32 }).notNull(),
+    eventName: varchar('name', { length: 32 }).notNull(),
     description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
     referenceType: reference('reference_type').notNull(),

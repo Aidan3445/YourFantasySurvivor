@@ -75,7 +75,7 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
         name: castaways.shortName,
         episode: episodes.number,
         points: customEventRules.points,
-        eventName: customEventRules.name,
+        eventName: customEventRules.eventName,
         description: customEventRules.description,
         referenceType: customEventRules.referenceType,
       })
@@ -94,7 +94,7 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
         displayName: tribes.name,
         episode: episodes.number,
         points: customEventRules.points,
-        eventName: customEventRules.name,
+        eventName: customEventRules.eventName,
         description: customEventRules.description,
         referenceType: customEventRules.referenceType,
       })
@@ -112,7 +112,7 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
         name: leagueMembers.displayName,
         episode: episodes.number,
         points: customEventRules.points,
-        eventName: customEventRules.name,
+        eventName: customEventRules.eventName,
         description: customEventRules.description,
         referenceType: customEventRules.referenceType,
       })
