@@ -215,8 +215,6 @@ export async function submitVotesPredicts(
   const { userId } = await auth();
   if (!userId) throw new Error('User not authenticated');
 
-  console.log(data);
-
   const memberId = await db
     .select({ id: leagueMembers.id })
     .from(leagueMembers)
