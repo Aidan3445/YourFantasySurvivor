@@ -41,7 +41,7 @@ export async function getRules(leagueId: number) {
   const customEvents = db
     .select({
       id: customEventRules.id,
-      eventName: customEventRules.name,
+      eventName: customEventRules.eventName,
       description: customEventRules.description,
       points: customEventRules.points,
       referenceType: customEventRules.referenceType,
