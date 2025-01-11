@@ -6,7 +6,7 @@ export default function compileScores(
   rules: BaseEventRuleType
 ): Record<string, number[]> {
   const scores: Record<string, number[]> = {};
-  const elimList: string[] = [];
+  const elims: Record<number, string[]> = {};
 
   // init castaway scores
   Object.entries(tribeUpdates[1]!).forEach(([_, castaways]) => {
@@ -16,22 +16,28 @@ export default function compileScores(
   // castaway events
   // sort for consistent elimination order
   const sortedCE = castawayEvents.sort((a, b) => a.episode - b.episode);
-  for (const { castaway, name, episode } of sortedCE) {
-    if (name === 'elim' || name === 'noVoteExit') {
-      // this means they left the game
-      elimList.push(castaway);
-      continue;
-    } else if (name === 'otherNotes') continue;
+  for (const { castaway, eventName, episode } of sortedCE) {
+    switch (eventName) {
+      case 'otherNotes':
+        continue;
+      case 'elim':
+      case 'noVoteExit':
+        elims[episode] ??= [];
+        elims[episode].push(castaway);
+        continue;
+      default:
+        break;
+    }
 
     scores[castaway] ??= [];
 
     const points = scores[castaway];
-    points[episode] = (points[episode] ?? 0) + rules[name as keyof BaseEventRuleType];
+    points[episode] = (points[episode] ?? 0) + rules[eventName as keyof BaseEventRuleType];
   }
 
   // tribe events
-  for (const { tribe, name, episode } of tribeEvents) {
-    const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
+  for (const { tribe, eventName: name, episode } of tribeEvents) {
+    const castaways = findTribeCastaways(tribeUpdates, elims, tribe, episode);
 
     for (const castaway of castaways) {
 
@@ -57,14 +63,13 @@ export default function compileScores(
 // find the castaways on a tribe at a given episode
 export function findTribeCastaways(
   tribeUpdates: Record<number, Record<string, string[]>>,
-  elimList: string[],
+  elims: Record<number, string[]>,
   tribe: string,
   episode: number) {
   const onTribe = new Set(tribeUpdates[1]?.[tribe] ?? []);
+
   for (let i = 2; i <= episode; i++) {
-    // -2 because we're looking at the previous episode
-    // and the elimList is 0-indexed while the episodes/tribeUpdates are 1-indexed
-    if (elimList[i - 2]) onTribe.delete(elimList[i - 2]!);
+    elims[i - 1]?.forEach((castaway) => onTribe.delete(castaway));
     if (!tribeUpdates[i]) continue;
     Object.entries(tribeUpdates[i]!).forEach(([tribeName, castaways]) => {
       if (tribeName === tribe) {

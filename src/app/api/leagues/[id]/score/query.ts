@@ -1,5 +1,5 @@
 import 'server-only';
-import { aliasedTable, and, desc, eq, inArray, lt, or } from 'drizzle-orm';
+import { aliasedTable, and, asc, desc, eq, lt, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { getCastawayEvents, getTribeEvents, getTribeUpdates } from '~/app/api/seasons/[name]/events/query';
 import { leagues, type Reference } from '~/server/db/schema/leagues';
@@ -480,9 +480,12 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
   return { castawayEvents: [], tribeEvents: [], memberEvents: events.flat() };
 }
 
-export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
-  const { userId } = await auth();
-  if (!userId) throw new Error('Not authorized');
+export type MemberCastaways = Record<string, string[]>;
+export type CastawayMembers = Record<string, (string | null)[]>;
+
+export async function getSelectionUpdates(leagueId: number) {
+  const { memberId } = await leagueMemberAuth(leagueId);
+  if (!memberId) throw new Error('Not authorized');
 
   const updates = await db
     .select({
@@ -494,19 +497,40 @@ export async function getCastawayMemberEpisodeTable(memberIds: number[]) {
     .from(selectionUpdates)
     .innerJoin(leagueMembers, eq(leagueMembers.id, selectionUpdates.member))
     .innerJoin(castaways, eq(castaways.id, selectionUpdates.castaway))
-    .leftJoin(episodes, eq(episodes.id, selectionUpdates.episode))
-    .where(inArray(leagueMembers.id, memberIds))
-    .orderBy(desc(episodes.number));
+    .innerJoin(episodes, eq(episodes.id, selectionUpdates.episode))
+    .where(eq(leagueMembers.league, leagueId))
+    .orderBy(asc(episodes.number));
 
-  return updates.reduce((lookup, update) => {
-    update.episode ??= 0;
-    lookup[update.episode] ??= {};
 
-    // initial castaway selection has null episode, replace with 0
-    lookup[update.episode]![update.castaway] = update.member;
+  const memberCastaways = updates.reduce((lookup, update) => {
+    lookup[update.member] ??= [];
+    const prevCastaway = lookup[update.member]?.[lookup[update.member]!.length - 1];
+    if (prevCastaway) {
+      lookup[update.member]!.push(...Array(update.episode - lookup[update.member]!.length - 1).fill(prevCastaway) as string[]);
+    }
+    lookup[update.member]!.push(update.castaway);
+    return lookup;
+  }, {} as MemberCastaways);
+
+  const castawayMembers = updates.reduce((lookup, update) => {
+    lookup[update.castaway] ??= Array(update.episode - 1).fill(null);
+    const prevMember = lookup[update.castaway]?.[lookup[update.castaway]!.length - 1];
+    if (prevMember) {
+      lookup[update.castaway]!.push(...Array(update.episode - lookup[update.castaway]!.length - 1).fill(prevMember) as string[]);
+    }
+    lookup[update.castaway]!.push(update.member);
+
+    // for castaways we need  to also clear the member for their previous castaway
+    const prevCastaway = memberCastaways[update.member]?.[update.episode - 2];
+    if (prevCastaway) {
+      lookup[prevCastaway]!.push(...Array(update.episode - lookup[prevCastaway]!.length - 1).fill(update.member) as string[]);
+      lookup[prevCastaway]!.push(null);
+    }
 
     return lookup;
-  }, {} as Record<number, Record<string, string>>);
+  }, {} as CastawayMembers);
+
+  return { memberCastaways, castawayMembers };
 }
 
 export async function getEpisodes(leagueId: number, includeFuture = false) {

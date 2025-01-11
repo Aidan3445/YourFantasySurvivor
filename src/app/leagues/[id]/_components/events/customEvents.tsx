@@ -34,6 +34,7 @@ export default function CustomEvents({ className, form, freeze, setUnsaved }: Ev
     }
 
     form.setValue('custom', newEvents as CustomEventRuleType[]);
+    setUnsaved && setUnsaved();
   };
 
   const newEvent = (value: keyof typeof CustomTemplates) => {
@@ -45,7 +46,11 @@ export default function CustomEvents({ className, form, freeze, setUnsaved }: Ev
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col'>
         {customEvents.map((event, index) => (
-          <CustomEvent key={index} event={event} eventIndex={index} updateEvent={freeze ? undefined : updateEvent} />
+          <CustomEvent
+            key={`${event.eventName}-${event.id ?? index}-${index}`}
+            event={event}
+            eventIndex={index}
+            updateEvent={freeze ? undefined : updateEvent} />
         ))}
         {customEvents.length === 0 && <h4 className='text-lg font-normal text-gray-700'>No custom events</h4>}
       </section>

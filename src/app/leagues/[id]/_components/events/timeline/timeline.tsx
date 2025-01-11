@@ -1,24 +1,26 @@
 import { Flame } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '~/app/_components/commonUI/hover';
 import { getBaseEventsTimeline, getSeasonEventsTimeline, getWeeklyEventsTimeline } from '~/app/api/leagues/[id]/events/timeline/query';
-import { EventCard } from './eventCard';
+import { EventCard, SelectionUpdateCard } from './eventCard';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
+import { getSelectionUpdates } from '~/app/api/leagues/[id]/score/query';
 
 interface TimelineProps {
   leagueId: number;
 }
 
 export async function Timeline({ leagueId }: TimelineProps) {
-  const [baseEventsTimeline, weeklyEventsTimeline, seasonPredictions, rules] = await Promise.all([
-    getBaseEventsTimeline(leagueId),
-    getWeeklyEventsTimeline(leagueId),
-    getSeasonEventsTimeline(leagueId),
-    getRules(leagueId),
-  ]);
+  const [baseEventsTimeline, weeklyEventsTimeline, seasonPredictions, { memberCastaways }, rules] =
+    await Promise.all([
+      getBaseEventsTimeline(leagueId),
+      getWeeklyEventsTimeline(leagueId),
+      getSeasonEventsTimeline(leagueId),
+      getSelectionUpdates(leagueId),
+      getRules(leagueId),
+    ]);
 
   const { votes: weeklyVotes, predictions: weeklyPredictions } = weeklyEventsTimeline;
-
 
   return (
     <section className='flex flex-col gap-1 pt-2 w-svw'>
@@ -28,6 +30,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
           <article key={episode}>
             <h2 className='text-xl'>Episode {episode}</h2>
             <span className='flex overflow-x-auto gap-2 px-2 pb-1 md:px-14 light-scroll pad-scroll'>
+              <SelectionUpdateCard episode={parseInt(episode)} memberCastaways={memberCastaways} />
               {weeklyVotes[parseInt(episode)] && <EventCard eventName='League Votes'>
                 {Object.entries(weeklyVotes[parseInt(episode)]!).map(([eventName, votes]) => {
                   const maxVoteCount = votes[0].voters.length;
@@ -123,7 +126,8 @@ export async function Timeline({ leagueId }: TimelineProps) {
               {events.tribe2nd && <EventCard eventName='Tribe Runner Up' events={events.tribe2nd} points={rules.tribe2nd} />}
               {events.tribeUpdate && (
                 <article className='p-1 rounded-md bg-b4'>
-                  <h3 className='text-lg font-semibold'>{events.tribeUpdate[0]?.merge ? 'Merge' : 'Tribe Swap'}</h3>
+                  <h3 className='text-lg font-semibold'>{parseInt(episode) === 1 ? 'Tribes' :
+                    events.tribeUpdate[0]?.merge ? 'Merge' : 'Tribe Swap'}</h3>
                   <div className='overflow-y-auto max-h-24 min-w-32 overflow-x-clip dark-scroll'>
                     {Object.entries(events.tribeUpdate.reduce((tribes, update) => {
                       if (!update.reference.tribe && !update.reference.castaway) return tribes;
@@ -185,8 +189,7 @@ export async function Timeline({ leagueId }: TimelineProps) {
                   </div>
                 </article>)}
             </span>
-          </article >))
-      }
+          </article >))}
     </section >
   );
 }

@@ -25,7 +25,7 @@ export function EventQueue({ children, disabled }: EventQueueProps) {
           <Separator orientation='vertical' className='h-20' />
           <div className='flex flex-col gap-2'>
             <Button onClick={() => setCount(count + 1)}>Add</Button>
-            <Button onClick={() => setCount(1)} disabled={count === 1}>Reset</Button>
+            <Button onClick={() => setCount(1)} disabled={count === 1}>Clear</Button>
           </div>
         </div>
       )}

@@ -33,6 +33,7 @@ export default function WeeklyEvents({ className, form, freeze, setUnsaved }: Ev
     }
 
     form.setValue('weekly', newEvents as WeeklyEventRuleType[]);
+    setUnsaved && setUnsaved();
   };
 
   const newEvent = (value: keyof typeof WeeklyTemplates) => {
@@ -44,7 +45,11 @@ export default function WeeklyEvents({ className, form, freeze, setUnsaved }: Ev
     <article className={cn('light-scroll h-96 pb-16', className)}>
       <section className='flex flex-col'>
         {weeklyEvents.map((event, index) => (
-          <WeeklyEvent key={index} event={event} eventIndex={index} updateEvent={freeze ? undefined : updateEvent} />
+          <WeeklyEvent
+            key={`${event.eventName}-${event.id ?? index}-${index}`}
+            event={event}
+            eventIndex={index}
+            updateEvent={freeze ? undefined : updateEvent} />
         ))}
         {weeklyEvents.length === 0 && <h4 className='text-lg font-normal text-gray-700'>No weekly events</h4>}
       </section>

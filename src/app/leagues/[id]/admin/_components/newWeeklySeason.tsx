@@ -1,5 +1,5 @@
 'use client';
-import { type ComponentProps } from '~/lib/utils';
+import { camelToTitle, type ComponentProps } from '~/lib/utils';
 import { type CastawayDetails } from '~/server/db/schema/castaways';
 import { type Member } from '~/server/db/schema/members';
 import { type Tribe } from '~/server/db/schema/tribes';
@@ -17,6 +17,7 @@ import { useToast } from '~/app/_components/commonUI/use-toast';
 import { type WeeklyEventRuleType } from '~/server/db/schema/weeklyEvents';
 import { type SeasonEventRuleType } from '~/server/db/schema/seasonEvents';
 import { submitSeasonResult, submitWeeklyResult } from '~/app/api/leagues/[id]/score/actions';
+import { SquareX } from 'lucide-react';
 /*import { Popover, PopoverContent, PopoverTrigger } from '~/app/_components/commonUI/popover';
 import { NotepadText } from 'lucide-react';
 import { Textarea } from '~/app/_components/commonUI/textArea';
@@ -90,8 +91,8 @@ export default function NewEventResult({
     form.setValue('ruleId', rule.id);
   };
 
-  const popRef = () => {
-    form.setValue('references', refs.slice(0, refs.length - 1));
+  const popRef = (index: number) => {
+    form.setValue('references', refs.filter((_, i) => i !== index));
     //form.setValue('notes', form.watch('notes').slice(0, refs.length - 1));
   };
 
@@ -207,7 +208,9 @@ export default function NewEventResult({
                 </SelectTrigger>
                 <SelectContent>
                   {rules.map((rule) => (
-                    <SelectItem value={rule.id.toString()} key={rule.id}>{rule.eventName} ({rule.timing})</SelectItem>
+                    <SelectItem value={rule.id.toString()} key={rule.id}>
+                      {rule.eventName} ({camelToTitle(rule.timing)})
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -237,43 +240,41 @@ export default function NewEventResult({
                   switch (selectedRule.referenceType) {
                     case 'castaway':
                       return (
-                        <span className='flex gap-2 justify-center items-center'>
-                          <FormControl>
+                        <FormControl>
+                          <span className='flex gap-2 justify-center items-center'>
                             <SelectCastaways castaways={showEliminated ? castaways : remaining} field={field} />
-                          </FormControl>
-                          {/*<AddNote form={form} index={index} />*/}
-                        </span>
+                            <SquareX className='cursor-pointer' onClick={() => popRef(index)} />
+                          </span>
+                        </FormControl>
                       );
                     case 'tribe':
                       return (
                         <FormControl>
-                          <SelectTribes tribes={tribes} field={field} />
+                          <span className='flex gap-2 justify-center items-center'>
+                            <SelectTribes tribes={tribes} field={field} />
+                            <SquareX className='cursor-pointer' onClick={() => popRef(index)} />
+                          </span>
                         </FormControl>
                       );
                     case 'member':
                       return (
                         <FormControl>
-                          <SelectMembers members={members} field={field} />
+                          <span className='flex gap-2 justify-center items-center'>
+                            <SelectMembers members={members} field={field} />
+                            <SquareX className='cursor-pointer' onClick={() => popRef(index)} />
+                          </span>
                         </FormControl>
                       );
                   }
                 }} />
               ))}
             </div>
-            <span className='grid grid-cols-2 gap-2'>
-              <Button
-                type='button'
-                className='px-1'
-                onClick={() => form.setValue('references', [...refs, undefined])}>
-                Add {selectedRule.referenceType}
-              </Button>
-              <Button
-                type='button'
-                className='px-1'
-                onClick={popRef}>
-                Remove {selectedRule.referenceType}
-              </Button>
-            </span>
+            <Button
+              type='button'
+              className='w-full'
+              onClick={() => form.setValue('references', [...refs, undefined])}>
+              Add {selectedRule.referenceType}
+            </Button>
           </article>)}
       </form>
     </Form>

@@ -19,14 +19,14 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
     event: SeasonTemplatesType,
     action: 'copy' | 'delete' | 'update',
     eventIndex: number) => {
-    const newEvents = [...seasonEvents] as SeasonTemplatesType[];
+    let newEvents = [...seasonEvents] as SeasonTemplatesType[];
 
     switch (action) {
       case 'copy':
         newEvents.push({ ...event, eventName: '' });
         break;
       case 'delete':
-        newEvents.splice(eventIndex, 1);
+        newEvents = newEvents.filter((_, index) => index !== eventIndex);
         break;
       case 'update':
         newEvents[eventIndex] = event;
@@ -34,6 +34,7 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
     }
 
     form.setValue('season', newEvents as SeasonEventRuleType[]);
+    setUnsaved && setUnsaved();
   };
 
   const newEvent = (value: keyof typeof SeasonTemplates) => {
@@ -42,10 +43,14 @@ export default function SeasonEvents({ className, form, freeze, setUnsaved }: Ev
   };
 
   return (
-    <article className={cn('light-scroll h-96 pb-16', className)}>
+    <article className={cn('light-scroll overscroll-none h-96 pb-16', className)}>
       <section className='flex flex-col'>
         {seasonEvents.map((event, index) => (
-          <SeasonEvent key={index} event={event} eventIndex={index} updateEvent={freeze ? undefined : updateEvent} />
+          <SeasonEvent
+            key={`${event.eventName}-${event.id ?? index}-${index}`}
+            event={event}
+            eventIndex={index}
+            updateEvent={freeze ? undefined : updateEvent} />
         ))}
         {seasonEvents.length === 0 && <h4 className='text-lg font-normal text-gray-700'>No season events</h4>}
       </section>
@@ -116,8 +121,8 @@ export function SeasonEvent({ event, eventIndex, updateEvent, className }: Seaso
         </div>
         {updateEvent &&
           <span className='flex gap-2'>
-            <CopyPlus className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={copyEvent} />
-            <SquareX className='inline-flex mt-6 align-middle rounded-md' size={24} onClick={deleteEvent} />
+            <CopyPlus className='inline-flex mt-6 align-middle rounded-md cursor-pointer' size={24} onClick={copyEvent} />
+            <SquareX className='inline-flex mt-6 align-middle rounded-md cursor-pointer' size={24} onClick={deleteEvent} />
           </span>}
       </span>
       <span className='flex gap-2 items-center'>

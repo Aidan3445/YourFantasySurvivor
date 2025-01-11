@@ -1,13 +1,15 @@
 import { type Member } from '~/server/db/schema/members';
-import Members, { CastawaysSkeleton, MembersSkeleton } from './membersScores';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
+import Members, { MembersSkeleton } from './membersScores';
+import { TabsContent, TabsList, TabsTrigger } from '~/app/_components/commonUI/tabs';
 import { getRules } from '~/app/api/leagues/[id]/events/query';
-import { getCastawayMemberEpisodeTable, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
-import compileScores from '~/app/api/leagues/[id]/score/compile';
+import { getSelectionUpdates, getCustomEvents, getBaseEvents, getWeeklyEvents, getSeasonEvents, getMemberEpisodeEvents } from '~/app/api/leagues/[id]/score/query';
+import { scoreCastaways, scoreMembers } from '~/app/api/leagues/[id]/score/compile';
 import Chart from '~/app/playground/_components/scoreChart';
 import { getDraftDetails } from '~/app/api/leagues/[id]/draft/query';
 import VotePredict from '../events/votePredict';
 import { Skeleton } from '~/app/_components/commonUI/skeleton';
+import Castaways, { CastawaysSkeleton } from './castawayScores';
+import { getHslIndex } from '~/lib/utils';
 
 interface MembersProps {
   leagueId: number;
@@ -16,14 +18,14 @@ interface MembersProps {
   isFull: boolean;
 }
 
-export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
+export async function LeaderboardTabs({ leagueId, members, ownerLoggedIn, isFull }: MembersProps) {
   const [
     rules, events, customEvents, weeklyEvents, seasonEvents,
-    memberCastaways, details, episodeEvents,
+    { memberCastaways, castawayMembers }, details, episodeEvents,
   ] = await Promise.all([
     getRules(leagueId), getBaseEvents(leagueId),
     getCustomEvents(leagueId), getWeeklyEvents(leagueId), getSeasonEvents(leagueId),
-    getCastawayMemberEpisodeTable(members.map((m) => m.id)),
+    getSelectionUpdates(leagueId),
     getDraftDetails(leagueId), getMemberEpisodeEvents(leagueId),
   ]);
 
@@ -33,10 +35,9 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
     memberEvents: [...customEvents.memberEvents, ...weeklyEvents.memberEvents, ...seasonEvents.memberEvents],
   };
 
-  const baseScores = compileScores(events, altEvents, memberCastaways, rules);
-
+  const membersScores = scoreMembers(events, altEvents, rules, memberCastaways, castawayMembers);
   const membersWithScores = members.map((member) => {
-    const points = baseScores[member.displayName] ?? [0, 0];
+    const points = membersScores[member.displayName] ?? [0, 0];
     return {
       ...member,
       points: points.reduce((a, b) => a + b, 0),
@@ -59,8 +60,35 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
     return 0;
   });
 
+  const castawaysScores = scoreCastaways(events, altEvents, rules);
+  const castawaysWithScores = details.castaways.map((castaway) => {
+    const points = castawaysScores[castaway.more.shortName] ?? [0, 0];
+    return {
+      ...castaway,
+      points: points.reduce((a, b) => a + b, 0),
+      episodeScores: points.reduce((totals, score, index) => {
+        const last = totals.pop() ?? 0;
+        for (let i = totals.length; i < index; i++) {
+          totals.push(last);
+        }
+        totals.push(last + score);
+        return totals;
+      }, [] as number[]),
+    };
+  }).sort((a, b) => {
+    // sort by last episode score, ties go to previous episode
+    for (let i = a.episodeScores.length - 1; i >= 0; i--) {
+      if (a.episodeScores[i] !== b.episodeScores[i])
+        return b.episodeScores[i]! - a.episodeScores[i]!;
+    }
+    return 0;
+  }).map((castaway, index) => ({
+    ...castaway,
+    color: getHslIndex(index, details.castaways.length / 2),
+  }));
+
   return (
-    <Tabs defaultValue='members' className='flex flex-col items-center'>
+    <>
       <section className='flex flex-col w-min'>
         <VotePredict
           leagueId={leagueId}
@@ -81,32 +109,40 @@ export async function Leaderboard({ leagueId, members, ownerLoggedIn, isFull }: 
             ownerLoggedIn={ownerLoggedIn}
             isFull={isFull}
             details={details} />
-          {Object.keys(baseScores).length !== 0 && <Chart className='w-96 min-h-60' data={membersWithScores} label />}
+          {Object.keys(membersScores).length !== 0 &&
+            <Chart className='w-96 min-h-60' data={membersWithScores} label />}
         </span>
       </TabsContent>
       <TabsContent value='castaways'>
-        <h2>Castaways scoreboard</h2>
-        <p>Coming soon</p>
-        <span className='flex flex-wrap gap-4 justify-center mt-2 w-full'>
+        <span className='flex flex-wrap gap-4 justify-center w-full'>
+          <Castaways castaways={castawaysWithScores} />
+          {Object.keys(castawaysScores).length !== 0 &&
+            <Chart className='w-96 h-[280px]' data={castawaysWithScores.slice(0, 9)} label />}
+        </span>
+      </TabsContent>
+    </>
+  );
+}
+
+export function LeaderboardTabsSkeleton() {
+  return (
+    <>
+      <TabsList>
+        <TabsTrigger value='members'>Members</TabsTrigger>
+        <TabsTrigger value='castaways'>Castaways</TabsTrigger>
+      </TabsList>
+      <TabsContent value='members'>
+        <span className='flex flex-wrap gap-4 justify-center w-full'>
+          <MembersSkeleton />
+          <Skeleton className='w-96 min-h-60' />
+        </span>
+      </TabsContent>
+      <TabsContent value='castaways'>
+        <span className='flex flex-wrap gap-4 justify-center w-full'>
           <CastawaysSkeleton />
           <Skeleton className='w-96 h-[280px]' />
         </span>
       </TabsContent>
-    </Tabs>
-  );
-}
-
-export function LeaderboardSkeleton() {
-  return (
-    <section className='flex flex-col items-center'>
-      <div className='flex flex-col gap-2 justify-center'>
-        <Skeleton className='p-1 w-48 h-6' />
-        <Skeleton className='p-1 w-48 h-10' />
-      </div>
-      <span className='flex flex-wrap gap-4 justify-center mt-2 w-full'>
-        <MembersSkeleton />
-        <Skeleton className='w-96 h-[280px]' />
-      </span>
-    </section>
+    </>
   );
 }

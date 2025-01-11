@@ -7,12 +7,14 @@ import { leagues } from '~/server/db/schema/leagues';
 import { tribes } from '~/server/db/schema/tribes';
 import { getWeeklyEventsRaw, leagueMemberAuth, type PredictionResult, tallyTheVotes } from '../../score/query';
 import { getSeasonPredictions } from '../query';
+import { camelToTitle } from '~/lib/utils';
 //import { weeklyEventRules } from '~/server/db/schema/weeklyEvents';
 //import { leagueMembers } from '~/server/db/schema/members';
 
 export async function getBaseEventsTimeline(leagueId: number) {
   const { memberId } = await leagueMemberAuth(leagueId);
   if (!memberId) return {};
+
 
   return await db
     .select({
@@ -83,7 +85,7 @@ export async function getSeasonEventsTimeline(leagueId: number) {
       ...pred, name: pred.result.name!, result: pred.result.name!, episode: pred.result.episode!, hits: [],
     }];
     const predIndex = timeline[pred.result.episode!]![pred.eventName]!.findIndex((p) => p.result === pred.result.name);
-    const memberTiming = `${pred.member} (${pred.timing})`;
+    const memberTiming = `${pred.member} (${camelToTitle(pred.timing)})`;
     if (predIndex === -1) {
       timeline[pred.result.episode!]![pred.eventName]!.push({
         ...pred, name: pred.result.name!, result: pred.result.name!, episode: pred.result.episode!, hits: [memberTiming],

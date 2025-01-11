@@ -49,7 +49,7 @@ export default function compileStats({ castawayEvents, tribeEvents, tribeUpdates
   castawayEvents.forEach((event) => {
     const castawayName = event.castaway;
 
-    switch (event.name) {
+    switch (event.eventName) {
       case 'advFound': {
         const castaway = stats.advantages.find((c) => c.name === castawayName);
         const status: AdvantageStatus = 'Active';
@@ -224,7 +224,7 @@ export default function compileStats({ castawayEvents, tribeEvents, tribeUpdates
   tribeEvents.forEach((event) => {
     const tribeName = event.tribe;
 
-    switch (event.name) {
+    switch (event.eventName) {
       case 'tribe1st': {
         // check if tribe is already in the list
         const tribe = stats.tribeChallenges.find((t) => t.name === tribeName);

@@ -1,50 +1,57 @@
 import 'server-only';
 import { type Events } from '~/app/api/seasons/[name]/events/query';
 import { type BaseEventRuleType } from '~/server/db/schema/leagues';
-import { type AltEvents } from './query';
+import type { CastawayMembers, AltEvents, MemberCastaways } from './query';
 import { findTribeCastaways } from '~/app/api/seasons/[name]/events/scores';
 
-export default function compileScores(
+function compileScores(
   { castawayEvents, tribeEvents, tribeUpdates }: Events,
   altEvents: AltEvents,
-  memberCastaways: Record<number, Record<string, string>>,
   rules: BaseEventRuleType,
+  memberCastaways?: MemberCastaways,
+  castawayMembers?: CastawayMembers,
 ): Record<string, number[]> {
   const scores: Record<string, number[]> = {};
-  const elimList: string[] = [];
+  const elims: string[][] = [];
 
   // castaway events
   // sort for consistent elimination order
   const sortedCE = castawayEvents.sort((a, b) => a.episode - b.episode);
-  for (const { castaway, name, episode } of sortedCE) {
-    if (name === 'otherNotes') continue;
-    if (name === 'elim' || name === 'noVoteExit') {
-      // this means they left the game
-      elimList.push(castaway);
-      continue;
+  for (const { castaway, eventName, episode } of sortedCE) {
+    switch (eventName) {
+      case 'otherNotes':
+        continue;
+      case 'elim':
+      case 'noVoteExit':
+        elims[episode] ??= [];
+        elims[episode].push(castaway);
+        continue;
+      default:
+        break;
     }
 
-    const member = findMember(memberCastaways, castaway, episode);
-    if (!member) continue;
+    const cmIndex = Math.min(episode - 1, (castawayMembers?.[castaway]?.length ?? 0) - 1);
+    const name = castawayMembers ? castawayMembers[castaway]?.[cmIndex] : castaway;
+    if (!name) continue;
 
-    scores[member] ??= [];
-
-    const points = scores[member];
-    points[episode] = (points[episode] ?? 0) + rules[name as keyof BaseEventRuleType];
+    scores[name] ??= [];
+    scores[name][episode] ??= 0;
+    scores[name][episode] += rules[eventName as keyof BaseEventRuleType];
   }
 
   // tribe events
-  for (const { tribe, name, episode } of tribeEvents) {
-    const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
+  for (const { tribe, eventName, episode } of tribeEvents) {
+    const castaways = findTribeCastaways(tribeUpdates, elims, tribe, episode);
 
     for (const castaway of castaways) {
-      const member = findMember(memberCastaways, castaway, episode);
-      if (!member) continue;
+      const cmIndex = Math.min(episode - 1, (castawayMembers?.[castaway]?.length ?? 0) - 1);
+      const name = castawayMembers ? castawayMembers[castaway]?.[cmIndex] : castaway;
+      if (!name) continue;
 
-      scores[member] ??= [];
-      const points = scores[member];
+      scores[name] ??= [];
+      const points = scores[name];
 
-      switch (name) {
+      switch (eventName) {
         case 'tribe1st':
           points[episode] = (points[episode] ?? 0) + rules.tribe1st;
           break;
@@ -52,63 +59,65 @@ export default function compileScores(
           points[episode] = (points[episode] ?? 0) + rules.tribe2nd;
           break;
         default:
-          break;
+          continue;
       }
     }
   }
 
   // alt events
   for (const { name: castaway, points, episode } of altEvents.castawayEvents) {
-    const member = findMember(memberCastaways, castaway, episode);
-    if (!member) continue;
+    const cmIndex = Math.min(episode - 1, (castawayMembers?.[castaway]?.length ?? 0) - 1);
+    const name = castawayMembers ? castawayMembers[castaway]?.[cmIndex] : castaway;
+    if (!name) continue;
 
-    scores[member] ??= [];
-    const memberPoints = scores[member];
-    memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
+    scores[name] ??= [];
+    scores[name][episode] ??= 0;
+    scores[name][episode] += points;
   }
 
 
   for (const { name: tribe, points, episode } of altEvents.tribeEvents) {
-    const castaways = findTribeCastaways(tribeUpdates, elimList, tribe, episode);
+    const castaways = findTribeCastaways(tribeUpdates, elims, tribe, episode);
 
     for (const castaway of castaways) {
-      const member = findMember(memberCastaways, castaway, episode);
-      if (!member) continue;
+      const cmIndex = Math.min(episode - 1, (castawayMembers?.[castaway]?.length ?? 0) - 1);
+      const name = castawayMembers ? castawayMembers[castaway]?.[cmIndex] : castaway;
+      if (!name) continue;
 
-      scores[member] ??= [];
-      const memberPoints = scores[member];
-      memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
+      scores[name] ??= [];
+      scores[name][episode] ??= 0;
+      scores[name][episode] += points;
     }
   }
 
 
-  for (const { name, points, episode } of altEvents.memberEvents) {
-    scores[name] ??= [];
-    const memberPoints = scores[name];
-    memberPoints[episode] = (memberPoints[episode] ?? 0) + points;
-  }
+  if (memberCastaways) {
+    for (const { name, points, episode } of altEvents.memberEvents) {
+      scores[name] ??= [];
+      scores[name][episode] ??= 0;
+      scores[name][episode] += points;
+    }
 
-  // add survival bonus
-  // each episode that your castaway survives
-  // you get points for the number of episodes they've survived
-  const members = Object.values(Object.values(memberCastaways)[0] ?? {});
-  const survivalTable = members.reduce((acc, castaway) => {
-    acc[castaway] = 1;
-    return acc;
-  }, {} as Record<string, number>);
+    // add survival bonus
+    // each episode that your castaway survives
+    // you get points for the number of episodes they've survived
+    const CAP = 100;
+    Object.entries(memberCastaways).forEach(([member, castaways]) => {
+      let streak = 0;
+      for (let episodeNum = 1; episodeNum < elims.length; episodeNum++) {
+        const eliminated = elims.slice(0, episodeNum + 1).flat();
+        const cIndex = Math.min(episodeNum - 1, castaways.length - 1);
 
-  for (let i = 1; i <= elimList.length; i++) {
-    const elminated = elimList[i - 1]!;
+        if (eliminated.includes(castaways[cIndex] ?? '')) {
+          streak = 0;
+          continue;
+        }
 
-    for (const member in survivalTable) {
-      if (findMember(memberCastaways, elminated, i) === member) {
-        survivalTable[member] = 0;
-      } else {
         scores[member] ??= [];
-        scores[member][i] ??= 0;
-        scores[member][i]! += survivalTable[member]!++;
+        scores[member][episodeNum] ??= 0;
+        scores[member][episodeNum]! += Math.min(++streak, CAP);
       }
-    }
+    });
   }
 
   // fill in missing episodes
@@ -124,19 +133,20 @@ export default function compileScores(
   return scores;
 }
 
-// could cache these but it's not that expensive 
-// since the numbers of castaways and tribes are small
-
-// find the member that has the castaway selected 
-function findMember(memberCastaways: Record<number, Record<string, string>>, castaway: string, episode: number) {
-  let member = memberCastaways[1]?.[castaway];
-  for (let i = 2; i <= episode; i++) {
-    if (!memberCastaways[i]) continue;
-
-    if (memberCastaways[i]![castaway]) member = memberCastaways[i]![castaway];
-    else if (member && Object.values(memberCastaways[i]!).includes(member)) member = undefined;
-  }
-
-  return member;
+export function scoreMembers(
+  events: Events,
+  altEvents: AltEvents,
+  rules: BaseEventRuleType,
+  memberCastaways: MemberCastaways,
+  castawayMembers: CastawayMembers
+): Record<string, number[]> {
+  return compileScores(events, altEvents, rules, memberCastaways, castawayMembers);
 }
 
+export function scoreCastaways(
+  events: Events,
+  altEvents: AltEvents,
+  rules: BaseEventRuleType
+): Record<string, number[]> {
+  return compileScores(events, altEvents, rules);
+}
