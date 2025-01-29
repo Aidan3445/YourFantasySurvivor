@@ -19,13 +19,13 @@ export async function getLeague(leagueId: number) {
     .select({
       id: leagues.id,
       name: leagues.name,
-      season: seasons.name,
+      season: seasons.seasonName,
       password: leagues.password,
       draftDate: leagueSettings.draftDate,
     })
     .from(leagues)
     .where(eq(leagues.id, leagueId))
-    .innerJoin(seasons, eq(seasons.id, leagues.season))
+    .innerJoin(seasons, eq(seasons.seasonId, leagues.season))
     .innerJoin(leagueSettings, eq(leagueSettings.league, leagues.id));
   const membersFetch = db
     .select()
@@ -56,8 +56,8 @@ export async function getLeague(leagueId: number) {
     (await db
       .select({ count: count() })
       .from(castaways)
-      .innerJoin(seasons, eq(castaways.season, seasons.id))
-      .where(eq(seasons.name, league[0]!.season))
+      .innerJoin(seasons, eq(castaways.season, seasons.seasonId))
+      .where(eq(seasons.seasonName, league[0]!.season))
       .then((count) => count[0]!.count <= safeMembers.length));
 
   return { league: league[0]!, members: safeMembers, isFull };
@@ -68,11 +68,11 @@ export async function getLeagues() {
   if (!userId) return [];
 
   const userLeagues = await db
-    .select({ name: leagues.name, season: seasons.name, id: leagues.id })
+    .select({ name: leagues.name, season: seasons.seasonName, id: leagues.id })
     .from(leagueMembers)
     .where(eq(leagueMembers.userId, userId))
     .innerJoin(leagues, eq(leagueMembers.league, leagues.id))
-    .innerJoin(seasons, eq(leagues.season, seasons.id));
+    .innerJoin(seasons, eq(leagues.season, seasons.seasonId));
   return userLeagues;
 }
 

@@ -19,7 +19,7 @@ export const leagues = createTable(
     id: serial('league_id').notNull().primaryKey(),
     name: varchar('name', { length: 64 }).notNull().unique(),
     password: varchar('password', { length: 64 }).notNull(),
-    season: integer('season_id').references(() => seasons.id, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasons.seasonId, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type League = typeof leagues.$inferSelect;

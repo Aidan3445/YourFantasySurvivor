@@ -61,7 +61,7 @@ export const weeklyEvents = createTable(
   {
     id: serial('event_weekly_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
@@ -75,7 +75,7 @@ export const weeklyCastaways = createTable(
   {
     id: serial('event_weekly_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    reference: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
   },
 );
 
@@ -84,7 +84,7 @@ export const weeklyTribes = createTable(
   {
     id: serial('event_weekly_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    reference: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
   }
 );
 
@@ -102,8 +102,8 @@ export const weeklyCastawayResults = createTable(
   {
     id: serial('event_weekly_result_castaway_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
   }
 );
 
@@ -112,8 +112,8 @@ export const weeklyTribeResults = createTable(
   {
     id: serial('event_weekly_result_tribe_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
   }
 );
 
@@ -122,7 +122,7 @@ export const weeklyMemberResults = createTable(
   {
     id: serial('event_weekly_result_member_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
     result: integer('result').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
   }
 );

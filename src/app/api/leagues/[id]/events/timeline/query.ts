@@ -28,15 +28,15 @@ export async function getBaseEventsTimeline(leagueId: number) {
         castaway: castaways.name,
         tribe: tribes.name,
       },
-      id: baseEvents.id,
+      id: baseEvents.baseEventId,
     })
     .from(baseEvents)
-    .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
-    .innerJoin(leagues, eq(leagues.season, episodes.season))
-    .leftJoin(baseEventCastaways, eq(baseEventCastaways.event, baseEvents.id))
-    .leftJoin(castaways, eq(castaways.id, baseEventCastaways.reference))
-    .leftJoin(baseEventTribes, eq(baseEventTribes.event, baseEvents.id))
-    .leftJoin(tribes, eq(tribes.id, baseEventTribes.reference))
+    .innerJoin(episodes, eq(episodes.episodeId, baseEvents.episodeId))
+    .innerJoin(leagues, eq(leagues.season, episodes.seasonId))
+    .leftJoin(baseEventCastaways, eq(baseEventCastaways.eventId, baseEvents.baseEventId))
+    .leftJoin(castaways, eq(castaways.castawayId, baseEventCastaways.referenceId))
+    .leftJoin(baseEventTribes, eq(baseEventTribes.eventId, baseEvents.baseEventId))
+    .leftJoin(tribes, eq(tribes.tribeId, baseEventTribes.referenceId))
     .where(eq(leagues.id, leagueId))
     .then((events) => events.reduce((timeline, event) => {
       const episodeId = `${event.episode} - ${event.title}`;

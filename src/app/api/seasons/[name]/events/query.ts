@@ -33,13 +33,13 @@ export async function getCastawayEvents(
       keywords: baseEvents.keywords,
     })
     .from(baseEventCastaways)
-    .innerJoin(baseEvents, eq(baseEvents.id, baseEventCastaways.event))
-    .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(castaways, eq(castaways.id, baseEventCastaways.reference))
+    .innerJoin(baseEvents, eq(baseEvents.baseEventId, baseEventCastaways.eventId))
+    .innerJoin(episodes, eq(episodes.episodeId, baseEvents.episodeId))
+    .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+    .innerJoin(castaways, eq(castaways.castawayId, baseEventCastaways.referenceId))
     .where(
       and(
-        eq(seasons.name, seasonName),
+        eq(seasons.seasonName, seasonName),
         not(eq(baseEvents.eventName, 'tribeUpdate')),
         or(
           eq(castaways.name, castawayName ?? castaways.name),
@@ -71,13 +71,13 @@ export async function getTribeEvents(
       keywords: baseEvents.keywords,
     })
     .from(baseEventTribes)
-    .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
-    .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(tribes, eq(tribes.id, baseEventTribes.reference))
+    .innerJoin(baseEvents, eq(baseEvents.baseEventId, baseEventTribes.eventId))
+    .innerJoin(episodes, eq(episodes.episodeId, baseEvents.episodeId))
+    .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+    .innerJoin(tribes, eq(tribes.tribeId, baseEventTribes.referenceId))
     .where(
       and(
-        eq(seasons.name, seasonName),
+        eq(seasons.seasonName, seasonName),
         not(eq(baseEvents.eventName, 'tribeUpdate')),
         eq(tribes.name, tribeName ?? tribes.name),
       ),
@@ -97,14 +97,14 @@ export async function getTribeUpdates(
       episode: episodes.number,
     })
     .from(baseEventTribes)
-    .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
-    .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(tribes, eq(tribes.id, baseEventTribes.reference))
-    .innerJoin(baseEventCastaways, eq(baseEvents.id, baseEventCastaways.event))
-    .innerJoin(castaways, eq(castaways.id, baseEventCastaways.reference))
+    .innerJoin(baseEvents, eq(baseEvents.baseEventId, baseEventTribes.eventId))
+    .innerJoin(episodes, eq(episodes.episodeId, baseEvents.episodeId))
+    .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+    .innerJoin(tribes, eq(tribes.tribeId, baseEventTribes.referenceId))
+    .innerJoin(baseEventCastaways, eq(baseEvents.baseEventId, baseEventCastaways.eventId))
+    .innerJoin(castaways, eq(castaways.castawayId, baseEventCastaways.referenceId))
     .where(
-      and(eq(seasons.name, seasonName), eq(baseEvents.eventName, 'tribeUpdate')),
+      and(eq(seasons.seasonName, seasonName), eq(baseEvents.eventName, 'tribeUpdate')),
     )
     .orderBy(desc(episodes.number));
 

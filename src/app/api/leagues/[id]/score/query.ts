@@ -32,9 +32,9 @@ export async function getBaseEvents(leagueId: number) {
   if (!memberId) throw new Error('Not authorized');
 
   const seasonName = await db
-    .select({ seasonName: seasons.name })
+    .select({ seasonName: seasons.seasonName })
     .from(seasons)
-    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
     .where(eq(leagues.id, leagueId))
     .then((res) => res[0]?.seasonName);
 
@@ -82,10 +82,10 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .from(customCastaways)
       .innerJoin(customEvents, eq(customEvents.id, customCastaways.event))
       .innerJoin(customEventRules, eq(customEventRules.id, customEvents.rule))
-      .innerJoin(episodes, eq(episodes.id, customEvents.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
-      .innerJoin(castaways, eq(castaways.id, customCastaways.reference))
+      .innerJoin(episodes, eq(episodes.episodeId, customEvents.episode))
+      .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+      .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
+      .innerJoin(castaways, eq(castaways.castawayId, customCastaways.reference))
       .where(eq(leagues.id, leagueId))
       .orderBy(desc(episodes.number)),
     db
@@ -101,10 +101,10 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .from(customTribes)
       .innerJoin(customEvents, eq(customEvents.id, customTribes.event))
       .innerJoin(customEventRules, eq(customEventRules.id, customEvents.rule))
-      .innerJoin(episodes, eq(episodes.id, customEvents.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
-      .innerJoin(tribes, eq(tribes.id, customTribes.reference))
+      .innerJoin(episodes, eq(episodes.episodeId, customEvents.episode))
+      .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+      .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
+      .innerJoin(tribes, eq(tribes.tribeId, customTribes.reference))
       .where(eq(leagues.id, leagueId))
       .orderBy(desc(episodes.number)),
     db
@@ -119,9 +119,9 @@ export async function getCustomEvents(leagueId: number): Promise<AltEvents> {
       .from(customMembers)
       .innerJoin(customEvents, eq(customEvents.id, customMembers.event))
       .innerJoin(customEventRules, eq(customEventRules.id, customEvents.rule))
-      .innerJoin(episodes, eq(episodes.id, customEvents.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(episodes, eq(episodes.episodeId, customEvents.episode))
+      .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+      .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
       .innerJoin(leagueMembers, eq(leagueMembers.id, customMembers.reference))
       .where(eq(leagues.id, leagueId))
       .orderBy(desc(episodes.number)),
@@ -194,9 +194,9 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       .innerJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyEvents.member))
       .innerJoin(episodes, and(
-        eq(episodes.id, weeklyCastawayResults.episode),
-        eq(episodes.id, weeklyEvents.episode)))
-      .innerJoin(castaways, eq(castaways.id, weeklyCastawayResults.result))
+        eq(episodes.episodeId, weeklyCastawayResults.episode),
+        eq(episodes.episodeId, weeklyEvents.episode)))
+      .innerJoin(castaways, eq(castaways.castawayId, weeklyCastawayResults.result))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'predict'),
@@ -221,9 +221,9 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       .innerJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyEvents.member))
       .innerJoin(episodes, and(
-        eq(episodes.id, weeklyTribeResults.episode),
-        eq(episodes.id, weeklyEvents.episode)))
-      .innerJoin(tribes, eq(tribes.id, weeklyTribeResults.result))
+        eq(episodes.episodeId, weeklyTribeResults.episode),
+        eq(episodes.episodeId, weeklyEvents.episode)))
+      .innerJoin(tribes, eq(tribes.tribeId, weeklyTribeResults.result))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'predict'),
@@ -249,9 +249,9 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       .innerJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyEvents.member))
       .innerJoin(episodes, and(
-        eq(episodes.id, weeklyMemberResults.episode),
-        eq(episodes.id, weeklyEvents.episode)))
-      .innerJoin(tribes, eq(tribes.id, weeklyMemberResults.result))
+        eq(episodes.episodeId, weeklyMemberResults.episode),
+        eq(episodes.episodeId, weeklyEvents.episode)))
+      .innerJoin(tribes, eq(tribes.tribeId, weeklyMemberResults.result))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'predict'),
@@ -278,8 +278,8 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
       .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
-      .innerJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
-      .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
+      .innerJoin(castaways, eq(castaways.castawayId, weeklyCastaways.reference))
+      .innerJoin(episodes, eq(episodes.episodeId, weeklyEvents.episode))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
@@ -303,8 +303,8 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       .innerJoin(voter, eq(voter.id, weeklyEvents.member))
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
       .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
-      .innerJoin(tribes, eq(tribes.id, weeklyTribes.reference))
-      .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
+      .innerJoin(tribes, eq(tribes.tribeId, weeklyTribes.reference))
+      .innerJoin(episodes, eq(episodes.episodeId, weeklyEvents.episode))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
@@ -329,7 +329,7 @@ export async function getWeeklyEventsRaw(leagueId: number): Promise<WeeklyEvents
       .innerJoin(weeklyEventRules, eq(weeklyEventRules.id, weeklyEvents.rule))
       .innerJoin(leagues, eq(leagues.id, weeklyEventRules.league))
       .innerJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
-      .innerJoin(episodes, eq(episodes.id, weeklyEvents.episode))
+      .innerJoin(episodes, eq(episodes.episodeId, weeklyEvents.episode))
       .where(and(
         eq(leagues.id, leagueId),
         eq(weeklyEventRules.type, 'vote'),
@@ -425,9 +425,9 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
       .innerJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, seasonEvents.member))
-      .innerJoin(episodes, eq(episodes.id, seasonCastawayResults.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(episodes, eq(episodes.episodeId, seasonCastawayResults.episode))
+      .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+      .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
       .where(and(
         eq(leagues.id, leagueId),
         eq(seasonEventRules.referenceType, 'castaway'),
@@ -446,9 +446,9 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
       .innerJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, seasonEvents.member))
-      .innerJoin(episodes, eq(episodes.id, seasonTribeResults.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(episodes, eq(episodes.episodeId, seasonTribeResults.episode))
+      .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+      .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
       .where(and(
         eq(leagues.id, leagueId),
         eq(seasonEventRules.referenceType, 'tribe'),
@@ -467,9 +467,9 @@ export async function getSeasonEvents(leagueId: number): Promise<AltEvents> {
       .innerJoin(seasonEvents, eq(seasonEvents.rule, seasonEventRules.id))
       .innerJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
       .innerJoin(leagueMembers, eq(leagueMembers.id, seasonEvents.member))
-      .innerJoin(episodes, eq(episodes.id, seasonMemberResults.episode))
-      .innerJoin(seasons, eq(seasons.id, episodes.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(episodes, eq(episodes.episodeId, seasonMemberResults.episode))
+      .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+      .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
       .where(and(
         eq(leagues.id, leagueId),
         eq(seasonEventRules.referenceType, 'member'),
@@ -496,8 +496,8 @@ export async function getSelectionUpdates(leagueId: number) {
     })
     .from(selectionUpdates)
     .innerJoin(leagueMembers, eq(leagueMembers.id, selectionUpdates.member))
-    .innerJoin(castaways, eq(castaways.id, selectionUpdates.castaway))
-    .innerJoin(episodes, eq(episodes.id, selectionUpdates.episode))
+    .innerJoin(castaways, eq(castaways.castawayId, selectionUpdates.castaway))
+    .innerJoin(episodes, eq(episodes.episodeId, selectionUpdates.episode))
     .where(eq(leagueMembers.league, leagueId))
     .orderBy(asc(episodes.number));
 
@@ -536,18 +536,18 @@ export async function getSelectionUpdates(leagueId: number) {
 export async function getEpisodes(leagueId: number, includeFuture = false) {
   const eps = await db
     .select({
-      id: episodes.id,
+      id: episodes.episodeId,
       title: episodes.title,
       number: episodes.number,
       airDate: episodes.airDate,
       runtime: episodes.runtime,
       merge: episodes.merge,
       finale: episodes.finale,
-      season: seasons.name,
+      season: seasons.seasonName,
     })
     .from(episodes)
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+    .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
     .where(eq(leagues.id, leagueId))
     .orderBy(desc(episodes.number));
 
@@ -637,9 +637,9 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
       eq(weeklyEvents.member, memberId),
       eq(weeklyEvents.episode, currentEpisode.id)))
     .leftJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
-    .leftJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
+    .leftJoin(castaways, eq(castaways.castawayId, weeklyCastaways.reference))
     .leftJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
-    .leftJoin(tribes, eq(tribes.id, weeklyTribes.reference))
+    .leftJoin(tribes, eq(tribes.tribeId, weeklyTribes.reference))
     .leftJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
     .leftJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
     .where(and(
@@ -684,9 +684,9 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
       eq(weeklyEvents.member, memberId),
       eq(weeklyEvents.episode, predictionEpisode.id)))
     .leftJoin(weeklyCastaways, eq(weeklyCastaways.event, weeklyEvents.id))
-    .leftJoin(castaways, eq(castaways.id, weeklyCastaways.reference))
+    .leftJoin(castaways, eq(castaways.castawayId, weeklyCastaways.reference))
     .leftJoin(weeklyTribes, eq(weeklyTribes.event, weeklyEvents.id))
-    .leftJoin(tribes, eq(tribes.id, weeklyTribes.reference))
+    .leftJoin(tribes, eq(tribes.tribeId, weeklyTribes.reference))
     .leftJoin(weeklyMembers, eq(weeklyMembers.event, weeklyEvents.id))
     .leftJoin(leagueMembers, eq(leagueMembers.id, weeklyMembers.reference))
     .where(and(
@@ -715,9 +715,9 @@ export async function getMemberEpisodeEvents(leagueId: number): Promise<MemberEp
         eq(seasonEvents.rule, seasonEventRules.id),
         eq(seasonEvents.member, memberId)))
       .leftJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
-      .leftJoin(castaways, eq(castaways.id, seasonCastaways.reference))
+      .leftJoin(castaways, eq(castaways.castawayId, seasonCastaways.reference))
       .leftJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
-      .leftJoin(tribes, eq(tribes.id, seasonTribes.reference))
+      .leftJoin(tribes, eq(tribes.tribeId, seasonTribes.reference))
       .leftJoin(seasonMembers, eq(seasonMembers.event, seasonEvents.id))
       .leftJoin(leagueMembers, eq(leagueMembers.id, seasonMembers.reference))
       .where(and(

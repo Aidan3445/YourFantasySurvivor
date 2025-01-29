@@ -45,7 +45,7 @@ export const customEvents = createTable(
   {
     id: serial('event_custom_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => customEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type CustomEvent = typeof customEvents.$inferSelect;
@@ -55,7 +55,7 @@ export const customCastaways = createTable(
   {
     id: serial('event_custom_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
   },
 );
 
@@ -64,7 +64,7 @@ export const customTribes = createTable(
   {
     id: serial('event_custom_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('tribe_id').references(() => tribes.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
   },
 );
 

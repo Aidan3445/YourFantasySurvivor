@@ -39,8 +39,8 @@ export const selectionUpdates = createTable(
   'selection_update',
   {
     member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.id, { onDelete: 'cascade' }).notNull(),
-    castaway: integer('castaway_id').references(() => castaways.id, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
+    castaway: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
     unique().on(table.member, table.episode),

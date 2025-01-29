@@ -27,7 +27,7 @@ export async function getLeagueSettings(leagueId: number) {
 
   const draftOver = await db.select({ premiere: seasons.premierDate })
     .from(seasons)
-    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
     .innerJoin(leagueSettings, eq(leagueSettings.league, leagues.id))
     .where(eq(leagueSettings.league, leagueId))
     .then((res) => res[0]?.premiere)
@@ -62,15 +62,15 @@ const elimEps = aliasedTable(episodes, 'elimEps');
 export async function getSurvivorsListEDITING(leagueId: number, memberId: number) {
   const elimEvents = db.select({
     episode: elimEps.number,
-    castawayId: baseEventCastaways.reference,
+    castawayId: baseEventCastaways.referenceId,
   })
     .from(baseEvents)
-    .innerJoin(baseEventCastaways, eq(baseEventCastaways.event, baseEvents.id))
-    .innerJoin(elimEps, eq(elimEps.id, baseEvents.episode))
-    .innerJoin(seasons, eq(seasons.id, elimEps.season))
+    .innerJoin(baseEventCastaways, eq(baseEventCastaways.eventId, baseEvents.baseEventId))
+    .innerJoin(elimEps, eq(elimEps.episodeId, baseEvents.episodeId))
+    .innerJoin(seasons, eq(seasons.seasonId, elimEps.seasonId))
     .innerJoin(leagues, and(
       eq(leagues.id, leagueId),
-      eq(leagues.season, seasons.id)))
+      eq(leagues.season, seasons.seasonId)))
     .where(or(
       eq(baseEvents.eventName, 'elim'),
       eq(baseEvents.eventName, 'noVoteExit')))
@@ -84,9 +84,9 @@ export async function getSurvivorsListEDITING(leagueId: number, memberId: number
     })
     .from(leagueMembers)
     .innerJoin(selectionUpdates, eq(selectionUpdates.member, leagueMembers.id))
-    .innerJoin(episodes, eq(selectionUpdates.episode, episodes.id))
-    .innerJoin(castaways, eq(selectionUpdates.castaway, castaways.id))
-    .leftJoin(elimEvents, eq(castaways.id, elimEvents.castawayId))
+    .innerJoin(episodes, eq(selectionUpdates.episode, episodes.episodeId))
+    .innerJoin(castaways, eq(selectionUpdates.castaway, castaways.castawayId))
+    .leftJoin(elimEvents, eq(castaways.castawayId, elimEvents.castawayId))
     .where(and(
       eq(leagueMembers.league, leagueId),
       eq(leagueMembers.id, memberId)))

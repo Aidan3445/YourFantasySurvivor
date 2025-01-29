@@ -26,10 +26,10 @@ export async function submitDraft(leagueId: number, picks: Picks) {
   if (!userId) throw new Error('User not authenticated');
 
   const firstEp = await db
-    .select({ id: episodes.id })
+    .select({ id: episodes.episodeId })
     .from(episodes)
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .innerJoin(leagues, eq(leagues.season, seasons.id))
+    .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+    .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
     .where(and(
       eq(leagues.id, leagueId),
       eq(episodes.number, 1)));
@@ -121,10 +121,10 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
   if (!userId) throw new Error('User not authenticated');
 
   const { memberId, season } = await db
-    .select({ memberId: leagueMembers.id, season: seasons.name })
+    .select({ memberId: leagueMembers.id, season: seasons.seasonName })
     .from(leagueMembers)
     .innerJoin(leagues, eq(leagues.id, leagueMembers.league))
-    .innerJoin(seasons, eq(seasons.id, leagues.season))
+    .innerJoin(seasons, eq(seasons.seasonId, leagues.season))
     .where(and(
       eq(leagueMembers.league, leagueId),
       eq(leagueMembers.userId, userId)))
@@ -150,19 +150,19 @@ export async function changeSurvivorPick(leagueId: number, castaway: string) {
 
   const [newCastawayId, currentCastawayId] = await Promise.all([
     db
-      .select({ id: castaways.id })
+      .select({ id: castaways.castawayId })
       .from(castaways)
-      .innerJoin(seasons, eq(seasons.id, castaways.season))
-      .innerJoin(leagues, eq(leagues.season, seasons.id))
+      .innerJoin(seasons, eq(seasons.seasonId, castaways.season))
+      .innerJoin(leagues, eq(leagues.season, seasons.seasonId))
       .where(and(
         eq(leagues.id, leagueId),
         or(eq(castaways.name, castaway), eq(castaways.shortName, castaway))))
       .then((res) => res[0]?.id),
     db
-      .select({ castaway: castaways.id })
+      .select({ castaway: castaways.castawayId })
       .from(selectionUpdates)
       .innerJoin(leagueMembers, eq(leagueMembers.id, selectionUpdates.member))
-      .innerJoin(castaways, eq(castaways.id, selectionUpdates.castaway))
+      .innerJoin(castaways, eq(castaways.castawayId, selectionUpdates.castaway))
       .where(and(
         eq(leagueMembers.id, memberId),
         lt(selectionUpdates.episode, nextEpisode.id)))

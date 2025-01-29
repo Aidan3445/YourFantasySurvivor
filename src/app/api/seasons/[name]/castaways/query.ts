@@ -7,7 +7,7 @@ import { tribes } from '~/server/db/schema/tribes';
 import { type CastawayDetails, castaways, type TribeEp } from '~/server/db/schema/castaways';
 
 export const CastawayDetailsSelect = {
-  id: castaways.id,
+  id: castaways.castawayId,
   name: castaways.name,
   photo: castaways.photo,
   tribe: tribes.name,
@@ -19,7 +19,7 @@ export const CastawayDetailsSelect = {
     hometown: castaways.hometown,
     residence: castaways.residence,
     job: castaways.job,
-    season: seasons.name,
+    season: seasons.seasonName,
   }
 };
 
@@ -27,14 +27,14 @@ export async function getCastaways(seasonName: string, castawayName?: string): P
   const rows = await db
     .select(CastawayDetailsSelect)
     .from(castaways)
-    .innerJoin(baseEventCastaways, eq(baseEventCastaways.reference, castaways.id))
-    .innerJoin(baseEventTribes, eq(baseEventTribes.event, baseEventCastaways.event))
-    .innerJoin(tribes, eq(tribes.id, baseEventTribes.reference))
-    .innerJoin(baseEvents, eq(baseEvents.id, baseEventTribes.event))
-    .innerJoin(episodes, eq(episodes.id, baseEvents.episode))
-    .innerJoin(seasons, eq(seasons.id, castaways.season))
+    .innerJoin(baseEventCastaways, eq(baseEventCastaways.referenceId, castaways.castawayId))
+    .innerJoin(baseEventTribes, eq(baseEventTribes.eventId, baseEventCastaways.eventId))
+    .innerJoin(tribes, eq(tribes.tribeId, baseEventTribes.referenceId))
+    .innerJoin(baseEvents, eq(baseEvents.baseEventId, baseEventTribes.eventId))
+    .innerJoin(episodes, eq(episodes.episodeId, baseEvents.episodeId))
+    .innerJoin(seasons, eq(seasons.seasonId, castaways.season))
     .where(and(
-      eq(seasons.name, seasonName),
+      eq(seasons.seasonName, seasonName),
       eq(baseEvents.eventName, 'tribeUpdate'),
       or(eq(castaways.name, castawayName ?? castaways.name),
         eq(castaways.shortName, castawayName ?? castaways.shortName))))
@@ -66,20 +66,20 @@ export async function getCastaways(seasonName: string, castawayName?: string): P
 export async function getRemainingCastaways(seasonName: string) {
   return await db
     .select({
-      id: castaways.id,
+      id: castaways.castawayId,
       name: castaways.name,
       more: { shortName: castaways.shortName }
     })
     .from(castaways)
-    .innerJoin(seasons, eq(seasons.id, castaways.season))
+    .innerJoin(seasons, eq(seasons.seasonId, castaways.season))
     .where(and(
-      eq(seasons.name, seasonName),
+      eq(seasons.seasonName, seasonName),
       notExists(db
-        .select({ id: baseEventCastaways.reference })
+        .select({ id: baseEventCastaways.referenceId })
         .from(baseEventCastaways)
-        .innerJoin(baseEvents, eq(baseEvents.id, baseEventCastaways.event))
+        .innerJoin(baseEvents, eq(baseEvents.baseEventId, baseEventCastaways.eventId))
         .where(and(
-          eq(baseEventCastaways.reference, castaways.id),
+          eq(baseEventCastaways.referenceId, castaways.castawayId),
           inArray(baseEvents.eventName, ['elim', 'noVoteExit'])))))) as CastawayDetails[];
 }
 

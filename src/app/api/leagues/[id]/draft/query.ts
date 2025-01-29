@@ -86,7 +86,7 @@ export async function getCurrentPredictions(
       .innerJoin(selectionUpdates, and(
         eq(selectionUpdates.member, leagueMembers.id),
         eq(leagueMembers.league, leagueId)))
-      .innerJoin(castaways, eq(selectionUpdates.castaway, castaways.id))
+      .innerJoin(castaways, eq(selectionUpdates.castaway, castaways.castawayId))
       .where(eq(leagueMembers.userId, userId))
       .orderBy(asc(selectionUpdates.episode))
       .then((res) => res[0]?.name),
@@ -98,7 +98,7 @@ export async function getCurrentPredictions(
         eq(seasonEvents.member, users.id),
         eq(users.userId, userId)))
       .innerJoin(seasonCastaways, eq(seasonCastaways.event, seasonEvents.id))
-      .innerJoin(castaways, eq(seasonCastaways.reference, castaways.id))
+      .innerJoin(castaways, eq(seasonCastaways.reference, castaways.castawayId))
       .where(eq(seasonEvents.rule, rule.id))
       .then((res) => res[0]?.castaway)) : []),
 
@@ -109,7 +109,7 @@ export async function getCurrentPredictions(
         eq(seasonEvents.member, users.id),
         eq(users.userId, userId)))
       .innerJoin(seasonTribes, eq(seasonTribes.event, seasonEvents.id))
-      .innerJoin(tribes, eq(seasonTribes.reference, tribes.id))
+      .innerJoin(tribes, eq(seasonTribes.reference, tribes.tribeId))
       .where(eq(seasonEvents.rule, rule.id))
       .then((res) => res[0]?.tribe)) : []),
 

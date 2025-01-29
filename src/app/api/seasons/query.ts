@@ -6,7 +6,7 @@ import { seasons } from '~/server/db/schema/seasons';
 
 export async function getSeasons(): Promise<string[]> {
   return db
-    .select({ name: seasons.name })
+    .select({ name: seasons.seasonName })
     .from(seasons)
     .orderBy(desc(seasons.premierDate))
     .then((seasons) => seasons.map((season) => season.name));
@@ -14,7 +14,7 @@ export async function getSeasons(): Promise<string[]> {
 
 export async function getLatestSeason(): Promise<number> {
   return db
-    .select({ id: seasons.id })
+    .select({ id: seasons.seasonId })
     .from(seasons)
     .orderBy(desc(seasons.premierDate))
     .then((seasons) => seasons[0]?.id ?? 0);

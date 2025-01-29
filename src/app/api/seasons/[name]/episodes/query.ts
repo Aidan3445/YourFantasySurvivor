@@ -5,10 +5,10 @@ import { seasons } from '~/server/db/schema/seasons';
 
 export async function getEpisodes(seasonName: string, includeFuture = false) {
   const eps = await db
-    .select({ id: episodes.id, number: episodes.number, title: episodes.title, airDate: episodes.airDate })
+    .select({ id: episodes.episodeId, number: episodes.number, title: episodes.title, airDate: episodes.airDate })
     .from(episodes)
-    .innerJoin(seasons, eq(seasons.id, episodes.season))
-    .where(eq(seasons.name, seasonName))
+    .innerJoin(seasons, eq(seasons.seasonId, episodes.seasonId))
+    .where(eq(seasons.seasonName, seasonName))
     .orderBy(desc(episodes.number));
 
   if (includeFuture) return eps;
