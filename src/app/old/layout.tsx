@@ -2,9 +2,12 @@ import '~/styles/globals.css';
 
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
+import TopNav from './_components/topNav';
 import { type ReactNode, StrictMode } from 'react';
-import { SidebarProvider } from '~/components/ui/sidebar';
-import SideNav from '~/components/custom/sideNav';
+import { Toaster } from './_components/commonUI/toaster';
+import SideNav from './_components/sideNav';
+import { SidebarProvider } from './_components/commonUI/sideBar';
+import { CustomSidebarTrigger } from './_components/sideNavHelpers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,6 +20,8 @@ export const metadata = {
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
+const oldNav = false;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <StrictMode>
@@ -25,8 +30,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <html lang='en'>
           <body className={`font-sans ${inter.variable}`}>
             <SidebarProvider className='flex flex-col page' defaultOpen={false}>
-              <SideNav />
+              {!oldNav && <CustomSidebarTrigger />}
+              {oldNav ? <TopNav /> : <SideNav />}
               {children}
+              <Toaster />
             </SidebarProvider>
           </body>
         </html>
@@ -34,3 +41,4 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </StrictMode>
   );
 }
+

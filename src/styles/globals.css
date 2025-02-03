@@ -160,19 +160,41 @@ button, .hs-in {
     @apply absolute bottom-0 right-0 -rotate-210 translate-y-3 translate-x-3;
 }
 
+/* CLERK */
+ .cl-button {
+  @apply !border-0 !ring-0;
+}
+
+.cl-userButton-root {
+  @apply w-full;
+}
+
+.cl-userButtonBox {
+  @apply flex-row-reverse -ml-1.5;
+} 
+
+.cl-userButtonTrigger {
+  @apply flex justify-start w-full;
+}
+
+.cl-userButtonOuterIdentifier {
+  @apply whitespace-nowrap;
+}
+
+/* Sidebar */
 @layer base {
   :root {
-        --sidebar-background: 33 58% 84% / 0.95;
+        --sidebar-background: 112 100% 88%;
         --sidebar-foreground: 240 5.3% 26.1%;
-        --sidebar-primary: 240 5.9% 10% / 0;
-        --sidebar-primary-foreground: 240 4.8% 95.9%;
-        --sidebar-accent: 33 61% 73%;
+        --sidebar-primary: 240 5.9% 10%;
+        --sidebar-primary-foreground: 0 0% 98%;
+        --sidebar-accent: 112 62% 62%;
         --sidebar-accent-foreground: 240 5.9% 10%;
-        --sidebar-border:  0;
-        --sidebar-ring: 0;
+        --sidebar-border: 220 13% 9%;
+        --sidebar-ring: 217.2 91.2% 59.8%;
     }
   .dark {
-        --sidebar-background: 240 5.9% 10%;
+        --sidebar-background: 112 80% 15%;
         --sidebar-foreground: 240 4.8% 95.9%;
         --sidebar-primary: 224.3 76.3% 48%;
         --sidebar-primary-foreground: 0 0% 100%;
