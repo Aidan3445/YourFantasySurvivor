@@ -1,24 +1,15 @@
 import { z } from 'zod';
 import { createTable } from './createTable';
 import { seasons } from './seasons';
-import { boolean, customType, integer, pgEnum, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 import { sql } from 'drizzle-orm';
-
-const pickCount = customType<{ data: 1 | 2; notNull: true; default: true }>(
-  {
-    dataType() {
-      return 'integer';
-    },
-  },
-);
 
 export const leagues = createTable(
   'league',
   {
     id: serial('league_id').notNull().primaryKey(),
     name: varchar('name', { length: 64 }).notNull().unique(),
-    password: varchar('password', { length: 64 }).notNull(),
     season: integer('season_id').references(() => seasons.seasonId, { onDelete: 'cascade' }).notNull(),
   }
 );
@@ -48,6 +39,7 @@ export const baseEventRules = createTable(
     soleSurvivor: integer('sole_survivor').notNull(),
   }
 );
+
 export const pointRange = z.coerce.number()
   .max(512, { message: 'Points must not exceed ±512' })
   .min(-512, { message: 'Points must not exceed ±512' });
@@ -69,7 +61,7 @@ export const BaseEventRule = z.object({
 
 export type BaseEventRuleType = z.infer<typeof BaseEventRule>;
 
-export const defaultBaseRules = (): BaseEventRuleType => ({
+export const defaultBaseRules: BaseEventRuleType = {
   advFound: 5,
   advPlay: 10,
   badAdvPlay: -5,
@@ -82,28 +74,27 @@ export const defaultBaseRules = (): BaseEventRuleType => ({
   finalists: 5,
   fireWin: 5,
   soleSurvivor: 10,
-});
+};
+
+export const DEFAULT_SURVIVAL_CAP = 5;
+
+const draftTiming = pgEnum('draft_timing', ['Before Premier', 'After Premier']);
+export const DraftTimingOptions = draftTiming.enumValues;
+export type DraftTiming = (typeof draftTiming.enumValues)[number];
 
 export const leagueSettings = createTable(
   'league_settings',
   {
     league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull().primaryKey(),
-    inviteOnly: boolean('invite_only').notNull().default(false),
-    pickCount: pickCount('pick_count').notNull().default(1),
-    draftDate: timestamp('draft_date', { mode: 'string' }).notNull(),
+    draftTiming: draftTiming('draft_timing').notNull().default('Before Premier'),
+    draftDate: timestamp('draft_date', { mode: 'string' }),
     draftOrder: integer('draft_order').array().notNull().default(sql`ARRAY[]::integer[]`),
-    turnLimitMins: integer('turn_limit_mins').notNull().default(10),
+    // The cap for points earned from survivor streaks
+    // 0 means no cap
+    survivalCap: integer('survival_cap').notNull().default(DEFAULT_SURVIVAL_CAP),
   }
 );
-export type Settings = {
-  pickCount: 1 | 2;
-  draftDate: Date;
-  draftOrder: {
-    name: string;
-    color: string;
-  }[];
-  turnLimitMins: number; // minutes before pick is skipped
-};
+export type LeagueSettings = typeof leagueSettings.$inferSelect;
 
 export const leagueInvite = createTable(
   'league_invite',

@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/ui/sidebar';
-import Nav from '~/components/custom/nav/navSelector';
+import Nav from '~/components/nav/navSelector';
 
 const inter = Inter({
   subsets: ['latin'],

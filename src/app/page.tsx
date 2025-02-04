@@ -1,6 +1,6 @@
 import { SignedIn, SignedOut, SignIn } from '@clerk/nextjs';
-import { Home } from 'lucide-react';
 import Image from 'next/image';
+import CreateLeagueForm from '~/components/leagues/createLeague';
 
 export default function HomePage() {
   return (
@@ -12,9 +12,7 @@ export default function HomePage() {
         <Image src='https://i.imgur.com/b6cHcaG.png' priority width={2100} height={2100} alt='Header Image' />
       </div>
       <SignedIn>
-        <div>
-          <p>Leagues</p>
-        </div>
+        <CreateLeagueForm />
       </SignedIn>
     </main>
   );

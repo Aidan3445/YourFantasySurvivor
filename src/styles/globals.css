@@ -204,19 +204,19 @@ button, .hs-in {
         --foreground: 20 14.3% 4.1%;
         --card: 0 0% 100%;
         --card-foreground: 20 14.3% 4.1%;
-        --popover: 0 0% 100%;
+        --popover: 34 58% 95%;
         --popover-foreground: 20 14.3% 4.1%;
-        --primary: 24 9.8% 10%;
+        --primary: 27 44% 28%;
         --primary-foreground: 60 9.1% 97.8%;
         --secondary: 60 4.8% 95.9%;
         --secondary-foreground: 24 9.8% 10%;
         --muted: 60 4.8% 95.9%;
         --muted-foreground: 25 5.3% 44.7%;
-        --accent: 60 4.8% 95.9%;
+        --accent: 31 45% 75%;
         --accent-foreground: 24 9.8% 10%;
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 60 9.1% 97.8%;
-        --border: 20 5.9% 90%;
+        --border: 27 44% 28%;
         --input: 20 5.9% 90%;
         --ring: 20 14.3% 4.1%;
         --chart-1: 12 76% 61%;
@@ -227,7 +227,7 @@ button, .hs-in {
         --radius: 0.5rem;
     }
   .dark {
-        --sidebar-background: 112 80% 15%;
+        --sidebar-background: 112 100% 15%;
         --sidebar-foreground: 240 4.8% 95.9%;
         --sidebar-primary: 224.3 76.3% 48%;
         --sidebar-primary-foreground: 0 0% 100%;
@@ -241,7 +241,7 @@ button, .hs-in {
         --card-foreground: 60 9.1% 97.8%;
         --popover: 20 14.3% 4.1%;
         --popover-foreground: 60 9.1% 97.8%;
-        --primary: 60 9.1% 97.8%;
+        --primary: 27 44% 28%;
         --primary-foreground: 24 9.8% 10%;
         --secondary: 12 6.5% 15.1%;
         --secondary-foreground: 60 9.1% 97.8%;
