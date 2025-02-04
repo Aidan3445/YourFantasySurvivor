@@ -6,12 +6,12 @@ import { BookUser, Home, Flame, Trophy } from 'lucide-react';
 export default function BottomNav() {
 
   return (
-    <div className='fixed bottom-0 left-0 right-0 bg-white shadow-md'>
-      <span className='flex justify-evenly py-2'>
-        <BottomNavLink href='/' icon={<Home />} />
-        <BottomNavLink href='/leagues' icon={<Trophy />} />
-        <BottomNavLink href='/seasons' icon={<BookUser />} />
-        <BottomNavLink href='/playground' icon={<Flame />} />
+    <div className='fixed bottom-0 left-0 right-0 bg-sidebar shadow-md'>
+      <span className='flex items-center justify-evenly'>
+        <BottomNavLink href='/' icon={<Home size={26} />} />
+        <BottomNavLink href='/leagues' icon={<Trophy size={26} />} />
+        <BottomNavLink href='/seasons' icon={<BookUser size={26} />} />
+        <BottomNavLink href='/playground' icon={<Flame size={26} />} />
         <BottomNavUser />
       </span>
     </div>
@@ -20,13 +20,10 @@ export default function BottomNav() {
 
 function BottomNavUser() {
   return (
-    <div>
+    <div className='mt-2'>
       <SignedIn>
         <UserButton />
       </SignedIn>
-      <SignedOut>
-        <SignInButton />
-      </SignedOut>
     </div>
   );
 }

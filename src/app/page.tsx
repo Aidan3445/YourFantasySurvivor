@@ -1,4 +1,5 @@
 import { SignedIn, SignedOut, SignIn } from '@clerk/nextjs';
+import { Home } from 'lucide-react';
 import Image from 'next/image';
 
 export default function HomePage() {
