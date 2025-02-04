@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/ui/sidebar';
-import SideNav from '~/components/custom/sideNav';
+import Nav from '~/components/custom/nav/navSelector';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -24,8 +24,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         appearance={{ variables: { colorPrimary: '#684528', colorBackground: '#EED9BF' } }}>
         <html lang='en'>
           <body className={`font-sans ${inter.variable}`}>
-            <SidebarProvider className='flex flex-col page' defaultOpen={false}>
-              <SideNav />
+            <SidebarProvider defaultOpen>
+              <Nav />
               {children}
             </SidebarProvider>
           </body>

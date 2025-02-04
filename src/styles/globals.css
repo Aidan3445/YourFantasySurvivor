@@ -181,6 +181,10 @@ button, .hs-in {
   @apply whitespace-nowrap;
 }
 
+.cl-modalBackdrop {
+  @apply h-svh;
+}
+
 /* Sidebar */
 @layer base {
   :root {
