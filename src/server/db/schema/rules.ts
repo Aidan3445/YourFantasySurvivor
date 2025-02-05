@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { BaseEventRule } from './leagues';
+import { BaseEventRule } from '../defs/baseEvents';
 import { CustomEventRule } from './customEvents';
 import { WeeklyEventRule } from './weeklyEvents';
 import { SeasonEventRule } from './seasonEvents';
