@@ -8,7 +8,7 @@ import * as leagues from './schema/leagues';
 import * as customEvents from './schema/customEvents';
 import * as weeklyEvents from './schema/weeklyEvents';
 import * as seasonEvents from './schema/seasonEvents';
-import * as members from './schema/members';
+import * as members from './schema/leagueMembers';
 
 // Define your schema
 const schema = {

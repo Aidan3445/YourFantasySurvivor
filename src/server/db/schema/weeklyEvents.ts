@@ -2,11 +2,12 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodes } from './episodes';
-import { leagues, pointRange, reference } from './leagues';
-import { leagueMembers } from './members';
+import { leaguesSchema, reference } from './leagues';
+import { leagueMembersSchema } from './leagueMembers';
 import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
 import { description, eventName } from './customEvents';
+import { pointRange } from '../defs/baseEvents';
 
 export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
 export type WeeklyEventType = (typeof weeklyEventType.enumValues)[number];
@@ -17,7 +18,7 @@ export const weeklyEventRules = createTable(
   'event_weekly_rule',
   {
     id: serial('weekly_rule_id').notNull().primaryKey(),
-    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
+    league: integer('league_id').references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }).notNull(),
     eventName: varchar('name', { length: 32 }).notNull(),
     // weekly events either exist on their own
     // or are tied to an admin or base event
@@ -62,7 +63,7 @@ export const weeklyEvents = createTable(
     id: serial('event_weekly_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
-    member: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+    member: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
     unique().on(table.rule, table.episode, table.member),
@@ -93,7 +94,7 @@ export const weeklyMembers = createTable(
   {
     id: serial('event_weekly_member_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull().unique(),
+    reference: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull().unique(),
   }
 );
 
@@ -123,6 +124,6 @@ export const weeklyMemberResults = createTable(
     id: serial('event_weekly_result_member_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
   }
 );

@@ -16,6 +16,8 @@ export function ChallengeScoreSettings() {
                   className='w-24'
                   type='number'
                   step={1}
+                  min={-512}
+                  max={512}
                   placeholder='Points'
                   {...field} />
               </FormControl>

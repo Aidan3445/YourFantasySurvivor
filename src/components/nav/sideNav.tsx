@@ -1,4 +1,4 @@
-import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
+import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
 import { SidebarMenuButton, SidebarSeparator } from '~/components/ui/sidebar';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/ui/sidebar';
 import { BookUser, Home, Flame, Trophy, LoaderCircle } from 'lucide-react';
@@ -28,7 +28,9 @@ function SideNavFooter() {
   return (
     <SidebarMenu className='mt-2'>
       <ClerkLoading>
-        <LoaderCircle size={32} className='animate-spin mt-0.5' color='#7f633f' />
+        <SidebarMenuButton size='lg'>
+          <LoaderCircle className='animate-spin' color='#7f633f' />
+        </SidebarMenuButton>
       </ClerkLoading>
       <ClerkLoaded>
         <SidebarMenuButton size='lg'>

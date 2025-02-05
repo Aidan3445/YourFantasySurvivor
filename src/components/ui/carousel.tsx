@@ -15,7 +15,7 @@ type CarouselOptions = UseCarouselParameters[0]
 type CarouselPlugin = UseCarouselParameters[1]
 
 type CarouselProps = {
-  opts?: CarouselOptions
+  opts?: CarouselOptions & { ignoreKeys?: boolean }
   plugins?: CarouselPlugin
   orientation?: 'horizontal' | 'vertical'
   setApi?: (api: CarouselApi) => void
@@ -87,6 +87,10 @@ const Carousel = React.forwardRef<
 
     const handleKeyDown = React.useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (opts?.ignoreKeys) {
+          return;
+        }
+
         if (event.key === 'ArrowLeft') {
           event.preventDefault();
           scrollPrev();
@@ -95,7 +99,7 @@ const Carousel = React.forwardRef<
           scrollNext();
         }
       },
-      [scrollPrev, scrollNext]
+      [scrollPrev, scrollNext, opts]
     );
 
     React.useEffect(() => {

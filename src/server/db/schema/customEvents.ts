@@ -2,16 +2,17 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodes } from './episodes';
-import { leagues, reference, pointRange } from './leagues';
-import { leagueMembers } from './members';
+import { leaguesSchema, reference } from './leagues';
+import { leagueMembersSchema } from './leagueMembers';
 import { integer, serial, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
+import { pointRange } from '../defs/baseEvents';
 
 export const customEventRules = createTable(
   'event_custom_rule',
   {
     id: serial('custom_rule_id').notNull().primaryKey(),
-    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
+    league: integer('league_id').references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }).notNull(),
     eventName: varchar('name', { length: 32 }).notNull(),
     description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
@@ -73,7 +74,7 @@ export const customMembers = createTable(
   {
     id: serial('event_custom_member_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('member_id').references(() => leagueMembers.id, { onDelete: 'cascade' }).notNull(),
+    reference: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
   },
 );
 

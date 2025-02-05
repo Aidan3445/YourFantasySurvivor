@@ -4,7 +4,7 @@ import { PopoverPortal } from '@radix-ui/react-popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
-import { type DraftTiming, DraftTimingOptions } from '~/server/db/schema/leagues';
+import { type DraftTiming, DraftTimingOptions, MAX_SURVIVAL_CAP } from '~/server/db/defs/leagues';
 
 export default function LeagueSettings() {
   return (
@@ -41,6 +41,8 @@ export default function LeagueSettings() {
                   className='w-36'
                   type='number'
                   step={1}
+                  min={0}
+                  max={MAX_SURVIVAL_CAP}
                   placeholder='Points'
                   {...field} />
               </FormControl>
@@ -51,35 +53,42 @@ export default function LeagueSettings() {
             <FormMessage />
           </FormItem>
         )} />
-      <FormField
-        name='draftTiming'
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Draft Timing</FormLabel>
-            <Select
-              onValueChange={field.onChange}
-              defaultValue={field.value as DraftTiming}>
-              <span className='flex gap-4 items-center'>
-                <FormControl>
-                  <SelectTrigger className='w-36'>
-                    <SelectValue placeholder='Select draft timing' />
-                  </SelectTrigger>
-                </FormControl>
-                <FormDescription className='max-w-48 text-wrap'>
-                  Do you want to draft before or after the season premieres?
-                </FormDescription>
-              </span>
-              <SelectContent>
-                {DraftTimingOptions.map(option => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )} />
+      <DraftTimingFormField />
     </section>
+  );
+}
+
+export function DraftTimingFormField() {
+  return (
+    <FormField
+      name='draftTiming'
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Draft Timing</FormLabel>
+          <Select
+            onValueChange={field.onChange}
+            defaultValue={field.value as DraftTiming}>
+            <span className='flex gap-4 items-center'>
+              <FormControl>
+                <SelectTrigger className='w-36'>
+                  <SelectValue placeholder='Select draft timing' />
+                </SelectTrigger>
+              </FormControl>
+              <FormDescription className='max-w-48 text-wrap'>
+                Do you want to draft before or after the season premieres?
+              </FormDescription>
+            </span>
+            <SelectContent>
+              {DraftTimingOptions.map(option => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <FormMessage />
+        </FormItem>
+      )} />
+
   );
 }

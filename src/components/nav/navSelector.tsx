@@ -1,6 +1,6 @@
 'use client';
 import { type ReactNode } from 'react';
-import { useIsMobile } from '~/hooks/use-mobile';
+import { useIsMobile } from '~/hooks/useMobile';
 import BottomNav from './bottomNav';
 import SideNav from './sideNav';
 

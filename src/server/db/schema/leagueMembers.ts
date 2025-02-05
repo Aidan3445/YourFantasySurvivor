@@ -1,0 +1,42 @@
+import 'server-only';
+import { createTable } from './createTable';
+import { leaguesSchema } from './leagues';
+import { episodes } from './episodes';
+import { castaways } from './castaways';
+import { integer, serial, varchar, unique, index, primaryKey, uniqueIndex, pgEnum } from 'drizzle-orm/pg-core';
+import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '../defs/leagueMembers';
+
+export const leagueMemberRole = pgEnum('league_member_role', LeagueMemberRoleOptions);
+
+export const leagueMembersSchema = createTable(
+  'league_member',
+  {
+    memberId: serial('league_member_id').notNull().primaryKey(),
+    leagueId: integer('league_id').references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }).notNull(),
+    userId: varchar('user_id', { length: 64 }).notNull(),
+    color: varchar('color', { length: 7 }).notNull(),
+    displayName: varchar('display_name', { length: DISPLAY_NAME_MAX_LENGTH }).notNull(),
+    role: leagueMemberRole('role').notNull().default('member'),
+  },
+  (table) => [
+    uniqueIndex('league_user_idx').on(table.leagueId, table.userId),
+    unique('league_displayName_unq').on(table.leagueId, table.displayName),
+    unique('league_color_unq').on(table.leagueId, table.color),
+  ]
+);
+export type LeagueMember = typeof leagueMembersSchema.$inferSelect;
+
+export const selectionUpdates = createTable(
+  'selection_update',
+  {
+    memberId: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
+    episodeId: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
+    castawayId: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.memberId, table.episodeId] }),
+    index('member_idx').on(table.memberId),
+  ]
+);
+export type SelectionUpdate = typeof selectionUpdates.$inferSelect;
+
