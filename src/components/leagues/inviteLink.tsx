@@ -2,18 +2,20 @@
 
 import { Link } from 'lucide-react';
 import { Input } from '../ui/input';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cn } from '~/lib/utils';
+import { useLeague } from '~/hooks/useLeague';
 
-interface InviteLinkProps {
-  leagueHash: string;
-}
-
-export default function InviteLink({ leagueHash }: InviteLinkProps) {
+export default function InviteLink() {
+  const { currentLeague: { leagueHash } } = useLeague();
   const [hasCopied, setHasCopied] = useState(false);
 
-  const origin = window.location.origin;
-  const link = `${origin}/leagues/join/${leagueHash}`;
+  const origin = useMemo(() => {
+    if (typeof window === 'undefined') return '';
+    return window.location.origin;
+  }, []);
+
+  const link = `${origin}/leagues/i/${leagueHash}`;
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(link);

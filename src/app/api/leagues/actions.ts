@@ -5,7 +5,7 @@ import { db } from '~/server/db';
 import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
 import { type BaseEventRuleType } from '~/server/db/defs/baseEvents';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { type NewLeagueMember } from '~/server/db/defs/leagueMembers';
@@ -14,6 +14,8 @@ import { type NewLeagueMember } from '~/server/db/defs/leagueMembers';
   * Create a new league
   * @param league - the league to create
   * @param settings - the settings for the league
+  * @param rules - the base event rules for the league
+  * @param newMember - the new member to add
   * @returns the id of the newly created league
   * @throws an error if the user is not authenticated
   * @throws an error if the league cannot be inserted
@@ -24,7 +26,8 @@ import { type NewLeagueMember } from '~/server/db/defs/leagueMembers';
 export async function createNewLeague(
   leagueName: string,
   settings: { draftTiming: DraftTiming, survivalCap: number },
-  rules: BaseEventRuleType
+  rules: BaseEventRuleType,
+  newMember: NewLeagueMember
 ): Promise<string> {
   const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
@@ -45,16 +48,21 @@ export async function createNewLeague(
       // Get the league id and hash
       const { leagueId, leagueHash } = insertedLeague[0]!;
 
-      // Insert the league settings and base event rules in parallel
+      // Insert the league settings
       await trx
         .insert(leagueSettingsSchema)
         .values({ ...settings, leagueId })
         .returning({ leagueId: leagueSettingsSchema.leagueId });
-
+      // Insert the base event rules
       await trx
         .insert(baseEventRulesSchema)
         .values({ ...rules, leagueId })
         .returning({ leagueId: baseEventRulesSchema.leagueId });
+      // Insert the owner as a member
+      await trx
+        .insert(leagueMembersSchema)
+        .values({ leagueId, userId: user.userId, ...newMember })
+        .returning({ memberId: leagueMembersSchema.memberId });
 
       return leagueHash;
     } catch (error) {
@@ -81,11 +89,11 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
   const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
-  const leagueId = await db
+  const { leagueId } = await db
     .select({ leagueId: leaguesSchema.leagueId })
     .from(leaguesSchema)
     .where(eq(leaguesSchema.leagueHash, leagueHash))
-    .then((res) => res[0]?.leagueId);
+    .then((res) => ({ leagueId: res[0]?.leagueId }));
   if (!leagueId) throw new Error('League not found');
 
   // Try to add the member, if there is a conflict, the user is already a member
@@ -101,21 +109,25 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
 
 /**
 * Update the draft timing for a league
-* @param leagueId - the id of the league
+* @param leagueHash - the hash of the league
 * @param draftTiming - the new draft timing
 * @param draftDate - the new draft date
 * @returns the updated league or undefined if not found
 * @throws an error if the user is not authorized
 * @throws an error if the draft timing cannot be updated
 */
-export async function updateDraftTiming(leagueId: number, draftTiming: DraftTiming, draftDate: Date) {
-  const { memberId } = await leagueMemberAuth(leagueId);
+export async function updateDraftTiming(leagueHash: string, draftTiming: DraftTiming, draftDate: Date) {
+  const { memberId } = await leagueMemberAuth(leagueHash);
   if (!memberId) throw new Error('User not authorized');
 
+  // Error can be ignored, the where clause is not understood by the type system
   const league = await db
     .update(leagueSettingsSchema)
     .set({ draftTiming, draftDate: draftDate.toUTCString() })
-    .where(eq(leagueSettingsSchema.leagueId, leagueId))
+    .from(leaguesSchema)
+    .where(and(
+      eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId),
+      eq(leaguesSchema.leagueHash, leagueHash)))
     .returning({ draftTiming: leagueSettingsSchema.draftTiming, draftDate: leagueSettingsSchema.draftDate });
 
   if (!league[0]) throw new Error('League not found');

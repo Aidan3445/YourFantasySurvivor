@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 export const pointRange = z.coerce.number()
-  .max(512, { message: 'Points must not exceed ±512' })
-  .min(-512, { message: 'Points must not exceed ±512' });
+  .lte(512, { message: 'Points must not exceed 512' })
+  .gte(-512, { message: 'Points must not be less than -512' });
 
 export const BaseEventRule = z.object({
   advFound: pointRange,

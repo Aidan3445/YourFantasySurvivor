@@ -9,13 +9,14 @@ export function useLeague() {
 
   const { currentLeague, updateLeague } = context;
 
-  const draftDate = currentLeague.league_settings.draftDate ? new Date(currentLeague.league_settings.draftDate) : null;
+  const draftDate = currentLeague.settings.draftDate ?
+    new Date(currentLeague.settings.draftDate) : null;
 
   return {
     currentLeague: {
       ...currentLeague,
       settings: {
-        ...currentLeague?.league_settings,
+        ...currentLeague?.settings,
         draftDate,
       }
     },

@@ -1,8 +1,8 @@
+import { SignIn } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { type ReactNode } from 'react';
 import { QUERIES } from '~/app/api/leagues/query';
 import LeagueProvider from '~/context/leagueContext';
-import { leagueMemberAuth } from '~/lib/auth';
 
 interface LeagueLayoutProps {
   children: ReactNode;
@@ -14,11 +14,20 @@ interface LeagueLayoutProps {
 export default async function LeagueLayout({ children, params }: LeagueLayoutProps) {
   const { leagueHash } = await params;
 
-  const leagueResponse = await QUERIES.getLeague(leagueHash);
-  if (!leagueResponse) return <div>League not found</div>;
+  let leagueResponse;
+  try {
+    leagueResponse = await QUERIES.getLeague(leagueHash);
+  } catch {
+    return (
+      <main className='w-full'>
+        <h1 className='text-3xl'>Sign in to view the League</h1>
+        <SignIn fallbackRedirectUrl={`/leagues/${leagueHash}`} />
+      </main>
+    );
+  }
 
-  const { memberId } = await leagueMemberAuth(leagueResponse.league.leagueId);
-  if (!memberId) {
+  if (!leagueResponse) {
+    console.log(leagueResponse);
     redirect('/leagues');
   }
 

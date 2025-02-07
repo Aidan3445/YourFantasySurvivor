@@ -14,24 +14,31 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { updateDraftTiming } from '~/app/api/leagues/actions';
 
 export function DraftCountdown() {
-  const { currentLeague: { settings: { draftTiming, draftDate } } } = useLeague();
+  const {
+    currentLeague: {
+      members: { loggedIn },
+      settings: { draftTiming, draftDate }
+    }
+  } = useLeague();
 
   return (
     <article className='flex flex-col w-full p-2 bg-accent rounded-xl'>
-      <span className='flex items-center justify-between'>
+      <span className='grid grid-cols-3 w-full items-center'>
         <div>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
           <p className='text-sm text-muted-foreground'>
             {draftDate ? draftDate.toLocaleString() : 'Draft date not set'}
           </p>
         </div>
-        <div className='text-center text-xl'>
-          Draft type:
-          <div className='text-sm text-muted-foreground'>
+        <div className='text-center text-base font-semibold'>
+          Draft type
+          <div className='text-sm text-muted-foreground font-normal'>
             {draftTiming}
           </div>
         </div>
-        <SetDraftDate />
+        <div className='flex justify-end'>
+          {loggedIn && loggedIn.role !== 'member' && <SetDraftDate />}
+        </div>
       </span>
       <span className='bg-primary rounded-2xl p-2 m-4 text-primary-foreground text-2xl shadow shadow-black'>
         <Countdown endDate={draftDate} />
@@ -47,8 +54,8 @@ const formSchema = z.object({
 });
 
 function SetDraftDate() {
-  const { currentLeague: { league, settings }, updateLeague } = useLeague();
-  const { leagueId } = league;
+  const { currentLeague: league, updateLeague } = useLeague();
+  const { leagueHash, settings } = league;
   const { draftTiming, draftDate } = settings;
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
@@ -58,20 +65,21 @@ function SetDraftDate() {
     },
   });
 
-  if (!leagueId) return null;
+  if (!leagueHash) return null;
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const res = await updateDraftTiming(leagueId, data.draftTiming, data.draftDate);
+      const res = await updateDraftTiming(leagueHash, data.draftTiming, data.draftDate);
 
       updateLeague({
-        league, league_settings: {
+        ...league,
+        settings: {
           ...settings,
           draftTiming: res.draftTiming,
           draftDate: res.draftDate,
-        }
+        },
       });
-      alert(`Draft timing updated for league ${leagueId}`);
+      alert(`Draft timing updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);
       alert('Failed to update draft timing');

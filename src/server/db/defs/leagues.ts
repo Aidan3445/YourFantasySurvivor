@@ -6,7 +6,7 @@ export const LeagueNameZod = z.string()
 
 export const DEFAULT_SURVIVAL_CAP = 5;
 export const MAX_SURVIVAL_CAP = 20;
-export const SurvivalCapZod = z.coerce.number().gte(0).lte(MAX_SURVIVAL_CAP);
+export const SurvivalCapZod = z.coerce.number().int().lte(MAX_SURVIVAL_CAP).gte(0);
 
 export const DraftTimingOptions = [
   'Before Premier',

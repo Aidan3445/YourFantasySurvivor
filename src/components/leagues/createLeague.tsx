@@ -8,7 +8,7 @@ import { Input } from '../ui/input';
 import { DraftTimingOptions, DEFAULT_SURVIVAL_CAP, LeagueNameZod, SurvivalCapZod } from '~/server/db/defs/leagues';
 import { BaseEventRule, defaultBaseRules } from '~/server/db/defs/baseEvents';
 import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
-import LeagueSettings from './customization/leagueSettings';
+import LeagueSettingsFields from './customization/leagueSettings';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '../ui/carousel';
 import { Button } from '../ui/button';
 import { Progress } from '../ui/progress';
@@ -16,12 +16,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
 import { useCarouselProgress } from '~/hooks/useCarouselProgress';
 import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
+import { LeagueMemberFields } from './joinLeague';
+import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
   baseEventRules: BaseEventRule,
   draftTiming: z.enum(DraftTimingOptions),
-  survivalCap: SurvivalCapZod
+  survivalCap: SurvivalCapZod,
+  displayName: DisplayNameZod,
+  color: ColorZod,
 }).transform(data => ({
   ...data,
   leagueName: data.leagueName.trim()
@@ -32,7 +36,9 @@ const defaultValues: z.infer<typeof formSchema> = {
   leagueName: '',
   baseEventRules: defaultBaseRules,
   draftTiming: 'Before Premier',
-  survivalCap: DEFAULT_SURVIVAL_CAP
+  survivalCap: DEFAULT_SURVIVAL_CAP,
+  displayName: '',
+  color: '',
 };
 
 export default function CreateLeagueForm() {
@@ -50,10 +56,15 @@ export default function CreateLeagueForm() {
           draftTiming: data.draftTiming,
           survivalCap: data.survivalCap
         },
-        data.baseEventRules);
-
+        data.baseEventRules,
+        {
+          displayName: data.displayName,
+          color: data.color,
+          role: 'owner'
+        }
+      );
       alert(`League created with id: ${leagueHash}`);
-      router.push(`/leagues/join/${leagueHash}`);
+      router.push(`/leagues/${leagueHash}/predraft`);
     } catch (error) {
       console.error(error);
       alert('Failed to create league');
@@ -72,19 +83,18 @@ export default function CreateLeagueForm() {
           <Progress className='w-80 absolute left-12 top-6' value={progress} />
           <CarouselContent className='-ml-14'>
             <CarouselItem className='pl-14 flex flex-col'>
-              <LeagueName />
+              <LeagueNameFields />
+              <LeagueMemberFields />
               <NextButton
-                disabled={!LeagueNameZod.safeParse(reactForm.watch('leagueName')).success}
+                disabled={!formSchema.safeParse(reactForm.watch())?.success}
                 onClick={() => api?.scrollNext()} />
             </CarouselItem>
             <CarouselItem className='pl-14 flex flex-col'>
-              <LeagueSettings />
-              <NextButton
-                disabled={!SurvivalCapZod.safeParse(reactForm.watch('survivalCap'))}
-                onClick={() => api?.scrollNext()} />
+              <LeagueSettingsFields />
+              <NextButton onClick={() => api?.scrollNext()} />
             </CarouselItem>
             <CarouselItem className='pl-14 flex flex-col'>
-              <BaseEvents />
+              <BaseEventsFields />
               <Button
                 className='m-4 mt-auto w-80 self-center'
                 type='submit'>
@@ -115,7 +125,7 @@ function NextButton({ disabled = false, onClick }: NextButtonProps) {
   );
 }
 
-function LeagueName() {
+function LeagueNameFields() {
   return (
     <section className='mx-2'>
       <FormField
@@ -139,7 +149,7 @@ function LeagueName() {
   );
 }
 
-function BaseEvents() {
+function BaseEventsFields() {
   return (
     <section className='mx-2'>
       <FormLabel>Setup Events</FormLabel>

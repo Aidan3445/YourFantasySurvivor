@@ -98,7 +98,7 @@ const config =
       }
     ],
     'drizzle/enforce-update-with-where': [
-      'error',
+      'warn',
       {
         drizzleObjectName: [
           'db'

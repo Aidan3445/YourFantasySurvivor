@@ -3,7 +3,6 @@ import { Popover, PopoverTrigger, PopoverContent } from '~/components/ui/popover
 import { PopoverPortal } from '@radix-ui/react-popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
 import { type DraftTiming, DraftTimingOptions, MAX_SURVIVAL_CAP } from '~/server/db/defs/leagues';
 
 export default function LeagueSettings() {
@@ -29,23 +28,36 @@ export default function LeagueSettings() {
                       <br />
                       <br />
                       This setting will cap the points earned from survival streaks. Set
-                      the cap to 0 to disable this feature. Tip: A cap above
+                      the cap to 0 to disable survival streaks entirely. Set the cap to Max
+                      to allow unlimited points from survival streaks.
                     </p>
                   </PopoverContent>
                 </PopoverPortal>
               </Popover>
             </span>
             <span className='flex gap-4 items-center'>
-              <FormControl>
-                <Input
-                  className='w-36'
-                  type='number'
-                  step={1}
-                  min={0}
-                  max={MAX_SURVIVAL_CAP}
-                  placeholder='Points'
-                  {...field} />
-              </FormControl>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={`${field.value}`}>
+                <FormControl>
+                  <SelectTrigger className='w-36'>
+                    <SelectValue placeholder='Select survival cap' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value={'0'}>
+                    Disabled
+                  </SelectItem>
+                  {Array(MAX_SURVIVAL_CAP - 1).fill(0).map((_, i) => (
+                    <SelectItem key={i} value={`${i + 1}`}>
+                      {i + 1}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value={'1000'}>
+                    Unlimited
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               <FormDescription className='max-w-48 text-wrap'>
                 Maximum points that can be earned from survival streaks
               </FormDescription>
