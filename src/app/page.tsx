@@ -8,12 +8,12 @@ export default function HomePage() {
       <div>
         <Image src='https://i.imgur.com/b6cHcaG.png' priority width={2100} height={2100} alt='Header Image' />
       </div>
-      <SignedIn>
-        <CreateLeagueForm />
-      </SignedIn>
       <SignedOut>
         <SignIn />
       </SignedOut>
+      <SignedIn>
+        <CreateLeagueForm />
+      </SignedIn>
     </main>
   );
 }

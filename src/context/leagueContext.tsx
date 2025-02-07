@@ -7,7 +7,7 @@ import { type QUERIES } from '~/app/api/leagues/query';
 export type CurrentLeagueType = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 
 type LeagueContextProps = {
-  currentLeague: CurrentLeagueType;
+  league: CurrentLeagueType;
   updateLeague: (league: CurrentLeagueType) => void;
 };
 
@@ -22,7 +22,7 @@ export default function LeagueProvider({ league, children }: LeagueProviderProps
   const [currentLeague, setCurrentLeague] = useState(league);
 
   return (
-    <LeagueContext.Provider value={{ currentLeague, updateLeague: setCurrentLeague }}>
+    <LeagueContext.Provider value={{ league: currentLeague, updateLeague: setCurrentLeague }}>
       {children}
     </LeagueContext.Provider>
   );

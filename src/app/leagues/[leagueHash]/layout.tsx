@@ -1,4 +1,4 @@
-import { SignIn } from '@clerk/nextjs';
+import { SignUp } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { type ReactNode } from 'react';
 import { QUERIES } from '~/app/api/leagues/query';
@@ -21,15 +21,12 @@ export default async function LeagueLayout({ children, params }: LeagueLayoutPro
     return (
       <main className='w-full'>
         <h1 className='text-3xl'>Sign in to view the League</h1>
-        <SignIn fallbackRedirectUrl={`/leagues/${leagueHash}`} />
+        <SignUp forceRedirectUrl={`/leagues/${leagueHash}`} />
       </main>
     );
   }
 
-  if (!leagueResponse) {
-    console.log(leagueResponse);
-    redirect('/leagues');
-  }
+  if (!leagueResponse) redirect('/leagues');
 
   return (
     <LeagueProvider league={leagueResponse}>

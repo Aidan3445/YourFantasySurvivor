@@ -4,7 +4,6 @@ import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { seasons } from '~/server/db/schema/seasons';
-import { auth } from '@clerk/nextjs/server';
 import { leagueMemberAuth } from '~/lib/auth';
 
 export const QUERIES = {
@@ -16,17 +15,14 @@ export const QUERIES = {
    * @returns the league or undefined if it does not exist
    * @throws an error if the user is not authenticated
    */
-  getLeague: async function(leagueHash: string, membersOnly = true) {
-    const { userId, memberId } = membersOnly ?
-      await leagueMemberAuth(leagueHash) :
-      { ...(await auth()), memberId: null };
+  getLeague: async function(leagueHash: string) {
+    const { userId, memberId } = await leagueMemberAuth(leagueHash);
     // If the user is not authenticated, throw an error
     if (!userId) {
       throw new Error('User not authenticated');
     }
-    // If the user is not a member of the league and membersOnly is true
-    // return undefined
-    if (membersOnly && !memberId) {
+    // If the user is not a member of the league return undefined
+    if (!memberId) {
       return undefined;
     }
 
@@ -69,17 +65,30 @@ export const QUERIES = {
   },
 
   /**
-    * Get the colors that are already taken in a league
-    * @param leagueId - the id of the league
-    * @returns the taken colors
-    * @throws an error if the league members cannot be fetched
+    * Get the league colors only for joining the league
+    * @param leagueHash - the hash of the league
+    * @returns the league or undefined if the user is already a member
+    * @throws an error if the user is not authenticated
     */
-  getUsedColors: async function(leagueId: number) {
-    const colors = await db
-      .select({ color: leagueMembersSchema.color })
-      .from(leagueMembersSchema)
-      .where(eq(leagueMembersSchema.leagueId, leagueId));
+  getLeagueJoin: async function(leagueHash: string) {
+    const { userId, memberId } = await leagueMemberAuth(leagueHash);
+    // If the user is not authenticated, throw an error
+    if (!userId) {
+      throw new Error('User not authenticated');
+    }
+    // If the user is already a member of the league return undefined
+    if (memberId) {
+      return undefined;
+    }
 
-    return colors.map((color) => color.color);
+    const members = {
+      list: await db
+        .select({ color: leagueMembersSchema.color })
+        .from(leagueMembersSchema)
+        .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
+        .where(eq(leaguesSchema.leagueHash, leagueHash))
+    };
+
+    return { members } as unknown as ReturnType<typeof QUERIES.getLeague>;
   }
 };

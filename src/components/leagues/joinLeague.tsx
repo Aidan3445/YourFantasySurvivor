@@ -7,12 +7,15 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { ColorZod, DisplayNameZod, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
-import Swatch from '@uiw/react-color-swatch';
-import { hsvaToHex, getContrastingColor } from '@uiw/color-convert';
+import Swatch, { type SwatchRectRenderProps } from '@uiw/react-color-swatch';
+import { hsvaToHex, hexToHsva, getContrastingColor, hexToRgba, rgbaToHex, type HsvaColor } from '@uiw/color-convert';
 import { twentyColors } from '~/lib/colors';
 import { Check } from 'lucide-react';
 import { joinLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@clerk/nextjs';
+import { useEffect, useState } from 'react';
+import { useLeague } from '~/hooks/useLeague';
 
 const formSchema = z.object({
   displayName: DisplayNameZod,
@@ -22,9 +25,9 @@ const formSchema = z.object({
   displayName: data.displayName.trim(),
 }));
 
-const defaultValues: z.infer<typeof formSchema> = {
+const defaultValues = {
   displayName: '',
-  color: '',
+  color: ''
 };
 
 interface JoinLeagueFormProps {
@@ -32,10 +35,23 @@ interface JoinLeagueFormProps {
 }
 
 export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
-  const reactForm = useForm<z.infer<typeof formSchema>>({
-    defaultValues, resolver: zodResolver(formSchema)
-  });
   const router = useRouter();
+  const { user } = useUser();
+  const {
+    league: {
+      members: {
+        list: memberColors
+      }
+    },
+  } = useLeague();
+  const reactForm = useForm<z.infer<typeof formSchema>>({
+    defaultValues,
+    resolver: zodResolver(formSchema),
+  });
+
+  useEffect(() => {
+    reactForm.setValue('displayName', user?.username ?? '');
+  }, [user, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
@@ -56,8 +72,8 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
 
   return (
     <Form {...reactForm}>
-      <form className=' flex flex-col gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
-        <LeagueMemberFields />
+      <form className=' flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+        <LeagueMemberFields memberColors={memberColors} />
         <Button
           className='w-full'
           type='submit'
@@ -69,7 +85,33 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
   );
 }
 
-export function LeagueMemberFields() {
+interface LeagueMemberFieldsProps {
+  memberColors: { color: string }[];
+}
+
+export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProps) {
+  const [availableColors, setAvailableColors] = useState(twentyColors);
+  useEffect(() => {
+    const takenColors = twentyColors.map((color) => {
+      if (memberColors.some((member) => member.color === color)) {
+        const rgb = hexToRgba(color);
+        const avg = Math.round((rgb.r + rgb.g + rgb.b) / 3);
+        return rgbaToHex({ r: avg, g: avg, b: avg, a: 1 });
+      }
+      return color;
+    });
+    setAvailableColors(takenColors);
+  }, [memberColors]);
+
+  const ensureNewColor = (color: HsvaColor, setColor?: (value: string) => void) => {
+    if (color.s === 0) {
+      if (setColor) alert('This color is taken by another member');
+      return false;
+    }
+    setColor?.(hsvaToHex(color));
+    return true;
+  };
+
   return (
     <section className='mx-2'>
       <FormField
@@ -98,11 +140,20 @@ export function LeagueMemberFields() {
               <div className='flex w-full justify-center'>
                 <Swatch
                   className='gap-1 justify-center'
-                  onChange={(color) => field.onChange(hsvaToHex(color))}
-                  colors={twentyColors}
+                  onChange={(color) => ensureNewColor(color, field.onChange)}
+                  colors={availableColors}
                   color={field.value as string}
+                  rectRender={(props: SwatchRectRenderProps) => {
+                    return (
+                      <div
+                        className={!ensureNewColor(hexToHsva(props.color)) ?
+                          '!cursor-not-allowed' : ''}
+                        {...props}>
+                        <Point color={props.color} checked={props.checked} />
+                      </div>
+                    );
+                  }}
                   rectProps={{
-                    children: <Point />,
                     style: {
                       width: '65px',
                       height: '65px',
@@ -116,8 +167,9 @@ export function LeagueMemberFields() {
             </FormControl>
             <FormMessage />
           </FormItem>
-        )} />
-    </section>
+        )
+        } />
+    </section >
   );
 }
 
@@ -130,6 +182,6 @@ function Point({ color, checked }: SwatchProps) {
   if (!checked) return null;
 
   return (
-    <Check color={getContrastingColor(color!)} />
+    <Check className='z-100' color={getContrastingColor(color!)} />
   );
 }

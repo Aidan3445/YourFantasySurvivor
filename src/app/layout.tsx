@@ -21,7 +21,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <StrictMode>
       <ClerkProvider
-        appearance={{ variables: { colorPrimary: '#684528', colorBackground: '#EED9BF' } }}>
+        appearance={{
+          variables: {
+            colorPrimary: '#B09472',
+            colorBackground: '#EED9BF',
+          }
+        }}>
         <html lang='en'>
           <body className={`font-sans ${inter.variable}`}>
             <SidebarProvider defaultOpen>

@@ -7,16 +7,16 @@ export function useLeague() {
     throw new Error('useLeague must be used within a LeagueProvider');
   }
 
-  const { currentLeague, updateLeague } = context;
+  const { league, updateLeague } = context;
 
-  const draftDate = currentLeague.settings.draftDate ?
-    new Date(currentLeague.settings.draftDate) : null;
+  const draftDate = league?.settings?.draftDate ?
+    new Date(league?.settings?.draftDate) : null;
 
   return {
-    currentLeague: {
-      ...currentLeague,
+    league: {
+      ...league,
       settings: {
-        ...currentLeague?.settings,
+        ...league?.settings,
         draftDate,
       }
     },

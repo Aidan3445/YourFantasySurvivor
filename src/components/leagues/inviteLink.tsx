@@ -7,7 +7,11 @@ import { cn } from '~/lib/utils';
 import { useLeague } from '~/hooks/useLeague';
 
 export default function InviteLink() {
-  const { currentLeague: { leagueHash } } = useLeague();
+  const {
+    league: {
+      leagueHash
+    }
+  } = useLeague();
   const [hasCopied, setHasCopied] = useState(false);
 
   const origin = useMemo(() => {
