@@ -50,7 +50,7 @@ interface CountdownProps {
 }
 
 function Countdown({ endDate, replacedBy }: CountdownProps) {
-  const [timer, setTimer] = useState<number | null>(endDate ? endDate.getTime() - Date.now() : null);
+  const [timer, setTimer] = useState<number | null>(null);
 
   useEffect(() => {
     if (!endDate || (timer !== null && timer <= 0)) return;

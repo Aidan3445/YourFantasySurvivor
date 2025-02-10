@@ -5,15 +5,15 @@ import { z } from 'zod';
 import { DraftTimingOptions } from '~/server/db/defs/leagues';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '../../ui/form';
-import { DraftTimingFormField } from './leagueSettings';
+import { DraftTimingField } from './leagueSettings';
 import { Calendar } from '../../ui/calendar';
 import { Button } from '../../ui/button';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '../../ui/alert-dialog';
-import { updateDraftTiming } from '~/app/api/leagues/actions';
+} from '../../ui/alertDialog';
+import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 
 const formSchema = z.object({
@@ -22,9 +22,15 @@ const formSchema = z.object({
 });
 
 export default function SetDraftDate() {
-  const { league } = useLeague();
-  const { leagueHash, settings } = league;
-  const { draftTiming, draftDate } = settings;
+  const {
+    league: {
+      leagueHash,
+      settings: {
+        draftTiming,
+        draftDate
+      }
+    }
+  } = useLeague();
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -37,7 +43,7 @@ export default function SetDraftDate() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateDraftTiming(leagueHash, data.draftTiming, data.draftDate);
+      await updateLeagueSettings(leagueHash, undefined, data.draftTiming, data.draftDate);
       alert(`Draft timing updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);
@@ -59,23 +65,8 @@ export default function SetDraftDate() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <form className='flex flex-col gap-2' action={() => handleSubmit()}>
-            <DraftTimingFormField />
-            <FormField
-              name='draftDate'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Draft Date</FormLabel>
-                  <FormControl className='flex w-full justify-center'>
-                    {/*TODO adapt range to season + timing setting*/}
-                    <Calendar
-                      className='border rounded-md self-center'
-                      mode='single'
-                      selected={field.value as Date}
-                      onSelect={field.onChange}
-                      disabled={(date) => date < new Date()} />
-                  </FormControl>
-                </FormItem>
-              )} />
+            <DraftTimingField />
+            <DraftDateField />
             <AlertDialogFooter className='grid grid-cols-2 gap-2'>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction asChild>
@@ -86,5 +77,28 @@ export default function SetDraftDate() {
         </AlertDialogContent>
       </AlertDialog>
     </Form>
+  );
+}
+
+export function DraftDateField() {
+  return (
+    <FormField
+      name='draftDate'
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Draft Start Date</FormLabel>
+          <FormControl>
+            {/*TODO adapt range to season + timing setting*/}
+            <span className='flex w-full justify-center'>
+              <Calendar
+                className='border rounded-md'
+                mode='single'
+                selected={field.value as Date}
+                onSelect={field.onChange}
+                disabled={(date) => date < new Date()} />
+            </span>
+          </FormControl>
+        </FormItem>
+      )} />
   );
 }

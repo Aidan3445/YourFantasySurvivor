@@ -4,6 +4,7 @@ import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { leaguesSchema } from '~/server/db/schema/leagues';
+import { type LeagueMemberRole } from '~/server/db/defs/leagueMembers';
 
 /**
   * Authenticate the user within a league
@@ -13,13 +14,13 @@ import { leaguesSchema } from '~/server/db/schema/leagues';
   * OR an empty object if the user is not authenticated
   */
 export async function leagueMemberAuth(leagueHash: string):
-  Promise<{ userId: string | null, memberId: number | null }> {
+  Promise<{ userId: string | null, memberId: number | null, role: LeagueMemberRole | null }> {
   const { userId } = await auth();
-  if (!userId) return { userId, memberId: null };
+  if (!userId) return { userId, memberId: null, role: null };
 
   // Ensure the user is a member of the league
   const member = await db
-    .select({ memberId: leagueMembersSchema.memberId })
+    .select({ memberId: leagueMembersSchema.memberId, role: leagueMembersSchema.role })
     .from(leagueMembersSchema)
     .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
     .where(and(
@@ -27,5 +28,5 @@ export async function leagueMemberAuth(leagueHash: string):
       eq(leagueMembersSchema.userId, userId),
     )).then((members) => members[0]);
 
-  return { userId, memberId: member?.memberId ?? null };
+  return { userId, memberId: member?.memberId ?? null, role: member?.role ?? null };
 }

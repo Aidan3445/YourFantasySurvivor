@@ -5,7 +5,7 @@ import { db } from '~/server/db';
 import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
 import { type BaseEventRuleType } from '~/server/db/defs/baseEvents';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray, not } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { type LeagueMember, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
@@ -120,17 +120,23 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
 }
 
 /**
-  * Update the draft timing for a league
+  * Update the league settings
   * @param leagueHash - the hash of the league
+  * @param survivalCap - the new survival cap
   * @param draftTiming - the new draft timing
   * @param draftDate - the new draft date
   * @returns the updated league or undefined if not found
   * @throws an error if the user is not authorized
   * @throws an error if the draft timing cannot be updated
   */
-export async function updateDraftTiming(leagueHash: string, draftTiming: DraftTiming, draftDate: Date) {
-  const { memberId } = await leagueMemberAuth(leagueHash);
-  if (!memberId) throw new Error('User not authorized');
+export async function updateLeagueSettings(
+  leagueHash: string,
+  survivalCap?: number,
+  draftTiming?: DraftTiming,
+  draftDate?: Date
+) {
+  const { memberId, role } = await leagueMemberAuth(leagueHash);
+  if (!memberId || role !== 'owner') throw new Error('User not authorized');
 
   // Check if the draft timing is valid for the season
   // Episode 2 date is 1 week after the premiere date, 
@@ -139,26 +145,29 @@ export async function updateDraftTiming(leagueHash: string, draftTiming: DraftTi
   const res = await db
     .select({ premiereDate: seasonsSchema.premiereDate, episode2Date: episodesSchema.airDate })
     .from(seasonsSchema)
-    .innerJoin(episodesSchema, eq(episodesSchema.seasonId, seasonsSchema.seasonId))
     .innerJoin(leaguesSchema, eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId))
-    .where(and(
-      eq(leaguesSchema.leagueHash, leagueHash),
+    .leftJoin(episodesSchema, and(
+      eq(episodesSchema.seasonId, seasonsSchema.seasonId),
       eq(episodesSchema.episodeNumber, 2)))
+    .where(eq(leaguesSchema.leagueHash, leagueHash))
     .then((res) => res[0]);
 
   if (!res) throw new Error('Season not found');
   const premiereDate = new Date(res.premiereDate);
-  const episode2Date = new Date(res.episode2Date);
+  const episode2Date = res.episode2Date ?
+    new Date(res.episode2Date) :
+    // If episode 2 is not in the DB we make the best guess
+    new Date(premiereDate).setDate(premiereDate.getDate() + 7);
 
   switch (draftTiming) {
     case 'Before Premier':
       if (premiereDate <= new Date()) throw new Error('Premiere date has already passed');
-      if (draftDate >= premiereDate) throw new Error('Draft date must be before the premiere date');
+      if (draftDate && draftDate >= premiereDate) throw new Error('Draft date must be before the premiere date');
       break;
     case 'After Premier':
       if (episode2Date <= new Date()) throw new Error('Episode 2 has already aired');
-      if (draftDate <= premiereDate) throw new Error('Draft date must be after the premiere date');
-      if (draftDate >= episode2Date) throw new Error('Draft date must be before episode 2 airs');
+      if (draftDate && draftDate <= premiereDate) throw new Error('Draft date must be after the premiere date');
+      if (draftDate && draftDate >= episode2Date) throw new Error('Draft date must be before episode 2 airs');
       break;
   }
 
@@ -166,7 +175,7 @@ export async function updateDraftTiming(leagueHash: string, draftTiming: DraftTi
   // eslint-disable-next-line drizzle/enforce-update-with-where
   const league = await db
     .update(leagueSettingsSchema)
-    .set({ draftTiming, draftDate: draftDate.toUTCString() })
+    .set({ survivalCap, draftTiming, draftDate: draftDate?.toUTCString() })
     .from(leaguesSchema)
     .where(and(
       eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId),
@@ -240,3 +249,50 @@ export async function updateMemberDetails(leagueHash: string, member: LeagueMemb
 
   return updatedMember[0];
 }
+
+/** 
+  * Update league admin list
+  * @param leagueHash - the hash of the league
+  * @param admins - the new list of admins
+  * @returns the updated league or undefined if not found
+  * @throws an error if the user is not authorized or not the owner
+  * @throws an error if the admins cannot be updated
+  */
+export async function updateAdmins(leagueHash: string, admins: number[]) {
+  const { memberId, role } = await leagueMemberAuth(leagueHash);
+  // Note that league member auth would be redundant here
+  if (!memberId || role !== 'owner') throw new Error('User not authorized');
+
+  // Create transaction
+  await db.transaction(async (trx) => {
+    try {
+      // Promote the new admins
+      await trx
+        .update(leagueMembersSchema)
+        .set({ role: 'admin' })
+        .from(leaguesSchema)
+        .where(and(
+          eq(leagueMembersSchema.leagueId, leaguesSchema.leagueId),
+          eq(leaguesSchema.leagueHash, leagueHash),
+          inArray(leagueMembersSchema.memberId, admins),
+          eq(leagueMembersSchema.role, 'member')));
+
+      // Demote the old admins not in the list
+      await trx
+        .update(leagueMembersSchema)
+        .set({ role: 'member' })
+        .from(leaguesSchema)
+        .where(and(
+          eq(leagueMembersSchema.leagueId, leaguesSchema.leagueId),
+          eq(leaguesSchema.leagueHash, leagueHash),
+          not(inArray(leagueMembersSchema.memberId, admins)),
+          eq(leagueMembersSchema.role, 'admin')));
+    } catch (error) {
+      console.error('Error updating admins:', error);
+      // Rollback the transaction
+      trx.rollback();
+      throw new Error('An error occurred while updating the admins. Please try again.');
+    }
+  });
+}
+

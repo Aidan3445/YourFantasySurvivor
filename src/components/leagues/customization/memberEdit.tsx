@@ -51,7 +51,6 @@ export default function MemberEditForm() {
         color: data.color,
       };
 
-
       await updateMemberDetails(leagueHash, member);
       alert('Successfully updated member details');
     } catch (error) {

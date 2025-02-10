@@ -4,7 +4,7 @@ import * as React from 'react';
 import type * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import {
-  Controller,
+  RHFController,
   type ControllerProps,
   type FieldPath,
   type FieldValues,
@@ -36,7 +36,7 @@ const FormField = <
 }: ControllerProps<TFieldValues, TName>) => {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
-      <Controller {...props} />
+      <RHFController {...props} />
     </FormFieldContext.Provider>
   );
 };

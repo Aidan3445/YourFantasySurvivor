@@ -86,6 +86,7 @@ export default function DraftOrder() {
         </>}
       </span>
       <DndContext
+        id='draftOrderDnd'
         sensors={sensors}
         collisionDetection={closestCenter}
         modifiers={[restrictToParentElement]}

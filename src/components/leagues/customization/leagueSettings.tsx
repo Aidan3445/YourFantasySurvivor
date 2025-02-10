@@ -1,11 +1,21 @@
+'use client';
 import { HelpCircle } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '~/components/ui/popover';
 import { PopoverPortal } from '@radix-ui/react-popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { type DraftTiming, DraftTimingOptions, MAX_SURVIVAL_CAP } from '~/server/db/defs/leagues';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
+import { type DraftTiming, DraftTimingOptions, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
+import { useLeague } from '~/hooks/useLeague';
+import { TabsContent } from '@radix-ui/react-tabs';
+import { TabsTrigger } from '~/components/ui/tabs';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { DraftDateField } from './setDraftDate';
+import { MultiSelect } from '~/components/ui/multiSelect';
+import { Button } from '~/components/ui/button';
+import { updateAdmins, updateLeagueSettings } from '~/app/api/leagues/actions';
 
-export default function LeagueSettings() {
+export default function LeagueSettingsFields() {
   return (
     <section className='mx-2 pointer-events-auto'>
       <FormLabel>League Settings</FormLabel>
@@ -53,7 +63,7 @@ export default function LeagueSettings() {
                       {i + 1}
                     </SelectItem>
                   ))}
-                  <SelectItem value={'1000'}>
+                  <SelectItem value={`${MAX_SURVIVAL_CAP}`}>
                     Unlimited
                   </SelectItem>
                 </SelectContent>
@@ -65,12 +75,12 @@ export default function LeagueSettings() {
             <FormMessage />
           </FormItem>
         )} />
-      <DraftTimingFormField />
+      <DraftTimingField />
     </section>
   );
 }
 
-export function DraftTimingFormField() {
+export function DraftTimingField() {
   return (
     <FormField
       name='draftTiming'
@@ -102,5 +112,120 @@ export function DraftTimingFormField() {
         </FormItem>
       )} />
 
+  );
+}
+
+export function LeagueSettingsTabTrigger() {
+  const {
+    league: {
+      members: {
+        loggedIn
+      }
+    }
+  } = useLeague();
+
+  if (!loggedIn || loggedIn.role === 'member') return null;
+
+  return (
+    <TabsTrigger value='league'>
+      League Settings
+    </TabsTrigger>
+  );
+}
+
+const formSchema = z.object({
+  survivalCap: SurvivalCapZod,
+  draftTiming: z.enum(DraftTimingOptions),
+  draftDate: z.date().optional(),
+  admins: z.array(z.number())
+});
+
+export function LeagueSettingsTabContent() {
+  const {
+    league: {
+      leagueHash,
+      settings: {
+        survivalCap,
+        draftTiming,
+        draftDate,
+        draftOver
+      },
+      members: {
+        loggedIn,
+        list,
+      },
+    }
+  } = useLeague();
+
+  const membersList = list.map(member => ({
+    value: member.memberId,
+    label: member.displayName,
+    role: member.role,
+  }))
+    .filter(member => member.value !== loggedIn?.memberId);
+
+  const reactForm = useForm<z.infer<typeof formSchema>>({
+    defaultValues: {
+      survivalCap,
+      draftTiming,
+      draftDate: draftDate ?? new Date(),
+      admins: membersList.filter(member => member.role === 'admin').map(member => member.value),
+    },
+  });
+
+  if (!loggedIn || loggedIn.role === 'member') return null;
+
+  const handleSubmit = reactForm.handleSubmit(async (data) => {
+    try {
+      await Promise.all([
+        updateLeagueSettings(leagueHash, data.survivalCap, data.draftTiming, data.draftDate),
+        console.log(data.admins),
+        updateAdmins(leagueHash, data.admins),
+      ]);
+      alert(`League settings updated for league ${leagueHash}`);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to update league some or all settings');
+    }
+  });
+
+  return (
+    <TabsContent value='league' >
+      <Form {...reactForm}>
+        <form className=' flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+          <LeagueSettingsFields />
+          {!draftOver && <DraftDateField />}
+          <LeagueAdminsField members={membersList} />
+          <Button type='submit'>Save</Button>
+        </form>
+      </Form>
+    </TabsContent >
+  );
+}
+
+interface LeagueAdminsFieldProps {
+  members: { value: number, label: string, role: string }[];
+}
+
+function LeagueAdminsField({ members }: LeagueAdminsFieldProps) {
+  return (
+    <FormField
+      name='admins'
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>Admins</FormLabel>
+          <FormDescription>
+            Admins can edit league settings and help score custom events throughout the season.
+          </FormDescription>
+          <FormControl>
+            <MultiSelect
+              options={members}
+              onValueChange={field.onChange}
+              defaultValue={field.value as string[]}
+              placeholder='Select admins' />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )} />
   );
 }
