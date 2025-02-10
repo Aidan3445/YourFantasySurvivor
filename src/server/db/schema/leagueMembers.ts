@@ -24,7 +24,6 @@ export const leagueMembersSchema = createTable(
     unique('league_color_unq').on(table.leagueId, table.color),
   ]
 );
-export type LeagueMember = typeof leagueMembersSchema.$inferSelect;
 
 export const selectionUpdates = createTable(
   'selection_update',

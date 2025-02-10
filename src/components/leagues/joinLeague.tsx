@@ -86,7 +86,7 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
 }
 
 interface LeagueMemberFieldsProps {
-  memberColors: { color: string }[];
+  memberColors?: { color: string }[];
 }
 
 export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProps) {

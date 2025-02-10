@@ -37,7 +37,6 @@ export default function DraftOrder() {
 
   const [order, setOrder] = useState(initialOrder);
   const orderChaged = useMemo(() => {
-    console.log(order, draftOrder);
     return order.some((member, index) => member.memberId !== draftOrder[index]);
   }, [order, draftOrder]);
 
@@ -46,7 +45,7 @@ export default function DraftOrder() {
     let i = 0;
     const interval = setInterval(() => {
       if (++i < order.length * SHUFFLE_LOOPS) {
-        const randomIndex = Math.floor(Math.random() * order.length);
+        const randomIndex = Math.floor(2 * order.length);
         setOrder((items) => {
           return arrayMove(items, i % order.length, randomIndex)
             .map((item, index) => ({ ...item, index }));
@@ -70,13 +69,13 @@ export default function DraftOrder() {
   };
 
   return (
-    <article className='flex flex-col w-full p-2 bg-accent rounded-xl'>
+    <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
       <span className='flex gap-4 items-center mb-4 w-full'>
-        <h2 className='text-lg font-bold text-accent-foreground'>Draft Order</h2>
+        <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
         {!orderLocked && <>
           <Shuffle
             className='cursor-pointer stroke-primary mr-2'
-            size={34}
+            size={24}
             onClick={shuffleOrderWithAnimation} />
           <span className='flex gap-2 ml-auto'>
             <form action={() => saveOrder()}>
@@ -103,8 +102,16 @@ export default function DraftOrder() {
                   <ColorRow
                     color={member.color}
                     loggedIn={members.loggedIn?.memberId === member.memberId}>
-                    <h3 className='text-lg' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
-                    <h2 className='text-3xl font-semibold' style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h2>
+                    <h3
+                      className='text-lg'
+                      style={{ color: getContrastingColor(member.color) }}>
+                      {index + 1}
+                    </h3>
+                    <h2
+                      className='text-3xl font-semibold'
+                      style={{ color: getContrastingColor(member.color) }}>
+                      {member.displayName}
+                    </h2>
                     {!orderLocked &&
                       <GripVertical className='ml-auto cursor-row-resize' color={getContrastingColor(member.color)} />}
                   </ColorRow>

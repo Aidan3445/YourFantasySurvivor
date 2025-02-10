@@ -13,11 +13,9 @@ export function ChallengeScoreSettings() {
             <span className='flex gap-4 items-center'>
               <FormControl>
                 <Input
-                  className='w-24'
+                  className='w-24 text-black'
                   type='number'
                   step={1}
-                  min={-512}
-                  max={512}
                   placeholder='Points'
                   {...field} />
               </FormControl>

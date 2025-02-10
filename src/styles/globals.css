@@ -69,23 +69,6 @@ main {
 
 /* Scrollbar styles */
 
-/* Main scroll */
-::-webkit-scrollbar {
-    @apply w-2 h-2;
-}
-
-::-webkit-scrollbar-track {
-    @apply bg-zinc-700/50;
-}
-
-::-webkit-scrollbar-thumb {
-    @apply bg-zinc-200/70 rounded-md;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    @apply bg-zinc-200;
-}
-
 /* Stats scroll */
 .stats-scroll {
     @apply flex overscroll-contain flex-col h-40;
@@ -96,25 +79,6 @@ main {
     background: transparent;
 }
 
-/* Light scroll */
-.light-scroll, .dark-scroll {
-    overflow: auto;
-}
-
-.light-scroll::-webkit-scrollbar-track {
-    background: transparent;
-    @apply bg-white/20 rounded-md m-2;
-}
-
-/* Dark scroll */
-.dark-scroll::-webkit-scrollbar-track {
-    @apply bg-black/20 rounded-md m-2;
-}
-
-/* scroll padding */
-.pad-scroll::-webkit-scrollbar-track {
-    @apply md:!m-14;
-}
   
 
 /* on hover and selected indent */
@@ -159,6 +123,41 @@ button, .hs-in {
 .br-corner {
     @apply absolute bottom-0 right-0 -rotate-210 translate-y-3 translate-x-3;
 }
+
+
+
+
+
+
+/*-----------------------------------*/
+/* Scrollbar styles */
+
+/* Main scroll */
+::-webkit-scrollbar {
+    @apply w-2 h-2;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-zinc-700/50;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply bg-zinc-200/70 rounded-md;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-200;
+}
+
+/* Light scroll */
+.light-scroll {
+    @apply overflow-auto;
+}
+
+.light-scroll::-webkit-scrollbar-track {
+    @apply bg-white/20 rounded-md;
+}
+
 
 /* CLERK */
  .cl-button {

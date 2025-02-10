@@ -5,6 +5,7 @@ import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues'
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMemberAuth } from '~/lib/auth';
+import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
 
 export const QUERIES = {
   /**
@@ -33,10 +34,12 @@ export const QUERIES = {
         leagueHash: leaguesSchema.leagueHash,
         season: seasonsSchema.seasonName,
         settings: leagueSettingsSchema,
+        baseEventRules: baseEventRulesSchema
       })
       .from(leaguesSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
+      .innerJoin(baseEventRulesSchema, eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId))
       .where(eq(leaguesSchema.leagueHash, leagueHash))
       .then((leagues) => leagues[0]);
 

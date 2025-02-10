@@ -29,8 +29,8 @@ export default function InviteLink() {
   };
 
   return (
-    <article className='p-2 bg-accent rounded-xl'>
-      <h2 className='text-lg font-bold text-accent-foreground'>Invite friends to play</h2>
+    <article className='p-2 bg-card rounded-xl w-full'>
+      <h2 className='text-lg font-bold text-card-foreground'>Invite friends to play</h2>
       <p className='text-sm text-muted-foreground'>Copy the link and share with your friends</p>
       <div
         className='relative flex items-center cursor-pointer'

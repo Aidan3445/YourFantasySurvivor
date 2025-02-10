@@ -18,6 +18,7 @@ import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from './joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
+import { type ReactNode } from 'react';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
@@ -154,22 +155,40 @@ function BaseEventsFields() {
     <section className='mx-2'>
       <FormLabel>Setup Events</FormLabel>
       <FormDescription>{'Don\'t worry, you can change these values later.'}</FormDescription>
-      <Tabs defaultValue='challenges' className='h-[26rem] mt-2'>
-        <TabsList className='w-full grid grid-cols-3'>
-          <TabsTrigger value='challenges'>Challenges</TabsTrigger>
-          <TabsTrigger value='advantages'>Advantages</TabsTrigger>
-          <TabsTrigger value='other'>Other</TabsTrigger>
-        </TabsList>
-        <TabsContent value='challenges'>
-          <ChallengeScoreSettings />
-        </TabsContent>
-        <TabsContent value='advantages'>
-          <AdvantageScoreSettings />
-        </TabsContent>
-        <TabsContent value='other'>
-          <OtherScoreSettings />
-        </TabsContent>
-      </Tabs>
+      <BaseEventRuleTabs />
     </section>
   );
 }
+
+interface BaseEventRuleTabsProps {
+  rightSide?: ReactNode;
+}
+
+export function BaseEventRuleTabs({ rightSide }: BaseEventRuleTabsProps) {
+  return (
+    <Tabs defaultValue='challenges' className='h-[26rem] mt-2'>
+      <TabsList className='w-full grid grid-cols-3'>
+        <TabsTrigger value='challenges'>Challenges</TabsTrigger>
+        <TabsTrigger value='advantages'>Advantages</TabsTrigger>
+        <TabsTrigger value='other'>Other</TabsTrigger>
+      </TabsList>
+      <span className='flex gap-4'>
+        <div className='flex-grow flex-shrink-0'>
+          <TabsContent value='challenges'>
+            <ChallengeScoreSettings />
+          </TabsContent>
+          <TabsContent value='advantages'>
+            <AdvantageScoreSettings />
+          </TabsContent>
+          <TabsContent value='other'>
+            <OtherScoreSettings />
+          </TabsContent>
+        </div>
+        <div className='flex-shrink flex-grow-0'>
+          {rightSide}
+        </div>
+      </span>
+    </Tabs>
+  );
+}
+

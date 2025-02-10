@@ -86,7 +86,7 @@ export function DraftTimingFormField() {
                   <SelectValue placeholder='Select draft timing' />
                 </SelectTrigger>
               </FormControl>
-              <FormDescription className='max-w-48 text-wrap'>
+              <FormDescription className='w-48 text-wrap'>
                 Do you want to draft before or after the season premieres?
               </FormDescription>
             </span>

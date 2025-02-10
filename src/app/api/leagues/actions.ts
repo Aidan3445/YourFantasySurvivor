@@ -8,7 +8,7 @@ import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues'
 import { and, eq } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { type NewLeagueMember } from '~/server/db/defs/leagueMembers';
+import { type LeagueMember, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
 
@@ -204,4 +204,39 @@ export async function updateDraftOrder(leagueHash: string, draftOrder: number[])
   if (!league[0]) throw new Error('League not found');
 
   return league[0];
+}
+
+/**
+  * Update league member details
+  * @param leagueHash - the hash of the league
+  * @param member - the member to update
+  * @returns the updated member or undefined if not found
+  * @throws an error if the user is not authorized
+  * @throws an error if the member cannot be updated
+  */
+export async function updateMemberDetails(leagueHash: string, member: LeagueMember) {
+  const { userId } = await auth();
+  // Note that league member auth would be redundant here
+  if (!userId) throw new Error('User not authorized');
+
+  // Error can be ignored, the where clause is not understood by the type system
+  // eslint-disable-next-line drizzle/enforce-update-with-where
+  const updatedMember = await db
+    .update(leagueMembersSchema)
+    .set(member)
+    .from(leaguesSchema)
+    .where(and(
+      eq(leagueMembersSchema.leagueId, leaguesSchema.leagueId),
+      eq(leaguesSchema.leagueHash, leagueHash),
+      eq(leagueMembersSchema.memberId, member.memberId)))
+    .returning({
+      memberId: leagueMembersSchema.memberId,
+      color: leagueMembersSchema.color,
+      displayName: leagueMembersSchema.displayName,
+      role: leagueMembersSchema.role,
+    });
+
+  if (!updatedMember[0]) throw new Error('Member not found');
+
+  return updatedMember[0];
 }

@@ -13,6 +13,10 @@ export interface NewLeagueMember {
   role: LeagueMemberRole;
 }
 
+export interface LeagueMember extends NewLeagueMember {
+  memberId: number;
+}
+
 export interface Member {
   memberId: number;
   displayName: string;

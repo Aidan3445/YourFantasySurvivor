@@ -22,7 +22,7 @@ const formSchema = z.object({
 });
 
 export default function SetDraftDate() {
-  const { league, updateLeague } = useLeague();
+  const { league } = useLeague();
   const { leagueHash, settings } = league;
   const { draftTiming, draftDate } = settings;
 
@@ -37,16 +37,7 @@ export default function SetDraftDate() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const res = await updateDraftTiming(leagueHash, data.draftTiming, data.draftDate);
-
-      updateLeague({
-        ...league,
-        settings: {
-          ...settings,
-          draftTiming: res.draftTiming,
-          draftDate: res.draftDate,
-        },
-      });
+      await updateDraftTiming(leagueHash, data.draftTiming, data.draftDate);
       alert(`Draft timing updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);
@@ -60,7 +51,7 @@ export default function SetDraftDate() {
         <AlertDialogTrigger>
           <Settings className='cursor-pointer stroke-primary mr-2' size={34} />
         </AlertDialogTrigger>
-        <AlertDialogContent className='w-96'>
+        <AlertDialogContent className='w-min'>
           <AlertDialogHeader>
             <AlertDialogTitle>Edit Draft Type and Date</AlertDialogTitle>
             <AlertDialogDescription>
@@ -85,7 +76,7 @@ export default function SetDraftDate() {
                   </FormControl>
                 </FormItem>
               )} />
-            <AlertDialogFooter className='w-full'>
+            <AlertDialogFooter className='grid grid-cols-2 gap-2'>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction asChild>
                 <Button type='submit'>Save</Button>

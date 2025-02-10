@@ -17,7 +17,7 @@ export function DraftCountdown() {
     (loggedIn && loggedIn.role !== 'member');
 
   return (
-    <article className='flex flex-col w-full p-2 bg-accent rounded-xl'>
+    <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
       <span className='grid grid-cols-3 w-full items-center'>
         <div>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
