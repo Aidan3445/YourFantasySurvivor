@@ -14,7 +14,7 @@ import { Check } from 'lucide-react';
 import { joinLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLeague } from '~/hooks/useLeague';
 
 const formSchema = z.object({
@@ -90,18 +90,14 @@ interface LeagueMemberFieldsProps {
 }
 
 export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProps) {
-  const [availableColors, setAvailableColors] = useState(twentyColors);
-  useEffect(() => {
-    const takenColors = twentyColors.map((color) => {
-      if (memberColors.some((member) => member.color === color)) {
-        const rgb = hexToRgba(color);
-        const avg = Math.round((rgb.r + rgb.g + rgb.b) / 3);
-        return rgbaToHex({ r: avg, g: avg, b: avg, a: 1 });
-      }
-      return color;
-    });
-    setAvailableColors(takenColors);
-  }, [memberColors]);
+  const availableColors = useMemo(() => twentyColors.map((color) => {
+    if (memberColors.some((member) => member.color === color)) {
+      const rgb = hexToRgba(color);
+      const avg = Math.round((rgb.r + rgb.g + rgb.b) / 3);
+      return rgbaToHex({ r: avg, g: avg, b: avg, a: 1 });
+    }
+    return color;
+  }), [memberColors]);
 
   const ensureNewColor = (color: HsvaColor, setColor?: (value: string) => void) => {
     if (color.s === 0) {

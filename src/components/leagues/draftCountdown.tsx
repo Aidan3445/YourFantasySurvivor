@@ -12,8 +12,6 @@ export function DraftCountdown() {
     }
   } = useLeague();
 
-  console.log('draftDate', draftDate);
-
   return (
     <article className='flex flex-col w-full p-2 bg-accent rounded-xl'>
       <span className='grid grid-cols-3 w-full items-center'>

@@ -118,19 +118,20 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
 }
 
 /**
-* Update the draft timing for a league
-* @param leagueHash - the hash of the league
-* @param draftTiming - the new draft timing
-* @param draftDate - the new draft date
-* @returns the updated league or undefined if not found
-* @throws an error if the user is not authorized
-* @throws an error if the draft timing cannot be updated
-*/
+  * Update the draft timing for a league
+  * @param leagueHash - the hash of the league
+  * @param draftTiming - the new draft timing
+  * @param draftDate - the new draft date
+  * @returns the updated league or undefined if not found
+  * @throws an error if the user is not authorized
+  * @throws an error if the draft timing cannot be updated
+  */
 export async function updateDraftTiming(leagueHash: string, draftTiming: DraftTiming, draftDate: Date) {
   const { memberId } = await leagueMemberAuth(leagueHash);
   if (!memberId) throw new Error('User not authorized');
 
   // Error can be ignored, the where clause is not understood by the type system
+  // eslint-disable-next-line drizzle/enforce-update-with-where
   const league = await db
     .update(leagueSettingsSchema)
     .set({ draftTiming, draftDate: draftDate.toUTCString() })
@@ -139,6 +140,34 @@ export async function updateDraftTiming(leagueHash: string, draftTiming: DraftTi
       eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId),
       eq(leaguesSchema.leagueHash, leagueHash)))
     .returning({ draftTiming: leagueSettingsSchema.draftTiming, draftDate: leagueSettingsSchema.draftDate });
+
+  if (!league[0]) throw new Error('League not found');
+
+  return league[0];
+}
+
+/**
+  * Update the draft order for a league
+  * @param leagueHash - the hash of the league
+  * @param draftOrder - the new draft order
+  * @returns the updated league or undefined if not found
+  * @throws an error if the user is not authorized
+  * @throws an error if the draft order cannot be updated
+  */
+export async function updateDraftOrder(leagueHash: string, draftOrder: number[]) {
+  const { memberId } = await leagueMemberAuth(leagueHash);
+  if (!memberId) throw new Error('User not authorized');
+
+  // Error can be ignored, the where clause is not understood by the type system
+  // eslint-disable-next-line drizzle/enforce-update-with-where
+  const league = await db
+    .update(leagueSettingsSchema)
+    .set({ draftOrder })
+    .from(leaguesSchema)
+    .where(and(
+      eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId),
+      eq(leaguesSchema.leagueHash, leagueHash)))
+    .returning({ draftOrder: leagueSettingsSchema.draftOrder });
 
   if (!league[0]) throw new Error('League not found');
 

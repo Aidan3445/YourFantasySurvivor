@@ -76,14 +76,12 @@ export default function SetDraftDate() {
                   <FormLabel>Draft Date</FormLabel>
                   <FormControl className='flex w-full justify-center'>
                     {/*TODO adapt range to season + timing setting*/}
-                    <div>
-                      <Calendar
-                        className='border rounded-md self-center'
-                        mode='single'
-                        selected={field.value as Date}
-                        onSelect={field.onChange}
-                        disabled={(date) => date < new Date()} />
-                    </div>
+                    <Calendar
+                      className='border rounded-md self-center'
+                      mode='single'
+                      selected={field.value as Date}
+                      onSelect={field.onChange}
+                      disabled={(date) => date < new Date()} />
                   </FormControl>
                 </FormItem>
               )} />
