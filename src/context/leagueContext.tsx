@@ -19,7 +19,7 @@ interface LeagueProviderProps {
 }
 
 export default function LeagueProvider({ league, children }: LeagueProviderProps) {
-  const [currentLeague, setCurrentLeague] = useState(league);
+  const [currentLeague, setCurrentLeague] = useState<CurrentLeagueType>(league);
 
   return (
     <LeagueContext.Provider value={{ league: currentLeague, updateLeague: setCurrentLeague }}>

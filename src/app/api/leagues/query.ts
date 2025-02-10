@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { seasons } from '~/server/db/schema/seasons';
+import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMemberAuth } from '~/lib/auth';
 
 export const QUERIES = {
@@ -31,13 +31,14 @@ export const QUERIES = {
         leagueId: leaguesSchema.leagueId,
         leagueName: leaguesSchema.leagueName,
         leagueHash: leaguesSchema.leagueHash,
-        season: seasons.seasonName,
+        season: seasonsSchema.seasonName,
         settings: leagueSettingsSchema,
       })
       .from(leaguesSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
-      .innerJoin(seasons, eq(seasons.seasonId, leaguesSchema.leagueSeason))
-      .where(eq(leaguesSchema.leagueHash, leagueHash));
+      .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
+      .where(eq(leaguesSchema.leagueHash, leagueHash))
+      .then((leagues) => leagues[0]);
 
     const membersPromise = db
       .select({
@@ -52,7 +53,7 @@ export const QUERIES = {
 
     const [league, membersList] = await Promise.all([leaguePromise, membersPromise]);
 
-    if (!league[0]) {
+    if (!league) {
       return undefined;
     }
 
@@ -61,7 +62,14 @@ export const QUERIES = {
       list: membersList,
     };
 
-    return { ...league[0], members };
+    return {
+      ...league,
+      settings: {
+        ...league.settings,
+        draftOver: !!(league.settings.draftDate && new Date() > new Date(league.settings.draftDate)),
+      },
+      members,
+    };
   },
 
   /**

@@ -12,6 +12,10 @@ export function DraftCountdown() {
     }
   } = useLeague();
 
+  const editable =
+    (draftDate && Date.now() < draftDate.getTime()) ??
+    (loggedIn && loggedIn.role !== 'member');
+
   return (
     <article className='flex flex-col w-full p-2 bg-accent rounded-xl'>
       <span className='grid grid-cols-3 w-full items-center'>
@@ -28,7 +32,7 @@ export function DraftCountdown() {
           </div>
         </div>
         <div className='flex justify-end'>
-          {loggedIn && loggedIn.role !== 'member' && <SetDraftDate />}
+          {editable && <SetDraftDate />}
         </div>
       </span>
       <span className='bg-primary rounded-2xl p-2 m-4 text-primary-foreground text-2xl shadow shadow-black'>

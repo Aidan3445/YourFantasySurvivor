@@ -1,7 +1,7 @@
 import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
-import { episodes } from './episodes';
+import { episodesSchema } from './episodes';
 import { leaguesSchema, reference } from './leagues';
 import { leagueMembersSchema } from './leagueMembers';
 import { integer, serial, varchar } from 'drizzle-orm/pg-core';
@@ -46,7 +46,7 @@ export const customEvents = createTable(
   {
     id: serial('event_custom_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => customEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
+    episode: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type CustomEvent = typeof customEvents.$inferSelect;

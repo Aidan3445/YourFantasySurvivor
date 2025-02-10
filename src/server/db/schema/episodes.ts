@@ -1,26 +1,26 @@
 import { createTable } from './createTable';
-import { seasons } from './seasons';
+import { seasonsSchema } from './seasons';
 import { tribes } from './tribes';
 import { castaways } from './castaways';
 import { integer, serial, varchar, smallint, timestamp, boolean, pgEnum, unique } from 'drizzle-orm/pg-core';
 
-export const episodes = createTable(
+export const episodesSchema = createTable(
   'episode',
   {
     episodeId: serial('episode_id').notNull().primaryKey(),
-    number: smallint('number').notNull(),
+    episodeNumber: smallint('number').notNull(),
     title: varchar('title', { length: 64 }).notNull(),
     airDate: timestamp('air_date', { mode: 'string' }).notNull(),
     runtime: smallint('runtime').default(90).notNull(),
-    seasonId: integer('season_id').references(() => seasons.seasonId, { onDelete: 'cascade' }).notNull(),
-    merge: boolean('merge').default(false).notNull(),
-    finale: boolean('finale').default(false).notNull(),
+    seasonId: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
+    isMerge: boolean('merge').default(false).notNull(),
+    isFinale: boolean('finale').default(false).notNull(),
   },
   (table) => [
-    unique().on(table.seasonId, table.number),
+    unique().on(table.seasonId, table.episodeNumber),
   ]
 );
-export type Episode = typeof episodes.$inferSelect;
+export type Episode = typeof episodesSchema.$inferSelect;
 
 export const eventName = pgEnum('event_name', [
   'advFound', 'advPlay', 'badAdvPlay', 'advElim', 'spokeEpTitle', 'tribe1st', 'tribe2nd',
@@ -32,7 +32,7 @@ export const baseEvents = createTable(
   'event_base',
   {
     baseEventId: serial('event_base_id').notNull().primaryKey(),
-    episodeId: integer('episode_id').references(() => episodes.episodeId, { onDelete: 'cascade' }).notNull(),
+    episodeId: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
     eventName: eventName('name').notNull(),
     keywords: varchar('keywords', { length: 32 }).array().notNull(),
     notes: varchar('notes', { length: 256 }).array().notNull(),

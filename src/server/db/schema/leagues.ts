@@ -1,6 +1,6 @@
 import 'server-only';
 import { createTable } from './createTable';
-import { seasons } from './seasons';
+import { seasonsSchema } from './seasons';
 import { integer, pgEnum, serial, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 import { sql } from 'drizzle-orm';
@@ -12,7 +12,7 @@ export const leaguesSchema = createTable(
     leagueId: serial('league_id').primaryKey(),
     leagueHash: varchar('league_hash', { length: 16 }).notNull().$defaultFn(() => nanoid(16)),
     leagueName: varchar('league_name', { length: 64 }).notNull(),
-    leagueSeason: integer('season_id').references(() => seasons.seasonId, { onDelete: 'cascade' }).notNull(),
+    leagueSeason: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
     uniqueIndex().on(table.leagueHash),

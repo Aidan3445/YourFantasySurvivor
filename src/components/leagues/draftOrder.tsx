@@ -2,7 +2,7 @@
 
 import { useLeague } from '~/hooks/useLeague';
 import { getContrastingColor } from '@uiw/color-convert';
-import { useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { closestCenter, DndContext, PointerSensor, type UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
@@ -22,17 +22,24 @@ export default function DraftOrder() {
       leagueHash,
       members,
       settings: {
-        draftOrder
+        draftOrder,
+        draftOver,
       }
     }
   } = useLeague();
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const [order, setOrder] = useState(draftOrder.map((memberId) => {
+  const initialOrder = draftOrder.map((memberId) => {
     const member = members.list.find((m) => m.memberId === memberId);
     return member;
   }).filter((member) => !!member)
-    .map((member) => ({ ...member, id: member.memberId as UniqueIdentifier })));
+    .map((member) => ({ ...member, id: member.memberId as UniqueIdentifier }));
+
+  const [order, setOrder] = useState(initialOrder);
+  const orderChaged = useMemo(() => {
+    console.log(order, draftOrder);
+    return order.some((member, index) => member.memberId !== draftOrder[index]);
+  }, [order, draftOrder]);
 
   const shuffleOrderWithAnimation = () => {
     // shuffle order by swapping items one by one
@@ -50,7 +57,7 @@ export default function DraftOrder() {
     }, SUFFLE_DURATION / (order.length * SHUFFLE_LOOPS));
   };
 
-  const orderLocked = members.loggedIn?.role === 'member';
+  const orderLocked = draftOver || members.loggedIn?.role === 'member';
 
   const saveOrder = async () => {
     try {
@@ -71,9 +78,12 @@ export default function DraftOrder() {
             className='cursor-pointer stroke-primary mr-2'
             size={34}
             onClick={shuffleOrderWithAnimation} />
-          <form className='ml-auto' action={() => saveOrder()}>
-            <Button>Save Order</Button>
-          </form>
+          <span className='flex gap-2 ml-auto'>
+            <form action={() => saveOrder()}>
+              <Button disabled={!orderChaged} onClick={saveOrder}>Save</Button>
+            </form>
+            <Button disabled={!orderChaged} variant='destructive' onClick={() => setOrder(initialOrder)}>Reset</Button>
+          </span>
         </>}
       </span>
       <DndContext

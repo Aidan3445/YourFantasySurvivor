@@ -9,6 +9,8 @@ import { and, eq } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { type NewLeagueMember } from '~/server/db/defs/leagueMembers';
+import { seasonsSchema } from '~/server/db/schema/seasons';
+import { episodesSchema } from '~/server/db/schema/episodes';
 
 /**
   * Create a new league
@@ -129,6 +131,36 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
 export async function updateDraftTiming(leagueHash: string, draftTiming: DraftTiming, draftDate: Date) {
   const { memberId } = await leagueMemberAuth(leagueHash);
   if (!memberId) throw new Error('User not authorized');
+
+  // Check if the draft timing is valid for the season
+  // Episode 2 date is 1 week after the premiere date, 
+  // so doing some extra work technically by fetching 
+  // the episode but it allows for a more dynamic solution 
+  const res = await db
+    .select({ premiereDate: seasonsSchema.premiereDate, episode2Date: episodesSchema.airDate })
+    .from(seasonsSchema)
+    .innerJoin(episodesSchema, eq(episodesSchema.seasonId, seasonsSchema.seasonId))
+    .innerJoin(leaguesSchema, eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId))
+    .where(and(
+      eq(leaguesSchema.leagueHash, leagueHash),
+      eq(episodesSchema.episodeNumber, 2)))
+    .then((res) => res[0]);
+
+  if (!res) throw new Error('Season not found');
+  const premiereDate = new Date(res.premiereDate);
+  const episode2Date = new Date(res.episode2Date);
+
+  switch (draftTiming) {
+    case 'Before Premier':
+      if (premiereDate <= new Date()) throw new Error('Premiere date has already passed');
+      if (draftDate >= premiereDate) throw new Error('Draft date must be before the premiere date');
+      break;
+    case 'After Premier':
+      if (episode2Date <= new Date()) throw new Error('Episode 2 has already aired');
+      if (draftDate <= premiereDate) throw new Error('Draft date must be after the premiere date');
+      if (draftDate >= episode2Date) throw new Error('Draft date must be before episode 2 airs');
+      break;
+  }
 
   // Error can be ignored, the where clause is not understood by the type system
   // eslint-disable-next-line drizzle/enforce-update-with-where

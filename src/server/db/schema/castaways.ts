@@ -1,5 +1,5 @@
 import { createTable } from './createTable';
-import { seasons } from './seasons';
+import { seasonsSchema } from './seasons';
 import { integer, serial, varchar, smallint, unique } from 'drizzle-orm/pg-core';
 
 export const castaways = createTable(
@@ -13,7 +13,7 @@ export const castaways = createTable(
     residence: varchar('residence', { length: 128 }).notNull().default('Unknown'),
     job: varchar('job', { length: 128 }).notNull().default('Unknown'),
     photo: varchar('photo', { length: 512 }).notNull().default('https://media.istockphoto.com/id/1980276924/vector/no-photo-thumbnail-graphic-element-no-found-or-available-image-in-the-gallery-or-album-flat.jpg?s=612x612&w=0&k=20&c=ZBE3NqfzIeHGDPkyvulUw14SaWfDj2rZtyiKv3toItk='),
-    season: integer('season_id').references(() => seasons.seasonId, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
   },
   // unique name and shortname for each season
   (table) => [

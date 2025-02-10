@@ -1,5 +1,5 @@
 import { createTable } from './createTable';
-import { seasons } from './seasons';
+import { seasonsSchema } from './seasons';
 import { integer, serial, varchar } from 'drizzle-orm/pg-core';
 
 export const tribes = createTable(
@@ -8,7 +8,7 @@ export const tribes = createTable(
     tribeId: serial('tribe_id').notNull().primaryKey(),
     name: varchar('name', { length: 16 }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
-    season: integer('season_id').references(() => seasons.seasonId, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
   }
 );
 export type Tribe = typeof tribes.$inferSelect;
