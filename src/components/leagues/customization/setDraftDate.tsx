@@ -2,11 +2,10 @@
 
 import { Settings } from 'lucide-react';
 import { z } from 'zod';
-import { DraftTimingOptions } from '~/server/db/defs/leagues';
+import { DraftTimingOptions, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '../../ui/form';
 import { DraftTimingField } from './leagueSettings';
-import { Calendar } from '../../ui/calendar';
 import { Button } from '../../ui/button';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -15,6 +14,7 @@ import {
 } from '../../ui/alertDialog';
 import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
+import { DateTimePicker } from '~/components/ui/dateTimePicker';
 
 const formSchema = z.object({
   draftTiming: z.enum(DraftTimingOptions),
@@ -42,8 +42,13 @@ export default function SetDraftDate() {
   if (!leagueHash) return null;
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    const leagueUpdate: LeagueSettingsUpdate = {
+      draftTiming: data.draftTiming,
+      draftDate: data.draftDate,
+    };
+
     try {
-      await updateLeagueSettings(leagueHash, undefined, data.draftTiming, data.draftDate);
+      await updateLeagueSettings(leagueHash, leagueUpdate);
       alert(`Draft timing updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);
@@ -80,7 +85,11 @@ export default function SetDraftDate() {
   );
 }
 
-export function DraftDateField() {
+interface DraftDateFieldProps {
+  disabled?: boolean;
+}
+
+export function DraftDateField({ disabled }: DraftDateFieldProps) {
   return (
     <FormField
       name='draftDate'
@@ -90,15 +99,14 @@ export function DraftDateField() {
           <FormControl>
             {/*TODO adapt range to season + timing setting*/}
             <span className='flex w-full justify-center'>
-              <Calendar
-                className='border rounded-md'
-                mode='single'
-                selected={field.value as Date}
-                onSelect={field.onChange}
-                disabled={(date) => date < new Date()} />
+              <DateTimePicker
+                date={field.value as Date}
+                setDate={field.onChange}
+                side='top'
+                disabled={disabled} />
             </span>
           </FormControl>
-        </FormItem>
+        </ FormItem>
       )} />
   );
 }

@@ -6,7 +6,7 @@ export default function HomePage() {
   return (
     <main>
       <div>
-        <Image src='https://i.imgur.com/b6cHcaG.png' priority width={2100} height={2100} alt='Header Image' />
+        <Image src='https://i.imgur.com/b6cHcaG.png' priority width={1200} height={1200} alt='Header Image' />
       </div>
       <SignedOut>
         <SignIn />

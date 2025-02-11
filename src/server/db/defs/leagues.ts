@@ -8,8 +8,12 @@ export const DEFAULT_SURVIVAL_CAP = 5;
 export const MAX_SURVIVAL_CAP = 20;
 export const SurvivalCapZod = z.coerce.number().int().lte(MAX_SURVIVAL_CAP).gte(0);
 
-export const DraftTimingOptions = [
-  'Before Premier',
-  'After Premier'
-] as const;
+export const DraftTimingOptions = ['Before Premiere', 'After Premiere'] as const;
 export type DraftTiming = typeof DraftTimingOptions[number];
+
+export type LeagueSettingsUpdate = {
+  leagueName?: string;
+  survivalCap?: number;
+  draftTiming?: DraftTiming;
+  draftDate?: Date;
+}

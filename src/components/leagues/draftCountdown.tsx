@@ -13,8 +13,8 @@ export function DraftCountdown() {
   } = useLeague();
 
   const editable =
-    (draftDate && Date.now() < draftDate.getTime()) ??
-    (loggedIn && loggedIn.role !== 'member');
+    (loggedIn && loggedIn.role === 'Owner') &&
+    (draftDate && Date.now() < draftDate.getTime());
 
   return (
     <article className='flex flex-col w-full p-2 bg-card rounded-xl'>

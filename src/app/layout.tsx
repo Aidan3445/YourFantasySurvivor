@@ -13,7 +13,7 @@ const inter = Inter({
 
 export const metadata = {
   title: 'Your Fantasy Survivor',
-  description: 'The best place to play fantasy survivor',
+  description: 'A fantasy league for the TV show Survivor',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 

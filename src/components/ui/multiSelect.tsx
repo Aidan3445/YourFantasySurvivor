@@ -115,6 +115,12 @@ interface MultiSelectProps
    * Optional, can be used to add custom styles.
    */
   className?: string;
+
+  /**
+   * Display as empty state
+   * Optional, defaults to false.
+   */
+  empty?: boolean;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -131,6 +137,7 @@ export const MultiSelect = React.forwardRef<
       animation = 0,
       maxCount = 3,
       modalPopover = false,
+      empty = false,
       //asChild = false,
       className,
       ...props
@@ -200,14 +207,14 @@ export const MultiSelect = React.forwardRef<
             {...props}
             onClick={handleTogglePopover}
             className={cn(
-              'flex w-full p-1 rounded-full border min-h-10 h-auto items-center justify-between bg-white/70 hover:bg-accent [&_svg]:pointer-events-auto',
+              'flex w-full p-1 rounded-3xl border min-h-10 h-auto items-center justify-between bg-white/70 hover:bg-accent [&_svg]:pointer-events-auto',
               className
             )}
           >
-            {selectedValues.length > 0 ? (
+            {selectedValues.length > 0 && !empty ? (
               <div className='flex justify-between items-center w-full'>
                 <div className='flex flex-wrap items-center'>
-                  {selectedValues.slice(0, maxCount).map((value) => {
+                  {!empty && selectedValues.slice(0, maxCount).map((value) => {
                     const option = options.find((o) => o.value === value);
                     const IconComponent = option?.icon;
                     return (
@@ -233,7 +240,7 @@ export const MultiSelect = React.forwardRef<
                       </Badge>
                     );
                   })}
-                  {selectedValues.length > maxCount && (
+                  {!empty && selectedValues.length > maxCount && (
                     <Badge
                       className={cn(
                         'bg-transparent text-foreground border-foreground/1 hover:bg-transparent',

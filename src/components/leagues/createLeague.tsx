@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
 import { DraftTimingOptions, DEFAULT_SURVIVAL_CAP, LeagueNameZod, SurvivalCapZod } from '~/server/db/defs/leagues';
-import { BaseEventRule, defaultBaseRules } from '~/server/db/defs/baseEvents';
+import { BaseEventRuleZod, defaultBaseRules } from '~/server/db/defs/events';
 import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
 import LeagueSettingsFields from './customization/leagueSettings';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '../ui/carousel';
@@ -22,7 +22,7 @@ import { type ReactNode } from 'react';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
-  baseEventRules: BaseEventRule,
+  baseEventRules: BaseEventRuleZod,
   draftTiming: z.enum(DraftTimingOptions),
   survivalCap: SurvivalCapZod,
   displayName: DisplayNameZod,
@@ -36,7 +36,7 @@ const formSchema = z.object({
 const defaultValues: z.infer<typeof formSchema> = {
   leagueName: '',
   baseEventRules: defaultBaseRules,
-  draftTiming: 'Before Premier',
+  draftTiming: 'Before Premiere',
   survivalCap: DEFAULT_SURVIVAL_CAP,
   displayName: '',
   color: '',
@@ -61,7 +61,7 @@ export default function CreateLeagueForm() {
         {
           displayName: data.displayName,
           color: data.color,
-          role: 'owner'
+          role: 'Owner'
         }
       );
       alert(`League created with id: ${leagueHash}`);

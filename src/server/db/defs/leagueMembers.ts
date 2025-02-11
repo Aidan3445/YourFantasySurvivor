@@ -4,7 +4,7 @@ export const DISPLAY_NAME_MAX_LENGTH = 16;
 export const DisplayNameZod = z.string().min(2).max(DISPLAY_NAME_MAX_LENGTH);
 export const ColorZod = z.string().regex(/^#[0-9a-f]{6}$/i);
 
-export const LeagueMemberRoleOptions = ['owner', 'admin', 'member'] as const;
+export const LeagueMemberRoleOptions = ['Owner', 'Admin', 'Member'] as const;
 export type LeagueMemberRole = typeof LeagueMemberRoleOptions[number];
 
 export interface NewLeagueMember {

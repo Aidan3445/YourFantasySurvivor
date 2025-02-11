@@ -1,9 +1,13 @@
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 
-export function ChallengeScoreSettings() {
+interface BaseEventSettingsProps {
+  disabled?: boolean;
+}
+
+export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <section>
+    <section className={disabled ? 'pointer-events-none' : ''}>
       <FormLabel className='text-2xl'>Challenges</FormLabel>
       <FormField
         name='baseEventRules.indivWin'
@@ -93,9 +97,9 @@ export function ChallengeScoreSettings() {
   );
 }
 
-export function AdvantageScoreSettings() {
+export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <section>
+    <section className={disabled ? 'pointer-events-none' : ''}>
       <FormLabel className='text-2xl'>Advantages</FormLabel>
       <FormField
         name='baseEventRules.advFound'
@@ -185,9 +189,9 @@ export function AdvantageScoreSettings() {
   );
 }
 
-export function OtherScoreSettings() {
+export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <section>
+    <section className={disabled ? 'pointer-events-none' : ''}>
       <FormLabel className='text-2xl'>Other</FormLabel>
       <FormField
         name='baseEventRules.spokeEpTitle'

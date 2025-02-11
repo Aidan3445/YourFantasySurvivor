@@ -2,11 +2,12 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodesSchema } from './episodes';
-import { leaguesSchema, reference } from './leagues';
+import { leaguesSchema } from './leagues';
 import { leagueMembersSchema } from './leagueMembers';
-import { integer, serial, varchar } from 'drizzle-orm/pg-core';
+import { integer, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
 import { z } from 'zod';
-import { pointRange } from '../defs/baseEvents';
+
+export const oldRef = pgEnum('event_old_reference', ['castaway', 'tribe', 'member']);
 
 export const customEventRules = createTable(
   'event_custom_rule',
@@ -16,7 +17,7 @@ export const customEventRules = createTable(
     eventName: varchar('name', { length: 32 }).notNull(),
     description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
-    referenceType: reference('reference_type').notNull(),
+    referenceType: oldRef('reference_type').notNull(),
   }
 );
 
@@ -28,18 +29,6 @@ export const description = z.coerce.string()
   .min(3, { message: 'Description must be between 3 and 256 characters, or blank' })
   .max(256, { message: 'Description must be between 3 and 256 characters, or blank' })
   .or(z.literal(''));
-
-
-export const CustomEventRule = z.object({
-  // id used for updating and deleting
-  id: z.number(),
-  eventName: eventName,
-  description: description,
-  points: pointRange,
-  referenceType: z.enum(reference.enumValues),
-});
-
-export type CustomEventRuleType = z.infer<typeof CustomEventRule>;
 
 export const customEvents = createTable(
   'event_custom',

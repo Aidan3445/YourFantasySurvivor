@@ -2,12 +2,10 @@ import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
 import { episodesSchema } from './episodes';
-import { leaguesSchema, reference } from './leagues';
+import { leaguesSchema } from './leagues';
 import { leagueMembersSchema } from './leagueMembers';
 import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
-import { z } from 'zod';
-import { description, eventName } from './customEvents';
-import { pointRange } from '../defs/baseEvents';
+import { oldRef } from './customEvents';
 
 export const weeklyEventType = pgEnum('event_weekly_type', ['vote', 'predict']);
 export type WeeklyEventType = (typeof weeklyEventType.enumValues)[number];
@@ -28,34 +26,9 @@ export const weeklyEventRules = createTable(
     points: integer('points').notNull(),
     type: weeklyEventType('type').notNull(),
     timing: weeklyEventTiming('timing').default('fullSeason').notNull(),
-    referenceType: reference('reference_type').notNull(),
+    referenceType: oldRef('reference_type').notNull(),
   }
 );
-
-export const WeeklyEventRule = z.object({
-  id: z.number(),
-  eventName: eventName,
-  //customEvent: z.number().nullable(),
-  //baseEvent: z.number().nullable(),
-  description: description,
-  points: pointRange,
-  referenceType: z.enum(reference.enumValues),
-  type: z.enum(weeklyEventType.enumValues),
-  timing: z.enum(weeklyEventTiming.enumValues),
-});/*.refine((rule) => {
-  const refAdmin = rule.customEvent !== null;
-  const refBase = rule.baseEvent !== null;
-  const newRule = rule.description !== null && rule.referenceType !== null;
-
-  // rule must be tied to an admin event, base event, or be a new rule
-  // it should not reference both an admin and base event or
-  // be a new rule with a reference of either type
-  return (refAdmin && !refBase && !newRule)
-    || (!refAdmin && refBase && !newRule)
-    || (!refAdmin && !refBase && newRule);
-});*/
-
-export type WeeklyEventRuleType = z.infer<typeof WeeklyEventRule>;
 
 export const weeklyEvents = createTable(
   'event_weekly',

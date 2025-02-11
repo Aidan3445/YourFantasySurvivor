@@ -58,7 +58,7 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
       const member: NewLeagueMember = {
         displayName: data.displayName,
         color: data.color,
-        role: 'member',
+        role: 'Member',
       };
 
       await joinLeague(leagueHash, member);

@@ -1,13 +1,11 @@
 import { createTable } from './createTable';
 import { castaways } from './castaways';
 import { tribes } from './tribes';
-import { leaguesSchema, reference } from './leagues';
+import { leaguesSchema } from './leagues';
 import { leagueMembersSchema } from './leagueMembers';
 import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
-import { z } from 'zod';
-import { description, eventName } from './customEvents';
 import { episodesSchema } from './episodes';
-import { pointRange } from '../defs/baseEvents';
+import { oldRef } from './customEvents';
 
 export const seasonEventTiming = pgEnum('event_season_timing', ['premiere', 'merge', 'finale']);
 export type SeasonEventTiming = (typeof seasonEventTiming.enumValues)[number];
@@ -24,36 +22,10 @@ export const seasonEventRules = createTable(
     //baseEvent: integer('base_event_id').references(() => baseEventRules.id),
     description: varchar('description', { length: 256 }).notNull(),
     points: integer('points').notNull(),
-    referenceType: reference('reference_type').notNull(),
+    referenceType: oldRef('reference_type').notNull(),
     timing: seasonEventTiming('timing').notNull(),
   }
 );
-
-export const SeasonEventRule = z.object({
-  id: z.number(),
-  eventName: eventName,
-  //adminEvent: z.number().nullable(),
-  //baseEvent: z.number().nullable(),
-  description: description,
-  points: pointRange,
-  referenceType: z.enum(reference.enumValues),
-  // nullable internally but not in the database
-  // the database will enforce a value
-  timing: z.enum(seasonEventTiming.enumValues)
-});/*.refine((rule) => {
-  const refAdmin = rule.adminEvent !== null;
-  const refBase = rule.baseEvent !== null;
-  const newRule = rule.name !== null && rule.description !== null && rule.referenceType !== null;
-
-  // rule must be tied to an admin event, base event, or be a new rule
-  // it should not reference both an admin and base event or
-  // be a new rule with a reference of either type
-  return (refAdmin && !refBase && !newRule)
-    || (!refAdmin && refBase && !newRule)
-    || (!refAdmin && !refBase && newRule);
-});*/
-
-export type SeasonEventRuleType = z.infer<typeof SeasonEventRule>;
 
 export const seasonEvents = createTable(
   'event_season',

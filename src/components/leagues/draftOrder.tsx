@@ -56,9 +56,9 @@ export default function DraftOrder() {
     }, SUFFLE_DURATION / (order.length * SHUFFLE_LOOPS));
   };
 
-  const orderLocked = draftOver || members.loggedIn?.role === 'member';
+  const orderLocked = draftOver || members.loggedIn?.role !== 'Owner';
 
-  const saveOrder = async () => {
+  const handleSubmit = async () => {
     try {
       await updateDraftOrder(leagueHash, order.map((member) => member.memberId));
       alert('Draft order saved');
@@ -78,8 +78,8 @@ export default function DraftOrder() {
             size={24}
             onClick={shuffleOrderWithAnimation} />
           <span className='flex gap-2 ml-auto'>
-            <form action={() => saveOrder()}>
-              <Button disabled={!orderChaged} onClick={saveOrder}>Save</Button>
+            <form action={() => handleSubmit()}>
+              <Button disabled={!orderChaged} onClick={handleSubmit}>Save</Button>
             </form>
             <Button disabled={!orderChaged} variant='destructive' onClick={() => setOrder(initialOrder)}>Reset</Button>
           </span>

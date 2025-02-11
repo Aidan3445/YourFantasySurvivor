@@ -1,4 +1,5 @@
-import { LeagueSettingsTabContent, LeagueSettingsTabTrigger } from '~/components/leagues/customization/leagueSettings';
+import CustomEvents from '~/components/leagues/customization/customEvents';
+import { LeagueSettingsTabContent } from '~/components/leagues/customization/leagueSettings';
 import MemberEditForm from '~/components/leagues/customization/memberEdit';
 import { DraftCountdown } from '~/components/leagues/draftCountdown';
 import DraftOrder from '~/components/leagues/draftOrder';
@@ -11,14 +12,16 @@ export default async function LeaguePage() {
   return (
     <main className='flex flex-col gap-0 w-full h-screen'>
       <LeagueHeader />
-      <div className='grid grid-cols-3 gap-4 w-full h-full p-4 overflow-hidden'>
+      <div className='grid grid-cols-3 gap-4 w-full h-full p-4'>
         <Tabs
           className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100vh-4rem)] overflow-clip'
           defaultValue='draft'>
-          <TabsList className='grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
+          <TabsList className='relative grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
             <TabsTrigger value='draft'>Draft Settings</TabsTrigger>
             <TabsTrigger value='member'>Member Settings</TabsTrigger>
-            <LeagueSettingsTabTrigger />
+            <TabsTrigger value='league'>
+              League Settings
+            </TabsTrigger>
           </TabsList>
           <section className='flex flex-col items-center h-full gap-4 px-4 pb-14 pt-2 mt-0 light-scroll'>
             <TabsContent value='draft'>
@@ -27,6 +30,7 @@ export default async function LeaguePage() {
                 <DraftCountdown />
                 <DraftOrder />
                 <LeagueScoring />
+                <CustomEvents />
               </div>
             </TabsContent>
             <TabsContent value='member'>

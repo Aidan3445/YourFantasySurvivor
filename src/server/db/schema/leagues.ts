@@ -18,11 +18,6 @@ export const leaguesSchema = createTable(
     uniqueIndex().on(table.leagueHash),
   ]
 );
-export type League = typeof leaguesSchema.$inferSelect;
-export type LeagueInsert = typeof leaguesSchema.$inferInsert;
-
-export const reference = pgEnum('reference', ['castaway', 'tribe', 'member']);
-export type Reference = (typeof reference.enumValues)[number];
 
 export const draftTiming = pgEnum('draft_timing', DraftTimingOptions);
 
@@ -32,21 +27,9 @@ export const leagueSettingsSchema = createTable(
     leagueId: integer('league_id')
       .references(() => leaguesSchema.leagueId, { onDelete: 'cascade' })
       .primaryKey(),
-    draftTiming: draftTiming('draft_timing').notNull().default('Before Premier'),
+    draftTiming: draftTiming('draft_timing').notNull().default('After Premiere'),
     draftDate: timestamp('draft_date', { mode: 'string' }),
     draftOrder: integer('draft_order').array().notNull().default(sql`ARRAY[]::integer[]`),
-    // The cap for points earned from survivor streaks
-    // 0 means no cap
     survivalCap: integer('survival_cap').notNull().default(DEFAULT_SURVIVAL_CAP),
-  }
-);
-export type LeagueSettings = typeof leagueSettingsSchema.$inferSelect;
-
-export const leagueInviteSchema = createTable(
-  'league_invite',
-  {
-    id: varchar('invite_id', { length: 16 }).notNull().primaryKey().default(nanoid()),
-    league: integer('league_id').references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }).notNull(),
-    expiration: timestamp('expiration', { mode: 'string' }).notNull(),
   }
 );

@@ -6,6 +6,7 @@ import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMemberAuth } from '~/lib/auth';
 import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
+import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
 
 export const QUERIES = {
   /**
@@ -29,7 +30,6 @@ export const QUERIES = {
 
     const leaguePromise = db
       .select({
-        leagueId: leaguesSchema.leagueId,
         leagueName: leaguesSchema.leagueName,
         leagueHash: leaguesSchema.leagueHash,
         season: seasonsSchema.seasonName,
@@ -54,7 +54,23 @@ export const QUERIES = {
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
       .where(eq(leaguesSchema.leagueHash, leagueHash));
 
-    const [league, membersList] = await Promise.all([leaguePromise, membersPromise]);
+    const leagueEventRulesPromise = db
+      .select({
+        eventName: leagueEventsRulesSchema.eventName,
+        description: leagueEventsRulesSchema.description,
+        points: leagueEventsRulesSchema.points,
+        type: leagueEventsRulesSchema.type,
+        timing: leagueEventsRulesSchema.timing,
+        public: leagueEventsRulesSchema.public,
+      })
+      .from(leagueEventsRulesSchema)
+      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
+      .where(eq(leaguesSchema.leagueHash, leagueHash));
+
+
+    const [league, membersList, customEventRules] = await Promise.all([
+      leaguePromise, membersPromise, leagueEventRulesPromise
+    ]);
 
     if (!league) {
       return undefined;
@@ -70,8 +86,10 @@ export const QUERIES = {
       settings: {
         ...league.settings,
         draftOver: !!(league.settings.draftDate && new Date() > new Date(league.settings.draftDate)),
+        draftDate: league.settings.draftDate ? new Date(league.settings.draftDate + 'Z') : null,
       },
       members,
+      customEventRules,
     };
   },
 
