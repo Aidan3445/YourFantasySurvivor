@@ -1,6 +1,6 @@
 import { createTable } from './createTable';
-import { castaways } from './castaways';
-import { tribes } from './tribes';
+import { castawaysSchema } from './castaways';
+import { tribesSchema } from './tribes';
 import { episodesSchema } from './episodes';
 import { leaguesSchema } from './leagues';
 import { leagueMembersSchema } from './leagueMembers';
@@ -49,7 +49,7 @@ export const weeklyCastaways = createTable(
   {
     id: serial('event_weekly_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    reference: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
   },
 );
 
@@ -58,7 +58,7 @@ export const weeklyTribes = createTable(
   {
     id: serial('event_weekly_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => weeklyEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    reference: integer('tribe_id').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribesSchema.tribeId, { onDelete: 'cascade' }).notNull(),
   }
 );
 
@@ -77,7 +77,7 @@ export const weeklyCastawayResults = createTable(
     id: serial('event_weekly_result_castaway_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
   }
 );
 
@@ -87,7 +87,7 @@ export const weeklyTribeResults = createTable(
     id: serial('event_weekly_result_tribe_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => weeklyEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => tribesSchema.tribeId, { onDelete: 'cascade' }).notNull(),
   }
 );
 

@@ -12,6 +12,7 @@ const config = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  crossOrigin: 'anonymous',
   images: {
     remotePatterns: [
       {
@@ -67,6 +68,12 @@ const config = {
         hostname: 'media.istockphoto.com',
         port: '',
         pathname: '/id/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.wikia.nocookie.net',
+        port: '',
+        pathname: '/**',
       },
     ],
   },

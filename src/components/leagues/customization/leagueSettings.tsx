@@ -5,7 +5,7 @@ import { Popover, PopoverTrigger, PopoverContent } from '~/components/ui/popover
 import { PopoverPortal } from '@radix-ui/react-popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { type DraftTiming, DraftTimingOptions, type LeagueSettingsUpdate, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
+import { type LeagueDraftTiming, DraftTimingOptions, type LeagueSettingsUpdate, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
 import { useLeague } from '~/hooks/useLeague';
 import { TabsContent } from '@radix-ui/react-tabs';
 import { z } from 'zod';
@@ -105,7 +105,7 @@ export function DraftTimingField({ disabled }: DraftTimingFieldProps) {
           <Select
             disabled={disabled}
             onValueChange={field.onChange}
-            defaultValue={field.value as DraftTiming}>
+            defaultValue={field.value as LeagueDraftTiming}>
             <span className='flex gap-4 items-center'>
               <FormControl>
                 <SelectTrigger className='w-36'>

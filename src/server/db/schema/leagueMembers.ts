@@ -2,7 +2,7 @@ import 'server-only';
 import { createTable } from './createTable';
 import { leaguesSchema } from './leagues';
 import { episodesSchema } from './episodes';
-import { castaways } from './castaways';
+import { castawaysSchema } from './castaways';
 import { integer, serial, varchar, unique, index, primaryKey, uniqueIndex, pgEnum } from 'drizzle-orm/pg-core';
 import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '../defs/leagueMembers';
 
@@ -30,7 +30,7 @@ export const selectionUpdates = createTable(
   {
     memberId: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
     episodeId: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-    castawayId: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
+    castawayId: integer('castaway_id').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
     primaryKey({ columns: [table.memberId, table.episodeId] }),

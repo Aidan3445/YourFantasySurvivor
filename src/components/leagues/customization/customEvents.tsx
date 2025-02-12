@@ -112,7 +112,7 @@ export default function CustomEvents() {
           {customEventRules.map((rule, index) => (
             <CarouselItem
               key={index}
-              className={cn('pl-1', customEventRules.length > 1 ? 'basis-1/2' : '')}>
+              className={cn('pl-1 cursor-ew-resize', customEventRules.length > 1 ? 'basis-1/2' : '')}>
               <CustomEventCard rule={rule} />
             </CarouselItem>
           ))}

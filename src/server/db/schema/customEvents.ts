@@ -1,6 +1,7 @@
+import 'server-only';
 import { createTable } from './createTable';
-import { castaways } from './castaways';
-import { tribes } from './tribes';
+import { castawaysSchema } from './castaways';
+import { tribesSchema } from './tribes';
 import { episodesSchema } from './episodes';
 import { leaguesSchema } from './leagues';
 import { leagueMembersSchema } from './leagueMembers';
@@ -45,7 +46,7 @@ export const customCastaways = createTable(
   {
     id: serial('event_custom_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
   },
 );
 
@@ -54,7 +55,7 @@ export const customTribes = createTable(
   {
     id: serial('event_custom_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('tribe_id').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribesSchema.tribeId, { onDelete: 'cascade' }).notNull(),
   },
 );
 

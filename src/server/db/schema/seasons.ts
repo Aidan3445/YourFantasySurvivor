@@ -1,3 +1,4 @@
+import 'server-only';
 import { createTable } from './createTable';
 import { serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 
@@ -10,8 +11,5 @@ export const seasonsSchema = createTable(
     finaleDate: timestamp('finale_date', { mode: 'string' }),
   }
 );
-
-export type Season = typeof seasonsSchema.$inferSelect;
-export type SeasonInsert = Omit<typeof seasonsSchema.$inferInsert, 'seasonId'>;
 
 

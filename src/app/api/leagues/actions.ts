@@ -1,6 +1,7 @@
 'use server';
+
 import { auth } from '@clerk/nextjs/server';
-import { type LeagueSettingsUpdate, type DraftTiming } from '~/server/db/defs/leagues';
+import { type LeagueSettingsUpdate, type LeagueDraftTiming } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
 import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
 import { type LeagueEventRule, type BaseEventRule } from '~/server/db/defs/events';
@@ -28,7 +29,7 @@ import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
   */
 export async function createNewLeague(
   leagueName: string,
-  settings: { draftTiming: DraftTiming, survivalCap: number },
+  settings: { draftTiming: LeagueDraftTiming, survivalCap: number },
   rules: BaseEventRule,
   newMember: NewLeagueMember
 ): Promise<string> {

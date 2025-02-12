@@ -1,6 +1,6 @@
 import { createTable } from './createTable';
-import { castaways } from './castaways';
-import { tribes } from './tribes';
+import { castawaysSchema } from './castaways';
+import { tribesSchema } from './tribes';
 import { leaguesSchema } from './leagues';
 import { leagueMembersSchema } from './leagueMembers';
 import { integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
@@ -44,7 +44,7 @@ export const seasonCastaways = createTable(
   {
     id: serial('event_season_castaway_id').notNull().primaryKey(),
     event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    reference: integer('castaway_id').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
+    reference: integer('castaway_id').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonTribes = createTable(
@@ -52,7 +52,7 @@ export const seasonTribes = createTable(
   {
     id: serial('event_season_tribe_id').notNull().primaryKey(),
     event: integer('event_id').references(() => seasonEvents.id, { onDelete: 'cascade' }).notNull().unique(),
-    reference: integer('tribe_id').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
+    reference: integer('tribe_id').references(() => tribesSchema.tribeId, { onDelete: 'cascade' }).notNull(),
   });
 
 export const seasonMembers = createTable(
@@ -69,7 +69,7 @@ export const seasonCastawayResults = createTable(
     id: serial('event_season_result_castaway_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').references(() => castaways.castawayId, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
   }
 );
 
@@ -79,7 +79,7 @@ export const seasonTribeResults = createTable(
     id: serial('event_season_result_tribe_id').notNull().primaryKey(),
     rule: integer('rule_id').references(() => seasonEventRules.id, { onDelete: 'cascade' }).notNull(),
     episode: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-    result: integer('result').references(() => tribes.tribeId, { onDelete: 'cascade' }).notNull(),
+    result: integer('result').references(() => tribesSchema.tribeId, { onDelete: 'cascade' }).notNull(),
   }
 );
 
