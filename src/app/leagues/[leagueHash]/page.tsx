@@ -1,4 +1,4 @@
-import LeagueHeader from '~/components/leagues/leagueHeader';
+import LeagueRouter from '~/components/leagues/leagueRouter';
 
 export interface LeaguePageProps {
   params: Promise<{
@@ -9,7 +9,8 @@ export interface LeaguePageProps {
 export default async function LeaguePage() {
   return (
     <main>
-      <LeagueHeader />
+      <LeagueRouter currentRoute='main' />
+      MAIN PAGE
     </main>
   );
 }

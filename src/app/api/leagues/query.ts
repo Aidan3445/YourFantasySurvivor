@@ -1,5 +1,5 @@
 import 'server-only';
-import { asc, eq } from 'drizzle-orm';
+import { and, asc, eq, sql } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
@@ -38,6 +38,7 @@ export const QUERIES = {
       .select({
         leagueName: leaguesSchema.leagueName,
         leagueHash: leaguesSchema.leagueHash,
+        leagueStatus: leaguesSchema.leagueStatus,
         season: seasonsSchema.seasonName,
         settings: leagueSettingsSchema,
         baseEventRules: baseEventRulesSchema
@@ -114,6 +115,7 @@ export const QUERIES = {
       .select({
         leagueName: leaguesSchema.leagueName,
         leagueHash: leaguesSchema.leagueHash,
+        leagueStatus: leaguesSchema.leagueStatus,
         season: seasonsSchema.seasonName,
         castaway: castawaysSchema.fullName,
       })
@@ -121,7 +123,15 @@ export const QUERIES = {
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
       .leftJoin(selectionUpdatesSchema, eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId))
-      .leftJoin(episodesSchema, eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId))
+      .leftJoin(episodesSchema, and(
+        eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId),
+        eq(episodesSchema.episodeNumber,
+          // I have no clue why MIN works but MAX doesn't but alas
+          db.select({ maxEpisode: sql`MIN(${episodesSchema.episodeNumber})` })
+            .from(selectionUpdatesSchema)
+            .innerJoin(episodesSchema, eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId))
+            .where(eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId))
+        )))
       .leftJoin(castawaysSchema, eq(castawaysSchema.castawayId, selectionUpdatesSchema.castawayId))
       .where(eq(leagueMembersSchema.userId, userId))
       .orderBy(asc(episodesSchema.episodeNumber))

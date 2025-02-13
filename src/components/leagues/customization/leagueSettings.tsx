@@ -5,7 +5,7 @@ import { Popover, PopoverTrigger, PopoverContent } from '~/components/ui/popover
 import { PopoverPortal } from '@radix-ui/react-popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { type LeagueDraftTiming, DraftTimingOptions, type LeagueSettingsUpdate, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
+import { type LeagueSettingsUpdate, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
 import { useLeague } from '~/hooks/useLeague';
 import { TabsContent } from '@radix-ui/react-tabs';
 import { z } from 'zod';
@@ -85,56 +85,14 @@ export default function LeagueSettingsFields({ disabled }: LeagueSettingsFieldsP
             <FormMessage />
           </FormItem>
         )} />
-      <DraftTimingField />
       <DraftDateField />
     </section>
-  );
-}
-
-interface DraftTimingFieldProps {
-  disabled?: boolean;
-}
-
-export function DraftTimingField({ disabled }: DraftTimingFieldProps) {
-  return (
-    <FormField
-      name='draftTiming'
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Draft Timing</FormLabel>
-          <Select
-            disabled={disabled}
-            onValueChange={field.onChange}
-            defaultValue={field.value as LeagueDraftTiming}>
-            <span className='flex gap-4 items-center'>
-              <FormControl>
-                <SelectTrigger className='w-36'>
-                  <SelectValue placeholder='Select draft timing' />
-                </SelectTrigger>
-              </FormControl>
-              <FormDescription className='w-48 text-wrap'>
-                Do you want to draft before or after the season premieres?
-              </FormDescription>
-            </span>
-            <SelectContent>
-              {DraftTimingOptions.map(option => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <FormMessage />
-        </FormItem>
-      )} />
-
   );
 }
 
 const formSchema = z.object({
   leagueName: z.string(),
   survivalCap: SurvivalCapZod,
-  draftTiming: z.enum(DraftTimingOptions),
   draftDate: z.date().optional(),
   admins: z.array(z.number())
 });
@@ -146,7 +104,6 @@ export function LeagueSettingsTabContent() {
       leagueName,
       settings: {
         survivalCap,
-        draftTiming,
         draftDate,
         draftOver
       },
@@ -168,7 +125,6 @@ export function LeagueSettingsTabContent() {
     defaultValues: {
       leagueName,
       survivalCap,
-      draftTiming,
       draftDate: draftDate ?? new Date(),
       admins: membersList.filter(member => member.role === 'Admin').map(member => member.value),
     },
@@ -178,7 +134,6 @@ export function LeagueSettingsTabContent() {
     const leagueUpdate: LeagueSettingsUpdate = {
       leagueName: data.leagueName,
       survivalCap: data.survivalCap,
-      draftTiming: draftOver ? undefined : data.draftTiming,
       draftDate: draftOver ? undefined : data.draftDate,
     };
 

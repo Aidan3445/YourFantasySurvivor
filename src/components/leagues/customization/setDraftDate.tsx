@@ -5,7 +5,6 @@ import { z } from 'zod';
 import { DraftTimingOptions, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '../../ui/form';
-import { DraftTimingField } from './leagueSettings';
 import { Button } from '../../ui/button';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
@@ -26,7 +25,6 @@ export default function SetDraftDate() {
     league: {
       leagueHash,
       settings: {
-        draftTiming,
         draftDate
       }
     }
@@ -34,7 +32,6 @@ export default function SetDraftDate() {
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      draftTiming,
       draftDate: draftDate!,
     },
   });
@@ -70,7 +67,6 @@ export default function SetDraftDate() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <form className='flex flex-col gap-2' action={() => handleSubmit()}>
-            <DraftTimingField />
             <DraftDateField />
             <AlertDialogFooter className='grid grid-cols-2 gap-2'>
               <AlertDialogCancel>Cancel</AlertDialogCancel>

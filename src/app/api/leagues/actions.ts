@@ -220,7 +220,7 @@ export async function updateLeagueSettings(
       // eslint-disable-next-line drizzle/enforce-update-with-where
       await trx
         .update(leagueSettingsSchema)
-        .set({ survivalCap, draftTiming, draftDate: draftDate?.toUTCString() })
+        .set({ survivalCap, draftDate: draftDate?.toUTCString() })
         .from(leaguesSchema)
         .where(and(
           eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId),

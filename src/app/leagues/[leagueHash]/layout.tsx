@@ -2,13 +2,17 @@ import { SignUp } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { type ReactNode } from 'react';
 import { QUERIES } from '~/app/api/leagues/query';
+import LeagueHeader from '~/components/leagues/leagueHeader';
 import LeagueProvider from '~/context/leagueContext';
 
-interface LeagueLayoutProps {
-  children: ReactNode;
+export interface LeagueRouteProps {
   params: Promise<{
     leagueHash: string;
   }>;
+}
+
+interface LeagueLayoutProps extends LeagueRouteProps {
+  children: ReactNode;
 }
 
 export default async function LeagueLayout({ children, params }: LeagueLayoutProps) {
@@ -30,7 +34,10 @@ export default async function LeagueLayout({ children, params }: LeagueLayoutPro
 
   return (
     <LeagueProvider league={leagueResponse}>
-      {children}
+      <div className='w-full'>
+        <LeagueHeader />
+        {children}
+      </div>
     </LeagueProvider>
   );
 }

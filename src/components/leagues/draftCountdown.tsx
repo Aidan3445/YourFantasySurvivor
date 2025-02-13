@@ -8,7 +8,7 @@ export function DraftCountdown() {
   const {
     league: {
       members: { loggedIn },
-      settings: { draftTiming, draftDate }
+      settings: { draftDate }
     }
   } = useLeague();
 
@@ -28,10 +28,10 @@ export function DraftCountdown() {
         <div className='text-center text-base font-semibold'>
           Draft type
           <div className='text-sm text-muted-foreground font-normal'>
-            {draftTiming}
+            --
           </div>
         </div>
-        <div className='flex justify-end'>
+        <div className='flex gap-2 justify-end'>
           {editable && <SetDraftDate />}
         </div>
       </span>
