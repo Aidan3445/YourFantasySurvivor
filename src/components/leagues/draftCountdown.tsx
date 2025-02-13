@@ -14,7 +14,7 @@ export function DraftCountdown() {
 
   const editable =
     (loggedIn && loggedIn.role === 'Owner') &&
-    (draftDate && Date.now() < draftDate.getTime());
+    (!draftDate || Date.now() < draftDate.getTime());
 
   return (
     <article className='flex flex-col w-full p-2 bg-card rounded-xl'>

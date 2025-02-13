@@ -5,6 +5,8 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/ui/sidebar';
 import Nav from '~/components/nav/navSelector';
+import UserProvider from '~/context/yfsUserContext';
+import { QUERIES } from './api/leagues/query';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,8 +19,12 @@ export const metadata = {
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
 
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const leagues = await QUERIES.getLeagues();
 
   return (
     <StrictMode>
@@ -29,14 +35,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             colorBackground: '#EED9BF',
           }
         }}>
-        <html lang='en'>
-          <body className={`font-sans ${inter.variable}`}>
-            <SidebarProvider defaultOpen>
-              <Nav />
-              {children}
-            </SidebarProvider>
-          </body>
-        </html>
+        <UserProvider leagues={leagues}>
+          <html lang='en'>
+            <body className={`font-sans ${inter.variable}`}>
+              <SidebarProvider defaultOpen>
+                <Nav />
+                {children}
+              </SidebarProvider>
+            </body>
+          </html>
+        </UserProvider>
       </ClerkProvider>
     </StrictMode>
   );

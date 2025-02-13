@@ -2,48 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* styles */
-body  {
-    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen overflow-x-clip bg-fixed overscroll-none;
-}
+/*
 
-* {
-    @apply text-black;
-}
-
-.page {
-    @apply px-14;
-}
-
-/* Responsive padding and margin */
-@media (min-width: 640px) { /* Adjust numbers based on your design preferences */
-    .page {
-        @apply px-14;  /* Horizontal padding for small screens */
-    }
-    .sidebar-gap-div {
-        @apply transform -translate-x-14;
-    }
-}
-
-@media (min-width: 1024px) {
-    .page {
-        @apply px-24; /* Horizontal padding for medium screens */
-    }
-    .sidebar-gap-div {
-        @apply transform -translate-x-52;
-    }
-}
-
-@media (min-width: 1280px) {
-    .page {
-        @apply px-60; /* Even more padding for extra large screens */
-    }
-    .sidebar-gap-div {
-        @apply transform -translate-x-60;
-    }
-}
-
-/* shimmer effect */
 .shimmer1::before, .shimmer2::before, .shimmer3::before {
     content: "";
     @apply  flex box-border absolute w-[200%] h-full 
@@ -62,16 +22,13 @@ body  {
     @apply animate-shimmer3;
 }
 
-/* Main container styles */
 main {
    @apply flex flex-col items-center text-white gap-6 py-2;
 }
 
-/* Scrollbar styles */
 
-/* Stats scroll */
 .stats-scroll {
-    @apply flex overscroll-contain flex-col h-40;
+    @apply flex  flex-col h-40;
     overflow-y: auto;
 }
 
@@ -81,7 +38,6 @@ main {
 
   
 
-/* on hover and selected indent */
 .hs-in {
     @apply hover:shadow-inner bg-b4 hover:shadow-b1
     aria-expanded:shadow-inner aria-expanded:shadow-b1 
@@ -95,7 +51,6 @@ button, .hs-in {
   border-none outline-none;
 }
 
-/* Corner frame for cards */
 .corner-frame {
     @apply relative overflow-clip;
 }
@@ -124,13 +79,20 @@ button, .hs-in {
     @apply absolute bottom-0 right-0 -rotate-210 translate-y-3 translate-x-3;
 }
 
-
-
-
+*/
 
 
 /*-----------------------------------*/
-/* Scrollbar styles */
+
+/* styles */
+body  {
+    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen 
+    bg-fixed overscroll-none pb-12;
+}
+
+* {
+    @apply text-black;
+}
 
 /* Main scroll */
 ::-webkit-scrollbar {
@@ -148,16 +110,6 @@ button, .hs-in {
 ::-webkit-scrollbar-thumb:hover {
     @apply bg-zinc-200;
 }
-
-/* Light scroll */
-.light-scroll {
-    @apply overflow-auto;
-}
-
-.light-scroll::-webkit-scrollbar-track {
-    @apply bg-white/20 rounded-md;
-}
-
 
 /* CLERK */
  .cl-button {

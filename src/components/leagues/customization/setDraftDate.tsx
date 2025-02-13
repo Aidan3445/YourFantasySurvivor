@@ -35,7 +35,7 @@ export default function SetDraftDate() {
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       draftTiming,
-      draftDate: draftDate ?? new Date(),
+      draftDate: draftDate!,
     },
   });
 
@@ -97,7 +97,6 @@ export function DraftDateField({ disabled }: DraftDateFieldProps) {
         <FormItem>
           <FormLabel>Draft Start Date</FormLabel>
           <FormControl>
-            {/*TODO adapt range to season + timing setting*/}
             <span className='flex w-full justify-center'>
               <DateTimePicker
                 date={field.value as Date}

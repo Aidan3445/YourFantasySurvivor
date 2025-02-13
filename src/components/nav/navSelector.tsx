@@ -6,7 +6,7 @@ import SideNav from './sideNav';
 
 export interface NavLinkProps {
   href: string;
-  icon: ReactNode;
+  icon?: ReactNode;
   label?: string;
 }
 

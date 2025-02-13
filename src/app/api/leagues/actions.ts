@@ -6,7 +6,7 @@ import { db } from '~/server/db';
 import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
 import { type LeagueEventRule, type BaseEventRule } from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
-import { and, eq, inArray, notInArray, } from 'drizzle-orm';
+import { and, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { type LeagueMember, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
@@ -20,7 +20,7 @@ import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
   * @param settings - the settings for the league
   * @param rules - the base event rules for the league
   * @param newMember - the new member to add
-  * @returns the hash of the newly created league
+  * @returns the league info of the league created
   * @throws an error if the user is not authenticated
   * @throws an error if the league cannot be inserted
   * @throws an error if the league settings cannot be inserted
@@ -32,17 +32,24 @@ export async function createNewLeague(
   settings: { draftTiming: LeagueDraftTiming, survivalCap: number },
   rules: BaseEventRule,
   newMember: NewLeagueMember
-): Promise<string> {
+) {
   const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
-  // Get the season id
-  // In future this will be a real fetch
-  const seasonId = 11;
-
   // Create the league in a transaction
-  const leagueHash = await db.transaction(async (trx) => {
+  return await db.transaction(async (trx) => {
     try {
+      // Get the current season
+      const { seasonId, seasonName } = await trx
+        .select({
+          seasonId: seasonsSchema.seasonId,
+          seasonName: seasonsSchema.seasonName,
+        })
+        .from(seasonsSchema)
+        .orderBy(desc(seasonsSchema.premiereDate))
+        .then((res) => ({ ...res[0] }));
+      if (!seasonId) throw new Error('Season not found');
+
       const insertedLeague = await trx
         .insert(leaguesSchema)
         .values({ leagueName, leagueSeason: seasonId })
@@ -71,7 +78,12 @@ export async function createNewLeague(
         .insert(baseEventRulesSchema)
         .values({ ...rules, leagueId });
 
-      return leagueHash;
+      return {
+        leagueName,
+        leagueHash,
+        season: seasonName!,
+        castaway: null,
+      };
     } catch (error) {
       console.error('Error creating league:', error);
       // Rollback the transaction
@@ -79,8 +91,6 @@ export async function createNewLeague(
       throw new Error('An error occurred while creating the league. Please try again.');
     }
   });
-
-  return leagueHash;
 }
 
 /** 
@@ -88,6 +98,7 @@ export async function createNewLeague(
   * @param leagueHash - the hash of the league
   * @param newMember - the new member to add
   * @param userId - the id of the user
+  * @returns the league info of the league joined
   * @throws an error if the user is not authenticated
   * @throws an error if the league cannot be found
   * @throws an error if the user is already a member of the league
@@ -98,14 +109,29 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
   if (!user.userId) throw new Error('User not authenticated');
 
   // Transaction to join the league
-  await db.transaction(async (trx) => {
+  return await db.transaction(async (trx) => {
     try {
-      const { leagueId, draftOrder } = await trx
-        .select({ leagueId: leaguesSchema.leagueId, draftOrder: leagueSettingsSchema.draftOrder })
+      const { leagueId, draftOrder, leagueInfo } = await trx
+        .select({
+          leagueId: leaguesSchema.leagueId,
+          draftOrder: leagueSettingsSchema.draftOrder,
+          leagueInfo: {
+            leagueName: leaguesSchema.leagueName,
+            leagueHash: leaguesSchema.leagueHash,
+            season: seasonsSchema.seasonName,
+          }
+        })
         .from(leaguesSchema)
         .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
+        .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
         .where(eq(leaguesSchema.leagueHash, leagueHash))
-        .then((res) => ({ leagueId: res[0]?.leagueId, draftOrder: res[0]?.draftOrder }));
+        .then((res) => ({
+          ...res[0],
+          leagueInfo: {
+            ...res[0]!.leagueInfo,
+            castaway: null,
+          }
+        }));
       if (!leagueId || !draftOrder) throw new Error('League not found');
 
       // Try to add the member, if there is a conflict, the user is already a member
@@ -122,6 +148,8 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
         .update(leagueSettingsSchema)
         .set({ draftOrder })
         .where(eq(leagueSettingsSchema.leagueId, leagueId));
+
+      return leagueInfo;
     } catch (error) {
       console.error('Error joining league:', error);
       // Rollback the transaction

@@ -1,9 +1,11 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
-import { SidebarMenuButton, SidebarSeparator } from '~/components/ui/sidebar';
+import { SidebarMenuButton, SidebarMenuSub, SidebarSeparator } from '~/components/ui/sidebar';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/ui/sidebar';
-import { BookUser, Home, Flame, Trophy, LoaderCircle } from 'lucide-react';
+import { BookUser, Home, Flame, Trophy, LoaderCircle, ListPlus } from 'lucide-react';
 import Link from 'next/link';
 import { type NavLinkProps } from './navSelector';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { useYfsUser } from '~/hooks/useYfsUser';
 
 export default function SideNav() {
   return (
@@ -12,7 +14,7 @@ export default function SideNav() {
         <SidebarGroup>
           <SidebarMenu>
             <SideNavLink href='/' icon={<Home />} label='Home' />
-            <SideNavLink href='/leagues' icon={<Trophy />} label='Leagues' />
+            <SideNavLeagues />
             <SideNavLink href='/seasons' icon={<BookUser />} label='Seasons' />
             <SideNavLink href='/playground' icon={<Flame />} label='Playground' />
             <SidebarSeparator />
@@ -52,5 +54,43 @@ function SideNavLink({ href, icon, label }: NavLinkProps) {
       </Link>
     </SidebarMenuButton>
   );
+}
+
+function SideNavLeagues() {
+  const { leagues } = useYfsUser();
+
+  if (leagues.length === 0) {
+    return <SideNavLink href='/leagues' icon={<Trophy />} label='Leagues' />;
+  }
+
+  return (
+    <Accordion type='single' collapsible defaultValue='leagues'>
+      <AccordionItem value='leagues'>
+        <SidebarMenuButton asChild size='lg'>
+          <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all'>
+            <span className='w-full flex gap-5 items-center'>
+              <Trophy />
+              Leagues
+              <Link className='ml-auto' href='/leagues/new'>
+                <ListPlus />
+              </Link>
+            </span>
+          </AccordionTrigger>
+        </SidebarMenuButton>
+        <AccordionContent className='pb-1'>
+          <SidebarMenuSub>
+            {leagues.map(league => (
+              <SideNavLink
+                key={league.leagueHash}
+                href={`/leagues/${league.leagueHash}`}
+                label={league.leagueName} />
+            ))}
+          </SidebarMenuSub>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion >
+  );
+
+
 }
 

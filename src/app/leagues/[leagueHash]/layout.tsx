@@ -26,7 +26,7 @@ export default async function LeagueLayout({ children, params }: LeagueLayoutPro
     );
   }
 
-  if (!leagueResponse) redirect('/leagues');
+  if (!leagueResponse) redirect('/leagues/new');
 
   return (
     <LeagueProvider league={leagueResponse}>

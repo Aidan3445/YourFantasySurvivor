@@ -8,7 +8,7 @@ export interface LeaguePageProps {
 
 export default async function LeaguePage() {
   return (
-    <main className='flex flex-col gap-0 text-center w-full' >
+    <main>
       <LeagueHeader />
     </main>
   );

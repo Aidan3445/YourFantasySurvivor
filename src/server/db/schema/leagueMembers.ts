@@ -25,17 +25,23 @@ export const leagueMembersSchema = createTable(
   ]
 );
 
-export const selectionUpdates = createTable(
+export const selectionUpdatesSchema = createTable(
   'selection_update',
   {
-    memberId: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
-    episodeId: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-    castawayId: integer('castaway_id').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
+    memberId: integer('member_id')
+      .references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' })
+      .notNull(),
+    episodeId: integer('episode_id')
+      .references(() => episodesSchema.episodeId, { onDelete: 'cascade' })
+      .notNull(),
+    castawayId: integer('castaway_id')
+      .references(() => castawaysSchema.castawayId, { onDelete: 'cascade' })
+      .notNull(),
   },
   (table) => [
     primaryKey({ columns: [table.memberId, table.episodeId] }),
     index('member_idx').on(table.memberId),
   ]
 );
-export type SelectionUpdate = typeof selectionUpdates.$inferSelect;
+export type SelectionUpdate = typeof selectionUpdatesSchema.$inferSelect;
 

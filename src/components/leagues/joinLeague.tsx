@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useMemo } from 'react';
 import { useLeague } from '~/hooks/useLeague';
+import { useYfsUser } from '~/hooks/useYfsUser';
 
 const formSchema = z.object({
   displayName: DisplayNameZod,
@@ -48,6 +49,7 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
     defaultValues,
     resolver: zodResolver(formSchema),
   });
+  const { addLeague } = useYfsUser();
 
   useEffect(() => {
     reactForm.setValue('displayName', user?.username ?? '');
@@ -61,7 +63,8 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
         role: 'Member',
       };
 
-      await joinLeague(leagueHash, member);
+      const leagueInfo = await joinLeague(leagueHash, member);
+      addLeague(leagueInfo);
       alert('Successfully joined league');
       router.push(`/leagues/${leagueHash}`);
     } catch (error) {
@@ -121,7 +124,7 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
                 type='text'
                 autoComplete='off'
                 autoCapitalize='on'
-                placeholder='Choose a display name for your league profile'
+                placeholder='Choose a display name for yourself in this league'
                 {...field} />
             </FormControl>
             <FormMessage />

@@ -7,7 +7,7 @@ export function useLeague() {
     throw new Error('useLeague must be used within a LeagueProvider');
   }
 
-  const { league } = context;
+  const { selectedLeague: league } = context;
 
   const draftDate = league?.settings?.draftDate ?
     new Date(league?.settings?.draftDate) : null;

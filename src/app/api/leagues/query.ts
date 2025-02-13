@@ -1,12 +1,18 @@
 import 'server-only';
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
-import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
+import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMemberAuth } from '~/lib/auth';
 import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
 import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
+import { auth } from '@clerk/nextjs/server';
+import { episodesSchema } from '~/server/db/schema/episodes';
+import { castawaysSchema } from '~/server/db/schema/castaways';
+import { type LeagueHash, type LeagueName } from '~/server/db/defs/leagues';
+import { type SeasonName } from '~/server/db/defs/seasons';
+import { type CastawayName } from '~/server/db/defs/castaways';
 
 export const QUERIES = {
   /**
@@ -91,6 +97,50 @@ export const QUERIES = {
       members,
       customEventRules,
     };
+  },
+
+  /**
+    * Get the leagues that you're a member of
+    * @returns the leagues you're a member of
+    */
+  getLeagues: async function() {
+    const { userId } = await auth();
+    // If the user is not authenticated, return an empty array
+    if (!userId) {
+      return [];
+    }
+
+    const leagues = await db
+      .select({
+        leagueName: leaguesSchema.leagueName,
+        leagueHash: leaguesSchema.leagueHash,
+        season: seasonsSchema.seasonName,
+        castaway: castawaysSchema.fullName,
+      })
+      .from(leagueMembersSchema)
+      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
+      .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
+      .leftJoin(selectionUpdatesSchema, eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId))
+      .leftJoin(episodesSchema, eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId))
+      .leftJoin(castawaysSchema, eq(castawaysSchema.castawayId, selectionUpdatesSchema.castawayId))
+      .where(eq(leagueMembersSchema.userId, userId))
+      .orderBy(asc(episodesSchema.episodeNumber))
+      .then((leagues) => leagues.reduce((acc, league) => {
+        const existing = acc.find((l) => l.leagueHash === league.leagueHash);
+        if (existing) {
+          existing.castaway = league.castaway;
+        } else {
+          acc.push(league);
+        }
+        return acc;
+      }, [] as {
+        leagueName: LeagueName,
+        leagueHash: LeagueHash,
+        season: SeasonName,
+        castaway: CastawayName | null,
+      }[]));
+
+    return leagues;
   },
 
   /**

@@ -13,11 +13,11 @@ export type LeagueSurvivalCap = number;
 export const DraftTimingOptions = ['Before Premiere', 'After Premiere'] as const;
 export type LeagueDraftTiming = typeof DraftTimingOptions[number];
 
-export type Leaguehash = string;
+export type LeagueHash = string;
 
 export interface League {
   leagueName: LeagueName;
-  leagueHash: Leaguehash;
+  leagueHash: LeagueHash;
   survivalCap: number;
   draftTiming: LeagueDraftTiming;
   draftDate: Date;

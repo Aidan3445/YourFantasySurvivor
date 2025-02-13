@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from './joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
 import { type ReactNode } from 'react';
+import { useYfsUser } from '~/hooks/useYfsUser';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
@@ -43,15 +44,16 @@ const defaultValues: z.infer<typeof formSchema> = {
 };
 
 export default function CreateLeagueForm() {
+  const router = useRouter();
+  const { api, setApi, current, count, progress } = useCarouselProgress();
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues, resolver: zodResolver(formSchema)
   });
-  const { api, setApi, current, count, progress } = useCarouselProgress();
-  const router = useRouter();
+  const { addLeague } = useYfsUser();
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const leagueHash = await createNewLeague(
+      const leagueInfo = await createNewLeague(
         data.leagueName,
         {
           draftTiming: data.draftTiming,
@@ -64,8 +66,9 @@ export default function CreateLeagueForm() {
           role: 'Owner'
         }
       );
-      alert(`League created with id: ${leagueHash}`);
-      router.push(`/leagues/${leagueHash}/predraft`);
+      addLeague(leagueInfo);
+      alert(`League created with id: ${leagueInfo.leagueHash}`);
+      router.push(`/leagues/${leagueInfo.leagueHash}/predraft`);
     } catch (error) {
       console.error(error);
       alert('Failed to create league');
