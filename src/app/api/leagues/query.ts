@@ -216,6 +216,7 @@ export const QUERIES = {
 
     const castawaysPromise = db
       .select({
+        castawayId: castawaysSchema.castawayId,
         fullName: castawaysSchema.fullName,
         age: castawaysSchema.age,
         residence: castawaysSchema.residence,

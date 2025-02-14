@@ -86,8 +86,7 @@ button, .hs-in {
 
 /* styles */
 body  {
-    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen 
-    bg-fixed overscroll-none pb-12;
+    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen bg-fixed overscroll-none;
 }
 
 * {

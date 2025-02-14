@@ -11,7 +11,7 @@ import { cn } from '~/lib/utils';
 
 export default function SideNav() {
   return (
-    <Sidebar variant='sidebar' collapsible='icon'>
+    <Sidebar variant='sidebar' collapsible='none'>
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>

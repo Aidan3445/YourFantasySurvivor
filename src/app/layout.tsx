@@ -4,7 +4,7 @@ import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/ui/sidebar';
-import Nav from '~/components/nav/navSelector';
+import Nav, { BottomNavSpacer } from '~/components/nav/navSelector';
 import UserProvider from '~/context/yfsUserContext';
 import { QUERIES } from './api/leagues/query';
 
@@ -37,10 +37,13 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         }}>
         <UserProvider leagues={leagues}>
           <html lang='en'>
-            <body className={`font-sans ${inter.variable}`}>
+            <body className={`font-sans ${inter.variable} `}>
               <SidebarProvider defaultOpen>
                 <Nav />
-                {children}
+                <div className='w-full'>
+                  {children}
+                  <BottomNavSpacer />
+                </div>
               </SidebarProvider>
             </body>
           </html>

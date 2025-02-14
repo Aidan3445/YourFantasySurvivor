@@ -4,6 +4,8 @@ import { useMemo } from 'react';
 import { useDraft } from '~/hooks/useDraft';
 import { useLeague } from '~/hooks/useLeague';
 import { type LeagueHash } from '~/server/db/defs/leagues';
+import DraftOrder from '../draftOrder';
+import ChooseCastaway from './chooseCastaway';
 
 interface DraftTrackerProps {
   leagueHash: LeagueHash;
@@ -29,12 +31,10 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
 
 
   return (
-    <section className='w-full col-span-2 bg-secondary rounded-3xl border overflow-x-hidden'>
+    <section className='w-full space-y-4 bg-secondary rounded-3xl border overflow-x-hidden p-4'>
+      <DraftOrder />
       {loggedIn?.displayName === nextUp?.displayName ? (
-        <span className='flex flex-col items-center justify-around text-center'>
-          <h1 className='text-2xl font-semibold'>{'You\'re on the clock!'}</h1>
-          <p>Make your pick below!</p>
-        </span>
+        <ChooseCastaway castaways={draft!.castaways} />
       ) : (
         <span className='flex flex-col items-center justify-around text-center'>
           <h2 className='text-2xl'> Next up: {nextUp?.displayName}</h2>

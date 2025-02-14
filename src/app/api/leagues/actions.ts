@@ -1,18 +1,20 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { type LeagueSettingsUpdate, type LeagueSurvivalCap, type LeagueName } from '~/server/db/defs/leagues';
+import { type LeagueSettingsUpdate, type LeagueSurvivalCap, type LeagueName, type LeagueHash } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
-import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
+import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { type LeagueEventRule, type BaseEventRule } from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
-import { and, desc, eq, inArray, notInArray, } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
-import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { type LeagueMember, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
+import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
+import { type LeagueMemberId, type LeagueMember, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
+import { type CastawayId } from '~/server/db/defs/castaways';
+import { castawaysSchema } from '~/server/db/schema/castaways';
 
 /**
   * Create a new league
@@ -398,3 +400,89 @@ export async function updateLeagueEventRule(leagueHash: string, rule: LeagueEven
       eq(leaguesSchema.leagueHash, leagueHash),
       eq(leagueEventsRulesSchema.eventName, rule.eventName)));
 }
+
+/**
+  * Choose a castaway, either in the draft or as a selection update
+  * @param leagueHash - the hash of the league
+  * @param castawayId - the id of the castaway
+  * @param isDraft - whether the castaway is being chosen in the draft
+  * @throws an error if the user is not authorized
+  * @throws an error if the castaway cannot be chosen
+  */
+export async function chooseCastaway(leagueHash: LeagueHash, castawayId: CastawayId, isDraft: boolean) {
+  const { memberId } = await leagueMemberAuth(leagueHash);
+  if (!memberId) throw new Error('User not authorized');
+
+  // castaways that are not eliminated
+  const survivingCastawaysPromise = db
+    .select({ castawayId: castawaysSchema.castawayId })
+    .from(castawaysSchema)
+    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, castawaysSchema.seasonId))
+    .innerJoin(leaguesSchema, and(
+      eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId),
+      eq(leaguesSchema.leagueHash, leagueHash)))
+    // still in the game
+    .leftJoin(baseEventReferenceSchema, and(
+      eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+      eq(baseEventReferenceSchema.referenceType, 'Castaway')))
+    .leftJoin(baseEventsSchema, and(
+      eq(baseEventsSchema.baseEventId, baseEventReferenceSchema.baseEventId),
+      notInArray(baseEventsSchema.eventName, ['elim', 'noVoteExit'])))
+    .then((res) => res.map(({ castawayId }) => castawayId));
+
+  // member selection history for the league
+  const currentSelectionsPromise = db
+    .select({
+      castawayId: selectionUpdatesSchema.castawayId,
+      memberId: selectionUpdatesSchema.memberId,
+    })
+    .from(selectionUpdatesSchema)
+    .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, selectionUpdatesSchema.memberId))
+    .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
+    .innerJoin(episodesSchema, eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId))
+    .where(eq(leaguesSchema.leagueHash, leagueHash))
+    .orderBy(asc(episodesSchema.episodeNumber))
+    .then((res) => Object.values(res.reduce((acc, { castawayId, memberId }) => {
+      acc[memberId] = castawayId;
+      return acc;
+    }, {} as Record<LeagueMemberId, CastawayId>)));
+
+  // next episode id to air
+  const nextEpisodeIdPromise = db
+    .select({ episodeId: episodesSchema.episodeId })
+    .from(episodesSchema)
+    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, episodesSchema.seasonId))
+    .innerJoin(leaguesSchema, and(
+      eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId),
+      eq(leaguesSchema.leagueHash, leagueHash)))
+    .orderBy(asc(episodesSchema.airDate))
+    .limit(1)
+    .then((res) => res[0]?.episodeId);
+
+
+  const [surviving, selections, nextEpisode] = await Promise.all([
+    survivingCastawaysPromise,
+    currentSelectionsPromise,
+    nextEpisodeIdPromise,
+  ]);
+
+  if (!surviving.includes(castawayId)) throw new Error('Castaway has been eliminated');
+  if (selections.includes(castawayId)) throw new Error('Castaway already chosen');
+  if (!nextEpisode) throw new Error('Next episode not found');
+
+  // update or insert selection
+  await db
+    .insert(selectionUpdatesSchema)
+    .values({
+      castawayId,
+      memberId,
+      episodeId: nextEpisode,
+      draft: isDraft,
+    })
+    .onConflictDoUpdate({
+      target: [selectionUpdatesSchema.memberId, selectionUpdatesSchema.episodeId],
+      set: { castawayId },
+    });
+}
+
+

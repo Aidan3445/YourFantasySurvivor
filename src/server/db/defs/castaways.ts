@@ -37,6 +37,7 @@ export interface NewCastaway {
 }
 
 export interface CastawayDraftInfo {
+  castawayId: CastawayId;
   fullName: CastawayName;
   age: CastawayAge;
   residence: CastawayResidence;

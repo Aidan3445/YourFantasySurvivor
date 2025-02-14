@@ -2,8 +2,9 @@
 
 import { type ReactNode } from 'react';
 import { useIsMobile } from '~/hooks/useMobile';
-import BottomNav from './bottomNav';
+import BottomNav, { navHeight } from './bottomNav';
 import SideNav from './sideNav';
+import { cn } from '~/lib/utils';
 
 export interface NavLinkProps {
   href: string;
@@ -20,4 +21,12 @@ export default function Nav() {
   } else {
     return <SideNav />;
   }
+}
+
+export function BottomNavSpacer() {
+  const isMobile = useIsMobile();
+
+  if (!isMobile) return null;
+
+  return <div className={cn('mt-2', navHeight)} />;
 }
