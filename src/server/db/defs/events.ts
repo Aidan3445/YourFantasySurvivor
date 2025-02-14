@@ -1,23 +1,18 @@
 import { z } from 'zod';
 
+// Base Events
 export const EventPointsZod = z.coerce.number()
   .lte(512, { message: 'Points must not exceed 512' })
   .gte(-512, { message: 'Points must not be less than -512' });
 
-export const BaseEventRuleZod = z.object({
-  advFound: EventPointsZod,
-  advPlay: EventPointsZod,
-  badAdvPlay: EventPointsZod,
-  advElim: EventPointsZod,
-  spokeEpTitle: EventPointsZod,
-  tribe1st: EventPointsZod,
-  tribe2nd: EventPointsZod,
-  indivWin: EventPointsZod,
-  indivReward: EventPointsZod,
-  finalists: EventPointsZod,
-  fireWin: EventPointsZod,
-  soleSurvivor: EventPointsZod,
-});
+export const ScoringBaseEventNames = [
+  'advFound', 'advPlay', 'badAdvPlay', 'advElim', 'spokeEpTitle', 'tribe1st', 'tribe2nd',
+  'indivWin', 'indivReward', 'finalists', 'fireWin', 'soleSurvivor'] as const;
+export type ScoringBaseEventName = typeof ScoringBaseEventNames[number];
+export const BaseEventRuleZod = z.object(
+  Object.fromEntries(ScoringBaseEventNames
+    .map((name: ScoringBaseEventName) => [name, EventPointsZod]))
+) as z.ZodObject<Record<ScoringBaseEventName, z.ZodNumber>, 'strip', z.ZodTypeAny, Record<ScoringBaseEventName, number>, Record<ScoringBaseEventName, number>>;
 export type BaseEventRule = z.infer<typeof BaseEventRuleZod>;
 export const defaultBaseRules: BaseEventRule = {
   advFound: 5,
@@ -34,6 +29,22 @@ export const defaultBaseRules: BaseEventRule = {
   soleSurvivor: 10,
 };
 
+export const AllBaseEventNames = [
+  ...ScoringBaseEventNames,
+  'elim', 'noVoteExit', 'tribeUpdate', 'otherNotes'] as const;
+export type BaseEventName = typeof AllBaseEventNames[number];
+
+export type BaseEvent = {
+  baseEventId: number;
+  episode: number;
+  name: BaseEventName;
+  castaways: string[];
+  tribes: string[];
+  keywords: string[];
+  notes: string[];
+};
+
+// League Events
 export const EventNameZod = z.coerce.string()
   .min(3, { message: 'Name must be between 3 and 16 characters' })
   .max(32, { message: 'Name must be between 3 and 16 characters' });
@@ -41,13 +52,12 @@ export const EventDescZod = z.coerce.string()
   .min(3, { message: 'Description must be between 3 and 256 characters, or blank' })
   .max(256, { message: 'Description must be between 3 and 256 characters, or blank' });
 
-
 export const LeagueEventTypeOptions = ['Direct', 'Prediction'] as const;
 export type LeagueEventType = typeof LeagueEventTypeOptions[number];
 export const EventTypeZod = z.enum(LeagueEventTypeOptions);
 
 export const LeaguePredictionTimingOptions = [
-  'Weekly', 'Before Premiere', 'After Premiere', 'After Merge', 'Before Finale'] as const;
+  'Draft', 'Weekly', 'After Merge', 'Before Finale', 'Manual'] as const;
 export type LeagueEventTiming = typeof LeaguePredictionTimingOptions[number];
 export const EventTimingZod = z.enum(LeaguePredictionTimingOptions);
 

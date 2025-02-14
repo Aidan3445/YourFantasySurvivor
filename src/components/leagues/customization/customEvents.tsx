@@ -70,10 +70,10 @@ export default function CustomEvents() {
           </p>
           <div>
             <p className='text-sm font-medium'>
-              Custom events can be scored in two ways:
+              <b><i>Custom events</i></b> can be scored in two ways:
             </p>
             <ul className='ml-4 list-decimal text-sm'>
-              <li><b>Direct</b>: Points awarded like the base events to the members whose pick
+              <li><b>Direct</b>: Points awarded like the <b><i>base events</i></b> to the members whose pick
                 scores the event.</li>
               <li><b>Prediction</b>: Points awarded to the members who correctly predict the outcome
                 of the event. Predictions can be every episode or at specific times during the

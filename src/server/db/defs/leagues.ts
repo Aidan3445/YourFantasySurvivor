@@ -13,22 +13,17 @@ export const MAX_SURVIVAL_CAP = 20;
 export const SurvivalCapZod = z.coerce.number().int().lte(MAX_SURVIVAL_CAP).gte(0);
 export type LeagueSurvivalCap = number;
 
-export const DraftTimingOptions = ['Before Premiere', 'After Premiere'] as const;
-export type LeagueDraftTiming = typeof DraftTimingOptions[number];
-
 export type LeagueHash = string;
 
 export interface League {
   leagueName: LeagueName;
   leagueHash: LeagueHash;
   survivalCap: number;
-  draftTiming: LeagueDraftTiming;
   draftDate: Date;
 }
 
 export interface LeagueSettingsUpdate {
   leagueName?: string;
   survivalCap?: number;
-  draftTiming?: LeagueDraftTiming;
   draftDate?: Date;
 }

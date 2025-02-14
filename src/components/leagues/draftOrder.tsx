@@ -14,16 +14,20 @@ import { updateDraftOrder } from '~/app/api/leagues/actions';
 import { Button } from '../ui/button';
 
 const SUFFLE_DURATION = 500;
-const SHUFFLE_LOOPS = 5;
+const SHUFFLE_LOOPS = 4;
 
-export default function DraftOrder() {
+interface DraftOrderProps {
+  className?: string;
+}
+
+export default function DraftOrder({ className }: DraftOrderProps) {
   const {
     league: {
       leagueHash,
       members,
+      leagueStatus,
       settings: {
         draftOrder,
-        draftOver,
       }
     }
   } = useLeague();
@@ -56,7 +60,7 @@ export default function DraftOrder() {
     }, SUFFLE_DURATION / (order.length * SHUFFLE_LOOPS));
   };
 
-  const orderLocked = draftOver || members.loggedIn?.role !== 'Owner';
+  const orderLocked = leagueStatus !== 'Predraft' || members.loggedIn?.role !== 'Owner';
 
   const handleSubmit = async () => {
     try {
@@ -69,7 +73,7 @@ export default function DraftOrder() {
   };
 
   return (
-    <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
+    <article className={cn('flex flex-col w-full p-2 bg-card rounded-xl', className)}>
       <span className='flex gap-4 items-center mb-4 w-full'>
         <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
         {!orderLocked && <>
@@ -79,7 +83,7 @@ export default function DraftOrder() {
             onClick={shuffleOrderWithAnimation} />
           <span className='flex gap-2 ml-auto'>
             <form action={() => handleSubmit()}>
-              <Button disabled={!orderChaged} onClick={handleSubmit}>Save</Button>
+              <Button disabled={!orderChaged}>Save</Button>
             </form>
             <Button disabled={!orderChaged} variant='destructive' onClick={() => setOrder(initialOrder)}>Reset</Button>
           </span>

@@ -5,7 +5,9 @@ import { db } from '~/server/db';
 import { type NewCastaway } from '~/server/db/defs/castaways';
 import { type NewSeason } from '~/server/db/defs/seasons';
 import { type NewTribe } from '~/server/db/defs/tribes';
+import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { castawaysSchema } from '~/server/db/schema/castaways';
+import { episodesSchema } from '~/server/db/schema/episodes';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { tribesSchema } from '~/server/db/schema/tribes';
 
@@ -38,14 +40,66 @@ export async function importContestants(
       if (!seasonId) throw new Error('Failed to insert season');
 
       // Insert castaways
-      await trx
+      const insertedCastaways = await trx
         .insert(castawaysSchema)
-        .values(castaways.map((castaway) => ({ ...castaway, seasonId })));
+        .values(castaways.map((castaway) => ({ ...castaway, seasonId })))
+        .returning({ castawayId: castawaysSchema.castawayId, fullName: castawaysSchema.fullName });
 
       // Insert tribes
-      await trx
+      const insertedTribes = await trx
         .insert(tribesSchema)
-        .values(tribes.map((tribe) => ({ ...tribe, seasonId })));
+        .values(tribes.map((tribe) => ({ ...tribe, seasonId })))
+        .returning({ tribeId: tribesSchema.tribeId, tribeName: tribesSchema.tribeName });
+
+      // Insert first episode
+      const episodeId = await trx
+        .insert(episodesSchema)
+        .values({
+          episodeNumber: 1,
+          title: season.premiereTitle,
+          airDate: premiereDate.toUTCString(),
+          runtime: 120,
+          seasonId,
+        })
+        .returning({ episodeId: episodesSchema.episodeId })
+        .then((episodes) => episodes[0]!.episodeId);
+
+      // Assign castaways to tribes
+      for (const tribe of insertedTribes) {
+        const tribeUpdateId = await trx
+          .insert(baseEventsSchema)
+          .values({
+            episodeId,
+            eventName: 'tribeUpdate',
+            keywords: ['Initial Tribes'],
+          })
+          .returning({ eventId: baseEventsSchema.baseEventId })
+          .then((events) => events[0]!.eventId);
+
+        await trx
+          .insert(baseEventReferenceSchema)
+          .values({
+            baseEventId: tribeUpdateId,
+            referenceType: 'Tribe',
+            referenceId: tribe.tribeId,
+          });
+
+        const thisTribeMembers = insertedCastaways
+          .filter((castaway) => castaways
+            .find((c) => c.fullName === castaway.fullName)?.tribe === tribe.tribeName);
+
+        for (const castaway of thisTribeMembers) {
+          await trx
+            .insert(baseEventReferenceSchema)
+            .values({
+              baseEventId: tribeUpdateId,
+              referenceType: 'Castaway',
+              referenceId: castaway.castawayId,
+            });
+        }
+      }
+
+
     } catch (error) {
       console.error('Error importing castaways:', error);
       trx.rollback();
@@ -53,3 +107,4 @@ export async function importContestants(
     }
   });
 }
+

@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { LeagueContext } from '~/context/leagueContext';
+import { type LeagueStatus } from '~/server/db/defs/leagues';
 
 export function useLeague() {
   const context = useContext(LeagueContext);
@@ -7,10 +8,17 @@ export function useLeague() {
     throw new Error('useLeague must be used within a LeagueProvider');
   }
 
-  const { selectedLeague: league } = context;
+  const { selectedLeague: league, setSelectedLeague } = context;
 
   const draftDate = league?.settings?.draftDate ?
     new Date(league?.settings?.draftDate) : null;
+
+  const updateLeagueStatus = (newStatus: LeagueStatus) => {
+    setSelectedLeague({
+      ...league,
+      leagueStatus: newStatus,
+    });
+  };
 
   return {
     league: {
@@ -19,6 +27,7 @@ export function useLeague() {
         ...league?.settings,
         draftDate,
       }
-    }
+    },
+    updateLeagueStatus,
   };
 }

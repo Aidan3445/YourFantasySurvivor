@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { type NavLinkProps } from './navSelector';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { useYfsUser } from '~/hooks/useYfsUser';
+import { useEffect, useState } from 'react';
+import { cn } from '~/lib/utils';
 
 export default function SideNav() {
   return (
@@ -45,10 +47,10 @@ function SideNavFooter() {
   );
 }
 
-function SideNavLink({ href, icon, label }: NavLinkProps) {
+function SideNavLink({ href, icon, label, className }: NavLinkProps) {
   return (
     <SidebarMenuButton asChild size='lg'>
-      <Link className='w-full flex gap-5 items-center' href={href}>
+      <Link className={cn('w-full flex gap-5 items-center', className)} href={href}>
         {icon}
         {label}
       </Link>
@@ -58,13 +60,24 @@ function SideNavLink({ href, icon, label }: NavLinkProps) {
 
 function SideNavLeagues() {
   const { leagues } = useYfsUser();
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (leagues.length > 0) {
+      setOpen(true);
+    }
+  }, [leagues, setOpen]);
 
   if (leagues.length === 0) {
     return <SideNavLink href='/leagues' icon={<Trophy />} label='Leagues' />;
   }
 
   return (
-    <Accordion type='single' collapsible defaultValue='leagues'>
+    <Accordion
+      type='single'
+      collapsible
+      value={open ? 'leagues' : undefined}
+      onValueChange={() => setOpen(!open)}>
       <AccordionItem value='leagues'>
         <SidebarMenuButton asChild size='lg'>
           <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all'>

@@ -1,4 +1,5 @@
 import 'server-only';
+
 import { serial, varchar } from 'drizzle-orm/pg-core';
 import { createTable } from './createTable';
 

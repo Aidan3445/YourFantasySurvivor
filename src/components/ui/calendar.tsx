@@ -1,5 +1,5 @@
-/* eslint-disable react/prop-types */
 'use client';
+/* eslint-disable react/prop-types */
 
 import type * as React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';

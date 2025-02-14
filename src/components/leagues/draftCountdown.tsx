@@ -3,18 +3,36 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { useLeague } from '~/hooks/useLeague';
 import SetDraftDate from './customization/setDraftDate';
+import { Button } from '~/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 export function DraftCountdown() {
   const {
     league: {
+      leagueHash,
+      leagueStatus,
       members: { loggedIn },
       settings: { draftDate }
-    }
+    },
+    updateLeagueStatus
   } = useLeague();
+  const router = useRouter();
 
   const editable =
     (loggedIn && loggedIn.role === 'Owner') &&
     (!draftDate || Date.now() < draftDate.getTime());
+
+  const onDraftJoin = async () => {
+    if (leagueStatus === 'Predraft') {
+      const res = await fetch(`/api/leagues/${leagueHash}/draft/start`, { method: 'POST' });
+      if (res.status !== 200) {
+        alert(`Failed to start draft: ${res.statusText}`);
+        return;
+      }
+      updateLeagueStatus('Draft');
+      router.push(`/leagues/${leagueHash}/draft`);
+    }
+  };
 
   return (
     <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
@@ -36,7 +54,14 @@ export function DraftCountdown() {
         </div>
       </span>
       <span className='bg-primary rounded-2xl p-2 m-4 text-primary-foreground text-2xl shadow shadow-black'>
-        <Countdown endDate={draftDate} replacedBy='Draft Over' />
+        <Countdown endDate={draftDate} replacedBy={
+          <Button
+            className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'
+            variant='positive'
+            onClick={onDraftJoin}>
+            Draft in progress, join now!
+          </Button>
+        } />
       </span>
     </article>
 

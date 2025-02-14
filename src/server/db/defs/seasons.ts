@@ -1,3 +1,5 @@
+import { type EpisodeTitle } from './episodes';
+
 export type SeasonId = number;
 export type SeasonName = string;
 export type SeasonDate = Date;
@@ -11,5 +13,6 @@ export type Season = {
 
 export type NewSeason = {
   seasonName: SeasonName;
+  premiereTitle: EpisodeTitle;
   premiereDate: SeasonDate;
 };

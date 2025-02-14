@@ -2,7 +2,7 @@
 
 import { Settings } from 'lucide-react';
 import { z } from 'zod';
-import { DraftTimingOptions, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
+import { type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '../../ui/form';
 import { Button } from '../../ui/button';
@@ -16,7 +16,6 @@ import { useLeague } from '~/hooks/useLeague';
 import { DateTimePicker } from '~/components/ui/dateTimePicker';
 
 const formSchema = z.object({
-  draftTiming: z.enum(DraftTimingOptions),
   draftDate: z.date(),
 });
 
@@ -40,7 +39,6 @@ export default function SetDraftDate() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     const leagueUpdate: LeagueSettingsUpdate = {
-      draftTiming: data.draftTiming,
       draftDate: data.draftDate,
     };
 

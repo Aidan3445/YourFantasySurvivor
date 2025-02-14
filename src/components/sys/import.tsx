@@ -30,14 +30,16 @@ export default function Import() {
 
   const [castaways, setCastaways] = useState<NewCastaway[]>([]);
   const [tribes, setTribes] = useState<NewTribe[]>([]);
+  const [episode, setEpisode] = useState<string>('');
 
   const handleClick = async () => {
-    const { castaways, tribes, premiere } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
+    const { castaways, tribes, episode, premiere } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
       method: 'GET',
     })
       .then(res => res.json())) as {
         castaways: NewCastaway[],
         tribes: NewTribe[],
+        episode: string,
         premiere: string
       };
 
@@ -48,12 +50,13 @@ export default function Import() {
 
     setCastaways(castaways);
     setTribes(tribes);
+    setEpisode(episode);
     reactForm.setValue('premiereDate', new Date(premiere));
   };
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await importContestants(data, castaways, tribes);
+      await importContestants({ ...data, premiereTitle: episode }, castaways, tribes);
       alert('Contestants imported successfully');
     } catch (error) {
       console.error('Error importing contestants', error);
@@ -104,6 +107,10 @@ export default function Import() {
               <h2 className='font-bold'>{tribe.tribeName}</h2>
             </div>
           ))}
+          <div className='flex items-center space-x-4 bg-card rounded-lg p-4'>
+            <h2 className='font-bold'>Episode</h2>
+            <p>{episode}</p>
+          </div>
         </span>
         {castaways.map((castaway, index) => (
           <div key={index} className='flex items-center space-x-4 bg-card rounded-lg p-4'>
@@ -119,6 +126,7 @@ export default function Import() {
               <p>residence: {castaway.residence}</p>
               <p>occupation: {castaway.occupation}</p>
               <p>imageUrl: {castaway.imageUrl}</p>
+              <p>tribe: {castaway.tribe}</p>
             </div>
           </div>
         ))}

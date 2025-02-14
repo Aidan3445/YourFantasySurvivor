@@ -1,8 +1,9 @@
 import 'server-only';
+
 import { createTable } from './createTable';
 import { boolean, index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
-import { LeagueEventTypeOptions, LeaguePredictionTimingOptions, ReferenceOptions } from '../defs/events';
+import { LeagueEventTypeOptions, LeaguePredictionTimingOptions } from '../defs/events';
 import { sql } from 'drizzle-orm';
 
 export const leagueEventType = pgEnum('event_league_type', LeagueEventTypeOptions);
@@ -25,5 +26,3 @@ export const leagueEventsRulesSchema = createTable(
     index().on(table.leagueId),
   ]
 );
-
-export const leagueEventReference = pgEnum('event_league_reference', ReferenceOptions);

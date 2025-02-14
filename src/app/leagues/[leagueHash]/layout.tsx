@@ -11,7 +11,7 @@ export interface LeagueRouteProps {
   }>;
 }
 
-interface LeagueLayoutProps extends LeagueRouteProps {
+export interface LeagueLayoutProps extends LeagueRouteProps {
   children: ReactNode;
 }
 

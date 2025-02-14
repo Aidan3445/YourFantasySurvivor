@@ -56,18 +56,20 @@ export async function fetchSeasonInfo(seasonName: string) {
         const backupUrl: string = $c(columns[0]).find('img').attr('data-src') ?? '';
         const chosenUrl = imageUrl.startsWith('data') ? backupUrl : imageUrl;
 
+        const tribeName = $c(columns[2]).text().trim();
+        const tribeColor = $c(columns[2]).attr('style')?.substring(11, 18) ?? '';
+        tribes[tribeName] = tribeColor;
+
         castaways.push({
           fullName,
           shortName: fullName.split(' ')[0] ?? fullName,
           age,
           residence: residence ?? 'Hometown N/A',
           occupation: occupation ?? 'Occupation N/A',
-          imageUrl: chosenUrl.startsWith('//') ? `https:${chosenUrl}` : chosenUrl
+          imageUrl: chosenUrl.startsWith('//') ? `https:${chosenUrl}` : chosenUrl,
+          tribe: tribeName
         });
 
-        const tribeName = $c(columns[2]).text().trim();
-        const tribeColor = $c(columns[2]).attr('style')?.substring(11, 18) ?? '';
-        tribes[tribeName] = tribeColor;
       }
     });
 
@@ -83,12 +85,15 @@ export async function fetchSeasonInfo(seasonName: string) {
     };
     const episodeHtml: string = episodeData.parse.text['*'];
     const $e = cheerio.load(episodeHtml);
+    const episodeTitle = $e($e('table.wikitable tbody tr')
+      .find('td')[1]).text().trim();
     const premiereDate = $e($e('table.wikitable tbody tr')
       .find('td')[2]).text().trim();
 
     return {
       castaways,
       tribes: tribeList,
+      episode: episodeTitle,
       premiere: new Date(`${premiereDate} 20:00:00`)
     };
   } catch (error) {

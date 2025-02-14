@@ -1,5 +1,6 @@
+import { type LeagueMemberDisplayName } from './leagueMembers';
 import { type SeasonName } from './seasons';
-import { type TribeEp } from './tribes';
+import { type TribeName, type TribeEp, type TribeColor } from './tribes';
 
 export type CastawayId = number;
 export type CastawayName = string;
@@ -32,4 +33,18 @@ export interface NewCastaway {
   residence: CastawayResidence;
   occupation: CastawayOccupation;
   imageUrl: CastawayImage;
+  tribe: TribeName;
+}
+
+export interface CastawayDraftInfo {
+  fullName: CastawayName;
+  age: CastawayAge;
+  residence: CastawayResidence;
+  occupation: CastawayOccupation;
+  imageUrl: CastawayImage;
+  tribe: {
+    tribeName: TribeName
+    tribeColor: TribeColor
+  };
+  pickedBy: LeagueMemberDisplayName | null;
 }

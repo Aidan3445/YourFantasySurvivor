@@ -1,18 +1,20 @@
 import 'server-only';
-import { and, asc, eq, sql } from 'drizzle-orm';
+
+import { aliasedTable, and, arrayContained, asc, eq, sql } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMemberAuth } from '~/lib/auth';
-import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
+import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
 import { auth } from '@clerk/nextjs/server';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { type LeagueHash, type LeagueName } from '~/server/db/defs/leagues';
 import { type SeasonName } from '~/server/db/defs/seasons';
-import { type CastawayName } from '~/server/db/defs/castaways';
+import { type CastawayDraftInfo, type CastawayName } from '~/server/db/defs/castaways';
+import { tribesSchema } from '~/server/db/schema/tribes';
 
 export const QUERIES = {
   /**
@@ -23,7 +25,7 @@ export const QUERIES = {
    * @returns the league or undefined if it does not exist
    * @throws an error if the user is not authenticated
    */
-  getLeague: async function(leagueHash: string) {
+  getLeague: async function(leagueHash: LeagueHash) {
     const { userId, memberId } = await leagueMemberAuth(leagueHash);
     // If the user is not authenticated, throw an error
     if (!userId) {
@@ -179,5 +181,113 @@ export const QUERIES = {
     };
 
     return { members } as unknown as ReturnType<typeof QUERIES.getLeague>;
+  },
+
+  /**
+    * Get the draft state and information for the league
+    * @param leagueHash - the hash of the league
+    * @returns the draft state and information
+    * @throws an error if the user is not a member of the league
+    */
+  getDraft: async function(leagueHash: LeagueHash) {
+    const { memberId } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId) {
+      throw new Error('User not a member of the league');
+    }
+
+    //leagueHash = 'OIK3njSpCQmEjzu6';
+
+    const predictionsPromise = db
+      .select({
+        eventName: leagueEventsRulesSchema.eventName,
+        timing: leagueEventsRulesSchema.timing,
+        points: leagueEventsRulesSchema.points,
+        description: leagueEventsRulesSchema.description,
+      })
+      .from(leagueEventsRulesSchema)
+      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
+      .where(and(
+        eq(leaguesSchema.leagueHash, leagueHash),
+        eq(leagueEventsRulesSchema.type, 'Prediction')))
+      .then((predictions) => predictions.filter((prediction) => prediction.timing.includes('Draft')));
+
+    const tribeUpdateEventSchema = aliasedTable(baseEventReferenceSchema, 'tribeUpdate');
+
+    const castawaysPromise = db
+      .select({
+        fullName: castawaysSchema.fullName,
+        age: castawaysSchema.age,
+        residence: castawaysSchema.residence,
+        occupation: castawaysSchema.occupation,
+        imageUrl: castawaysSchema.imageUrl,
+        tribe: {
+          tribeName: tribesSchema.tribeName,
+          tribeColor: tribesSchema.color,
+        },
+        pickedBy: leagueMembersSchema.displayName,
+      })
+      .from(castawaysSchema)
+      .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, castawaysSchema.seasonId))
+      .innerJoin(leaguesSchema, and(
+        eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId),
+        eq(leaguesSchema.leagueHash, leagueHash)))
+      // Joining tribe assignments
+      .innerJoin(baseEventReferenceSchema, and(
+        eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+        eq(baseEventReferenceSchema.referenceType, 'Castaway')))
+      .innerJoin(baseEventsSchema, and(
+        eq(baseEventsSchema.baseEventId, baseEventReferenceSchema.baseEventId),
+        eq(baseEventsSchema.eventName, 'tribeUpdate'),
+        arrayContained(baseEventsSchema.keywords, ['Initial Tribes'])))
+      .innerJoin(tribeUpdateEventSchema, and(
+        eq(tribeUpdateEventSchema.baseEventId, baseEventsSchema.baseEventId),
+        eq(tribeUpdateEventSchema.referenceType, 'Tribe')))
+      .innerJoin(tribesSchema, eq(tribesSchema.tribeId, tribeUpdateEventSchema.referenceId))
+      // Joining draft picks if they exist
+      .leftJoin(selectionUpdatesSchema, and(
+        eq(selectionUpdatesSchema.castawayId, castawaysSchema.castawayId),
+        eq(selectionUpdatesSchema.draft, true)))
+      .leftJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, selectionUpdatesSchema.memberId));
+
+    const picksPromise = db
+      .select({
+        memberId: leagueMembersSchema.memberId,
+        displayName: leagueMembersSchema.displayName,
+        draftPick: castawaysSchema.fullName,
+      })
+      .from(leagueMembersSchema)
+      .innerJoin(leaguesSchema, and(
+        eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId),
+        eq(leaguesSchema.leagueHash, leagueHash)
+      ))
+      .leftJoin(selectionUpdatesSchema, and(
+        eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId),
+        eq(selectionUpdatesSchema.draft, true)))
+      .leftJoin(castawaysSchema, eq(castawaysSchema.castawayId, selectionUpdatesSchema.castawayId));
+
+    const draftOrderPromise = db
+      .select({
+        draftOrder: leagueSettingsSchema.draftOrder,
+      })
+      .from(leagueSettingsSchema)
+      .innerJoin(leaguesSchema, and(
+        eq(leaguesSchema.leagueId, leagueSettingsSchema.leagueId),
+        eq(leaguesSchema.leagueHash, leagueHash)))
+      .then((settings) => settings[0]!.draftOrder);
+
+    const [predictions, picks, castaways, draftOrder] = await Promise.all([
+      predictionsPromise, picksPromise, castawaysPromise, draftOrderPromise]);
+
+    const typedCastaways: CastawayDraftInfo[] = castaways;
+
+    const draftPicks = draftOrder.map((memberId) =>
+      picks.find((pick) => pick.memberId === memberId));
+
+    return {
+      predictions,
+      castaways: typedCastaways,
+      picks: draftPicks,
+    };
   }
 };

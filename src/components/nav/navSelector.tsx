@@ -1,4 +1,5 @@
 'use client';
+
 import { type ReactNode } from 'react';
 import { useIsMobile } from '~/hooks/useMobile';
 import BottomNav from './bottomNav';
@@ -8,6 +9,7 @@ export interface NavLinkProps {
   href: string;
   icon?: ReactNode;
   label?: string;
+  className?: string;
 }
 
 export default function Nav() {

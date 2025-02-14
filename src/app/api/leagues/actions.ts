@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { type LeagueSettingsUpdate, type LeagueDraftTiming } from '~/server/db/defs/leagues';
+import { type LeagueSettingsUpdate, type LeagueSurvivalCap, type LeagueName } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
 import { baseEventRulesSchema } from '~/server/db/schema/baseEvents';
 import { type LeagueEventRule, type BaseEventRule } from '~/server/db/defs/events';
@@ -28,8 +28,8 @@ import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
   * @throws an error if the user cannot be added as a member
   */
 export async function createNewLeague(
-  leagueName: string,
-  settings: { draftTiming: LeagueDraftTiming, survivalCap: number },
+  leagueName: LeagueName,
+  settings: { survivalCap: LeagueSurvivalCap },
   rules: BaseEventRule,
   newMember: NewLeagueMember
 ) {
@@ -188,30 +188,7 @@ export async function updateLeagueSettings(
     .then((res) => res[0]);
   if (!res) throw new Error('Season not found');
 
-  const { leagueName, survivalCap, draftTiming, draftDate } = update;
-  console.log(update);
-
-  if (draftTiming && !draftDate) throw new Error('Draft date is required with draft timing');
-  if (!draftTiming && draftDate) throw new Error('Draft timing is required with draft date');
-  if (draftTiming && draftDate) {
-    const premiereDate = new Date(res.premiereDate);
-    const episode2Date = res.episode2Date ?
-      new Date(res.episode2Date) :
-      // If episode 2 is not in the DB we make the best guess
-      new Date(premiereDate).setDate(premiereDate.getDate() + 7);
-
-    switch (draftTiming) {
-      case 'Before Premiere':
-        if (premiereDate <= new Date()) throw new Error('Premiere date has already passed');
-        if (draftDate && draftDate >= premiereDate) throw new Error('Draft date must be before the premiere date');
-        break;
-      case 'After Premiere':
-        if (episode2Date <= new Date()) throw new Error('Episode 2 has already aired');
-        if (draftDate && draftDate <= premiereDate) throw new Error('Draft date must be after the premiere date');
-        if (draftDate && draftDate >= episode2Date) throw new Error('Draft date must be before episode 2 airs');
-        break;
-    }
-  }
+  const { leagueName, survivalCap, draftDate } = update;
 
   // Transaction to update the league settings
   await db.transaction(async (trx) => {
@@ -277,13 +254,18 @@ export async function updateDraftOrder(leagueHash: string, draftOrder: number[])
 
   // Error can be ignored, the where clause is not understood by the type system
   // eslint-disable-next-line drizzle/enforce-update-with-where
-  await db
+  const updated = await db
     .update(leagueSettingsSchema)
     .set({ draftOrder })
     .from(leaguesSchema)
     .where(and(
       eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId),
-      eq(leaguesSchema.leagueHash, leagueHash)));
+      eq(leaguesSchema.leagueHash, leagueHash),
+      eq(leaguesSchema.leagueStatus, 'Predraft')))
+    .returning({ draftOrder: leagueSettingsSchema.draftOrder })
+    .then((res) => !!res[0]);
+
+  if (!updated) throw new Error('Draft order cannot be updated');
 }
 
 /**

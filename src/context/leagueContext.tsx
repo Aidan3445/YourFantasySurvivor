@@ -6,14 +6,14 @@ import { type QUERIES } from '~/app/api/leagues/query';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 
-type LeagueContextProps = {
+export type LeagueContextProps = {
   selectedLeague: League;
   setSelectedLeague: (league: League) => void;
 };
 
 export const LeagueContext = createContext<LeagueContextProps | undefined>(undefined);
 
-interface LeagueProviderProps {
+export interface LeagueProviderProps {
   league: League;
   children: ReactNode;
 }

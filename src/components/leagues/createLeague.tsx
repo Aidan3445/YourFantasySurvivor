@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../ui/form';
 import { Input } from '../ui/input';
-import { DraftTimingOptions, DEFAULT_SURVIVAL_CAP, LeagueNameZod, SurvivalCapZod } from '~/server/db/defs/leagues';
+import { DEFAULT_SURVIVAL_CAP, LeagueNameZod, SurvivalCapZod } from '~/server/db/defs/leagues';
 import { BaseEventRuleZod, defaultBaseRules } from '~/server/db/defs/events';
 import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
 import LeagueSettingsFields from './customization/leagueSettings';
@@ -18,13 +18,13 @@ import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from './joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
-import { type ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { useYfsUser } from '~/hooks/useYfsUser';
+import { useUser } from '@clerk/nextjs';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
   baseEventRules: BaseEventRuleZod,
-  draftTiming: z.enum(DraftTimingOptions),
   survivalCap: SurvivalCapZod,
   displayName: DisplayNameZod,
   color: ColorZod,
@@ -37,7 +37,6 @@ const formSchema = z.object({
 const defaultValues: z.infer<typeof formSchema> = {
   leagueName: '',
   baseEventRules: defaultBaseRules,
-  draftTiming: 'Before Premiere',
   survivalCap: DEFAULT_SURVIVAL_CAP,
   displayName: '',
   color: '',
@@ -45,18 +44,22 @@ const defaultValues: z.infer<typeof formSchema> = {
 
 export default function CreateLeagueForm() {
   const router = useRouter();
+  const { user } = useUser();
   const { api, setApi, current, count, progress } = useCarouselProgress();
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues, resolver: zodResolver(formSchema)
   });
   const { addLeague } = useYfsUser();
 
+  useEffect(() => {
+    reactForm.setValue('displayName', user?.username ?? '');
+  }, [user, reactForm]);
+
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       const leagueInfo = await createNewLeague(
         data.leagueName,
         {
-          draftTiming: data.draftTiming,
           survivalCap: data.survivalCap
         },
         data.baseEventRules,

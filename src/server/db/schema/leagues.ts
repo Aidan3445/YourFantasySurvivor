@@ -1,4 +1,5 @@
 import 'server-only';
+
 import { createTable } from './createTable';
 import { seasonsSchema } from './seasons';
 import { integer, pgEnum, serial, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';

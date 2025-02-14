@@ -1,4 +1,5 @@
 import 'server-only';
+
 import { createTable } from './createTable';
 import { castawaysSchema } from './castaways';
 import { tribesSchema } from './tribes';
