@@ -1,4 +1,4 @@
-import { useParams } from 'next/navigation';
+import { redirect, useParams } from 'next/navigation';
 import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
 import { type QUERIES } from '~/app/api/leagues/query';
@@ -17,16 +17,20 @@ export function useLeague() {
   const { data: league, mutate } = useSWR<League>({ leagueHash, key: 'league' }, leagueFetcher, { refreshInterval: 10000, revalidateOnMount: true }
   );
 
-  return {
-    league: league ? {
-      ...league,
-      settings: {
-        ...league.settings,
-        draftDate: league.settings.draftDate ? new Date(league.settings.draftDate) : null
-      }
-    } : nonLeague,
-    refresh: mutate
-  };
+  try {
+    return {
+      league: league ? {
+        ...league,
+        settings: {
+          ...league.settings,
+          draftDate: league.settings.draftDate ? new Date(league.settings.draftDate) : null
+        }
+      } : nonLeague,
+      refresh: mutate
+    };
+  } catch {
+    redirect('/leagues');
+  }
 }
 
 const nonLeague: League = {

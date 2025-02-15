@@ -52,9 +52,6 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
     }
   }, [onTheClock, setDialogOpen]);
 
-  console.log('onTheClock', onTheClock);
-  console.log('onDeck', onDeck);
-
   return (
     <section className='w-full space-y-4 bg-secondary rounded-3xl border overflow-x-hidden p-4'>
       <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
