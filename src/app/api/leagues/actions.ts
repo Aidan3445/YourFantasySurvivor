@@ -106,7 +106,7 @@ export async function createNewLeague(
   * @throws an error if the user is already a member of the league
   * @throws an error if the user cannot be added as a member
   */
-export async function joinLeague(leagueHash: string, newMember: NewLeagueMember) {
+export async function joinLeague(leagueHash: LeagueHash, newMember: NewLeagueMember) {
   const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
 
@@ -169,7 +169,7 @@ export async function joinLeague(leagueHash: string, newMember: NewLeagueMember)
   * @throws an error if the draft timing cannot be updated
   */
 export async function updateLeagueSettings(
-  leagueHash: string,
+  leagueHash: LeagueHash,
   update: LeagueSettingsUpdate
 ) {
   const { role } = await leagueMemberAuth(leagueHash);
@@ -228,7 +228,7 @@ export async function updateLeagueSettings(
   * @throws an error if the user is not authorized
   * @throws an error if the rules cannot be updated
   */
-export async function updateBaseEventRules(leagueHash: string, rules: BaseEventRule) {
+export async function updateBaseEventRules(leagueHash: LeagueHash, rules: BaseEventRule) {
   const { role } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
 
@@ -250,7 +250,7 @@ export async function updateBaseEventRules(leagueHash: string, rules: BaseEventR
   * @throws an error if the user is not authorized
   * @throws an error if the draft order cannot be updated
   */
-export async function updateDraftOrder(leagueHash: string, draftOrder: number[]) {
+export async function updateDraftOrder(leagueHash: LeagueHash, draftOrder: number[]) {
   const { role } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
 
@@ -278,7 +278,7 @@ export async function updateDraftOrder(leagueHash: string, draftOrder: number[])
   * @throws an error if the user is not authorized
   * @throws an error if the member cannot be updated
   */
-export async function updateMemberDetails(leagueHash: string, member: LeagueMember) {
+export async function updateMemberDetails(leagueHash: LeagueHash, member: LeagueMember) {
   const { userId } = await auth();
   // Note that league member auth would be redundant here
   if (!userId) throw new Error('User not authorized');
@@ -308,7 +308,7 @@ export async function updateMemberDetails(leagueHash: string, member: LeagueMemb
   * @throws an error if the user is not authorized or not the owner
   * @throws an error if the admins cannot be updated
   */
-export async function updateAdmins(leagueHash: string, admins: number[]) {
+export async function updateAdmins(leagueHash: LeagueHash, admins: number[]) {
   const { role } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
 
@@ -356,7 +356,7 @@ export async function updateAdmins(leagueHash: string, admins: number[]) {
   * @throws an error if the user is not authorized
   * @throws an error if the rule cannot be created
   */
-export async function createLeagueEventRule(leagueHash: string, rule: LeagueEventRule) {
+export async function createLeagueEventRule(leagueHash: LeagueHash, rule: LeagueEventRule) {
   const { role } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
 
@@ -385,7 +385,7 @@ export async function createLeagueEventRule(leagueHash: string, rule: LeagueEven
   * @throws an error if the user is not authorized
   * @throws an error if the rule cannot be updated
   */
-export async function updateLeagueEventRule(leagueHash: string, rule: LeagueEventRule) {
+export async function updateLeagueEventRule(leagueHash: LeagueHash, rule: LeagueEventRule) {
   const { role } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
 
@@ -399,6 +399,25 @@ export async function updateLeagueEventRule(leagueHash: string, rule: LeagueEven
       eq(leagueEventsRulesSchema.leagueId, leaguesSchema.leagueId),
       eq(leaguesSchema.leagueHash, leagueHash),
       eq(leagueEventsRulesSchema.eventName, rule.eventName)));
+}
+
+/**
+  * Delete a league event rule
+  * @param leagueHash - the hash of the league
+  * @param LeagueEventRule - the rule to delete
+  * @throws an error if the user is not authorized
+  * @throws an error if the rule cannot be deleted
+  */
+export async function deleteLeagueEventRule(leagueHash: LeagueHash, eventName: string) {
+  const { role, league } = await leagueMemberAuth(leagueHash);
+  if (!role || role !== 'Owner' || !league) throw new Error('User not authorized');
+
+  await db
+    .delete(leagueEventsRulesSchema)
+    .where(and(
+      // DB keeps unique constraints on leagueId and eventName
+      eq(leagueEventsRulesSchema.leagueId, league.leagueId),
+      eq(leagueEventsRulesSchema.eventName, eventName)));
 }
 
 /**
@@ -459,16 +478,30 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
     .limit(1)
     .then((res) => res[0]?.episodeId);
 
+  // draft order of the league
+  const draftOrderPromise = db
+    .select({ draftOrder: leagueSettingsSchema.draftOrder })
+    .from(leaguesSchema)
+    .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
+    .where(eq(leaguesSchema.leagueHash, leagueHash))
+    .then((res) => res[0]?.draftOrder);
 
-  const [surviving, selections, nextEpisode] = await Promise.all([
+
+  const [surviving, selections, nextEpisode, draftOrder] = await Promise.all([
     survivingCastawaysPromise,
     currentSelectionsPromise,
     nextEpisodeIdPromise,
+    draftOrderPromise
   ]);
 
   if (!surviving.includes(castawayId)) throw new Error('Castaway has been eliminated');
   if (selections.includes(castawayId)) throw new Error('Castaway already chosen');
   if (!nextEpisode) throw new Error('Next episode not found');
+
+  // If drafting ensure order is correct
+  if (!draftOrder || isDraft && draftOrder.findIndex((id) => id === memberId) !== selections.length) {
+    throw new Error('Not your turn to draft');
+  }
 
   // update or insert selection
   await db
@@ -483,6 +516,14 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
       target: [selectionUpdatesSchema.memberId, selectionUpdatesSchema.episodeId],
       set: { castawayId },
     });
+
+  // see if the draft is complete
+  if (isDraft && draftOrder.length === selections.length + 1) {
+    await db
+      .update(leaguesSchema)
+      .set({ leagueStatus: 'Active' })
+      .where(eq(leaguesSchema.leagueHash, leagueHash));
+  }
 }
 
 

@@ -12,13 +12,14 @@ import { chooseCastaway } from '~/app/api/leagues/actions';
 
 interface ChooseCastawayProps {
   castaways: CastawayDraftInfo[];
+  onDeck: boolean;
 }
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
 });
 
-export default function ChooseCastaway({ castaways }: ChooseCastawayProps) {
+export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProps) {
   const {
     league: {
       leagueHash
@@ -31,7 +32,6 @@ export default function ChooseCastaway({ castaways }: ChooseCastawayProps) {
   const availableCastaways = castaways.filter(castaway => !castaway.pickedBy);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    console.log('leagueHash', leagueHash);
     try {
       await chooseCastaway(leagueHash, data.castawayId, true);
       alert('Castaway chosen successfully');
@@ -43,7 +43,9 @@ export default function ChooseCastaway({ castaways }: ChooseCastawayProps) {
   return (
     <Form {...reactForm}>
       <form className='bg-card p-1 rounded-lg text-center' action={() => handleSubmit()}>
-        <h1 className='text-2xl font-semibold'>{'You\'re on the clock!'}</h1>
+        <h1 className='text-2xl font-semibold'>
+          {onDeck ? 'You\'re on deck!' : 'You\'re on the clock!'}
+        </h1>
         <span className='w-full flex justify-between gap-4 items-center p-1'>
           <FormField
             name='castawayId'
@@ -66,9 +68,9 @@ export default function ChooseCastaway({ castaways }: ChooseCastawayProps) {
               </FormItem>
             )} />
           <Button
-            disabled={!formSchema.safeParse(reactForm.watch())?.success}
+            disabled={!formSchema.safeParse(reactForm.watch())?.success || onDeck}
             type='submit'>
-            Submit Pick
+            {onDeck ? 'Almost ready!' : 'Submit Pick!'}
           </Button>
         </span>
       </form>

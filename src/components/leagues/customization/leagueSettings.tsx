@@ -105,7 +105,6 @@ export function LeagueSettingsTabContent() {
       settings: {
         survivalCap,
         draftDate,
-        draftOver
       },
       members: {
         loggedIn,
@@ -134,7 +133,7 @@ export function LeagueSettingsTabContent() {
     const leagueUpdate: LeagueSettingsUpdate = {
       leagueName: data.leagueName,
       survivalCap: data.survivalCap,
-      draftDate: draftOver ? undefined : data.draftDate,
+      draftDate: data.draftDate,
     };
 
     try {

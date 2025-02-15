@@ -28,6 +28,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
       leagueStatus,
       settings: {
         draftOrder,
+        draftDate
       }
     }
   } = useLeague();
@@ -60,7 +61,10 @@ export default function DraftOrder({ className }: DraftOrderProps) {
     }, SUFFLE_DURATION / (order.length * SHUFFLE_LOOPS));
   };
 
-  const orderLocked = leagueStatus !== 'Predraft' || members.loggedIn?.role !== 'Owner';
+  const orderLocked =
+    leagueStatus !== 'Predraft' ||
+    members.loggedIn?.role !== 'Owner' ||
+    (!!draftDate && Date.now() > draftDate.getTime());
 
   const handleSubmit = async () => {
     try {
@@ -130,18 +134,20 @@ export default function DraftOrder({ className }: DraftOrderProps) {
   );
 }
 
-interface ColorRowProps {
+export interface ColorRowProps {
   color: string;
-  loggedIn: boolean;
+  loggedIn?: boolean;
+  className?: string;
   children: ReactNode;
 }
 
-function ColorRow({ color, loggedIn, children }: ColorRowProps) {
+export function ColorRow({ color, loggedIn, className, children }: ColorRowProps) {
   return (
     <span
       className={cn(
         'px-4 gap-4 rounded border border-black flex items-center text-nowrap',
-        loggedIn && 'border-none ring-2 ring-white'
+        loggedIn && 'border-none ring-2 ring-white',
+        className
       )}
       style={{ backgroundColor: color, color: getContrastingColor(color) }}>
       {children}

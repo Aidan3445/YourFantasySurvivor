@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from 'clsx';
 import { type CSSProperties, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { type CastawayDetails } from '~/server/db/defs/castaways';
+import { type LeagueHash } from '~/server/db/defs/leagues';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -12,6 +13,8 @@ export interface ComponentProps {
   children?: ReactNode;
   style?: CSSProperties;
 }
+
+export type SWRKey = { leagueHash: LeagueHash, key: string };
 
 export function castawaysByTribe(options: CastawayDetails[]): Record<string, CastawayDetails[]> {
   return options.reduce((acc, c) => {

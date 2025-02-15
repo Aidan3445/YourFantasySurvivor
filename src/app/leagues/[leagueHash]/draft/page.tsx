@@ -1,14 +1,12 @@
 import DraftCastaways from '~/components/leagues/draft/draftCastaways';
-import LeagueRouter from '~/components/leagues/leagueRouter';
-import { type LeagueRouteProps } from '../layout';
+import { type LeaguePageProps } from '../layout';
 import DraftTracker from '~/components/leagues/draft/draftTracker';
 
-export default async function DraftPage({ params }: LeagueRouteProps) {
+export default async function DraftPage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
 
   return (
     <main className='flex flex-col gap-4 items-center px-8'>
-      <LeagueRouter currentRoute='draft' />
       <h1 className='text-3xl'>Welcome to the Draft!</h1>
       <DraftTracker leagueHash={leagueHash} />
       <DraftCastaways leagueHash={leagueHash} />

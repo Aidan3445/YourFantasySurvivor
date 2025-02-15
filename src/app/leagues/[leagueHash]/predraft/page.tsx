@@ -7,12 +7,10 @@ import InviteLink from '~/components/leagues/inviteLink';
 import LeagueScoring from '~/components/leagues/leagueScoring';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import LeagueRouter from '~/components/leagues/leagueRouter';
 
 export default async function LeaguePage() {
   return (
     <main className='flex flex-col gap-0 w-full'>
-      <LeagueRouter currentRoute='predraft' />
       <div className='xl:grid xl:grid-cols-3 gap-4 px-4'>
         <Tabs
           className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100vh-4rem)] overflow-hidden'
@@ -41,10 +39,10 @@ export default async function LeaguePage() {
             <ScrollBar orientation='vertical' />
           </ScrollArea>
         </Tabs>
-        <section className='w-full h-[calc(100vh-4rem)] p-4 bg-secondary rounded-3xl border flex flex-col'>
+        {/*<section className='w-full h-[calc(100vh-4rem)] p-4 bg-secondary rounded-3xl border flex flex-col'>
           <h2 className='text-lg font-bold text-center'>League Chat</h2>
           <div className='flex flex-col gap-2 overflow-y-auto flex-1'>YO</div>
-        </section>
+        </section>*/}
       </div>
     </main >
   );

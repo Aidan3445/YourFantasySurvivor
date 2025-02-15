@@ -1,27 +1,23 @@
 import { SignUp } from '@clerk/nextjs';
-import { redirect } from 'next/navigation';
 import { type ReactNode } from 'react';
-import { QUERIES } from '~/app/api/leagues/query';
 import LeagueHeader from '~/components/leagues/leagueHeader';
-import LeagueProvider from '~/context/leagueContext';
+import { leagueMemberAuth } from '~/lib/auth';
 
-export interface LeagueRouteProps {
+export interface LeaguePageProps {
   params: Promise<{
     leagueHash: string;
   }>;
 }
 
-export interface LeagueLayoutProps extends LeagueRouteProps {
+export interface LeagueLayoutProps extends LeaguePageProps {
   children: ReactNode;
 }
 
 export default async function LeagueLayout({ children, params }: LeagueLayoutProps) {
   const { leagueHash } = await params;
+  const { memberId } = await leagueMemberAuth(leagueHash);
 
-  let leagueResponse;
-  try {
-    leagueResponse = await QUERIES.getLeague(leagueHash);
-  } catch {
+  if (!memberId) {
     return (
       <main className='w-full'>
         <h1 className='text-3xl'>Sign in to view the League</h1>
@@ -30,14 +26,10 @@ export default async function LeagueLayout({ children, params }: LeagueLayoutPro
     );
   }
 
-  if (!leagueResponse) redirect('/leagues/new');
-
   return (
-    <LeagueProvider league={leagueResponse}>
-      <div className='w-full'>
-        <LeagueHeader />
-        {children}
-      </div>
-    </LeagueProvider>
+    <div className='w-full'>
+      <LeagueHeader />
+      {children}
+    </div>
   );
 }

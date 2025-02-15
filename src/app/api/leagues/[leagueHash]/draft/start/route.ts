@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { type LeagueRouteProps } from '~/app/leagues/[leagueHash]/layout';
+import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import { UPDATES } from '~/app/api/leagues/update';
 
-export async function POST(_: NextRequest, { params }: LeagueRouteProps) {
+export async function POST(_: NextRequest, { params }: LeaguePageProps) {
   const { leagueHash } = await params;
   try {
     await UPDATES.updateLeagueStatus(leagueHash, 'Draft');

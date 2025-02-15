@@ -7,7 +7,7 @@ interface BaseEventSettingsProps {
 
 export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <section className={disabled ? 'pointer-events-none' : ''}>
+    <section>
       <FormLabel className='text-2xl'>Challenges</FormLabel>
       <FormField
         name='baseEventRules.indivWin'
@@ -21,6 +21,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -42,6 +43,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -63,6 +65,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -84,6 +87,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -113,6 +117,7 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -134,6 +139,7 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -155,6 +161,7 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -176,6 +183,7 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -205,6 +213,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -226,6 +235,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -247,6 +257,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
@@ -268,6 +279,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                   type='number'
                   step={1}
                   placeholder='Points'
+                  disabled={disabled}
                   {...field} />
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>

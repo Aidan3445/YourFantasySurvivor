@@ -1,3 +1,5 @@
+'use client';
+
 import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
 import { SidebarMenuButton, SidebarMenuSub, SidebarSeparator } from '~/components/ui/sidebar';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/ui/sidebar';
@@ -8,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '..
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useEffect, useState } from 'react';
 import { cn } from '~/lib/utils';
+import { useParams, usePathname } from 'next/navigation';
 
 export default function SideNav() {
   return (
@@ -50,7 +53,7 @@ function SideNavFooter() {
 function SideNavLink({ href, icon, label, className }: NavLinkProps) {
   return (
     <SidebarMenuButton asChild size='lg'>
-      <Link className={cn('w-full flex gap-5 items-center', className)} href={href}>
+      <Link className={cn('w-full flex gap-5 items-center transition-all', className)} href={href}>
         {icon}
         {label}
       </Link>
@@ -60,13 +63,23 @@ function SideNavLink({ href, icon, label, className }: NavLinkProps) {
 
 function SideNavLeagues() {
   const { leagues } = useYfsUser();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState('');
+  const { leagueHash } = useParams();
+  const path = usePathname();
 
   useEffect(() => {
     if (leagues.length > 0) {
-      setOpen(true);
+      setOpen('leagues');
     }
   }, [leagues, setOpen]);
+
+  const toggleOpen = () => {
+    if (open === 'leagues') {
+      setOpen('');
+    } else {
+      setOpen('leagues');
+    }
+  };
 
   if (leagues.length === 0) {
     return <SideNavLink href='/leagues' icon={<Trophy />} label='Leagues' />;
@@ -76,17 +89,14 @@ function SideNavLeagues() {
     <Accordion
       type='single'
       collapsible
-      value={open ? 'leagues' : undefined}
-      onValueChange={() => setOpen(!open)}>
+      value={open}
+      onValueChange={() => toggleOpen()}>
       <AccordionItem value='leagues'>
         <SidebarMenuButton asChild size='lg'>
           <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all'>
             <span className='w-full flex gap-5 items-center'>
               <Trophy />
               Leagues
-              <Link className='ml-auto' href='/leagues/new'>
-                <ListPlus />
-              </Link>
             </span>
           </AccordionTrigger>
         </SidebarMenuButton>
@@ -94,10 +104,17 @@ function SideNavLeagues() {
           <SidebarMenuSub>
             {leagues.map(league => (
               <SideNavLink
+                className={league.leagueHash === leagueHash ? 'font-semibold' : ''}
                 key={league.leagueHash}
                 href={`/leagues/${league.leagueHash}`}
                 label={league.leagueName} />
             ))}
+            <SideNavLink
+              href='/leagues/new'
+              icon={<ListPlus />}
+              label='Create League'
+              className={cn('text-nowrap italic flex-row-reverse justify-between',
+                path === '/leagues/new' && 'font-semibold')} />
           </SidebarMenuSub>
         </AccordionContent>
       </AccordionItem>

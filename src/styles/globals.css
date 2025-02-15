@@ -4,23 +4,6 @@
 
 /*
 
-.shimmer1::before, .shimmer2::before, .shimmer3::before {
-    content: "";
-    @apply  flex box-border absolute w-[200%] h-full 
-    bg-gradient-to-r from-transparent via-white/50 to-transparent;
-}
-
-.shimmer1::before{
-    @apply animate-shimmer1;
-}
-
-.shimmer2::before {
-    @apply animate-shimmer2;
-}
-
-.shimmer3::before {
-    @apply animate-shimmer3;
-}
 
 main {
    @apply flex flex-col items-center text-white gap-6 py-2;
@@ -218,4 +201,30 @@ body  {
   body {
     @apply bg-background text-foreground;
     }
+}
+
+.shimmer-1, .shimmer-2, .shimmer-3, .shimmer-fast {
+    @apply relative overflow-hidden;
+}
+
+.shimmer-1::before, .shimmer-2::before, .shimmer-3::before, .shimmer-fast::before {
+    content: "";
+    @apply  flex box-border absolute w-[200%] h-full 
+    bg-gradient-to-r from-transparent via-white/50 to-transparent;
+}
+
+.shimmer-1::before{
+    @apply animate-shimmer1;
+}
+
+.shimmer-2::before {
+    @apply animate-shimmer2;
+}
+
+.shimmer-3::before {
+    @apply animate-shimmer3;
+}
+
+.shimmer-fast::before {
+    @apply animate-shimmer-fast
 }

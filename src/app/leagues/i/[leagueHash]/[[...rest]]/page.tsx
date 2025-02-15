@@ -1,17 +1,14 @@
 import JoinLeagueForm from '~/components/leagues/joinLeague';
-import { type LeaguePageProps } from '../../../[leagueHash]/page';
+import { type LeaguePageProps } from '../../../[leagueHash]/layout';
 import { SignUp } from '@clerk/nextjs';
-import { QUERIES } from '~/app/api/leagues/query';
-import LeagueProvider from '~/context/leagueContext';
 import { redirect } from 'next/navigation';
+import { leagueMemberAuth } from '~/lib/auth';
 
 export default async function LeagueJoinPage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
+  const { userId, memberId } = await leagueMemberAuth(leagueHash);
 
-  let leagueResponse;
-  try {
-    leagueResponse = await QUERIES.getLeagueJoin(leagueHash);
-  } catch {
+  if (!userId) {
     return (
       <main className='w-full'>
         <h1 className='text-3xl'>Sign in to join the League</h1>
@@ -21,16 +18,14 @@ export default async function LeagueJoinPage({ params }: LeaguePageProps) {
   }
 
 
-  if (!leagueResponse) {
+  if (memberId) {
     redirect(`/leagues/${leagueHash}`);
   }
 
   return (
-    <LeagueProvider league={leagueResponse}>
-      <main className='w-full'>
-        <h1 className='text-3xl'>Join the League</h1>
-        <JoinLeagueForm leagueHash={leagueHash} />
-      </main>
-    </LeagueProvider>
+    <main className='w-full'>
+      <h1 className='text-3xl'>Join the League</h1>
+      <JoinLeagueForm leagueHash={leagueHash} />
+    </main>
   );
 }

@@ -13,9 +13,7 @@ import { Textarea } from '~/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { MultiSelect } from '~/components/ui/multiSelect';
 import { Button } from '~/components/ui/button';
-import { createLeagueEventRule, updateLeagueEventRule } from '~/app/api/leagues/actions';
-import { Carousel, CarouselContent, CarouselItem } from '~/components/ui/carousel';
-import { cn } from '~/lib/utils';
+import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/app/api/leagues/actions';
 import { Flame, Settings2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alertDialog';
@@ -25,9 +23,13 @@ export default function CustomEvents() {
   const {
     league: {
       leagueHash,
+      leagueStatus,
       customEventRules,
       members: {
         loggedIn
+      },
+      settings: {
+        draftDate
       }
     }
   } = useLeague();
@@ -52,6 +54,11 @@ export default function CustomEvents() {
       alert('Failed to create custom event');
     }
   });
+
+  const disabled =
+    leagueStatus !== 'Predraft' ||
+    loggedIn?.role !== 'Owner' ||
+    (!!draftDate && Date.now() > draftDate.getTime());
 
   return (
     <article className='bg-card py-2 rounded-xl w-full'>
@@ -81,7 +88,7 @@ export default function CustomEvents() {
             </ul>
           </div>
         </div>
-        {loggedIn && loggedIn.role === 'Owner' &&
+        {!disabled &&
           <Accordion
             type='single'
             collapsible
@@ -107,17 +114,12 @@ export default function CustomEvents() {
         <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
           No custom events have been created yet.
         </h3>}
-      <Carousel className='w-full'>
-        <CarouselContent className='-ml-1 px-2'>
-          {customEventRules.map((rule, index) => (
-            <CarouselItem
-              key={index}
-              className={cn('pl-1 cursor-ew-resize', customEventRules.length > 1 ? 'basis-1/2' : '')}>
-              <CustomEventCard rule={rule} />
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
+
+      <article className='grid grid-cols-2 gap-3 px-2'>
+        {customEventRules.map((rule, index) => (
+          <CustomEventCard key={index} rule={rule} />
+        ))}
+      </article>
     </article >
   );
 }
@@ -207,6 +209,7 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
               <FormControl>
                 <Select
                   defaultValue={field.value as string}
+                  value={field.value as string}
                   onValueChange={(value) => { onTypeChange(value); field.onChange(value); }} >
                   <SelectTrigger>
                     <SelectValue placeholder='Select event type' />
@@ -270,6 +273,7 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
       }
     }
   } = useLeague();
+  const [isEditing, setIsEditing] = useState(false);
 
   const reactForm = useForm<LeagueEventRule>({
     defaultValues: rule,
@@ -286,10 +290,21 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
     }
   });
 
+  const handleDelete = async () => {
+    try {
+      await deleteLeagueEventRule(leagueHash, rule.eventName);
+      setIsEditing(false);
+      alert(`Custom event deleted for league ${leagueHash}`);
+    } catch (error) {
+      console.error(error);
+      alert('Failed to delete custom event');
+    }
+  };
+
   return (
-    <article className='bg-b3 rounded-xl p-2 h-full relative'>
-      <span className='flex gap-1 items-center'>
-        <h3 className='text-lg font-semibold text-card-foreground'>{rule.eventName}</h3>
+    <article className='bg-b3 rounded-xl p-2 h-full relative max-h-40 select-none'>
+      <span className='flex gap-1 items-center mr-8'>
+        <h3 className='text-lg font-semibold text-card-foreground text-nowrap'>{rule.eventName}</h3>
         -
         <div className='inline-flex items-center'>
           <p className='text-sm'>{rule.points}</p>
@@ -302,7 +317,7 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
       {loggedIn && loggedIn.role === 'Owner' &&
         <Form {...reactForm}>
           <form action={() => handleSubmit()}>
-            <AlertDialog>
+            <AlertDialog open={isEditing} onOpenChange={setIsEditing}>
               <AlertDialogTrigger asChild>
                 <Settings2 className='absolute top-2 right-2 cursor-pointer' size={18} />
               </AlertDialogTrigger>
@@ -310,7 +325,9 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
                 <AlertDialogHeader>
                   <AlertDialogTitle className='flex justify-between'>
                     {rule.eventName}
-                    <Button type='button' variant='destructive'>Delete Event</Button>
+                    <form action={() => handleDelete()}>
+                      <Button type='submit' variant='destructive'>Delete Event</Button>
+                    </form>
                   </AlertDialogTitle>
                   <AlertDialogDescription hidden>
                     Edit the event details or delete the event.

@@ -168,9 +168,10 @@ function BaseEventsFields() {
 
 interface BaseEventRuleTabsProps {
   rightSide?: ReactNode;
+  disabled?: boolean;
 }
 
-export function BaseEventRuleTabs({ rightSide }: BaseEventRuleTabsProps) {
+export function BaseEventRuleTabs({ rightSide, disabled }: BaseEventRuleTabsProps) {
   return (
     <Tabs defaultValue='challenges' className='h-[26rem] mt-2'>
       <TabsList className='w-full grid grid-cols-3'>
@@ -181,13 +182,13 @@ export function BaseEventRuleTabs({ rightSide }: BaseEventRuleTabsProps) {
       <span className='flex gap-4'>
         <div className='flex-grow flex-shrink-0'>
           <TabsContent value='challenges'>
-            <ChallengeScoreSettings />
+            <ChallengeScoreSettings disabled={disabled} />
           </TabsContent>
           <TabsContent value='advantages'>
-            <AdvantageScoreSettings />
+            <AdvantageScoreSettings disabled={disabled} />
           </TabsContent>
           <TabsContent value='other'>
-            <OtherScoreSettings />
+            <OtherScoreSettings disabled={disabled} />
           </TabsContent>
         </div>
         <div className='flex-shrink flex-grow-0'>

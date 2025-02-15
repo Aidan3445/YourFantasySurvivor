@@ -9,6 +9,7 @@ import { cn } from '~/lib/utils';
 import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 import { type TribeName } from '~/server/db/defs/tribes';
+import { ColorRow } from '../draftOrder';
 
 interface CastawayCardsProps {
   leagueHash: LeagueHash;
@@ -43,7 +44,7 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
             <h2 className='text-lg font-semibold'>{tribeName}</h2>
             {castaways.map((castaway) => (
               <Popover key={castaway.fullName}>
-                <PopoverTrigger className='flex gap-4 items-center bg-accent p-1 rounded-md text-left'>
+                <PopoverTrigger className='relative flex gap-4 items-center bg-accent p-1 rounded-md text-left'>
                   <Image
                     src={castaway.imageUrl}
                     alt={castaway.fullName}
@@ -52,12 +53,16 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
                     className={cn('rounded-full', !!castaway.pickedBy && 'grayscale')}
                   />
                   <p>{castaway.fullName}</p>
+                  {castaway.pickedBy && (
+                    <ColorRow
+                      className='absolute -right-1 top-1 rotate-30 text-xs leading-tight p-0 px-1'
+                      color={castaway.tribe.tribeColor}>
+                      {castaway.pickedBy}
+                    </ColorRow>
+                  )}
                 </PopoverTrigger>
                 <PopoverContent className='flex flex-col w-fit gap-2 p-2 text-nowrap' side='top'>
-                  <span className='flex gap-4 justify-between items-baseline'>
-                    <h3 className='text-lg font-semibold'>{castaway.fullName}</h3>
-                    <i>{castaway.pickedBy ? `Picked by ${castaway.pickedBy}` : 'Available'}</i>
-                  </span>
+                  <h3 className='text-lg font-semibold'>{castaway.fullName}</h3>
                   <p><b>Age:</b> {castaway.age}</p>
                   <p><b>Current Residence:</b> {castaway.residence}</p>
                   <p><b>Occupation:</b> {castaway.occupation}</p>

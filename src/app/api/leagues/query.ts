@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { aliasedTable, and, arrayContained, asc, eq, sql } from 'drizzle-orm';
+import { aliasedTable, and, arrayContained, asc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
@@ -94,7 +94,7 @@ export const QUERIES = {
       ...league,
       settings: {
         ...league.settings,
-        draftOver: !!(league.settings.draftDate && new Date() > new Date(league.settings.draftDate)),
+        //draftOver: !!(league.settings.draftDate && new Date() > new Date(league.settings.draftDate)),
         draftDate: league.settings.draftDate ? new Date(league.settings.draftDate + 'Z') : null,
       },
       members,
@@ -190,13 +190,11 @@ export const QUERIES = {
     * @throws an error if the user is not a member of the league
     */
   getDraft: async function(leagueHash: LeagueHash) {
-    const { memberId } = await leagueMemberAuth(leagueHash);
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
     // If the user is not a member of the league, throw an error
-    if (!memberId) {
+    if (!memberId || !league) {
       throw new Error('User not a member of the league');
     }
-
-    //leagueHash = 'OIK3njSpCQmEjzu6';
 
     const predictionsPromise = db
       .select({
@@ -233,6 +231,7 @@ export const QUERIES = {
       .innerJoin(leaguesSchema, and(
         eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId),
         eq(leaguesSchema.leagueHash, leagueHash)))
+      .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
       // Joining tribe assignments
       .innerJoin(baseEventReferenceSchema, and(
         eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId),
@@ -248,13 +247,18 @@ export const QUERIES = {
       // Joining draft picks if they exist
       .leftJoin(selectionUpdatesSchema, and(
         eq(selectionUpdatesSchema.castawayId, castawaysSchema.castawayId),
-        eq(selectionUpdatesSchema.draft, true)))
+        eq(selectionUpdatesSchema.draft, true),
+        inArray(selectionUpdatesSchema.memberId, db.select({ memberId: leagueMembersSchema.memberId })
+          .from(leagueMembersSchema)
+          .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
+          .where(eq(leaguesSchema.leagueHash, leagueHash)))))
       .leftJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, selectionUpdatesSchema.memberId));
 
     const picksPromise = db
       .select({
         memberId: leagueMembersSchema.memberId,
         displayName: leagueMembersSchema.displayName,
+        color: leagueMembersSchema.color,
         draftPick: castawaysSchema.fullName,
       })
       .from(leagueMembersSchema)
@@ -283,7 +287,10 @@ export const QUERIES = {
     const typedCastaways: CastawayDraftInfo[] = castaways;
 
     const draftPicks = draftOrder.map((memberId) =>
-      picks.find((pick) => pick.memberId === memberId));
+      picks.find((pick) => pick.memberId === memberId))
+      // Filter is kind of unnecessary but it's here to make TS happy
+      // and to ensure that the draft order didn't have any erroneous member ids
+      .filter((pick) => !!pick);
 
     return {
       predictions,

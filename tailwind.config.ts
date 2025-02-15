@@ -141,6 +141,20 @@ const config = {
             transform: 'translateX(57.5%) skewX(-45deg)'
           }
         },
+        'shimmerfast': {
+          '0%': {
+            transform: 'translateX(57.5%) skewX(-45deg)'
+          },
+          '25%': {
+            transform: 'translateX(-157.5%) skewX(-45deg)'
+          },
+          '50%': {
+            transform: 'translateX(-157.5%) skewX(-45deg)'
+          },
+          '100%': {
+            transform: 'translateX(57.5%) skewX(-45deg)'
+          }
+        },
         'scale-in': {
           '0%': {
             transform: 'scale(0)'
@@ -164,6 +178,7 @@ const config = {
         'shimmer1': 'shimmer1 10s infinite',
         'shimmer2': 'shimmer2 10s infinite',
         'shimmer3': 'shimmer3 10s infinite',
+        'shimmer-fast': 'shimmerfast 5s infinite',
         'scale-in': 'scale-in 2s ease-out',
         'scale-in-fast': 'scale-in 0.1s ease-out',
         'scale-out': 'scale-out 2s ease-out',

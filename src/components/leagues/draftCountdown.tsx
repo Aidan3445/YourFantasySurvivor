@@ -14,7 +14,7 @@ export function DraftCountdown() {
       members: { loggedIn },
       settings: { draftDate }
     },
-    updateLeagueStatus
+    refresh
   } = useLeague();
   const router = useRouter();
 
@@ -26,10 +26,10 @@ export function DraftCountdown() {
     if (leagueStatus === 'Predraft') {
       const res = await fetch(`/api/leagues/${leagueHash}/draft/start`, { method: 'POST' });
       if (res.status !== 200) {
-        alert(`Failed to start draft: ${res.statusText}`);
+        alert(`Failed to join draft: ${res.statusText}`);
         return;
       }
-      updateLeagueStatus('Draft');
+      await refresh();
       router.push(`/leagues/${leagueHash}/draft`);
     }
   };
