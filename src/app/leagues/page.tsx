@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { QUERIES } from '../api/leagues/query';
+import { QUERIES } from '~/app/api/leagues/query';
 import Link from 'next/link';
 import CreateLeagueForm from '~/components/leagues/createLeague';
 

@@ -24,5 +24,6 @@ export function useDraft(leagueHash: LeagueHash) {
 const nonDraft: Draft = {
   picks: [],
   castaways: [],
+  tribes: [],
   predictions: [],
 };

@@ -8,17 +8,17 @@ export type TribeColor = string;
 export interface Tribe {
   tribeId: TribeId;
   tribeName: TribeName;
-  color: TribeColor;
-  season: SeasonName
+  tribeColor: TribeColor;
+  seasonName: SeasonName
 }
 
 export interface NewTribe {
   tribeName: TribeName;
-  color: TribeColor;
+  tribeColor: TribeColor;
 }
 
 export type TribeEp = {
   tribeName: TribeName;
-  color: TribeColor;
+  tribeColor: TribeColor;
   episode: EpisodeNumber
 };

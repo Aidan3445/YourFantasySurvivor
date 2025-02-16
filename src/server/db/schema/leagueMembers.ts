@@ -3,8 +3,8 @@ import { createTable } from './createTable';
 import { leaguesSchema } from './leagues';
 import { episodesSchema } from './episodes';
 import { castawaysSchema } from './castaways';
-import { integer, serial, varchar, unique, index, primaryKey, uniqueIndex, pgEnum, boolean } from 'drizzle-orm/pg-core';
-import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '../defs/leagueMembers';
+import { boolean, index, integer, pgEnum, primaryKey, serial, unique, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
+import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '~/server/db/defs/leagueMembers';
 
 export const leagueMemberRole = pgEnum('league_member_role', LeagueMemberRoleOptions);
 

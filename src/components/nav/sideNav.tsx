@@ -3,10 +3,10 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
 import { SidebarMenuButton, SidebarMenuSub, SidebarSeparator } from '~/components/ui/sidebar';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/ui/sidebar';
-import { BookUser, Home, Flame, Trophy, LoaderCircle, ListPlus } from 'lucide-react';
+import { BookUser, Flame, Home, ListPlus, LoaderCircle, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { type NavLinkProps } from './navSelector';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useEffect, useState } from 'react';
 import { cn } from '~/lib/utils';

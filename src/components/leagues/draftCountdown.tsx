@@ -1,10 +1,15 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
-import { useLeague } from '~/hooks/useLeague';
-import SetDraftDate from './customization/setDraftDate';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/ui/button';
+import SetDraftDate from './customization/setDraftDate';
+import { useLeague } from '~/hooks/useLeague';
 import { useRouter } from 'next/navigation';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from '~/components/ui/alertDialog';
 
 export function DraftCountdown() {
   const {
@@ -30,27 +35,24 @@ export function DraftCountdown() {
         return;
       }
       await refresh();
-      router.push(`/leagues/${leagueHash}/draft`);
     }
+    router.push(`/leagues/${leagueHash}/draft`);
   };
 
   return (
     <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
-      <span className='grid grid-cols-3 w-full items-center'>
-        <div>
+      <span className='flex w-full items-center'>
+        <div className='flex gap-2 items-center'>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
           <p className='text-sm text-muted-foreground'>
-            {draftDate ? draftDate.toLocaleString() : 'Draft date not set'}
+            {draftDate ? `Starts at: ${draftDate.toLocaleString()}` : 'Draft date not set'}
           </p>
         </div>
-        <div className='text-center text-base font-semibold'>
-          Draft type
-          <div className='text-sm text-muted-foreground font-normal'>
-            --
-          </div>
-        </div>
-        <div className='flex gap-2 justify-end'>
-          {editable && <SetDraftDate />}
+        <div className='flex gap-2 ml-auto'>
+          {editable && (<>
+            <StartDraft startDraft={onDraftJoin} />
+            <SetDraftDate />
+          </>)}
         </div>
       </span>
       <span className='bg-primary rounded-2xl p-2 m-4 text-primary-foreground text-2xl shadow shadow-black'>
@@ -120,5 +122,33 @@ function CountdownPlace({ value, label }: CountdownPlaceProps) {
       <h1 className='text-4xl font-bold text-sidebar'>{value}</h1>
       <p className='text-xs text-muted'>{label}</p>
     </div>
+  );
+}
+
+interface StartDraftProps {
+  startDraft: () => void;
+}
+
+function StartDraft({ startDraft }: StartDraftProps) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant='positive'>Start Draft</Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Start Draft</AlertDialogTitle>
+        </AlertDialogHeader>
+        <AlertDialogDescription>
+          Are you sure you want to start the draft now?
+          <br />
+          This action cannot be undone.
+        </AlertDialogDescription>
+        <AlertDialogFooter className='w-full grid grid-cols-2'>
+          <AlertDialogAction onClick={startDraft}>Start Draft</AlertDialogAction>
+          <AlertDialogCancel>Not Yet</AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

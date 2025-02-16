@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createTable } from './createTable';
 import { seasonsSchema } from './seasons';
-import { integer, serial, varchar, smallint, unique } from 'drizzle-orm/pg-core';
+import { integer, serial, smallint, unique, varchar } from 'drizzle-orm/pg-core';
 
 export const castawaysSchema = createTable(
   'castaway',

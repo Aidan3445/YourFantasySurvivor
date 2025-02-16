@@ -1,13 +1,13 @@
 import 'server-only';
 
-import { aliasedTable, and, arrayContained, asc, eq, inArray, sql } from 'drizzle-orm';
+import { aliasedTable, and, arrayContained, arrayContains, asc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMemberAuth } from '~/lib/auth';
 import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
+import { leagueEventPredictionsSchema, leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
 import { auth } from '@clerk/nextjs/server';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
@@ -15,6 +15,8 @@ import { type LeagueHash, type LeagueName } from '~/server/db/defs/leagues';
 import { type SeasonName } from '~/server/db/defs/seasons';
 import { type CastawayDraftInfo, type CastawayName } from '~/server/db/defs/castaways';
 import { tribesSchema } from '~/server/db/schema/tribes';
+import { type LeagueMemberColor } from '~/server/db/defs/leagueMembers';
+import { type LeagueEventPrediction } from '~/server/db/defs/events';
 
 export const QUERIES = {
   /**
@@ -68,7 +70,8 @@ export const QUERIES = {
         eventName: leagueEventsRulesSchema.eventName,
         description: leagueEventsRulesSchema.description,
         points: leagueEventsRulesSchema.points,
-        type: leagueEventsRulesSchema.type,
+        eventType: leagueEventsRulesSchema.eventType,
+        referenceTypes: leagueEventsRulesSchema.referenceTypes,
         timing: leagueEventsRulesSchema.timing,
         public: leagueEventsRulesSchema.public,
       })
@@ -158,29 +161,24 @@ export const QUERIES = {
   /**
     * Get the league colors only for joining the league
     * @param leagueHash - the hash of the league
-    * @returns the league or undefined if the user is already a member
+    * @returns the league member selected colors
     * @throws an error if the user is not authenticated
     */
   getLeagueJoin: async function(leagueHash: string) {
-    const { userId, memberId } = await leagueMemberAuth(leagueHash);
+    const { userId } = await leagueMemberAuth(leagueHash);
     // If the user is not authenticated, throw an error
     if (!userId) {
       throw new Error('User not authenticated');
     }
-    // If the user is already a member of the league return undefined
-    if (memberId) {
-      return undefined;
-    }
 
-    const members = {
-      list: await db
-        .select({ color: leagueMembersSchema.color })
-        .from(leagueMembersSchema)
-        .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
-        .where(eq(leaguesSchema.leagueHash, leagueHash))
-    };
+    const memberColors: LeagueMemberColor[] = await db
+      .select({ color: leagueMembersSchema.color })
+      .from(leagueMembersSchema)
+      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
+      .where(eq(leaguesSchema.leagueHash, leagueHash))
+      .then((members) => members.map((member) => member.color));
 
-    return { members } as unknown as ReturnType<typeof QUERIES.getLeague>;
+    return memberColors;
   },
 
   /**
@@ -198,17 +196,34 @@ export const QUERIES = {
 
     const predictionsPromise = db
       .select({
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventName: leagueEventsRulesSchema.eventName,
-        timing: leagueEventsRulesSchema.timing,
-        points: leagueEventsRulesSchema.points,
         description: leagueEventsRulesSchema.description,
+        points: leagueEventsRulesSchema.points,
+        referenceTypes: leagueEventsRulesSchema.referenceTypes,
+        predictionMade: {
+          referenceType: leagueEventPredictionsSchema.referenceType,
+          referenceId: leagueEventPredictionsSchema.referenceId,
+        }
       })
       .from(leagueEventsRulesSchema)
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
+      .leftJoin(leagueEventPredictionsSchema, and(
+        eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsRulesSchema.leagueEventRuleId),
+        eq(leagueEventPredictionsSchema.memberId, memberId)))
       .where(and(
         eq(leaguesSchema.leagueHash, leagueHash),
-        eq(leagueEventsRulesSchema.type, 'Prediction')))
-      .then((predictions) => predictions.filter((prediction) => prediction.timing.includes('Draft')));
+        eq(leagueEventsRulesSchema.eventType, 'Prediction'),
+        arrayContains(leagueEventsRulesSchema.timing, ['Draft'])))
+      .then((predictions) => predictions.map((prediction) => {
+        const draftPrediction: LeagueEventPrediction = {
+          ...prediction,
+          timing: ['Draft'],
+          eventType: 'Prediction',
+          public: false
+        };
+        return draftPrediction;
+      }));
 
     const tribeUpdateEventSchema = aliasedTable(baseEventReferenceSchema, 'tribeUpdate');
 
@@ -221,8 +236,10 @@ export const QUERIES = {
         occupation: castawaysSchema.occupation,
         imageUrl: castawaysSchema.imageUrl,
         tribe: {
+          tribeId: tribesSchema.tribeId,
           tribeName: tribesSchema.tribeName,
-          tribeColor: tribesSchema.color,
+          tribeColor: tribesSchema.tribeColor,
+          seasonName: seasonsSchema.seasonName,
         },
         pickedBy: leagueMembersSchema.displayName,
       })
@@ -295,7 +312,32 @@ export const QUERIES = {
     return {
       predictions,
       castaways: typedCastaways,
+      tribes: Array.from(new Set(typedCastaways.map((castaway) => castaway.tribe))),
       picks: draftPicks,
     };
+  },
+
+  /**
+    * Get the next episode to air for the league's season
+    * @param leagueHash - the hash of the league
+    * @returns the next episode to air
+    * @throws an error if the season does not exist
+    * @throws if there are no episodes that have not aired
+    */
+  getNextEpisodeId: async function(leagueHash: LeagueHash) {
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    return await db
+      .select({ episodeId: episodesSchema.episodeId })
+      .from(episodesSchema)
+      .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, episodesSchema.seasonId))
+      .where(eq(seasonsSchema.seasonId, league.leagueSeason))
+      .orderBy(asc(episodesSchema.airDate))
+      .limit(1)
+      .then((res) => res[0]?.episodeId);
   }
 };

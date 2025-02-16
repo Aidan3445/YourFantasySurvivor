@@ -8,7 +8,7 @@ export const tribesSchema = createTable(
   {
     tribeId: serial('tribe_id').notNull().primaryKey(),
     tribeName: varchar('name', { length: 16 }).notNull(),
-    color: varchar('color', { length: 7 }).notNull(),
+    tribeColor: varchar('color', { length: 7 }).notNull(),
     seasonId: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
   }
 );

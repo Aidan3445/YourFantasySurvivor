@@ -1,20 +1,23 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { type LeagueSettingsUpdate, type LeagueSurvivalCap, type LeagueName, type LeagueHash } from '~/server/db/defs/leagues';
+import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate, type LeagueSurvivalCap } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { type LeagueEventRule, type BaseEventRule } from '~/server/db/defs/events';
+import { type ReferenceType, type BaseEventRule, type LeagueEventRule } from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
-import { type LeagueMemberId, type LeagueMember, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
+import { type LeagueMember, type LeagueMemberId, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
-import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
+import { leagueEventPredictionsSchema, leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
 import { type CastawayId } from '~/server/db/defs/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
+import { type EpisodeId } from '~/server/db/defs/episodes';
+import { type TribeId } from '~/server/db/defs/tribes';
+import { QUERIES } from './query';
 
 /**
   * Create a new league
@@ -240,7 +243,9 @@ export async function updateBaseEventRules(leagueHash: LeagueHash, rules: BaseEv
     .from(leaguesSchema)
     .where(and(
       eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId),
-      eq(leaguesSchema.leagueHash, leagueHash)));
+      eq(leaguesSchema.leagueHash, leagueHash)))
+    .returning({ rules: baseEventRulesSchema })
+    .then((res) => console.log(res));
 }
 
 /**
@@ -467,16 +472,7 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
     }, {} as Record<LeagueMemberId, CastawayId>)));
 
   // next episode id to air
-  const nextEpisodeIdPromise = db
-    .select({ episodeId: episodesSchema.episodeId })
-    .from(episodesSchema)
-    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, episodesSchema.seasonId))
-    .innerJoin(leaguesSchema, and(
-      eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId),
-      eq(leaguesSchema.leagueHash, leagueHash)))
-    .orderBy(asc(episodesSchema.airDate))
-    .limit(1)
-    .then((res) => res[0]?.episodeId);
+  const nextEpisodeIdPromise = QUERIES.getNextEpisodeId(leagueHash);
 
   // draft order of the league
   const draftOrderPromise = db
@@ -526,4 +522,47 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
   }
 }
 
+/**
+  * Make a league event prediction or update an existing prediction if it exists
+  * @param leagueHash - the hash of the league
+  * @param rule - the rule to predict
+  * @param referenceId - the id of the reference (castaway, tribe, member)
+  * @param episodeId - the id of the episode (optional)
+  * @throws an error if the user is not authorized
+  * @throws an error if the prediction cannot be made
+  */
+export async function makePrediction(
+  leagueHash: LeagueHash,
+  rule: LeagueEventRule,
+  referenceType: ReferenceType,
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+  referenceId: CastawayId | TribeId | LeagueMemberId,
+  episodeId?: EpisodeId
+) {
+  const { memberId } = await leagueMemberAuth(leagueHash);
+  if (!memberId) throw new Error('User not authorized');
 
+  if (!episodeId) {
+    // Get the next episode to air
+    episodeId = await QUERIES.getNextEpisodeId(leagueHash);
+    if (!episodeId) throw new Error('Next episode not found');
+  }
+
+  await db
+    .insert(leagueEventPredictionsSchema)
+    .values({
+      leagueEventRuleId: rule.leagueEventRuleId!,
+      episodeId,
+      memberId,
+      referenceType,
+      referenceId,
+    })
+    .onConflictDoUpdate({
+      target: [
+        leagueEventPredictionsSchema.leagueEventRuleId,
+        leagueEventPredictionsSchema.episodeId,
+        leagueEventPredictionsSchema.memberId,
+      ],
+      set: { referenceType, referenceId },
+    });
+}

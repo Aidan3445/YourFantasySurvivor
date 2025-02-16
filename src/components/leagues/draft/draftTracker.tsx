@@ -6,8 +6,12 @@ import { useLeague } from '~/hooks/useLeague';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 import { getContrastingColor } from '@uiw/color-convert';
 import ChooseCastaway from './chooseCastaway';
-import { ColorRow } from '../draftOrder';
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '~/components/ui/alertDialog';
+import { ColorRow } from '~/components/leagues/draftOrder';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
+} from '~/components/ui/alertDialog';
+import MakePredictions from './MakePredictions';
 
 interface DraftTrackerProps {
   leagueHash: LeagueHash;
@@ -61,7 +65,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
             <ColorRow
               key={pick.memberId}
               className={onTheClock.memberId === pick.memberId ?
-                'animate-pulse ring-4 ring-green-500 border-transparent' : ''}
+                'animate-pulse' : ''}
               color={pick.color}
               loggedIn={loggedIn?.displayName === pick.displayName}>
               <h3
@@ -74,6 +78,13 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
                 style={{ color: getContrastingColor(pick.color) }}>
                 {pick.displayName}
               </h2>
+              {onTheClock.memberId === pick.memberId && (
+                <h3
+                  className='ml-auto inline-flex text-lg self-end animate-bounce'
+                  style={{ color: getContrastingColor(pick.color) }}>
+                  Picking...
+                </h3>
+              )}
               {pick.draftPick && (
                 <h3
                   className='text-lg self-end'
@@ -85,15 +96,20 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
           ))}
         </div>
       </article>
-      {(onDeck.loggedIn || onTheClock.loggedIn) &&
-        <ChooseCastaway castaways={draft.castaways} onDeck={onDeck.loggedIn} />}
+      {(onDeck.loggedIn || onTheClock.loggedIn) ?
+        <ChooseCastaway castaways={draft.castaways} onDeck={onDeck.loggedIn} /> :
+        <MakePredictions
+          predictions={draft.predictions}
+          castaways={draft.castaways}
+          tribes={draft.tribes}
+          members={draft.picks} />}
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               {'It\'s your turn to pick!'}
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className='text-left'>
               This castaway will earn you points based on their performance in the game.
               <br />
               Additionally you will earn points for each successive episode they

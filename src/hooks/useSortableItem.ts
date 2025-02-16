@@ -1,4 +1,4 @@
-import type { UniqueIdentifier, DragEndEvent } from '@dnd-kit/core';
+import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { type SetStateAction } from 'react';
 

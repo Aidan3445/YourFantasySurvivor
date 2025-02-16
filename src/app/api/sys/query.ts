@@ -3,7 +3,7 @@ import 'server-only';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { type NewCastaway } from '~/server/db/defs/castaways';
-import type { TribeName, TribeColor, NewTribe } from '~/server/db/defs/tribes';
+import type { NewTribe, TribeColor, TribeName } from '~/server/db/defs/tribes';
 
 export async function fetchSeasonInfo(seasonName: string) {
   const url = 'https://survivor.fandom.com/api.php';
@@ -74,7 +74,7 @@ export async function fetchSeasonInfo(seasonName: string) {
     });
 
     const tribeList: NewTribe[] = Object.entries(tribes)
-      .map(([tribeName, color]) => ({ tribeName, color }));
+      .map(([tribeName, tribeColor]) => ({ tribeName, tribeColor }));
 
     const episodeData = episodeRes.data as {
       parse: {

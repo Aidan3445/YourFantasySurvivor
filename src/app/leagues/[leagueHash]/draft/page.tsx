@@ -1,5 +1,5 @@
 import DraftCastaways from '~/components/leagues/draft/draftCastaways';
-import { type LeaguePageProps } from '../layout';
+import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import DraftTracker from '~/components/leagues/draft/draftTracker';
 
 export default async function DraftPage({ params }: LeaguePageProps) {

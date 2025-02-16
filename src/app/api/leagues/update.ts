@@ -1,12 +1,12 @@
 import 'server-only';
 
 import { and, count, eq } from 'drizzle-orm';
-import { leagueMemberAuth } from '~/lib/auth';
 import { db } from '~/server/db';
 import { type LeagueHash, type LeagueStatus } from '~/server/db/defs/leagues';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
+import { auth } from '@clerk/nextjs/server';
 
 export const UPDATES = {
   /**
@@ -19,25 +19,34 @@ export const UPDATES = {
     * @throws an error if the draft date has not passed
     */
   updateLeagueStatus: async function(leagueHash: LeagueHash, newStatus: LeagueStatus) {
-    const { memberId } = await leagueMemberAuth(leagueHash);
-    // If the user is not a member of the league, throw an error
-    if (!memberId) {
-      throw new Error('User not a member of the league');
+    const { userId } = await auth();
+    // Ensure authenticated, note member validation is part of the current state request
+    if (!userId) {
+      throw new Error('User not authenticated');
     }
 
     const currentState = await db
       .select({
+        leagueId: leaguesSchema.leagueId,
         leagueStatus: leaguesSchema.leagueStatus,
         draftDate: leagueSettingsSchema.draftDate,
         premeireDate: seasonsSchema.premiereDate,
         finaleDate: seasonsSchema.finaleDate,
         members: leagueSettingsSchema.draftOrder,
+        reqesterRole: leagueMembersSchema.role,
       })
       .from(leaguesSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
+      .innerJoin(leagueMembersSchema, and(
+        eq(leagueMembersSchema.leagueId, leaguesSchema.leagueId),
+        eq(leagueMembersSchema.userId, userId)))
       .where(eq(leaguesSchema.leagueHash, leagueHash))
       .then((leagues) => leagues[0]);
+
+    if (!currentState) {
+      throw new Error('League not found');
+    }
 
     const draftPicks = await db
       .select({ count: count() })
@@ -48,11 +57,6 @@ export const UPDATES = {
         eq(leaguesSchema.leagueHash, leagueHash),
         eq(selectionUpdatesSchema.draft, true)))
       .then((picks) => picks[0]?.count ?? 0);
-
-    if (!currentState) {
-      throw new Error('League does not exist');
-    }
-
     // Validate the status update
     const { leagueStatus, draftDate, finaleDate } = currentState;
     const draftDatePassed = draftDate ? Date.now() > new Date(`${draftDate} Z`).getTime() : true;
@@ -62,7 +66,7 @@ export const UPDATES = {
     switch (newStatus) {
       case 'Draft':
         if (leagueStatus !== 'Predraft') throw new Error('Invalid status update');
-        if (!draftDatePassed) {
+        if (!draftDatePassed && currentState.reqesterRole !== 'Owner') {
           throw new Error('Draft date has not passed');
         }
         break;
@@ -79,9 +83,24 @@ export const UPDATES = {
     }
 
     // If we made it this far, update the league status
-    await db
-      .update(leaguesSchema)
-      .set({ leagueStatus: newStatus })
-      .where(eq(leaguesSchema.leagueHash, leagueHash));
+    await db.transaction(async (trx) => {
+      try {
+        await trx
+          .update(leaguesSchema)
+          .set({ leagueStatus: newStatus })
+          .where(eq(leaguesSchema.leagueHash, leagueHash));
+
+        if (newStatus === 'Draft') {
+          await trx
+            .update(leagueSettingsSchema)
+            .set({ draftDate: new Date().toUTCString() })
+            .where(eq(leagueSettingsSchema.leagueId, currentState.leagueId));
+        }
+      } catch (error) {
+        console.error(error);
+        trx.rollback();
+        throw new Error('Failed to update league status');
+      }
+    });
   }
 };

@@ -9,7 +9,7 @@ import { cn } from '~/lib/utils';
 import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 import { type TribeName } from '~/server/db/defs/tribes';
-import { ColorRow } from '../draftOrder';
+import { ColorRow } from '~/components/leagues/draftOrder';
 
 interface CastawayCardsProps {
   leagueHash: LeagueHash;
@@ -32,7 +32,7 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
   return (
     <section className='w-full bg-secondary rounded-3xl border overflow-x-hidden'>
       <span className='flex flex-col items-center justify-around text-center'>
-        <h1 className='text-2xl font-semibold'>Castaways</h1>
+        <h1 className='text-2xl font-semibold'>Do Your Research</h1>
         <p>{isMobile ? 'Tap' : 'Click'} the castaways below to learn more about them!</p>
       </span>
       <article className='flex gap-4 p-4 justify-start overflow-auto'>
@@ -55,7 +55,7 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
                   <p>{castaway.fullName}</p>
                   {castaway.pickedBy && (
                     <ColorRow
-                      className='absolute -right-1 top-1 rotate-30 text-xs leading-tight p-0 px-1'
+                      className='absolute -right-1 top-1 rotate-30 text-xs leading-tight p-0 px-1 z-50'
                       color={castaway.tribe.tribeColor}>
                       {castaway.pickedBy}
                     </ColorRow>

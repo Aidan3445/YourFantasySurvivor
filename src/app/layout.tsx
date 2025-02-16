@@ -23,6 +23,7 @@ interface RootLayoutProps {
   children: ReactNode;
 }
 
+
 export default async function RootLayout({ children }: RootLayoutProps) {
   const leagues = await QUERIES.getLeagues();
 

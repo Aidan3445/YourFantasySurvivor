@@ -61,11 +61,17 @@ export const LeaguePredictionTimingOptions = [
 export type LeagueEventTiming = typeof LeaguePredictionTimingOptions[number];
 export const EventTimingZod = z.enum(LeaguePredictionTimingOptions);
 
+export const ReferenceOptions = ['Castaway', 'Tribe', 'Member'] as const;
+export type ReferenceType = typeof ReferenceOptions[number];
+export const EventRefZod = z.enum(ReferenceOptions);
+
 export const LeagueEventRuleZod = z.object({
+  leagueEventRuleId: z.number().optional(),
   eventName: EventNameZod,
   description: EventDescZod,
   points: EventPointsZod,
-  type: EventTypeZod,
+  eventType: EventTypeZod,
+  referenceTypes: z.array(EventRefZod),
   timing: EventTimingZod.array(),
   public: z.boolean(),
 });
@@ -74,11 +80,15 @@ export const defaultLeagueEventRule: LeagueEventRule = {
   eventName: '',
   description: '',
   points: 5,
-  type: 'Direct',
+  eventType: 'Direct',
+  referenceTypes: ['Castaway'],
   timing: [],
   public: false,
 };
 
-export const ReferenceOptions = ['Castaway', 'Tribe', 'Member'] as const;
-export type ReferenceType = typeof ReferenceOptions[number];
-export const EventRefZod = z.enum(ReferenceOptions);
+export type LeagueEventPrediction = LeagueEventRule & {
+  predictionMade: {
+    referenceType: ReferenceType;
+    referenceId: number;
+  } | null
+};

@@ -44,3 +44,10 @@ export interface Selection {
   episode: EpisodeNumber;
   castaway: CastawayName;
 }
+
+export interface LeagueMembersDraftInfo {
+  memberId: number;
+  displayName: string;
+  color: string;
+  draftPick: string | null;
+}

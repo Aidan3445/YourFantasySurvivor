@@ -3,7 +3,7 @@ import { createTable } from './createTable';
 import { seasonsSchema } from './seasons';
 import { tribesSchema } from './tribes';
 import { castawaysSchema } from './castaways';
-import { integer, serial, varchar, smallint, timestamp, boolean, unique } from 'drizzle-orm/pg-core';
+import { boolean, integer, serial, smallint, timestamp, unique, varchar } from 'drizzle-orm/pg-core';
 import { baseEventsSchema } from './baseEvents';
 
 export const episodesSchema = createTable(

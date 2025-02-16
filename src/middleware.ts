@@ -1,18 +1,4 @@
 // middleware.ts
-/*
-import { clerkMiddleware } from '@clerk/nextjs/server';
-
-export default clerkMiddleware();
-
-export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
-};
-*/
 
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
@@ -28,14 +14,11 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  const { userId, sessionId } = await auth(); //getToken
+  const { userId, sessionId } = await auth();
 
   if (!userId || !sessionId) {
-    return NextResponse.redirect(new URL('/login', req.url));
+    return NextResponse.redirect(new URL('/', req.url));
   }
-
-  // Get the auth token to use in fetch requests
-  //const token = await getToken();
 
   const url = req.nextUrl;
   const pathname = url.pathname;
@@ -50,20 +33,9 @@ export default clerkMiddleware(async (auth, req) => {
       eq(leaguesSchema.leagueHash, leagueHash!),
       eq(leagueMembersSchema.userId, userId)))
     .then((leagues) => leagues[0]?.leagueStatus);
-
-  /*
-  // Fetch league status (replace with actual logic)
-  const { leagueStatus } = await fetch(new URL(`/api/leagues/${leagueHash}/status`, req.url), {
-    method: 'GET',
-    headers: {
-      Authorization: `Bearer ${token}`, // Pass the user's Clerk token
-    }
-  })
-    .then((res) => res.json())
-    .catch(() => {
-      return NextResponse.redirect(new URL('/leagues', req.url));
-    }) as { leagueStatus: LeagueStatus };
-    */
+  if (!leagueStatus) {
+    return NextResponse.redirect(new URL('/leagues', req.url));
+  }
 
   let expectedRoute: string | undefined;
   if (leagueStatus === 'Predraft') {

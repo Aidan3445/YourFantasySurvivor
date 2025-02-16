@@ -1,5 +1,5 @@
 import JoinLeagueForm from '~/components/leagues/joinLeague';
-import { type LeaguePageProps } from '../../../[leagueHash]/layout';
+import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import { SignUp } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { leagueMemberAuth } from '~/lib/auth';
@@ -12,7 +12,7 @@ export default async function LeagueJoinPage({ params }: LeaguePageProps) {
     return (
       <main className='w-full'>
         <h1 className='text-3xl'>Sign in to join the League</h1>
-        <SignUp forceRedirectUrl={`/leagues/i/${leagueHash}`} />
+        <SignUp forceRedirectUrl={`/i/${leagueHash}`} />
       </main>
     );
   }

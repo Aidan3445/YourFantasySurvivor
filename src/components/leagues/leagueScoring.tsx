@@ -5,10 +5,11 @@ import { BaseEventRuleZod } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form } from '../ui/form';
+import { Form } from '~/components/ui/form';
 import { BaseEventRuleTabs } from './createLeague';
-import { Button } from '../ui/button';
+import { Button } from '~/components/ui/button';
 import { updateBaseEventRules } from '~/app/api/leagues/actions';
+import { useEffect } from 'react';
 
 const formSchema = z.object({
   baseEventRules: BaseEventRuleZod
@@ -32,6 +33,10 @@ export default function LeagueScoring() {
     defaultValues: { baseEventRules },
     resolver: zodResolver(formSchema)
   });
+
+  useEffect(() => {
+    reactForm.setValue('baseEventRules', baseEventRules);
+  }, [baseEventRules, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {

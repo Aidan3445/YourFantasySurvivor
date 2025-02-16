@@ -11,9 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 export default async function LeaguePage() {
   return (
     <main className='flex flex-col gap-0 w-full'>
-      <div className='xl:grid xl:grid-cols-3 gap-4 px-4'>
+      {/*<div className='xl:grid xl:grid-cols-3 gap-4 px-4'>*/}
+      <div className='p-4 pb-0'>
         <Tabs
-          className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100vh-4rem)] overflow-hidden'
+          className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100vh-4rem)] max-md:h-[calc(100vh-6.5rem)] overflow-hidden'
           defaultValue='draft'>
           <TabsList className='sticky z-50 top-0 grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
             <TabsTrigger value='draft'>Draft Settings</TabsTrigger>

@@ -57,7 +57,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.tribe1st'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tribe 1st Place</FormLabel>
+            <FormLabel>Tribe/Team 1st Place</FormLabel>
             <span className='flex gap-4 items-center'>
               <FormControl>
                 <Input
@@ -79,7 +79,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.tribe2nd'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Tribe Place</FormLabel>
+            <FormLabel>Tribe/Team 2nd Place</FormLabel>
             <span className='flex gap-4 items-center'>
               <FormControl>
                 <Input
@@ -92,6 +92,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
               </FormControl>
               <FormDescription className='max-w-60 text-wrap'>
                 Points if your castaway gets second in a tribe or team challenge
+                (only applies for 3+ tribe or team challenges)
               </FormDescription>
             </span>
             <FormMessage />

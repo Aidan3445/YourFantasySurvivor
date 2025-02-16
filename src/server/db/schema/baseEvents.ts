@@ -3,7 +3,7 @@ import 'server-only';
 import { createTable } from './createTable';
 import { index, integer, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
-import { AllBaseEventNames, ReferenceOptions } from '../defs/events';
+import { AllBaseEventNames, ReferenceOptions } from '~/server/db/defs/events';
 import { episodesSchema } from './episodes';
 
 export const eventName = pgEnum('event_name', AllBaseEventNames);

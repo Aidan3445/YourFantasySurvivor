@@ -2,11 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { useLeague } from '~/hooks/useLeague';
 import {
-  defaultLeagueEventRule, type LeagueEventRule, LeagueEventRuleZod,
-  LeaguePredictionTimingOptions, LeagueEventTypeOptions
+  type LeagueEventRule, LeagueEventRuleZod, LeagueEventTypeOptions,
+  LeaguePredictionTimingOptions, defaultLeagueEventRule
 } from '~/server/db/defs/events';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
@@ -42,7 +42,7 @@ export default function CustomEvents() {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     const newRule: LeagueEventRule = {
       ...data,
-      timing: data.type === 'Prediction' ? data.timing : [],
+      timing: data.eventType === 'Prediction' ? data.timing : [],
     };
 
     try {
@@ -311,7 +311,7 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
           <Flame size={16} />
         </div>
       </span>
-      {rule.type === 'Prediction' &&
+      {rule.eventType === 'Prediction' &&
         <p className='text-xs italic mb-1'>Predictions: {rule.timing.join(', ')}</p>}
       <p className='text-sm'>{rule.description}</p>
       {loggedIn && loggedIn.role === 'Owner' &&

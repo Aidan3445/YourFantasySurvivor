@@ -1,4 +1,4 @@
-import { SignedIn, SignedOut, SignIn } from '@clerk/nextjs';
+import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
 import Image from 'next/image';
 import CreateLeagueForm from '~/components/leagues/createLeague';
 

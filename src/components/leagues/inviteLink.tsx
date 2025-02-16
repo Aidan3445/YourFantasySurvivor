@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from 'lucide-react';
-import { Input } from '../ui/input';
+import { Input } from '~/components/ui/input';
 import { useMemo, useState } from 'react';
 import { cn } from '~/lib/utils';
 import { useLeague } from '~/hooks/useLeague';
@@ -19,7 +19,7 @@ export default function InviteLink() {
     return window.location.origin;
   }, []);
 
-  const link = `${origin}/leagues/i/${leagueHash}`;
+  const link = `${origin}/i/${leagueHash}`;
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(link);

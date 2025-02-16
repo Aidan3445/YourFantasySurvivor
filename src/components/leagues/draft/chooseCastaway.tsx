@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem } from '~/components/ui/form';
 import { Button } from '~/components/ui/button';
 import { useLeague } from '~/hooks/useLeague';
 import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { chooseCastaway } from '~/app/api/leagues/actions';
 
 interface ChooseCastawayProps {
@@ -29,7 +29,7 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
     resolver: zodResolver(formSchema),
   });
 
-  const availableCastaways = castaways.filter(castaway => !castaway.pickedBy);
+  const availableCastaways = castaways;//.filter(castaway => !castaway.pickedBy);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
@@ -44,7 +44,7 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
     <Form {...reactForm}>
       <form className='bg-card p-1 rounded-lg text-center' action={() => handleSubmit()}>
         <h1 className='text-2xl font-semibold'>
-          {onDeck ? 'You\'re on deck!' : 'You\'re on the clock!'}
+          {onDeck ? 'You\'re on deck' : 'You\'re on the clock!'}
         </h1>
         <span className='w-full flex justify-between gap-4 items-center p-1'>
           <FormField
@@ -57,24 +57,33 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
                       <SelectValue placeholder='Select castaway' />
                     </SelectTrigger>
                     <SelectContent className='z-50'>
-                      {availableCastaways.map((castaway) => (
-                        <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                          {castaway.fullName}
-                        </SelectItem>
-                      ))}
+                      <SelectGroup>
+                        {availableCastaways.map((castaway) => (
+                          castaway.pickedBy ?
+                            <SelectLabel
+                              key={castaway.fullName}
+                              className='bg-zinc-300 cursor-not-allowed'>
+                              {castaway.fullName} ({castaway.pickedBy})
+                            </SelectLabel> :
+                            <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
+                              {castaway.fullName}
+                            </SelectItem>
+                        ))}
+                      </SelectGroup>
                     </SelectContent>
                   </Select>
                 </FormControl>
               </FormItem>
             )} />
           <Button
+            className='w-40'
             disabled={!formSchema.safeParse(reactForm.watch())?.success || onDeck}
             type='submit'>
-            {onDeck ? 'Almost ready!' : 'Submit Pick!'}
+            {onDeck ? 'Almost time!' : 'Submit Pick'}
           </Button>
         </span>
       </form>
-    </Form>
+    </Form >
   );
 }
 

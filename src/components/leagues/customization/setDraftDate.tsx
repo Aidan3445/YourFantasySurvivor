@@ -4,13 +4,13 @@ import { Settings } from 'lucide-react';
 import { z } from 'zod';
 import { type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../../ui/form';
-import { Button } from '../../ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
+import { Button } from '~/components/ui/button';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '../../ui/alertDialog';
+} from '~/components/ui/alertDialog';
 import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { DateTimePicker } from '~/components/ui/dateTimePicker';
@@ -55,7 +55,9 @@ export default function SetDraftDate() {
     <Form {...reactForm}>
       <AlertDialog>
         <AlertDialogTrigger>
-          <Settings className='cursor-pointer stroke-primary mr-2' size={34} />
+          <Settings
+            className='cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+            size={34} />
         </AlertDialogTrigger>
         <AlertDialogContent className='w-min'>
           <AlertDialogHeader>

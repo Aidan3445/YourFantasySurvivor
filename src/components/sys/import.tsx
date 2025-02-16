@@ -1,15 +1,15 @@
 'use client';
 
-import { Button } from '../ui/button';
+import { Button } from '~/components/ui/button';
 import { importContestants } from '~/app/api/sys/actions';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import Image from 'next/image';
-import { Input } from '../ui/input';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '../ui/form';
-import { DateTimePicker } from '../ui/dateTimePicker';
+import { Input } from '~/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/components/ui/form';
+import { DateTimePicker } from '~/components/ui/dateTimePicker';
 import { type NewCastaway } from '~/server/db/defs/castaways';
 import { type NewTribe } from '~/server/db/defs/tribes';
 import { Circle } from 'lucide-react';
@@ -103,7 +103,7 @@ export default function Import() {
         <span className='flex gap-4'>
           {tribes.map((tribe, index) => (
             <div key={index} className='flex items-center space-x-4 bg-card rounded-lg p-4'>
-              <Circle fill={tribe.color} />
+              <Circle fill={tribe.tribeColor} />
               <h2 className='font-bold'>{tribe.tribeName}</h2>
             </div>
           ))}

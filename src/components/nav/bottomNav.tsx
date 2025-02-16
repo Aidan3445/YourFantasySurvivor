@@ -1,7 +1,7 @@
 import { SignedIn, UserButton } from '@clerk/nextjs';
 import { type NavLinkProps } from './navSelector';
 import Link from 'next/link';
-import { BookUser, Home, Flame, Trophy } from 'lucide-react';
+import { BookUser, Flame, Home, Trophy } from 'lucide-react';
 import { cn } from '~/lib/utils';
 
 export const navHeight = 'h-10';

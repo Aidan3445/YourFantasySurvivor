@@ -1,7 +1,7 @@
 import type { UniqueIdentifier } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { cn, type ComponentProps } from '~/lib/utils';
+import { type ComponentProps, cn } from '~/lib/utils';
 
 interface SortableItemProps extends ComponentProps {
   id: UniqueIdentifier;

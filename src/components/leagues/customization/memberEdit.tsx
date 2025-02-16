@@ -3,12 +3,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormLabel } from '../../ui/form';
+import { Form, FormLabel } from '~/components/ui/form';
 import { ColorZod, DisplayNameZod, type LeagueMember } from '~/server/db/defs/leagueMembers';
 import { updateMemberDetails } from '~/app/api/leagues/actions';
 import { useEffect } from 'react';
 import { useLeague } from '~/hooks/useLeague';
-import { LeagueMemberFields } from '../joinLeague';
+import { LeagueMemberFields } from '~/components/leagues/joinLeague';
 import { Button } from '~/components/ui/button';
 
 const formSchema = z.object({
@@ -63,7 +63,10 @@ export default function MemberEditForm() {
     <Form {...reactForm}>
       <form className=' flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground'>Edit Member Details</FormLabel>
-        <LeagueMemberFields memberColors={memberColors.filter((m) => m.memberId !== loggedIn?.memberId)} />
+        <LeagueMemberFields
+          memberColors={memberColors
+            .filter((m) => m.memberId !== loggedIn?.memberId)
+            .map((m) => m.color)} />
         <Button type='submit'>Save</Button>
       </form>
     </Form>

@@ -2,16 +2,16 @@
 
 import { useLeague } from '~/hooks/useLeague';
 import { getContrastingColor } from '@uiw/color-convert';
-import { useMemo, useState, type ReactNode } from 'react';
-import { closestCenter, DndContext, PointerSensor, type UniqueIdentifier, useSensor, useSensors } from '@dnd-kit/core';
-import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { DndContext, PointerSensor, type UniqueIdentifier, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
+import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { cn } from '~/lib/utils';
 import { GripVertical, Shuffle } from 'lucide-react';
-import SortableItem from '../ui/sortableItem';
+import SortableItem from '~/components/ui/sortableItem';
 import { handleDragEnd } from '~/hooks/useSortableItem';
 import { updateDraftOrder } from '~/app/api/leagues/actions';
-import { Button } from '../ui/button';
+import { Button } from '~/components/ui/button';
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -34,14 +34,20 @@ export default function DraftOrder({ className }: DraftOrderProps) {
   } = useLeague();
   const sensors = useSensors(useSensor(PointerSensor));
 
-  const initialOrder = draftOrder.map((memberId) => {
+  const dbOrder = useMemo(() => draftOrder.map((memberId) => {
     const member = members.list.find((m) => m.memberId === memberId);
     return member;
   }).filter((member) => !!member)
-    .map((member) => ({ ...member, id: member.memberId as UniqueIdentifier }));
+    .map((member) => ({ ...member, id: member.memberId as UniqueIdentifier })),
+    [members, draftOrder]);
 
-  const [order, setOrder] = useState(initialOrder);
-  const orderChaged = useMemo(() => {
+  const [order, setOrder] = useState(dbOrder);
+
+  useEffect(() => {
+    setOrder(dbOrder);
+  }, [dbOrder, setOrder]);
+
+  const orderChanged = useMemo(() => {
     return order.some((member, index) => member.memberId !== draftOrder[index]);
   }, [order, draftOrder]);
 
@@ -82,14 +88,14 @@ export default function DraftOrder({ className }: DraftOrderProps) {
         <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
         {!orderLocked && <>
           <Shuffle
-            className='cursor-pointer stroke-primary mr-2'
+            className='cursor-pointer stroke-primary hover:stroke-secondary transition-all mr-2'
             size={24}
             onClick={shuffleOrderWithAnimation} />
           <span className='flex gap-2 ml-auto'>
             <form action={() => handleSubmit()}>
-              <Button disabled={!orderChaged}>Save</Button>
+              <Button disabled={!orderChanged}>Save</Button>
             </form>
-            <Button disabled={!orderChaged} variant='destructive' onClick={() => setOrder(initialOrder)}>Reset</Button>
+            <Button disabled={!orderChanged} variant='destructive' onClick={() => setOrder(dbOrder)}>Reset</Button>
           </span>
         </>}
       </span>
