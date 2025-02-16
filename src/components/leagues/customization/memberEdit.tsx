@@ -27,7 +27,8 @@ export default function MemberEditForm() {
         loggedIn,
         list: memberColors
       }
-    }
+    },
+    refresh
   } = useLeague();
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -52,6 +53,7 @@ export default function MemberEditForm() {
       };
 
       await updateMemberDetails(leagueHash, member);
+      await refresh();
       alert('Successfully updated member details');
     } catch (error) {
       console.error(error);

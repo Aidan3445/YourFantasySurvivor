@@ -26,7 +26,8 @@ export default function SetDraftDate() {
       settings: {
         draftDate
       }
-    }
+    },
+    refresh
   } = useLeague();
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
@@ -44,6 +45,7 @@ export default function SetDraftDate() {
 
     try {
       await updateLeagueSettings(leagueHash, leagueUpdate);
+      await refresh();
       alert(`Draft timing updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);

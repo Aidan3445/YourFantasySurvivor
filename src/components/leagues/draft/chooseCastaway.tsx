@@ -23,7 +23,8 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
   const {
     league: {
       leagueHash
-    }
+    },
+    refresh
   } = useLeague();
   const reactForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,6 +35,7 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       await chooseCastaway(leagueHash, data.castawayId, true);
+      await refresh();
       alert('Castaway chosen successfully');
     } catch (error) {
       alert('Failed to choose castaway');

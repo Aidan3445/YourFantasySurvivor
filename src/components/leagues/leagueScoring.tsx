@@ -27,7 +27,8 @@ export default function LeagueScoring() {
       settings: {
         draftDate
       }
-    }
+    },
+    refresh,
   } = useLeague();
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: { baseEventRules },
@@ -41,6 +42,7 @@ export default function LeagueScoring() {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       await updateBaseEventRules(leagueHash, data.baseEventRules);
+      await refresh();
       alert(`Base event rules updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);

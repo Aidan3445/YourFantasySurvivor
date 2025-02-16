@@ -156,7 +156,7 @@ interface SubmissionCardProps {
 }
 
 function SubmissionCard({ prediction, options }: SubmissionCardProps) {
-  const { league } = useLeague();
+  const { league, refresh } = useLeague();
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       referenceId: prediction.predictionMade?.referenceId
@@ -171,6 +171,7 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
       if (!selectedType) throw new Error('Invalid reference type');
 
       await makePrediction(league.leagueHash, prediction, selectedType, data.referenceId);
+      await refresh();
       alert('Prediction submitted');
     } catch (error) {
       console.error(error);

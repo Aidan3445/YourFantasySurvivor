@@ -30,7 +30,8 @@ export default function DraftOrder({ className }: DraftOrderProps) {
         draftOrder,
         draftDate
       }
-    }
+    },
+    refresh
   } = useLeague();
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -75,6 +76,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
   const handleSubmit = async () => {
     try {
       await updateDraftOrder(leagueHash, order.map((member) => member.memberId));
+      await refresh();
       alert('Draft order saved');
     } catch (error) {
       console.error(error);

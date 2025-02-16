@@ -31,7 +31,8 @@ export default function CustomEvents() {
       settings: {
         draftDate
       }
-    }
+    },
+    refresh
   } = useLeague();
 
   const reactForm = useForm<LeagueEventRule>({
@@ -47,6 +48,7 @@ export default function CustomEvents() {
 
     try {
       await createLeagueEventRule(leagueHash, newRule);
+      await refresh();
       alert(`Custom event created for league ${leagueHash}`);
       reactForm.reset();
     } catch (error) {
@@ -271,7 +273,8 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
       members: {
         loggedIn
       }
-    }
+    },
+    refresh
   } = useLeague();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -283,6 +286,7 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       await updateLeagueEventRule(leagueHash, data);
+      await refresh();
       alert(`Custom event updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);

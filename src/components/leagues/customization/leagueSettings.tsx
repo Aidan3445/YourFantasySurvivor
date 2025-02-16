@@ -110,7 +110,8 @@ export function LeagueSettingsTabContent() {
         loggedIn,
         list,
       },
-    }
+    },
+    refresh
   } = useLeague();
 
   const membersList = list.map(member => ({
@@ -141,6 +142,7 @@ export function LeagueSettingsTabContent() {
         updateLeagueSettings(leagueHash, leagueUpdate),
         updateAdmins(leagueHash, data.admins),
       ]);
+      await refresh();
       alert(`League settings updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);
