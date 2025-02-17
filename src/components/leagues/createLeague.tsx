@@ -18,9 +18,15 @@ import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from './joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useUser } from '@clerk/nextjs';
+import {
+  AlertDialog, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from '~/components/ui/alertDialog';
+import { X } from 'lucide-react';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
@@ -42,7 +48,11 @@ const defaultValues: z.infer<typeof formSchema> = {
   color: '',
 };
 
-export default function CreateLeagueForm() {
+interface CreateLeagueFormProps {
+  onSubmit?: () => void;
+}
+
+export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
   const router = useRouter();
   const { user } = useUser();
   const { api, setApi, current, count, progress } = useCarouselProgress();
@@ -71,6 +81,7 @@ export default function CreateLeagueForm() {
       );
       addLeague(leagueInfo);
       alert(`League created with id: ${leagueInfo.leagueHash}`);
+      onSubmit?.();
       router.push(`/leagues/${leagueInfo.leagueHash}/predraft`);
     } catch (error) {
       console.error(error);
@@ -196,6 +207,36 @@ export function BaseEventRuleTabs({ rightSide, disabled }: BaseEventRuleTabsProp
         </div>
       </span>
     </Tabs>
+  );
+}
+
+interface CreateLeagueModalProps {
+  children: ReactNode;
+}
+
+export function CreateLeagueModal({ children }: CreateLeagueModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <AlertDialogTrigger>
+        {children}
+      </AlertDialogTrigger>
+      <AlertDialogContent className='w-min'>
+        <AlertDialogHeader>
+          <AlertDialogTitle hidden>Create a New League</AlertDialogTitle>
+          <AlertDialogDescription hidden>
+            Create a new league to start drafting with your friends.
+          </AlertDialogDescription>
+          <CreateLeagueForm onSubmit={() => setIsOpen(false)} />
+        </AlertDialogHeader>
+        <AlertDialogFooter className='absolute top-1 right-1'>
+          <AlertDialogCancel className='h-min p-1'>
+            <X stroke='white' />
+          </AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 

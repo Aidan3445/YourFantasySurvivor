@@ -12,6 +12,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/ui/alertDialog';
 import MakePredictions from './MakePredictions';
+import { useRouter } from 'next/navigation';
 
 interface DraftTrackerProps {
   leagueHash: LeagueHash;
@@ -29,9 +30,15 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
       }
     }
   } = useLeague();
+  const router = useRouter();
 
   const { onTheClock, onDeck } = useMemo(() => {
     const onTheClockIndex = draft?.picks.findIndex((pick) => !pick?.draftPick);
+
+    if (onTheClockIndex === -1) {
+      router.push(`/leagues/${leagueHash}`);
+    }
+
 
     const onTheClockDisplayName = draft.picks[onTheClockIndex]?.displayName;
     const onDeckDisplayName = draft.picks[onTheClockIndex + 1]?.displayName;
@@ -46,7 +53,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
         loggedIn: !!onDeckDisplayName && onDeckDisplayName === loggedIn?.displayName,
       },
     };
-  }, [draft, loggedIn]);
+  }, [draft, loggedIn, router, leagueHash]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 

@@ -10,7 +10,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useEffect, useState } from 'react';
 import { cn } from '~/lib/utils';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { CreateLeagueModal } from '../leagues/createLeague';
+import { Separator } from '../ui/separator';
 
 export default function SideNav() {
   return (
@@ -65,7 +67,6 @@ function SideNavLeagues() {
   const { leagues } = useYfsUser();
   const [open, setOpen] = useState('');
   const { leagueHash } = useParams();
-  const path = usePathname();
 
   useEffect(() => {
     if (leagues.length > 0) {
@@ -102,19 +103,32 @@ function SideNavLeagues() {
         </SidebarMenuButton>
         <AccordionContent className='pb-1'>
           <SidebarMenuSub>
-            {leagues.map(league => (
-              <SideNavLink
-                className={league.leagueHash === leagueHash ? 'font-semibold' : ''}
-                key={league.leagueHash}
-                href={`/leagues/${league.leagueHash}`}
-                label={league.leagueName} />
-            ))}
-            <SideNavLink
-              href='/leagues/new'
-              icon={<ListPlus />}
-              label='Create League'
-              className={cn('text-nowrap italic flex-row-reverse justify-between',
-                path === '/leagues/new' && 'font-semibold')} />
+            {leagues
+              .filter(league => league.leagueStatus !== 'Inactive')
+              .slice(0, 5)
+              .map(league => (
+                <SideNavLink
+                  className={league.leagueHash === leagueHash ? 'font-semibold' : ''}
+                  key={league.leagueHash}
+                  href={`/leagues/${league.leagueHash}`}
+                  label={league.leagueName} />
+              ))}
+            <Separator />
+            {leagues.length > 5 ||
+              leagues.some(league => league.leagueStatus === 'Inactive') && (
+                <SideNavLink
+                  href='/leagues'
+                  label='View All Leagues' />
+              )}
+
+            <CreateLeagueModal>
+              <SidebarMenuButton asChild size='lg'>
+                <span className='w-full flex gap-5 items-center transition-all'>
+                  Create League
+                  <ListPlus />
+                </span>
+              </SidebarMenuButton>
+            </CreateLeagueModal>
           </SidebarMenuSub>
         </AccordionContent>
       </AccordionItem>

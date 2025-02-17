@@ -16,7 +16,7 @@ export function DraftCountdown() {
     league: {
       leagueHash,
       leagueStatus,
-      members: { loggedIn },
+      members: { loggedIn, list },
       settings: { draftDate }
     },
     refresh
@@ -49,10 +49,9 @@ export function DraftCountdown() {
           </p>
         </div>
         <div className='flex gap-2 ml-auto'>
-          {editable && (<>
-            <StartDraft startDraft={onDraftJoin} />
-            <SetDraftDate />
-          </>)}
+          {editable && list.length > 1 && leagueStatus === 'Predraft' &&
+            <StartDraft startDraft={onDraftJoin} />}
+          {editable && <SetDraftDate />}
         </div>
       </span>
       <span className='bg-primary rounded-2xl p-2 m-4 text-primary-foreground text-2xl shadow shadow-black'>

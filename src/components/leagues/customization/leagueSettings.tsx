@@ -7,7 +7,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { type LeagueSettingsUpdate, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
 import { useLeague } from '~/hooks/useLeague';
-import { TabsContent } from '@radix-ui/react-tabs';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { DraftDateField } from './setDraftDate';
@@ -97,7 +96,7 @@ const formSchema = z.object({
   admins: z.array(z.number())
 });
 
-export function LeagueSettingsTabContent() {
+export function LeagueSettings() {
   const {
     league: {
       leagueHash,
@@ -153,33 +152,31 @@ export function LeagueSettingsTabContent() {
   const editable = loggedIn?.role === 'Owner';
 
   return (
-    <TabsContent value='league'>
-      <Form {...reactForm}>
-        <form className=' flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
-          <FormField
-            name='leagueName'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>League Name</FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={!editable}
-                    className='w-36 text-black'
-                    type='text'
-                    placeholder='League Name'
-                    {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-          <LeagueSettingsFields />
-          {editable && <>
-            <LeagueAdminsField members={membersList} />
-            <Button type='submit'>Save</Button>
-          </>}
-        </form>
-      </Form>
-    </TabsContent >
+    <Form {...reactForm}>
+      <form className='h-full flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+        <FormField
+          name='leagueName'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>League Name</FormLabel>
+              <FormControl>
+                <Input
+                  disabled={!editable}
+                  className='w-36 text-black'
+                  type='text'
+                  placeholder='League Name'
+                  {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )} />
+        <LeagueSettingsFields />
+        {editable && <>
+          <LeagueAdminsField members={membersList} />
+          <Button className='mt-auto' type='submit'>Save</Button>
+        </>}
+      </form>
+    </Form>
   );
 }
 interface LeagueAdminsFieldProps {

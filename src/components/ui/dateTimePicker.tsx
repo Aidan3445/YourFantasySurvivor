@@ -79,7 +79,7 @@ export function DateTimePicker({ defaultValue, date, setDate, disabled, side }: 
           {date ? (
             format(date, 'MM/dd/yyyy hh:mm aa')
           ) : (
-            <span>MM/DD/YYYY hh:mm aa</span>
+            <span>Select date and time</span>
           )}
         </Button>
       </PopoverTrigger>

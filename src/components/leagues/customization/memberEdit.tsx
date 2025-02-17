@@ -30,6 +30,7 @@ export default function MemberEditForm() {
     },
     refresh
   } = useLeague();
+
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       displayName: loggedIn?.displayName ?? '',

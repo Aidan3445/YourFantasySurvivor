@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { aliasedTable, and, arrayContained, arrayContains, asc, eq, inArray, sql } from 'drizzle-orm';
+import { aliasedTable, and, arrayContained, arrayContains, asc, desc, eq, inArray } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
@@ -11,7 +11,7 @@ import { leagueEventPredictionsSchema, leagueEventsRulesSchema } from '~/server/
 import { auth } from '@clerk/nextjs/server';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
-import { type LeagueHash, type LeagueName } from '~/server/db/defs/leagues';
+import { type LeagueStatus, type LeagueHash, type LeagueName } from '~/server/db/defs/leagues';
 import { type SeasonName } from '~/server/db/defs/seasons';
 import { type CastawayDraftInfo, type CastawayName } from '~/server/db/defs/castaways';
 import { tribesSchema } from '~/server/db/schema/tribes';
@@ -123,23 +123,28 @@ export const QUERIES = {
         leagueStatus: leaguesSchema.leagueStatus,
         season: seasonsSchema.seasonName,
         castaway: castawaysSchema.fullName,
+        out: baseEventsSchema.eventName,
+        memberId: leagueMembersSchema.displayName,
       })
       .from(leagueMembersSchema)
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
-      .leftJoin(selectionUpdatesSchema, eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId))
-      .leftJoin(episodesSchema, and(
-        eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId),
-        eq(episodesSchema.episodeNumber,
-          // I have no clue why MIN works but MAX doesn't but alas
-          db.select({ maxEpisode: sql`MIN(${episodesSchema.episodeNumber})` })
-            .from(selectionUpdatesSchema)
-            .innerJoin(episodesSchema, eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId))
-            .where(eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId))
-        )))
-      .leftJoin(castawaysSchema, eq(castawaysSchema.castawayId, selectionUpdatesSchema.castawayId))
+      .leftJoin(castawaysSchema, eq(castawaysSchema.castawayId,
+        db.select({ castawayId: selectionUpdatesSchema.castawayId })
+          .from(selectionUpdatesSchema)
+          .where(eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId))
+          .orderBy(desc(selectionUpdatesSchema.episodeId))
+          .limit(1)))
+      .leftJoin(baseEventsSchema, and(
+        inArray(baseEventsSchema.eventName, ['elim', 'noVoteExit']),
+        inArray(baseEventsSchema.baseEventId,
+          db.select({ baseEventId: baseEventReferenceSchema.baseEventId })
+            .from(baseEventReferenceSchema)
+            .where(and(
+              eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+              eq(baseEventReferenceSchema.referenceType, 'Castaway'))))))
       .where(eq(leagueMembersSchema.userId, userId))
-      .orderBy(asc(episodesSchema.episodeNumber))
+      .orderBy(desc(seasonsSchema.premiereDate))
       .then((leagues) => leagues.reduce((acc, league) => {
         const existing = acc.find((l) => l.leagueHash === league.leagueHash);
         if (existing) {
@@ -151,8 +156,10 @@ export const QUERIES = {
       }, [] as {
         leagueName: LeagueName,
         leagueHash: LeagueHash,
+        leagueStatus: LeagueStatus,
         season: SeasonName,
         castaway: CastawayName | null,
+        out?: string | null,
       }[]));
 
     return leagues;

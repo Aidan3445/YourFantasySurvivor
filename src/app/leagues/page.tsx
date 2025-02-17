@@ -1,33 +1,83 @@
-import { redirect } from 'next/navigation';
-import { QUERIES } from '~/app/api/leagues/query';
-import Link from 'next/link';
-import CreateLeagueForm from '~/components/leagues/createLeague';
+'use client';
 
-export default async function LeaguesPage() {
-  try {
-    const myLeagues = await QUERIES.getLeagues();
-    return (
-      <main className='w-full flex flex-col gap-5'>
-        <h1 className='text-3xl'>My Leagues</h1>
-        {myLeagues.map(league => (
-          <Link
-            key={league.leagueHash}
-            className='w-5/6 mx-5'
-            href={`/leagues/${league.leagueHash}`}>
-            <section className='px-2 py-1 rounded-lg bg-card'>
-              <h3 className='text-xl'>{league.leagueName}</h3>
-              <p className='text-sm'>{league.season}</p>
-              <p>{league.castaway}</p>
-            </section>
-          </Link>
-        ))}
-        <h2 className='text-2xl'>Create a new League</h2>
-        <CreateLeagueForm />
-      </main>
-    );
-  } catch {
-    redirect('/leagues/new');
-  }
+import Link from 'next/link';
+import { FlameKindling, ListPlus } from 'lucide-react';
+import { CreateLeagueModal } from '~/components/leagues/createLeague';
+import { useYfsUser } from '~/hooks/useYfsUser';
+import { type LeagueInfo } from '~/context/yfsUserContext';
+
+export default function LeaguesPage() {
+  const { leagues } = useYfsUser();
+
+  const { currentLeagues, inactiveLeagues } = leagues.reduce((acc, league) => {
+    if (league.leagueStatus === 'Inactive') {
+      acc.inactiveLeagues.push(league);
+    } else {
+      acc.currentLeagues.push(league);
+    }
+    return acc;
+  }, { currentLeagues: [], inactiveLeagues: [] } as {
+    currentLeagues: LeagueInfo[],
+    inactiveLeagues: LeagueInfo[]
+  });
+
+
+
+  return (
+    <main className='w-full flex flex-col gap-5 items-center'>
+      {leagues.length > 0 ?
+        <h1 className='text-3xl'>My Leagues</h1> :
+        <h1 className='text-3xl'>No Leagues Yet...</h1>}
+      {currentLeagues.map(league => (
+        <Link
+          key={league.leagueHash}
+          className='w-5/6 mx-5'
+          href={`/leagues/${league.leagueHash}`}>
+          <section className='px-2 py-1 rounded-lg bg-card'>
+            <h3 className='text-xl font-semibold'>{league.leagueName}</h3>
+            <p className='text-sm'>{league.season}</p>
+            {league.castaway ? (
+              <p>
+                <i>{league.castaway}</i>
+                {league.out && <FlameKindling className='inline' size={16} />}
+              </p>
+            ) : (
+              <p><i>Yet to draft</i></p>
+            )}
+          </section>
+        </Link>
+      ))}
+      <CreateLeagueModal>
+        <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-card'>
+          <h3 className='text-xl'>Create New League</h3>
+          <ListPlus size={24} />
+        </section>
+      </CreateLeagueModal>
+      {inactiveLeagues.length > 0 && (
+        <section className='flex flex-col gap-5 w-5/6 mx-5'>
+          <h2 className='text-center text-2xl'>Past Seasons</h2>
+          {inactiveLeagues.map(league => (
+            <Link
+              key={league.leagueHash}
+              href={`/leagues/${league.leagueHash}`}>
+              <section className='px-2 py-1 rounded-lg bg-card'>
+                <h3 className='text-xl font-semibold'>{league.leagueName}</h3>
+                <p className='text-sm'>{league.season}</p>
+                {league.castaway ? (
+                  <p>
+                    <i>{league.castaway}</i>
+                    {league.out && <FlameKindling className='inline' size={16} />}
+                  </p>
+                ) : (
+                  <p><i>Yet to draft</i></p>
+                )}
+              </section>
+            </Link>
+          ))}
+        </section>
+      )}
+    </main>
+  );
 }
 
 
