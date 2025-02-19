@@ -16,7 +16,7 @@ import { type SeasonName } from '~/server/db/defs/seasons';
 import { type CastawayDraftInfo, type CastawayName } from '~/server/db/defs/castaways';
 import { tribesSchema } from '~/server/db/schema/tribes';
 import { type LeagueMemberDisplayName, type LeagueMemberColor } from '~/server/db/defs/leagueMembers';
-import { type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent, type BaseEventRule } from '~/server/db/defs/events';
+import { type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent, type BaseEventRule, LeagueEventId, LeagueEventName } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import { type TribeName } from '~/server/db/defs/tribes';
 import { type EpisodeAirStatus, type EpisodeNumber } from '~/server/db/defs/episodes';
@@ -405,7 +405,7 @@ export const QUERIES = {
     const directEventsPromise = db
       .select({
         episodeNumber: episodesSchema.episodeNumber,
-        leagueEventId: leagueEventsSchema.leagueEventId,
+        eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
         points: leagueEventsRulesSchema.points,
         referenceType: leagueEventsSchema.referenceType,
@@ -438,6 +438,7 @@ export const QUERIES = {
         };
 
         const newEvent = {
+          eventId: event.eventId,
           eventName: event.eventName,
           points: event.points,
           referenceType: event.referenceType,
@@ -463,6 +464,7 @@ export const QUERIES = {
     const predictionMaker = aliasedTable(leagueMembersSchema, 'predictionMaker');
     const predictionEventsPromise = db
       .select({
+        eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
         points: leagueEventsRulesSchema.points,
         episodeNumber: episodesSchema.episodeNumber,
@@ -496,20 +498,22 @@ export const QUERIES = {
         eq(leagueMembersSchema.memberId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Member')))
       .then((events: {
-        eventName: string,
+        eventId: LeagueEventId,
+        eventName: LeagueEventName
         points: number,
         episodeNumber: EpisodeNumber,
-        predictionMaker: string,
+        predictionMaker: LeagueMemberDisplayName,
         referenceType: ReferenceType,
         castaway: CastawayName | null,
         tribe: TribeName | null,
-        member: string | null,
+        member: LeagueMemberDisplayName | null,
         notes: string[] | null
       }[]
 
       ) => events.reduce((acc, event) => {
         acc[event.episodeNumber] ??= [];
         const newEvent = {
+          eventId: event.eventId,
           eventName: event.eventName,
           points: event.points,
           referenceType: event.referenceType,

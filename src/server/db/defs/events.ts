@@ -100,6 +100,7 @@ export type LeagueEventId = number;
 export type LeagueEventName = string;
 
 export type LeagueDirectEvent = {
+  eventId: LeagueEventId,
   eventName: LeagueEventName,
   points: number,
   referenceType: ReferenceType,
@@ -109,6 +110,7 @@ export type LeagueDirectEvent = {
 };
 
 export type LeaguePredictionEvent = {
+  eventId: LeagueEventId,
   eventName: LeagueEventName,
   points: number,
   referenceType: ReferenceType,

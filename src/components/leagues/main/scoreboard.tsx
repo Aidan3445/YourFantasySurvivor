@@ -28,7 +28,7 @@ export default function Scoreboard() {
             <TableHead className=' rounded-tl-md'>Place</TableHead>
             <TableHead>Points</TableHead>
             <TableHead>Member</TableHead>
-            <TableHead className='text-right rounded-tr-md'>Survivor</TableHead>
+            <TableHead className='text-right rounded-tr-md text-nowrap'>Survivor</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
