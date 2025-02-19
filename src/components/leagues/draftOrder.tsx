@@ -113,7 +113,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
               return (
                 <SortableItem
                   key={member.memberId}
-                  id={member.id}
+                  id={member.displayName}
                   className='grid col-span-3 grid-cols-subgrid'
                   disabled={orderLocked}>
                   <ColorRow

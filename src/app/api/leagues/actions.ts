@@ -58,13 +58,17 @@ export async function createNewLeague(
       const insertedLeague = await trx
         .insert(leaguesSchema)
         .values({ leagueName, leagueSeason: seasonId })
-        .returning({ leagueId: leaguesSchema.leagueId, leagueHash: leaguesSchema.leagueHash })
+        .returning({
+          leagueId: leaguesSchema.leagueId,
+          leagueHash: leaguesSchema.leagueHash,
+          leagueStatus: leaguesSchema.leagueStatus,
+        })
         .then((res) => res[0]);
       if (!insertedLeague) throw new Error('Failed to create league');
 
       // Safe to assume the league was inserted if we got this far
       // Get the league id and hash
-      const { leagueId, leagueHash } = insertedLeague;
+      const { leagueId, leagueHash, leagueStatus } = insertedLeague;
 
       // Insert the owner as a member
       const memberId = await trx
@@ -86,6 +90,7 @@ export async function createNewLeague(
       return {
         leagueName,
         leagueHash,
+        leagueStatus,
         season: seasonName!,
         castaway: null,
       };
@@ -108,6 +113,7 @@ export async function createNewLeague(
   * @throws an error if the league cannot be found
   * @throws an error if the user is already a member of the league
   * @throws an error if the user cannot be added as a member
+  * @throws an error if the league is not in the predraft status
   */
 export async function joinLeague(leagueHash: LeagueHash, newMember: NewLeagueMember) {
   const user = await auth();
@@ -123,6 +129,7 @@ export async function joinLeague(leagueHash: LeagueHash, newMember: NewLeagueMem
           leagueInfo: {
             leagueName: leaguesSchema.leagueName,
             leagueHash: leaguesSchema.leagueHash,
+            leagueStatus: leaguesSchema.leagueStatus,
             season: seasonsSchema.seasonName,
           }
         })
@@ -138,6 +145,10 @@ export async function joinLeague(leagueHash: LeagueHash, newMember: NewLeagueMem
           }
         }));
       if (!leagueId || !draftOrder) throw new Error('League not found');
+
+      if (leagueInfo.leagueStatus !== 'Predraft') {
+        throw new Error('Cannot join after the draft has started');
+      }
 
       // Try to add the member, if there is a conflict, the user is already a member
       const memberId = await trx
