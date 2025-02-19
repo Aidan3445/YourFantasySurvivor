@@ -1,20 +1,59 @@
 import { type ClassValue, clsx } from 'clsx';
-import { type CSSProperties, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { type QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import { type CastawayDetails } from '~/server/db/defs/castaways';
+import { type EpisodeNumber } from '~/server/db/defs/episodes';
 import { type LeagueHash } from '~/server/db/defs/leagues';
+import { type TribeName } from '~/server/db/defs/tribes';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export interface ComponentProps {
-  className?: string;
-  children?: ReactNode;
-  style?: CSSProperties;
+export type SWRKey = { leagueHash: LeagueHash, key: string };
+
+/**
+  * Find the castaways on a tribe at a given episode
+  * @param tribeUpdates The tribe updates for the season
+  * @param eliminations The eliminations for the season
+  * @param tribeName The tribe to find castaways for
+  * @param episodeNumber The episode to find castaways for
+  * @returns The castaways on the tribe at the given episode
+  */
+export function findTribeCastaways(
+  tribeUpdates: Awaited<ReturnType<typeof SEASON_QUERIES.getTribesTimeline>>,
+  eliminations: Awaited<ReturnType<typeof SEASON_QUERIES.getEliminations>>,
+  tribeName: TribeName,
+  episodeNumber: EpisodeNumber) {
+
+  const onTribe = new Set(tribeUpdates[1]?.[tribeName]?.castaways ?? []);
+
+  for (let i = 2; i <= episodeNumber; i++) {
+    eliminations[i - 1]?.forEach((castaway) => onTribe.delete(castaway));
+    if (!tribeUpdates[i]) continue;
+    Object.entries(tribeUpdates[i]!).forEach(([tribeName, update]) => {
+      if (tribeName === tribeName) {
+        update.castaways.forEach((castaway) => onTribe.add(castaway));
+      } else {
+        update.castaways.forEach((castaway) => onTribe.delete(castaway));
+      }
+    });
+  }
+
+  return [...onTribe];
 }
 
-export type SWRKey = { leagueHash: LeagueHash, key: string };
+
+
+
+
+
+
+
+
+
+
+
 
 export function castawaysByTribe(options: CastawayDetails[]): Record<string, CastawayDetails[]> {
   return options.reduce((acc, c) => {

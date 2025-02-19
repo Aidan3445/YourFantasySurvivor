@@ -1,3 +1,4 @@
+import { type CastawayName } from './castaways';
 import { type EpisodeNumber } from './episodes';
 import { type SeasonName } from './seasons';
 
@@ -21,4 +22,9 @@ export type TribeEp = {
   tribeName: TribeName;
   tribeColor: TribeColor;
   episode: EpisodeNumber
+};
+
+export type TribeUpdate = {
+  tribeColor: TribeColor;
+  castaways: CastawayName[];
 };

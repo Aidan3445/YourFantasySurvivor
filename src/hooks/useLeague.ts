@@ -6,16 +6,24 @@ import { type SWRKey } from '~/lib/utils';
 import { defaultBaseRules } from '~/server/db/defs/events';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
+export type LeagueScores = NonUndefined<Awaited<ReturnType<typeof QUERIES.getBaseEventScores>>>;
 
-const leagueFetcher: Fetcher<League, SWRKey> = ({ leagueHash }) =>
+type Response = {
+  league: League,
+  leagueScores: LeagueScores
+};
+
+const leagueFetcher: Fetcher<Response, SWRKey> = ({ leagueHash }) =>
   fetch(`/api/leagues/${leagueHash}`)
     .then((res) => res.json());
 
 export function useLeague() {
   const { leagueHash } = useParams();
 
-  const { data: league, mutate } = useSWR<League>({ leagueHash, key: 'league' }, leagueFetcher, { refreshInterval: 10000, revalidateOnMount: true }
-  );
+  const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher, { refreshInterval: 10000, revalidateOnMount: true });
+  const { league, leagueScores } = data ?? {};
+
+  console.log(leagueScores);
 
   try {
     return {

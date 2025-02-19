@@ -1,4 +1,7 @@
 import { z } from 'zod';
+import { type CastawayName } from './castaways';
+import { type TribeName } from './tribes';
+import { type LeagueMemberDisplayName } from './leagueMembers';
 
 // Base Events
 export const EventPointsZod = z.coerce.number()
@@ -34,14 +37,13 @@ export const AllBaseEventNames = [
   'elim', 'noVoteExit', 'tribeUpdate', 'otherNotes'] as const;
 export type BaseEventName = typeof AllBaseEventNames[number];
 
+export type BaseEventId = number;
 export type BaseEvent = {
-  baseEventId: number;
-  episode: number;
-  name: BaseEventName;
-  castaways: string[];
-  tribes: string[];
-  keywords: string[];
-  notes: string[];
+  eventName: BaseEventName,
+  castaways: CastawayName[],
+  tribes: TribeName[],
+  keywords: string[] | null,
+  notes: string[] | null
 };
 
 // League Events
@@ -57,7 +59,8 @@ export type LeagueEventType = typeof LeagueEventTypeOptions[number];
 export const EventTypeZod = z.enum(LeagueEventTypeOptions);
 
 export const LeaguePredictionTimingOptions = [
-  'Draft', 'Weekly', 'After Merge', 'Before Finale', 'Manual'] as const;
+  'Draft', 'Weekly', 'After Merge', 'Before Finale',
+  'Manual', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'] as const;
 export type LeagueEventTiming = typeof LeaguePredictionTimingOptions[number];
 export const EventTimingZod = z.enum(LeaguePredictionTimingOptions);
 
@@ -91,4 +94,26 @@ export type LeagueEventPrediction = LeagueEventRule & {
     referenceType: ReferenceType;
     referenceId: number;
   } | null
+};
+
+export type LeagueEventId = number;
+export type LeagueEventName = string;
+
+export type LeagueDirectEvent = {
+  eventName: LeagueEventName,
+  points: number,
+  referenceType: ReferenceType,
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+  referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
+  notes: string[] | null
+};
+
+export type LeaguePredictionEvent = {
+  eventName: LeagueEventName,
+  points: number,
+  referenceType: ReferenceType,
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+  referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
+  predictionMaker: LeagueMemberDisplayName,
+  notes: string[] | null
 };

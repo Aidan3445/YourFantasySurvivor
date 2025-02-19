@@ -102,7 +102,7 @@
     "prettier-plugin-tailwindcss": "^0.6.6",
     "server-only": "^0.0.1",
     "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.4",
+    "typescript": "^5.7.3",
     "typescript-eslint": "^7.18.0"
   },
   "ct3aMetadata": {

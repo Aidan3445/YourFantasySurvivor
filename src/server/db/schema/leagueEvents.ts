@@ -54,24 +54,12 @@ export const leagueEventsSchema = createTable(
     leagueEventId: serial('league_event_id').notNull().primaryKey(),
     leagueEventRuleId: integer('league_event_rule_id').notNull().references(() => leagueEventsRulesSchema.leagueEventRuleId, { onDelete: 'cascade' }),
     episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }),
+    referenceType: leagueEventReference('reference_type').notNull(),
+    referenceId: integer('reference_id').notNull(),
     notes: varchar('notes', { length: 256 }).array(),
   },
   (table) => [
     index().on(table.leagueEventRuleId),
     index().on(table.episodeId),
-  ]
-);
-
-export const leagueEventReferencesSchema = createTable(
-  'event_league_reference',
-  {
-    leagueEventReferenceId: serial('league_event_reference_id').notNull().primaryKey(),
-    leagueEventId: integer('league_event_id').notNull().references(() => leagueEventsSchema.leagueEventId, { onDelete: 'cascade' }),
-    referenceType: leagueEventReference('reference_type').notNull(),
-    referenceId: integer('reference_id').notNull(),
-  },
-  (table) => [
-    index().on(table.leagueEventId),
-    index().on(table.referenceId),
   ]
 );
