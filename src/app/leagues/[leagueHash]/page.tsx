@@ -1,5 +1,6 @@
 import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
 import MemberEditForm from '~/components/leagues/customization/memberEdit';
+import RecentActivity from '~/components/leagues/main/recentActivity';
 import Scoreboard from '~/components/leagues/main/scoreboard';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
@@ -16,7 +17,10 @@ export default async function LeaguePage() {
         </TabsList>
         <ScrollArea className='h-full w-full'>
           <TabsContent value='league'>
-            <Scoreboard />
+            <div className='flex flex-col gap-4 items-center w-full px-4 pb-12'>
+              <Scoreboard />
+              <RecentActivity />
+            </div>
           </TabsContent>
           <TabsContent value='member'>
             <MemberEditForm />

@@ -14,13 +14,13 @@ import { type CastawayName } from '~/server/db/defs/castaways';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 
 export default function Scoreboard() {
-  const { leagueScores } = useLeague();
+  const { leagueData } = useLeague();
 
-  const sortedMemberScores = Object.entries(leagueScores.scores.Member)
+  const sortedMemberScores = Object.entries(leagueData.scores.Member)
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
   return (
-    <section className='w-[calc(100%-2rem)] bg-card rounded-lg'>
+    <section className='w-full bg-card rounded-lg'>
       <Table>
         <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
         <TableHeader>
@@ -38,7 +38,7 @@ export default function Scoreboard() {
               place={index + 1}
               member={member}
               points={scores.slice().pop() ?? 0}
-              survivor={leagueScores.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None'}
+              survivor={leagueData.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None'}
             />
           ))}
         </TableBody>

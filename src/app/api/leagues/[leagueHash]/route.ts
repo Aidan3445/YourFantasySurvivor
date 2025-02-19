@@ -6,11 +6,11 @@ export async function GET(_: NextRequest, { params }: LeaguePageProps) {
   const { leagueHash } = await params;
   try {
     const leaguePromise = QUERIES.getLeague(leagueHash);
-    const leagueScoresPromise = QUERIES.getBaseEventScores(leagueHash);
+    const leagueDataPromise = QUERIES.getLeagueLiveData(leagueHash);
 
-    const [league, leagueScores] = await Promise.all([leaguePromise, leagueScoresPromise]);
+    const [league, leagueData] = await Promise.all([leaguePromise, leagueDataPromise]);
 
-    return NextResponse.json({ league, leagueScores }, { status: 200 });
+    return NextResponse.json({ league, leagueData }, { status: 200 });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });

@@ -16,10 +16,10 @@ import { type SeasonName } from '~/server/db/defs/seasons';
 import { type CastawayDraftInfo, type CastawayName } from '~/server/db/defs/castaways';
 import { tribesSchema } from '~/server/db/schema/tribes';
 import { type LeagueMemberDisplayName, type LeagueMemberColor } from '~/server/db/defs/leagueMembers';
-import { type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent } from '~/server/db/defs/events';
+import { type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent, type BaseEventRule } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import { type TribeName } from '~/server/db/defs/tribes';
-import { type EpisodeNumber } from '~/server/db/defs/episodes';
+import { type EpisodeAirStatus, type EpisodeNumber } from '~/server/db/defs/episodes';
 import { compileScores } from './[leagueHash]/scores';
 
 export const QUERIES = {
@@ -331,11 +331,12 @@ export const QUERIES = {
   /**
     * Get the next episode to air for the league's season
     * @param leagueHash - the hash of the league
-    * @returns the next episode to air
+    * @param count - the number of episodes to get, default 1
+    * @returns the episodes starting from the next episode to air 
+    * sorted by air date in descending order
     * @throws an error if the season does not exist
-    * @throws if there are no episodes that have not aired
     */
-  getNextEpisodeId: async function(leagueHash: LeagueHash) {
+  getEpisodes: async function(leagueHash: LeagueHash, count = 1) {
     const { memberId, league } = await leagueMemberAuth(leagueHash);
     // If the user is not a member of the league, throw an error
     if (!memberId || !league) {
@@ -343,77 +344,56 @@ export const QUERIES = {
     }
 
     return await db
-      .select({ episodeId: episodesSchema.episodeId })
+      .select({
+        episodeId: episodesSchema.episodeId,
+        episodeNumber: episodesSchema.episodeNumber,
+        episodeTitle: episodesSchema.title,
+        episodeAirDate: episodesSchema.airDate,
+        episodeRuntime: episodesSchema.runtime,
+      })
       .from(episodesSchema)
-      .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, episodesSchema.seasonId))
-      .where(eq(seasonsSchema.seasonId, league.leagueSeason))
-      .orderBy(asc(episodesSchema.airDate))
-      .limit(1)
-      .then((res) => res[0]?.episodeId);
+      .innerJoin(seasonsSchema, and(
+        eq(seasonsSchema.seasonId, episodesSchema.seasonId),
+        eq(seasonsSchema.seasonId, league.leagueSeason)))
+      .orderBy(desc(episodesSchema.airDate))
+      .then((res) => {
+        let nextEpisodeIndex = res.findIndex((episode) =>
+          new Date(`${episode.episodeAirDate} Z`) > new Date());
+        if (nextEpisodeIndex === -1) {
+          nextEpisodeIndex = 0;
+          res.unshift({
+            episodeId: -1,
+            episodeNumber: 0,
+            episodeTitle: 'No upcoming episodes',
+            episodeAirDate: new Date().toISOString(),
+            episodeRuntime: 0,
+          });
+        }
+        return res.slice(nextEpisodeIndex, nextEpisodeIndex + count)
+          .map((episode) => {
+            const airDate = new Date(`${episode.episodeAirDate} Z`);
+            const airStatus: EpisodeAirStatus = airDate > new Date() ? 'Upcoming' :
+              airDate.getTime() + episode.episodeRuntime * 60 * 1000 > new Date().getTime() ?
+                'Airing' : 'Aired';
+
+            return {
+              episodeId: episode.episodeId,
+              episodeNumber: episode.episodeNumber,
+              episodeTitle: episode.episodeTitle,
+              episodeAirDate: new Date(`${episode.episodeAirDate} Z`),
+              airStatus: airStatus,
+            };
+          });
+      });
   },
 
   /**
-    * Get the base event scores for a league
-    * @param leagueHash - the hash of the league
-    * @returns the base event scores for the league
-    * @throws an error if the user is not a member of the league
-    */
-  getBaseEventScores: async function(leagueHash: LeagueHash) {
-    const { memberId, league } = await leagueMemberAuth(leagueHash);
-    // If the user is not a member of the league, throw an error
-    if (!memberId || !league) {
-      throw new Error('User not a member of the league');
-    }
-
-    const baseEventRulesPromise = db
-      .select()
-      .from(baseEventRulesSchema)
-      .where(eq(baseEventRulesSchema.leagueId, league.leagueId))
-      .limit(1)
-      .then((rules) => rules[0]);
-
-    const leagueSettingsPromise = db
-      .select()
-      .from(leagueSettingsSchema)
-      .where(eq(leagueSettingsSchema.leagueId, league.leagueId))
-      .limit(1)
-      .then((settings) => settings[0]);
-
-    const [
-      baseEvents, tribes, elims, leagueEvents,
-      baseEventRules, selectionTimeline, leagueSettings
-    ] = await Promise.all([
-      SEASON_QUERIES.getBaseEvents(league.leagueSeason),
-      SEASON_QUERIES.getTribesTimeline(league.leagueSeason),
-      SEASON_QUERIES.getEliminations(league.leagueSeason),
-
-      QUERIES.getLeagueEvents(leagueHash),
-      baseEventRulesPromise,
-      QUERIES.getSelectionTimeline(leagueHash),
-      leagueSettingsPromise
-    ]);
-
-    if (!baseEventRules || !leagueSettings) {
-      throw new Error('League not found');
-    }
-
-    const scores = compileScores(
-      baseEvents, tribes, elims, leagueEvents,
-      baseEventRules, selectionTimeline, leagueSettings.survivalCap);
-
-    return {
-      scores,
-      selectionTimeline
-    };
-  },
-
-  /**
-    * Get the league events for a league
-    * @param leagueHash - the hash of the league
-    * @returns the league events for the league as a map of episode number to events
-    * split into direct and prediction events
-    * @throws an error if the user is not a member of the league
-    */
+   * Get the league events for a league
+   * @param leagueHash - the hash of the league
+   * @returns the league events for the league as a map of episode number to events
+   * split into direct and prediction events
+   * @throws an error if the user is not a member of the league
+   */
   getLeagueEvents: async function(leagueHash: LeagueHash) {
     const { memberId, league } = await leagueMemberAuth(leagueHash);
     // If the user is not a member of the league, throw an error
@@ -636,4 +616,68 @@ export const QUERIES = {
 
     return { memberCastaways, castawayMembers };
   },
+
+  /**
+    * Get the current score, event, and selection timeline for a league
+    * @param leagueHash - the hash of the league
+    * @returns the scores, selection timeline, and league
+    * @throws an error if the user is not a member of the league
+    */
+  getLeagueLiveData: async function(leagueHash: LeagueHash) {
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    const baseEventRulesPromise = db
+      .select()
+      .from(baseEventRulesSchema)
+      .where(eq(baseEventRulesSchema.leagueId, league.leagueId))
+      .limit(1)
+      .then((rules) => rules[0]);
+
+    const leagueSettingsPromise = db
+      .select()
+      .from(leagueSettingsSchema)
+      .where(eq(leagueSettingsSchema.leagueId, league.leagueId))
+      .limit(1)
+      .then((settings) => settings[0]);
+
+    const [
+      baseEvents, tribes, elims, leagueEvents, baseEventRules,
+      selectionTimeline, leagueSettings, episodes
+    ] = await Promise.all([
+      SEASON_QUERIES.getBaseEvents(league.leagueSeason),
+      SEASON_QUERIES.getTribesTimeline(league.leagueSeason),
+      SEASON_QUERIES.getEliminations(league.leagueSeason),
+
+      QUERIES.getLeagueEvents(leagueHash),
+      baseEventRulesPromise,
+      QUERIES.getSelectionTimeline(leagueHash),
+      leagueSettingsPromise,
+
+      QUERIES.getEpisodes(leagueHash, 100),
+    ]);
+
+    if (!baseEventRules || !leagueSettings) {
+      throw new Error('League not found');
+    }
+
+    const scores = compileScores(
+      baseEvents, tribes, elims, leagueEvents, baseEventRules,
+      selectionTimeline, leagueSettings.survivalCap);
+
+    return {
+      scores,
+      baseEvents,
+      tribes,
+      leagueEvents,
+      selectionTimeline,
+      episodes,
+      baseEventRules: baseEventRules as BaseEventRule,
+    };
+  },
+
+
 };

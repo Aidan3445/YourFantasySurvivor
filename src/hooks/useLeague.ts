@@ -6,11 +6,11 @@ import { type SWRKey } from '~/lib/utils';
 import { defaultBaseRules } from '~/server/db/defs/events';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
-export type LeagueScores = NonUndefined<Awaited<ReturnType<typeof QUERIES.getBaseEventScores>>>;
+export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagueLiveData>>>;
 
 type Response = {
   league: League,
-  leagueScores: LeagueScores
+  leagueData: LeagueData
 };
 
 const leagueFetcher: Fetcher<Response, SWRKey> = ({ leagueHash }) =>
@@ -23,7 +23,7 @@ export function useLeague() {
   const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher, { refreshInterval: 10000, revalidateOnMount: true });
 
   const league = data?.league;
-  const leagueScores = data?.leagueScores;
+  const leagueData = data?.leagueData;
 
   try {
     return {
@@ -33,9 +33,14 @@ export function useLeague() {
           ...league.settings,
           draftDate: league.settings.draftDate ? new Date(league.settings.draftDate) : null
         },
-        scores: leagueScores
       } : nonLeague,
-      leagueScores: leagueScores ?? emptyScores,
+      leagueData: leagueData ? {
+        ...leagueData,
+        episodes: leagueData.episodes.map(episode => ({
+          ...episode,
+          episodeAirDate: new Date(episode.episodeAirDate)
+        }))
+      } : emptyData,
       refresh: mutate
     };
   } catch {
@@ -62,15 +67,23 @@ const nonLeague: League = {
   },
 };
 
-const emptyScores: LeagueScores = {
+const emptyData: LeagueData = {
   scores: {
     Castaway: {},
     Tribe: {},
     Member: {}
   },
+  baseEvents: {},
+  tribes: {},
+  leagueEvents: {
+    directEvents: [],
+    predictionEvents: []
+  },
   selectionTimeline: {
     memberCastaways: {},
     castawayMembers: {}
-  }
+  },
+  episodes: [],
+  baseEventRules: defaultBaseRules
 };
 

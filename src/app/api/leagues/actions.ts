@@ -483,7 +483,8 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
     }, {} as Record<LeagueMemberId, CastawayId>)));
 
   // next episode id to air
-  const nextEpisodeIdPromise = QUERIES.getNextEpisodeId(leagueHash);
+  const nextEpisodePromise = QUERIES.getEpisodes(leagueHash)
+    .then((episodes) => episodes[0]);
 
   // draft order of the league
   const draftOrderPromise = db
@@ -497,7 +498,7 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
   const [surviving, selections, nextEpisode, draftOrder] = await Promise.all([
     survivingCastawaysPromise,
     currentSelectionsPromise,
-    nextEpisodeIdPromise,
+    nextEpisodePromise,
     draftOrderPromise
   ]);
 
@@ -516,7 +517,7 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
     .values({
       castawayId,
       memberId,
-      episodeId: nextEpisode,
+      episodeId: nextEpisode.episodeId,
       draft: isDraft,
     })
     .onConflictDoUpdate({
@@ -555,7 +556,7 @@ export async function makePrediction(
 
   if (!episodeId) {
     // Get the next episode to air
-    episodeId = await QUERIES.getNextEpisodeId(leagueHash);
+    episodeId = (await QUERIES.getEpisodes(leagueHash))?.pop()?.episodeId;
     if (!episodeId) throw new Error('Next episode not found');
   }
 
