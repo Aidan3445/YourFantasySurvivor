@@ -186,7 +186,7 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
           name='referenceId'
           render={({ field }) => (
             <FormItem className='w-full p-2'>
-              <FormLabel hidden>Prediction</FormLabel>
+              <FormLabel className='sr-only'>Prediction</FormLabel>
               <FormControl>
                 <Select
                   onValueChange={field.onChange}

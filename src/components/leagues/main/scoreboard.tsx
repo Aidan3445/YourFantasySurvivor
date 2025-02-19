@@ -1,11 +1,69 @@
+'use client';
+
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '~/components/ui/table';
+import { useLeague } from '~/hooks/useLeague';
+import { type CastawayName } from '~/server/db/defs/castaways';
+import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+
 export default function Scoreboard() {
+  const { leagueScores } = useLeague();
+
+  const sortedMemberScores = Object.entries(leagueScores.scores.Member)
+    .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
+
   return (
-    <div className='flex flex-col gap-4 items-center w-full px-4 pb-12'>
-      Scoreboard
-      <br />
-      Make Predictions
-      <br />
-      League Settings/Scoring
-    </div>
+    <section className='w-[calc(100%-2rem)] bg-card rounded-lg'>
+      <Table>
+        <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
+        <TableHeader>
+          <TableRow className='bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
+            <TableHead className=' rounded-tl-md'>Place</TableHead>
+            <TableHead>Points</TableHead>
+            <TableHead>Member</TableHead>
+            <TableHead className='text-right rounded-tr-md'>Survivor</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedMemberScores.map(([member, scores], index) => (
+            <MemberRow
+              key={index}
+              place={index + 1}
+              member={member}
+              points={scores.slice().pop() ?? 0}
+              survivor={leagueScores.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None'}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </section>
+  );
+}
+
+interface MemberRowProps {
+  place: number;
+  member: LeagueMemberDisplayName;
+  points: number;
+  survivor: CastawayName;
+  //color: string;
+}
+
+function MemberRow(
+  { place, member, points, survivor }: MemberRowProps
+) {
+  return (
+    <TableRow>
+      <TableCell className='rounded-bl-md'>{place}</TableCell>
+      <TableCell>{points}</TableCell>
+      <TableCell>{member}</TableCell>
+      <TableCell className='text-right rounded-br-md'>{survivor}</TableCell>
+    </TableRow>
   );
 }

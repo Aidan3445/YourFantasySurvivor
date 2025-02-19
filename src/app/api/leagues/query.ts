@@ -394,12 +394,17 @@ export const QUERIES = {
     ]);
 
     if (!baseEventRules || !leagueSettings) {
-      return {};
+      throw new Error('League not found');
     }
 
-    return compileScores(
+    const scores = compileScores(
       baseEvents, tribes, elims, leagueEvents,
       baseEventRules, selectionTimeline, leagueSettings.survivalCap);
+
+    return {
+      scores,
+      selectionTimeline
+    };
   },
 
   /**

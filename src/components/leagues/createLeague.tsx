@@ -224,8 +224,8 @@ export function CreateLeagueModal({ children }: CreateLeagueModalProps) {
       </AlertDialogTrigger>
       <AlertDialogContent className='w-min'>
         <AlertDialogHeader>
-          <AlertDialogTitle hidden>Create a New League</AlertDialogTitle>
-          <AlertDialogDescription hidden>
+          <AlertDialogTitle className='sr-only'>Create a New League</AlertDialogTitle>
+          <AlertDialogDescription className='sr-only'>
             Create a new league to start drafting with your friends.
           </AlertDialogDescription>
           <CreateLeagueForm onSubmit={() => setIsOpen(false)} />

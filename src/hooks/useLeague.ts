@@ -21,9 +21,9 @@ export function useLeague() {
   const { leagueHash } = useParams();
 
   const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher, { refreshInterval: 10000, revalidateOnMount: true });
-  const { league, leagueScores } = data ?? {};
 
-  console.log(leagueScores);
+  const league = data?.league;
+  const leagueScores = data?.leagueScores;
 
   try {
     return {
@@ -32,8 +32,10 @@ export function useLeague() {
         settings: {
           ...league.settings,
           draftDate: league.settings.draftDate ? new Date(league.settings.draftDate) : null
-        }
+        },
+        scores: leagueScores
       } : nonLeague,
+      leagueScores: leagueScores ?? emptyScores,
       refresh: mutate
     };
   } catch {
@@ -57,7 +59,18 @@ const nonLeague: League = {
     draftDate: null,
     draftOrder: [],
     survivalCap: 5
-  }
+  },
 };
 
+const emptyScores: LeagueScores = {
+  scores: {
+    Castaway: {},
+    Tribe: {},
+    Member: {}
+  },
+  selectionTimeline: {
+    memberCastaways: {},
+    castawayMembers: {}
+  }
+};
 

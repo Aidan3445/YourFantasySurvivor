@@ -160,7 +160,7 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
                 placeholder='Enter the name of the event'
                 {...field} />
             </FormControl>
-            <FormDescription hidden>
+            <FormDescription className='sr-only'>
               The name of the event that will be scored in this league.
             </FormDescription>
             <FormMessage />
@@ -177,7 +177,7 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
                 placeholder='Points awarded to...'
                 {...field} />
             </FormControl>
-            <FormDescription hidden>
+            <FormDescription className='sr-only'>
               A description of the event that will be scored in this league.
             </FormDescription>
             <FormMessage />
@@ -197,7 +197,7 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
                   placeholder='Points'
                   {...field} />
               </FormControl>
-              <FormDescription hidden>
+              <FormDescription className='sr-only'>
                 Points awarded for this event.
               </FormDescription>
               <FormMessage />
@@ -225,7 +225,7 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
                   </SelectContent>
                 </Select>
               </FormControl>
-              <FormDescription hidden>
+              <FormDescription className='sr-only'>
                 How this event will be scored.
               </FormDescription>
               <FormMessage />
@@ -250,7 +250,7 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
                   modalPopover
                   placeholder='Select prediction timing' />
               </FormControl>
-              <FormDescription hidden>
+              <FormDescription className='sr-only'>
                 When this event will be scored.
               </FormDescription>
               <FormMessage />
@@ -333,7 +333,7 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
                       <Button type='submit' variant='destructive'>Delete Event</Button>
                     </form>
                   </AlertDialogTitle>
-                  <AlertDialogDescription hidden>
+                  <AlertDialogDescription className='sr-only'>
                     Edit the event details or delete the event.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
