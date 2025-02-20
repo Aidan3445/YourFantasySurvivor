@@ -30,7 +30,7 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
     resolver: zodResolver(formSchema),
   });
 
-  const availableCastaways = castaways;//.filter(castaway => !castaway.pickedBy);
+  const availableCastaways = castaways.filter(castaway => !castaway.pickedBy);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
@@ -88,34 +88,3 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
     </Form >
   );
 }
-
-/*
-    <AlertDialog defaultOpen>
-      <AlertDialogTrigger asChild>
-        <Button>Make your pick!</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent >
-        <AlertDialogHeader>
-          <AlertDialogTitle>Choose your castaway!</AlertDialogTitle>
-        </AlertDialogHeader>
-        <AlertDialogDescription>
-          This castaway will earn you points based on their performance in the game.
-          <br />
-          Additionally you will earn points for each successive episode they
-          survive (i.e one point for the first episode, two for the second, etc.)
-          {survivalCap ? ` up to a maximum of ${survivalCap} points.` : '.'}
-          <br />
-          When they are voted out you will select from the remaining castaways.
-        </AlertDialogDescription>
-            <AlertDialogFooter className='w-full'>
-              <AlertDialogAction asChild>
-                <Button
-                  onClick={() => console.log(formSchema.parse(reactForm.watch()))}
-                  //disabled={!formSchema.safeParse(reactForm.watch())?.success}
-                  className='w-full'
-                  type='submit'>Submit Pick</Button>
-              </AlertDialogAction>
-            </AlertDialogFooter> 
-      </AlertDialogContent>
-    </AlertDialog >
-*/

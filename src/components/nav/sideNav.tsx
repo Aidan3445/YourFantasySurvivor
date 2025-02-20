@@ -120,7 +120,6 @@ function SideNavLeagues() {
                   href='/leagues'
                   label='View All Leagues' />
               )}
-
             <CreateLeagueModal>
               <SidebarMenuButton asChild size='lg'>
                 <span className='w-full flex gap-5 items-center transition-all'>

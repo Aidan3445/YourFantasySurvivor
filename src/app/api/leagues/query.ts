@@ -11,15 +11,18 @@ import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSche
 import { auth } from '@clerk/nextjs/server';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
-import { type LeagueStatus, type LeagueHash, type LeagueName } from '~/server/db/defs/leagues';
-import { type SeasonName } from '~/server/db/defs/seasons';
-import { type CastawayDraftInfo, type CastawayName } from '~/server/db/defs/castaways';
+import type { LeagueStatus, LeagueHash, LeagueName } from '~/server/db/defs/leagues';
+import type { SeasonName } from '~/server/db/defs/seasons';
+import type { CastawayDraftInfo, CastawayName } from '~/server/db/defs/castaways';
 import { tribesSchema } from '~/server/db/schema/tribes';
-import { type LeagueMemberDisplayName, type LeagueMemberColor } from '~/server/db/defs/leagueMembers';
-import { type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent, type BaseEventRule, LeagueEventId, LeagueEventName } from '~/server/db/defs/events';
+import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/server/db/defs/leagueMembers';
+import type {
+  LeagueEventPrediction, LeagueDirectEvent, ReferenceType, LeaguePredictionEvent,
+  BaseEventRule, LeagueEventId, LeagueEventName
+} from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
-import { type TribeName } from '~/server/db/defs/tribes';
-import { type EpisodeAirStatus, type EpisodeNumber } from '~/server/db/defs/episodes';
+import type { TribeName } from '~/server/db/defs/tribes';
+import type { EpisodeAirStatus, EpisodeNumber } from '~/server/db/defs/episodes';
 import { compileScores } from './[leagueHash]/scores';
 
 export const QUERIES = {
@@ -557,6 +560,7 @@ export const QUERIES = {
       .select({
         episodeNumber: episodesSchema.episodeNumber,
         leagueMember: leagueMembersSchema.displayName,
+        color: leagueMembersSchema.color,
         castaway: castawaysSchema.fullName,
         draft: selectionUpdatesSchema.draft,
       })
@@ -649,19 +653,21 @@ export const QUERIES = {
       .then((settings) => settings[0]);
 
     const [
-      baseEvents, tribes, elims, leagueEvents, baseEventRules,
+      baseEvents, tribes, elims, castaways,
+      leagueEvents, baseEventRules,
       selectionTimeline, leagueSettings, episodes
     ] = await Promise.all([
       SEASON_QUERIES.getBaseEvents(league.leagueSeason),
       SEASON_QUERIES.getTribesTimeline(league.leagueSeason),
       SEASON_QUERIES.getEliminations(league.leagueSeason),
+      SEASON_QUERIES.getCastaways(league.leagueSeason),
 
       QUERIES.getLeagueEvents(leagueHash),
       baseEventRulesPromise,
       QUERIES.getSelectionTimeline(leagueHash),
       leagueSettingsPromise,
 
-      QUERIES.getEpisodes(leagueHash, 100),
+      QUERIES.getEpisodes(leagueHash, 100), // move to seasons
     ]);
 
     if (!baseEventRules || !leagueSettings) {
@@ -676,6 +682,7 @@ export const QUERIES = {
       scores,
       baseEvents,
       tribes,
+      castaways,
       leagueEvents,
       selectionTimeline,
       episodes,

@@ -55,7 +55,6 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
       await fetch(`/api/leagues/${leagueHash}/join`)
         .then(res => res.json())
         .then(({ memberColors }: { memberColors: LeagueMemberColor[] }) => {
-          console.log(memberColors);
           setMemberColors(memberColors);
         });
     }

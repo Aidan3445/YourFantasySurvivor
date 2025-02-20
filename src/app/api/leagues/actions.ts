@@ -254,9 +254,7 @@ export async function updateBaseEventRules(leagueHash: LeagueHash, rules: BaseEv
     .from(leaguesSchema)
     .where(and(
       eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId),
-      eq(leaguesSchema.leagueHash, leagueHash)))
-    .returning({ rules: baseEventRulesSchema })
-    .then((res) => console.log(res));
+      eq(leaguesSchema.leagueHash, leagueHash)));
 }
 
 /**

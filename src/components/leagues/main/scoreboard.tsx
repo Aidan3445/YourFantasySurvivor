@@ -10,40 +10,50 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { useLeague } from '~/hooks/useLeague';
-import { type CastawayName } from '~/server/db/defs/castaways';
+import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+import { ColorRow } from '../draftOrder';
+import { Circle, History } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
+import { PopoverArrow } from '@radix-ui/react-popover';
+import { useIsMobile } from '~/hooks/useMobile';
 
 export default function Scoreboard() {
-  const { leagueData } = useLeague();
+  const { leagueData, league } = useLeague();
 
   const sortedMemberScores = Object.entries(leagueData.scores.Member)
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
   return (
-    <section className='w-full bg-card rounded-lg'>
-      <Table>
-        <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
-        <TableHeader>
-          <TableRow className='bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
-            <TableHead className=' rounded-tl-md'>Place</TableHead>
-            <TableHead>Points</TableHead>
-            <TableHead>Member</TableHead>
-            <TableHead className='text-right rounded-tr-md text-nowrap'>Survivor</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedMemberScores.map(([member, scores], index) => (
+    <Table className='bg-card rounded-lg overflow-clip gap-0'>
+      <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
+      <TableHeader>
+        <TableRow className='bg-white px-4'>
+          <TableHead className='text-center w-0'>Place</TableHead>
+          <TableHead className='text-center w-0'>Points</TableHead>
+          <TableHead className='text-center'>Member</TableHead>
+          <TableHead className='text-center w-0'>Survivor</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {sortedMemberScores.map(([member, scores], index) => {
+          const color = league.members.list.find((m) => m.displayName === member)?.color ?? '#ffffff';
+          const survivorName = leagueData.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None';
+          const survivor = leagueData.castaways.find((c) => c.fullName === survivorName)!;
+          return (
             <MemberRow
               key={index}
               place={index + 1}
               member={member}
               points={scores.slice().pop() ?? 0}
-              survivor={leagueData.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None'}
+              survivor={survivor}
+              color={color}
+              selectionTimeline={leagueData.selectionTimeline.memberCastaways[member] ?? []}
             />
-          ))}
-        </TableBody>
-      </Table>
-    </section>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }
 
@@ -51,19 +61,73 @@ interface MemberRowProps {
   place: number;
   member: LeagueMemberDisplayName;
   points: number;
-  survivor: CastawayName;
-  //color: string;
+  survivor: CastawayDetails;
+  color: string;
+  selectionTimeline: (CastawayName | null)[];
 }
 
-function MemberRow(
-  { place, member, points, survivor }: MemberRowProps
-) {
+function MemberRow({ place, member, points, survivor, color, selectionTimeline }: MemberRowProps) {
+  const isMobile = useIsMobile();
+
+  const condensedTimeline = selectionTimeline.reduce((acc, castaway) => {
+    if (castaway === null) return acc;
+    if (acc.length === 0) return [castaway];
+    if (acc[acc.length - 1] === castaway) return acc;
+    return [...acc, castaway];
+  }, [] as CastawayName[]);
+
+
   return (
     <TableRow>
-      <TableCell className='rounded-bl-md'>{place}</TableCell>
-      <TableCell>{points}</TableCell>
-      <TableCell>{member}</TableCell>
-      <TableCell className='text-right rounded-br-md'>{survivor}</TableCell>
+      <TableCell>
+        <ColorRow className='justify-center p-0' color={color}>
+          {place}
+        </ColorRow>
+      </TableCell>
+      <TableCell>
+        <ColorRow className='justify-center p-0' color={color}>
+          {points}
+        </ColorRow>
+      </TableCell>
+      <TableCell className='text-nowrap'>
+        <ColorRow className='justify-center' color={color}>
+          {member}
+        </ColorRow>
+      </TableCell>
+      <TableCell className='text-nowrap'>
+        <ColorRow className='justify-center' color={survivor.eliminatedEpisode
+          ? '#AAAAAA' : survivor.startingTribe.tribeColor}>
+          {isMobile ? survivor.shortName : survivor.fullName}
+          {survivor.tribes.length + condensedTimeline.length > 2 &&
+            <div className='flex gap-0.5'>
+              {survivor.tribes.length > 1 && survivor.tribes.map((tribe) => (
+                <Popover key={tribe.tribeName}>
+                  <PopoverTrigger>
+                    <Circle size={16} fill={tribe.tribeColor} />
+                  </PopoverTrigger>
+                  <PopoverContent className='w-min text-nowrap p-1'>
+                    <PopoverArrow />
+                    {tribe.tribeName} - Episode {tribe.episode}
+                  </PopoverContent>
+                </Popover>
+              ))}
+              {condensedTimeline.length > 1 &&
+                <Popover>
+                  <PopoverTrigger className='ml-2'>
+                    <History size={16} />
+                  </PopoverTrigger>
+                  <PopoverContent className='w-min p-1 space-y-1 pt-0'>
+                    <PopoverArrow />
+                    {condensedTimeline.map((castaway, index) => (
+                      <ColorRow key={index} color='#FFFFFF'>
+                        {castaway}
+                      </ColorRow>
+                    ))}
+                  </PopoverContent>
+                </Popover>}
+            </div>}
+        </ColorRow>
+      </TableCell>
     </TableRow>
   );
 }

@@ -1,5 +1,4 @@
 import { type LeagueMemberDisplayName } from './leagueMembers';
-import { type SeasonName } from './seasons';
 import { type Tribe, type TribeEp, type TribeName } from './tribes';
 
 export type CastawayId = number;
@@ -10,18 +9,12 @@ export type CastawayResidence = string;
 export type CastawayOccupation = string;
 
 export interface CastawayDetails {
-  castawayId: CastawayId;
+  fullName: CastawayName;
   shortName: CastawayName;
-  tribes: TribeEp[];
   startingTribe: TribeEp;
-  details: {
-    fullName: CastawayName;
-    age: CastawayAge;
-    hometown: CastawayHometown;
-    residence: CastawayResidence;
-    occupation: CastawayOccupation;
-    season: SeasonName;
-  };
+  tribes: TribeEp[];
+  imageUrl: CastawayImage;
+  eliminatedEpisode: number | null;
 }
 
 export type CastawayImage = string;

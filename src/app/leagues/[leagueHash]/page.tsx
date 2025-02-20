@@ -1,12 +1,16 @@
-import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
 import MemberEditForm from '~/components/leagues/customization/memberEdit';
+import Chart from '~/components/leagues/main/chart';
 import RecentActivity from '~/components/leagues/main/recentActivity';
 import Scoreboard from '~/components/leagues/main/scoreboard';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { leagueMemberAuth } from '~/lib/auth';
+import { type LeaguePageProps } from './layout';
 
 
-export default async function LeaguePage() {
+export default async function LeaguePage({ params }: LeaguePageProps) {
+  const { leagueHash } = await params;
+  const { role } = await leagueMemberAuth(leagueHash);
   return (
     <main className='flex flex-col gap-0 w-full p-4 pb-0'>
       <Tabs
@@ -14,22 +18,24 @@ export default async function LeaguePage() {
         defaultValue='league'>
         <TabsList className='sticky z-50 top-0 grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
           <TabsTrigger value='league'>League</TabsTrigger>
+          {role !== 'Member' && <TabsTrigger value='score'>Score Events</TabsTrigger>}
         </TabsList>
         <ScrollArea className='h-full w-full'>
           <TabsContent value='league'>
-            <div className='flex flex-col gap-4 items-center w-full px-4 pb-12'>
-              <Scoreboard />
+            <div className='flex flex-col gap-4 w-full px-4 pb-12'>
+              <span className='flex max-lg:flex-wrap gap-4 items-center'>
+                <Scoreboard />
+                <Chart />
+              </span>
               <RecentActivity />
             </div>
           </TabsContent>
-          <TabsContent value='member'>
+          <TabsContent value='settings'>
             <MemberEditForm />
-            Leave League
-            <LeagueSettings />
           </TabsContent>
           <ScrollBar orientation='vertical' />
         </ScrollArea>
       </Tabs>
-    </main>
+    </main >
   );
 }

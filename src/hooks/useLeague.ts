@@ -75,6 +75,7 @@ const emptyData: LeagueData = {
   },
   baseEvents: {},
   tribes: {},
+  castaways: [],
   leagueEvents: {
     directEvents: [],
     predictionEvents: []

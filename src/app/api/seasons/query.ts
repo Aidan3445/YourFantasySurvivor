@@ -2,14 +2,15 @@ import { aliasedTable, and, desc, eq, inArray } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
-import { type CastawayName } from '~/server/db/defs/castaways';
+import { type CastawayImage, type CastawayDetails, type CastawayName } from '~/server/db/defs/castaways';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type BaseEvent, type BaseEventId } from '~/server/db/defs/events';
+import { type BaseEventName, type BaseEvent, type BaseEventId } from '~/server/db/defs/events';
 import { type SeasonId } from '~/server/db/defs/seasons';
-import { type TribeName, type TribeUpdate } from '~/server/db/defs/tribes';
+import { type TribeEp, type TribeName, type TribeUpdate } from '~/server/db/defs/tribes';
 import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { episodesSchema } from '~/server/db/schema/episodes';
+import { seasonsSchema } from '~/server/db/schema/seasons';
 import { tribesSchema } from '~/server/db/schema/tribes';
 
 export const QUERIES = {
@@ -129,5 +130,83 @@ export const QUERIES = {
 
         return acc;
       }, [] as CastawayName[][]));
+  },
+
+  /**
+    * Get the castaways for the season
+    * @param seasonId The season to get castaways from
+    * @returns The castaways for the season
+    */
+  getCastaways: async function(seasonId: SeasonId) {
+    const castawayReference = aliasedTable(baseEventReferenceSchema, 'castawayReference');
+    const tribeReference = aliasedTable(baseEventReferenceSchema, 'tribeReference');
+
+    const rows = await db
+      .select({
+        fullName: castawaysSchema.fullName,
+        shortName: castawaysSchema.shortName,
+        startingTribe: {
+          tribeName: tribesSchema.tribeName,
+          tribeColor: tribesSchema.tribeColor,
+          episode: episodesSchema.episodeNumber
+        },
+        imageUrl: castawaysSchema.imageUrl,
+        episodeNumber: episodesSchema.episodeNumber,
+        eventName: baseEventsSchema.eventName
+      })
+      .from(castawaysSchema)
+      .innerJoin(castawayReference, and(
+        eq(castawaysSchema.castawayId, castawayReference.referenceId),
+        eq(castawayReference.referenceType, 'Castaway')))
+      .innerJoin(baseEventsSchema, and(
+        eq(baseEventsSchema.baseEventId, castawayReference.baseEventId),
+        inArray(baseEventsSchema.eventName, ['tribeUpdate', 'elim', 'noVoteExit'])))
+      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventsSchema.episodeId))
+      .innerJoin(seasonsSchema, and(
+        eq(seasonsSchema.seasonId, castawaysSchema.seasonId),
+        eq(seasonsSchema.seasonId, seasonId)))
+      .leftJoin(tribeReference, and(
+        eq(tribeReference.baseEventId, baseEventsSchema.baseEventId),
+        eq(tribeReference.referenceType, 'Tribe')))
+      .leftJoin(tribesSchema, eq(tribeReference.referenceId, tribesSchema.tribeId))
+      .then((rows: {
+        fullName: CastawayName,
+        shortName: CastawayName,
+        startingTribe: TribeEp,
+        imageUrl: CastawayImage,
+        episodeNumber: EpisodeNumber,
+        eventName: BaseEventName
+      }[]) => rows.sort((a, b) => {
+        // sort tribe updates first then eliminations
+        if (a.eventName !== 'tribeUpdate' && b.eventName === 'tribeUpdate') {
+          return 1;
+        } else if (a.eventName === 'tribeUpdate' && b.eventName !== 'tribeUpdate') {
+          return -1;
+        } else {
+          // each by episode number ascending
+          return a.episodeNumber - b.episodeNumber;
+        }
+      }));
+
+    const castawaysWithTribes = rows.reduce((acc, row) => {
+      const castaway = acc[row.fullName] ?? {
+        fullName: row.fullName,
+        shortName: row.shortName,
+        startingTribe: row.startingTribe,
+        tribes: [] as TribeEp[],
+        imageUrl: row.imageUrl,
+        eliminatedEpisode: null
+      };
+      if (row.eventName === 'tribeUpdate') {
+        castaway.tribes.push(row.startingTribe);
+      } else {
+        castaway.eliminatedEpisode = row.episodeNumber;
+      }
+      acc[row.fullName] = castaway;
+      return acc;
+    }, {} as Record<string, CastawayDetails>);
+
+    return Object.values(castawaysWithTribes).sort(
+      (a, b) => a.startingTribe.tribeName.localeCompare(b.startingTribe.tribeName));
   }
 };
