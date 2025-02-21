@@ -6,7 +6,7 @@ export const castaways = createTable(
   'castaway',
   {
     castawayId: serial('castaway_id').notNull().primaryKey(),
-    name: varchar('name', { length: 64 }).notNull(),
+    name: varchar('full_name', { length: 64 }).notNull(),
     shortName: varchar('short_name', { length: 16 }).notNull(),
     age: smallint('age').notNull(),
     hometown: varchar('hometown', { length: 128 }).notNull().default('Unknown'),

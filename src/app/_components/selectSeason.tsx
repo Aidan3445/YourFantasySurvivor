@@ -46,7 +46,7 @@ export default function SelectSeason({ className, initSeason }: SelectSeasonProp
   // if select default then set the first season as default
   if (initSeason && !season) {
     season = seasons[0] ?? '';
-    initSeason?.(season);
+    //initSeason?.(season);
   }
 
   return (
