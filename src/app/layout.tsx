@@ -16,7 +16,7 @@ const inter = Inter({
 export const metadata = {
   title: 'Your Fantasy Survivor',
   description: 'A fantasy league for the TV show Survivor',
-  icons: [{ rel: 'icon', url: '/favicon.ico' }],
+  icons: [{ rel: 'icon', url: '/Icon.ico' }],
 };
 
 interface RootLayoutProps {

@@ -579,10 +579,10 @@ export const QUERIES = {
       const latestUpdateEpisode = acc[row.leagueMember]!.length;
       // get previous selection if it exists
       const previousSelection = acc[row.leagueMember]![latestUpdateEpisode - 1];
-      if (previousSelection) {
+      if (previousSelection !== undefined) {
         // fill in the episodes between
         acc[row.leagueMember]!.push(...Array(row.episodeNumber - latestUpdateEpisode)
-          .fill(previousSelection) as CastawayName[]);
+          .fill(previousSelection) as (CastawayName | null)[]);
       }
       // add the new selection
       acc[row.leagueMember]!.push(row.castaway);
@@ -596,29 +596,27 @@ export const QUERIES = {
 
     /* castawayMembers holds an array of which members selected each castaway each episode */
     const castawayMembers = selectionUpdates.reduce((acc, row) => {
-      const latestUpdateEpisode = acc[row.castaway] ? acc[row.castaway]!.length : 0;
-      // castaways, unlike members may not be selected at the start of the season
-      // so fill in the episodes between the start and the first selection
-      acc[row.castaway] ??= Array(row.episodeNumber - 1).fill(null);
-      // get the previous selection if it exists
-      const previousSelection = acc[row.castaway]![latestUpdateEpisode - 1];
-      if (previousSelection) {
-        // fill in the episodes between
-        acc[row.castaway]!.push(...Array(row.episodeNumber - latestUpdateEpisode)
-          .fill(previousSelection) as LeagueMemberDisplayName[]);
-      }
+      acc[row.castaway] ??= [];
+      const latestUpdateEpisode = acc[row.castaway]!.length - 1;
+      // get previous selection if it exists or null if this is the first time 
+      // a member picked up this castaway
+      const previousSelector = acc[row.castaway]![latestUpdateEpisode] ?? null;
+      // fill in the episodes between
+      acc[row.castaway]!.push(...Array(Math.max(row.episodeNumber - latestUpdateEpisode - 1, 0))
+        .fill(previousSelector) as (LeagueMemberDisplayName | null)[]);
       // add the new selection
-      acc[row.castaway]!.push(row.leagueMember);
+      acc[row.castaway]![row.episodeNumber] = row.leagueMember;
 
-      // for castaways we want to track when they are 'free agents'
-      // so update the previous selection from the member to null
-      const previousSelector = memberCastaways[row.leagueMember]?.[row.episodeNumber - 1];
-      if (previousSelector === row.castaway) {
-        // safe to assert defined since this selection updates are sorted by episodeNumber
-        acc[previousSelector]!.push(...Array(row.episodeNumber - latestUpdateEpisode)
-          .fill(row.leagueMember) as LeagueMemberDisplayName[]);
-        acc[previousSelector]!.push(null);
+      // castaways, unlike members, can be dropped by players
+      const previousSelection = memberCastaways[row.leagueMember]![row.episodeNumber - 1];
+      if (previousSelection && previousSelection !== row.castaway) {
+        // fill in the episodes between
+        acc[previousSelection]!.push(...Array(Math.max(row.episodeNumber - acc[previousSelection]!.length, 0))
+          .fill(row.leagueMember) as (LeagueMemberDisplayName | null)[]);
+        // insert the null to indicate the castaway was dropped
+        acc[previousSelection]!.push(null);
       }
+
       return acc;
     }, {} as Record<CastawayName, (LeagueMemberDisplayName | null)[]>);
 

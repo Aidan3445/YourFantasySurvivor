@@ -140,12 +140,14 @@ export function compileScores(
       // get the castaways who were eliminated at any point before this episode
       const eliminated = eliminations.slice(0, episodeNumber + 1).flat();
       // get the castaways who were selected by this member at this episode
-      const mcIndex = Math.min(episodeNumber - 1, castaways.length - 1);
+      const mcIndex = Math.min(episodeNumber, castaways.length - 1);
       // if the castaway selected has been eliminated set the streak to 0
       // note this has the side effect of ensuring that streaks end when
       // a member is out of castaways to select
       if (eliminated.includes(castaways[mcIndex] ?? '')) {
         streak = 0;
+        if (member === 'Aidan')
+          console.log('eliminated', member, episodeNumber, castaways[mcIndex], eliminated);
         continue;
       }
       // increment the streak and add the bonus to the member's score
@@ -154,6 +156,8 @@ export function compileScores(
       scores.Member[member] ??= [];
       scores.Member[member][episodeNumber] ??= 0;
       scores.Member[member][episodeNumber]! += bonus;
+      if (member === 'Aidan') console.log('bonus', bonus, member, episodeNumber, castaways[mcIndex],
+        scores.Member[member].join(', '), eliminated);
     }
   });
 

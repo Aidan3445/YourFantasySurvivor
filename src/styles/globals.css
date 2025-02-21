@@ -122,6 +122,14 @@ body  {
   @apply h-svh;
 }
 
+.cl-signUp-start, .cl-signIn-start {
+  @apply pt-0;
+}
+
+.cl-logoBox {
+  @apply h-44;
+}
+
 /* Sidebar */
 @layer base { 
   :root {

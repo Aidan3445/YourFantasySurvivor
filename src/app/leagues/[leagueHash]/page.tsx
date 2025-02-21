@@ -6,6 +6,7 @@ import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { leagueMemberAuth } from '~/lib/auth';
 import { type LeaguePageProps } from './layout';
+import ChangeSurvivor from '~/components/leagues/main/changeSurvivor';
 
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
@@ -27,6 +28,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
                 <Scoreboard />
                 <Chart />
               </span>
+              <ChangeSurvivor />
               <RecentActivity />
             </div>
           </TabsContent>

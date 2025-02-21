@@ -1,20 +1,26 @@
 import JoinLeagueForm from '~/components/leagues/joinLeague';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
-import { SignUp } from '@clerk/nextjs';
+import { SignIn, SignUp } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { leagueMemberAuth } from '~/lib/auth';
 import { Button } from '~/components/ui/button';
 import Link from 'next/link';
 
-export default async function LeagueJoinPage({ params }: LeaguePageProps) {
-  const { leagueHash } = await params;
+interface JoinPageProps extends LeaguePageProps {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export default async function LeagueJoinPage({ searchParams, params }: JoinPageProps) {
+  const [{ leagueHash }, query] = await Promise.all([params, searchParams]);
   const { userId, memberId, league } = await leagueMemberAuth(leagueHash);
 
   if (!userId) {
     return (
-      <main className='w-full'>
-        <h1 className='text-3xl'>Sign in to join the League</h1>
-        <SignUp forceRedirectUrl={`/i/${leagueHash}`} />
+      <main className='w-full flex justify-center mt-2'>
+        {query?.SignUp ?
+          <SignUp forceRedirectUrl={`/i/${leagueHash}`} signInUrl={`/i/${leagueHash}`} /> :
+          <SignIn forceRedirectUrl={`/i/${leagueHash}`} signUpUrl={`/i/${leagueHash}?SignUp=true`} />
+        }
       </main>
     );
   }

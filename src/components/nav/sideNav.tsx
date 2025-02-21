@@ -114,12 +114,11 @@ function SideNavLeagues() {
                   label={league.leagueName} />
               ))}
             <Separator />
-            {leagues.length > 5 ||
-              leagues.some(league => league.leagueStatus === 'Inactive') && (
-                <SideNavLink
-                  href='/leagues'
-                  label='View All Leagues' />
-              )}
+            {leagues.some(league => league.leagueStatus === 'Inactive') && (
+              <SideNavLink
+                href='/leagues'
+                label='View All Leagues' />
+            )}
             <CreateLeagueModal>
               <SidebarMenuButton asChild size='lg'>
                 <span className='w-full flex gap-5 items-center transition-all'>

@@ -156,7 +156,7 @@ function EpisodeEvents({ episodeNumber }: EpisodeEventsProps) {
       baseEvents,
       selectionTimeline,
       leagueEvents,
-      baseEventRules
+      baseEventRules,
     }
   } = useLeague();
 
