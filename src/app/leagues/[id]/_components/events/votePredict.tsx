@@ -67,7 +67,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
           if (id) submitData.weeklyVotes.castaway[event.id] = id;
           break;
         case 'tribe':
-          id = tribes.find((tribe) => tribe.name === data.weeklyVote[index])?.id;
+          id = tribes.find((tribe) => tribe.name === data.weeklyVote[index])?.tribeId;
           if (id) submitData.weeklyVotes.tribe[event.id] = id;
           break;
         case 'member':
@@ -85,7 +85,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
           if (id) submitData.weeklyPredicts.castaway[event.id] = id;
           break;
         case 'tribe':
-          id = tribes.find((tribe) => tribe.name === data.weeklyPredict[index])?.id;
+          id = tribes.find((tribe) => tribe.name === data.weeklyPredict[index])?.tribeId;
           if (id) submitData.weeklyPredicts.tribe[event.id] = id;
           break;
         case 'member':
@@ -103,7 +103,7 @@ export default function VotePredict({ leagueId, events, castaways, tribes, membe
           if (id) submitData.seasonPredicts.castaway[event.id] = id;
           break;
         case 'tribe':
-          id = tribes.find((tribe) => tribe.name === data.season[index])?.id;
+          id = tribes.find((tribe) => tribe.name === data.season[index])?.tribeId;
           if (id) submitData.seasonPredicts.tribe[event.id] = id;
           break;
         case 'member':

@@ -2,7 +2,6 @@
 import { eq } from 'drizzle-orm';
 import { sysAuth } from '~/app/api/system/query';
 import { db } from '~/server/db';
-import { castaways } from '~/server/db/schema/castaways';
 import { baseEventCastaways, type BaseEventInsert, baseEvents, baseEventTribes, type EventName } from '~/server/db/schema/episodes';
 import { type Reference } from '~/server/db/schema/leagues';
 

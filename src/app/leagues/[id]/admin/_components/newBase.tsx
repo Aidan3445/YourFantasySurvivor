@@ -117,7 +117,7 @@ export default function NewBaseEvent({
           if (r) references.push({ id: r.id });
           break;
         case 'tribe':
-          r = tribes.find((t) => t.name === ref);
+          r = tribes.find((t) => t.name === ref)?.tribeId ? { id: tribes.find((t) => t.name === ref)!.tribeId } : undefined;
           if (r) references.push({ id: r.id });
           break;
       }

@@ -84,7 +84,7 @@ export default function DraftForm({
       if (castawayId && event.id) submission.castaway[event.id] = castawayId;
     });
     tribe?.forEach((event, index) => {
-      const tribeId = options.tribes.find((t) => t.name === data.tribe![index])?.id;
+      const tribeId = options.tribes.find((t) => t.name === data.tribe![index])?.tribeId;
       if (tribeId && event.id) submission.tribe[event.id] = tribeId;
     });
     member?.forEach((event, index) => {
