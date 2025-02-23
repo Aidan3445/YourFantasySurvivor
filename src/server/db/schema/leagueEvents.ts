@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createTable } from './createTable';
-import { boolean, index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
+import { boolean, check, index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
 import { LeagueEventTypeOptions, LeaguePredictionTimingOptions } from '~/server/db/defs/events';
 import { sql } from 'drizzle-orm';
@@ -28,6 +28,7 @@ export const leagueEventsRulesSchema = createTable(
   (table) => [
     unique().on(table.leagueId, table.eventName),
     index().on(table.leagueId),
+    check('no_manual_prediction', sql`NOT (event_type = 'Prediction' AND 'Manual' = ANY(event_timing))`)
   ]
 );
 

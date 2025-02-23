@@ -23,8 +23,11 @@ import {
 } from '~/components/ui/table';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
+import { type CastawayName } from '~/server/db/defs/castaways';
 import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes';
-import { type BaseEventName, type BaseEventRule, type ScoringBaseEventName, ScoringBaseEventNames } from '~/server/db/defs/events';
+import { type BaseEvent, baseEventLabelPrefixes, baseEventLabels, type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName, type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames } from '~/server/db/defs/events';
+import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+import { type TribeName } from '~/server/db/defs/tribes';
 
 export default function RecentActivity() {
   const {
@@ -39,7 +42,7 @@ export default function RecentActivity() {
   const [filterMember, setFilterMember] = useState();
   const [filterBaseEvent, setFilterBaseEvent] = useState();*/
 
-  const latestEpisode = episodes[1];
+  const latestEpisode = episodes[0];
 
   return (
     <section className='md:w-full bg-card rounded-lg relative'>
@@ -49,7 +52,7 @@ export default function RecentActivity() {
             View All
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className='max-h-svh overflow-y-auto min-w-[50svw]'>
+        <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max pb-0'>
           <AlertDialogHeader>
             <AlertDialogTitle>All Events</AlertDialogTitle>
             <AlertDialogDescription hidden>View all events from the season</AlertDialogDescription>
@@ -62,11 +65,13 @@ export default function RecentActivity() {
               <SelectValue placeholder='Select an episode' />
             </SelectTrigger>
             <SelectContent>
-              {episodes.slice(1).map((episode) => (
-                <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
-                  {episode.episodeNumber} - {episode.episodeTitle}
-                </SelectItem>
-              ))}
+              {// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                episodes.toReversed()
+                  .map((episode) => (
+                    <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
+                      {episode.episodeNumber} - {episode.episodeTitle}
+                    </SelectItem>
+                  ))}
             </SelectContent>
           </Select>
           {/*<Accordion type='single' collapsible>
@@ -148,9 +153,12 @@ export default function RecentActivity() {
 
 interface EpisodeEventsProps {
   episodeNumber: EpisodeNumber;
+  mockBase?: BaseEvent;
+  mockPrediction?: LeaguePredictionEvent;
+  mockDirect?: LeagueDirectEvent;
 }
 
-function EpisodeEvents({ episodeNumber }: EpisodeEventsProps) {
+export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDirect }: EpisodeEventsProps) {
   const {
     leagueData: {
       baseEvents,
@@ -161,12 +169,14 @@ function EpisodeEvents({ episodeNumber }: EpisodeEventsProps) {
   } = useLeague();
 
   if (!baseEvents[episodeNumber] && !leagueEvents.predictionEvents[episodeNumber] &&
-    !leagueEvents.directEvents[episodeNumber]) return (
-      <div className='flex items-center justify-center h-48 text-muted-foreground' />
-    );
+    !leagueEvents.directEvents[episodeNumber] &&
+    !mockBase && !mockPrediction && !mockDirect
+  ) return (
+    <div className='flex items-center justify-center h-48 text-muted-foreground' />
+  );
 
   return (
-    <ScrollArea className='max-md:w-[calc(100svw-4rem)]'>
+    <ScrollArea className='max-md:w-[calc(100svw-4rem)] flex-grow bg-card rounded-lg gap-0'>
       <Table>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader>
@@ -180,80 +190,79 @@ function EpisodeEvents({ episodeNumber }: EpisodeEventsProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
+          {mockBase && (
+            <BaseEventRow
+              className='bg-yellow-500'
+              key='mockBase'
+              label={mockBase.label}
+              eventName={mockBase.eventName}
+              baseEventRules={baseEventRules}
+              tribes={mockBase.tribes}
+              castaways={mockBase.castaways}
+              members={mockBase.castaways?.map((castaway) =>
+                selectionTimeline.castawayMembers[castaway]?.slice(
+                  0, episodeNumber + 1).pop())}
+              notes={mockBase.notes} />
+          )}
+          {mockPrediction && (
+            <LeagueEventRow
+              className='bg-yellow-500'
+              key='mockPrediction'
+              eventName={mockPrediction.eventName}
+              points={mockPrediction.points}
+              referenceType={mockPrediction.referenceType}
+              referenceName={mockPrediction.referenceName}
+              predictionMaker={mockPrediction.predictionMaker}
+              notes={mockPrediction.notes} />
+          )}
+          {mockDirect && (
+            <LeagueEventRow
+              className='bg-yellow-500'
+              key='mockDirect'
+              eventName={mockDirect.eventName}
+              points={mockDirect.points}
+              referenceType={mockDirect.referenceType}
+              referenceName={mockDirect.referenceName}
+              notes={mockDirect.notes} />
+          )}
           {Object.entries(baseEvents[episodeNumber] ?? {})
             .map(([eventId, event]) => (
-              <TableRow key={eventId}>
-                <TableCell className='text-nowrap'>{event.eventName}</TableCell>
-                <PointsCell baseEventName={event.eventName} baseEventRules={baseEventRules} />
-                <TableCell className='text-center'>
-                  <div className='text-sm flex flex-col h-full justify-start'>
-                    {event.tribes.map((tribe) => (
-                      <span key={tribe}>{tribe}</span>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell className='text-right align-top'>
-                  <div className='text-xs flex flex-col h-full justify-start'>
-                    {event.castaways.map((ct) => (
-                      <span className='text-nowrap' key={ct}>{ct}</span>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell className='flex flex-col text-xs'>
-                  {event.castaways.map((castaway) => (
-                    <span key={castaway} className='text-nowrap'>
-                      {selectionTimeline.castawayMembers[castaway]?.slice(
-                        0, episodeNumber).pop() ?? <br />}
-                    </span>
-                  ))}
-                </TableCell>
-                <TableCell>
-                  <NotesPopover notes={event.notes} />
-                </TableCell>
-              </TableRow>
+              <BaseEventRow
+                key={eventId}
+                label={event.label}
+                eventName={event.eventName}
+                baseEventRules={baseEventRules}
+                tribes={event.tribes}
+                castaways={event.castaways}
+                members={event.castaways.map((castaway) =>
+                  selectionTimeline.castawayMembers[castaway]?.slice(
+                    0, episodeNumber + 1).pop())}
+                notes={event.notes} />
             ))}
           {leagueEvents.predictionEvents[episodeNumber]?.map((event, index) => (
-            <TableRow key={index}>
-              <TableCell className='text-nowrap'>{event.eventName}</TableCell>
-              <PointsCell points={event.points} />
-              <TableCell className='text-right text-xs'>
-                {event.referenceType === 'Tribe' ? event.referenceName : ''}
-              </TableCell>
-              <TableCell className='text-right text-xs'>
-                {event.referenceType === 'Castaway' ? event.referenceName : ''}
-              </TableCell>
-              <TableCell className='text-xs'>
-                {event.referenceType === 'Member' ? event.referenceName : ''}
-                {event.predictionMaker}
-              </TableCell>
-              <TableCell>
-                <NotesPopover notes={event.notes} />
-              </TableCell>
-            </TableRow>
+            <LeagueEventRow
+              key={index}
+              eventName={event.eventName}
+              points={event.points}
+              referenceType={event.referenceType}
+              referenceName={event.referenceName}
+              predictionMaker={event.predictionMaker}
+              notes={event.notes} />
           ))}
-          {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).map((refEvents) =>
-            refEvents.map((event, index) => (
-              <TableRow key={index}>
-                <TableCell className='text-nowrap'>{event.eventName}</TableCell>
-                <PointsCell points={event.points} />
-                <TableCell className='text-right text-xs'>
-                  {event.referenceType === 'Tribe' ? event.referenceName : ''}
-                </TableCell>
-                <TableCell className='text-right text-xs'>
-                  {event.referenceType === 'Castaway' ? event.referenceName : ''}
-                </TableCell>
-                <TableCell className='text-xs'>
-                  {event.referenceType === 'Member' ? event.referenceName : ''}
-                </TableCell>
-                <TableCell>
-                  <NotesPopover notes={event.notes} />
-                </TableCell>
-              </TableRow>
+          {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).map((directEvents) =>
+            directEvents.map((event, index) => (
+              <LeagueEventRow
+                key={index}
+                eventName={event.eventName}
+                points={event.points}
+                referenceType={event.referenceType}
+                referenceName={event.referenceName}
+                notes={event.notes} />
             ))
           )}
         </TableBody>
       </Table>
-      <ScrollBar orientation='horizontal' />
+      <ScrollBar hidden orientation='horizontal' />
     </ScrollArea>
   );
 }
@@ -324,5 +333,110 @@ function AirStatus({ airDate, airStatus }: AirStatusProps) {
         {airStatus}
       </div>
     </span>
+  );
+}
+
+interface BaseEventRowProps {
+  className?: string;
+  label?: string;
+  eventName: BaseEventName;
+  baseEventRules: BaseEventRule;
+  tribes: TribeName[];
+  castaways: CastawayName[];
+  members: (LeagueMemberDisplayName | null | undefined)[];
+  notes: string[] | null;
+}
+
+function BaseEventRow({
+  label, eventName, baseEventRules, tribes, castaways, members, notes, className
+}: BaseEventRowProps) {
+  return (
+    <TableRow className={className}>
+      <TableCell className='text-nowrap'>
+        { // disable because we want label to be ignored if empty string as well as undefined
+          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+          label || (`${baseEventLabelPrefixes[eventName]} ${baseEventLabels[eventName]?.[0] ?? eventName}`)}
+      </TableCell>
+      <PointsCell baseEventName={eventName} baseEventRules={baseEventRules} />
+      <TableCell className='text-center' style={{ height: 'inherit' }}>
+        <div className='h-full grid auto-rows-fr items-center'>
+          {tribes?.map((tribe, index) => (
+            <span key={index} className='flex h-full text-nowrap justify-center items-center'>
+              {tribe}
+            </span>
+          ))}
+        </div>
+      </TableCell >
+      <TableCell className='text-right'>
+        <div
+          className={cn(
+            'text-xs flex flex-col h-full',
+            castaways?.length === 1 && 'justify-center')}>
+          {castaways?.map((castaway, index) => (
+            <span className='text-nowrap' key={index}>{castaway}</span>
+          ))}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div
+          className={cn(
+            'flex flex-col text-xs h-full',
+            members?.length === 1 && 'justify-center')}>
+          {members?.map((member, index) =>
+            member ?
+              <span key={index} className='text-nowrap'>
+                {member}
+              </span> :
+              <br key={index} />
+          )}
+        </div>
+      </TableCell>
+      <TableCell>
+        <NotesPopover notes={notes} />
+      </TableCell>
+    </TableRow >
+  );
+}
+
+interface LeagueEventRowProps {
+  className?: string;
+  eventName: LeagueEventName;
+  points: number;
+  referenceType: ReferenceType;
+  referenceName: string;
+  predictionMaker?: LeagueMemberDisplayName;
+  notes: string[] | null;
+}
+
+function LeagueEventRow({
+  eventName, points, referenceType, referenceName, predictionMaker, notes, className
+}: LeagueEventRowProps) {
+  return (
+    <TableRow className={className}>
+      <TableCell className='text-nowrap sticky'>{eventName}</TableCell>
+      <PointsCell points={points} />
+      <TableCell className='text-right text-xs text-nowrap'>
+        {referenceType === 'Tribe' ? referenceName : ''}
+      </TableCell>
+      <TableCell className='text-right text-xs text-nowrap'>
+        {referenceType === 'Castaway' ? referenceName : ''}
+      </TableCell>
+      <TableCell className='text-xs text-nowrap'>
+        {referenceType === 'Member' ? referenceName : ''}
+        {predictionMaker &&
+          <Popover>
+            <PopoverTrigger>
+              <b>{predictionMaker}</b>
+            </PopoverTrigger>
+            <PopoverContent className='w-min p-1 text-nowrap' side='left'>
+              <PopoverArrow />
+              Predicted {referenceName} correctly
+            </PopoverContent>
+          </Popover>}
+      </TableCell>
+      <TableCell>
+        <NotesPopover notes={notes} />
+      </TableCell>
+    </TableRow>
   );
 }

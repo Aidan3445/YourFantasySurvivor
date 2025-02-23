@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { aliasedTable, and, arrayContained, arrayContains, asc, desc, eq, inArray } from 'drizzle-orm';
+import { aliasedTable, and, arrayContained, arrayContains, arrayOverlaps, asc, desc, eq, inArray, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
@@ -16,9 +16,10 @@ import type { SeasonName } from '~/server/db/defs/seasons';
 import type { CastawayDraftInfo, CastawayName } from '~/server/db/defs/castaways';
 import { tribesSchema } from '~/server/db/schema/tribes';
 import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/server/db/defs/leagueMembers';
-import type {
-  LeagueEventPrediction, LeagueDirectEvent, ReferenceType, LeaguePredictionEvent,
-  BaseEventRule, LeagueEventId, LeagueEventName
+import {
+  type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent,
+  type BaseEventRule, type LeagueEventId, type LeagueEventName,
+  LeaguePredictionTimingOptions
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { TribeName } from '~/server/db/defs/tribes';
@@ -360,19 +361,7 @@ export const QUERIES = {
         eq(seasonsSchema.seasonId, league.leagueSeason)))
       .orderBy(desc(episodesSchema.airDate))
       .then((res) => {
-        let nextEpisodeIndex = res.findIndex((episode) =>
-          new Date(`${episode.episodeAirDate} Z`) > new Date());
-        if (nextEpisodeIndex === -1) {
-          nextEpisodeIndex = 0;
-          res.unshift({
-            episodeId: -1,
-            episodeNumber: 0,
-            episodeTitle: 'No upcoming episodes',
-            episodeAirDate: new Date().toISOString(),
-            episodeRuntime: 0,
-          });
-        }
-        return res.slice(nextEpisodeIndex, nextEpisodeIndex + count)
+        return res.slice(0, count)
           .map((episode) => {
             const airDate = new Date(`${episode.episodeAirDate} Z`);
             const airStatus: EpisodeAirStatus = airDate > new Date() ? 'Upcoming' :
@@ -487,8 +476,16 @@ export const QUERIES = {
       // prediction
       .innerJoin(leagueEventPredictionsSchema, and(
         eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
-        eq(leagueEventPredictionsSchema.episodeId, leagueEventsSchema.episodeId),
-        eq(leagueEventPredictionsSchema.referenceId, leagueEventsSchema.referenceId)))
+        eq(leagueEventPredictionsSchema.referenceId, leagueEventsSchema.referenceId),
+        or(
+          // if the prediction episode matches the event for weekly predictions
+          and(
+            eq(leagueEventPredictionsSchema.episodeId, leagueEventsSchema.episodeId),
+            arrayOverlaps(leagueEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
+          // if the event is not weekly, the episode doesn't matter
+          // note manual predictions should not be possible but just in case
+          arrayOverlaps(leagueEventsRulesSchema.timing, LeaguePredictionTimingOptions
+            .filter(timing => !timing.includes('Weekly') || timing === 'Manual')))))
       .innerJoin(predictionMaker, eq(predictionMaker.memberId, leagueEventPredictionsSchema.memberId))
       // references
       .leftJoin(castawaysSchema, and(
@@ -651,7 +648,7 @@ export const QUERIES = {
       .then((settings) => settings[0]);
 
     const [
-      baseEvents, tribes, elims, castaways,
+      baseEvents, tribesTimeline, elims, castaways,
       leagueEvents, baseEventRules,
       selectionTimeline, leagueSettings, episodes
     ] = await Promise.all([
@@ -673,13 +670,13 @@ export const QUERIES = {
     }
 
     const scores = compileScores(
-      baseEvents, tribes, elims, leagueEvents, baseEventRules,
+      baseEvents, tribesTimeline, elims, leagueEvents, baseEventRules,
       selectionTimeline, leagueSettings.survivalCap);
+
 
     return {
       scores,
       baseEvents,
-      tribes,
       castaways,
       leagueEvents,
       selectionTimeline,

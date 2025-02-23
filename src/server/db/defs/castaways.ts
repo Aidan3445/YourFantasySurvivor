@@ -9,6 +9,7 @@ export type CastawayResidence = string;
 export type CastawayOccupation = string;
 
 export interface CastawayDetails {
+  castawayId: CastawayId;
   fullName: CastawayName;
   shortName: CastawayName;
   startingTribe: TribeEp;

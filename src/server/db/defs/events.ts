@@ -36,13 +36,14 @@ export const AllBaseEventNames = [
   ...ScoringBaseEventNames,
   'elim', 'noVoteExit', 'tribeUpdate', 'otherNotes'] as const;
 export type BaseEventName = typeof AllBaseEventNames[number];
+export const BaseEventNameZod = z.enum(AllBaseEventNames);
 
 export type BaseEventId = number;
 export type BaseEvent = {
   eventName: BaseEventName,
+  label: string,
   castaways: CastawayName[],
   tribes: TribeName[],
-  keywords: string[] | null,
   notes: string[] | null
 };
 
@@ -119,3 +120,44 @@ export type LeaguePredictionEvent = {
   predictionMaker: LeagueMemberDisplayName,
   notes: string[] | null
 };
+
+const advList = ['Advantage', 'Idol', 'Beware Advantage', 'Extra Vote', 'Block a Vote', 'Steal a Vote',
+  'Safety Without Power', 'Idol Nullifier', 'Challenge Advantage', 'Knowledge is Power'] as const;
+
+export const baseEventLabels: Record<BaseEventName, readonly [string, ...string[]]> = {
+  advFound: advList,
+  advPlay: [...advList, 'Shot in the Dark'],
+  badAdvPlay: [...advList, 'Shot in the Dark'],
+  advElim: advList,
+  spokeEpTitle: ['Spoke Episode Title'],
+  tribe1st: ['Tribe Immunity and Reward', 'Tribe Immunity', 'Tribe Reward'],
+  tribe2nd: ['Tribe Immunity and Reward', 'Tribe Immunity', 'Tribe Reward'],
+  indivWin: ['Individual Immunity and Reward', 'Individual Immunity'],
+  indivReward: ['Individual Reward'],
+  finalists: ['Final 3', 'Final 2'],
+  fireWin: ['Won Fire Making'],
+  soleSurvivor: ['Sole Survivor'],
+  elim: ['Voted Out', 'Blindside', 'Rock Draw'],
+  noVoteExit: ['Lost Fire Making', 'Quit', 'Medevac', 'Removed'],
+  tribeUpdate: ['Starting Tribes', 'Merge Tribe', 'Tribe Swap', 'New Tribes'],
+  otherNotes: ['Other Notes']
+} as const;
+
+export const baseEventLabelPrefixes: Record<BaseEventName, string> = {
+  advFound: 'Found',
+  advPlay: 'Correctly played',
+  badAdvPlay: 'Incorrectly played',
+  advElim: 'Eliminated with',
+  spokeEpTitle: 'Spoke',
+  tribe1st: '1st',
+  tribe2nd: '2nd',
+  indivWin: 'Won',
+  indivReward: 'Won',
+  finalists: '',
+  fireWin: '',
+  soleSurvivor: '',
+  elim: '',
+  noVoteExit: '',
+  tribeUpdate: '',
+  otherNotes: ''
+} as const;

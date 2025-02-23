@@ -2,7 +2,7 @@ import { aliasedTable, and, desc, eq, inArray } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
-import { type CastawayImage, type CastawayDetails, type CastawayName } from '~/server/db/defs/castaways';
+import { type CastawayImage, type CastawayDetails, type CastawayName, type CastawayId } from '~/server/db/defs/castaways';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
 import { type BaseEventName, type BaseEvent, type BaseEventId } from '~/server/db/defs/events';
 import { type SeasonId } from '~/server/db/defs/seasons';
@@ -25,10 +25,10 @@ export const QUERIES = {
         episodeNumber: episodesSchema.episodeNumber,
         baseEventId: baseEventsSchema.baseEventId,
         eventName: baseEventsSchema.eventName,
+        label: baseEventsSchema.label,
         referenceType: baseEventReferenceSchema.referenceType,
         castaway: castawaysSchema.fullName,
         tribe: tribesSchema.tribeName,
-        keywords: baseEventsSchema.keywords,
         notes: baseEventsSchema.notes
       })
       .from(baseEventsSchema)
@@ -46,9 +46,9 @@ export const QUERIES = {
         const events = acc[row.episodeNumber]!;
         events[row.baseEventId] ??= {
           eventName: row.eventName,
+          label: row.label,
           castaways: [],
           tribes: [],
-          keywords: row.keywords,
           notes: row.notes
         };
         switch (row.referenceType) {
@@ -143,9 +143,11 @@ export const QUERIES = {
 
     const rows = await db
       .select({
+        castawayId: castawaysSchema.castawayId,
         fullName: castawaysSchema.fullName,
         shortName: castawaysSchema.shortName,
         startingTribe: {
+          tribeId: tribesSchema.tribeId,
           tribeName: tribesSchema.tribeName,
           tribeColor: tribesSchema.tribeColor,
           episode: episodesSchema.episodeNumber
@@ -170,6 +172,7 @@ export const QUERIES = {
         eq(tribeReference.referenceType, 'Tribe')))
       .leftJoin(tribesSchema, eq(tribeReference.referenceId, tribesSchema.tribeId))
       .then((rows: {
+        castawayId: CastawayId
         fullName: CastawayName,
         shortName: CastawayName,
         startingTribe: TribeEp,
@@ -190,6 +193,7 @@ export const QUERIES = {
 
     const castawaysWithTribes = rows.reduce((acc, row) => {
       const castaway = acc[row.fullName] ?? {
+        castawayId: row.castawayId,
         fullName: row.fullName,
         shortName: row.shortName,
         startingTribe: row.startingTribe,

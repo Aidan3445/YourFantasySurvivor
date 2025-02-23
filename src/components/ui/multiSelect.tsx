@@ -121,6 +121,11 @@ interface MultiSelectProps
    * Optional, defaults to false.
    */
   empty?: boolean;
+
+  /**
+   * if this field is updated clear the selected values
+  */
+  clear?: number | string | boolean | null;
 }
 
 export const MultiSelect = React.forwardRef<
@@ -138,6 +143,7 @@ export const MultiSelect = React.forwardRef<
       maxCount = 3,
       modalPopover = false,
       empty = false,
+      clear,
       //asChild = false,
       className,
       ...props
@@ -149,9 +155,18 @@ export const MultiSelect = React.forwardRef<
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
 
+
+    const handleClear = React.useCallback(() => {
+      setSelectedValues([]);
+      onValueChange([]);
+    }, [onValueChange]);
+
+
     React.useEffect(() => {
-      setSelectedValues(defaultValue);
-    }, [defaultValue]);
+      if (clear) {
+        handleClear();
+      }
+    }, [clear, handleClear]);
 
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
@@ -173,12 +188,6 @@ export const MultiSelect = React.forwardRef<
       setSelectedValues(newSelectedValues);
       onValueChange(newSelectedValues);
     };
-
-    const handleClear = () => {
-      setSelectedValues([]);
-      onValueChange([]);
-    };
-
     const handleTogglePopover = () => {
       setIsPopoverOpen((prev) => !prev);
     };
@@ -211,7 +220,7 @@ export const MultiSelect = React.forwardRef<
             {...props}
             onClick={handleTogglePopover}
             className={cn(
-              'flex w-full p-1 rounded-3xl border min-h-10 h-auto items-center justify-between bg-white/70 hover:bg-accent [&_svg]:pointer-events-auto',
+              'flex w-full p-1 rounded-3xl border border-input min-h-10 h-auto items-center justify-between bg-white/70 hover:bg-accent [&_svg]:pointer-events-auto',
               className
             )}
           >

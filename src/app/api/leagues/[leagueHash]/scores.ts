@@ -62,7 +62,7 @@ export function compileScores(
         const points = baseEventRules[event.eventName as ScoringBaseEventName];
         scores.Castaway[castaway][episodeNum] += points;
         // score the member who has this castaway selected at this episode
-        const cmIndex = Math.min(episodeNum - 1,
+        const cmIndex = Math.min(episodeNum,
           (selectionTimeline.castawayMembers[castaway]?.length ?? 0) - 1);
         const leagueMember = selectionTimeline.castawayMembers[castaway]?.[cmIndex];
         // if the castaway was not selected at this episode, don't score the member
@@ -146,8 +146,6 @@ export function compileScores(
       // a member is out of castaways to select
       if (eliminated.includes(castaways[mcIndex] ?? '')) {
         streak = 0;
-        if (member === 'Aidan')
-          console.log('eliminated', member, episodeNumber, castaways[mcIndex], eliminated);
         continue;
       }
       // increment the streak and add the bonus to the member's score
@@ -156,8 +154,6 @@ export function compileScores(
       scores.Member[member] ??= [];
       scores.Member[member][episodeNumber] ??= 0;
       scores.Member[member][episodeNumber]! += bonus;
-      if (member === 'Aidan') console.log('bonus', bonus, member, episodeNumber, castaways[mcIndex],
-        scores.Member[member].join(', '), eliminated);
     }
   });
 

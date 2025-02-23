@@ -14,6 +14,7 @@ export const baseEventsSchema = createTable(
     episodeId: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
     eventName: eventName('name').notNull(),
     keywords: varchar('keywords', { length: 32 }).array(),
+    label: varchar('label', { length: 32 }).notNull().default(''),
     notes: varchar('notes', { length: 256 }).array()
   },
   (table) => [

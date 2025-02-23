@@ -3,7 +3,7 @@ const config =
 {
   env: {
     browser: true,
-    es2021: true
+    es2023: true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {

@@ -222,7 +222,7 @@ export function CreateLeagueModal({ children }: CreateLeagueModalProps) {
       <AlertDialogTrigger>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className='w-min'>
+      <AlertDialogContent className='w-min max-sm:scale-75'>
         <AlertDialogHeader>
           <AlertDialogTitle className='sr-only'>Create a New League</AlertDialogTitle>
           <AlertDialogDescription className='sr-only'>

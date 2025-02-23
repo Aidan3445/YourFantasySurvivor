@@ -19,6 +19,7 @@ export interface NewTribe {
 }
 
 export type TribeEp = {
+  tribeId: TribeId;
   tribeName: TribeName;
   tribeColor: TribeColor;
   episode: EpisodeNumber

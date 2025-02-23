@@ -4,26 +4,28 @@ import RecentActivity from '~/components/leagues/main/recentActivity';
 import Scoreboard from '~/components/leagues/main/scoreboard';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { leagueMemberAuth } from '~/lib/auth';
+import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from './layout';
 import ChangeSurvivor from '~/components/leagues/main/changeSurvivor';
-
+import CreateBaseEvent from '~/components/leagues/main/createBaseEvent';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
   const { role } = await leagueMemberAuth(leagueHash);
+  const { userId } = await systemAdminAuth();
   return (
     <main className='flex flex-col gap-0 w-full p-4 pb-0'>
       <Tabs
-        className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100vh-4rem)] max-md:h-[calc(100vh-6.5rem)] overflow-hidden'
-        defaultValue='league'>
-        <TabsList className='sticky z-50 top-0 grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
-          <TabsTrigger value='league'>League</TabsTrigger>
-          {role !== 'Member' && <TabsTrigger value='score'>Score Events</TabsTrigger>}
+        className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100svh-4rem)] max-md:h-[calc(100svh-6.5rem)] overflow-hidden'
+        defaultValue='scores'>
+        <TabsList className='top-0 grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
+          <TabsTrigger value='scores'>Scores</TabsTrigger>
+          {role !== 'Member' && <TabsTrigger value='events'>Commish</TabsTrigger>}
+          <TabsTrigger value='settings'>Settings</TabsTrigger>
         </TabsList>
-        <ScrollArea className='h-full w-full'>
-          <TabsContent value='league'>
-            <div className='flex flex-col gap-4 w-full px-4 pb-12'>
+        <ScrollArea className='h-full'>
+          <TabsContent value='scores'>
+            <div className='flex flex-col gap-4 w-full px-4 pb-10'>
               <span className='flex max-lg:flex-wrap gap-4 items-center'>
                 <Scoreboard />
                 <Chart />
@@ -32,10 +34,15 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               <RecentActivity />
             </div>
           </TabsContent>
+          <TabsContent value='events'>
+            <div className='flex flex-col gap-4 w-full px-4 pb-10'>
+              {userId && <CreateBaseEvent />}
+            </div>
+          </TabsContent>
           <TabsContent value='settings'>
             <MemberEditForm />
           </TabsContent>
-          <ScrollBar orientation='vertical' />
+          <ScrollBar hidden orientation='vertical' />
         </ScrollArea>
       </Tabs>
     </main >

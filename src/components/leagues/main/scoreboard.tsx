@@ -19,6 +19,7 @@ import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/useMobile';
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
+import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 
 export default function Scoreboard() {
   const { leagueData, league } = useLeague();
@@ -28,35 +29,38 @@ export default function Scoreboard() {
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
   return (
-    <Table className='bg-card rounded-lg overflow-clip gap-0'>
-      <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
-      <TableHeader>
-        <TableRow className={cn(
-          'px-4 bg-white pointer-events-none',
-          selectedMembers.length > 0 && 'pointer-events-auto')}>
-          <TableHead className='text-center w-0'>Place</TableHead>
-          <TableHead className='text-center w-0'>Points</TableHead>
-          <TableHead className='text-center'>Member</TableHead>
-          <TableHead className='text-center w-0'>Survivor</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sortedMemberScores.map(([member, scores], index) => {
-          const color = league.members.list.find((m) => m.displayName === member)?.color ?? '#ffffff';
-          const survivorName = leagueData.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None';
-          const survivor = leagueData.castaways.find((c) => c.fullName === survivorName)!;
-          return (
-            <MemberRow
-              key={index}
-              place={index + 1}
-              member={member}
-              points={scores.slice().pop() ?? 0}
-              survivor={survivor}
-              color={color} />
-          );
-        })}
-      </TableBody>
-    </Table>
+    <ScrollArea className='max-md:w-[calc(100svw-4rem)] w-full bg-card rounded-lg gap-0'>
+      <Table>
+        <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
+        <TableHeader>
+          <TableRow className={cn(
+            'px-4 bg-white pointer-events-none',
+            selectedMembers.length > 0 && 'pointer-events-auto')}>
+            <TableHead className='text-center w-0'>Place</TableHead>
+            <TableHead className='text-center w-0'>Points</TableHead>
+            <TableHead className='text-center'>Member</TableHead>
+            <TableHead className='text-center w-0'>Survivor</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {sortedMemberScores.map(([member, scores], index) => {
+            const color = league.members.list.find((m) => m.displayName === member)?.color ?? '#ffffff';
+            const survivorName = leagueData.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None';
+            const survivor = leagueData.castaways.find((c) => c.fullName === survivorName)!;
+            return (
+              <MemberRow
+                key={index}
+                place={index + 1}
+                member={member}
+                points={scores.slice().pop() ?? 0}
+                survivor={survivor}
+                color={color} />
+            );
+          })}
+        </TableBody>
+      </Table>
+      <ScrollBar hidden orientation='horizontal' />
+    </ScrollArea>
   );
 }
 
