@@ -1,7 +1,7 @@
 'use client';
 
 import { PopoverArrow } from '@radix-ui/react-popover';
-import { ScrollText, X } from 'lucide-react';
+import { Pencil, ScrollText, X } from 'lucide-react';
 import { useState } from 'react';
 import {
   AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
@@ -23,11 +23,10 @@ import {
 } from '~/components/ui/table';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
-import { type CastawayName } from '~/server/db/defs/castaways';
 import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes';
 import { type BaseEvent, baseEventLabelPrefixes, baseEventLabels, type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName, type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames } from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
-import { type TribeName } from '~/server/db/defs/tribes';
+import EditBaseEvent from './editBaseEvent';
 
 export default function RecentActivity() {
   const {
@@ -153,16 +152,16 @@ export default function RecentActivity() {
 
 interface EpisodeEventsProps {
   episodeNumber: EpisodeNumber;
-  mockBase?: BaseEvent;
+  mockBase?: Omit<BaseEvent, 'baseEventId'>;
   mockPrediction?: LeaguePredictionEvent;
   mockDirect?: LeagueDirectEvent;
+  edit?: boolean;
 }
 
-export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDirect }: EpisodeEventsProps) {
+export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDirect, edit }: EpisodeEventsProps) {
   const {
     leagueData: {
       baseEvents,
-      selectionTimeline,
       leagueEvents,
       baseEventRules,
     }
@@ -175,80 +174,84 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
     <div className='flex items-center justify-center h-48 text-muted-foreground' />
   );
 
+  const noTribes = baseEvents[episodeNumber] &&
+    !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0) &&
+    !mockBase?.tribes &&
+    !leagueEvents.predictionEvents[episodeNumber]?.some((event) => event.referenceType === 'Tribe') &&
+    mockPrediction?.referenceType !== 'Tribe' &&
+    !leagueEvents.directEvents[episodeNumber]?.Tribe.some((event) => event.referenceType === 'Tribe') && mockDirect?.referenceType !== 'Tribe';
+
+
   return (
     <ScrollArea className='max-md:w-[calc(100svw-4rem)] flex-grow bg-card rounded-lg gap-0'>
       <Table>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader>
-          <TableRow className='bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
-            <TableHead className='rounded-tl-md w-0'>Event</TableHead>
+          <TableRow className='bg-white hover:bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
+            {edit && <TableHead className='w-0'>
+              Edit
+            </TableHead>}
+            <TableHead className='w-0'>Event</TableHead>
             <TableHead className='text-center'>Points</TableHead>
-            <TableHead className='w-0'>Tribes</TableHead>
+            <TableHead className='w-0'>
+              {noTribes ? null : 'Tribes'}
+            </TableHead>
             <TableHead className='text-right w-0'>Castaways</TableHead>
             <TableHead>Members</TableHead>
-            <TableHead className='rounded-tr-md text-right' >Notes</TableHead>
+            <TableHead className='text-right' >Notes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {mockBase && (
             <BaseEventRow
               className='bg-yellow-500'
-              key='mockBase'
-              label={mockBase.label}
-              eventName={mockBase.eventName}
+              baseEvent={{ ...mockBase, baseEventId: -1 }}
+              episodeNumber={episodeNumber}
               baseEventRules={baseEventRules}
-              tribes={mockBase.tribes}
-              castaways={mockBase.castaways}
-              members={mockBase.castaways?.map((castaway) =>
-                selectionTimeline.castawayMembers[castaway]?.slice(
-                  0, episodeNumber + 1).pop())}
-              notes={mockBase.notes} />
+              edit={false} />
           )}
           {mockPrediction && (
             <LeagueEventRow
               className='bg-yellow-500'
-              key='mockPrediction'
               eventName={mockPrediction.eventName}
               points={mockPrediction.points}
               referenceType={mockPrediction.referenceType}
               referenceName={mockPrediction.referenceName}
               predictionMaker={mockPrediction.predictionMaker}
-              notes={mockPrediction.notes} />
+              notes={mockPrediction.notes}
+              edit={false} />
           )}
           {mockDirect && (
             <LeagueEventRow
               className='bg-yellow-500'
-              key='mockDirect'
               eventName={mockDirect.eventName}
               points={mockDirect.points}
               referenceType={mockDirect.referenceType}
               referenceName={mockDirect.referenceName}
-              notes={mockDirect.notes} />
+              notes={mockDirect.notes}
+              edit={false} />
           )}
+          {Object.values(baseEvents[episodeNumber] ?? {}).length > 0 &&
+            <TableRow className='bg-gray-100 hover:bg-gray-200'>
+              <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+                Base Events
+              </TableCell>
+            </TableRow>}
           {Object.entries(baseEvents[episodeNumber] ?? {})
             .map(([eventId, event]) => (
               <BaseEventRow
                 key={eventId}
-                label={event.label}
-                eventName={event.eventName}
+                baseEvent={event}
+                episodeNumber={episodeNumber}
                 baseEventRules={baseEventRules}
-                tribes={event.tribes}
-                castaways={event.castaways}
-                members={event.castaways.map((castaway) =>
-                  selectionTimeline.castawayMembers[castaway]?.slice(
-                    0, episodeNumber + 1).pop())}
-                notes={event.notes} />
+                edit={edit} />
             ))}
-          {leagueEvents.predictionEvents[episodeNumber]?.map((event, index) => (
-            <LeagueEventRow
-              key={index}
-              eventName={event.eventName}
-              points={event.points}
-              referenceType={event.referenceType}
-              referenceName={event.referenceName}
-              predictionMaker={event.predictionMaker}
-              notes={event.notes} />
-          ))}
+          {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).length > 0 &&
+            <TableRow className='bg-gray-100 hover:bg-gray-200'>
+              <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+                Direct Events
+              </TableCell>
+            </TableRow>}
           {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).map((directEvents) =>
             directEvents.map((event, index) => (
               <LeagueEventRow
@@ -257,9 +260,27 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
                 points={event.points}
                 referenceType={event.referenceType}
                 referenceName={event.referenceName}
-                notes={event.notes} />
+                notes={event.notes}
+                edit={edit} />
             ))
           )}
+          {Object.values(leagueEvents.predictionEvents[episodeNumber] ?? {}).length > 0 &&
+            <TableRow className='bg-gray-100 hover:bg-gray-200'>
+              <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+                Correct Predictions
+              </TableCell>
+            </TableRow>}
+          {leagueEvents.predictionEvents[episodeNumber]?.map((event, index) => (
+            <LeagueEventRow
+              key={index}
+              eventName={event.eventName}
+              points={event.points}
+              referenceType={event.referenceType}
+              referenceName={event.referenceName}
+              predictionMaker={event.predictionMaker}
+              notes={event.notes}
+              edit={edit} />
+          ))}
         </TableBody>
       </Table>
       <ScrollBar hidden orientation='horizontal' />
@@ -338,20 +359,29 @@ function AirStatus({ airDate, airStatus }: AirStatusProps) {
 
 interface BaseEventRowProps {
   className?: string;
-  label?: string;
-  eventName: BaseEventName;
+  baseEvent: BaseEvent;
+  episodeNumber: EpisodeNumber;
   baseEventRules: BaseEventRule;
-  tribes: TribeName[];
-  castaways: CastawayName[];
-  members: (LeagueMemberDisplayName | null | undefined)[];
-  notes: string[] | null;
+  edit?: boolean;
 }
 
 function BaseEventRow({
-  label, eventName, baseEventRules, tribes, castaways, members, notes, className
+  baseEvent, episodeNumber, baseEventRules, edit, className
 }: BaseEventRowProps) {
+  const { leagueData } = useLeague();
+  const { eventName, label, tribes, castaways, notes } = baseEvent;
+
+  const members =
+    castaways?.map((castaway) =>
+      leagueData.selectionTimeline.castawayMembers[castaway]?.slice(
+        0, episodeNumber + 1).pop());
+
   return (
     <TableRow className={className}>
+      {edit ? <TableCell className='w-0'>
+        <EditBaseEvent episodeNumber={episodeNumber} baseEvent={baseEvent} />
+      </TableCell> :
+        edit === false ? <TableCell className='w-0' /> : null}
       <TableCell className='text-nowrap'>
         { // disable because we want label to be ignored if empty string as well as undefined
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -406,13 +436,32 @@ interface LeagueEventRowProps {
   referenceName: string;
   predictionMaker?: LeagueMemberDisplayName;
   notes: string[] | null;
+  edit?: boolean;
 }
 
 function LeagueEventRow({
-  eventName, points, referenceType, referenceName, predictionMaker, notes, className
+  eventName, points, referenceType, referenceName, predictionMaker, notes, edit, className
 }: LeagueEventRowProps) {
   return (
     <TableRow className={className}>
+      {edit && <TableCell className='w-0'>
+        <AlertDialog>
+          <AlertDialogTrigger>
+            <Pencil size={20} />
+          </AlertDialogTrigger>
+          <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max pb-0'>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Edit Event</AlertDialogTitle>
+              <AlertDialogDescription hidden>Edit the event details</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel className='h-min p-1'>
+                <X stroke='white' />
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </TableCell>}
       <TableCell className='text-nowrap sticky'>{eventName}</TableCell>
       <PointsCell points={points} />
       <TableCell className='text-right text-xs text-nowrap'>

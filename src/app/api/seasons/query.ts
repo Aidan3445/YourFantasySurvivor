@@ -27,6 +27,7 @@ export const QUERIES = {
         eventName: baseEventsSchema.eventName,
         label: baseEventsSchema.label,
         referenceType: baseEventReferenceSchema.referenceType,
+        referenceId: baseEventReferenceSchema.referenceId,
         castaway: castawaysSchema.fullName,
         tribe: tribesSchema.tribeName,
         notes: baseEventsSchema.notes
@@ -45,12 +46,16 @@ export const QUERIES = {
         acc[row.episodeNumber] ??= {};
         const events = acc[row.episodeNumber]!;
         events[row.baseEventId] ??= {
+          baseEventId: row.baseEventId,
+          referenceType: row.referenceType,
+          references: [],
           eventName: row.eventName,
           label: row.label,
           castaways: [],
           tribes: [],
           notes: row.notes
         };
+        events[row.baseEventId]!.references.push(row.referenceId);
         switch (row.referenceType) {
           case 'Castaway':
             events[row.baseEventId]!.castaways.push(row.castaway!);

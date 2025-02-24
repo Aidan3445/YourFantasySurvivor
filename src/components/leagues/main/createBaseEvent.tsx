@@ -2,35 +2,27 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { useLeague } from '~/hooks/useLeague';
-import { AllBaseEventNames, baseEventLabelPrefixes, baseEventLabels, BaseEventNameZod, EventRefZod } from '~/server/db/defs/events';
+import { AllBaseEventNames, type BaseEventInsert, baseEventLabelPrefixes, baseEventLabels, BaseEventInsertZod } from '~/server/db/defs/events';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { MultiSelect } from '~/components/ui/multiSelect';
 import { useMemo, useState } from 'react';
-import { type TribeId, type TribeName } from '~/server/db/defs/tribes';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
 import { EpisodeEvents } from './recentActivity';
 import { Button } from '~/components/ui/button';
-
-const formSchema = z.object({
-  episodeId: z.number(),
-  eventName: BaseEventNameZod,
-  referenceType: EventRefZod,
-  references: z.array(z.number().or(z.undefined())).nonempty(),
-  label: z.string(),
-  notes: z.array(z.string())
-});
+import { createBaseEvent } from '~/app/api/seasons/actions';
+import { useEventOptions } from '~/hooks/useEventOptions';
 
 export default function CreateBaseEvent() {
-  const { leagueData } = useLeague();
-  const reactForm = useForm<z.infer<typeof formSchema>>({
+  const { leagueData, refresh } = useLeague();
+  const reactForm = useForm<BaseEventInsert>({
     defaultValues: {
       episodeId: leagueData.episodes[0]?.episodeId,
+      notes: null,
     },
-    resolver: zodResolver(formSchema)
+    resolver: zodResolver(BaseEventInsertZod),
   });
 
   const selectedReferenceType = reactForm.watch('referenceType');
@@ -39,33 +31,10 @@ export default function CreateBaseEvent() {
   const selectedEpisodeId = reactForm.watch('episodeId');
   const selectedEpisode = useMemo(() => leagueData.episodes
     .find(episode =>
-      episode.episodeId === Number(selectedEpisodeId))?.episodeNumber,
+      episode.episodeId === Number(selectedEpisodeId))?.episodeNumber ?? 1,
     [leagueData.episodes, selectedEpisodeId]);
 
-  const castawayOptions = useMemo(() => leagueData.castaways
-    .filter(castaway => !castaway.eliminatedEpisode || castaway.eliminatedEpisode > (selectedEpisode ?? 0))
-    .map(castaway => ({ value: castaway.castawayId, label: castaway.fullName })),
-    [leagueData.castaways, selectedEpisode]);
-
-  const tribeOptions = useMemo(() => leagueData.castaways
-    .filter(castaway => castawayOptions
-      .some(castawayOption => castawayOption.value === castaway.castawayId))
-    .reduce((acc, castawayDetails) => {
-      const currentTribe = castawayDetails.tribes
-        .toReversed().find(tribe => tribe.episode <= (selectedEpisode ?? 0));
-      let tribeIndex = acc.findIndex(tribe => tribe.value === currentTribe?.tribeId);
-      if (currentTribe && tribeIndex === -1) {
-        acc.push({ value: currentTribe.tribeId, label: currentTribe.tribeName, castaways: [] });
-        tribeIndex = acc.length - 1;
-      }
-
-      if (currentTribe) {
-        acc[tribeIndex]?.castaways.push(castawayDetails.fullName);
-      }
-      return acc;
-    }, [] as { value: TribeId, label: TribeName, castaways: string[] }[]),
-    [leagueData.castaways, castawayOptions, selectedEpisode]);
-
+  const { castawayOptions, tribeOptions } = useEventOptions(selectedEpisode);
   const [eventSubtype, setEventSubtype] = useState('');
 
   const labelHelper = (subtype: string) => {
@@ -78,14 +47,29 @@ export default function CreateBaseEvent() {
 
   const clearReferences = () => {
     setEventClearer(eventClearer + 1);
+    reactForm.resetField('references');
   };
+
+  const handleSubmit = reactForm.handleSubmit(async (data) => {
+    try {
+      await createBaseEvent(data);
+      alert('Base event created successfully');
+      reactForm.reset();
+      await refresh();
+    } catch (e) {
+      alert('Failed to create base event');
+      console.error('Failed to create base event', e);
+    }
+  });
 
   return (
     <section className='bg-card rounded-lg'>
       <Form {...reactForm}>
         <span className='flex gap-8 flex-wrap justify-evenly'>
-          <form className='flex flex-col gap-1 px-2 max-md:w-full flex-grow'>
-            <h2 className='text-2xl'>Create Base Event</h2>
+          <form
+            className='flex flex-col gap-1 px-2 max-md:w-full flex-grow'
+            action={() => handleSubmit()}>
+            <h2 className='text-2xl self-center'>Create Base Event</h2>
             <FormField
               name='episodeId'
               render={({ field }) => (
@@ -128,6 +112,7 @@ export default function CreateBaseEvent() {
                           field.onChange(value);
                           reactForm.resetField('label');
                           setEventSubtype('');
+                          clearReferences();
                         }}>
                         <SelectTrigger>
                           <SelectValue placeholder='Select Event' />
@@ -152,9 +137,9 @@ export default function CreateBaseEvent() {
                     <SelectValue placeholder='Event Subtype' />
                   </SelectTrigger>
                   <SelectContent>
-                    {baseEventLabels[selectedEvent]?.map(label => (
-                      <SelectItem key={label} value={label}>
-                        {label}
+                    {baseEventLabels[selectedEvent]?.map(subtype => (
+                      <SelectItem key={subtype} value={subtype}>
+                        {subtype}
                       </SelectItem>
                     ))}
                     <SelectItem value='Custom'>Custom</SelectItem>
@@ -175,30 +160,32 @@ export default function CreateBaseEvent() {
                     <FormMessage />
                   </FormItem>
                 )} />}
-            <FormLabel>Reference</FormLabel>
-            <FormField
-              name='referenceType'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Select
-                      defaultValue={field.value as string}
-                      value={field.value as string}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        clearReferences();
-                      }}>
-                      <SelectTrigger className='h-full'>
-                        <SelectValue placeholder='Select Reference Type' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='Castaway'>Castaway</SelectItem>
-                        <SelectItem value='Tribe'>Tribe</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )} />
+            {eventSubtype && <>
+              <FormLabel>Reference</FormLabel>
+              <FormField
+                name='referenceType'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Select
+                        defaultValue={field.value as string}
+                        value={field.value as string}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          clearReferences();
+                        }}>
+                        <SelectTrigger className='h-full'>
+                          <SelectValue placeholder='Select Reference Type' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='Castaway'>Castaway</SelectItem>
+                          <SelectItem value='Tribe'>Tribe</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                  </FormItem>
+                )} />
+            </>}
             {selectedReferenceType &&
               <FormField
                 name='references'
@@ -240,11 +227,11 @@ export default function CreateBaseEvent() {
             </Button>
           </form>
           <EpisodeEvents
-            episodeNumber={selectedEpisode!}
+            episodeNumber={selectedEpisode}
             mockBase={selectedEvent ? {
               eventName: selectedEvent,
               label: reactForm.watch('label'),
-              notes: reactForm.watch('notes')?.filter(note => note !== ''),
+              notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
               castaways: selectedReferenceType === 'Castaway' ?
                 selectedReferenceIds?.map(castawayId =>
                   castawayOptions.find(castaway => castaway.value === castawayId)?.label)
@@ -255,8 +242,11 @@ export default function CreateBaseEvent() {
               tribes: selectedReferenceType === 'Tribe' ?
                 selectedReferenceIds?.map(tribeId =>
                   tribeOptions.find(tribe => tribe.value === tribeId)?.label)
-                  .filter((tribe): tribe is string => tribe !== undefined) : [] as string[]
+                  .filter((tribe): tribe is string => tribe !== undefined) : [] as string[],
+              referenceType: selectedReferenceType,
+              references: selectedReferenceIds,
             } : undefined}
+            edit
           />
         </span>
       </Form>

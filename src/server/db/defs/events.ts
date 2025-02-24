@@ -40,8 +40,11 @@ export const BaseEventNameZod = z.enum(AllBaseEventNames);
 
 export type BaseEventId = number;
 export type BaseEvent = {
+  baseEventId: BaseEventId,
   eventName: BaseEventName,
   label: string,
+  referenceType: ReferenceType,
+  references: number[],
   castaways: CastawayName[],
   tribes: TribeName[],
   notes: string[] | null
@@ -161,3 +164,15 @@ export const baseEventLabelPrefixes: Record<BaseEventName, string> = {
   tribeUpdate: '',
   otherNotes: ''
 } as const;
+
+export const BaseEventInsertZod = z.object({
+  episodeId: z.number(),
+  eventName: BaseEventNameZod,
+  referenceType: EventRefZod,
+  references: z.number().array().nonempty(),
+  label: z.string(),
+  notes: z.array(z.string()).nullable(),
+});
+export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
+
+

@@ -155,18 +155,11 @@ export const MultiSelect = React.forwardRef<
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
 
-
-    const handleClear = React.useCallback(() => {
-      setSelectedValues([]);
-      onValueChange([]);
-    }, [onValueChange]);
-
-
     React.useEffect(() => {
       if (clear) {
-        handleClear();
+        setSelectedValues([]);
       }
-    }, [clear, handleClear]);
+    }, [clear]);
 
     const handleInputKeyDown = (
       event: React.KeyboardEvent<HTMLInputElement>
@@ -188,6 +181,12 @@ export const MultiSelect = React.forwardRef<
       setSelectedValues(newSelectedValues);
       onValueChange(newSelectedValues);
     };
+
+    const handleClear = () => {
+      setSelectedValues([]);
+      onValueChange([]);
+    };
+
     const handleTogglePopover = () => {
       setIsPopoverOpen((prev) => !prev);
     };
