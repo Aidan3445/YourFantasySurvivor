@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
 import { ColorZod, DisplayNameZod, type LeagueMemberColor, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
@@ -124,16 +124,22 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
         name='displayName'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Display Name</FormLabel>
+            <FormLabel className='text-lg'>Display Name</FormLabel>
             <FormControl>
               <Input
-                className='w-full'
+                className='w-full h-12 indent-2 placeholder:italic'
                 type='text'
                 autoComplete='off'
                 autoCapitalize='on'
                 placeholder='Choose a display name for yourself in this league'
                 {...field} />
             </FormControl>
+            <FormDescription className='text-sm text-left'>
+              Choose your name and color for this league. This is the name that will be at the top
+              of the leaderboard when you destroy the competition.
+              <br />
+              You can change your display name and color later.
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )} />
@@ -141,11 +147,10 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
         name='color'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Display Color</FormLabel>
             <FormControl>
-              <div className='flex w-full justify-center'>
+              <div className='flex justify-center mt-4'>
                 <Swatch
-                  className='gap-1 justify-center'
+                  className='pb-4'
                   onChange={(color) => ensureNewColor(color, field.onChange)}
                   colors={availableColors}
                   color={field.value as string}
@@ -153,7 +158,7 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
                     return (
                       <div
                         className={cn(
-                          'border border-primary',
+                          'border border-primary flex justify-center items-center',
                           !ensureNewColor(hexToHsva(props.color)) ? '!cursor-not-allowed' : '')}
                         {...props}>
                         <Point color={props.color} checked={props.checked} />
@@ -162,12 +167,8 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
                   }}
                   rectProps={{
                     style: {
-                      width: '65px',
-                      height: '65px',
-                      margin: '0px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      width: '50px',
+                      height: '50px',
                     },
                   }} />
               </div>

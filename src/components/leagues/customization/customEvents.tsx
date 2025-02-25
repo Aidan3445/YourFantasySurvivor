@@ -82,7 +82,7 @@ export default function CustomEvents() {
               <b><i>Custom events</i></b> can be scored in two ways:
             </p>
             <ul className='ml-4 list-decimal text-sm'>
-              <li><b>Direct</b>: Points awarded like the <b><i>base events</i></b> to the members whose pick
+              <li><b>Direct</b>: Points awarded like the <b><i>official events</i></b> to the members whose pick
                 scores the event.</li>
               <li><b>Prediction</b>: Points awarded to the members who correctly predict the outcome
                 of the event. Predictions can be every episode or at specific times during the
@@ -116,7 +116,6 @@ export default function CustomEvents() {
         <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
           No custom events have been created yet.
         </h3>}
-
       <article className='grid grid-cols-2 gap-3 px-2'>
         {customEventRules.map((rule, index) => (
           <CustomEventCard key={index} rule={rule} />

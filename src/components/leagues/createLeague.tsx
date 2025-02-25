@@ -5,10 +5,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
-import { DEFAULT_SURVIVAL_CAP, LeagueNameZod, SurvivalCapZod } from '~/server/db/defs/leagues';
-import { BaseEventRuleZod, defaultBaseRules } from '~/server/db/defs/events';
+import { LeagueNameZod } from '~/server/db/defs/leagues';
 import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
-import LeagueSettingsFields from './customization/leagueSettings';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '~/components/ui/carousel';
 import { Button } from '~/components/ui/button';
 import { Progress } from '~/components/ui/progress';
@@ -27,26 +25,17 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/ui/alertDialog';
 import { X } from 'lucide-react';
+import { DraftDateField } from './customization/setDraftDate';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
-  baseEventRules: BaseEventRuleZod,
-  survivalCap: SurvivalCapZod,
   displayName: DisplayNameZod,
   color: ColorZod,
+  draftDate: z.date().optional(),
 }).transform(data => ({
   ...data,
   leagueName: data.leagueName.trim()
 }));
-
-
-const defaultValues: z.infer<typeof formSchema> = {
-  leagueName: '',
-  baseEventRules: defaultBaseRules,
-  survivalCap: DEFAULT_SURVIVAL_CAP,
-  displayName: '',
-  color: '',
-};
 
 interface CreateLeagueFormProps {
   onSubmit?: () => void;
@@ -57,7 +46,12 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
   const { user } = useUser();
   const { api, setApi, current, count, progress } = useCarouselProgress();
   const reactForm = useForm<z.infer<typeof formSchema>>({
-    defaultValues, resolver: zodResolver(formSchema)
+    defaultValues: {
+      leagueName: '',
+      displayName: '',
+      color: '',
+    },
+    resolver: zodResolver(formSchema)
   });
   const { addLeague } = useYfsUser();
 
@@ -70,14 +64,11 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
       const leagueInfo = await createNewLeague(
         data.leagueName,
         {
-          survivalCap: data.survivalCap
-        },
-        data.baseEventRules,
-        {
           displayName: data.displayName,
           color: data.color,
           role: 'Owner'
-        }
+        },
+        data.draftDate
       );
       addLeague(leagueInfo);
       alert(`League created with id: ${leagueInfo.leagueHash}`);
@@ -91,30 +82,35 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
 
   return (
     <Form {...reactForm}>
-      <form className='bg-card rounded-lg w-96' action={() => handleSubmit()}>
-        <Carousel className='pt-10' setApi={setApi} opts={{ watchDrag: false, ignoreKeys: true }}>
-          <CarouselPrevious className='absolute left-1 top-5 z-10' />
-          {count > 0 &&
-            <p className='w-full text-center text-sm absolute top-1'>
-              Step {current + 1} of {count}
-            </p>}
-          <Progress className='w-80 absolute left-12 top-6' value={progress} />
+      <form className='bg-card rounded-lg' action={() => handleSubmit()}>
+        <Carousel setApi={setApi} opts={{ watchDrag: false, ignoreKeys: true }}>
+          <span className='flex w-full justify-center items-end gap-4'>
+            <CarouselPrevious className='static translate-y-0' />
+            <div className='space-y-1 flex-grow'>
+              {count > 0 &&
+                <p className='w-full text-center text-sm'>
+                  Step {current + 1} of {count}
+                </p>}
+              <Progress className='w-full' value={progress} />
+            </div>
+            <div className='w-8' />
+          </span>
           <CarouselContent className='-ml-14'>
-            <CarouselItem className='pl-14 flex flex-col'>
-              <LeagueNameFields />
-              <LeagueMemberFields />
+            <CarouselItem className='pl-14 flex flex-col pt-4'>
+              <LeagueNameField />
               <NextButton
-                disabled={!formSchema.safeParse(reactForm.watch())?.success}
+                disabled={!LeagueNameZod.safeParse(reactForm.watch('leagueName')).success}
                 onClick={() => api?.scrollNext()} />
             </CarouselItem>
-            <CarouselItem className='pl-14 flex flex-col'>
-              <LeagueSettingsFields />
+            <CarouselItem className='pl-14 flex flex-col pt-4'>
+              <DraftDateField />
               <NextButton onClick={() => api?.scrollNext()} />
             </CarouselItem>
-            <CarouselItem className='pl-14 flex flex-col'>
-              <BaseEventsFields />
+            <CarouselItem className='pl-14 flex flex-col pt-4'>
+              <LeagueMemberFields />
               <Button
                 className='m-4 mt-auto w-80 self-center'
+                disabled={!reactForm.formState.isValid}
                 type='submit'>
                 Create League
               </Button>
@@ -143,23 +139,48 @@ function NextButton({ disabled = false, onClick }: NextButtonProps) {
   );
 }
 
-function LeagueNameFields() {
+
+const placeholderOptions = [
+  'Jeff Probst Fan Club',
+  'Torch Snuffers',
+  'Jury\'s Out'
+];
+
+function LeagueNameField() {
+  const [placeholder, setPlaceholder] = useState(0);
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholder((prev) => (prev + 1) % placeholderOptions.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [setPlaceholder]);
+
+
+
   return (
     <section className='mx-2'>
       <FormField
         name='leagueName'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>League Name</FormLabel>
+            <FormLabel className='text-lg'>League Name</FormLabel>
             <FormControl>
               <Input
-                className='w-full'
+                className='w-full h-12 indent-2 placeholder:italic'
                 type='text'
                 autoComplete='off'
                 autoCapitalize='on'
-                placeholder='Enter the name of your league'
+                placeholder={placeholderOptions[placeholder]}
                 {...field} />
             </FormControl>
+            <FormDescription className='text-sm text-left'>
+              Pick a fun or creative name for your league!
+              This is how your league will appear to members.
+              {' Don\'t worry, you can change this later.'}
+            </FormDescription>
             <FormMessage />
           </FormItem>
         )} />
@@ -222,9 +243,9 @@ export function CreateLeagueModal({ children }: CreateLeagueModalProps) {
       <AlertDialogTrigger>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className='w-min max-sm:scale-75'>
+      <AlertDialogContent className='sm:w-[40rem] w-96 flex flex-col'>
         <AlertDialogHeader>
-          <AlertDialogTitle className='sr-only'>Create a New League</AlertDialogTitle>
+          <AlertDialogTitle className='text-2xl'>Create a New League</AlertDialogTitle>
           <AlertDialogDescription className='sr-only'>
             Create a new league to start drafting with your friends.
           </AlertDialogDescription>

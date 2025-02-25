@@ -1,7 +1,7 @@
 'use client';
 
 import { z } from 'zod';
-import { BaseEventRuleZod } from '~/server/db/defs/events';
+import { BaseEventRuleZod, defaultBaseRules } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -31,12 +31,12 @@ export default function LeagueScoring() {
     refresh,
   } = useLeague();
   const reactForm = useForm<z.infer<typeof formSchema>>({
-    defaultValues: { baseEventRules },
+    defaultValues: { baseEventRules: baseEventRules ?? defaultBaseRules },
     resolver: zodResolver(formSchema)
   });
 
   useEffect(() => {
-    reactForm.setValue('baseEventRules', baseEventRules);
+    reactForm.setValue('baseEventRules', baseEventRules ?? defaultBaseRules);
   }, [baseEventRules, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
@@ -46,7 +46,7 @@ export default function LeagueScoring() {
       alert(`Base event rules updated for league ${leagueHash}`);
     } catch (error) {
       console.error(error);
-      alert('Failed to update base event rules');
+      alert('Failed to update official event rules');
     }
   });
 
@@ -57,7 +57,7 @@ export default function LeagueScoring() {
 
   return (
     <article className='p-2 bg-card rounded-xl w-full'>
-      <h2 className='text-lg font-bold text-card-foreground'>Base Events</h2>
+      <h2 className='text-lg font-bold text-card-foreground'>Official Events</h2>
       <Form {...reactForm}>
         <form action={() => handleSubmit()}>
           <BaseEventRuleTabs
@@ -65,7 +65,7 @@ export default function LeagueScoring() {
             rightSide={
               <section className='flex flex-col gap-2 mt-2'>
                 <h3 className='text-lg font-bold text-card-foreground'>Customizing Base Events</h3>
-                <p className='text-sm'>These <b><i>base events</i></b> will be automatically scored
+                <p className='text-sm'>These <b><i>official events</i></b> will be automatically scored
                   for your league based on the events of each episode. Set the point values for each
                   event that will be awarded to the member whose current <i>survivor</i> scores the event.
                 </p>

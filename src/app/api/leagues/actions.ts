@@ -1,7 +1,7 @@
 'use server';
 
 import { auth } from '@clerk/nextjs/server';
-import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate, type LeagueSurvivalCap } from '~/server/db/defs/leagues';
+import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { type ReferenceType, type BaseEventRule, type LeagueEventRule } from '~/server/db/defs/events';
@@ -34,9 +34,8 @@ import { QUERIES } from './query';
   */
 export async function createNewLeague(
   leagueName: LeagueName,
-  settings: { survivalCap: LeagueSurvivalCap },
-  rules: BaseEventRule,
-  newMember: NewLeagueMember
+  newMember: NewLeagueMember,
+  draftDate?: Date
 ) {
   const user = await auth();
   if (!user.userId) throw new Error('User not authenticated');
@@ -81,11 +80,7 @@ export async function createNewLeague(
       // Insert the league settings
       await trx
         .insert(leagueSettingsSchema)
-        .values({ ...settings, leagueId, draftOrder: [memberId] });
-      // Insert the base event rules
-      await trx
-        .insert(baseEventRulesSchema)
-        .values({ ...rules, leagueId });
+        .values({ leagueId, draftDate: draftDate?.toUTCString(), draftOrder: [memberId] });
 
       return {
         leagueName,
@@ -243,8 +238,23 @@ export async function updateLeagueSettings(
   * @throws an error if the rules cannot be updated
   */
 export async function updateBaseEventRules(leagueHash: LeagueHash, rules: BaseEventRule) {
-  const { role } = await leagueMemberAuth(leagueHash);
-  if (!role || role !== 'Owner') throw new Error('User not authorized');
+  const { role, league } = await leagueMemberAuth(leagueHash);
+  if (!role || role !== 'Owner' || !league) throw new Error('User not authorized');
+
+  // See if the league is still using the default rules
+  const noRulesSet = await db
+    .select({ leagueId: baseEventRulesSchema.leagueId })
+    .from(baseEventRulesSchema)
+    .where(eq(baseEventRulesSchema.leagueId, league.leagueId))
+    .then((res) => !res[0]?.leagueId);
+
+  // if no rules we're inserting
+  if (noRulesSet) {
+    await db
+      .insert(baseEventRulesSchema)
+      .values({ ...rules, leagueId: league.leagueId });
+    return;
+  }
 
   // Error can be ignored, the where clause is not understood by the type system
   // eslint-disable-next-line drizzle/enforce-update-with-where

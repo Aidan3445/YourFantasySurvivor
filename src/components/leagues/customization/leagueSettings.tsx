@@ -9,7 +9,6 @@ import { type LeagueSettingsUpdate, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/s
 import { useLeague } from '~/hooks/useLeague';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { DraftDateField } from './setDraftDate';
 import { MultiSelect } from '~/components/ui/multiSelect';
 import { Button } from '~/components/ui/button';
 import { updateAdmins, updateLeagueSettings } from '~/app/api/leagues/actions';
@@ -84,7 +83,6 @@ export default function LeagueSettingsFields({ disabled }: LeagueSettingsFieldsP
             <FormMessage />
           </FormItem>
         )} />
-      <DraftDateField />
     </section>
   );
 }

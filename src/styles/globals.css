@@ -130,6 +130,11 @@ body  {
   @apply h-44;
 }
 
+/* Color Swatch */
+.w-color-swatch {
+  @apply !grid grid-cols-5;
+}
+
 /* Sidebar */
 @layer base { 
   :root {

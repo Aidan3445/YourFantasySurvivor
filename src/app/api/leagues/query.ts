@@ -19,7 +19,8 @@ import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/server/db/def
 import {
   type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent,
   type BaseEventRule, type LeagueEventId, type LeagueEventName,
-  LeaguePredictionTimingOptions
+  LeaguePredictionTimingOptions,
+  defaultBaseRules
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { TribeName } from '~/server/db/defs/tribes';
@@ -58,7 +59,7 @@ export const QUERIES = {
       .from(leaguesSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
-      .innerJoin(baseEventRulesSchema, eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId))
+      .leftJoin(baseEventRulesSchema, eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId))
       .where(eq(leaguesSchema.leagueHash, leagueHash))
       .then((leagues) => leagues[0]);
 
@@ -105,7 +106,6 @@ export const QUERIES = {
       ...league,
       settings: {
         ...league.settings,
-        //draftOver: !!(league.settings.draftDate && new Date() > new Date(league.settings.draftDate)),
         draftDate: league.settings.draftDate ? new Date(league.settings.draftDate + 'Z') : null,
       },
       members,
@@ -665,12 +665,12 @@ export const QUERIES = {
       QUERIES.getEpisodes(leagueHash, 100), // move to seasons
     ]);
 
-    if (!baseEventRules || !leagueSettings) {
+    if (!leagueSettings) {
       throw new Error('League not found');
     }
 
     const scores = compileScores(
-      baseEvents, tribesTimeline, elims, leagueEvents, baseEventRules,
+      baseEvents, tribesTimeline, elims, leagueEvents, baseEventRules ?? defaultBaseRules,
       selectionTimeline, leagueSettings.survivalCap);
 
 

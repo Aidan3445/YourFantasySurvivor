@@ -18,11 +18,14 @@ interface DateTimePickerProps {
   setDate: (date: Date) => void;
   disabled?: boolean;
   side?: 'top' | 'bottom';
+  placeholder?: string;
+  rangeStart?: Date;
+  rangeEnd?: Date;
 }
 
 
 
-export function DateTimePicker({ defaultValue, date, setDate, disabled, side }: DateTimePickerProps) {
+export function DateTimePicker({ defaultValue, date, setDate, disabled, side, placeholder, rangeStart, rangeEnd }: DateTimePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
 
@@ -72,14 +75,14 @@ export function DateTimePicker({ defaultValue, date, setDate, disabled, side }: 
           variant='outline'
           className={cn(
             'w-full justify-start text-left font-normal rounded-full',
-            !date && 'text-muted-foreground'
+            !date && 'text-muted-foreground h-12'
           )}
         >
           <CalendarIcon className='mr-2 h-4 w-4' />
           {date ? (
             format(date, 'MM/dd/yyyy hh:mm aa')
           ) : (
-            <span>Select date and time</span>
+            <span>{placeholder ?? 'Select date and time'}</span>
           )}
         </Button>
       </PopoverTrigger>
@@ -90,6 +93,15 @@ export function DateTimePicker({ defaultValue, date, setDate, disabled, side }: 
             selected={date}
             onSelect={handleDateSelect}
             initialFocus
+            disabled={(checkDate) => {
+              if (rangeStart && checkDate < rangeStart) {
+                return true;
+              }
+              if (rangeEnd && checkDate > rangeEnd) {
+                return true;
+              }
+              return false;
+            }}
           />
           <div className='flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x'>
             <ScrollArea className='w-64 sm:w-auto'>

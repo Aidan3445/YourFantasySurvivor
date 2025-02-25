@@ -8,6 +8,7 @@ import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from './layout';
 import ChangeSurvivor from '~/components/leagues/main/changeSurvivor';
 import CreateBaseEvent from '~/components/leagues/main/createBaseEvent';
+import CustomEvents from '~/components/leagues/customization/customEvents';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
@@ -32,6 +33,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </span>
               <ChangeSurvivor />
               <RecentActivity />
+              <CustomEvents />
             </div>
           </TabsContent>
           <TabsContent value='events'>
