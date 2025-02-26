@@ -20,7 +20,11 @@ const leagueFetcher: Fetcher<Response, SWRKey> = ({ leagueHash }) =>
 export function useLeague() {
   const { leagueHash } = useParams();
 
-  const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher, { refreshInterval: 10000, revalidateOnMount: true });
+  const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher,
+    {
+      refreshInterval: 10000,
+      refreshWhenHidden: false
+    });
 
   const league = data?.league;
   const leagueData = data?.leagueData;
@@ -63,7 +67,8 @@ const nonLeague: League = {
     leagueId: 0,
     draftDate: null,
     draftOrder: [],
-    survivalCap: 5
+    survivalCap: 5,
+    preserveStreak: true
   },
 };
 

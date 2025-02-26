@@ -76,6 +76,7 @@ export const QUERIES = {
 
     const leagueEventRulesPromise = db
       .select({
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventName: leagueEventsRulesSchema.eventName,
         description: leagueEventsRulesSchema.description,
         points: leagueEventsRulesSchema.points,
@@ -396,6 +397,7 @@ export const QUERIES = {
 
     const directEventsPromise = db
       .select({
+        leageueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         episodeNumber: episodesSchema.episodeNumber,
         eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
@@ -430,6 +432,7 @@ export const QUERIES = {
         };
 
         const newEvent = {
+          leageueEventRuleId: event.leageueEventRuleId,
           eventId: event.eventId,
           eventName: event.eventName,
           points: event.points,
@@ -456,6 +459,7 @@ export const QUERIES = {
     const predictionMaker = aliasedTable(leagueMembersSchema, 'predictionMaker');
     const predictionEventsPromise = db
       .select({
+        leageueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
         points: leagueEventsRulesSchema.points,
@@ -498,6 +502,7 @@ export const QUERIES = {
         eq(leagueMembersSchema.memberId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Member')))
       .then((events: {
+        leageueEventRuleId: LeagueEventId,
         eventId: LeagueEventId,
         eventName: LeagueEventName
         points: number,
@@ -513,6 +518,7 @@ export const QUERIES = {
       ) => events.reduce((acc, event) => {
         acc[event.episodeNumber] ??= [];
         const newEvent = {
+          leageueEventRuleId: event.leageueEventRuleId,
           eventId: event.eventId,
           eventName: event.eventName,
           points: event.points,
@@ -671,7 +677,7 @@ export const QUERIES = {
 
     const scores = compileScores(
       baseEvents, tribesTimeline, elims, leagueEvents, baseEventRules ?? defaultBaseRules,
-      selectionTimeline, leagueSettings.survivalCap);
+      selectionTimeline, leagueSettings.survivalCap, leagueSettings.preserveStreak);
 
 
     return {

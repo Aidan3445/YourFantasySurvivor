@@ -15,8 +15,10 @@ import { MultiSelect } from '~/components/ui/multiSelect';
 import { Button } from '~/components/ui/button';
 import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/app/api/leagues/actions';
 import { Flame, Settings2 } from 'lucide-react';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/ui/alertDialog';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from '~/components/ui/alertDialog';
 import { type ReactNode, useState } from 'react';
 
 export default function CustomEvents() {
@@ -68,57 +70,63 @@ export default function CustomEvents() {
         <h2 className='text-lg font-bold text-card-foreground'>Custom Events</h2>
         <div className='flex flex-col gap-2'>
           <p className='text-sm'>
-            These <b><i>custom events</i></b> allow you to make this league unique!
-            Anything and everything can be scored here, from speaking the first word of the
-            episode to orchestrating a blindside. The possibilities are endless!
+            These <i>Custom Events</i> let you make your league truly unique!
+            Anything can be scored—from speaking the first word of the episode to orchestrating a blindside.
+            <br />
+            The possibilities are endless!
           </p>
           <p className='text-sm'>
-            For most custom events you make, you will need to record the <i>result</i> during
-            the episode yourself. Once the season starts, you will see a new tab on this page
-            where you can score events as they happen.
+            Most custom events require manual scoring. Once your league drafts, you’ll see a new
+            tab on this page where you can track and score events as they happen.
           </p>
           <div>
-            <p className='text-sm font-medium'>
-              <b><i>Custom events</i></b> can be scored in two ways:
+            <p className='text-sm'>
+              <i>Custom Events</i> can be scored in two ways:
             </p>
             <ul className='ml-4 list-decimal text-sm'>
-              <li><b>Direct</b>: Points awarded like the <b><i>official events</i></b> to the members whose pick
-                scores the event.</li>
-              <li><b>Prediction</b>: Points awarded to the members who correctly predict the outcome
-                of the event. Predictions can be every episode or at specific times during the
-                season.</li>
+              <li><b>Direct</b>: Points are awarded like <i>Official Events</i>, based on a player’s pick.</li>
+              <li><b>Prediction</b>: Points are awarded to members who correctly predict an event’s outcome.
+                Predictions can occur each episode or at specific times in the season.</li>
             </ul>
           </div>
         </div>
-        {!disabled &&
-          <Accordion
-            type='single'
-            collapsible
-            defaultValue={customEventRules.length === 0 ? 'create' : ''}>
-            <AccordionItem value='create'>
-              <Form {...reactForm}>
-                <form action={() => handleSubmit()}>
-                  <AccordionTrigger className='items-baseline gap-2 justify-start'>
-                    <h3 className='text-lg font-bold text-card-foreground'>Create a Custom Event</h3>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <CustomEventFields>
-                      <Button type='submit' className='ml-auto mt-auto'>Create Event</Button>
-                    </CustomEventFields>
-                  </AccordionContent>
-                </form>
-              </Form>
-            </AccordionItem>
-          </Accordion>}
         <br />
+        {!disabled &&
+          <AlertDialog>
+            <Form {...reactForm}>
+              <form action={() => handleSubmit()}>
+                <AlertDialogTrigger asChild>
+                  <Button>Create Custom Event</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Create a Custom Event</AlertDialogTitle>
+                    <AlertDialogDescription className='sr-only'>
+                      Create a custom event to score in your league.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <CustomEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
+                  <AlertDialogFooter>
+                    <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
+                    <AlertDialogAction asChild>
+                      <Button type='submit' onClick={() => handleSubmit()}>Create Event</Button>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </form>
+            </Form>
+          </AlertDialog>}
       </div>
-      {customEventRules.length === 0 &&
+      <br />
+      {
+        customEventRules.length === 0 &&
         <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
           No custom events have been created yet.
-        </h3>}
+        </h3>
+      }
       <article className='grid grid-cols-2 gap-3 px-2'>
         {customEventRules.map((rule, index) => (
-          <CustomEventCard key={index} rule={rule} />
+          <CustomEventCard key={index} rule={rule} locked={disabled} />
         ))}
       </article>
     </article >
@@ -134,11 +142,12 @@ from the event publisher.
 */
 
 interface CustomEventFieldsProps {
+  predictionDefault?: boolean;
   children?: ReactNode;
 }
 
-export function CustomEventFields({ children }: CustomEventFieldsProps) {
-  const [isPrediction, setIsPrediction] = useState(false);
+export function CustomEventFields({ predictionDefault, children }: CustomEventFieldsProps) {
+  const [isPrediction, setIsPrediction] = useState(predictionDefault ?? false);
 
   const onTypeChange = (type: string) => {
     setIsPrediction(type === 'Prediction');
@@ -203,7 +212,7 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
             </FormItem>
           )} />
         <FormField
-          name='type'
+          name='eventType'
           render={({ field }) => (
             <FormItem className='w-2/3'>
               <FormLabel>Event Type</FormLabel>
@@ -263,9 +272,10 @@ export function CustomEventFields({ children }: CustomEventFieldsProps) {
 
 interface CustomEventCardProps {
   rule: LeagueEventRule;
+  locked?: boolean;
 }
 
-function CustomEventCard({ rule }: CustomEventCardProps) {
+function CustomEventCard({ rule, locked }: CustomEventCardProps) {
   const {
     league: {
       leagueHash,
@@ -317,7 +327,7 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
       {rule.eventType === 'Prediction' &&
         <p className='text-xs italic mb-1'>Predictions: {rule.timing.join(', ')}</p>}
       <p className='text-sm'>{rule.description}</p>
-      {loggedIn && loggedIn.role === 'Owner' &&
+      {loggedIn && loggedIn.role === 'Owner' && !locked &&
         <Form {...reactForm}>
           <form action={() => handleSubmit()}>
             <AlertDialog open={isEditing} onOpenChange={setIsEditing}>
@@ -336,7 +346,7 @@ function CustomEventCard({ rule }: CustomEventCardProps) {
                     Edit the event details or delete the event.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <CustomEventFields />
+                <CustomEventFields predictionDefault={rule.eventType === 'Prediction'} />
                 <AlertDialogFooter className='grid grid-cols-2 gap-2'>
                   <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
                   <AlertDialogAction asChild>

@@ -93,12 +93,14 @@ export default function DraftOrder({ className }: DraftOrderProps) {
             className='cursor-pointer stroke-primary hover:stroke-secondary transition-all mr-2'
             size={24}
             onClick={shuffleOrderWithAnimation} />
-          <span className='flex gap-2 ml-auto'>
-            <form action={() => handleSubmit()}>
-              <Button disabled={!orderChanged}>Save</Button>
-            </form>
-            <Button disabled={!orderChanged} variant='destructive' onClick={() => setOrder(dbOrder)}>Reset</Button>
-          </span>
+          <form className='ml-auto' action={() => handleSubmit()}>
+            <span className='grid grid-cols-2 gap-2'>
+              <Button type='button' disabled={!orderChanged} variant='destructive' onClick={() => setOrder(dbOrder)}>
+                Cancel
+              </Button>
+              <Button type='submit' disabled={!orderChanged}>Save</Button>
+            </span>
+          </form>
         </>}
       </span>
       <DndContext

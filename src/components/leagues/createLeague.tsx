@@ -188,44 +188,30 @@ function LeagueNameField() {
   );
 }
 
-function BaseEventsFields() {
-  return (
-    <section className='mx-2'>
-      <FormLabel>Setup Events</FormLabel>
-      <FormDescription>{'Don\'t worry, you can change these values later.'}</FormDescription>
-      <BaseEventRuleTabs />
-    </section>
-  );
-}
-
 interface BaseEventRuleTabsProps {
   rightSide?: ReactNode;
-  disabled?: boolean;
+  locked?: boolean;
 }
 
-export function BaseEventRuleTabs({ rightSide, disabled }: BaseEventRuleTabsProps) {
+export function BaseEventRuleTabs({ rightSide, locked: disabled }: BaseEventRuleTabsProps) {
   return (
-    <Tabs defaultValue='challenges' className='h-[26rem] mt-2'>
+    <Tabs defaultValue='challenges' className='h-[27rem] mt-2'>
       <TabsList className='w-full grid grid-cols-3'>
         <TabsTrigger value='challenges'>Challenges</TabsTrigger>
         <TabsTrigger value='advantages'>Advantages</TabsTrigger>
         <TabsTrigger value='other'>Other</TabsTrigger>
       </TabsList>
-      <span className='flex gap-4'>
-        <div className='flex-grow flex-shrink-0'>
-          <TabsContent value='challenges'>
-            <ChallengeScoreSettings disabled={disabled} />
-          </TabsContent>
-          <TabsContent value='advantages'>
-            <AdvantageScoreSettings disabled={disabled} />
-          </TabsContent>
-          <TabsContent value='other'>
-            <OtherScoreSettings disabled={disabled} />
-          </TabsContent>
-        </div>
-        <div className='flex-shrink flex-grow-0'>
-          {rightSide}
-        </div>
+      <span className='flex'>
+        <TabsContent value='challenges'>
+          <ChallengeScoreSettings disabled={disabled} />
+        </TabsContent>
+        <TabsContent value='advantages'>
+          <AdvantageScoreSettings disabled={disabled} />
+        </TabsContent>
+        <TabsContent value='other'>
+          <OtherScoreSettings disabled={disabled} />
+        </TabsContent>
+        {rightSide}
       </span>
     </Tabs>
   );
@@ -233,14 +219,15 @@ export function BaseEventRuleTabs({ rightSide, disabled }: BaseEventRuleTabsProp
 
 interface CreateLeagueModalProps {
   children: ReactNode;
+  className?: string;
 }
 
-export function CreateLeagueModal({ children }: CreateLeagueModalProps) {
+export function CreateLeagueModal({ children, className }: CreateLeagueModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger>
+      <AlertDialogTrigger className={className}>
         {children}
       </AlertDialogTrigger>
       <AlertDialogContent className='sm:w-[40rem] w-96 flex flex-col'>

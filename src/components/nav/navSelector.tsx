@@ -14,13 +14,12 @@ export interface NavLinkProps {
 }
 
 export default function Nav() {
-  const isMobile = useIsMobile();
-
-  if (isMobile) {
-    return <BottomNav />;
-  } else {
-    return <SideNav />;
-  }
+  return (
+    <>
+      <SideNav />
+      <BottomNav />
+    </>
+  );
 }
 
 export function BottomNavSpacer() {

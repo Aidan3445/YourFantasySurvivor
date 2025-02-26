@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createTable } from './createTable';
 import { seasonsSchema } from './seasons';
-import { integer, pgEnum, serial, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
+import { boolean, integer, pgEnum, serial, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 import { sql } from 'drizzle-orm';
 import { DEFAULT_SURVIVAL_CAP, LeagueStatusOptions } from '~/server/db/defs/leagues';
@@ -32,5 +32,6 @@ export const leagueSettingsSchema = createTable(
     draftDate: timestamp('draft_date', { mode: 'string' }),
     draftOrder: integer('draft_order').array().notNull().default(sql`ARRAY[]::integer[]`),
     survivalCap: integer('survival_cap').notNull().default(DEFAULT_SURVIVAL_CAP),
+    preserveStreak: boolean('preserve_streak').notNull().default(true),
   }
 );

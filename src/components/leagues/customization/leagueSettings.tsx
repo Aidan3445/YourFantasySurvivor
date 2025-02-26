@@ -100,7 +100,6 @@ export function LeagueSettings() {
       leagueHash,
       leagueName,
       settings: {
-        survivalCap,
         draftDate,
       },
       members: {
@@ -121,7 +120,6 @@ export function LeagueSettings() {
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       leagueName,
-      survivalCap,
       draftDate: draftDate ?? new Date(),
       admins: membersList.filter(member => member.role === 'Admin').map(member => member.value),
     },
@@ -130,7 +128,6 @@ export function LeagueSettings() {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     const leagueUpdate: LeagueSettingsUpdate = {
       leagueName: data.leagueName,
-      survivalCap: data.survivalCap,
       draftDate: data.draftDate,
     };
 
@@ -149,26 +146,29 @@ export function LeagueSettings() {
 
   const editable = loggedIn?.role === 'Owner';
 
+  if (!editable) return null;
+
   return (
     <Form {...reactForm}>
-      <form className='h-full flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+      <form className='lg:flex-grow flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+        <FormLabel className='text-lg font-bold text-card-foreground'>Edit League Details</FormLabel>
         <FormField
           name='leagueName'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>League Name</FormLabel>
+              <FormLabel className='text-lg'>League Name</FormLabel>
               <FormControl>
                 <Input
-                  disabled={!editable}
-                  className='w-36 text-black'
+                  className='w-full h-12 indent-2 placeholder:italic'
                   type='text'
+                  autoComplete='off'
+                  autoCapitalize='on'
                   placeholder='League Name'
                   {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )} />
-        <LeagueSettingsFields />
         {editable && <>
           <LeagueAdminsField members={membersList} />
           <Button className='mt-auto' type='submit'>Save</Button>

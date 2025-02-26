@@ -9,8 +9,12 @@ export const LeagueStatusOptions = ['Predraft', 'Draft', 'Active', 'Inactive'] a
 export type LeagueStatus = typeof LeagueStatusOptions[number];
 
 export const DEFAULT_SURVIVAL_CAP = 5;
-export const MAX_SURVIVAL_CAP = 20;
-export const SurvivalCapZod = z.coerce.number().int().lte(MAX_SURVIVAL_CAP).gte(0);
+export const MAX_SURVIVAL_CAP = 15;
+export const SurvivalCapZod = z.object({
+  survivalCap: z.coerce.number().int().lte(MAX_SURVIVAL_CAP).gte(0),
+  preserveStreak: z.boolean(),
+});
+
 export type LeagueSurvivalCap = number;
 
 export type LeagueHash = string;
@@ -24,6 +28,7 @@ export interface League {
 
 export interface LeagueSettingsUpdate {
   leagueName?: string;
-  survivalCap?: number;
   draftDate?: Date;
+  survivalCap?: number;
+  preserveStreak?: boolean;
 }

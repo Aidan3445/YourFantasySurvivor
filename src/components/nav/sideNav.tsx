@@ -1,9 +1,9 @@
 'use client';
 
 import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
-import { SidebarMenuButton, SidebarMenuSub, SidebarSeparator } from '~/components/ui/sidebar';
+import { SidebarMenuButton, SidebarMenuSub } from '~/components/ui/sidebar';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/ui/sidebar';
-import { BookUser, Flame, Home, ListPlus, LoaderCircle, Trophy } from 'lucide-react';
+import { Home, ListPlus, LoaderCircle, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { type NavLinkProps } from './navSelector';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
@@ -16,15 +16,15 @@ import { Separator } from '../ui/separator';
 
 export default function SideNav() {
   return (
-    <Sidebar variant='sidebar' collapsible='none'>
+    <Sidebar className='hidden md:block' variant='sidebar' collapsible='none'>
       <SidebarContent>
         <SidebarGroup>
           <SidebarMenu>
             <SideNavLink href='/' icon={<Home />} label='Home' />
             <SideNavLeagues />
-            <SideNavLink href='/seasons' icon={<BookUser />} label='Seasons' />
+            {/*<SideNavLink href='/seasons' icon={<BookUser />} label='Seasons' />
             <SideNavLink href='/playground' icon={<Flame />} label='Playground' />
-            <SidebarSeparator />
+            <SidebarSeparator />*/}
           </SidebarMenu>
           <SideNavFooter />
         </SidebarGroup>

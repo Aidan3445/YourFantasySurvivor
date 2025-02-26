@@ -413,16 +413,21 @@ export async function updateLeagueEventRule(leagueHash: LeagueHash, rule: League
   const { role } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
 
+  console.log('rule', rule);
+
   // Error can be ignored, the where clause is not understood by the type system
   // eslint-disable-next-line drizzle/enforce-update-with-where
-  await db
+  const update = await db
     .update(leagueEventsRulesSchema)
     .set(rule)
     .from(leaguesSchema)
     .where(and(
       eq(leagueEventsRulesSchema.leagueId, leaguesSchema.leagueId),
       eq(leaguesSchema.leagueHash, leagueHash),
-      eq(leagueEventsRulesSchema.eventName, rule.eventName)));
+      eq(leagueEventsRulesSchema.leagueEventRuleId, rule.leagueEventRuleId!)))
+    .returning({ leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId })
+    .then(res => res[0]);
+  if (!update) throw new Error('Rule not found');
 }
 
 /**
@@ -436,12 +441,15 @@ export async function deleteLeagueEventRule(leagueHash: LeagueHash, eventName: s
   const { role, league } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner' || !league) throw new Error('User not authorized');
 
-  await db
+  const deleted = await db
     .delete(leagueEventsRulesSchema)
     .where(and(
       // DB keeps unique constraints on leagueId and eventName
       eq(leagueEventsRulesSchema.leagueId, league.leagueId),
-      eq(leagueEventsRulesSchema.eventName, eventName)));
+      eq(leagueEventsRulesSchema.eventName, eventName)))
+    .returning({ leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId })
+    .then(res => res[0]);
+  if (!deleted) throw new Error('Rule not found');
 }
 
 /**

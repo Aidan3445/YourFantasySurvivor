@@ -12,7 +12,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 export default async function LeaguePage() {
   return (
     <main className='flex flex-col gap-0 w-full p-4 pb-0'>
-      {/*<div className='xl:grid xl:grid-cols-3 gap-4 px-4'>*/}
       <Tabs
         className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100svh-4rem)] max-md:h-[calc(100svh-6.5rem)] overflow-hidden'
         defaultValue='draft'>
@@ -36,7 +35,7 @@ export default async function LeaguePage() {
           </TabsContent>
           <TabsContent
             value='settings'>
-            <section className='w-fit grid lg:grid-cols-2 gap-4 justify-center'>
+            <section className='w-fit flex flex-wrap gap-4 justify-center pb-12'>
               <MemberEditForm />
               <LeagueSettings />
             </section>
@@ -44,10 +43,6 @@ export default async function LeaguePage() {
           <ScrollBar hidden orientation='vertical' />
         </ScrollArea>
       </Tabs>
-      {/*<section className='w-full h-[calc(100vh-4rem)] p-4 bg-secondary rounded-3xl border flex flex-col'>
-          <h2 className='text-lg font-bold text-center'>League Chat</h2>
-          <div className='flex flex-col gap-2 overflow-y-auto flex-1'>YO</div>
-        </section>*/}
     </main >
   );
 }

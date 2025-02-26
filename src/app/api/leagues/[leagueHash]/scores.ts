@@ -25,7 +25,8 @@ export function compileScores(
   baseEventRules: BaseEventRule,
   selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>>,
 
-  survivalCap: LeagueSurvivalCap
+  survivalCap: LeagueSurvivalCap,
+  preserveStreak: boolean
 ) {
   const scores: Record<ReferenceType, Record<LeagueMemberDisplayName, number[]>> = {
     Castaway: {},
@@ -144,7 +145,9 @@ export function compileScores(
       // if the castaway selected has been eliminated set the streak to 0
       // note this has the side effect of ensuring that streaks end when
       // a member is out of castaways to select
-      if (eliminated.includes(castaways[mcIndex] ?? '')) {
+      if (eliminated.includes(castaways[mcIndex] ?? '') ||
+        (!preserveStreak && castaways[episodeNumber - 1] &&
+          castaways[episodeNumber - 1] !== castaways[mcIndex])) {
         streak = 0;
         continue;
       }

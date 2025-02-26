@@ -6,10 +6,11 @@ import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '~/components/ui/form';
-import { BaseEventRuleTabs } from './createLeague';
 import { Button } from '~/components/ui/button';
 import { updateBaseEventRules } from '~/app/api/leagues/actions';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Lock, LockOpen } from 'lucide-react';
+import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
 
 const formSchema = z.object({
   baseEventRules: BaseEventRuleZod
@@ -34,6 +35,7 @@ export default function LeagueScoring() {
     defaultValues: { baseEventRules: baseEventRules ?? defaultBaseRules },
     resolver: zodResolver(formSchema)
   });
+  const [locked, setLocked] = useState(true);
 
   useEffect(() => {
     reactForm.setValue('baseEventRules', baseEventRules ?? defaultBaseRules);
@@ -56,36 +58,48 @@ export default function LeagueScoring() {
     (!!draftDate && Date.now() > draftDate.getTime());
 
   return (
-    <article className='p-2 bg-card rounded-xl w-full'>
+    <article className='p-2 bg-card rounded-xl w-full relative'>
+      {!disabled && (locked ?
+        <Lock
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          onClick={() => setLocked(false)} /> :
+        <LockOpen
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          onClick={() => { setLocked(true); reactForm.reset(); }} />)}
       <h2 className='text-lg font-bold text-card-foreground'>Official Events</h2>
+      <p className='text-sm'>
+        These <i>Official Events</i> are <b>automatically scored</b> for your
+        league based on what drafted castaways do in the show.
+        <br />
+        Set the point values for each event—these points will be awarded to the member
+        whose current castaway pick scores the event.
+      </p>
+      <div className='text-sm'>
+        For example:
+        <ul className='list-disc pl-4'>
+          <li>If you set <i>Individual Immunity</i> to <b>5 points</b>, the member whose
+            pick wins immunity earns those <b>5 points</b>.</li>
+          <li>If you set <i>Tribe 1st Place</i> to <b>3 points</b>, then every member
+            whose pick is on the winning tribe receives <b>3 points</b>.</li>
+        </ul>
+      </div>
       <Form {...reactForm}>
         <form action={() => handleSubmit()}>
-          <BaseEventRuleTabs
-            disabled={disabled}
-            rightSide={
-              <section className='flex flex-col gap-2 mt-2'>
-                <h3 className='text-lg font-bold text-card-foreground'>Customizing Base Events</h3>
-                <p className='text-sm'>These <b><i>official events</i></b> will be automatically scored
-                  for your league based on the events of each episode. Set the point values for each
-                  event that will be awarded to the member whose current <i>survivor</i> scores the event.
-                </p>
-                <p className='text-sm'>For example, if you set the <i>Individual Immunity</i> event
-                  to 5 points, the member whose pick wins immunity will receive 5 points.
-                  If you set the <i>Tribe 1st Place</i> event to 3 points, then every member whose
-                  pick is on the winning tribe will receive 3 points.
-                </p>
-                {!disabled && (
-                  <span className='flex gap-2'>
-                    <Button type='submit' className='w-1/2'>Save</Button>
-                    <Button
-                      type='button'
-                      variant='destructive'
-                      className='w-1/2'
-                      onClick={() => reactForm.reset()}>
-                      Reset
-                    </Button>
-                  </span>)}
-              </section>} />
+          <span className='grid lg:grid-cols-3 gap-4 '>
+            <ChallengeScoreSettings disabled={disabled || locked} />
+            <AdvantageScoreSettings disabled={disabled || locked} />
+            <OtherScoreSettings disabled={disabled || locked} />
+          </span>
+          {!(disabled || locked) && (
+            <span className='w-fit ml-auto grid grid-cols-2 gap-2'>
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={() => { setLocked(true); reactForm.reset(); }}>
+                Cancel
+              </Button>
+              <Button type='submit'>Save</Button>
+            </span>)}
         </form>
       </Form>
     </article >

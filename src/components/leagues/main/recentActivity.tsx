@@ -234,7 +234,7 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
           {Object.values(baseEvents[episodeNumber] ?? {}).length > 0 &&
             <TableRow className='bg-gray-100 hover:bg-gray-200'>
               <TableCell colSpan={7} className='text-xs text-muted-foreground'>
-                Base Events
+                Official Events
               </TableCell>
             </TableRow>}
           {Object.entries(baseEvents[episodeNumber] ?? {})
@@ -249,7 +249,7 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
           {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).length > 0 &&
             <TableRow className='bg-gray-100 hover:bg-gray-200'>
               <TableCell colSpan={7} className='text-xs text-muted-foreground'>
-                Direct Events
+                Custom Events
               </TableCell>
             </TableRow>}
           {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).map((directEvents) =>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Settings } from 'lucide-react';
+import { Settings, X } from 'lucide-react';
 import { z } from 'zod';
 import { type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { useForm } from 'react-hook-form';
@@ -61,17 +61,19 @@ export default function SetDraftDate() {
             className='cursor-pointer stroke-primary hover:stroke-secondary transition-all'
             size={34} />
         </AlertDialogTrigger>
-        <AlertDialogContent className='w-min'>
+        <AlertDialogContent className='h-3/4 flex flex-col'>
           <AlertDialogHeader>
             <AlertDialogTitle>Edit Draft Type and Date</AlertDialogTitle>
             <AlertDialogDescription>
               You have the choice to draft before or after the first episode of the season.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <form className='flex flex-col gap-2' action={() => handleSubmit()}>
+          <form className='flex flex-col gap-2 justify-between h-full' action={() => handleSubmit()}>
             <DraftDateField />
-            <AlertDialogFooter className='grid grid-cols-2 gap-2'>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogFooter>
+              <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
+                <X stroke='white' />
+              </AlertDialogCancel>
               <AlertDialogAction asChild>
                 <Button type='submit'>Save</Button>
               </AlertDialogAction>

@@ -25,9 +25,9 @@ export default function HomePage() {
         <SignIn />
       </SignedOut>
       <SignedIn>
-        <CreateLeagueModal>
+        <CreateLeagueModal className='w-full md:w-fit'>
           <section className='flex gap-8 items-center p-8 rounded-lg bg-card'>
-            <h3 className='text-4xl'>Create New League</h3>
+            <h3 className='text-4xl w-full'>Create New League</h3>
             <CirclePlus size={40} />
           </section>
         </CreateLeagueModal>
