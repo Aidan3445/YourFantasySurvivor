@@ -80,11 +80,11 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
     const prediction = predictions[0]!;
     return (<article
       className={cn(
-        'flex flex-col bg-accent rounded-lg my-4 text-center transition-transform duration-700',
+        'flex flex-col bg-secondary rounded-lg my-4 text-center transition-transform duration-700',
         className)}>
       <span className='flex gap-1 items-start self-center px-1'>
         <h3 className='text-lg font-semibold text-card-foreground'>
-          {prediction.eventName} some more
+          {prediction.eventName}
         </h3>
         -
         <div className='inline-flex mt-1'>
@@ -99,18 +99,15 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
   }
 
   return (
-    <Carousel
-      setApi={setApi}
-      className='w-3/4'
-      opts={{ align: 'center' }}>
-      <CarouselContent>
+    <Carousel className='gap-4 items-center' setApi={setApi} opts={{ align: 'center' }}>
+      <CarouselContent className='w-min lg:w-auto'>
         {predictions.map((prediction, index) => (
           <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
             'opacity-50 -z-10': index !== current - 1,
           })}>
             <article
               className={cn(
-                'flex flex-col bg-accent rounded-lg shadow-lg my-4',
+                'flex flex-col bg-secondary rounded-lg shadow-lg my-4',
                 'text-center transition-transform duration-700',
                 {
                   'scale-75': index !== current - 1,
@@ -118,15 +115,17 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
                   'translate-x-1/2': index === (current - 2) % (predictions.length * 5),
                   '-translate-x-8': index + current + 1 === 2 * predictions.length * 5
                 })} >
-              <span className='flex gap-1 items-start self-center px-1'>
-                <h3 className='text-lg font-semibold text-card-foreground'>
-                  {prediction.eventName} some more
-                </h3>
-                -
-                <div className='inline-flex mt-1'>
-                  <p className='text-sm'>{prediction.points}</p>
-                  <Flame size={16} />
-                </div>
+              <span className='flex w-min gap-1 items-start self-center px-1 lg:w-full'>
+                <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1 mr-auto' />
+                <span>
+                  <h3 className='inline text-lg font-semibold text-card-foreground'>
+                    {prediction.eventName}
+                  </h3>
+                  -
+                  <p className='inline text-sm'>{prediction.points}</p>
+                  <Flame className='inline' size={16} />
+                </span>
+                <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1 ml-auto' />
               </span>
               <p className='text-sm'>{prediction.description}</p>
               <SubmissionCard prediction={prediction} options={getOptions(prediction.referenceTypes)} />
@@ -134,8 +133,6 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
     </Carousel>
   );
 }
@@ -155,8 +152,6 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
     defaultValues: { referenceId: prediction.predictionMade?.referenceId },
     resolver: zodResolver(formSchema),
   });
-
-  console.log(prediction, reactForm.getValues());
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
@@ -179,14 +174,14 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
         <FormField
           name='referenceId'
           render={({ field }) => (
-            <FormItem className='w-full p-2'>
+            <FormItem className='p-2'>
               <FormLabel className='sr-only'>Prediction</FormLabel>
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
                   value={`${field.value ?? ''}`}>
-                  <span className='grid grid-cols-4 gap-2'>
-                    <SelectTrigger className='w-full col-span-3'>
+                  <span className='grid lg:grid-cols-4 grid-cols-1 gap-2'>
+                    <SelectTrigger className='lg:col-span-3'>
                       <SelectValue placeholder='Select prediction' />
                     </SelectTrigger>
                     <Button

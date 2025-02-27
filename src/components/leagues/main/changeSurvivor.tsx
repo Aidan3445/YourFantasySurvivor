@@ -49,9 +49,9 @@ export default function ChangeSurvivor() {
   return (
     <div className='p-4'>
       <Form {...reactForm}>
-        <form className='w-full text-center bg-accent rounded-lg flex flex-col' action={() => handleSubmit()}>
+        <form className='w-full text-center bg-secondary rounded-lg flex flex-col' action={() => handleSubmit()}>
           <h1 className='text-2xl font-semibold'>Swap your Survivor Pick</h1>
-          <span className='w-full flex justify-between gap-4 items-center p-1 mt-auto mb-1'>
+          <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center p-2 mt-auto'>
             <FormField
               name='castawayId'
               render={({ field }) => (
@@ -92,7 +92,7 @@ export default function ChangeSurvivor() {
                 </FormItem>
               )} />
             <Button
-              className='w-40'
+              className='lg:w-24 w-full'
               disabled={!formSchema.safeParse(reactForm.watch())?.success || leagueData.episodes.slice(-1)[0]?.airStatus === 'Airing'}
               type='submit'>
               Submit

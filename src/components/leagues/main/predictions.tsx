@@ -14,7 +14,10 @@ export default async function Predictions({ leagueHash }: PredictionsProps) {
 
   return (
     <div className='px-4'>
-      <PredictionCards predictions={predictions} castaways={castaways} tribes={tribes} />
+      <PredictionCards
+        predictions={[...predictions, ...predictions, ...predictions]}
+        castaways={castaways}
+        tribes={tribes} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { aliasedTable, and, arrayContained, arrayContains, arrayOverlaps, asc, desc, eq, inArray, or } from 'drizzle-orm';
+import { aliasedTable, and, arrayContained, arrayOverlaps, asc, desc, eq, inArray, or } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
@@ -29,6 +29,19 @@ import type { EpisodeAirStatus, EpisodeNumber } from '~/server/db/defs/episodes'
 import { compileScores } from './[leagueHash]/scores';
 
 export const QUERIES = {
+  /**
+    * Get the league name
+    * @param leagueHash - the hash of the league
+    * @returns the league name
+    */
+  getLeagueName: async function(leagueHash: LeagueHash) {
+    return await db
+      .select({ leagueName: leaguesSchema.leagueName })
+      .from(leaguesSchema)
+      .where(eq(leaguesSchema.leagueHash, leagueHash))
+      .then((leagues) => leagues[0]?.leagueName);
+  },
+
   /**
     * Get a league by its hash
     * @param leagueHash - the hash of the league
@@ -231,7 +244,8 @@ export const QUERIES = {
       .where(and(
         eq(leaguesSchema.leagueHash, leagueHash),
         eq(leagueEventsRulesSchema.eventType, 'Prediction'),
-        arrayContains(leagueEventsRulesSchema.timing, ['Draft'])))
+        arrayOverlaps(leagueEventsRulesSchema.timing, ['Draft', 'Weekly', 'Weekly (Premerge only)'])))
+      .orderBy(asc(leagueEventsRulesSchema.timing))
       .then((predictions) => predictions.map((prediction) => {
         const draftPrediction: LeagueEventPrediction = {
           ...prediction,

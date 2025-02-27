@@ -5,9 +5,30 @@ import { redirect } from 'next/navigation';
 import { leagueMemberAuth } from '~/lib/auth';
 import { Button } from '~/components/ui/button';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import { QUERIES } from '~/app/api/leagues/query';
+import { metadata } from '~/app/layout';
 
 interface JoinPageProps extends LeaguePageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}
+
+export async function generateMetadata(
+  { params }: JoinPageProps,
+): Promise<Metadata> {
+  // read route params
+  const { leagueHash } = await params;
+  const leagueName = await QUERIES.getLeagueName(leagueHash) ?? 'Your Fantasy Survivor';
+
+
+  return {
+    ...metadata,
+    openGraph: {
+      title: `Join ${leagueName} on YFS`,
+      description: 'You\'ve bee invited to join a league on Your Fantasy Survivor!',
+      images: ['https://i.imgur.com/xS6JQdr.png'],
+    }
+  };
 }
 
 export default async function LeagueJoinPage({ searchParams, params }: JoinPageProps) {

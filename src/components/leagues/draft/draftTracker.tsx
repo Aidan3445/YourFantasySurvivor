@@ -32,13 +32,8 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
   } = useLeague();
   const router = useRouter();
 
-  const { onTheClock, onDeck } = useMemo(() => {
+  const { onTheClock, onDeck, onTheClockIndex } = useMemo(() => {
     const onTheClockIndex = draft?.picks.findIndex((pick) => !pick?.draftPick);
-
-    if (onTheClockIndex === -1) {
-      router.push(`/leagues/${leagueHash}`);
-    }
-
 
     const onTheClockDisplayName = draft.picks[onTheClockIndex]?.displayName;
     const onDeckDisplayName = draft.picks[onTheClockIndex + 1]?.displayName;
@@ -52,8 +47,9 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
         ...draft.picks[onTheClockIndex + 1],
         loggedIn: !!onDeckDisplayName && onDeckDisplayName === loggedIn?.displayName,
       },
+      onTheClockIndex
     };
-  }, [draft, loggedIn, router, leagueHash]);
+  }, [draft, loggedIn]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -62,6 +58,13 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
       setDialogOpen(true);
     }
   }, [onTheClock, setDialogOpen]);
+
+
+  useEffect(() => {
+    if (onTheClockIndex === -1) {
+      router.push(`/leagues/${leagueHash}`);
+    }
+  }, [onTheClockIndex, router, leagueHash]);
 
   return (
     <section className='w-full space-y-4 bg-secondary rounded-3xl border overflow-x-hidden p-4'>

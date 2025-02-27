@@ -30,8 +30,8 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         </TabsList>
         <ScrollArea className='h-full'>
           <TabsContent value='scores'>
-            <div className='flex flex-col gap-4 w-full px-4 pb-10'>
-              <span className='flex max-lg:flex-wrap gap-4 items-center overflow-x-auto'>
+            <div className='flex flex-col gap-4 w-full pb-10 px-4'>
+              <span className='flex flex-wrap lg:flex-nowrap gap-4 items-center overflow-x-auto'>
                 <Scoreboard />
                 <Chart />
               </span>

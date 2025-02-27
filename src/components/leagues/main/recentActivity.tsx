@@ -219,7 +219,7 @@ export function EpisodeEvents({ episodeNumber, mockBases, mockPredictions, mockD
     }>) ?? {});
 
   return (
-    <ScrollArea className='w-[calc(100svw-3rem)] sm:w-[calc(100svw-4rem)] md:w-auto flex-grow bg-card rounded-lg gap-0'>
+    <ScrollArea className='w-[calc(100svw-4rem)] md:w-auto flex-grow bg-card rounded-lg gap-0'>
       <Table>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader className='sticky top-0'>
