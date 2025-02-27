@@ -36,7 +36,7 @@ export default function InviteLink() {
         className='relative flex items-center cursor-pointer'
         onClick={copyLink}>
         <Input
-          className={cn('w-full cursor-pointer transition-all', hasCopied && 'bg-white/40')}
+          className={cn('w-full cursor-pointer transition-all pr-10', hasCopied && 'bg-white/40')}
           readOnly
           value={link} />
         <Link className='absolute right-4 transition-all' color={hasCopied ? 'gray' : 'black'} />

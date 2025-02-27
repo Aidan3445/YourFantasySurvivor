@@ -7,7 +7,7 @@ import { DndContext, PointerSensor, type UniqueIdentifier, closestCenter, useSen
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { cn } from '~/lib/utils';
-import { GripVertical, Shuffle } from 'lucide-react';
+import { GripVertical, Lock, LockOpen, Shuffle } from 'lucide-react';
 import SortableItem from '~/components/ui/sortableItem';
 import { handleDragEnd } from '~/hooks/useSortableItem';
 import { updateDraftOrder } from '~/app/api/leagues/actions';
@@ -34,6 +34,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
     refresh
   } = useLeague();
   const sensors = useSensors(useSensor(PointerSensor));
+  const [locked, setLocked] = useState(true);
 
   const dbOrder = useMemo(() => draftOrder.map((memberId) => {
     const member = members.list.find((m) => m.memberId === memberId);
@@ -68,7 +69,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
     }, SUFFLE_DURATION / (order.length * SHUFFLE_LOOPS));
   };
 
-  const orderLocked =
+  const orderLocked = locked ||
     leagueStatus !== 'Predraft' ||
     members.loggedIn?.role !== 'Owner' ||
     (!!draftDate && Date.now() > draftDate.getTime());
@@ -85,16 +86,23 @@ export default function DraftOrder({ className }: DraftOrderProps) {
   };
 
   return (
-    <article className={cn('flex flex-col w-full p-2 bg-card rounded-xl', className)}>
+    <article className={cn('flex flex-col w-full p-2 bg-card rounded-xl relative', className)}>
+      {orderLocked ?
+        <Lock
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          onClick={() => setLocked(false)} /> :
+        <LockOpen
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          onClick={() => { setLocked(true); setOrder(dbOrder); }} />}
       <span className='flex gap-4 items-center mb-4 w-full'>
-        <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
+        <h2 className='text-lg font-bold text-card-foreground h-9 place-content-center'>Draft Order</h2>
         {!orderLocked && <>
           <Shuffle
             className='cursor-pointer stroke-primary hover:stroke-secondary transition-all mr-2'
             size={24}
             onClick={shuffleOrderWithAnimation} />
           <form className='ml-auto' action={() => handleSubmit()}>
-            <span className='grid grid-cols-2 gap-2'>
+            <span className='grid grid-cols-2 gap-2 mr-12'>
               <Button type='button' disabled={!orderChanged} variant='destructive' onClick={() => setOrder(dbOrder)}>
                 Cancel
               </Button>
@@ -114,10 +122,8 @@ export default function DraftOrder({ className }: DraftOrderProps) {
             {order.map((member, index) => {
               return (
                 <SortableItem
-                  key={member.memberId}
-                  id={member.displayName}
-                  className='grid col-span-3 grid-cols-subgrid'
-                  disabled={orderLocked}>
+                  key={member.displayName}
+                  id={member.displayName}>
                   <ColorRow
                     color={member.color}
                     loggedIn={members.loggedIn?.memberId === member.memberId}>
