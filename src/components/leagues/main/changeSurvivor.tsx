@@ -47,57 +47,59 @@ export default function ChangeSurvivor() {
   }
 
   return (
-    <Form {...reactForm}>
-      <form className='bg-card p-1 rounded-lg text-center' action={() => handleSubmit()}>
-        <h1 className='text-2xl font-semibold'>Swap your Survivor Pick</h1>
-        <span className='w-full flex justify-between gap-4 items-center p-1'>
-          <FormField
-            name='castawayId'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormControl>
-                  <Select
-                    defaultValue={selected}
-                    value={selected}
-                    onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select castaway' />
-                    </SelectTrigger>
-                    <SelectContent className='z-50'>
-                      <SelectGroup>
-                        {availableCastaways.map((castaway) => {
-                          return (castaway.pickedBy ?
-                            <SelectLabel
-                              key={castaway.fullName}
-                              className='cursor-not-allowed opacity-75'
-                              style={{
-                                backgroundColor:
-                                  league.members.list
-                                    .find(member => member.displayName === castaway.pickedBy)?.color,
-                                color: getContrastingColor(league.members.list
-                                  .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
-                              }}>
-                              {castaway.fullName} ({castaway.pickedBy})
-                            </SelectLabel> :
-                            <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                              {castaway.fullName}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              </FormItem>
-            )} />
-          <Button
-            className='w-40'
-            disabled={!formSchema.safeParse(reactForm.watch())?.success || leagueData.episodes.slice(-1)[0]?.airStatus === 'Airing'}
-            type='submit'>
-            Submit
-          </Button>
-        </span>
-      </form>
-    </Form >
+    <div className='p-4'>
+      <Form {...reactForm}>
+        <form className='w-full text-center bg-accent rounded-lg flex flex-col' action={() => handleSubmit()}>
+          <h1 className='text-2xl font-semibold'>Swap your Survivor Pick</h1>
+          <span className='w-full flex justify-between gap-4 items-center p-1 mt-auto mb-1'>
+            <FormField
+              name='castawayId'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormControl>
+                    <Select
+                      defaultValue={selected}
+                      value={selected}
+                      onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select castaway' />
+                      </SelectTrigger>
+                      <SelectContent className='z-50'>
+                        <SelectGroup>
+                          {availableCastaways.map((castaway) => {
+                            return (castaway.pickedBy ?
+                              <SelectLabel
+                                key={castaway.fullName}
+                                className='cursor-not-allowed opacity-75'
+                                style={{
+                                  backgroundColor:
+                                    league.members.list
+                                      .find(member => member.displayName === castaway.pickedBy)?.color,
+                                  color: getContrastingColor(league.members.list
+                                    .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
+                                }}>
+                                {castaway.fullName} ({castaway.pickedBy})
+                              </SelectLabel> :
+                              <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
+                                {castaway.fullName}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )} />
+            <Button
+              className='w-40'
+              disabled={!formSchema.safeParse(reactForm.watch())?.success || leagueData.episodes.slice(-1)[0]?.airStatus === 'Airing'}
+              type='submit'>
+              Submit
+            </Button>
+          </span>
+        </form>
+      </Form>
+    </div>
   );
 }

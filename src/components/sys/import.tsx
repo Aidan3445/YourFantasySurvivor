@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '~/components/ui/button';
-import { importContestants } from '~/app/api/sys/actions';
+import { importContestants, importEpisode } from '~/app/api/sys/actions';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -23,24 +23,24 @@ export default function Import() {
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       seasonName: '',
-      premiereDate: new Date(),
     },
     resolver: zodResolver(formSchema),
   });
 
   const [castaways, setCastaways] = useState<NewCastaway[]>([]);
   const [tribes, setTribes] = useState<NewTribe[]>([]);
-  const [episode, setEpisode] = useState<string>('');
+  const [premiere, setPremiere] = useState<{ episodeNumber: number, episodeTitle: string, episodeAirDate: string }>();
+  const [episodes, setEpisodes] = useState<{ episodeNumber: number, episodeTitle: string, episodeAirDate: string }[]>([]);
 
   const handleClick = async () => {
-    const { castaways, tribes, episode, premiere } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
+    const { castaways, tribes, episodes, premiere } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
       method: 'GET',
     })
       .then(res => res.json())) as {
         castaways: NewCastaway[],
         tribes: NewTribe[],
-        episode: string,
-        premiere: string
+        episodes: { episodeNumber: number, episodeTitle: string, episodeAirDate: string }[],
+        premiere?: { episodeNumber: number, episodeTitle: string, episodeAirDate: string },
       };
 
     if (castaways.length === 0) {
@@ -50,13 +50,17 @@ export default function Import() {
 
     setCastaways(castaways);
     setTribes(tribes);
-    setEpisode(episode);
-    reactForm.setValue('premiereDate', new Date(premiere));
+    setEpisodes(episodes);
+    if (premiere) {
+      reactForm.setValue('premiereDate', new Date(premiere.episodeAirDate));
+      setPremiere(premiere);
+    }
   };
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!reactForm.watch('premiereDate') || !premiere) return;
     try {
-      await importContestants({ ...data, premiereTitle: episode }, castaways, tribes);
+      await importContestants({ ...data, premiereTitle: premiere?.episodeTitle }, castaways, tribes);
       alert('Contestants imported successfully');
     } catch (error) {
       console.error('Error importing contestants', error);
@@ -65,12 +69,12 @@ export default function Import() {
   });
 
   return (
-    <Form {...reactForm}>
-      <form
-        className='w-full space-y-4'
-        action={() => handleSubmit()}>
-        <span className='flex gap-4 bg-card p-8 rounded-full justify-center'>
-          <Button type='button' onClick={handleClick}>Fetch Contestants</Button>
+    <span className='w-full space-y-4'>
+      <Form {...reactForm}>
+        <form
+          className='flex gap-4 bg-card p-8 rounded-full justify-center'
+          action={() => handleSubmit()}>
+          <Button type='button' onClick={handleClick}>Fetch Data</Button>
           <FormField
             name='seasonName'
             render={({ field }) => (
@@ -99,39 +103,71 @@ export default function Import() {
               </FormItem>
             )} />
           <Button type='submit' disabled={castaways.length === 0}>Import Contestants</Button>
-        </span>
-        <span className='flex gap-4'>
-          {tribes.map((tribe, index) => (
-            <div key={index} className='flex items-center space-x-4 bg-card rounded-lg p-4'>
-              <Circle fill={tribe.tribeColor} />
-              <h2 className='font-bold'>{tribe.tribeName}</h2>
-            </div>
-          ))}
-          <div className='flex items-center space-x-4 bg-card rounded-lg p-4'>
-            <h2 className='font-bold'>Episode</h2>
-            <p>{episode}</p>
-          </div>
-        </span>
-        {castaways.map((castaway, index) => (
+        </form>
+      </Form>
+      <span className='flex gap-4'>
+        {tribes.map((tribe, index) => (
           <div key={index} className='flex items-center space-x-4 bg-card rounded-lg p-4'>
-            <Image
-              src={castaway.imageUrl}
-              alt={castaway.fullName}
-              width={48}
-              height={48} />
-            <div>
-              <h2 className='font-bold'>{castaway.fullName}</h2>
-              <p>shortName: {castaway.shortName}</p>
-              <p>age: {castaway.age}</p>
-              <p>residence: {castaway.residence}</p>
-              <p>occupation: {castaway.occupation}</p>
-              <p>imageUrl: {castaway.imageUrl}</p>
-              <p>tribe: {castaway.tribe}</p>
-            </div>
+            <Circle fill={tribe.tribeColor} />
+            <h2 className='font-bold'>{tribe.tribeName}</h2>
           </div>
         ))}
-      </form>
-    </Form>
+        {episodes.map((episode, index) => (
+          <ImportEpisode key={index} {...episode} seasonName={reactForm.watch('seasonName')} />
+        ))}
+      </span>
+      {castaways.map((castaway, index) => (
+        <div key={index} className='flex items-center space-x-4 bg-card rounded-lg p-4'>
+          <Image
+            src={castaway.imageUrl}
+            alt={castaway.fullName}
+            width={48}
+            height={48} />
+          <div>
+            <h2 className='font-bold'>{castaway.fullName}</h2>
+            <p>shortName: {castaway.shortName}</p>
+            <p>age: {castaway.age}</p>
+            <p>residence: {castaway.residence}</p>
+            <p>occupation: {castaway.occupation}</p>
+            <p>imageUrl: {castaway.imageUrl}</p>
+            <p>tribe: {castaway.tribe}</p>
+          </div>
+        </div>
+      ))}
+    </span>
   );
 }
 
+interface ImportEpisodeProps {
+  episodeNumber: number;
+  episodeTitle: string;
+  episodeAirDate: string;
+  seasonName: string;
+}
+
+function ImportEpisode({ seasonName: seasonId, episodeNumber, episodeTitle, episodeAirDate }: ImportEpisodeProps) {
+  const handleSubmit = async () => {
+    try {
+      await importEpisode(seasonId, {
+        episodeNumber,
+        episodeTitle,
+        episodeAirDate: new Date(episodeAirDate).toUTCString()
+      });
+      alert('Episode imported successfully');
+    } catch (error) {
+      console.error('Error importing episode', error);
+      alert('Error importing episode');
+    }
+  };
+
+  return (
+    <div className='items-center bg-card rounded-lg p-4'>
+      <h2 className='font-bold'>Episode {episodeNumber}</h2>
+      <p>{episodeTitle}</p>
+      <p>{new Date(episodeAirDate).toLocaleString()}</p>
+      <form action={() => handleSubmit()}>
+        <Button type='submit'>Import Episode</Button>
+      </form>
+    </div>
+  );
+}

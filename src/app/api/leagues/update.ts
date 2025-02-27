@@ -67,7 +67,7 @@ export const UPDATES = {
       case 'Draft':
         if (leagueStatus !== 'Predraft') throw new Error('Invalid status update');
         if (!draftDatePassed && currentState.reqesterRole !== 'Owner') {
-          throw new Error('Draft date has not passed');
+          throw new Error('Scheduled draft date has not passed');
         }
         break;
       case 'Active':
@@ -90,6 +90,7 @@ export const UPDATES = {
           .set({ leagueStatus: newStatus })
           .where(eq(leaguesSchema.leagueHash, leagueHash));
 
+        // ensure draft date is the true draft start time
         if (newStatus === 'Draft') {
           await trx
             .update(leagueSettingsSchema)

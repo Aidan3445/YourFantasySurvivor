@@ -10,6 +10,9 @@ import ChangeSurvivor from '~/components/leagues/main/changeSurvivor';
 import CreateBaseEvent from '~/components/leagues/main/createBaseEvent';
 import CustomEvents from '~/components/leagues/customization/customEvents';
 import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
+import LeagueScoring from '~/components/leagues/leagueScoring';
+import CreateCustomEvent from '~/components/leagues/main/createCustomEvent';
+import Predictions from '~/components/leagues/main/predictions';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
@@ -28,25 +31,32 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         <ScrollArea className='h-full'>
           <TabsContent value='scores'>
             <div className='flex flex-col gap-4 w-full px-4 pb-10'>
-              <span className='flex max-lg:flex-wrap gap-4 items-center'>
+              <span className='flex max-lg:flex-wrap gap-4 items-center overflow-x-auto'>
                 <Scoreboard />
                 <Chart />
               </span>
-              <ChangeSurvivor />
+              <span className='bg-card rounded-lg'>
+                <ChangeSurvivor />
+                <Predictions leagueHash={leagueHash} />
+              </span>
               <RecentActivity />
-              <CustomEvents />
             </div>
           </TabsContent>
           <TabsContent value='events'>
             <div className='flex flex-col gap-4 w-full px-4 pb-10'>
-              {role !== 'Member' && <CustomEvents />}
+              <CreateCustomEvent />
               {userId && <CreateBaseEvent />}
             </div>
           </TabsContent>
           <TabsContent value='settings'>
-            <section className='w-fit flex flex-wrap gap-4 justify-center pb-12'>
-              <MemberEditForm />
+            <section className='w-fit flex flex-wrap gap-4 justify-center pb-12 px-4'>
+              <MemberEditForm className='w-full' />
               <LeagueSettings />
+              <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
+                League Scoring
+              </h2>
+              <LeagueScoring />
+              <CustomEvents />
             </section>
           </TabsContent>
           <ScrollBar hidden orientation='vertical' />

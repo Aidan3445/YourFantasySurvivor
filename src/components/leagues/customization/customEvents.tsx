@@ -6,7 +6,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useLeague } from '~/hooks/useLeague';
 import {
   type LeagueEventRule, LeagueEventRuleZod, LeagueEventTypeOptions,
-  LeaguePredictionTimingOptions, defaultLeagueEventRule
+  LeaguePredictionTimingOptions, ReferenceOptions, defaultLeagueEventRule
 } from '~/server/db/defs/events';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { MultiSelect } from '~/components/ui/multiSelect';
 import { Button } from '~/components/ui/button';
 import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/app/api/leagues/actions';
-import { Flame, Settings2 } from 'lucide-react';
+import { Flame, Lock, LockOpen, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
@@ -25,13 +25,9 @@ export default function CustomEvents() {
   const {
     league: {
       leagueHash,
-      leagueStatus,
       customEventRules,
       members: {
         loggedIn
-      },
-      settings: {
-        draftDate
       }
     },
     refresh
@@ -41,6 +37,7 @@ export default function CustomEvents() {
     defaultValues: defaultLeagueEventRule,
     resolver: zodResolver(LeagueEventRuleZod),
   });
+  const [locked, setLocked] = useState(true);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     const newRule: LeagueEventRule = {
@@ -59,17 +56,21 @@ export default function CustomEvents() {
     }
   });
 
-  const disabled =
-    leagueStatus !== 'Predraft' ||
-    loggedIn?.role !== 'Owner' ||
-    (!!draftDate && Date.now() > draftDate.getTime());
+  const disabled = loggedIn?.role !== 'Owner';
 
   return (
-    <article className='bg-card py-2 rounded-xl w-full'>
-      <div className='px-2'>
+    <article className='bg-card p-2 rounded-xl w-full relative space-y-2'>
+      {!disabled && (locked ?
+        <Lock
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          onClick={() => setLocked(false)} /> :
+        <LockOpen
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          onClick={() => { setLocked(true); reactForm.reset(); }} />)}
+      <div>
         <h2 className='text-lg font-bold text-card-foreground'>Custom Events</h2>
         <div className='flex flex-col gap-2'>
-          <p className='text-sm'>
+          <p className='text-sm mr-12'>
             These <i>Custom Events</i> let you make your league truly unique!
             Anything can be scored—from speaking the first word of the episode to orchestrating a blindside.
             <br />
@@ -90,43 +91,41 @@ export default function CustomEvents() {
             </ul>
           </div>
         </div>
-        <br />
-        {!disabled &&
-          <AlertDialog>
-            <Form {...reactForm}>
-              <form action={() => handleSubmit()}>
-                <AlertDialogTrigger asChild>
-                  <Button>Create Custom Event</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Create a Custom Event</AlertDialogTitle>
-                    <AlertDialogDescription className='sr-only'>
-                      Create a custom event to score in your league.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <CustomEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
-                  <AlertDialogFooter>
-                    <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
-                    <AlertDialogAction asChild>
-                      <Button type='submit' onClick={() => handleSubmit()}>Create Event</Button>
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </form>
-            </Form>
-          </AlertDialog>}
       </div>
-      <br />
+      {!(disabled || locked) &&
+        <AlertDialog>
+          <Form {...reactForm}>
+            <form action={() => handleSubmit()}>
+              <AlertDialogTrigger asChild>
+                <Button>Create Custom Event</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Create a Custom Event</AlertDialogTitle>
+                  <AlertDialogDescription className='sr-only'>
+                    Create a custom event to score in your league.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <CustomEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
+                <AlertDialogFooter>
+                  <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
+                  <AlertDialogAction asChild>
+                    <Button type='submit' onClick={() => handleSubmit()}>Create Event</Button>
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </form>
+          </Form>
+        </AlertDialog>}
       {
         customEventRules.length === 0 &&
         <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
           No custom events have been created yet.
         </h3>
       }
-      <article className='grid grid-cols-2 gap-3 px-2'>
+      <article className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
         {customEventRules.map((rule, index) => (
-          <CustomEventCard key={index} rule={rule} locked={disabled} />
+          <CustomEventCard key={index} rule={rule} locked={disabled || locked} />
         ))}
       </article>
     </article >
@@ -187,6 +186,27 @@ export function CustomEventFields({ predictionDefault, children }: CustomEventFi
             </FormControl>
             <FormDescription className='sr-only'>
               A description of the event that will be scored in this league.
+            </FormDescription>
+            <FormMessage />
+          </FormItem>
+        )} />
+      <FormField
+        name='referenceTypes'
+        render={({ field }) => (
+          <FormItem className='w-full'>
+            <FormLabel>Reference Type</FormLabel>
+            <FormControl>
+              <MultiSelect
+                options={ReferenceOptions
+                  .map((option) => ({ label: option, value: option }))}
+                onValueChange={field.onChange}
+                defaultValue={field.value as string[]}
+                value={field.value as string[]}
+                modalPopover
+                placeholder='Select reference types' />
+            </FormControl>
+            <FormDescription className='sr-only'>
+              Does this event reference a castaway or tribe or either?
             </FormDescription>
             <FormMessage />
           </FormItem>

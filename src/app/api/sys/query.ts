@@ -83,18 +83,24 @@ export async function fetchSeasonInfo(seasonName: string) {
         }
       }
     };
-    const episodeHtml: string = episodeData.parse.text['*'];
-    const $e = cheerio.load(episodeHtml);
-    const episodeTitle = $e($e('table.wikitable tbody tr')
-      .find('td')[1]).text().trim();
-    const premiereDate = $e($e('table.wikitable tbody tr')
-      .find('td')[2]).text().trim();
+    const episodesHtml: string = episodeData.parse.text['*'];
+    const $e = cheerio.load(episodesHtml);
+    const episodes: { episodeNumber: number, episodeTitle: string, episodeAirDate: Date }[] = [];
+    $e('table.wikitable tbody tr').each((_, row) => {
+      const columns = $e(row).find('td');
+      if (columns.length > 1) {
+        const episodeNumber = +$e(columns[0]).text().trim();
+        const episodeTitle = $e(columns[1]).text().trim();
+        const premiereDate = $e(columns[2]).text().trim();
+        episodes.push({ episodeNumber, episodeTitle, episodeAirDate: new Date(`${premiereDate} 20:00:00`) });
+      }
+    });
 
     return {
       castaways,
       tribes: tribeList,
-      episode: episodeTitle,
-      premiere: new Date(`${premiereDate} 20:00:00`)
+      episodes: episodes,
+      premiere: episodes[0],
     };
   } catch (error) {
     console.error('Error fetching Survivor 48 data:', error);

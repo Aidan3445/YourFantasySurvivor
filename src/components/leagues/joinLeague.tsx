@@ -119,7 +119,7 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
   };
 
   return (
-    <section className='mx-2'>
+    <section className='mx-2 flex flex-wrap gap-8'>
       <FormField
         name='displayName'
         render={({ field }) => (
@@ -127,14 +127,14 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
             <FormLabel className='text-lg'>Display Name</FormLabel>
             <FormControl>
               <Input
-                className='w-full h-12 indent-2 placeholder:italic'
+                className='w-full max-w-96 h-12 indent-2 placeholder:italic'
                 type='text'
                 autoComplete='off'
                 autoCapitalize='on'
                 placeholder='Choose a display name for yourself in this league'
                 {...field} />
             </FormControl>
-            <FormDescription className='text-sm text-left'>
+            <FormDescription className='text-sm text-left max-w-96'>
               Choose your name and color for this league. This is the name that will be at the top
               of the leaderboard when you destroy the competition.
               <br />

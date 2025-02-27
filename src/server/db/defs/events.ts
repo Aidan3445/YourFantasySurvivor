@@ -64,11 +64,11 @@ export const EventTypeZod = z.enum(LeagueEventTypeOptions);
 
 export const LeaguePredictionTimingOptions = [
   'Draft', 'Weekly', 'After Merge', 'Before Finale',
-  'Manual', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'] as const;
+  'Weekly (Premerge only)', 'Weekly (Postmerge only)'] as const;
 export type LeagueEventTiming = typeof LeaguePredictionTimingOptions[number];
 export const EventTimingZod = z.enum(LeaguePredictionTimingOptions);
 
-export const ReferenceOptions = ['Castaway', 'Tribe', 'Member'] as const;
+export const ReferenceOptions = ['Castaway', 'Tribe'] as const;
 export type ReferenceType = typeof ReferenceOptions[number];
 export const EventRefZod = z.enum(ReferenceOptions);
 
@@ -104,23 +104,36 @@ export type LeagueEventId = number;
 export type LeagueEventName = string;
 
 export type LeagueDirectEvent = {
+  leagueEventRuleId: LeagueEventId,
   eventId: LeagueEventId,
   eventName: LeagueEventName,
   points: number,
   referenceType: ReferenceType,
+  referenceId: number,
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
   notes: string[] | null
 };
 
 export type LeaguePredictionEvent = {
+  leagueEventRuleId: number,
   eventId: LeagueEventId,
   eventName: LeagueEventName,
   points: number,
   referenceType: ReferenceType,
+  referenceId: number,
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
   predictionMaker: LeagueMemberDisplayName,
+  notes: string[] | null
+};
+
+export type LeagueEvent = {
+  eventId: LeagueEventId,
+  eventName: LeagueEventName,
+  points: number,
+  referenceType: ReferenceType,
+  referenceId: number,
   notes: string[] | null
 };
 
@@ -175,4 +188,12 @@ export const BaseEventInsertZod = z.object({
 });
 export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
 
+export const LeagueEventInsertZod = z.object({
+  leagueEventRuleId: z.coerce.number(),
+  episodeId: z.coerce.number(),
+  referenceType: EventRefZod,
+  referenceId: z.coerce.number(),
+  notes: z.array(z.string()).nullable(),
+});
+export type LeagueEventInsert = z.infer<typeof LeagueEventInsertZod>;
 

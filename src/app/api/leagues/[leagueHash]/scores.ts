@@ -28,7 +28,7 @@ export function compileScores(
   survivalCap: LeagueSurvivalCap,
   preserveStreak: boolean
 ) {
-  const scores: Record<ReferenceType, Record<LeagueMemberDisplayName, number[]>> = {
+  const scores: Record<ReferenceType | 'Member', Record<LeagueMemberDisplayName, number[]>> = {
     Castaway: {},
     Tribe: {},
     Member: {},

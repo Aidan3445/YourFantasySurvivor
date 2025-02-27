@@ -114,3 +114,4 @@ export async function deleteBaseEvent(baseEventId: number) {
     .delete(baseEventsSchema)
     .where(eq(baseEventsSchema.baseEventId, baseEventId));
 }
+

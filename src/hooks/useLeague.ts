@@ -22,7 +22,7 @@ export function useLeague() {
 
   const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher,
     {
-      refreshInterval: 10000,
+      refreshInterval: 60000,
       refreshWhenHidden: false
     });
 

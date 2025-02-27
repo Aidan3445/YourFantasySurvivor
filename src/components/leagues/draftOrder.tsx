@@ -145,7 +145,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
 }
 
 export interface ColorRowProps {
-  color: string;
+  color?: string;
   loggedIn?: boolean;
   className?: string;
   children: ReactNode;
@@ -159,7 +159,7 @@ export function ColorRow({ color, loggedIn, className, children }: ColorRowProps
         loggedIn && 'border-none ring-2 ring-white',
         className
       )}
-      style={{ backgroundColor: color, color: getContrastingColor(color) }}>
+      style={{ backgroundColor: color, color: color ? getContrastingColor(color) : '' }}>
       {children}
     </span>
   );

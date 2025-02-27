@@ -1,7 +1,7 @@
 'use client';
 
 import { PopoverArrow } from '@radix-ui/react-popover';
-import { Pencil, ScrollText, X } from 'lucide-react';
+import { ScrollText, X } from 'lucide-react';
 import { useState } from 'react';
 import {
   AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
@@ -27,6 +27,8 @@ import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes'
 import { type BaseEvent, baseEventLabelPrefixes, baseEventLabels, type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName, type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames } from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import EditBaseEvent from './editBaseEvent';
+import { ColorRow } from '../draftOrder';
+import EditLeagueEvent from './editLeagueEvent';
 
 export default function RecentActivity() {
   const {
@@ -41,7 +43,10 @@ export default function RecentActivity() {
   const [filterMember, setFilterMember] = useState();
   const [filterBaseEvent, setFilterBaseEvent] = useState();*/
 
-  const latestEpisode = episodes[0];
+  const latestEpisode = episodes.find((episode) =>
+    episode.airStatus === 'Airing') ??
+    episodes.findLast((episode) => episode.airStatus === 'Aired') ??
+    episodes[0];
 
   return (
     <section className='md:w-full bg-card rounded-lg relative'>
@@ -51,7 +56,7 @@ export default function RecentActivity() {
             View All
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max pb-0'>
+        <AlertDialogContent className='bg-card rounded-lg min-w-max pb-0 max-h-[calc(100vh-4rem)]'>
           <AlertDialogHeader>
             <AlertDialogTitle>All Events</AlertDialogTitle>
             <AlertDialogDescription hidden>View all events from the season</AlertDialogDescription>
@@ -128,7 +133,10 @@ export default function RecentActivity() {
               </AccordionContent>
             </AccordionItem>
           </Accordion>*/}
-          <EpisodeEvents episodeNumber={selectedEpisode} />
+          <ScrollArea className='max-h-[calc(100vh-12rem)]'>
+            <EpisodeEvents episodeNumber={selectedEpisode} />
+            <ScrollBar hidden orientation='vertical' />
+          </ScrollArea>
           <AlertDialogFooter className='absolute top-1 right-1'>
             <AlertDialogCancel className='h-min p-1'>
               <X stroke='white' />
@@ -152,13 +160,13 @@ export default function RecentActivity() {
 
 interface EpisodeEventsProps {
   episodeNumber: EpisodeNumber;
-  mockBase?: Omit<BaseEvent, 'baseEventId'>;
-  mockPrediction?: LeaguePredictionEvent;
-  mockDirect?: LeagueDirectEvent;
+  mockBases?: Omit<BaseEvent, 'baseEventId'>[];
+  mockPredictions?: Omit<LeaguePredictionEvent, 'eventId'>[];
+  mockDirects?: Omit<LeagueDirectEvent, 'eventId'>[];
   edit?: boolean;
 }
 
-export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDirect, edit }: EpisodeEventsProps) {
+export function EpisodeEvents({ episodeNumber, mockBases, mockPredictions, mockDirects, edit }: EpisodeEventsProps) {
   const {
     leagueData: {
       baseEvents,
@@ -169,24 +177,52 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
 
   if (!baseEvents[episodeNumber] && !leagueEvents.predictionEvents[episodeNumber] &&
     !leagueEvents.directEvents[episodeNumber] &&
-    !mockBase && !mockPrediction && !mockDirect
+    !mockBases && !mockPredictions && !mockDirects
   ) return (
-    <div className='flex items-center justify-center h-48 text-muted-foreground' />
+    <div className='flex items-center justify-center h-48'>
+      <h1 className='text-3xl font-bold'>No events yet</h1>
+    </div>
   );
 
   const noTribes = baseEvents[episodeNumber] &&
     !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0) &&
-    !mockBase?.tribes &&
-    !leagueEvents.predictionEvents[episodeNumber]?.some((event) => event.referenceType === 'Tribe') &&
-    mockPrediction?.referenceType !== 'Tribe' &&
-    !leagueEvents.directEvents[episodeNumber]?.Tribe.some((event) => event.referenceType === 'Tribe') && mockDirect?.referenceType !== 'Tribe';
+    !mockBases?.some((event) => event.tribes.length > 0) &&
+    ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
+      ?.some((event) => event.referenceType === 'Tribe') &&
+    ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
+      ?.some((event) => event.referenceType === 'Tribe');
+  const combinedPredictions = Object.values(
+    leagueEvents.predictionEvents[episodeNumber]?.reduce((acc, event) => {
+      acc[event.eventId] ??= {
+        eventId: event.eventId,
+        eventName: event.eventName,
+        points: event.points,
+        notes: event.notes,
+        referenceId: event.referenceId,
+        referenceType: event.referenceType,
+        referenceName: event.referenceName,
+        predictionMakers: []
+      };
 
+      acc[event.eventId]!.predictionMakers.push(event.predictionMaker);
+
+      return acc;
+    }, {} as Record<number, {
+      eventId: number;
+      eventName: string;
+      points: number;
+      notes: string[] | null;
+      referenceId: number;
+      referenceType: ReferenceType;
+      referenceName: string;
+      predictionMakers: LeagueMemberDisplayName[];
+    }>) ?? {});
 
   return (
-    <ScrollArea className='max-md:w-[calc(100svw-4rem)] flex-grow bg-card rounded-lg gap-0'>
+    <ScrollArea className='w-[calc(100svw-3rem)] sm:w-[calc(100svw-4rem)] md:w-auto flex-grow bg-card rounded-lg gap-0'>
       <Table>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
-        <TableHeader>
+        <TableHeader className='sticky top-0'>
           <TableRow className='bg-white hover:bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
             {edit && <TableHead className='w-0'>
               Edit
@@ -202,33 +238,42 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mockBase && (
+          {mockBases?.map((mockBase, index) =>
             <BaseEventRow
+              key={index}
               className='bg-yellow-500'
               baseEvent={{ ...mockBase, baseEventId: -1 }}
               episodeNumber={episodeNumber}
               baseEventRules={baseEventRules}
               edit={false} />
           )}
-          {mockPrediction && (
+          {mockPredictions?.map((mockPrediction, index) =>
             <LeagueEventRow
+              key={index}
               className='bg-yellow-500'
+              eventId={-1}
               eventName={mockPrediction.eventName}
               points={mockPrediction.points}
+              predictionMakers={[mockPrediction.predictionMaker]}
+              referenceId={mockPrediction.referenceId}
               referenceType={mockPrediction.referenceType}
               referenceName={mockPrediction.referenceName}
-              predictionMaker={mockPrediction.predictionMaker}
               notes={mockPrediction.notes}
+              episodeNumber={episodeNumber}
               edit={false} />
           )}
-          {mockDirect && (
+          {mockDirects?.map((mockDirect, index) =>
             <LeagueEventRow
+              key={index}
               className='bg-yellow-500'
+              eventId={-1}
               eventName={mockDirect.eventName}
               points={mockDirect.points}
+              referenceId={mockDirect.referenceId}
               referenceType={mockDirect.referenceType}
               referenceName={mockDirect.referenceName}
               notes={mockDirect.notes}
+              episodeNumber={episodeNumber}
               edit={false} />
           )}
           {Object.values(baseEvents[episodeNumber] ?? {}).length > 0 &&
@@ -256,11 +301,14 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
             directEvents.map((event, index) => (
               <LeagueEventRow
                 key={index}
+                eventId={event.eventId}
                 eventName={event.eventName}
                 points={event.points}
                 referenceType={event.referenceType}
                 referenceName={event.referenceName}
+                referenceId={event.referenceId}
                 notes={event.notes}
+                episodeNumber={episodeNumber}
                 edit={edit} />
             ))
           )}
@@ -270,15 +318,18 @@ export function EpisodeEvents({ episodeNumber, mockBase, mockPrediction, mockDir
                 Correct Predictions
               </TableCell>
             </TableRow>}
-          {leagueEvents.predictionEvents[episodeNumber]?.map((event, index) => (
+          {combinedPredictions?.map((event, index) => (
             <LeagueEventRow
               key={index}
+              eventId={event.eventId}
               eventName={event.eventName}
               points={event.points}
               referenceType={event.referenceType}
               referenceName={event.referenceName}
-              predictionMaker={event.predictionMaker}
+              referenceId={event.referenceId}
+              predictionMakers={event.predictionMakers}
               notes={event.notes}
+              episodeNumber={episodeNumber}
               edit={edit} />
           ))}
         </TableBody>
@@ -346,7 +397,7 @@ type AirStatusProps = {
 function AirStatus({ airDate, airStatus }: AirStatusProps) {
   return (
     <span className='inline-flex -ml-1 gap-1 items-center text-sm text-muted-foreground'>
-      {airDate.toLocaleDateString()}
+      {airDate.toLocaleString()}
       <div className={cn('text-destructive-foreground text-xs px-1 rounded-md',
         airStatus === 'Aired' && 'bg-destructive',
         airStatus === 'Upcoming' && 'bg-amber-500',
@@ -368,7 +419,7 @@ interface BaseEventRowProps {
 function BaseEventRow({
   baseEvent, episodeNumber, baseEventRules, edit, className
 }: BaseEventRowProps) {
-  const { leagueData } = useLeague();
+  const { leagueData, league } = useLeague();
   const { eventName, label, tribes, castaways, notes } = baseEvent;
 
   const members =
@@ -391,33 +442,49 @@ function BaseEventRow({
       <TableCell className='text-center' style={{ height: 'inherit' }}>
         <div className='h-full grid auto-rows-fr items-center'>
           {tribes?.map((tribe, index) => (
-            <span key={index} className='flex h-full text-nowrap justify-center items-center'>
+            <ColorRow
+              key={index}
+              className='leading-tight px-1 w-min'
+              color={leagueData.castaways.find((listItem) =>
+                listItem.tribes.some((tribeEp) => tribeEp.tribeName === tribe))?.tribes
+                .find((tribeEp) => tribeEp.tribeName === tribe)?.tribeColor}>
               {tribe}
-            </span>
+            </ColorRow>
           ))}
         </div>
       </TableCell >
       <TableCell className='text-right'>
-        <div
-          className={cn(
-            'text-xs flex flex-col h-full',
-            castaways?.length === 1 && 'justify-center')}>
+        <div className={cn(
+          'text-xs flex flex-col h-full gap-0.5 items-end',
+          castaways?.length === 1 && 'justify-center')}>
           {castaways?.map((castaway, index) => (
-            <span className='text-nowrap' key={index}>{castaway}</span>
+            <ColorRow
+              key={index}
+              className='leading-tight px-1 w-min'
+              color={leagueData.castaways.find((listItem) =>
+                listItem.fullName === castaway)?.tribes.findLast((tribeEp) =>
+                  tribeEp.episode <= episodeNumber)?.tribeColor}>
+              {castaway}
+            </ColorRow>
           ))}
         </div>
       </TableCell>
       <TableCell>
-        <div
-          className={cn(
-            'flex flex-col text-xs h-full',
-            members?.length === 1 && 'justify-center')}>
+        <div className={cn(
+          'flex flex-col text-xs h-full gap-0.5',
+          members?.length === 1 && 'justify-center')}>
           {members?.map((member, index) =>
             member ?
-              <span key={index} className='text-nowrap'>
+              <ColorRow
+                key={index}
+                className='leading-tight px-1 w-min'
+                color={league.members.list.find((listItem) =>
+                  listItem.displayName === member)?.color}>
                 {member}
-              </span> :
-              <br key={index} />
+              </ColorRow> :
+              <ColorRow className='invisible leading-tight px-1 w-min' key={index}>
+                None
+              </ColorRow>
           )}
         </div>
       </TableCell>
@@ -431,57 +498,87 @@ function BaseEventRow({
 interface LeagueEventRowProps {
   className?: string;
   eventName: LeagueEventName;
+  eventId: number;
   points: number;
   referenceType: ReferenceType;
-  referenceName: string;
-  predictionMaker?: LeagueMemberDisplayName;
+  referenceName?: string;
+  referenceId: number;
+  predictionMakers?: LeagueMemberDisplayName[];
   notes: string[] | null;
+  episodeNumber: EpisodeNumber;
   edit?: boolean;
 }
 
 function LeagueEventRow({
-  eventName, points, referenceType, referenceName, predictionMaker, notes, edit, className
+  eventName,
+  eventId,
+  points,
+  referenceType,
+  referenceName,
+  referenceId,
+  predictionMakers,
+  notes,
+  episodeNumber,
+  edit,
+  className
 }: LeagueEventRowProps) {
+  const { leagueData, league } = useLeague();
+
   return (
     <TableRow className={className}>
-      {edit && <TableCell className='w-0'>
-        <AlertDialog>
-          <AlertDialogTrigger>
-            <Pencil size={20} />
-          </AlertDialogTrigger>
-          <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max pb-0'>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Edit Event</AlertDialogTitle>
-              <AlertDialogDescription hidden>Edit the event details</AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel className='h-min p-1'>
-                <X stroke='white' />
-              </AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </TableCell>}
+      {edit ? <TableCell className='w-0'>
+        <EditLeagueEvent episodeNumber={episodeNumber} leagueEvent={{
+          eventId,
+          eventName,
+          points,
+          referenceType,
+          referenceId,
+          notes
+        }} />
+      </TableCell> :
+        edit === false ? <TableCell className='w-0' /> : null}
       <TableCell className='text-nowrap sticky'>{eventName}</TableCell>
       <PointsCell points={points} />
       <TableCell className='text-right text-xs text-nowrap'>
-        {referenceType === 'Tribe' ? referenceName : ''}
+        <div className='h-full grid auto-rows-fr items-center'>
+          {referenceType === 'Tribe' && referenceName &&
+            <ColorRow
+              className='leading-tight px-1 w-min'
+              color={leagueData.castaways.find((listItem) =>
+                listItem.tribes.some((tribeEp) => tribeEp.tribeName === referenceName))?.tribes
+                .find((tribeEp) => tribeEp.tribeName === referenceName)?.tribeColor}>
+              {referenceName}
+            </ColorRow>}
+        </div>
       </TableCell>
-      <TableCell className='text-right text-xs text-nowrap'>
-        {referenceType === 'Castaway' ? referenceName : ''}
+      <TableCell className='text-right text-xs text-nowrap justify-items-end'>
+        {referenceType === 'Castaway' && referenceName &&
+          <ColorRow
+            className='leading-tight px-1 w-min'
+            color={leagueData.castaways.find((listItem) =>
+              listItem.fullName === referenceName)?.tribes.findLast((tribeEp) =>
+                tribeEp.episode <= episodeNumber)?.tribeColor}>
+            {referenceName}
+          </ColorRow>}
       </TableCell>
       <TableCell className='text-xs text-nowrap'>
-        {referenceType === 'Member' ? referenceName : ''}
-        {predictionMaker &&
-          <Popover>
-            <PopoverTrigger>
-              <b>{predictionMaker}</b>
-            </PopoverTrigger>
-            <PopoverContent className='w-min p-1 text-nowrap' side='left'>
-              <PopoverArrow />
-              Predicted {referenceName} correctly
-            </PopoverContent>
-          </Popover>}
+        <div className={cn(
+          'flex flex-col text-xs h-full gap-0.5',
+          predictionMakers?.length === 1 && 'justify-center')}>
+          {predictionMakers?.map((member, index) =>
+            member ?
+              <ColorRow
+                key={index}
+                className='leading-tight px-1 w-min'
+                color={league.members.list.find((listItem) =>
+                  listItem.displayName === member)?.color}>
+                {member}
+              </ColorRow> :
+              <ColorRow className='invisible leading-tight px-1 w-min' key={index}>
+                None
+              </ColorRow>
+          )}
+        </div>
       </TableCell>
       <TableCell>
         <NotesPopover notes={notes} />

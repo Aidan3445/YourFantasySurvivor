@@ -9,43 +9,40 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/ui/alertDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { MultiSelect } from '~/components/ui/multiSelect';
-import { type BaseEventInsert, BaseEventInsertZod, baseEventLabelPrefixes, baseEventLabels, type BaseEvent } from '~/server/db/defs/events';
 import { useState } from 'react';
-import { Input } from '~/components/ui/input';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { Textarea } from '~/components/ui/textarea';
 import { Button } from '~/components/ui/button';
-import { deleteBaseEvent, updateBaseEvent } from '~/app/api/seasons/actions';
+import { deleteLeagueEvent, updateLeagueEvent } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
+import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/server/db/defs/events';
 
-interface EditBaseEventProps {
+interface EditLeagueEventProps {
   episodeNumber: number;
-  baseEvent: BaseEvent;
+  leagueEvent: LeagueEvent;
 }
 
-export default function EditBaseEvent({ episodeNumber, baseEvent }: EditBaseEventProps) {
-  const { leagueData, refresh } = useLeague();
-  const reactForm = useForm<BaseEventInsert>({
+export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeagueEventProps) {
+  const { league, leagueData, refresh } = useLeague();
+  const reactForm = useForm<LeagueEventInsert>({
     defaultValues: {
       episodeId: leagueData.episodes.toReversed()[episodeNumber - 1]?.episodeId,
-      ...baseEvent,
-      label: baseEvent.label || (`${baseEventLabelPrefixes[baseEvent.eventName]} ${baseEventLabels[baseEvent.eventName]?.[0] ?? baseEvent.eventName}`)
+      ...leagueEvent,
     },
-    resolver: zodResolver(BaseEventInsertZod)
+    resolver: zodResolver(LeagueEventInsertZod)
   });
   const selectedReferenceType = reactForm.watch('referenceType');
   const { castawayOptions, tribeOptions } = useEventOptions(episodeNumber);
-  const [eventClearer, setEventClearer] = useState(0);
 
   const clearReferences = () => {
-    setEventClearer(eventClearer + 1);
-    reactForm.resetField('references');
+    reactForm.resetField('referenceId');
   };
+
+  console.log(leagueEvent, reactForm.getValues());
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateBaseEvent(baseEvent.baseEventId, data);
+      await updateLeagueEvent(league.leagueHash, leagueEvent.eventId, data);
       alert('Event updated successfully');
       await refresh();
     } catch (e) {
@@ -56,7 +53,7 @@ export default function EditBaseEvent({ episodeNumber, baseEvent }: EditBaseEven
 
   const handleDelete = async () => {
     try {
-      await deleteBaseEvent(baseEvent.baseEventId);
+      await deleteLeagueEvent(league.leagueHash, leagueEvent.eventId);
       alert('Event deleted successfully');
       await refresh();
     } catch (e) {
@@ -75,28 +72,12 @@ export default function EditBaseEvent({ episodeNumber, baseEvent }: EditBaseEven
         </AlertDialogTrigger>
         <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max'>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Edit {baseEvent.eventName}
-            </AlertDialogTitle>
+            <AlertDialogTitle>Edit {leagueEvent.eventName}</AlertDialogTitle>
             <AlertDialogDescription hidden>Edit the event details</AlertDialogDescription>
           </AlertDialogHeader>
           <form
             className='flex flex-col gap-1 px-2 w-full'
             action={() => handleSubmit()}>
-            <FormField
-              name='label'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Event Label</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='text'
-                      placeholder='Label'
-                      {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
             <FormLabel>Reference</FormLabel>
             <FormField
               name='referenceType'
@@ -122,19 +103,31 @@ export default function EditBaseEvent({ episodeNumber, baseEvent }: EditBaseEven
                 </FormItem>
               )} />
             <FormField
-              name='references'
+              name='referenceId'
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <MultiSelect
-                      options={selectedReferenceType === 'Castaway' ?
-                        castawayOptions : tribeOptions}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value as string[]}
-                      value={field.value as string[]}
-                      modalPopover
-                      clear={eventClearer}
-                      placeholder={`Select ${selectedReferenceType}s`} />
+                    <Select
+                      defaultValue={`${field.value}`}
+                      value={`${field.value}`}
+                      onValueChange={field.onChange}>
+                      <SelectTrigger className='h-full'>
+                        <SelectValue placeholder='Select Reference' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedReferenceType === 'Castaway' && castawayOptions.map((castaway) => (
+                          <SelectItem key={castaway.value} value={`${castaway.value}`}>
+                            {castaway.label}
+                          </SelectItem>
+                        ))}
+                        {selectedReferenceType === 'Tribe' && tribeOptions.map((tribe) => (
+                          <SelectItem key={tribe.value} value={`${tribe.value}`}>
+                            {tribe.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                      <FormMessage />
+                    </Select>
                   </FormControl>
                 </FormItem>
               )} />
@@ -158,7 +151,7 @@ export default function EditBaseEvent({ episodeNumber, baseEvent }: EditBaseEven
               <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
                 <X stroke='white' />
               </AlertDialogCancel>
-              <span className='flex gap-1 items-baseline'>
+              <span className='flex gap-1 items-leagueline'>
                 <AlertDialogCancel variant='secondary'>
                   Cancel
                 </AlertDialogCancel>

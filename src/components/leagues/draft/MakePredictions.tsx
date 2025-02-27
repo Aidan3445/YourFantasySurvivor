@@ -11,20 +11,19 @@ import { type ReferenceType, type LeagueEventPrediction } from '~/server/db/defs
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
+import { type CastawayDetails, type CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { type Tribe } from '~/server/db/defs/tribes';
-import { type LeagueMembersDraftInfo } from '~/server/db/defs/leagueMembers';
 
 interface MakePredictionsProps {
   predictions: LeagueEventPrediction[];
-  castaways: CastawayDraftInfo[];
+  castaways: (CastawayDraftInfo | CastawayDetails)[];
   tribes: Tribe[];
-  members: LeagueMembersDraftInfo[];
+  className?: string;
 }
 
-export default function MakePredictions({ predictions, castaways, tribes, members }: MakePredictionsProps) {
+export default function MakePredictions({ predictions, castaways, tribes }: MakePredictionsProps) {
   if (predictions.length === 0) return null;
 
   return (
@@ -34,12 +33,12 @@ export default function MakePredictions({ predictions, castaways, tribes, member
         Make your predictions! Earn points throughout the season
         for each correct prediction you make.
       </p>
-      <PredictionCards predictions={predictions} castaways={castaways} tribes={tribes} members={members} />
+      <PredictionCards predictions={predictions} castaways={castaways} tribes={tribes} />
     </div>
   );
 }
 
-function PredictionCards({ predictions, castaways, tribes, members }: MakePredictionsProps) {
+export function PredictionCards({ predictions, castaways, tribes, className }: MakePredictionsProps) {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
 
@@ -61,7 +60,6 @@ function PredictionCards({ predictions, castaways, tribes, members }: MakePredic
     const options: Record<ReferenceType, Record<string, number>> = {
       Castaway: {},
       Tribe: {},
-      Member: {},
     };
 
     if (referenceTypes.length === 0 || referenceTypes.includes('Castaway')) {
@@ -74,12 +72,6 @@ function PredictionCards({ predictions, castaways, tribes, members }: MakePredic
         options.Tribe[tribe.tribeName] = tribe.tribeId;
       });
     }
-    if (referenceTypes.length === 0 || referenceTypes.includes('Member')) {
-      members.forEach((member) => {
-        options.Member[member.displayName] = member.memberId;
-      });
-    }
-
     return options;
   };
 
@@ -87,7 +79,9 @@ function PredictionCards({ predictions, castaways, tribes, members }: MakePredic
   if (predictions.length === 1) {
     const prediction = predictions[0]!;
     return (<article
-      className='flex flex-col bg-accent rounded-lg shadow-lg my-4 text-center transition-transform duration-700'>
+      className={cn(
+        'flex flex-col bg-accent rounded-lg my-4 text-center transition-transform duration-700',
+        className)}>
       <span className='flex gap-1 items-start self-center px-1'>
         <h3 className='text-lg font-semibold text-card-foreground'>
           {prediction.eventName} some more
@@ -110,7 +104,7 @@ function PredictionCards({ predictions, castaways, tribes, members }: MakePredic
       className='w-3/4'
       opts={{ align: 'center' }}>
       <CarouselContent>
-        {[...predictions, ...predictions, ...predictions, ...predictions, ...predictions].map((prediction, index) => (
+        {predictions.map((prediction, index) => (
           <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
             'opacity-50 -z-10': index !== current - 1,
           })}>
@@ -158,11 +152,11 @@ interface SubmissionCardProps {
 function SubmissionCard({ prediction, options }: SubmissionCardProps) {
   const { league, refresh } = useLeague();
   const reactForm = useForm<z.infer<typeof formSchema>>({
-    defaultValues: {
-      referenceId: prediction.predictionMade?.referenceId
-    },
+    defaultValues: { referenceId: prediction.predictionMade?.referenceId },
     resolver: zodResolver(formSchema),
   });
+
+  console.log(prediction, reactForm.getValues());
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
@@ -190,7 +184,7 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
               <FormControl>
                 <Select
                   onValueChange={field.onChange}
-                  value={`${field.value as string}`}>
+                  value={`${field.value ?? ''}`}>
                   <span className='grid grid-cols-4 gap-2'>
                     <SelectTrigger className='w-full col-span-3'>
                       <SelectValue placeholder='Select prediction' />

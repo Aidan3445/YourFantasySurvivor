@@ -1,5 +1,6 @@
 'use server';
 
+import { eq } from 'drizzle-orm';
 import { systemAdminAuth } from '~/lib/auth';
 import { db } from '~/server/db';
 import { type NewCastaway } from '~/server/db/defs/castaways';
@@ -108,3 +109,33 @@ export async function importContestants(
   });
 }
 
+/**
+  * Import episode from fandom
+  * @param seasonName - the season to import to
+  * @param episode - the episode to import
+  */
+export async function importEpisode(
+  seasonName: string,
+  episode: { episodeNumber: number, episodeTitle: string, episodeAirDate: string }
+) {
+  const { userId } = await systemAdminAuth();
+  if (!userId) {
+    throw new Error('Unauthorized');
+  }
+
+  const seasonId = await db
+    .select({ seasonId: seasonsSchema.seasonId })
+    .from(seasonsSchema)
+    .where(eq(seasonsSchema.seasonName, seasonName))
+    .then((seasons) => seasons[0]?.seasonId);
+  if (!seasonId) throw new Error('Season not found');
+
+  await db
+    .insert(episodesSchema)
+    .values({
+      episodeNumber: episode.episodeNumber,
+      title: episode.episodeTitle.replaceAll('"', ''),
+      airDate: episode.episodeAirDate,
+      seasonId,
+    });
+}

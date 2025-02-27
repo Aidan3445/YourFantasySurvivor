@@ -4,9 +4,10 @@ import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { leaguesSchema } from '~/server/db/schema/leagues';
+import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { systemSchema } from '~/server/db/schema/system';
 import { type LeagueHash } from '~/server/db/defs/leagues';
+import { seasonsSchema } from '~/server/db/schema/seasons';
 
 /**
   * Authenticate the user within a league
@@ -26,11 +27,16 @@ export async function leagueMemberAuth(leagueHash: LeagueHash) {
       role: leagueMembersSchema.role,
       member: leagueMembersSchema,
       league: leaguesSchema,
+      seasonName: seasonsSchema.seasonName,
+      draftDate: leagueSettingsSchema.draftDate,
     })
     .from(leagueMembersSchema)
-    .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
+    .innerJoin(leaguesSchema, and(
+      eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId),
+      eq(leaguesSchema.leagueHash, leagueHash)))
+    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
+    .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
     .where(and(
-      eq(leaguesSchema.leagueHash, leagueHash),
       eq(leagueMembersSchema.userId, userId),
     )).then((members) => members[0]);
 
@@ -39,7 +45,8 @@ export async function leagueMemberAuth(leagueHash: LeagueHash) {
     memberId: member?.memberId ?? null,
     role: member?.role ?? null,
     member: member?.member ?? null,
-    league: member?.league ?? null,
+    league: member ? { ...member.league, draftDate: new Date(member.draftDate + 'Z') } : null,
+    seasonName: member?.seasonName ?? null,
   };
 }
 

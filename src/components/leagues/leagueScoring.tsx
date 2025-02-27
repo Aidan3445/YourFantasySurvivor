@@ -21,12 +21,8 @@ export default function LeagueScoring() {
     league: {
       leagueHash,
       baseEventRules,
-      leagueStatus,
       members: {
         loggedIn
-      },
-      settings: {
-        draftDate
       }
     },
     refresh,
@@ -52,10 +48,7 @@ export default function LeagueScoring() {
     }
   });
 
-  const disabled =
-    leagueStatus !== 'Predraft' ||
-    loggedIn?.role !== 'Owner' ||
-    (!!draftDate && Date.now() > draftDate.getTime());
+  const disabled = loggedIn?.role !== 'Owner';
 
   return (
     <article className='p-2 bg-card rounded-xl w-full relative'>
@@ -67,7 +60,7 @@ export default function LeagueScoring() {
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => { setLocked(true); reactForm.reset(); }} />)}
       <h2 className='text-lg font-bold text-card-foreground'>Official Events</h2>
-      <p className='text-sm'>
+      <p className='text-sm mr-12'>
         These <i>Official Events</i> are <b>automatically scored</b> for your
         league based on what drafted castaways do in the show.
         <br />
@@ -98,7 +91,11 @@ export default function LeagueScoring() {
                 onClick={() => { setLocked(true); reactForm.reset(); }}>
                 Cancel
               </Button>
-              <Button type='submit'>Save</Button>
+              <Button
+                disabled={!reactForm.formState.isDirty}
+                type='submit'>
+                Save
+              </Button>
             </span>)}
         </form>
       </Form>

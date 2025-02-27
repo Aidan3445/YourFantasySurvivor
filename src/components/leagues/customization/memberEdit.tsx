@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { useLeague } from '~/hooks/useLeague';
 import { LeagueMemberFields } from '~/components/leagues/joinLeague';
 import { Button } from '~/components/ui/button';
+import { cn } from '~/lib/utils';
 
 const formSchema = z.object({
   displayName: DisplayNameZod,
@@ -19,7 +20,11 @@ const formSchema = z.object({
   displayName: data.displayName.trim(),
 }));
 
-export default function MemberEditForm() {
+interface MemberEditFormProps {
+  className?: string;
+}
+
+export default function MemberEditForm({ className }: MemberEditFormProps) {
   const {
     league: {
       leagueHash,
@@ -64,13 +69,18 @@ export default function MemberEditForm() {
 
   return (
     <Form {...reactForm}>
-      <form className=' flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+      <form className={cn(
+        'flex flex-col p-2 gap-2 bg-card rounded-lg w-96',
+        className
+      )} action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground'>Edit Member Details</FormLabel>
         <LeagueMemberFields
           memberColors={memberColors
             .filter((m) => m.memberId !== loggedIn?.memberId)
             .map((m) => m.color)} />
-        <Button type='submit'>Save</Button>
+        <Button
+          disabled={!reactForm.formState.isDirty}
+          type='submit'>Save</Button>
       </form>
     </Form>
   );

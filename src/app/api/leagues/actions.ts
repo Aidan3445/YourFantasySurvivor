@@ -4,7 +4,7 @@ import { auth } from '@clerk/nextjs/server';
 import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { type ReferenceType, type BaseEventRule, type LeagueEventRule } from '~/server/db/defs/events';
+import { type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert, type LeagueEventId } from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { leagueMemberAuth } from '~/lib/auth';
@@ -12,7 +12,7 @@ import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/
 import { type LeagueMember, type LeagueMemberId, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
-import { leagueEventPredictionsSchema, leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
+import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
 import { type CastawayId } from '~/server/db/defs/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { type EpisodeId } from '~/server/db/defs/episodes';
@@ -413,8 +413,6 @@ export async function updateLeagueEventRule(leagueHash: LeagueHash, rule: League
   const { role } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
 
-  console.log('rule', rule);
-
   // Error can be ignored, the where clause is not understood by the type system
   // eslint-disable-next-line drizzle/enforce-update-with-where
   const update = await db
@@ -565,16 +563,49 @@ export async function makePrediction(
   referenceType: ReferenceType,
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceId: CastawayId | TribeId | LeagueMemberId,
-  episodeId?: EpisodeId
+  episodeId?: EpisodeId,
 ) {
-  const { memberId } = await leagueMemberAuth(leagueHash);
-  if (!memberId) throw new Error('User not authorized');
+  const { memberId, league } = await leagueMemberAuth(leagueHash);
+  if (!memberId || !league) throw new Error('User not authorized');
 
-  if (!episodeId) {
-    // Get the next episode to air
-    episodeId = (await QUERIES.getEpisodes(leagueHash))?.pop()?.episodeId;
-    if (!episodeId) throw new Error('Next episode not found');
+  const episodes = await QUERIES.getEpisodes(leagueHash, 100);
+  if (!episodes || episodes.length === 0) throw new Error('Episodes not found');
+  const nextEpisode = episodes.find((episode) => episode.airStatus === 'Upcoming');
+  if (!nextEpisode) throw new Error('Next episode not found');
+  episodeId ??= nextEpisode.episodeId;
+
+  /*
+  let timing: LeagueEventTiming | undefined;
+  const lastEpisode = episodes[nextEpisode.episodeNumber - 2];
+  const mergeEpisode = episodes.find((episode) => episode.isMerge);
+
+  // Draft takes precedence if included in the list: 
+  // - if the league is in draft status
+  // - if there are no previous episodes
+  // - if the draft date is after the last aired episode
+  if (rule.timing.includes('Draft') &&
+    (league.leagueStatus === 'Draft' || !lastEpisode ||
+      league.draftDate > lastEpisode.episodeAirDate)) timing = 'Draft';
+  // Weekly takes precedence if included in the list and draft checks fail
+  else if (rule.timing.includes('Weekly')) timing = 'Weekly';
+  // Likewise for weekly premerge and postmerge
+  // Weekly premerge only if included in the list and no merge episode
+  else if (rule.timing.includes('Weekly (Premerge only)') &&
+    !mergeEpisode) timing = 'Weekly (Premerge only)';
+  // Weekly postmerge only if included in the list and merge episode exists
+  else if (rule.timing.includes('Weekly (Postmerge only)') &&
+    !!mergeEpisode) timing = 'Weekly (Postmerge only)';
+  // After merge only if included in the list and merge episode is last aired
+  else if (rule.timing.includes('After Merge') &&
+    !!lastEpisode?.isMerge) timing = 'After Merge';
+  // Before finale only if included in the list and next episode is the finale
+  else if (rule.timing.includes('Before Finale') &&
+    !!nextEpisode?.isFinale) timing = 'Before Finale';
+ 
+  if (!timing || league.leagueStatus === 'Inactive') {
+    throw new Error('This prediction cannot be made at this time');
   }
+  */
 
   await db
     .insert(leagueEventPredictionsSchema)
@@ -594,3 +625,85 @@ export async function makePrediction(
       set: { referenceType, referenceId },
     });
 }
+
+/**
+  * Create a new custom/league event for the season
+  * @param leagueHash hash of the league to create the event for
+  * @param leagueEvent event to create
+  * @throws if the user is not a system admin
+  * @throws if the event cannot be created
+  */
+export async function createLeagueEvent(leagueHash: LeagueHash, leagueEvent: LeagueEventInsert) {
+  const { memberId, role } = await leagueMemberAuth(leagueHash);
+  if (!memberId || role === 'Member') throw new Error('User not authorized');
+
+  // ensure the rule is in the league
+  const rule = await db
+    .select({ leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId })
+    .from(leagueEventsRulesSchema)
+    .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
+    .where(and(
+      eq(leaguesSchema.leagueHash, leagueHash),
+      eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEvent.leagueEventRuleId)))
+    .then((res) => res[0]);
+  if (!rule) throw new Error('Rule not found');
+
+  // insert the league event
+  const leagueEventId = await db
+    .insert(leagueEventsSchema)
+    .values(leagueEvent)
+    .returning({ leagueEventId: leagueEventsSchema.leagueEventId })
+    .then((result) => result[0]?.leagueEventId);
+  if (!leagueEventId) throw new Error('Failed to create league event');
+}
+
+/**
+  * Update a base event for the season
+  * @param leagueHash hash of the league to update the event for
+  * @param leagueEvent event to update
+  * @throws if the user is not a system admin
+  * @throws if the event cannot be updated
+  */
+export async function updateLeagueEvent(
+  leagueHash: LeagueHash,
+  leagueEventId: LeagueEventId,
+  leagueEvent: LeagueEventInsert
+) {
+  const { memberId, role, league } = await leagueMemberAuth(leagueHash);
+  if (!memberId || role === 'Member') throw new Error('User not authorized');
+
+  // ensure the rule is in the league
+  const rule = await db
+    .select({ leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId })
+    .from(leagueEventsRulesSchema)
+    .where(and(
+      eq(leagueEventsRulesSchema.leagueId, league!.leagueId),
+      eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEvent.leagueEventRuleId)))
+    .then((res) => res[0]);
+  if (!rule) throw new Error('Rule not found');
+
+  // update the base event
+  await db
+    .update(leagueEventsSchema)
+    .set(leagueEvent)
+    .where(eq(leagueEventsSchema.leagueEventId, leagueEventId));
+}
+
+/**
+  * Delete a base event for the season
+  * @param leagueHash hash of the league to delete the event for
+  * @param leagueEvent event to delete
+  * @throws if the user is not an admin or owner of the league
+  * @throws if the event cannot be deleted
+  */
+export async function deleteLeagueEvent(leagueHash: LeagueHash, leagueEventId: number) {
+  const { memberId, role } = await leagueMemberAuth(leagueHash);
+  if (!memberId || role === 'Member') throw new Error('User not authorized');
+
+  // unlike update and insert, cascade delete will take care of deleting
+  // the references as well, nice!
+  await db
+    .delete(leagueEventsSchema)
+    .where(eq(leagueEventsSchema.leagueEventId, leagueEventId));
+}
+

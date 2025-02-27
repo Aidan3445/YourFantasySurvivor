@@ -46,7 +46,7 @@ export default function SetSurvivalCap() {
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => { setLocked(true); reactForm.reset(); }} />)}
       <h2 className='text-lg font-bold text-card-foreground'>Survival Streak</h2>
-      <p className='text-sm'>
+      <p className='text-sm mr-12'>
         The <i>Survival Streak</i> rewards players for picking a castaway that survives each episode.
       </p>
       <div className='text-sm'>
@@ -111,7 +111,11 @@ export default function SetSurvivalCap() {
                   onClick={() => { setLocked(true); reactForm.reset(); }}>
                   Cancel
                 </Button>
-                <Button type='submit'>Save</Button>
+                <Button
+                  disabled={!reactForm.formState.isDirty}
+                  type='submit'>
+                  Save
+                </Button>
               </span>}
           </span>
         </form>

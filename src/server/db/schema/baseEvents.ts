@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createTable } from './createTable';
-import { index, integer, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
+import { index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
 import { AllBaseEventNames, ReferenceOptions } from '~/server/db/defs/events';
 import { episodesSchema } from './episodes';
@@ -34,6 +34,7 @@ export const baseEventReferenceSchema = createTable(
   (table) => [
     index().on(table.baseEventId),
     index().on(table.referenceId),
+    unique().on(table.baseEventId, table.referenceType, table.referenceId)
   ]
 );
 

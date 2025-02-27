@@ -21,7 +21,7 @@ export const leagueEventsRulesSchema = createTable(
     description: varchar('event_desc', { length: 256 }).notNull(),
     points: integer('event_points').notNull(),
     eventType: leagueEventType('event_type').notNull(),
-    referenceTypes: leagueEventReference('reference_types').array().notNull().default(sql`ARRAY['Castaway', 'Tribe', 'Member']::event_league_reference[]`),
+    referenceTypes: leagueEventReference('reference_types').array().notNull().default(sql`ARRAY['Castaway', 'Tribe']::event_league_reference[]`),
     timing: leagueEventTiming('event_timing').array().notNull().default(sql`ARRAY[]::event_league_timing[]`),
     public: boolean('public').notNull(),
   },
@@ -62,5 +62,20 @@ export const leagueEventsSchema = createTable(
   (table) => [
     index().on(table.leagueEventRuleId),
     index().on(table.episodeId),
+  ]
+);
+
+export const leagueEventReferenceSchema = createTable(
+  'event_league_reference',
+  {
+    leagueEventReferenceId: serial('league_event_reference_id').notNull().primaryKey(),
+    leagueEventId: integer('league_event_id').notNull().references(() => leagueEventsSchema.leagueEventId, { onDelete: 'cascade' }),
+    referenceType: leagueEventReference('reference_type').notNull(),
+    referenceId: integer('reference_id').notNull(),
+  },
+  (table) => [
+    index().on(table.leagueEventId),
+    index().on(table.referenceId),
+    unique().on(table.leagueEventId, table.referenceType, table.referenceId),
   ]
 );

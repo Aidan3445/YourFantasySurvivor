@@ -11,7 +11,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/ui/alertDialog';
-import MakePredictions from './MakePredictions';
+import MakePredictions from './makePredictions';
 import { useRouter } from 'next/navigation';
 
 interface DraftTrackerProps {
@@ -108,8 +108,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
         <MakePredictions
           predictions={draft.predictions}
           castaways={draft.castaways}
-          tribes={draft.tribes}
-          members={draft.picks} />}
+          tribes={draft.tribes} />}
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
