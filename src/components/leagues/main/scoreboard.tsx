@@ -13,7 +13,7 @@ import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { ColorRow } from '../draftOrder';
-import { Circle, History } from 'lucide-react';
+import { Circle, Flame, History } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/useMobile';
@@ -37,7 +37,10 @@ export default function Scoreboard() {
             'px-4 bg-white pointer-events-none',
             selectedMembers.length > 0 && 'pointer-events-auto')}>
             <TableHead className='text-center w-0'>Place</TableHead>
-            <TableHead className='text-center w-0'>Points</TableHead>
+            <TableHead className='text-center w-0 text-nowrap'>
+              Points
+              <Flame className='align-top inline w-4 h-4 stroke-muted-foreground' />
+            </TableHead>
             <TableHead className='text-center'>Member</TableHead>
             <TableHead className='text-center w-0'>Survivor</TableHead>
           </TableRow>

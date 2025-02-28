@@ -1,6 +1,8 @@
+import { Flame } from 'lucide-react';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { cn } from '~/lib/utils';
+import { BaseEventFullName } from '~/server/db/defs/events';
 
 interface BaseEventSettingsProps {
   disabled?: boolean;
@@ -14,12 +16,16 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.indivWin'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Individual Immunity
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.indivWin}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
             <span className='flex gap-4 items-top'>
@@ -44,12 +50,16 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.indivReward'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Individual Reward
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.indivReward}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
             <span className='flex gap-4 items-top'>
@@ -74,12 +84,16 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.tribe1st'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Tribe/Team 1st Place
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.tribe1st}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
             <span className='flex gap-4 items-top'>
@@ -104,12 +118,16 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.tribe2nd'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Tribe/Team 2nd Place
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.tribe2nd}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
             <span className='flex gap-4 items-top'>
@@ -144,12 +162,16 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.advFound'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Advantage Found
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.advFound}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
             <span className='flex gap-4 items-top'>
@@ -174,12 +196,16 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.advPlay'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Advantage Played
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.advPlay}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
             <span className='flex gap-4 items-top'>
@@ -204,12 +230,16 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.badAdvPlay'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Bad Advantage Played
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.badAdvPlay}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
             <span className='flex gap-4 items-top'>
@@ -234,12 +264,16 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
         name='baseEventRules.advElim'
         render={({ field }) => (
           <FormItem>
-            <FormLabel className='inline-flex gap-2 items-center'>Advantage Eliminated
+            <FormLabel className='inline-flex gap-2 items-center'>
+              {BaseEventFullName.advElim}
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                   {field.value}
+                  <Flame className={cn('inline align-top',
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                  )} />
                 </h2>}
             </FormLabel>
 
@@ -274,12 +308,16 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
           name='baseEventRules.spokeEpTitle'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='inline-flex gap-2 items-center'>Spoke Episode Title
+              <FormLabel className='inline-flex gap-2 items-center'>
+                {BaseEventFullName.spokeEpTitle}
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
                     field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                     {field.value}
+                    <Flame className={cn('inline align-top',
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    )} />
                   </h2>}
               </FormLabel>
               <span className='flex gap-4 items-top'>
@@ -306,12 +344,16 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
           name='baseEventRules.finalists'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='inline-flex gap-2 items-center'>Finalists
+              <FormLabel className='inline-flex gap-2 items-center'>
+                {BaseEventFullName.finalists}
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
                     field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                     {field.value}
+                    <Flame className={cn('inline align-top',
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    )} />
                   </h2>}
               </FormLabel>
               <span className='flex gap-4 items-top'>
@@ -338,12 +380,16 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
           name='baseEventRules.fireWin'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='inline-flex gap-2 items-center'>Fire Making Win
+              <FormLabel className='inline-flex gap-2 items-center'>
+                {BaseEventFullName.fireWin}
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
                     field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                     {field.value}
+                    <Flame className={cn('inline align-top',
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    )} />
                   </h2>}
               </FormLabel>
               <span className='flex gap-4 items-top'>
@@ -370,12 +416,16 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
           name='baseEventRules.soleSurvivor'
           render={({ field }) => (
             <FormItem>
-              <FormLabel className='inline-flex gap-2 items-center'>Sole Survivor
+              <FormLabel className='inline-flex gap-2 items-center'>
+                {BaseEventFullName.soleSurvivor}
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
                     field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
                     {field.value}
+                    <Flame className={cn('inline align-top',
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    )} />
                   </h2>}
               </FormLabel>
               <span className='flex gap-4 items-top'>

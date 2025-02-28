@@ -10,7 +10,7 @@ import { Switch } from '~/components/ui/switch';
 import { Button } from '~/components/ui/button';
 import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
-import { Lock, LockOpen } from 'lucide-react';
+import { Flame, Lock, LockOpen } from 'lucide-react';
 import { useState } from 'react';
 
 
@@ -52,9 +52,9 @@ export default function SetSurvivalCap() {
       <div className='text-sm'>
         Each episode your pick survives, their streak grows:
         <ul className='list-disc pl-4'>
-          <li><b>Episode 1</b>: Earn 1 point</li>
-          <li><b>Episode 2</b>: Earn 2 points</li>
-          <li><b>Episode 3</b>: Earn 3 points, and so on...</li>
+          <li><b>Episode 1</b>: Earn 1<Flame className='inline align-top w-4 h-4' /> point</li>
+          <li><b>Episode 2</b>: Earn 2<Flame className='inline align-top w-4 h-4' /> points</li>
+          <li><b>Episode 3</b>: Earn 3<Flame className='inline align-top w-4 h-4' /> points, and so on...</li>
         </ul>
         If your pick is eliminated, you must choose a new unclaimed castaway, and your streak resets.
       </div>

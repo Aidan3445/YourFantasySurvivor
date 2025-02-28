@@ -1,7 +1,7 @@
 'use client';
 
 import { PopoverArrow } from '@radix-ui/react-popover';
-import { ScrollText, X } from 'lucide-react';
+import { Flame, ScrollText, X } from 'lucide-react';
 import { useState } from 'react';
 import {
   AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
@@ -24,7 +24,7 @@ import {
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
 import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes';
-import { type BaseEvent, baseEventLabelPrefixes, baseEventLabels, type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName, type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames } from '~/server/db/defs/events';
+import { type BaseEvent, BaseEventFullName, baseEventLabelPrefixes, baseEventLabels, type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName, type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames } from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import EditBaseEvent from './editBaseEvent';
 import { ColorRow } from '../draftOrder';
@@ -354,9 +354,12 @@ function PointsCell({ baseEventName: eventName, baseEventRules, points }: EventR
   points ??= baseEventRules?.[eventName as ScoringBaseEventName];
 
   return (
-    <TableCell className={cn('text-sm text-muted-foreground text-center',
+    <TableCell className={cn('text-sm text-center',
       points! > 0 ? 'text-green-600' : 'text-destructive')}>
       {points! > 0 ? `+${points}` : points}
+      <Flame className={cn(
+        'inline align-top w-4 h-min',
+        points! > 0 ? 'stroke-green-600' : 'stroke-destructive')} />
     </TableCell>
   );
 }
@@ -434,6 +437,7 @@ function BaseEventRow({
       </TableCell> :
         edit === false ? <TableCell className='w-0' /> : null}
       <TableCell className='text-nowrap'>
+        <p className='text-xs text-muted-foreground'>{BaseEventFullName[eventName]}</p>
         { // disable because we want label to be ignored if empty string as well as undefined
           // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
           label || (`${baseEventLabelPrefixes[eventName]} ${baseEventLabels[eventName]?.[0] ?? eventName}`)}

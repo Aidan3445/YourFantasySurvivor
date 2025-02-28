@@ -38,6 +38,25 @@ export const AllBaseEventNames = [
 export type BaseEventName = typeof AllBaseEventNames[number];
 export const BaseEventNameZod = z.enum(AllBaseEventNames);
 
+export const BaseEventFullName: Record<BaseEventName, string> = {
+  advFound: 'Advantage Found',
+  advPlay: 'Advantage Played',
+  badAdvPlay: 'Bad Advantage Play',
+  advElim: 'Advantage Eliminated',
+  spokeEpTitle: 'Spoke Episode Title',
+  tribe1st: 'Tribe/Team 1st',
+  tribe2nd: 'Tribe/Team 2nd',
+  indivWin: 'Individual Immunity',
+  indivReward: 'Individual Reward',
+  finalists: 'Finalists',
+  fireWin: 'Fire Making Challenge',
+  soleSurvivor: 'Sole Survivor',
+  elim: 'Eliminated',
+  noVoteExit: 'No Vote Exit',
+  tribeUpdate: 'Tribe Update',
+  otherNotes: 'Other Notes'
+};
+
 export type BaseEventId = number;
 export type BaseEvent = {
   baseEventId: BaseEventId,

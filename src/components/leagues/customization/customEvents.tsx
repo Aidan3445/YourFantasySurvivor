@@ -20,6 +20,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/ui/alertDialog';
 import { type ReactNode, useState } from 'react';
+import { cn } from '~/lib/utils';
 
 export default function CustomEvents() {
   const {
@@ -339,9 +340,13 @@ function CustomEventCard({ rule, locked }: CustomEventCardProps) {
       <span className='flex gap-1 items-center mr-8'>
         <h3 className='text-lg font-semibold text-card-foreground text-nowrap'>{rule.eventName}</h3>
         -
-        <div className='inline-flex items-center'>
-          <p className='text-sm'>{rule.points}</p>
-          <Flame size={16} />
+        <div className='inline-flex'>
+          <p className={cn(
+            'text-sm',
+            rule.points <= 0 ? 'text-destructive' : 'text-green-600')}>
+            {rule.points}
+          </p>
+          <Flame className={rule.points <= 0 ? 'stroke-destructive' : 'stroke-green-600'} size={16} />
         </div>
       </span>
       {rule.eventType === 'Prediction' &&
