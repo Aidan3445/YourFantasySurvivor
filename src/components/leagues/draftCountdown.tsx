@@ -42,7 +42,7 @@ export function DraftCountdown() {
   return (
     <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
       <span className='flex w-full items-center'>
-        <div className='flex gap-2 items-center'>
+        <div className='flex flex-wrap gap-x-2 items-baseline'>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
           <p className='text-sm text-muted-foreground'>
             {draftDate ? `Starts at: ${draftDate.toLocaleString()}` : 'Draft date not set'}
@@ -54,7 +54,7 @@ export function DraftCountdown() {
           {editable && <SetDraftDate />}
         </div>
       </span>
-      <span className='bg-primary rounded-2xl p-2 m-4 text-primary-foreground text-2xl shadow shadow-black'>
+      <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow shadow-black'>
         <Countdown endDate={draftDate} replacedBy={
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'

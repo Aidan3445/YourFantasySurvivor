@@ -6,7 +6,7 @@ import { CreateLeagueModal } from '~/components/leagues/createLeague';
 export default function HomePage() {
   return (
     <main className='flex flex-col gap-4 w-full p-4 items-center'>
-      <Image src='https://i.imgur.com/xS6JQdr.png' priority width={256} height={0} alt='Header Image' />
+      <Image src='https://i.imgur.com/xS6JQdr.png' priority width={256} height={256} alt='Header Image' />
       <section className='bg-card rounded-lg p-4'>
         <h1 className='text-4xl font-bold'>Welcome to Your Fantasy Survivor!</h1>
         <p>

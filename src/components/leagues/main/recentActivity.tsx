@@ -146,7 +146,7 @@ export default function RecentActivity() {
       </AlertDialog >
       <span className='flex flex-wrap gap-x-4 items-baseline px-2 mr-14'>
         <h2 className='text-lg font-bold text-card-foreground'>Recent Events</h2>
-        {latestEpisode && <span className='inline-flex gap-4 flex-nowrap'>
+        {latestEpisode && <span className='inline-flex gap-x-4 flex-wrap'>
           <p className='text-sm text-muted-foreground'>
             {`${latestEpisode.episodeNumber}:`} {latestEpisode.episodeTitle}
           </p>
@@ -396,7 +396,7 @@ type AirStatusProps = {
 
 function AirStatus({ airDate, airStatus }: AirStatusProps) {
   return (
-    <span className='inline-flex -ml-1 gap-1 items-center text-sm text-muted-foreground'>
+    <span className='inline-flex gap-1 items-center text-sm text-muted-foreground'>
       {airDate.toLocaleString()}
       <div className={cn('text-destructive-foreground text-xs px-1 rounded-md',
         airStatus === 'Aired' && 'bg-destructive',

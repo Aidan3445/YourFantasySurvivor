@@ -7,8 +7,6 @@ export function handleDragEnd<T>(
   setItems: (items: SetStateAction<(T & { id: UniqueIdentifier })[]>) => void) {
   const { active, over } = event;
 
-  console.log('active', active);
-
   if (over && active.id !== over.id) {
     setItems((items) => {
       const oldIndex = items.findIndex((item) => item.id === active.id);

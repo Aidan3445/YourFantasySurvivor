@@ -257,6 +257,8 @@ export const QUERIES = {
       }));
 
     const tribeUpdateEventSchema = aliasedTable(baseEventReferenceSchema, 'tribeUpdate');
+    const eliminationEventReferenceSchema = aliasedTable(baseEventReferenceSchema, 'elimination_ref');
+    const eliminationEventSchema = aliasedTable(baseEventsSchema, 'elimination');
 
     const castawaysPromise = db
       .select({
@@ -273,6 +275,7 @@ export const QUERIES = {
           seasonName: seasonsSchema.seasonName,
         },
         pickedBy: leagueMembersSchema.displayName,
+        eliminatedEpisode: eliminationEventSchema.episodeId,
       })
       .from(castawaysSchema)
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, castawaysSchema.seasonId))
@@ -292,6 +295,16 @@ export const QUERIES = {
         eq(tribeUpdateEventSchema.baseEventId, baseEventsSchema.baseEventId),
         eq(tribeUpdateEventSchema.referenceType, 'Tribe')))
       .innerJoin(tribesSchema, eq(tribesSchema.tribeId, tribeUpdateEventSchema.referenceId))
+      // Joining elimination if it exists
+      .leftJoin(eliminationEventSchema, and(
+        eq(eliminationEventSchema.baseEventId,
+          db.select({ baseEventId: eliminationEventReferenceSchema.baseEventId })
+            .from(eliminationEventReferenceSchema)
+            .where(and(
+              eq(eliminationEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+              eq(eliminationEventReferenceSchema.referenceType, 'Castaway')))
+            .limit(1)),
+        inArray(eliminationEventSchema.eventName, ['elim', 'noVoteExit'])))
       // Joining draft picks if they exist
       .leftJoin(selectionUpdatesSchema, and(
         eq(selectionUpdatesSchema.castawayId, castawaysSchema.castawayId),
@@ -333,6 +346,7 @@ export const QUERIES = {
       predictionsPromise, picksPromise, castawaysPromise, draftOrderPromise]);
 
     const typedCastaways: CastawayDraftInfo[] = castaways;
+    typedCastaways.sort((a, b) => a.tribe.tribeName.localeCompare(b.tribe.tribeName));
 
     const draftPicks = draftOrder.map((memberId) =>
       picks.find((pick) => pick.memberId === memberId))
@@ -686,7 +700,6 @@ export const QUERIES = {
       baseEvents, tribesTimeline, elims, leagueEvents, baseEventRules ?? defaultBaseRules,
       selectionTimeline, leagueSettings.survivalCap, leagueSettings.preserveStreak);
 
-
     return {
       scores,
       baseEvents,
@@ -785,7 +798,10 @@ export async function getThisWeeksPredictions(leagueHash: LeagueHash) {
     SEASON_QUERIES.getCastaways(league.leagueSeason),
   ]);
 
-  const tribes: Tribe[] = Array.from(new Set(castaways.map((castaway) => {
+  const remainingCastaways = castaways.filter((castaway) =>
+    !castaway.eliminatedEpisode || castaway.eliminatedEpisode > nextEpisode.episodeNumber);
+
+  const tribes: Tribe[] = Array.from(new Set(remainingCastaways.map((castaway) => {
     const tribe = castaway.tribes
       .findLast((tribe) => tribe.episode <= nextEpisode.episodeNumber);
     if (!tribe) return;
@@ -793,5 +809,5 @@ export async function getThisWeeksPredictions(leagueHash: LeagueHash) {
   })))
     .filter((tribe) => tribe !== undefined);
 
-  return { predictions, castaways, tribes };
+  return { predictions, castaways: remainingCastaways, tribes };
 }

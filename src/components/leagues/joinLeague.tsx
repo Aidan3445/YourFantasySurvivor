@@ -119,7 +119,7 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
   };
 
   return (
-    <section className='mx-2 flex flex-wrap gap-8'>
+    <section className='mx-2 flex flex-wrap gap-8 justify-center'>
       <FormField
         name='displayName'
         render={({ field }) => (

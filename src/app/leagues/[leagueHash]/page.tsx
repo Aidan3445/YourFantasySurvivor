@@ -50,7 +50,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           </TabsContent>
           <TabsContent value='settings'>
             <section className='w-fit flex flex-wrap gap-4 justify-center pb-12 px-4'>
-              <MemberEditForm className='w-full' />
+              <MemberEditForm className='w-full xl:w-auto' />
               <LeagueSettings />
               <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
                 League Scoring

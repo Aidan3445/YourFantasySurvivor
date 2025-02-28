@@ -19,7 +19,6 @@ const leagueFetcher: Fetcher<Response, SWRKey> = ({ leagueHash }) =>
 
 export function useLeague() {
   const { leagueHash } = useParams();
-
   const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher,
     {
       refreshInterval: 60000,

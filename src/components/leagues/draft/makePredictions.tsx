@@ -15,6 +15,7 @@ import { type CastawayDetails, type CastawayDraftInfo } from '~/server/db/defs/c
 import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { type Tribe } from '~/server/db/defs/tribes';
+import { ColorRow } from '../draftOrder';
 
 interface MakePredictionsProps {
   predictions: LeagueEventPrediction[];
@@ -57,19 +58,32 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
   if (predictions.length === 0) return null;
 
   const getOptions = (referenceTypes: ReferenceType[]) => {
-    const options: Record<ReferenceType, Record<string, number>> = {
+    const options: Record<ReferenceType, Record<string, {
+      id: number,
+      color: string,
+      tribeName?: string
+    }>> = {
       Castaway: {},
       Tribe: {},
     };
 
     if (referenceTypes.length === 0 || referenceTypes.includes('Castaway')) {
       castaways.forEach((castaway) => {
-        options.Castaway[castaway.fullName] = castaway.castawayId;
+        const tribe = (castaway as CastawayDraftInfo).tribe ??
+          (castaway as CastawayDetails).tribes.slice(-1)[0];
+        options.Castaway[castaway.fullName] = {
+          id: castaway.castawayId,
+          color: tribe.tribeColor,
+          tribeName: tribe.tribeName
+        };
       });
     }
     if (referenceTypes.length === 0 || referenceTypes.includes('Tribe')) {
       tribes.forEach((tribe) => {
-        options.Tribe[tribe.tribeName] = tribe.tribeId;
+        options.Tribe[tribe.tribeName] = {
+          id: tribe.tribeId,
+          color: tribe.tribeColor
+        };
       });
     }
     return options;
@@ -100,7 +114,7 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
 
   return (
     <Carousel className='gap-4 items-center' setApi={setApi} opts={{ align: 'center' }}>
-      <CarouselContent className='w-min lg:w-auto'>
+      <CarouselContent className='w-[calc(100svw-5rem)] lg:w-full'>
         {predictions.map((prediction, index) => (
           <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
             'opacity-50 -z-10': index !== current - 1,
@@ -111,20 +125,20 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
                 'text-center transition-transform duration-700',
                 {
                   'scale-75': index !== current - 1,
-                  '-translate-x-1/2': index === (current) % (predictions.length * 5),
-                  'translate-x-1/2': index === (current - 2) % (predictions.length * 5),
-                  '-translate-x-8': index + current + 1 === 2 * predictions.length * 5
+                  '-translate-x-1/2': index === current % predictions.length,
+                  'translate-x-1/2': index === (current - 2) % predictions.length,
+                  '-translate-x-6 md:-translate-x-8': index + current + 1 === 2 * predictions.length,
+                  'translate-x-6 md:translate-x-8 lg:translate-x-12': index + current === 1,
                 })} >
-              <span className='flex w-min gap-1 items-start self-center px-1 lg:w-full'>
+              <span className='flex gap-4 items-center self-center px-1 lg:w-full'>
                 <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1 mr-auto' />
-                <span>
-                  <h3 className='inline text-lg font-semibold text-card-foreground'>
-                    {prediction.eventName}
-                  </h3>
-                  -
-                  <p className='inline text-sm'>{prediction.points}</p>
-                  <Flame className='inline' size={16} />
-                </span>
+                <h3 className='inline text-lg font-semibold text-card-foreground'>
+                  {prediction.eventName}
+                  <span className='ml-2 inline-flex mt-1'>
+                    <p className='text-sm'>{prediction.points}</p>
+                    <Flame size={16} />
+                  </span>
+                </h3>
                 <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1 ml-auto' />
               </span>
               <p className='text-sm'>{prediction.description}</p>
@@ -143,7 +157,7 @@ const formSchema = z.object({
 
 interface SubmissionCardProps {
   prediction: LeagueEventPrediction;
-  options: Record<ReferenceType, Record<string, number>>;
+  options: Record<ReferenceType, Record<string, { id: number, color: string, tribeName?: string }>>;
 }
 
 function SubmissionCard({ prediction, options }: SubmissionCardProps) {
@@ -156,7 +170,7 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       const selectedType = Object.keys(options).find((type) =>
-        Object.values(options[type as ReferenceType]).includes(data.referenceId)) as ReferenceType;
+        Object.values(options[type as ReferenceType]).some(({ id }) => id === data.referenceId)) as ReferenceType | undefined;
       if (!selectedType) throw new Error('Invalid reference type');
 
       await makePrediction(league.leagueHash, prediction, selectedType, data.referenceId);
@@ -195,10 +209,25 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
                       Object.keys(references).length === 0 ? null : (
                         <SelectGroup key={referenceType}>
                           <SelectLabel>{referenceType}s</SelectLabel>
-                          {Object.entries(references).map(([name, id]) => (
-                            <SelectItem key={id} value={`${id}`}>
-                              {name}
-                            </SelectItem>
+                          {Object.entries(references).map(([name, vals]) => (
+                            referenceType === 'Tribe' ?
+                              <SelectItem key={vals.id} value={`${vals.id}`}>
+                                <ColorRow
+                                  className='w-10 px-0 justify-center leading-tight'
+                                  color={vals.color}>
+                                  {name}
+                                </ColorRow>
+                              </SelectItem> :
+                              <SelectItem key={vals.id} value={`${vals.id}`}>
+                                <span className='flex items-center gap-1'>
+                                  <ColorRow
+                                    className='w-10 px-0 justify-center leading-tight'
+                                    color={vals.color}>
+                                    {vals.tribeName}
+                                  </ColorRow>
+                                  {name}
+                                </span>
+                              </SelectItem>
                           ))}
                         </SelectGroup>
                       )))}

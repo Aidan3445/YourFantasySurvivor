@@ -3,7 +3,7 @@
 import { useLeague } from '~/hooks/useLeague';
 import { getContrastingColor } from '@uiw/color-convert';
 import { type ReactNode, useEffect, useMemo, useState } from 'react';
-import { DndContext, PointerSensor, type UniqueIdentifier, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
+import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { cn } from '~/lib/utils';
@@ -40,7 +40,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
     const member = members.list.find((m) => m.memberId === memberId);
     return member;
   }).filter((member) => !!member)
-    .map((member) => ({ ...member, id: member.memberId as UniqueIdentifier })),
+    .map((member) => ({ ...member, id: member.memberId })),
     [members, draftOrder]);
 
   const [order, setOrder] = useState(dbOrder);
@@ -79,6 +79,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
       await updateDraftOrder(leagueHash, order.map((member) => member.memberId));
       await refresh();
       alert('Draft order saved');
+      setLocked(true);
     } catch (error) {
       console.error(error);
       alert('Failed to save draft order');
@@ -103,7 +104,11 @@ export default function DraftOrder({ className }: DraftOrderProps) {
             onClick={shuffleOrderWithAnimation} />
           <form className='ml-auto' action={() => handleSubmit()}>
             <span className='grid grid-cols-2 gap-2 mr-12'>
-              <Button type='button' disabled={!orderChanged} variant='destructive' onClick={() => setOrder(dbOrder)}>
+              <Button
+                type='button'
+                disabled={!orderChanged}
+                variant='destructive'
+                onClick={() => { setOrder(dbOrder); setLocked(true); }}>
                 Cancel
               </Button>
               <Button type='submit' disabled={!orderChanged}>Save</Button>
@@ -112,7 +117,6 @@ export default function DraftOrder({ className }: DraftOrderProps) {
         </>}
       </span>
       <DndContext
-        id='draftOrderDnd'
         sensors={sensors}
         collisionDetection={closestCenter}
         modifiers={[restrictToParentElement]}
@@ -122,21 +126,15 @@ export default function DraftOrder({ className }: DraftOrderProps) {
             {order.map((member, index) => {
               return (
                 <SortableItem
-                  key={member.displayName}
-                  id={member.displayName}>
+                  key={member.memberId}
+                  id={member.memberId}
+                  className='grid col-span-3 grid-cols-subgrid'
+                  disabled={orderLocked}>
                   <ColorRow
                     color={member.color}
                     loggedIn={members.loggedIn?.memberId === member.memberId}>
-                    <h3
-                      className='text-lg'
-                      style={{ color: getContrastingColor(member.color) }}>
-                      {index + 1}
-                    </h3>
-                    <h2
-                      className='text-3xl font-semibold'
-                      style={{ color: getContrastingColor(member.color) }}>
-                      {member.displayName}
-                    </h2>
+                    <h3 className='text-lg' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
+                    <h2 className='text-3xl font-semibold' style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h2>
                     {!orderLocked &&
                       <GripVertical className='ml-auto cursor-row-resize' color={getContrastingColor(member.color)} />}
                   </ColorRow>

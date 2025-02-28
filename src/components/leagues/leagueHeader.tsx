@@ -16,10 +16,10 @@ export default function LeagueHeader() {
     <span className='flex gap-4 w-full px-8 mt-1 items-baseline'>
       {!leagueName ? (
         <Skeleton className='h-8 w-full rounded-md' />
-      ) : (<span className='flex gap-8 items-baseline'>
+      ) : (<span className='flex gap-2 items-baseline'>
         <h1 className='text-2xl font-bold'>{leagueName}</h1>
         <Link href={`https://survivor.fandom.com/wiki/${season}`} target='_blank'>
-          <h3 className='hidden sm:inline text-lg font-semibold text-secondary-foreground hover:underline'>
+          <h3 className='text-lg italic font-medium text-muted-foreground hover:underline'>
             {season}
           </h3>
         </Link>

@@ -1,11 +1,14 @@
 import type { UniqueIdentifier } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { type ComponentProps } from 'react';
+import { type ReactNode } from 'react';
 import { cn } from '~/lib/utils';
 
-interface SortableItemProps extends ComponentProps<'div'> {
+interface SortableItemProps {
   disabled?: boolean;
+  id: UniqueIdentifier;
+  className?: string;
+  children: ReactNode;
 }
 
 export default function SortableItem({ id, disabled, className, children }: SortableItemProps) {
@@ -15,7 +18,7 @@ export default function SortableItem({ id, disabled, className, children }: Sort
     setNodeRef,
     transform,
     transition,
-  } = useSortable({ id: id as UniqueIdentifier });
+  } = useSortable({ id: id });
 
   const style = {
     transform: CSS.Transform.toString(transform),

@@ -1,3 +1,4 @@
+import { type EpisodeId } from './episodes';
 import { type LeagueMemberDisplayName } from './leagueMembers';
 import { type Tribe, type TribeEp, type TribeName } from './tribes';
 
@@ -39,4 +40,5 @@ export interface CastawayDraftInfo {
   imageUrl: CastawayImage;
   tribe: Tribe;
   pickedBy: LeagueMemberDisplayName | null;
+  eliminatedEpisode: EpisodeId | null;
 }

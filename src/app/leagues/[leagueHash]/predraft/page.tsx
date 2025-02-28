@@ -13,9 +13,9 @@ export default async function LeaguePage() {
   return (
     <main className='flex flex-col gap-0 w-full p-4 pb-0'>
       <Tabs
-        className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100svh-4rem)] max-md:h-[calc(100svh-6.5rem)] overflow-hidden'
+        className='relative col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100svh-4rem)] max-md:h-[calc(100svh-6.5rem)] overflow-hidden'
         defaultValue='draft'>
-        <TabsList className='top-0 grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
+        <TabsList className='top-0 grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none z-50'>
           <TabsTrigger value='draft'>Draft</TabsTrigger>
           <TabsTrigger value='settings'>Settings</TabsTrigger>
         </TabsList>

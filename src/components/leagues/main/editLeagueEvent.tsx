@@ -38,8 +38,6 @@ export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeag
     reactForm.resetField('referenceId');
   };
 
-  console.log(leagueEvent, reactForm.getValues());
-
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       await updateLeagueEvent(league.leagueHash, leagueEvent.eventId, data);

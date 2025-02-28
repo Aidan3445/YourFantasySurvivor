@@ -9,6 +9,8 @@ import { useLeague } from '~/hooks/useLeague';
 import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { chooseCastaway } from '~/app/api/leagues/actions';
+import { ColorRow } from '../draftOrder';
+import { getContrastingColor } from '@uiw/color-convert';
 
 interface ChooseCastawayProps {
   castaways: CastawayDraftInfo[];
@@ -22,7 +24,8 @@ const formSchema = z.object({
 export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProps) {
   const {
     league: {
-      leagueHash
+      leagueHash,
+      members
     },
     refresh
   } = useLeague();
@@ -30,7 +33,7 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
     resolver: zodResolver(formSchema),
   });
 
-  const availableCastaways = castaways.filter(castaway => !castaway.pickedBy);
+  const availableCastaways = castaways.filter(castaway => !castaway.eliminatedEpisode);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
@@ -60,17 +63,43 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
                     </SelectTrigger>
                     <SelectContent className='z-50'>
                       <SelectGroup>
-                        {availableCastaways.map((castaway) => (
-                          castaway.pickedBy ?
+                        {availableCastaways.map((castaway) => {
+                          return (castaway.pickedBy ?
                             <SelectLabel
                               key={castaway.fullName}
-                              className='bg-zinc-300 cursor-not-allowed'>
-                              {castaway.fullName} ({castaway.pickedBy})
+                              className='cursor-not-allowed'
+                              style={{
+                                backgroundColor:
+                                  members.list
+                                    .find(member => member.displayName === castaway.pickedBy)?.color,
+
+                              }}>
+                              <span
+                                className='flex items-center gap-1'
+                                style={{
+                                  color: getContrastingColor(members.list
+                                    .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
+                                }}>
+                                <ColorRow
+                                  className='w-10 px-0 justify-center leading-tight font-normal'
+                                  color={castaway.tribe.tribeColor}>
+                                  {castaway.tribe.tribeName}
+                                </ColorRow>
+                                {castaway.fullName} ({castaway.pickedBy})
+                              </span>
                             </SelectLabel> :
                             <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                              {castaway.fullName}
+                              <span className='flex items-center gap-1'>
+                                <ColorRow
+                                  className='w-10 px-0 justify-center leading-tight'
+                                  color={castaway.tribe.tribeColor}>
+                                  {castaway.tribe.tribeName}
+                                </ColorRow>
+                                {castaway.fullName}
+                              </span>
                             </SelectItem>
-                        ))}
+                          );
+                        })}
                       </SelectGroup>
                     </SelectContent>
                   </Select>

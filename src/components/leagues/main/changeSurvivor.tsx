@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { chooseCastaway } from '~/app/api/leagues/actions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useState } from 'react';
+import { ColorRow } from '../draftOrder';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
@@ -61,6 +62,7 @@ export default function ChangeSurvivor() {
                       defaultValue={selected}
                       value={selected}
                       onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
+
                       <SelectTrigger>
                         <SelectValue placeholder='Select castaway' />
                       </SelectTrigger>
@@ -70,18 +72,36 @@ export default function ChangeSurvivor() {
                             return (castaway.pickedBy ?
                               <SelectLabel
                                 key={castaway.fullName}
-                                className='cursor-not-allowed opacity-75'
+                                className='cursor-not-allowed'
                                 style={{
                                   backgroundColor:
                                     league.members.list
                                       .find(member => member.displayName === castaway.pickedBy)?.color,
-                                  color: getContrastingColor(league.members.list
-                                    .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
+
                                 }}>
-                                {castaway.fullName} ({castaway.pickedBy})
+                                <span
+                                  className='flex items-center gap-1'
+                                  style={{
+                                    color: getContrastingColor(league.members.list
+                                      .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
+                                  }}>
+                                  {<ColorRow
+                                    className='w-10 px-0 justify-center leading-tight font-normal'
+                                    color={castaway.tribes.slice(-1)[0]?.tribeColor}>
+                                    {castaway.tribes.slice(-1)[0]?.tribeName}
+                                  </ColorRow>}
+                                  {castaway.fullName} ({castaway.pickedBy})
+                                </span>
                               </SelectLabel> :
                               <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                                {castaway.fullName}
+                                <span className='flex items-center gap-1'>
+                                  {<ColorRow
+                                    className='w-10 px-0 justify-center leading-tight'
+                                    color={castaway.tribes.slice(-1)[0]?.tribeColor}>
+                                    {castaway.tribes.slice(-1)[0]?.tribeName}
+                                  </ColorRow>}
+                                  {castaway.fullName}
+                                </span>
                               </SelectItem>
                             );
                           })}

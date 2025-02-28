@@ -56,7 +56,7 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
                   {castaway.pickedBy && (
                     <ColorRow
                       className='absolute -right-1 top-1 rotate-30 text-xs leading-tight p-0 px-1 z-50'
-                      color={castaway.tribe.tribeColor}>
+                      color={draft?.picks.find(pick => pick.displayName === castaway.pickedBy)?.color}>
                       {castaway.pickedBy}
                     </ColorRow>
                   )}
