@@ -28,7 +28,6 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
     return acc;
   }, {} as Record<TribeName, CastawayDraftInfo[]>);
 
-
   return (
     <section className='w-full bg-secondary rounded-3xl border overflow-x-hidden'>
       <span className='flex flex-col items-center justify-around text-center'>
@@ -44,14 +43,17 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
             <h2 className='text-lg font-semibold'>{tribeName}</h2>
             {castaways.map((castaway) => (
               <Popover key={castaway.fullName}>
-                <PopoverTrigger className='relative flex gap-4 items-center bg-accent p-1 rounded-md text-left'>
+                <PopoverTrigger className={cn(
+                  'relative flex gap-4 items-center bg-accent p-1 rounded-md text-left',
+                  !!castaway.eliminatedEpisode && 'bg-red-300'
+                )}>
                   <Image
                     src={castaway.imageUrl}
                     alt={castaway.fullName}
                     width={50}
                     height={50}
-                    className={cn('rounded-full', !!castaway.pickedBy && 'grayscale')}
-                  />
+                    className={cn('rounded-full',
+                      (!!castaway.pickedBy || !!castaway.eliminatedEpisode) && 'grayscale')} />
                   <p>{castaway.fullName}</p>
                   {castaway.pickedBy && (
                     <ColorRow

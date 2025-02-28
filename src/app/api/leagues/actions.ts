@@ -495,8 +495,8 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
     }, {} as Record<LeagueMemberId, CastawayId>)));
 
   // next episode id to air
-  const nextEpisodePromise = QUERIES.getEpisodes(leagueHash)
-    .then((episodes) => episodes[0]);
+  const nextEpisodePromise = QUERIES.getEpisodes(leagueHash, 100)
+    .then((episodes) => episodes.find((episode) => episode.airStatus === 'Upcoming'));
 
   // draft order of the league
   const draftOrderPromise = db

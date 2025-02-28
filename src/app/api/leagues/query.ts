@@ -296,14 +296,14 @@ export const QUERIES = {
       .innerJoin(tribesSchema, eq(tribesSchema.tribeId, tribeUpdateEventSchema.referenceId))
       // Joining elimination if it exists
       .leftJoin(eliminationEventSchema, and(
-        eq(eliminationEventSchema.baseEventId,
+        inArray(eliminationEventSchema.eventName, ['elim', 'noVoteExit']),
+        inArray(eliminationEventSchema.baseEventId,
           db.select({ baseEventId: eliminationEventReferenceSchema.baseEventId })
             .from(eliminationEventReferenceSchema)
             .where(and(
               eq(eliminationEventReferenceSchema.referenceId, castawaysSchema.castawayId),
               eq(eliminationEventReferenceSchema.referenceType, 'Castaway')))
-            .limit(1)),
-        inArray(eliminationEventSchema.eventName, ['elim', 'noVoteExit'])))
+        )))
       // Joining draft picks if they exist
       .leftJoin(selectionUpdatesSchema, and(
         eq(selectionUpdatesSchema.castawayId, castawaysSchema.castawayId),

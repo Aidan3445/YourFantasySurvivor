@@ -133,11 +133,14 @@ export function compileScores(
   // then they earn two points for the next episode, then three, etc.
   // the bonus is capped at the survival cap set by the league
   Object.entries(selectionTimeline.memberCastaways).forEach(([member, castaways]) => {
+    // get the episode of the first pick, this will be the same for all members for now
+    // but doing it this way allows for the possibility of members joining late
+    const firstPickEpisode = castaways.findIndex((c) => c);
     // ensure at least zero entry exists for the member
     scores.Member[member] ??= [0];
     // iterate to add the streak bonus
     let streak = 0;
-    for (let episodeNumber = 1; episodeNumber < eliminations.length; episodeNumber++) {
+    for (let episodeNumber = firstPickEpisode; episodeNumber < eliminations.length; episodeNumber++) {
       // get the castaways who were eliminated at any point before this episode
       const eliminated = eliminations.slice(0, episodeNumber + 1).flat();
       // get the castaways who were selected by this member at this episode

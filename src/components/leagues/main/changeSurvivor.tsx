@@ -43,83 +43,105 @@ export default function ChangeSurvivor() {
     }
   });
 
-  if (availableCastaways.every(castaway => castaway.pickedBy)) {
+  if (availableCastaways.every((castaway) => castaway.pickedBy)) {
     return null;
   }
 
-  return (
-    <div className='p-4'>
-      <Form {...reactForm}>
-        <form className='w-full text-center bg-secondary rounded-lg flex flex-col' action={() => handleSubmit()}>
-          <h1 className='text-2xl font-semibold'>Swap your Survivor Pick</h1>
-          <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center p-2 mt-auto'>
-            <FormField
-              name='castawayId'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormControl>
-                    <Select
-                      defaultValue={selected}
-                      value={selected}
-                      onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
 
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select castaway' />
-                      </SelectTrigger>
-                      <SelectContent className='z-50'>
-                        <SelectGroup>
-                          {availableCastaways.map((castaway) => {
-                            return (castaway.pickedBy ?
-                              <SelectLabel
-                                key={castaway.fullName}
-                                className='cursor-not-allowed'
-                                style={{
-                                  backgroundColor:
-                                    league.members.list
-                                      .find(member => member.displayName === castaway.pickedBy)?.color,
+  const pickPriority = Object.entries(leagueData.selectionTimeline.memberCastaways)
+    .filter(([_, castaways]) => !!leagueData.castaways
+      .find(castaway => castaway.fullName === castaways.slice(-1)[0])?.eliminatedEpisode)
+    .map(([member, _]) => member);
 
-                                }}>
-                                <span
-                                  className='flex items-center gap-1'
-                                  style={{
-                                    color: getContrastingColor(league.members.list
-                                      .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
-                                  }}>
-                                  {<ColorRow
-                                    className='w-10 px-0 justify-center leading-tight font-normal'
-                                    color={castaway.tribes.slice(-1)[0]?.tribeColor}>
-                                    {castaway.tribes.slice(-1)[0]?.tribeName}
-                                  </ColorRow>}
-                                  {castaway.fullName} ({castaway.pickedBy})
-                                </span>
-                              </SelectLabel> :
-                              <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                                <span className='flex items-center gap-1'>
-                                  {<ColorRow
-                                    className='w-10 px-0 justify-center leading-tight'
-                                    color={castaway.tribes.slice(-1)[0]?.tribeColor}>
-                                    {castaway.tribes.slice(-1)[0]?.tribeName}
-                                  </ColorRow>}
-                                  {castaway.fullName}
-                                </span>
-                              </SelectItem>
-                            );
-                          })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )} />
-            <Button
-              className='lg:w-24 w-full'
-              disabled={!formSchema.safeParse(reactForm.watch())?.success || leagueData.episodes.slice(-1)[0]?.airStatus === 'Airing'}
-              type='submit'>
-              Submit
-            </Button>
+  if (pickPriority.length > 0 && !pickPriority.includes(league.members.loggedIn?.displayName ?? '')) {
+    return (
+      <div className='m-4 text-center bg-secondary rounded-lg flex flex-col p-1 place-items-center'>
+        <h1 className='text-2xl font-semibold'>Wait to Swap your Survivor Pick</h1>
+        <h3 className='text-lg font-semibold'>Eliminated members must pick first:</h3>
+        {pickPriority.map((member) => (
+          <span key={member} className='flex items-center gap-2'>
+            <ColorRow
+              className='justify-center leading-tight font-normal'
+              color={league.members.list.find(m => m.displayName === member)?.color}>
+              {member}
+            </ColorRow>
           </span>
-        </form>
-      </Form>
-    </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <Form {...reactForm}>
+      <form className='text-center bg-secondary rounded-lg flex flex-col m-4' action={() => handleSubmit()}>
+        <h1 className='text-2xl font-semibold'>Swap your Survivor Pick</h1>
+        <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center p-2 mt-auto'>
+          <FormField
+            name='castawayId'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormControl>
+                  <Select
+                    defaultValue={selected}
+                    value={selected}
+                    onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
+
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select castaway' />
+                    </SelectTrigger>
+                    <SelectContent className='z-50'>
+                      <SelectGroup>
+                        {availableCastaways.map((castaway) => {
+                          return (castaway.pickedBy ?
+                            <SelectLabel
+                              key={castaway.fullName}
+                              className='cursor-not-allowed'
+                              style={{
+                                backgroundColor:
+                                  league.members.list
+                                    .find(member => member.displayName === castaway.pickedBy)?.color,
+
+                              }}>
+                              <span
+                                className='flex items-center gap-1'
+                                style={{
+                                  color: getContrastingColor(league.members.list
+                                    .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
+                                }}>
+                                {<ColorRow
+                                  className='w-10 px-0 justify-center leading-tight font-normal'
+                                  color={castaway.tribes.slice(-1)[0]?.tribeColor}>
+                                  {castaway.tribes.slice(-1)[0]?.tribeName}
+                                </ColorRow>}
+                                {castaway.fullName} ({castaway.pickedBy})
+                              </span>
+                            </SelectLabel> :
+                            <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
+                              <span className='flex items-center gap-1'>
+                                {<ColorRow
+                                  className='w-10 px-0 justify-center leading-tight'
+                                  color={castaway.tribes.slice(-1)[0]?.tribeColor}>
+                                  {castaway.tribes.slice(-1)[0]?.tribeName}
+                                </ColorRow>}
+                                {castaway.fullName}
+                              </span>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+            )} />
+          <Button
+            className='lg:w-24 w-full'
+            disabled={!formSchema.safeParse(reactForm.watch())?.success || leagueData.episodes.slice(-1)[0]?.airStatus === 'Airing'}
+            type='submit'>
+            Submit
+          </Button>
+        </span>
+      </form>
+    </Form>
   );
 }
