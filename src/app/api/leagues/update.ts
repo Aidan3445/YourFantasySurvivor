@@ -6,7 +6,7 @@ import { type LeagueHash, type LeagueStatus } from '~/server/db/defs/leagues';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
-import { auth } from '@clerk/nextjs/server';
+import { auth } from '~/lib/auth';
 
 export const UPDATES = {
   /**

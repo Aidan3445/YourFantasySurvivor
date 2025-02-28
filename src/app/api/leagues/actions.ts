@@ -1,13 +1,12 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
 import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert, type LeagueEventId } from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
-import { leagueMemberAuth } from '~/lib/auth';
+import { auth, leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { type LeagueMember, type LeagueMemberId, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
@@ -37,8 +36,8 @@ export async function createNewLeague(
   newMember: NewLeagueMember,
   draftDate?: Date
 ) {
-  const user = await auth();
-  if (!user.userId) throw new Error('User not authenticated');
+  const { userId } = await auth();
+  if (!userId) throw new Error('User not authenticated');
 
   // Create the league in a transaction
   return await db.transaction(async (trx) => {
@@ -72,7 +71,7 @@ export async function createNewLeague(
       // Insert the owner as a member
       const memberId = await trx
         .insert(leagueMembersSchema)
-        .values({ leagueId, userId: user.userId, ...newMember })
+        .values({ leagueId, userId: userId, ...newMember })
         .returning({ memberId: leagueMembersSchema.memberId })
         .then((res) => res[0]?.memberId);
       if (!memberId) throw new Error('Failed to add user as a member');
@@ -102,7 +101,6 @@ export async function createNewLeague(
   * Join a league
   * @param leagueHash - the hash of the league
   * @param newMember - the new member to add
-  * @param userId - the id of the user
   * @returns the league info of the league joined
   * @throws an error if the user is not authenticated
   * @throws an error if the league cannot be found
@@ -111,8 +109,8 @@ export async function createNewLeague(
   * @throws an error if the league is not in the predraft status
   */
 export async function joinLeague(leagueHash: LeagueHash, newMember: NewLeagueMember) {
-  const user = await auth();
-  if (!user.userId) throw new Error('User not authenticated');
+  const { userId } = await auth();
+  if (!userId) throw new Error('User not authenticated');
 
   // Transaction to join the league
   return await db.transaction(async (trx) => {
@@ -148,7 +146,7 @@ export async function joinLeague(leagueHash: LeagueHash, newMember: NewLeagueMem
       // Try to add the member, if there is a conflict, the user is already a member
       const memberId = await trx
         .insert(leagueMembersSchema)
-        .values({ leagueId, userId: user.userId, ...newMember })
+        .values({ leagueId, userId: userId, ...newMember })
         .returning({ memberId: leagueMembersSchema.memberId })
         .then((res) => res[0]?.memberId);
       if (!memberId) throw new Error('Failed to add user as a member');

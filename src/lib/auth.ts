@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { auth } from '@clerk/nextjs/server';
+import { auth as clerkAuth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
@@ -8,6 +8,18 @@ import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues'
 import { systemSchema } from '~/server/db/schema/system';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 import { seasonsSchema } from '~/server/db/schema/seasons';
+
+/**
+  * Auth wrapper that utilizes session claims for merging dev and prod users
+  * @returns the same auth data with the user id and sessionClaims user id merged
+  */
+export async function auth() {
+  const res = await clerkAuth();
+  return {
+    ...res,
+    userId: res.sessionClaims?.userId ?? res.userId,
+  };
+}
 
 /**
   * Authenticate the user within a league
