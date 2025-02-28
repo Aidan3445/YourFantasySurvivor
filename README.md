@@ -1,4 +1,4 @@
-# Your Fantasy Survivor
+# [YourFantasySurvivor.com](YourFantasySurvivor.com)
 #### The most customizable Fantasy Survivor league hosting service.
 
 ## Your League, Your Way
