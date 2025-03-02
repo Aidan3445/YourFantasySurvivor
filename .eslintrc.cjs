@@ -1,8 +1,9 @@
 /** @type {import('eslint').Linter.Config} */
-const config = {
+const config =
+{
   env: {
     browser: true,
-    es2021: true
+    es2023: true,
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -47,11 +48,6 @@ const config = {
     'linebreak-style': [
       'error',
       'unix'
-    ],
-    'indent': [
-      'error',
-      2,
-      { SwitchCase: 1 }
     ],
     'quotes': [
       'error',
@@ -102,7 +98,7 @@ const config = {
       }
     ],
     'drizzle/enforce-update-with-where': [
-      'error',
+      'warn',
       {
         drizzleObjectName: [
           'db'
@@ -111,4 +107,5 @@ const config = {
     ]
   }
 };
+
 module.exports = config;

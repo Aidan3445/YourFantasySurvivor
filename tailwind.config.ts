@@ -14,10 +14,13 @@ const config = {
       center: true,
       padding: '2rem',
       screens: {
-        '2xl': '1400px'
+        '2xl': '1400px',
       }
     },
     extend: {
+      screens: {
+        web: '768px',
+      },
       colors: {
         'b1': '#684528',
         'b1-light': '#8C6D4D',
@@ -37,6 +40,46 @@ const config = {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           'border': 'hsl(var(--sidebar-border))',
           'ring': 'hsl(var(--sidebar-ring))'
+        },
+        'background': 'hsl(var(--background))',
+        'foreground': 'hsl(var(--foreground))',
+        'card': {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))'
+        },
+        'popover': {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))'
+        },
+        'primary': {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))'
+        },
+        'secondary': {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))'
+        },
+        'muted': {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))'
+        },
+        'accent': {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))'
+        },
+        'destructive': {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))'
+        },
+        'border': 'hsl(var(--border))',
+        'input': 'hsl(var(--input))',
+        'ring': 'hsl(var(--ring))',
+        'chart': {
+          1: 'hsl(var(--chart-1))',
+          2: 'hsl(var(--chart-2))',
+          3: 'hsl(var(--chart-3))',
+          4: 'hsl(var(--chart-4))',
+          5: 'hsl(var(--chart-5))'
         }
       },
       keyframes: {
@@ -98,6 +141,20 @@ const config = {
             transform: 'translateX(57.5%) skewX(-45deg)'
           }
         },
+        'shimmerfast': {
+          '0%': {
+            transform: 'translateX(57.5%) skewX(-45deg)'
+          },
+          '25%': {
+            transform: 'translateX(-157.5%) skewX(-45deg)'
+          },
+          '50%': {
+            transform: 'translateX(-157.5%) skewX(-45deg)'
+          },
+          '100%': {
+            transform: 'translateX(57.5%) skewX(-45deg)'
+          }
+        },
         'scale-in': {
           '0%': {
             transform: 'scale(0)'
@@ -121,6 +178,7 @@ const config = {
         'shimmer1': 'shimmer1 10s infinite',
         'shimmer2': 'shimmer2 10s infinite',
         'shimmer3': 'shimmer3 10s infinite',
+        'shimmer-fast': 'shimmerfast 5s infinite',
         'scale-in': 'scale-in 2s ease-out',
         'scale-in-fast': 'scale-in 0.1s ease-out',
         'scale-out': 'scale-out 2s ease-out',
@@ -135,6 +193,11 @@ const config = {
       },
       dropShadow: {
         text: '0 1.2px 1.2px rgba(0,0,0,1)'
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)'
       }
     }
   },

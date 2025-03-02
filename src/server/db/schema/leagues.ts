@@ -1,115 +1,37 @@
-import { z } from 'zod';
+import 'server-only';
+
 import { createTable } from './createTable';
-import { seasons } from './seasons';
-import { boolean, customType, integer, pgEnum, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
+import { seasonsSchema } from './seasons';
+import { boolean, integer, pgEnum, serial, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 import { sql } from 'drizzle-orm';
+import { DEFAULT_SURVIVAL_CAP, LeagueStatusOptions } from '~/server/db/defs/leagues';
 
-const pickCount = customType<{ data: 1 | 2; notNull: true; default: true }>(
-  {
-    dataType() {
-      return 'integer';
-    },
-  },
-);
+export const leagueStatus = pgEnum('league_status', LeagueStatusOptions);
 
-export const leagues = createTable(
+export const leaguesSchema = createTable(
   'league',
   {
-    id: serial('league_id').notNull().primaryKey(),
-    name: varchar('league_name', { length: 64 }).notNull().unique(),
-    password: varchar('password', { length: 64 }).notNull(),
-    season: integer('season_id').references(() => seasons.seasonId, { onDelete: 'cascade' }).notNull(),
-  }
+    leagueId: serial('league_id').primaryKey(),
+    leagueHash: varchar('league_hash', { length: 16 }).notNull().$defaultFn(() => nanoid(16)),
+    leagueName: varchar('league_name', { length: 64 }).notNull(),
+    leagueSeason: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
+    leagueStatus: leagueStatus('league_status').notNull().default('Predraft'),
+  },
+  (table) => [
+    uniqueIndex().on(table.leagueHash),
+  ]
 );
-export type League = typeof leagues.$inferSelect;
-export type LeagueInsert = typeof leagues.$inferInsert;
 
-export const reference = pgEnum('reference', ['castaway', 'tribe', 'member']);
-export type Reference = (typeof reference.enumValues)[number];
-
-export const baseEventRules = createTable(
-  'event_base_rule',
-  {
-    id: serial('base_rule_id').notNull().primaryKey(),
-    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
-    // point values for all the base events
-    advFound: integer('adv_found').notNull(),
-    advPlay: integer('adv_play').notNull(),
-    badAdvPlay: integer('bad_adv_play').notNull(),
-    advElim: integer('adv_elim').notNull(),
-    spokeEpTitle: integer('spoke_ep_title').notNull(),
-    tribe1st: integer('tribe_1st').notNull(),
-    tribe2nd: integer('tribe_2nd').notNull(),
-    indivWin: integer('indiv_win').notNull(),
-    indivReward: integer('indiv_reward').notNull(),
-    finalists: integer('finalists').notNull(),
-    fireWin: integer('fire_win').notNull(),
-    soleSurvivor: integer('sole_survivor').notNull(),
-  }
-);
-export const pointRange = z.coerce.number()
-  .max(512, { message: 'Points must not exceed ±512' })
-  .min(-512, { message: 'Points must not exceed ±512' });
-
-export const BaseEventRule = z.object({
-  advFound: pointRange,
-  advPlay: pointRange,
-  badAdvPlay: pointRange,
-  advElim: pointRange,
-  spokeEpTitle: pointRange,
-  tribe1st: pointRange,
-  tribe2nd: pointRange,
-  indivWin: pointRange,
-  indivReward: pointRange,
-  finalists: pointRange,
-  fireWin: pointRange,
-  soleSurvivor: pointRange,
-});
-
-export type BaseEventRuleType = z.infer<typeof BaseEventRule>;
-
-export const defaultBaseRules = (): BaseEventRuleType => ({
-  advFound: 5,
-  advPlay: 10,
-  badAdvPlay: -5,
-  advElim: -10,
-  spokeEpTitle: 2,
-  tribe1st: 2,
-  tribe2nd: 1,
-  indivWin: 10,
-  indivReward: 5,
-  finalists: 5,
-  fireWin: 5,
-  soleSurvivor: 10,
-});
-
-export const leagueSettings = createTable(
+export const leagueSettingsSchema = createTable(
   'league_settings',
   {
-    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull().primaryKey(),
-    inviteOnly: boolean('invite_only').notNull().default(false),
-    pickCount: pickCount('pick_count').notNull().default(1),
-    draftDate: timestamp('draft_date', { mode: 'string' }).notNull(),
+    leagueId: integer('league_id')
+      .references(() => leaguesSchema.leagueId, { onDelete: 'cascade' })
+      .primaryKey(),
+    draftDate: timestamp('draft_date', { mode: 'string' }),
     draftOrder: integer('draft_order').array().notNull().default(sql`ARRAY[]::integer[]`),
-    turnLimitMins: integer('turn_limit_mins').notNull().default(10),
-  }
-);
-export type Settings = {
-  pickCount: 1 | 2;
-  draftDate: Date;
-  draftOrder: {
-    name: string;
-    color: string;
-  }[];
-  turnLimitMins: number; // minutes before pick is skipped
-};
-
-export const leagueInvite = createTable(
-  'league_invite',
-  {
-    id: varchar('invite_id', { length: 16 }).notNull().primaryKey().default(nanoid()),
-    league: integer('league_id').references(() => leagues.id, { onDelete: 'cascade' }).notNull(),
-    expiration: timestamp('expiration', { mode: 'string' }).notNull(),
+    survivalCap: integer('survival_cap').notNull().default(DEFAULT_SURVIVAL_CAP),
+    preserveStreak: boolean('preserve_streak').notNull().default(true),
   }
 );

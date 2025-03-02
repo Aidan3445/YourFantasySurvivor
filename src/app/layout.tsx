@@ -2,12 +2,11 @@ import '~/styles/globals.css';
 
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
-import TopNav from './_components/topNav';
 import { type ReactNode, StrictMode } from 'react';
-import { Toaster } from './_components/commonUI/toaster';
-import SideNav from './_components/sideNav';
-import { SidebarProvider } from './_components/commonUI/sideBar';
-import { CustomSidebarTrigger } from './_components/sideNavHelpers';
+import { SidebarProvider } from '~/components/ui/sidebar';
+import Nav, { BottomNavSpacer } from '~/components/nav/navSelector';
+import UserProvider from '~/context/yfsUserContext';
+import { QUERIES } from './api/leagues/query';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -16,29 +15,41 @@ const inter = Inter({
 
 export const metadata = {
   title: 'Your Fantasy Survivor',
-  description: 'The best place to play fantasy survivor',
-  icons: [{ rel: 'icon', url: '/favicon.ico' }],
+  description: 'A fantasy league for the TV show Survivor',
+  icons: [{ rel: 'icon', url: '/Icon.ico' }],
 };
 
-const oldNav = false;
+interface RootLayoutProps {
+  children: ReactNode;
+}
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const leagues = await QUERIES.getLeagues();
+
   return (
     <StrictMode>
       <ClerkProvider
-        appearance={{ variables: { colorPrimary: '#684528', colorBackground: '#EED9BF' } }}>
-        <html lang='en'>
-          <body className={`font-sans ${inter.variable}`}>
-            <SidebarProvider className='flex flex-col page' defaultOpen={false}>
-              {!oldNav && <CustomSidebarTrigger />}
-              {oldNav ? <TopNav /> : <SideNav />}
-              {children}
-              <Toaster />
-            </SidebarProvider>
-          </body>
-        </html>
+        appearance={{
+          variables: {
+            colorPrimary: '#B09472',
+            colorBackground: '#EED9BF',
+          }
+        }}>
+        <UserProvider leagues={leagues}>
+          <html lang='en'>
+            <body className={`font-sans ${inter.variable} `}>
+              <SidebarProvider defaultOpen>
+                <Nav />
+                <div className='w-full'>
+                  {children}
+                  <BottomNavSpacer />
+                </div>
+              </SidebarProvider>
+            </body>
+          </html>
+        </UserProvider>
       </ClerkProvider>
     </StrictMode>
   );
 }
-
