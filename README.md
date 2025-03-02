@@ -1,22 +1,17 @@
 # [YourFantasySurvivor.com](YourFantasySurvivor.com)
 #### The most customizable Fantasy Survivor league hosting service.
 
-## Your League, Your Way
-When you create a `league` you can choose the point value of rewards, immunities, or advantage plays/misplays. 
-But you can also define your own! 
-* Points for pulling off a blindside?
-* Points off for swearing?
-* Points for anything you want!
-You can also define season or semi-season (pre/post-merge) `side bet` predictions such as 'Most Individual Immunities' to add to your total if it hits.
+## Welcome to Your Fantasy Survivor!  
 
-And you can set weekly picks like 'Who is going home' or 'Who will say the episode title' so you can stay in the season even if your survivor is out.
+Compete with friends in *Your Fantasy Survivor*, the ultimate Survivor fantasy league.  
 
-## We Get to Vote Too
-When you create a custom point `category`, you can open the events to a vote from your league or give yourself as the admin unilateral power to decide. 
-Customizable doesn't need to mean fair...
+### How It Works  
+- **Create your own league**, draft a Survivor, and rack up points as they navigate the game.  
+- **Score points** for their victories, bold moves, and even the chaos they create.  
+- **Change your pick at any time** — switch to any remaining castaway if your Survivor gets eliminated, or shake things up with a strategic swap.  
+- **Customize your league’s scoring system**, create unique events, and make the game your own.  
 
-Certain events, like orchestrating a blindside, might be popular enough categories that they get opened up to the community. 
-When this happens, all players in a league with that event in their scoring system will have the opportunity to vote for the players they think deserve the credit.
+**Outdraft your rivals. Outpredict the game. Outwatch every moment.**  
 
 When the next episode airs, the outcome of the votes for the previous week will be announced and points will be added. Don't worry, you can give yourself or your league veto power to change or negate the outcome of the vote if you can't take the heat.
 
