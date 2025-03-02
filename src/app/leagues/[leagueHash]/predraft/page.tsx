@@ -34,6 +34,7 @@ export default async function LeaguePage() {
             </div>
           </TabsContent>
           <TabsContent
+            className='mt-0'
             value='settings'>
             <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-12'>
               <MemberEditForm className='w-full' />

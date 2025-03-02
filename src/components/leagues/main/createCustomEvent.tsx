@@ -56,176 +56,178 @@ export default function CreateCustomEvent() {
   }
 
   return (
-    <section className='bg-card rounded-lg pb-4'>
-      <Form {...reactForm}>
-        <span className='flex gap-8 flex-wrap justify-evenly'>
-          <form
-            className='flex flex-col gap-1 px-2 max-md:w-full flex-grow'
-            action={() => handleSubmit()}>
-            <h2 className='text-2xl self-center'>Create Custom Event</h2>
-            <FormField
-              name='episodeId'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Episode</FormLabel>
-                  <FormControl>
-                    <Select
-                      defaultValue={`${field.value}`}
-                      value={`${field.value}`}
-                      onValueChange={(value) => field.onChange(Number(value))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select Episode' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {leagueData.episodes.map(episode => (
-                          <SelectItem key={episode.episodeId} value={`${episode.episodeId}`}>
-                            {episode.episodeNumber}: {episode.episodeTitle} - {episode.episodeAirDate.toLocaleDateString()}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            <FormLabel>Event</FormLabel>
-            <FormField
-              name='leagueEventRuleId'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormControl>
-                    <Select
-                      defaultValue={field.value as string}
-                      value={field.value as string}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        if (selectedEvent?.referenceTypes[0])
-                          reactForm.setValue('referenceType', selectedEvent.referenceTypes[0]);
-                      }}>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select Event' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {league.customEventRules.map(({ eventName, leagueEventRuleId }) => (
-                          <SelectItem key={eventName} value={leagueEventRuleId.toString()}>
-                            {eventName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            {selectedEvent && <>
-              <FormLabel>Reference</FormLabel>
+    <div className='px-4 w-full md:pb-12'>
+      <section className='bg-card rounded-xl pb-4 w-full'>
+        <Form {...reactForm}>
+          <span className='flex gap-8 flex-wrap justify-evenly'>
+            <form
+              className='flex flex-col gap-1 px-2 max-md:w-full flex-grow'
+              action={() => handleSubmit()}>
+              <h2 className='text-2xl self-center'>Create Custom Event</h2>
               <FormField
-                name='referenceType'
+                name='episodeId'
                 render={({ field }) => (
                   <FormItem>
+                    <FormLabel>Episode</FormLabel>
+                    <FormControl>
+                      <Select
+                        defaultValue={`${field.value}`}
+                        value={`${field.value}`}
+                        onValueChange={(value) => field.onChange(Number(value))}>
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select Episode' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {leagueData.episodes.map(episode => (
+                            <SelectItem key={episode.episodeId} value={`${episode.episodeId}`}>
+                              {episode.episodeNumber}: {episode.episodeTitle} - {episode.episodeAirDate.toLocaleDateString()}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              <FormLabel>Event</FormLabel>
+              <FormField
+                name='leagueEventRuleId'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
                     <FormControl>
                       <Select
                         defaultValue={field.value as string}
                         value={field.value as string}
                         onValueChange={(value) => {
                           field.onChange(value);
-                          reactForm.resetField('referenceId');
+                          if (selectedEvent?.referenceTypes[0])
+                            reactForm.setValue('referenceType', selectedEvent.referenceTypes[0]);
                         }}>
-                        <SelectTrigger className='h-full'>
-                          <SelectValue placeholder='Select Reference Type' />
+                        <SelectTrigger>
+                          <SelectValue placeholder='Select Event' />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value='Castaway'>Castaway</SelectItem>
-                          <SelectItem value='Tribe'>Tribe</SelectItem>
+                          {league.customEventRules.map(({ eventName, leagueEventRuleId }) => (
+                            <SelectItem key={eventName} value={leagueEventRuleId.toString()}>
+                              {eventName}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )} />
-            </>}
-            {selectedReferenceType &&
+              {selectedEvent && <>
+                <FormLabel>Reference</FormLabel>
+                <FormField
+                  name='referenceType'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select
+                          defaultValue={field.value as string}
+                          value={field.value as string}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            reactForm.resetField('referenceId');
+                          }}>
+                          <SelectTrigger className='h-full'>
+                            <SelectValue placeholder='Select Reference Type' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value='Castaway'>Castaway</SelectItem>
+                            <SelectItem value='Tribe'>Tribe</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )} />
+              </>}
+              {selectedReferenceType &&
+                <FormField
+                  name='referenceId'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select
+                          defaultValue={field.value as string}
+                          value={field.value as string ?? ''}
+                          onValueChange={(value) => field.onChange(value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select Reference' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {selectedReferenceType === 'Castaway' ?
+                              castawayOptions.map(({ value, label }) => (
+                                <SelectItem key={value} value={`${value}`}>
+                                  {label}
+                                </SelectItem>
+                              )) :
+                              tribeOptions.map(({ value, label }) => (
+                                <SelectItem key={value} value={`${value}`}>
+                                  {label}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )} />}
               <FormField
-                name='referenceId'
+                name='notes'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='w-full'>
+                    <FormLabel>Notes (line separated)</FormLabel>
                     <FormControl>
-                      <Select
-                        defaultValue={field.value as string}
-                        value={field.value as string ?? ''}
-                        onValueChange={(value) => field.onChange(value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select Reference' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {selectedReferenceType === 'Castaway' ?
-                            castawayOptions.map(({ value, label }) => (
-                              <SelectItem key={value} value={`${value}`}>
-                                {label}
-                              </SelectItem>
-                            )) :
-                            tribeOptions.map(({ value, label }) => (
-                              <SelectItem key={value} value={`${value}`}>
-                                {label}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
+                      <Textarea
+                        className='w-full'
+                        value={(field.value as string[])?.join('\n')}
+                        onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
+                        placeholder='Notes' />
                     </FormControl>
+                    <FormMessage />
                   </FormItem>
-                )} />}
-            <FormField
-              name='notes'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel>Notes (line separated)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className='w-full'
-                      value={(field.value as string[])?.join('\n')}
-                      onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
-                      placeholder='Notes' />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            <br />
-            <Button
-              disabled={!reactForm.formState.isValid}
-              type='submit'>
-              Create
-            </Button>
-          </form>
-          <EpisodeEvents
-            episodeNumber={selectedEpisode}
-            mockDirects={selectedEvent?.eventType === 'Direct' ? [{
-              leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
-              eventName: selectedEvent.eventName,
-              referenceType: selectedReferenceType,
-              points: selectedEvent.points,
-              referenceId: +reactForm.watch('referenceId'),
-              referenceName: selectedReferenceType === 'Castaway' ?
-                castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
-                tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
-              notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
-            }] : undefined}
-            mockPredictions={selectedEvent?.eventType === 'Prediction' ?
-              correctPredictions.map(prediction => ({
+                )} />
+              <br />
+              <Button
+                disabled={!reactForm.formState.isValid}
+                type='submit'>
+                Create
+              </Button>
+            </form>
+            <EpisodeEvents
+              episodeNumber={selectedEpisode}
+              mockDirects={selectedEvent?.eventType === 'Direct' ? [{
                 leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
                 eventName: selectedEvent.eventName,
                 referenceType: selectedReferenceType,
                 points: selectedEvent.points,
-                predictionMaker: prediction.predictionMaker,
                 referenceId: +reactForm.watch('referenceId'),
                 referenceName: selectedReferenceType === 'Castaway' ?
                   castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
                   tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
                 notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
-              })) : undefined}
-            edit
-          />
-        </span>
-      </Form>
-    </section >
+              }] : undefined}
+              mockPredictions={selectedEvent?.eventType === 'Prediction' ?
+                correctPredictions.map(prediction => ({
+                  leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
+                  eventName: selectedEvent.eventName,
+                  referenceType: selectedReferenceType,
+                  points: selectedEvent.points,
+                  predictionMaker: prediction.predictionMaker,
+                  referenceId: +reactForm.watch('referenceId'),
+                  referenceName: selectedReferenceType === 'Castaway' ?
+                    castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
+                    tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
+                  notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
+                })) : undefined}
+              edit
+            />
+          </span>
+        </Form>
+      </section>
+    </div>
   );
 }
 /*

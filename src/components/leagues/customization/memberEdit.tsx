@@ -70,7 +70,7 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
   return (
     <Form {...reactForm}>
       <form className={cn(
-        'flex flex-col p-2 gap-2 bg-card rounded-lg w-96',
+        'flex flex-col p-2 gap-2 bg-card rounded-xl w-96',
         className
       )} action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground'>Edit Member Details</FormLabel>

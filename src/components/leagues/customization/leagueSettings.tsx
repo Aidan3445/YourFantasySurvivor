@@ -150,7 +150,7 @@ export function LeagueSettings() {
 
   return (
     <Form {...reactForm}>
-      <form className='lg:flex-grow w-full lg:w-min flex flex-col p-2 gap-2 bg-card rounded-lg' action={() => handleSubmit()}>
+      <form className='lg:flex-grow w-full lg:w-min flex flex-col p-2 gap-2 bg-card rounded-xl' action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground'>Edit League Details</FormLabel>
         <FormField
           name='leagueName'

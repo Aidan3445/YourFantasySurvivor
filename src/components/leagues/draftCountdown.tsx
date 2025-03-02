@@ -41,7 +41,7 @@ export function DraftCountdown() {
 
   return (
     <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
-      <span className='flex w-full items-center'>
+      <span className='flex w-full items-start'>
         <div className='flex flex-wrap gap-x-2 items-baseline'>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
           <p className='text-sm text-muted-foreground'>

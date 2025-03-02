@@ -26,6 +26,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         <TabsList className='sticky top-10 md:static grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
           <TabsTrigger value='scores'>Scores</TabsTrigger>
           {role !== 'Member' && <TabsTrigger value='events'>Commish</TabsTrigger>}
+          {userId && <TabsTrigger value='Base'>Base</TabsTrigger>}
           <TabsTrigger value='settings'>Settings</TabsTrigger>
         </TabsList>
         <ScrollArea className='h-full'>
@@ -40,13 +41,19 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               <RecentActivity />
             </div>
           </TabsContent>
-          <TabsContent value='events'>
-            <div className=' w-full px-4 pb-10'>
-              <CreateCustomEvent />
-              {userId && <CreateBaseEvent />}
-            </div>
+          <TabsContent
+            className='mt-0'
+            value='events'>
+            <CreateCustomEvent />
           </TabsContent>
-          <TabsContent value='settings'>
+          <TabsContent
+            className='mt-0'
+            value='Base'>
+            <CreateBaseEvent />
+          </TabsContent>
+          <TabsContent
+            className='mt-0'
+            value='settings'>
             <section className='w-fit flex flex-wrap gap-4 justify-center pb-12 px-4'>
               <MemberEditForm className='w-full xl:w-auto' />
               <LeagueSettings />

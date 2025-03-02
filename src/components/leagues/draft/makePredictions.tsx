@@ -113,8 +113,8 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
   }
 
   return (
-    <Carousel className='gap-4 items-center' setApi={setApi} opts={{ align: 'center' }}>
-      <CarouselContent className='w-full'>
+    <Carousel className='select-none gap-4 items-center w-[calc(100svw-2.5rem)] md:w-auto' setApi={setApi} opts={{ align: 'center' }}>
+      <CarouselContent className=''>
         {predictions.map((prediction, index) => (
           <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
             'opacity-50 -z-10': index !== current - 1,
@@ -130,8 +130,8 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
                   '-translate-x-6 md:-translate-x-8': index + current + 1 === 2 * predictions.length,
                   'translate-x-6 md:translate-x-8 lg:translate-x-12': index + current === 1,
                 })} >
-              <span className='flex gap-4 items-center self-center px-1 lg:w-full'>
-                <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1 mr-auto' />
+              <span className='flex w-full gap-4 justify-between items-center self-center px-1 lg:w-full'>
+                <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1' />
                 <h3 className='inline text-lg font-semibold text-card-foreground'>
                   {prediction.eventName}
                   <span className='ml-2 inline-flex mt-1'>
@@ -139,7 +139,7 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
                     <Flame size={16} />
                   </span>
                 </h3>
-                <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1 ml-auto' />
+                <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1' />
               </span>
               <p className='text-sm'>{prediction.description}</p>
               <SubmissionCard prediction={prediction} options={getOptions(prediction.referenceTypes)} />

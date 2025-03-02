@@ -111,7 +111,7 @@ export function DraftDateField({ disabled }: DraftDateFieldProps) {
                 setDate={field.onChange}
                 side='top'
                 disabled={disabled}
-                placeholder='Start Draft Manually'
+                placeholder='Select draft start date and time'
                 rangeStart={new Date()} />
             </span>
           </FormControl>
