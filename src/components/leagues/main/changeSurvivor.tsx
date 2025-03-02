@@ -55,7 +55,7 @@ export default function ChangeSurvivor() {
 
   if (pickPriority.length > 0 && !pickPriority.includes(league.members.loggedIn?.displayName ?? '')) {
     return (
-      <div className='m-4 text-center bg-secondary rounded-lg flex flex-col p-1 place-items-center'>
+      <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
         <h1 className='text-2xl font-semibold'>Wait to Swap your Survivor Pick</h1>
         <h3 className='text-lg font-semibold'>Eliminated members must pick first:</h3>
         {pickPriority.map((member) => (
@@ -73,7 +73,7 @@ export default function ChangeSurvivor() {
 
   return (
     <Form {...reactForm}>
-      <form className='text-center bg-secondary rounded-lg flex flex-col m-4' action={() => handleSubmit()}>
+      <form className='w-full text-center bg-card rounded-lg flex flex-col' action={() => handleSubmit()}>
         <h1 className='text-2xl font-semibold'>Swap your Survivor Pick</h1>
         <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center p-2 mt-auto'>
           <FormField

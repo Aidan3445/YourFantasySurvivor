@@ -12,6 +12,7 @@ import SortableItem from '~/components/ui/sortableItem';
 import { handleDragEnd } from '~/hooks/useSortableItem';
 import { updateDraftOrder } from '~/app/api/leagues/actions';
 import { Button } from '~/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -33,6 +34,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
     },
     refresh
   } = useLeague();
+  const router = useRouter();
   const sensors = useSensors(useSensor(PointerSensor));
   const [locked, setLocked] = useState(true);
 
@@ -44,6 +46,10 @@ export default function DraftOrder({ className }: DraftOrderProps) {
     [members, draftOrder]);
 
   const [order, setOrder] = useState(dbOrder);
+
+  useEffect(() => {
+    if (leagueStatus !== 'Predraft') router.push(`/leagues/${leagueHash}/draft`);
+  }, [leagueStatus, router, leagueHash]);
 
   useEffect(() => {
     setOrder(dbOrder);
@@ -71,7 +77,6 @@ export default function DraftOrder({ className }: DraftOrderProps) {
 
   const orderLocked = locked ||
     leagueStatus !== 'Predraft' ||
-    members.loggedIn?.role !== 'Owner' ||
     (!!draftDate && Date.now() > draftDate.getTime());
 
   const handleSubmit = async () => {
@@ -88,13 +93,13 @@ export default function DraftOrder({ className }: DraftOrderProps) {
 
   return (
     <article className={cn('flex flex-col w-full p-2 bg-card rounded-xl relative', className)}>
-      {orderLocked ?
+      {members.loggedIn?.role === 'Owner' && (orderLocked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => setLocked(false)} /> :
         <LockOpen
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
-          onClick={() => { setLocked(true); setOrder(dbOrder); }} />}
+          onClick={() => { setLocked(true); setOrder(dbOrder); }} />)}
       <span className='flex gap-4 items-center mb-4 w-full'>
         <h2 className='text-lg font-bold text-card-foreground h-9 place-content-center'>Draft Order</h2>
         {!orderLocked && <>

@@ -5,8 +5,10 @@ import { FlameKindling, ListPlus } from 'lucide-react';
 import { CreateLeagueModal } from '~/components/leagues/createLeague';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { type LeagueInfo } from '~/context/yfsUserContext';
+import { SignIn, useUser } from '@clerk/nextjs';
 
 export default function LeaguesPage() {
+  const user = useUser();
   const { leagues } = useYfsUser();
 
   const { currentLeagues, inactiveLeagues } = leagues.reduce((acc, league) => {
@@ -21,13 +23,13 @@ export default function LeaguesPage() {
     inactiveLeagues: LeagueInfo[]
   });
 
-
-
   return (
-    <main className='w-full flex flex-col gap-5 items-center'>
+    <main className='w-full flex flex-col gap-5 items-center text-center'>
       {leagues.length > 0 ?
         <h1 className='text-3xl'>My Leagues</h1> :
-        <h1 className='text-3xl'>No Leagues Yet...</h1>}
+        user.isSignedIn ?
+          <h1 className='text-3xl'>No Leagues Yet...</h1> :
+          <h1 className='text-3xl'>Sign in or sign up to view and create leagues</h1>}
       {currentLeagues.map(league => (
         <Link
           key={league.leagueHash}
@@ -47,12 +49,14 @@ export default function LeaguesPage() {
           </section>
         </Link>
       ))}
-      <CreateLeagueModal>
-        <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-card'>
-          <h3 className='text-xl'>Create New League</h3>
-          <ListPlus size={24} />
-        </section>
-      </CreateLeagueModal>
+      {user.isSignedIn ?
+        <CreateLeagueModal>
+          <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-card'>
+            <h3 className='text-xl'>Create New League</h3>
+            <ListPlus size={24} />
+          </section>
+        </CreateLeagueModal> :
+        <SignIn forceRedirectUrl='/leagues' />}
       {inactiveLeagues.length > 0 && (
         <section className='flex flex-col gap-5 w-5/6 mx-5'>
           <h2 className='text-center text-2xl'>Past Seasons</h2>

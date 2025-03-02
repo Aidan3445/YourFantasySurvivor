@@ -114,7 +114,7 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
 
   return (
     <Carousel className='gap-4 items-center' setApi={setApi} opts={{ align: 'center' }}>
-      <CarouselContent className='w-[calc(100svw-5rem)] lg:w-full'>
+      <CarouselContent className='w-full'>
         {predictions.map((prediction, index) => (
           <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
             'opacity-50 -z-10': index !== current - 1,

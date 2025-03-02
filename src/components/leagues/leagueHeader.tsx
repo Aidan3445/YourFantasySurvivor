@@ -13,7 +13,7 @@ export default function LeagueHeader() {
   } = useLeague();
 
   return (
-    <span className='flex gap-4 w-full px-8 mt-1 items-baseline'>
+    <span className='sticky md:static top-0 z-50 flex gap-4 w-full px-8 py-1 md:py-0 items-baseline bg-b3 md:bg-transparent'>
       {!leagueName ? (
         <Skeleton className='h-8 w-full rounded-md' />
       ) : (<span className='flex gap-2 items-baseline'>

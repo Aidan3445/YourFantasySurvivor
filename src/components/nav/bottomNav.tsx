@@ -1,7 +1,7 @@
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { type NavLinkProps } from './navSelector';
 import Link from 'next/link';
-import { Home, Trophy } from 'lucide-react';
+import { Home, LogIn, Trophy } from 'lucide-react';
 import { cn } from '~/lib/utils';
 
 export const navHeight = 'h-10';
@@ -28,9 +28,9 @@ function BottomNavUser() {
       </div>
     </SignedIn>
     <SignedOut>
-      <div className='mt-2'>
-        <Link href='/sign-in'>Sign in</Link>
-      </div>
+      <SignInButton>
+        <LogIn size={26} />
+      </SignInButton>
     </SignedOut>
   </>
   );

@@ -49,7 +49,7 @@ export default function RecentActivity() {
     episodes[0];
 
   return (
-    <section className='md:w-full bg-card rounded-lg relative'>
+    <section className='w-full bg-card rounded-lg relative '>
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button className='absolute top-2 right-2 text-xs px-1 h-4' variant='secondary'>
@@ -219,8 +219,8 @@ export function EpisodeEvents({ episodeNumber, mockBases, mockPredictions, mockD
     }>) ?? {});
 
   return (
-    <ScrollArea className='w-[calc(100svw-4rem)] md:w-auto flex-grow bg-card rounded-lg gap-0'>
-      <Table>
+    <ScrollArea className='w-[calc(100svw-4rem)] md:w-auto bg-card rounded-lg gap-0'>
+      <Table className='w-full'>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader className='sticky top-0'>
           <TableRow className='bg-white hover:bg-white px-4 gap-4 rounded-md items-center text-nowrap'>

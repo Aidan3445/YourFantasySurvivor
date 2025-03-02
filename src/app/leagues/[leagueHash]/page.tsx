@@ -19,31 +19,29 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
   const { role } = await leagueMemberAuth(leagueHash);
   const { userId } = await systemAdminAuth();
   return (
-    <main className='flex flex-col gap-0 w-full p-4 pb-0'>
+    <main className='flex flex-col gap-0 w-full md:p-4 pb-0 md:h-auto'>
       <Tabs
-        className='col-span-2 w-full bg-secondary rounded-3xl border h-[calc(100svh-4rem)] max-md:h-[calc(100svh-6.5rem)] overflow-hidden'
+        className='w-full md:bg-secondary rounded-3xl md:border md:h-[calc(100svh-4rem)] md:overflow-hidden'
         defaultValue='scores'>
-        <TabsList className='top-0 grid grid-flow-col auto-cols-fr w-full px-10 rounded-b-none'>
+        <TabsList className='sticky top-10 md:static grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
           <TabsTrigger value='scores'>Scores</TabsTrigger>
           {role !== 'Member' && <TabsTrigger value='events'>Commish</TabsTrigger>}
           <TabsTrigger value='settings'>Settings</TabsTrigger>
         </TabsList>
         <ScrollArea className='h-full'>
           <TabsContent value='scores'>
-            <div className='flex flex-col gap-4 w-full pb-10 px-4'>
-              <span className='flex flex-wrap lg:flex-nowrap gap-4 items-center overflow-x-auto'>
+            <div className='space-y-4 w-full md:pb-10 place-items-center px-4'>
+              <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-2 md:grid-rows-1 gap-4 items-center justify-center overflow-x-auto'>
                 <Scoreboard />
                 <Chart />
               </span>
-              <span className='bg-card rounded-lg'>
-                <ChangeSurvivor />
-                <Predictions leagueHash={leagueHash} />
-              </span>
+              <Predictions leagueHash={leagueHash} />
+              <ChangeSurvivor />
               <RecentActivity />
             </div>
           </TabsContent>
           <TabsContent value='events'>
-            <div className='flex flex-col gap-4 w-full px-4 pb-10'>
+            <div className=' w-full px-4 pb-10'>
               <CreateCustomEvent />
               {userId && <CreateBaseEvent />}
             </div>

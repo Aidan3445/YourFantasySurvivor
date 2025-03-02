@@ -29,10 +29,10 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
   }, {} as Record<TribeName, CastawayDraftInfo[]>);
 
   return (
-    <section className='w-full bg-secondary rounded-3xl border overflow-x-hidden'>
+    <section className='w-full md:bg-secondary md:rounded-3xl md:border overflow-x-hidden'>
       <span className='flex flex-col items-center justify-around text-center'>
-        <h1 className='text-2xl font-semibold'>Do Your Research</h1>
-        <p>{isMobile ? 'Tap' : 'Click'} the castaways below to learn more about them!</p>
+        <h1 className='text-2xl font-semibold'>Do Your Research!</h1>
+        <p>{isMobile ? 'Tap' : 'Click'} the castaways below to learn more about them</p>
       </span>
       <article className='flex gap-4 p-4 justify-start overflow-auto'>
         {Object.entries(castawaysByTribe ?? {}).map(([tribeName, castaways]) => (

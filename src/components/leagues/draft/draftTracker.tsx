@@ -22,6 +22,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
   const { draft } = useDraft(leagueHash);
   const {
     league: {
+      leagueStatus,
       members: {
         loggedIn
       },
@@ -52,6 +53,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
   }, [draft, loggedIn]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [closedDialog, setClosedDialog] = useState(false);
 
   useEffect(() => {
     if (onTheClock?.loggedIn) {
@@ -61,13 +63,13 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
 
 
   useEffect(() => {
-    if (onTheClockIndex === -1) {
+    if (onTheClockIndex === -1 || leagueStatus !== 'Draft') {
       router.push(`/leagues/${leagueHash}`);
     }
-  }, [onTheClockIndex, router, leagueHash]);
+  }, [onTheClockIndex, leagueStatus, router, leagueHash]);
 
   return (
-    <section className='w-full space-y-4 bg-secondary rounded-3xl border overflow-x-hidden p-4'>
+    <section className='w-full space-y-4 md:bg-secondary md:rounded-3xl md:border overflow-x-hidden p-4'>
       <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
         <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
         <div className='flex flex-col gap-2'>
@@ -106,13 +108,13 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
           ))}
         </div>
       </article>
-      {(onDeck.loggedIn || onTheClock.loggedIn) ?
-        <ChooseCastaway castaways={draft.castaways} onDeck={onDeck.loggedIn} /> :
-        <MakePredictions
-          predictions={draft.predictions}
-          castaways={draft.castaways}
-          tribes={draft.tribes} />}
-      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {(onDeck.loggedIn || onTheClock.loggedIn) &&
+        <ChooseCastaway castaways={draft.castaways} onDeck={onDeck.loggedIn} />}
+      <MakePredictions
+        predictions={draft.predictions}
+        castaways={draft.castaways}
+        tribes={draft.tribes} />
+      <AlertDialog open={dialogOpen && !closedDialog} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -129,7 +131,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction className='w-full'>
+            <AlertDialogAction className='w-full' onClick={() => setClosedDialog(true)}>
               {'I\'m ready!'}
             </AlertDialogAction>
           </AlertDialogFooter>

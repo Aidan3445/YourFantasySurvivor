@@ -15,7 +15,7 @@ export default async function Predictions({ leagueHash }: PredictionsProps) {
   if (predictions.length === 0) return null;
 
   return (
-    <div className='px-4 text-center'>
+    <div className='text-center bg-card rounded-lg w-full'>
       <h1 className='text-3xl'>{'This Week\'s Prediction'}{predictions.length > 1 ? 's!' : '!'}</h1>
       <PredictionCards
         predictions={predictions}

@@ -29,7 +29,7 @@ export default function Scoreboard() {
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
   return (
-    <ScrollArea className='max-md:w-[calc(100svw-4rem)] w-full bg-card rounded-lg gap-0'>
+    <ScrollArea className='bg-card rounded-lg gap-0'>
       <Table>
         <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
         <TableHeader>
