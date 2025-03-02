@@ -45,7 +45,9 @@ export function DraftCountdown() {
         <div className='flex flex-wrap gap-x-2 items-baseline'>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
           <p className='text-sm text-muted-foreground'>
-            {draftDate ? `Starts at: ${draftDate.toLocaleString()}` : 'Draft date not set'}
+            {draftDate ?
+              `Starts at: ${draftDate.toLocaleString()}` :
+              'Draft set to manual start by commissioner'}
           </p>
         </div>
         <div className='flex gap-2 ml-auto'>
@@ -97,13 +99,13 @@ function Countdown({ endDate, replacedBy }: CountdownProps) {
   return (
     !timer || timer > 0 ?
       <span className='w-full flex text-white text-4xl  justify-evenly'>
-        <CountdownPlace value={days.toString()} label='Days' />
+        <CountdownPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
         :
-        <CountdownPlace value={hours.toString()} label='Hours' />
+        <CountdownPlace value={hours.toString()} label={hours === 1 ? 'Hour' : 'Hours'} />
         :
-        <CountdownPlace value={minutes.toString()} label='Minutes' />
+        <CountdownPlace value={minutes.toString()} label={minutes === 1 ? 'Minute' : 'Minutes'} />
         :
-        <CountdownPlace value={seconds.toString()} label='Seconds' />
+        <CountdownPlace value={seconds.toString()} label={seconds === 1 ? 'Second' : 'Seconds'} />
       </span>
       :
       replacedBy

@@ -28,7 +28,7 @@ export interface League {
 
 export interface LeagueSettingsUpdate {
   leagueName?: string;
-  draftDate?: Date;
+  draftDate?: Date | null;
   survivalCap?: number;
   preserveStreak?: boolean;
 }

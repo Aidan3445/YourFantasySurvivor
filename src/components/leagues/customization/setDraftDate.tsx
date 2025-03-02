@@ -16,7 +16,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { DateTimePicker } from '~/components/ui/dateTimePicker';
 
 const formSchema = z.object({
-  draftDate: z.date(),
+  draftDate: z.date().nullable(),
 });
 
 export default function SetDraftDate() {
@@ -69,7 +69,15 @@ export default function SetDraftDate() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <form className='flex flex-col gap-2 justify-between h-full' action={() => handleSubmit()}>
-            <DraftDateField />
+            <span className='space-y-2'>
+              <DraftDateField />
+              {reactForm.watch('draftDate') && <>
+                <h3 className='text-lg'>OR</h3>
+                <Button type='button' onClick={() => reactForm.setValue('draftDate', null)}>
+                  Set draft to manually start
+                </Button>
+              </>}
+            </span>
             <AlertDialogFooter>
               <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
                 <X stroke='white' />
