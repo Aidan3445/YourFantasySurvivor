@@ -1,6 +1,7 @@
 import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
-import { CirclePlus } from 'lucide-react';
+import { CirclePlus, List } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { CreateLeagueModal } from '~/components/leagues/createLeague';
 
 export default function HomePage() {
@@ -24,12 +25,20 @@ export default function HomePage() {
         <SignIn />
       </SignedOut>
       <SignedIn>
-        <CreateLeagueModal className='w-full md:w-fit'>
-          <section className='flex gap-8 items-center p-8 rounded-lg bg-card'>
-            <h3 className='text-4xl w-full'>Create New League</h3>
-            <CirclePlus size={40} />
-          </section>
-        </CreateLeagueModal>
+        <div className='flex flex-col lg:flex-row gap-4'>
+          <Link href='/leagues'>
+            <section className='flex justify-center items-center gap-2 p-4 rounded-lg bg-card'>
+              <h2 className='sm:text-4xl text-2xl'>View Your Leagues</h2>
+              <List size={36} />
+            </section>
+          </Link>
+          <CreateLeagueModal className='w-full md:w-fit'>
+            <section className='flex justify-center items-center gap-2 p-4 rounded-lg bg-card'>
+              <h3 className='sm:text-4xl text-2xl'>Create New League</h3>
+              <CirclePlus size={36} />
+            </section>
+          </CreateLeagueModal>
+        </div>
       </SignedIn>
     </main>
   );

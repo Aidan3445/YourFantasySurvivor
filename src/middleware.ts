@@ -36,6 +36,7 @@ export default clerkMiddleware(async (auth, req) => {
       eq(leagueMembersSchema.userId, userId)))
     .then((leagues) => leagues[0]?.leagueStatus);
   if (!leagueStatus) {
+    console.log('League not found', leagueHash, userId, leagueStatus, pathname);
     return NextResponse.redirect(new URL('/leagues', req.url));
   }
 

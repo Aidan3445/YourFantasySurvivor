@@ -48,7 +48,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
   const [order, setOrder] = useState(dbOrder);
 
   useEffect(() => {
-    if (leagueStatus !== 'Predraft') router.push(`/leagues/${leagueHash}/draft`);
+    if (leagueStatus !== 'Predraft' && leagueHash) router.push(`/leagues/${leagueHash}/draft`);
   }, [leagueStatus, router, leagueHash]);
 
   useEffect(() => {
