@@ -71,7 +71,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
         data.draftDate
       );
       addLeague(leagueInfo);
-      alert(`League created with id: ${leagueInfo.leagueHash}`);
+      alert(`League created called ${data.leagueName}`);
       onSubmit?.();
       router.push(`/leagues/${leagueInfo.leagueHash}/predraft`);
     } catch (error) {

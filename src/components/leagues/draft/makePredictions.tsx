@@ -31,8 +31,8 @@ export default function MakePredictions({ predictions, castaways, tribes }: Make
     <div className='bg-card p-2 rounded-lg text-center flex flex-col items-center'>
       <h3 className='text-xl font-semibold'>While you wait...</h3>
       <p>
-        Make your predictions! Earn points throughout the season
-        for each correct prediction you make.
+        Make your prediction{predictions.length > 1 ? 's! Earn  points throughout the season for\
+        each correct prediction you make.' : ' and earn points if you are correct!'}
       </p>
       <PredictionCards predictions={predictions} castaways={castaways} tribes={tribes} />
     </div>

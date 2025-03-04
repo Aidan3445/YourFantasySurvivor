@@ -41,7 +41,7 @@ export default function LeagueScoring() {
     try {
       await updateBaseEventRules(leagueHash, data.baseEventRules);
       await refresh();
-      alert(`Base event rules updated for league ${leagueHash}`);
+      alert('Base event rules updated.');
     } catch (error) {
       console.error(error);
       alert('Failed to update official event rules');

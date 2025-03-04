@@ -49,7 +49,7 @@ export default function CustomEvents() {
     try {
       await createLeagueEventRule(leagueHash, newRule);
       await refresh();
-      alert(`Custom event created for league ${leagueHash}`);
+      alert(`Custom event ${newRule.eventName} created.`);
       reactForm.reset();
     } catch (error) {
       console.error(error);
@@ -317,7 +317,7 @@ function CustomEventCard({ rule, locked }: CustomEventCardProps) {
     try {
       await updateLeagueEventRule(leagueHash, data);
       await refresh();
-      alert(`Custom event updated for league ${leagueHash}`);
+      alert(`Custom event ${data.eventName} updated.`);
     } catch (error) {
       console.error(error);
       alert('Failed to update custom event');
@@ -328,7 +328,7 @@ function CustomEventCard({ rule, locked }: CustomEventCardProps) {
     try {
       await deleteLeagueEventRule(leagueHash, rule.eventName);
       setIsEditing(false);
-      alert(`Custom event deleted for league ${leagueHash}`);
+      alert(`Custom event ${rule.eventName} deleted.`);
     } catch (error) {
       console.error(error);
       alert('Failed to delete custom event');

@@ -137,7 +137,7 @@ export function LeagueSettings() {
         updateAdmins(leagueHash, data.admins),
       ]);
       await refresh();
-      alert(`League settings updated for league ${leagueHash}`);
+      alert(`League settings updated for ${data.leagueName}`);
     } catch (error) {
       console.error(error);
       alert('Failed to update league some or all settings');

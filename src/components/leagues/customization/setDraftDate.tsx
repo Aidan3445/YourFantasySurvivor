@@ -46,7 +46,7 @@ export default function SetDraftDate() {
     try {
       await updateLeagueSettings(leagueHash, leagueUpdate);
       await refresh();
-      alert(`Draft timing updated for league ${leagueHash}`);
+      alert(`Draft timing updated: ${data.draftDate?.toLocaleString() ?? 'Manual Draft'}`);
     } catch (error) {
       console.error(error);
       alert('Failed to update draft timing');
