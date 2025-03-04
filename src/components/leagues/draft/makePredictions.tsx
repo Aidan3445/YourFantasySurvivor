@@ -69,6 +69,7 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
 
     if (referenceTypes.length === 0 || referenceTypes.includes('Castaway')) {
       castaways.forEach((castaway) => {
+        if (castaway.eliminatedEpisode) return;
         const tribe = (castaway as CastawayDraftInfo).tribe ??
           (castaway as CastawayDetails).tribes.slice(-1)[0];
         options.Castaway[castaway.fullName] = {
