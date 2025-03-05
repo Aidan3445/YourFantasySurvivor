@@ -86,7 +86,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
                 {index + 1}
               </h3>
               <h2
-                className='text-3xl font-semibold'
+                className='text-3xl font-semibold text-wrap'
                 style={{ color: getContrastingColor(pick.color) }}>
                 {pick.displayName}
               </h2>
