@@ -77,7 +77,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
             <ColorRow
               key={pick.memberId}
               className={onTheClock.memberId === pick.memberId ?
-                'animate-pulse' : ''}
+                'animate-pulse items-center' : 'items-center'}
               color={pick.color}
               loggedIn={loggedIn?.displayName === pick.displayName}>
               <h3
