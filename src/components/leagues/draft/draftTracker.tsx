@@ -72,7 +72,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
     <section className='w-full space-y-4 md:bg-secondary md:rounded-3xl md:border overflow-x-hidden p-4'>
       <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
         <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
-        <div className='flex flex-col gap-2'>
+        <div className='grid grid-cols-1 gap-2'>
           {draft?.picks.map((pick, index) => (
             <ColorRow
               key={pick.memberId}
@@ -99,7 +99,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
               )}
               {pick.draftPick && (
                 <h3
-                  className='ml-auto text-base md:text-lg md:self-end'
+                  className='ml-auto text-lg text-wrap'
                   style={{ color: getContrastingColor(pick.color) }}>
                   {pick.draftPick}
                 </h3>
