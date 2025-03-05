@@ -77,7 +77,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
             <ColorRow
               key={pick.memberId}
               className={onTheClock.memberId === pick.memberId ?
-                'animate-pulse items-center' : 'items-center'}
+                'animate-pulse' : ''}
               color={pick.color}
               loggedIn={loggedIn?.displayName === pick.displayName}>
               <h3
@@ -99,7 +99,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
               )}
               {pick.draftPick && (
                 <h3
-                  className='text-base md:text-lg md:self-end'
+                  className='ml-auto text-base md:text-lg md:self-end'
                   style={{ color: getContrastingColor(pick.color) }}>
                   {pick.draftPick}
                 </h3>
