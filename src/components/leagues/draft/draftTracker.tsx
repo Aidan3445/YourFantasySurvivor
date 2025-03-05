@@ -99,7 +99,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
               )}
               {pick.draftPick && (
                 <h3
-                  className='text-lg self-end text-wrap leading-tight'
+                  className='text-lg self-end text-wrap leading-none'
                   style={{ color: getContrastingColor(pick.color) }}>
                   {pick.draftPick}
                 </h3>
