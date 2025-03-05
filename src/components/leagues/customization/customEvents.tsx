@@ -21,6 +21,7 @@ import {
 } from '~/components/ui/alertDialog';
 import { type ReactNode, useState } from 'react';
 import { cn } from '~/lib/utils';
+import { PredictionTimingHelp } from '../draft/makePredictions';
 
 export default function CustomEvents() {
   const {
@@ -266,7 +267,10 @@ export function CustomEventFields({ predictionDefault, children }: CustomEventFi
           name='timing'
           render={({ field }) => (
             <FormItem className={!isPrediction ? '!pointer-events-none w-full' : 'w-full'}>
-              <FormLabel >Timing</FormLabel>
+              <FormLabel className='flex items-center gap-1'>
+                Timing
+                <PredictionTimingHelp />
+              </FormLabel>
               <FormControl>
                 <MultiSelect
                   options={LeaguePredictionTimingOptions

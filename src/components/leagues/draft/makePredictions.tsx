@@ -6,7 +6,7 @@ import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '~/components/ui/carousel';
-import { Flame } from 'lucide-react';
+import { Flame, HelpCircle } from 'lucide-react';
 import { type ReferenceType, type LeagueEventPrediction } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +16,9 @@ import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { type Tribe } from '~/server/db/defs/tribes';
 import { ColorRow } from '../draftOrder';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
+import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import { PopoverArrow } from '@radix-ui/react-popover';
 
 interface MakePredictionsProps {
   predictions: LeagueEventPrediction[];
@@ -133,12 +136,16 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
                 })} >
               <span className='flex w-full gap-4 justify-between items-center self-center px-1 lg:w-full'>
                 <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1' />
-                <h3 className='inline text-lg font-semibold text-card-foreground'>
+                <h3 className='text-lg font-semibold text-card-foreground'>
                   {prediction.eventName}
                   <span className='ml-2 inline-flex mt-1'>
                     <p className='text-sm'>{prediction.points}</p>
                     <Flame size={16} />
                   </span>
+                  <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+                    {prediction.timing.join(' - ')}
+                    <PredictionTimingHelp />
+                  </div>
                 </h3>
                 <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1' />
               </span>
@@ -242,3 +249,37 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
   );
 }
 
+export function PredictionTimingHelp() {
+  return (
+    <Popover modal>
+      <PopoverTrigger>
+        <HelpCircle size={16} className='inline-block' />
+      </PopoverTrigger>
+      <PopoverContent className='w-80 md:w-full'>
+        <PopoverArrow />
+        <h3 className='text-lg font-semibold'>Prediction Timing</h3>
+        <p className='text-sm'>
+          Prediction timing determines when players make their predictions. Predictions can be set at various points in the season:
+        </p>
+        <ScrollArea className='max-h-40'>
+          <ul className='list-disc pl-4 text-sm'>
+            <li><b>Draft</b> – Predictions are locked in when players draft their teams, before the league starts.</li>
+            <li><b>Weekly</b> – Predictions are made each week. Can apply to:
+              <ul className='list-[revert] pl-4'>
+                <li><b className='font-semibold'>Full Season</b> – Every week from premiere to finale.</li>
+                <li><b className='font-semibold'>Pre-Merge Only</b> – Weekly predictions end once the tribes merge.</li>
+                <li><b className='font-semibold'>Post-Merge Only</b> – Weekly predictions start after the merge.</li>
+              </ul>
+            </li>
+            <li><b>Merge</b> – Predictions are made right after the merge episode airs.</li>
+            <li><b>Finale</b> – Predictions are made just before the final episode.</li>
+          </ul>
+          <ScrollBar orientation='vertical' />
+        </ScrollArea>
+        <p className='text-sm'>
+          A prediction may be required at multiple points (e.g., Draft, Merge, and Finale).
+        </p>
+      </PopoverContent>
+    </Popover>
+  );
+}

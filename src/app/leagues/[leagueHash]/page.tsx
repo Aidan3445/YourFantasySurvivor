@@ -31,7 +31,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         </TabsList>
         <ScrollArea className='h-full'>
           <TabsContent value='scores'>
-            <div className='space-y-4 w-full md:pb-10 place-items-center px-4'>
+            <div className='space-y-4 w-full md:pb-14 place-items-center px-4'>
               <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-2 md:grid-rows-1 gap-4 items-center justify-center overflow-x-auto'>
                 <Scoreboard />
                 <Chart />
@@ -54,7 +54,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           <TabsContent
             className='mt-0'
             value='settings'>
-            <section className='w-fit flex flex-wrap gap-4 justify-center px-4'>
+            <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-14'>
               <MemberEditForm className='w-full xl:w-auto' />
               <LeagueSettings />
               <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>

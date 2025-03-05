@@ -63,7 +63,7 @@ export default function CreateCustomEvent() {
   });
 
   return (
-    <div className='w-full px-4 md:pb-12'>
+    <div className='w-full px-4 md:pb-14'>
       <section className='bg-card rounded-xl pb-4'>
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
