@@ -695,12 +695,13 @@ export const QUERIES = {
       throw new Error('League not found');
     }
 
-    const scores = compileScores(
+    const { scores, currentStreaks } = compileScores(
       baseEvents, tribesTimeline, elims, leagueEvents, baseEventRules ?? defaultBaseRules,
       selectionTimeline, leagueSettings.survivalCap, leagueSettings.preserveStreak);
 
     return {
       scores,
+      currentStreaks,
       baseEvents,
       castaways,
       leagueEvents,
@@ -808,5 +809,5 @@ export async function getThisWeeksPredictions(leagueHash: LeagueHash) {
   })))
     .filter((tribe) => tribe !== undefined);
 
-  return { predictions, castaways: remainingCastaways, tribes };
+  return { predictions, castaways: remainingCastaways, tribes, nextEpisode };
 }

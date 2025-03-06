@@ -13,13 +13,14 @@ import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { ColorRow } from '../draftOrder';
-import { Circle, Flame, History } from 'lucide-react';
+import { MoveRight, Circle, Flame, History, Skull } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/useMobile';
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import { Separator } from '~/components/ui/separator';
 
 export default function Scoreboard() {
   const { leagueData, league } = useLeague();
@@ -76,15 +77,29 @@ interface MemberRowProps {
 }
 
 function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
-  const { leagueData } = useLeague();
+  const { leagueData, league } = useLeague();
   const isMobile = useIsMobile();
 
-  const condensedTimeline = (leagueData.selectionTimeline.memberCastaways[member] ?? []).reduce((acc, castaway) => {
+  console.log(leagueData.selectionTimeline.memberCastaways[member]);
+
+  const condensedTimeline = (leagueData.selectionTimeline.memberCastaways[member] ?? []).reduce((acc, castaway, index) => {
     if (castaway === null) return acc;
-    if (acc.length === 0) return [castaway];
-    if (acc[acc.length - 1] === castaway) return acc;
-    return [...acc, castaway];
-  }, [] as CastawayName[]);
+
+    const prev = acc[acc.length - 1];
+    if (prev) {
+      acc[acc.length - 1] = { ...prev, end: index - 1 };
+    }
+
+    if (acc[acc.length - 1]?.fullName === castaway) {
+      acc[acc.length - 1]!.end = index;
+      return acc;
+    }
+    return [...acc, {
+      fullName: castaway,
+      start: acc.length === 0 ? 'Draft' : index,
+      end: leagueData.castaways.find((c) => c.fullName === castaway)?.eliminatedEpisode
+    }];
+  }, [] as { fullName: CastawayName, start: number | string, end?: number | null }[]);
 
 
   return (
@@ -105,7 +120,7 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
         </ColorRow>
       </TableCell>
       <TableCell className='text-nowrap'>
-        <ColorRow className='justify-center' color={survivor.eliminatedEpisode
+        <ColorRow className='justify-center pr-0' color={survivor.eliminatedEpisode
           ? '#AAAAAA' : survivor.startingTribe.tribeColor}>
           {isMobile ? survivor.shortName : survivor.fullName}
           <div className='ml-auto flex gap-0.5'>
@@ -124,15 +139,33 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
               <PopoverTrigger className='ml-2'>
                 <History size={16} />
               </PopoverTrigger>
-              <PopoverContent className='w-min p-1 space-y-1 pt-0'>
+              <PopoverContent className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'>
                 <PopoverArrow />
+                <div className='text-center'>Survivor</div>
+                <div className='text-center'>Episodes</div>
+                <Separator className='col-span-2' />
                 {condensedTimeline.map((castaway, index) => (
-                  <ColorRow key={index} color={leagueData.castaways.find((c) => c.fullName === castaway)?.startingTribe.tribeColor ?? '#AAAAAA'}>
-                    {castaway}
-                  </ColorRow>
+                  <>
+                    <ColorRow className='px-1 justify-center' key={index} color={leagueData.castaways.find((c) => c.fullName === castaway.fullName)?.startingTribe.tribeColor ?? '#AAAAAA'}>
+                      {castaway.fullName}
+                    </ColorRow>
+                    <div className='flex gap-1 items-center text-nowrap' key={`e-${index}`}>
+                      {typeof castaway.start === 'number' ?
+                        castaway.start : castaway.start}
+                      <MoveRight className='w-4 h-4' />
+                      {castaway.end ? `${castaway.end}` :
+                        leagueData.episodes.find((e) => e.isFinale && e.airStatus !== 'Upcoming') ?
+                          'Finale' : 'Present'}
+                    </div>
+                  </>
                 ))}
               </PopoverContent>
             </Popover>
+            {league.settings.survivalCap > 0 && (
+              <div className='ml-1 w-4 flex justify-center'>
+                {leagueData.currentStreaks[member]! || <Skull size={16} />}
+              </div>
+            )}
           </div>
         </ColorRow>
       </TableCell>

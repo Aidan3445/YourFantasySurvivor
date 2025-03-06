@@ -132,6 +132,7 @@ export function compileScores(
   // after each episode the castaway survives, they earn a bonus point
   // then they earn two points for the next episode, then three, etc.
   // the bonus is capped at the survival cap set by the league
+  const currentStreaks: Record<LeagueMemberDisplayName, number> = {};
   Object.entries(selectionTimeline.memberCastaways).forEach(([member, castaways]) => {
     // get the episode of the first pick, this will be the same for all members for now
     // but doing it this way allows for the possibility of members joining late
@@ -161,6 +162,7 @@ export function compileScores(
       scores.Member[member][episodeNumber] ??= 0;
       scores.Member[member][episodeNumber]! += bonus;
     }
+    currentStreaks[member] = streak;
   });
 
   // fill in missing episodes and convert to running totals
@@ -176,6 +178,5 @@ export function compileScores(
     }
   }
 
-  return scores;
+  return { scores, currentStreaks };
 }
-

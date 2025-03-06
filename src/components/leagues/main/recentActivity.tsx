@@ -29,6 +29,7 @@ import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import EditBaseEvent from './editBaseEvent';
 import { ColorRow } from '../draftOrder';
 import EditLeagueEvent from './editLeagueEvent';
+import { useIsMobile } from '~/hooks/useMobile';
 
 export default function RecentActivity() {
   const {
@@ -36,6 +37,7 @@ export default function RecentActivity() {
       episodes
     }
   } = useLeague();
+  const isMobile = useIsMobile();
 
   const [selectedEpisode, setSelectedEpisode] = useState(1);
   /*const [filterCastaway, setFilterCastaway] = useState();
@@ -73,7 +75,14 @@ export default function RecentActivity() {
                 episodes.toReversed()
                   .map((episode) => (
                     <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
-                      {episode.episodeNumber} - {episode.episodeTitle}
+                      {`${episode.episodeNumber}:`} {episode.episodeTitle}
+                      <div className='inline ml-1'>
+                        <AirStatus
+                          airDate={episode.episodeAirDate}
+                          airStatus={episode.airStatus}
+                          showTime={false}
+                          showDate={!isMobile} />
+                      </div>
                     </SelectItem>
                   ))}
             </SelectContent>
@@ -347,7 +356,6 @@ interface EventRowProps {
 }
 
 function PointsCell({ baseEventName: eventName, baseEventRules, points }: EventRowProps) {
-  console.log(eventName, baseEventRules, points);
   if ((!ScoringBaseEventNames.includes(eventName as ScoringBaseEventName) || !baseEventRules) &&
     !points)
     return <TableCell className='text-xs text-muted-foreground text-center'>N/A</TableCell>;
@@ -396,12 +404,14 @@ function NotesPopover({ notes }: NotesPopoverProps) {
 type AirStatusProps = {
   airDate: Date;
   airStatus: EpisodeAirStatus;
+  showDate?: boolean;
+  showTime?: boolean;
 };
 
-function AirStatus({ airDate, airStatus }: AirStatusProps) {
+export function AirStatus({ airDate, airStatus, showDate = true, showTime = true }: AirStatusProps) {
   return (
     <span className='inline-flex gap-1 items-center text-sm text-muted-foreground'>
-      {airDate.toLocaleString()}
+      {showDate && (showTime ? airDate.toLocaleString() : airDate.toLocaleDateString())}
       <div className={cn('text-destructive-foreground text-xs px-1 rounded-md',
         airStatus === 'Aired' && 'bg-destructive',
         airStatus === 'Upcoming' && 'bg-amber-500',
