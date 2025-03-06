@@ -347,6 +347,7 @@ interface EventRowProps {
 }
 
 function PointsCell({ baseEventName: eventName, baseEventRules, points }: EventRowProps) {
+  console.log(eventName, baseEventRules, points);
   if ((!ScoringBaseEventNames.includes(eventName as ScoringBaseEventName) || !baseEventRules) &&
     !points)
     return <TableCell className='text-xs text-muted-foreground text-center'>N/A</TableCell>;

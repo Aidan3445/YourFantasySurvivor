@@ -19,7 +19,9 @@ export default function CreateCustomEvent() {
   const { leagueData, refresh } = useLeague();
   const reactForm = useForm<BaseEventInsert>({
     defaultValues: {
-      episodeId: leagueData.episodes[0]?.episodeId,
+      episodeId: leagueData.episodes.find(episode => episode.airStatus === 'Airing')?.episodeId ??
+        leagueData.episodes.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
+        leagueData.episodes[0]?.episodeId,
       notes: null,
     },
     resolver: zodResolver(BaseEventInsertZod),

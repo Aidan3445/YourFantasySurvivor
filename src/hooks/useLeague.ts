@@ -32,6 +32,7 @@ export function useLeague() {
     return {
       league: league ? {
         ...league,
+        baseEventRules: league.baseEventRules ?? defaultBaseRules,
         settings: {
           ...league.settings,
           draftDate: league.settings.draftDate ? new Date(league.settings.draftDate) : null
@@ -42,7 +43,8 @@ export function useLeague() {
         episodes: leagueData.episodes.map(episode => ({
           ...episode,
           episodeAirDate: new Date(episode.episodeAirDate)
-        }))
+        })),
+        baseEventRules: leagueData.baseEventRules ?? defaultBaseRules
       } : emptyData,
       refresh: mutate
     };
