@@ -80,8 +80,6 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
   const { leagueData, league } = useLeague();
   const isMobile = useIsMobile();
 
-  console.log(leagueData.selectionTimeline.memberCastaways[member]);
-
   const condensedTimeline = (leagueData.selectionTimeline.memberCastaways[member] ?? []).reduce((acc, castaway, index) => {
     if (castaway === null) return acc;
 
@@ -100,7 +98,6 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
       end: leagueData.castaways.find((c) => c.fullName === castaway)?.eliminatedEpisode
     }];
   }, [] as { fullName: CastawayName, start: number | string, end?: number | null }[]);
-
 
   return (
     <TableRow>

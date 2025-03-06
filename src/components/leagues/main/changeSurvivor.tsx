@@ -7,9 +7,13 @@ import { Form, FormControl, FormField, FormItem } from '~/components/ui/form';
 import { Button } from '~/components/ui/button';
 import { useLeague } from '~/hooks/useLeague';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
+} from '~/components/ui/alertDialog';
 import { chooseCastaway } from '~/app/api/leagues/actions';
 import { getContrastingColor } from '@uiw/color-convert';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ColorRow } from '../draftOrder';
 
 const formSchema = z.object({
@@ -43,17 +47,28 @@ export default function ChangeSurvivor() {
     }
   });
 
+  const pickPriority = useMemo(() => Object.entries(leagueData.selectionTimeline.memberCastaways)
+    .filter(([_, castaways]) => !!leagueData.castaways
+      .find(castaway => castaway.fullName === castaways.slice(-1)[0])?.eliminatedEpisode)
+    .map(([member, _]) => member), [leagueData]);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [closedDialog, setClosedDialog] = useState(false);
+
+  useEffect(() => {
+    if (pickPriority.includes(league.members.loggedIn?.displayName ?? '')) {
+      setDialogOpen(true);
+    }
+
+    setClosedDialog(localStorage.getItem('closedDialog') ?
+      Date.now() - JSON.parse(localStorage.getItem('closedDialog')!) < 1000 * 60 * 10 : false);
+  }, [pickPriority, league.members.loggedIn]);
+
   if (availableCastaways.every((castaway) => castaway.pickedBy)) {
     return null;
   }
 
-
-  const pickPriority = Object.entries(leagueData.selectionTimeline.memberCastaways)
-    .filter(([_, castaways]) => !!leagueData.castaways
-      .find(castaway => castaway.fullName === castaways.slice(-1)[0])?.eliminatedEpisode)
-    .map(([member, _]) => member);
-
-  if (pickPriority.length > 0 && !pickPriority.includes(league.members.loggedIn?.displayName ?? '')) {
+  if (pickPriority.length > 0 && !dialogOpen) {
     return (
       <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
         <h1 className='text-2xl font-semibold'>Wait to Swap your Survivor Pick</h1>
@@ -68,8 +83,15 @@ export default function ChangeSurvivor() {
           </span>
         ))}
       </div>
+
     );
   }
+
+  // mark modal closed for 30 minutes
+  const markModalClosed = () => {
+    setClosedDialog(true);
+    localStorage.setItem('closedDialog', JSON.stringify(Date.now()));
+  };
 
   return (
     <Form {...reactForm}>
@@ -142,6 +164,27 @@ export default function ChangeSurvivor() {
           </Button>
         </span>
       </form>
+      <AlertDialog open={dialogOpen && !closedDialog} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className='text-center'>
+              Oh no!
+            </AlertDialogTitle>
+            <AlertDialogDescription className='text-left'>
+              Your survivor was eliminated, but you get another chance.
+              <br />
+              Choose from the reaming castaways to continue earning points.
+              <br />
+              {'You\'re still in it, good luck!'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction className='w-full' onClick={markModalClosed}>
+              Got it!
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Form>
   );
 }
