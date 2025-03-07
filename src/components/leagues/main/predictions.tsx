@@ -19,7 +19,7 @@ export default async function Predictions({ leagueHash }: PredictionsProps) {
     <div className='text-center bg-card rounded-lg w-full'>
       <h1 className='text-3xl'>{'This Week\'s Prediction'}{predictions.length > 1 ? 's!' : '!'}</h1>
       <span className='flex flex-wrap justify-center items-center gap-2 text-muted-foreground text-sm'>
-        <span classname='text-nowrap'>
+        <span className='text-nowrap'>
           {nextEpisode.episodeNumber}: {nextEpisode.episodeTitle}
         </span>
         <AirStatus airDate={nextEpisode.episodeAirDate} airStatus={nextEpisode.airStatus} />
