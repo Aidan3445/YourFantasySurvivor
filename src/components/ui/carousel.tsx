@@ -258,6 +258,64 @@ const CarouselNext = React.forwardRef<
 });
 CarouselNext.displayName = 'CarouselNext';
 
+interface BounceyCarouselProps {
+  items: {
+    header: React.ReactNode
+    content: React.ReactNode
+    footer: React.ReactNode
+  }[]
+}
+
+function BounceyCarousel({ items }: BounceyCarouselProps) {
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+
+  React.useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on('select', () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
+
+
+  return (
+    <Carousel className='select-none gap-4 items-center w-[calc(100svw-2.5rem)] md:w-auto' setApi={setApi} opts={{ align: 'center' }}>
+      <CarouselContent>
+        {items.map((item, index) => (
+          <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
+            'opacity-50 -z-10': index !== current - 1,
+          })}>
+            <article
+              className={cn(
+                'flex flex-col bg-secondary rounded-lg shadow-lg my-4 overflow-y-hidden',
+                'text-center transition-transform duration-700',
+                {
+                  'scale-75': index !== current - 1,
+                  '-translate-x-1/2': index === current % items.length,
+                  'translate-x-1/2': index === (current - 2) % items.length,
+                  '-translate-x-6 md:-translate-x-8': index + current + 1 === 2 * items.length,
+                  'translate-x-6 md:translate-x-8 lg:translate-x-12': index + current === 1,
+                })} >
+              <span className='flex w-full gap-4 justify-between items-center self-center px-1 lg:w-full'>
+                <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1' />
+                {item.header}
+                <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1' />
+              </span>
+              {item.content}
+              {item.footer}
+            </article>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+    </Carousel>
+  );
+}
+
 export {
   type CarouselApi,
   Carousel,
@@ -265,4 +323,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  BounceyCarousel,
 };

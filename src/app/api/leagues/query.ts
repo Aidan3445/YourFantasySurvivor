@@ -20,7 +20,8 @@ import {
   type BaseEventRule, type LeagueEventId, type LeagueEventName,
   LeaguePredictionTimingOptions,
   defaultBaseRules,
-  type LeagueEventTiming
+  type LeagueEventTiming,
+  type Prediction
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
@@ -482,7 +483,7 @@ export const QUERIES = {
       }, {} as Record<EpisodeNumber, Record<ReferenceType, LeagueDirectEvent[]>>));
 
 
-    const predictionEventsPromise = db
+    const predictionHitsPromise = db
       .select({
         leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventId: leagueEventsSchema.leagueEventId,
@@ -490,7 +491,7 @@ export const QUERIES = {
         points: leagueEventsRulesSchema.points,
         episodeNumber: episodesSchema.episodeNumber,
         predictionMaker: leagueMembersSchema.displayName,
-        referenceType: leagueEventPredictionsSchema.referenceType,
+        referenceType: leagueEventsSchema.referenceType,
         referenceId: leagueEventsSchema.referenceId,
         castaway: castawaysSchema.fullName,
         tribe: tribesSchema.tribeName,
@@ -535,9 +536,7 @@ export const QUERIES = {
         castaway: CastawayName | null,
         tribe: TribeName | null,
         notes: string[] | null
-      }[]
-
-      ) => events.reduce((acc, event) => {
+      }[]) => events.reduce((acc, event) => {
         acc[event.episodeNumber] ??= [];
         const newEvent = {
           leagueEventRuleId: event.leagueEventRuleId,
@@ -562,9 +561,8 @@ export const QUERIES = {
         return acc;
       }, {} as Record<EpisodeNumber, LeaguePredictionEvent[]>));
 
-
     const [directEvents, predictionEvents] = await Promise.all([
-      directEventsPromise, predictionEventsPromise
+      directEventsPromise, predictionHitsPromise
     ]);
 
     return { directEvents, predictionEvents };
@@ -710,104 +708,222 @@ export const QUERIES = {
       baseEventRules: baseEventRules as BaseEventRule,
     };
   },
-};
 
-/**
-  * Get this weeks predictions for a league, episode, and member
-  * @param leagueHash - the hash of the league
-  * @returns the predictions for the league for this week
-  * @throws an error if the user is not a member of the league
-  */
-export async function getThisWeeksPredictions(leagueHash: LeagueHash) {
-  const { memberId, league, seasonName } = await leagueMemberAuth(leagueHash);
-  // If the user is not a member of the league, throw an error
-  if (!memberId || !league) {
-    throw new Error('User not a member of the league');
+  /**
+    * Get this weeks predictions for a league, episode, and member
+    * @param leagueHash - the hash of the league
+    * @returns the predictions for the league for this week
+    * @throws an error if the user is not a member of the league
+    */
+  getThisWeeksPredictions: async function(leagueHash: LeagueHash) {
+    const { memberId, league, seasonName } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    if (league.leagueStatus === 'Inactive') return;
+
+    const episodes = await QUERIES.getEpisodes(leagueHash, 100);
+    if (!episodes || episodes.length === 0) return;
+    if (episodes.some((episode) => episode.airStatus === 'Airing')) return;
+    const nextEpisode = episodes.find((episode) => episode.airStatus === 'Upcoming');
+    if (!nextEpisode) return;
+
+    const lastEpisode = episodes[nextEpisode.episodeNumber - 2];
+    const mergeEpisode = episodes.find((episode) => episode.isMerge);
+
+    const predictionsFilter = (ruleTiming: LeagueEventTiming[]) => {
+      // Draft takes precedence if included in the list: 
+      // - if the league is in draft status
+      // - if there are no previous episodes
+      // - if the draft date is after the last aired episode
+      if (ruleTiming.includes('Draft') && (league.leagueStatus === 'Draft' || !lastEpisode ||
+        league.draftDate > lastEpisode.episodeAirDate)) return true;
+      // Weekly takes precedence if included in the list and draft checks fail
+      else if (ruleTiming.includes('Weekly')) return true;
+      // Likewise for weekly premerge and postmerge
+      // Weekly premerge only if included in the list and no merge episode
+      else if (ruleTiming.includes('Weekly (Premerge only)') &&
+        !mergeEpisode) return true;
+      // Weekly postmerge only if included in the list and merge episode exists
+      else if (ruleTiming.includes('Weekly (Postmerge only)') &&
+        !!mergeEpisode) return true;
+      // After merge only if included in the list and merge episode is last aired
+      else if (ruleTiming.includes('After Merge') &&
+        !!lastEpisode?.isMerge) return true;
+      // Before finale only if included in the list and next episode is the finale
+      else if (ruleTiming.includes('Before Finale') &&
+        !!nextEpisode?.isFinale) return true;
+    };
+
+    const predictionsPromise = db
+      .select({
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
+        eventName: leagueEventsRulesSchema.eventName,
+        description: leagueEventsRulesSchema.description,
+        points: leagueEventsRulesSchema.points,
+        referenceTypes: leagueEventsRulesSchema.referenceTypes,
+        timing: leagueEventsRulesSchema.timing,
+        predictionMade: {
+          referenceType: leagueEventPredictionsSchema.referenceType,
+          referenceId: leagueEventPredictionsSchema.referenceId,
+        },
+        public: leagueEventsRulesSchema.public
+      })
+      .from(leagueEventsRulesSchema)
+      .innerJoin(leaguesSchema, and(
+        eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId),
+        eq(leaguesSchema.leagueHash, leagueHash)))
+      .leftJoin(leagueEventPredictionsSchema, and(
+        eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsRulesSchema.leagueEventRuleId),
+        eq(leagueEventPredictionsSchema.memberId, memberId),
+        eq(leagueEventPredictionsSchema.episodeId, nextEpisode.episodeId)))
+      .where(eq(leagueEventsRulesSchema.eventType, 'Prediction'))
+      .then((predictions) => predictions
+        .filter((prediction) => predictionsFilter(prediction.timing))
+        .map((prediction) => {
+          const draftPrediction: LeagueEventPrediction = {
+            ...prediction,
+            eventType: 'Prediction',
+          };
+          return draftPrediction;
+        }));
+
+    const [predictions, castaways] = await Promise.all([
+      predictionsPromise,
+      SEASON_QUERIES.getCastaways(league.leagueSeason),
+    ]);
+
+    const remainingCastaways = castaways.filter((castaway) =>
+      !castaway.eliminatedEpisode || castaway.eliminatedEpisode > nextEpisode.episodeNumber);
+
+    const tribes: Tribe[] = Array.from(new Set(remainingCastaways.map((castaway) => {
+      const tribe = castaway.tribes
+        .findLast((tribe) => tribe.episode <= nextEpisode.episodeNumber);
+      if (!tribe) return;
+      return { ...tribe, seasonName: seasonName! };
+    })))
+      .filter((tribe) => tribe !== undefined);
+
+    return { predictions, castaways: remainingCastaways, tribes, nextEpisode };
+  },
+
+  /**
+    * Get all predictions made by the logged in user 
+    * @param leagueHash - the hash of the league
+    * @returns the predictions made by the logged in user
+    * @throws an error if the user is not authenticated
+    */
+  getMyPredictions: async function(leagueHash: LeagueHash) {
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    const castawayPrediction = aliasedTable(castawaysSchema, 'castawayPrediction');
+    const tribePrediction = aliasedTable(tribesSchema, 'tribePrediction');
+    const episodesPrediction = aliasedTable(episodesSchema, 'episodesPrediction');
+
+    return await db
+      .select({
+        leagueMember: leagueMembersSchema.displayName,
+        eventName: leagueEventsRulesSchema.eventName,
+        leagueEventRuleId: leagueEventPredictionsSchema.leagueEventRuleId,
+        points: leagueEventsRulesSchema.points,
+        timing: leagueEventsRulesSchema.timing,
+        prediction: {
+          episodeNumber: episodesPrediction.episodeNumber,
+          castaway: castawayPrediction.fullName,
+          tribe: tribePrediction.tribeName,
+          referenceType: leagueEventPredictionsSchema.referenceType,
+          referenceId: leagueEventPredictionsSchema.referenceId,
+        },
+        result: {
+          episodeNumber: episodesSchema.episodeNumber,
+          castaway: castawaysSchema.fullName,
+          tribe: tribesSchema.tribeName,
+          referenceType: leagueEventsSchema.referenceType,
+          referenceId: leagueEventsSchema.referenceId,
+        }
+      })
+      .from(leagueEventPredictionsSchema)
+      .innerJoin(leagueEventsRulesSchema, eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEventPredictionsSchema.leagueEventRuleId))
+      .innerJoin(leagueMembersSchema, and(
+        eq(leagueMembersSchema.memberId, leagueEventPredictionsSchema.memberId),
+        eq(leagueMembersSchema.leagueId, leagueEventsRulesSchema.leagueId),
+        eq(leagueMembersSchema.leagueId, league.leagueId)))
+      .innerJoin(episodesPrediction, eq(episodesPrediction.episodeId, leagueEventPredictionsSchema.episodeId))
+      .leftJoin(castawayPrediction, and(
+        eq(castawayPrediction.castawayId, leagueEventPredictionsSchema.referenceId),
+        eq(leagueEventPredictionsSchema.referenceType, 'Castaway')))
+      .leftJoin(tribePrediction, and(
+        eq(tribePrediction.tribeId, leagueEventPredictionsSchema.referenceId),
+        eq(leagueEventPredictionsSchema.referenceType, 'Tribe')))
+      .leftJoin(leagueEventsSchema, and(
+        eq(leagueEventsSchema.leagueEventRuleId, leagueEventPredictionsSchema.leagueEventRuleId),
+        or(
+          // if the prediction episode matches the event for weekly predictions
+          and(
+            eq(leagueEventPredictionsSchema.episodeId, leagueEventsSchema.episodeId),
+            arrayOverlaps(leagueEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
+          // if the event is not weekly, the episode doesn't matter
+          // note manual predictions should not be possible but just in case
+          arrayOverlaps(leagueEventsRulesSchema.timing, LeaguePredictionTimingOptions
+            .filter(timing => !timing.includes('Weekly'))))))
+      .leftJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
+      .leftJoin(castawaysSchema, and(
+        eq(castawaysSchema.castawayId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Castaway')))
+      .leftJoin(tribesSchema, and(
+        eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Tribe')))
+      .where(eq(leagueEventPredictionsSchema.memberId, memberId))
+      .then((predictions: {
+        leagueMember: LeagueMemberDisplayName,
+        eventName: LeagueEventName,
+        leagueEventRuleId: LeagueEventId,
+        points: number,
+        timing: LeagueEventTiming[]
+        prediction: {
+          episodeNumber: EpisodeNumber,
+          castaway: CastawayName | null,
+          tribe: TribeName | null
+          referenceType: ReferenceType,
+          referenceId: number,
+        },
+        result: {
+          episodeNumber: EpisodeNumber | null,
+          castaway: CastawayName | null,
+          tribe: TribeName | null
+          referenceType: ReferenceType | null,
+          referenceId: number | null,
+        }
+      }[]) => predictions.reduce((acc, prediction) => {
+        const episodeNumber = prediction.prediction.episodeNumber;
+        acc[episodeNumber] ??= [];
+
+        let predictionIndex = acc[episodeNumber].findIndex((p) =>
+          p.leagueEventRuleId === prediction.leagueEventRuleId);
+        if (predictionIndex === -1) {
+          acc[episodeNumber].push({
+            leagueMember: prediction.leagueMember,
+            eventName: prediction.eventName,
+            leagueEventRuleId: prediction.leagueEventRuleId,
+            points: prediction.points,
+            timing: prediction.timing,
+            prediction: prediction.prediction,
+            results: [],
+          });
+          predictionIndex = acc[episodeNumber].length - 1;
+        }
+
+        if (prediction.result.episodeNumber !== null) {
+          acc[episodeNumber][predictionIndex]!.results.push(prediction.result);
+        }
+
+        return acc;
+      }, {} as Record<EpisodeNumber, Prediction[]>));
   }
-
-  if (league.leagueStatus === 'Inactive') return;
-
-  const episodes = await QUERIES.getEpisodes(leagueHash, 100);
-  if (!episodes || episodes.length === 0) return;
-  if (episodes.some((episode) => episode.airStatus === 'Airing')) return;
-  const nextEpisode = episodes.find((episode) => episode.airStatus === 'Upcoming');
-  if (!nextEpisode) return;
-
-  const lastEpisode = episodes[nextEpisode.episodeNumber - 2];
-  const mergeEpisode = episodes.find((episode) => episode.isMerge);
-
-  const predictionsFilter = (ruleTiming: LeagueEventTiming[]) => {
-    // Draft takes precedence if included in the list: 
-    // - if the league is in draft status
-    // - if there are no previous episodes
-    // - if the draft date is after the last aired episode
-    if (ruleTiming.includes('Draft') && (league.leagueStatus === 'Draft' || !lastEpisode ||
-      league.draftDate > lastEpisode.episodeAirDate)) return true;
-    // Weekly takes precedence if included in the list and draft checks fail
-    else if (ruleTiming.includes('Weekly')) return true;
-    // Likewise for weekly premerge and postmerge
-    // Weekly premerge only if included in the list and no merge episode
-    else if (ruleTiming.includes('Weekly (Premerge only)') &&
-      !mergeEpisode) return true;
-    // Weekly postmerge only if included in the list and merge episode exists
-    else if (ruleTiming.includes('Weekly (Postmerge only)') &&
-      !!mergeEpisode) return true;
-    // After merge only if included in the list and merge episode is last aired
-    else if (ruleTiming.includes('After Merge') &&
-      !!lastEpisode?.isMerge) return true;
-    // Before finale only if included in the list and next episode is the finale
-    else if (ruleTiming.includes('Before Finale') &&
-      !!nextEpisode?.isFinale) return true;
-  };
-
-  const predictionsPromise = db
-    .select({
-      leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
-      eventName: leagueEventsRulesSchema.eventName,
-      description: leagueEventsRulesSchema.description,
-      points: leagueEventsRulesSchema.points,
-      referenceTypes: leagueEventsRulesSchema.referenceTypes,
-      timing: leagueEventsRulesSchema.timing,
-      predictionMade: {
-        referenceType: leagueEventPredictionsSchema.referenceType,
-        referenceId: leagueEventPredictionsSchema.referenceId,
-      },
-      public: leagueEventsRulesSchema.public
-    })
-    .from(leagueEventsRulesSchema)
-    .innerJoin(leaguesSchema, and(
-      eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId),
-      eq(leaguesSchema.leagueHash, leagueHash)))
-    .leftJoin(leagueEventPredictionsSchema, and(
-      eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsRulesSchema.leagueEventRuleId),
-      eq(leagueEventPredictionsSchema.memberId, memberId),
-      eq(leagueEventPredictionsSchema.episodeId, nextEpisode.episodeId)))
-    .where(eq(leagueEventsRulesSchema.eventType, 'Prediction'))
-    .then((predictions) => predictions
-      .filter((prediction) => predictionsFilter(prediction.timing))
-      .map((prediction) => {
-        const draftPrediction: LeagueEventPrediction = {
-          ...prediction,
-          eventType: 'Prediction',
-        };
-        return draftPrediction;
-      }));
-
-  const [predictions, castaways] = await Promise.all([
-    predictionsPromise,
-    SEASON_QUERIES.getCastaways(league.leagueSeason),
-  ]);
-
-  const remainingCastaways = castaways.filter((castaway) =>
-    !castaway.eliminatedEpisode || castaway.eliminatedEpisode > nextEpisode.episodeNumber);
-
-  const tribes: Tribe[] = Array.from(new Set(remainingCastaways.map((castaway) => {
-    const tribe = castaway.tribes
-      .findLast((tribe) => tribe.episode <= nextEpisode.episodeNumber);
-    if (!tribe) return;
-    return { ...tribe, seasonName: seasonName! };
-  })))
-    .filter((tribe) => tribe !== undefined);
-
-  return { predictions, castaways: remainingCastaways, tribes, nextEpisode };
-}
+};

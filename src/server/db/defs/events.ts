@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { type CastawayName } from './castaways';
 import { type TribeName } from './tribes';
 import { type LeagueMemberDisplayName } from './leagueMembers';
+import { type EpisodeNumber } from './episodes';
 
 // Base Events
 export const EventPointsZod = z.coerce.number()
@@ -145,6 +146,28 @@ export type LeaguePredictionEvent = {
   referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
   predictionMaker: LeagueMemberDisplayName,
   notes: string[] | null
+};
+
+export type Prediction = {
+  leagueMember: LeagueMemberDisplayName,
+  eventName: LeagueEventName,
+  leagueEventRuleId: LeagueEventId,
+  points: number,
+  timing: LeagueEventTiming[]
+  prediction: {
+    episodeNumber: EpisodeNumber,
+    castaway: CastawayName | null,
+    tribe: TribeName | null
+    referenceType: ReferenceType,
+    referenceId: number,
+  },
+  results: {
+    episodeNumber: EpisodeNumber | null,
+    castaway: CastawayName | null,
+    tribe: TribeName | null
+    referenceType: ReferenceType | null,
+    referenceId: number | null,
+  }[]
 };
 
 export type LeagueEvent = {

@@ -59,7 +59,7 @@ export default function ChangeSurvivor() {
     if (pickPriority.includes(league.members.loggedIn?.displayName ?? '')) {
       setDialogOpen(true);
     }
-
+    // check if dialog was closed within the last 10 minutes
     setClosedDialog(localStorage.getItem('closedDialog') ?
       Date.now() - JSON.parse(localStorage.getItem('closedDialog')!) < 1000 * 60 * 10 : false);
   }, [pickPriority, league.members.loggedIn]);
@@ -87,7 +87,7 @@ export default function ChangeSurvivor() {
     );
   }
 
-  // mark modal closed for 30 minutes
+  // mark modal closed in local storage
   const markModalClosed = () => {
     setClosedDialog(true);
     localStorage.setItem('closedDialog', JSON.stringify(Date.now()));

@@ -1,13 +1,7 @@
 'use client';
 
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
 import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';

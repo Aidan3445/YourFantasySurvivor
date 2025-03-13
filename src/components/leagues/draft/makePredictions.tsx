@@ -1,11 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, type CarouselApi } from '~/components/ui/carousel';
+import { BounceyCarousel } from '~/components/ui/carousel';
 import { Flame, HelpCircle } from 'lucide-react';
 import { type ReferenceType, type LeagueEventPrediction } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
@@ -43,21 +42,6 @@ export default function MakePredictions({ predictions, castaways, tribes }: Make
 }
 
 export function PredictionCards({ predictions, castaways, tribes, className }: MakePredictionsProps) {
-  const [api, setApi] = useState<CarouselApi>();
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    if (!api) {
-      return;
-    }
-
-    setCurrent(api.selectedScrollSnap() + 1);
-
-    api.on('select', () => {
-      setCurrent(api.selectedScrollSnap() + 1);
-    });
-  }, [api]);
-
   if (predictions.length === 0) return null;
 
   const getOptions = (referenceTypes: ReferenceType[]) => {
@@ -96,66 +80,47 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
 
   if (predictions.length === 1) {
     const prediction = predictions[0]!;
-    return (<article
-      className={cn(
-        'flex flex-col bg-secondary rounded-lg my-4 text-center transition-transform duration-700',
-        className)}>
-      <span className='flex gap-1 items-start self-center px-1'>
-        <h3 className='text-lg font-semibold text-card-foreground'>
-          {prediction.eventName}
-        </h3>
-        -
-        <div className='inline-flex mt-1'>
-          <p className='text-sm'>{prediction.points}</p>
-          <Flame size={16} />
-        </div>
-      </span>
-      <p className='text-sm'>{prediction.description}</p>
-      <SubmissionCard prediction={prediction} options={getOptions(prediction.referenceTypes)} />
-    </article>
+    return (
+      <article
+        className={cn('flex flex-col my-4 text-center', className)}>
+        <span className='flex gap-1 items-start self-center px-1'>
+          <h3 className='text-lg font-semibold text-card-foreground'>
+            {prediction.eventName}
+          </h3>
+          -
+          <div className='inline-flex mt-1'>
+            <p className='text-sm'>{prediction.points}</p>
+            <Flame size={16} />
+          </div>
+        </span>
+        <p className='text-sm'>{prediction.description}</p>
+        <SubmissionCard prediction={prediction} options={getOptions(prediction.referenceTypes)} />
+      </article>
     );
   }
 
   return (
-    <Carousel className='select-none gap-4 items-center w-[calc(100svw-2.5rem)] md:w-auto' setApi={setApi} opts={{ align: 'center' }}>
-      <CarouselContent className=''>
-        {predictions.map((prediction, index) => (
-          <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
-            'opacity-50 -z-10': index !== current - 1,
-          })}>
-            <article
-              className={cn(
-                'flex flex-col bg-secondary rounded-lg shadow-lg my-4',
-                'text-center transition-transform duration-700',
-                {
-                  'scale-75': index !== current - 1,
-                  '-translate-x-1/2': index === current % predictions.length,
-                  'translate-x-1/2': index === (current - 2) % predictions.length,
-                  '-translate-x-6 md:-translate-x-8': index + current + 1 === 2 * predictions.length,
-                  'translate-x-6 md:translate-x-8 lg:translate-x-12': index + current === 1,
-                })} >
-              <span className='flex w-full gap-4 justify-between items-center self-center px-1 lg:w-full'>
-                <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1' />
-                <h3 className='text-lg font-semibold text-card-foreground'>
-                  {prediction.eventName}
-                  <span className='ml-2 inline-flex mt-1'>
-                    <p className='text-sm'>{prediction.points}</p>
-                    <Flame size={16} />
-                  </span>
-                  <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
-                    {prediction.timing.join(' - ')}
-                    <PredictionTimingHelp />
-                  </div>
-                </h3>
-                <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1' />
-              </span>
-              <p className='text-sm'>{prediction.description}</p>
-              <SubmissionCard prediction={prediction} options={getOptions(prediction.referenceTypes)} />
-            </article>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-    </Carousel>
+    <BounceyCarousel items={predictions.map((prediction) => ({
+      header: (
+        <h3 className='text-lg font-semibold text-card-foreground'>
+          {prediction.eventName}
+          <span className='ml-2 inline-flex mt-1'>
+            <p className='text-sm'>{prediction.points}</p>
+            <Flame size={16} />
+          </span>
+          <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+            {prediction.timing.join(' - ')}
+            <PredictionTimingHelp />
+          </div>
+        </h3>
+      ),
+      content: (<p className='text-sm'>{prediction.description}</p>),
+      footer: (
+        <SubmissionCard
+          prediction={prediction}
+          options={getOptions(prediction.referenceTypes)} />
+      ),
+    }))} />
   );
 }
 
