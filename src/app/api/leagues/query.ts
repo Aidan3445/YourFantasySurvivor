@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { aliasedTable, and, arrayContained, arrayOverlaps, asc, desc, eq, inArray, or } from 'drizzle-orm';
+import { aliasedTable, and, arrayContained, arrayOverlaps, asc, desc, eq, inArray, or, sql } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
@@ -812,10 +812,11 @@ export const QUERIES = {
   /**
     * Get all predictions made by the logged in user 
     * @param leagueHash - the hash of the league
+    * @param otherMemberId - the member to get predictions for if undefined gets for logged in user
     * @returns the predictions made by the logged in user
     * @throws an error if the user is not authenticated
     */
-  getMyPredictions: async function(leagueHash: LeagueHash) {
+  getMyPredictions: async function(leagueHash: LeagueHash, otherMemberId?: number) {
     const { memberId, league } = await leagueMemberAuth(leagueHash);
     // If the user is not a member of the league, throw an error
     if (!memberId || !league) {
@@ -836,6 +837,7 @@ export const QUERIES = {
         prediction: {
           episodeNumber: episodesPrediction.episodeNumber,
           castaway: castawayPrediction.fullName,
+          castawayShort: castawayPrediction.shortName,
           tribe: tribePrediction.tribeName,
           referenceType: leagueEventPredictionsSchema.referenceType,
           referenceId: leagueEventPredictionsSchema.referenceId,
@@ -843,6 +845,7 @@ export const QUERIES = {
         result: {
           episodeNumber: episodesSchema.episodeNumber,
           castaway: castawaysSchema.fullName,
+          castawayShort: castawaysSchema.shortName,
           tribe: tribesSchema.tribeName,
           referenceType: leagueEventsSchema.referenceType,
           referenceId: leagueEventsSchema.referenceId,
@@ -879,7 +882,10 @@ export const QUERIES = {
       .leftJoin(tribesSchema, and(
         eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Tribe')))
-      .where(eq(leagueEventPredictionsSchema.memberId, memberId))
+      .where(and(
+        eq(leagueEventPredictionsSchema.memberId, otherMemberId ?? memberId),
+        eq(leagueMembersSchema.leagueId, league.leagueId),
+        sql`(${episodesPrediction.airDate} < ${new Date().toUTCString()})`))
       .then((predictions: {
         leagueMember: LeagueMemberDisplayName,
         eventName: LeagueEventName,
@@ -889,6 +895,7 @@ export const QUERIES = {
         prediction: {
           episodeNumber: EpisodeNumber,
           castaway: CastawayName | null,
+          castawayShort: CastawayName | null,
           tribe: TribeName | null
           referenceType: ReferenceType,
           referenceId: number,
@@ -896,6 +903,7 @@ export const QUERIES = {
         result: {
           episodeNumber: EpisodeNumber | null,
           castaway: CastawayName | null,
+          castawayShort: CastawayName | null,
           tribe: TribeName | null
           referenceType: ReferenceType | null,
           referenceId: number | null,

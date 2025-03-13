@@ -157,6 +157,7 @@ export type Prediction = {
   prediction: {
     episodeNumber: EpisodeNumber,
     castaway: CastawayName | null,
+    castawayShort: CastawayName | null,
     tribe: TribeName | null
     referenceType: ReferenceType,
     referenceId: number,
@@ -164,6 +165,7 @@ export type Prediction = {
   results: {
     episodeNumber: EpisodeNumber | null,
     castaway: CastawayName | null,
+    castawayShort: CastawayName | null,
     tribe: TribeName | null
     referenceType: ReferenceType | null,
     referenceId: number | null,

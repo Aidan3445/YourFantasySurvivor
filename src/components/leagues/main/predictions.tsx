@@ -100,51 +100,7 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
         </span>
         <article className='flex flex-col bg-card rounded-lg my-4 text-center overflow-hidden'>
           <h2 className='text-2xl'>{`Episode ${episode}`}</h2>
-          <Table>
-            <TableCaption className='sr-only'>Member Predictions</TableCaption>
-            <TableHeader>
-              <TableRow className='px-4 bg-white pointer-events-none'>
-                <TableHead className='text-center'>Event</TableHead>
-                <TableHead className='text-center'>Points</TableHead>
-                <TableHead className='text-center'>Prediction</TableHead>
-                <TableHead className='text-center'>Results</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {preds.sort((a) => a.timing.some((t) => t.startsWith('Weekly')) ? 1 : -1)
-                .map((pred) => {
-                  const hit = pred.results.some((res) =>
-                    res.referenceId === pred.prediction.referenceId &&
-                    res.referenceType === pred.prediction.referenceType);
-                  return (
-                    <TableRow key={pred.leagueEventRuleId} className='bg-b3'>
-                      <TableCell>{pred.eventName}</TableCell>
-                      <TableCell>
-                        <span className={cn('text-sm text-center',
-                          hit ?
-                            pred.points > 0 ? 'text-green-800' : 'text-red-800' :
-                            'text-muted-foreground')}>
-                          {pred.points > 0 && hit ? `+${pred.points}` : pred.points}
-                          <Flame className={cn(
-                            'inline align-top w-4 h-min',
-                            hit ?
-                              pred.points > 0 ? 'stroke-green-800' : 'stroke-red-800' :
-                              'stroke-muted-foreground'
-                          )} />
-                        </span>
-                      </TableCell>
-                      <TableCell>{pred.prediction.castaway ?? pred.prediction.tribe}</TableCell>
-                      <TableCell>
-                        {pred.results.map((res) => res.castaway ?? res.tribe)
-                          .join(', ') ||
-                          <p className='text-muted-foreground'>TBD</p>
-                        }
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
+          <PredctionTable predictions={preds} />
         </article>
       </div>
     );
@@ -159,55 +115,81 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
       </span>
       <BounceyCarousel items={Object.entries(predictions).map(([episode, preds]) => ({
         header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
-        content: (
-          <Table>
-            <TableCaption className='sr-only'>Member Predictions</TableCaption>
-            <TableHeader>
-              <TableRow className='px-4 bg-white pointer-events-none'>
-                <TableHead className='text-center'>Event</TableHead>
-                <TableHead className='text-center'>Points</TableHead>
-                <TableHead className='text-center'>Prediction</TableHead>
-                <TableHead className='text-center'>Results</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {preds.sort((a) => a.timing.some((t) => t.startsWith('Weekly')) ? 1 : -1)
-                .map((pred) => {
-                  const hit = pred.results.some((res) =>
-                    res.referenceId === pred.prediction.referenceId &&
-                    res.referenceType === pred.prediction.referenceType);
-                  return (
-                    <TableRow key={pred.leagueEventRuleId} className='bg-b3'>
-                      <TableCell>{pred.eventName}</TableCell>
-                      <TableCell>
-                        <span className={cn('text-sm text-center',
-                          hit ?
-                            pred.points > 0 ? 'text-green-800' : 'text-red-800' :
-                            'text-muted-foreground')}>
-                          {pred.points > 0 && hit ? `+${pred.points}` : pred.points}
-                          <Flame className={cn(
-                            'inline align-top w-4 h-min',
-                            hit ?
-                              pred.points > 0 ? 'stroke-green-800' : 'stroke-red-800' :
-                              'stroke-muted-foreground'
-                          )} />
-                        </span>
-                      </TableCell>
-                      <TableCell>{pred.prediction.castaway ?? pred.prediction.tribe}</TableCell>
-                      <TableCell>
-                        {pred.results.map((res) => res.castaway ?? res.tribe)
-                          .join(', ') ||
-                          <p className='text-muted-foreground'>TBD</p>
-                        }
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-            </TableBody>
-          </Table>
-        ),
+        content: (<PredctionTable predictions={preds} />),
         footer: null,
       }))} />
     </div>
+  );
+}
+
+interface PredictionTableProps {
+  predictions: Prediction[];
+}
+
+function PredctionTable({ predictions }: PredictionTableProps) {
+  return (
+    <Table>
+      <TableCaption className='sr-only'>Member Predictions</TableCaption>
+      <TableHeader>
+        <TableRow className='px-4 bg-white pointer-events-none'>
+          <TableHead className='text-center'>Event</TableHead>
+          <TableHead className='text-center'>Points</TableHead>
+          <TableHead className='text-center'>Prediction</TableHead>
+          <TableHead className='text-center'>Results</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {predictions.sort((a) => a.timing.some((t) => t.startsWith('Weekly')) ? 1 : -1)
+          .map((pred) => {
+            const hit = pred.results.some((res) =>
+              res.referenceId === pred.prediction.referenceId &&
+              res.referenceType === pred.prediction.referenceType);
+            return (
+              <TableRow key={pred.leagueEventRuleId} className='bg-b3'>
+                <TableCell>
+                  <div className='flex flex-col'>
+                    {pred.eventName}
+                    <span className='text-xs italic'>
+                      {pred.timing.join(' - ')}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className={cn('text-sm text-center',
+                    hit ?
+                      pred.points > 0 ? 'text-green-800' : 'text-red-800' :
+                      'text-muted-foreground')}>
+                    {pred.points > 0 && hit ? `+${pred.points}` : pred.points}
+                    <Flame className={cn(
+                      'inline align-top w-4 h-min',
+                      hit ?
+                        pred.points > 0 ? 'stroke-green-800' : 'stroke-red-800' :
+                        'stroke-muted-foreground'
+                    )} />
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className='md:hidden'>{pred.prediction.castawayShort ?? pred.prediction.tribe}</div>
+                  <div className='hidden md:block'>{pred.prediction.castaway ?? pred.prediction.tribe}</div>
+                </TableCell>
+                <TableCell>
+                  <div className='md:hidden'>
+                    {pred.results.map((res) => res.castawayShort ?? res.tribe)
+                      .join(', ') ||
+                      <div className='text-muted-foreground'>TBD</div>
+                    }
+                  </div>
+                  <div className='hidden md:block'>
+                    {pred.results.map((res) => res.castaway ?? res.tribe)
+                      .join(', ') ||
+                      <div className='text-muted-foreground'>TBD</div>
+                    }
+                  </div>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+      </TableBody>
+    </Table>
   );
 }
