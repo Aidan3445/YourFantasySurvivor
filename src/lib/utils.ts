@@ -25,14 +25,13 @@ export function findTribeCastaways(
   eliminations: Awaited<ReturnType<typeof SEASON_QUERIES.getEliminations>>,
   tribeName: TribeName,
   episodeNumber: EpisodeNumber) {
-
   const onTribe = new Set(tribeUpdates[1]?.[tribeName]?.castaways ?? []);
 
   for (let i = 2; i <= episodeNumber; i++) {
     eliminations[i - 1]?.forEach((castaway) => onTribe.delete(castaway));
     if (!tribeUpdates[i]) continue;
-    Object.entries(tribeUpdates[i]!).forEach(([tribeName, update]) => {
-      if (tribeName === tribeName) {
+    Object.entries(tribeUpdates[i]!).forEach(([tribeUpdateName, update]) => {
+      if (tribeUpdateName === tribeName) {
         update.castaways.forEach((castaway) => onTribe.add(castaway));
       } else {
         update.castaways.forEach((castaway) => onTribe.delete(castaway));

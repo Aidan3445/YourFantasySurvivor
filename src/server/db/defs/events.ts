@@ -22,7 +22,7 @@ export const defaultBaseRules: BaseEventRule = {
   advFound: 5,
   advPlay: 10,
   badAdvPlay: -5,
-  advElim: -10,
+  advElim: -7,
   spokeEpTitle: 2,
   tribe1st: 2,
   tribe2nd: 1,

@@ -40,9 +40,11 @@ export function compileScores(
     Object.values(events).forEach((event) => {
       event.tribes.forEach((tribe) => {
         // add castaways to be scored
+        //if (event.eventName !== 'tribeUpdate') {
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
           if (!event.castaways.includes(castaway)) event.castaways.push(castaway);
         });
+        //}
         // here we want to align the castaways for non scoring events so we
         // push this check inside, later we skip iteration entirely for castaways
         if (!ScoringBaseEventNames.includes(event.eventName as ScoringBaseEventName)) return;

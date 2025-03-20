@@ -20,8 +20,6 @@ export default function Scoreboard() {
   const { leagueData, league } = useLeague();
   const [selectedMembers] = useState<LeagueMemberDisplayName[]>([]);
 
-  console.log('leagueData', leagueData);
-
   const sortedMemberScores = Object.entries(leagueData.scores.Member)
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
@@ -118,7 +116,7 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
           {isMobile ? survivor.shortName : survivor.fullName}
           <div className='ml-auto flex gap-0.5'>
             {survivor.tribes.length > 1 && survivor.tribes.map((tribe) => (
-              <Popover key={tribe.tribeName}>
+              <Popover key={`${tribe.tribeName}-${tribe.episode}`}>
                 <PopoverTrigger>
                   <Circle size={16} fill={tribe.tribeColor} />
                 </PopoverTrigger>
