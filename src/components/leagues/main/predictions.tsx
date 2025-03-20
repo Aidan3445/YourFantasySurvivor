@@ -115,7 +115,7 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
         <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
         <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
       </span>
-      <BounceyCarousel items={Object.entries(predictions).map(([episode, preds]) => ({
+      <BounceyCarousel items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
         header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
         content: (<PredctionTable predictions={preds} />),
         footer: null,
