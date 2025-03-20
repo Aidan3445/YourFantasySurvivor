@@ -600,6 +600,12 @@ export const QUERIES = {
       const latestUpdateEpisode = acc[row.leagueMember]!.length;
       // get previous selection if it exists
       const previousSelection = acc[row.leagueMember]![latestUpdateEpisode - 1];
+
+      // if the selection went back to the previous pick, ignore it
+      if (previousSelection === row.castaway) {
+        return acc;
+      }
+
       if (previousSelection !== undefined) {
         // fill in the episodes between
         acc[row.leagueMember]!.push(...Array(row.episodeNumber - latestUpdateEpisode)
@@ -622,6 +628,12 @@ export const QUERIES = {
       // get previous selection if it exists or null if this is the first time 
       // a member picked up this castaway
       const previousSelector = acc[row.castaway]![latestUpdateEpisode] ?? null;
+
+      // if the selector went back to the previous pick, ignore it
+      if (previousSelector === row.leagueMember) {
+        return acc;
+      }
+
       // fill in the episodes between
       acc[row.castaway]!.push(...Array(Math.max(row.episodeNumber - latestUpdateEpisode - 1, 0))
         .fill(previousSelector) as (LeagueMemberDisplayName | null)[]);

@@ -136,11 +136,11 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                 <div className='text-center'>Episodes</div>
                 <Separator className='col-span-2' />
                 {condensedTimeline.map((castaway, index) => (
-                  <>
-                    <ColorRow className='px-1 justify-center' key={index} color={leagueData.castaways.find((c) => c.fullName === castaway.fullName)?.startingTribe.tribeColor ?? '#AAAAAA'}>
+                  <span key={index} className='grid col-span-2 grid-cols-subgrid'>
+                    <ColorRow className='px-1 justify-center' color={leagueData.castaways.find((c) => c.fullName === castaway.fullName)?.startingTribe.tribeColor ?? '#AAAAAA'}>
                       {castaway.fullName}
                     </ColorRow>
-                    <div className='flex gap-1 items-center text-nowrap' key={`e-${index}`}>
+                    <div className='flex gap-1 items-center text-nowrap'>
                       {typeof castaway.start === 'number' ?
                         castaway.start : castaway.start}
                       <MoveRight className='w-4 h-4' />
@@ -148,7 +148,7 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                         leagueData.episodes.find((e) => e.isFinale && e.airStatus !== 'Upcoming') ?
                           'Finale' : 'Present'}
                     </div>
-                  </>
+                  </span>
                 ))}
               </PopoverContent>
             </Popover>
