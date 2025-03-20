@@ -20,6 +20,8 @@ export default function Scoreboard() {
   const { leagueData, league } = useLeague();
   const [selectedMembers] = useState<LeagueMemberDisplayName[]>([]);
 
+  console.log('leagueData', leagueData);
+
   const sortedMemberScores = Object.entries(leagueData.scores.Member)
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 

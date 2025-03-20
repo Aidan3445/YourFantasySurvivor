@@ -31,15 +31,15 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         </TabsList>
         <ScrollArea className='h-full'>
           <TabsContent value='scores'>
-            <div className='space-y-4 w-full md:pb-14 place-items-center px-4'>
+            <section className='space-y-4 w-fit md:pb-14 place-items-center px-4'>
               <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-2 md:grid-rows-1 gap-4 items-center justify-center overflow-x-auto'>
                 <Scoreboard />
                 <Chart />
               </span>
-              <Predictions leagueHash={leagueHash} />
               <ChangeSurvivor />
+              <Predictions leagueHash={leagueHash} />
               <RecentActivity />
-            </div>
+            </section>
           </TabsContent>
           <TabsContent
             className='mt-0'

@@ -24,7 +24,7 @@ export default async function Predictions({ leagueHash }: PredictionsProps) {
   ]);
 
   return (
-    <div className='md:w-[calc(100svw-19rem)] space-y-4'>
+    <div className='w-full space-y-4'>
       <WeeklyPredictions weekly={week} />
       <MemberPredictions predictions={member} />
     </div>
@@ -109,7 +109,7 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
   }
 
   return (
-    <div className='text-center bg-card rounded-lg w-full'>
+    <div className='text-center bg-card rounded-lg md:w-[calc(100svw-8rem)] lg:w-[calc(100svw-19rem)]'>
       <h1 className='text-3xl'>Prediction History</h1>
       <span className='flex justify-center items-center gap-2 text-sm'>
         <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
