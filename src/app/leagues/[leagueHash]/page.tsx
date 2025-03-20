@@ -2,7 +2,6 @@ import MemberEditForm from '~/components/leagues/customization/memberEdit';
 import Chart from '~/components/leagues/main/chart';
 import RecentActivity from '~/components/leagues/main/recentActivity';
 import Scoreboard from '~/components/leagues/main/scoreboard';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from './layout';
@@ -29,7 +28,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           {userId && <TabsTrigger value='Base'>Base</TabsTrigger>}
           <TabsTrigger value='settings'>Settings</TabsTrigger>
         </TabsList>
-        <ScrollArea className='h-full'>
+        <div className='h-full overflow-y-auto relative'>
           <TabsContent value='scores'>
             <section className='space-y-4 w-fit md:pb-14 place-items-center px-4'>
               <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-2 md:grid-rows-1 gap-4 items-center justify-center overflow-x-auto'>
@@ -64,8 +63,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               <CustomEvents />
             </section>
           </TabsContent>
-          <ScrollBar hidden orientation='vertical' />
-        </ScrollArea>
+        </div>
       </Tabs>
     </main >
   );

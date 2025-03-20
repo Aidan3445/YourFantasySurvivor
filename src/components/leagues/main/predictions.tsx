@@ -88,13 +88,13 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
     }
   });
 
-  if (stats.count.total === 1) {
+  if (stats.count.total >= 1) {
     const prediction = Object.entries(predictions)[0];
     if (!prediction) return null;
 
     const [episode, preds] = prediction;
     return (
-      <div className='text-center bg-card rounded-lg w-full'>
+      <div className='text-center bg-card rounded-lg md:w-[calc(100svw-8rem)] lg:w-[calc(100svw-19rem)]'>
         <h1 className='text-3xl'>Prediction History</h1>
         <span className='flex justify-center items-center gap-2 text-sm'>
           <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
