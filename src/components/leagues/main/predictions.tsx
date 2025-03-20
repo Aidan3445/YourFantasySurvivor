@@ -88,7 +88,7 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
     }
   });
 
-  if (stats.count.total >= 1) {
+  if (stats.count.total === 1) {
     const prediction = Object.entries(predictions)[0];
     if (!prediction) return null;
 
