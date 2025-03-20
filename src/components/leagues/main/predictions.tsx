@@ -24,7 +24,7 @@ export default async function Predictions({ leagueHash }: PredictionsProps) {
   ]);
 
   return (
-    <div className='w-full space-y-4'>
+    <div className='md:w-[calc(100svw-19rem)] space-y-4'>
       <WeeklyPredictions weekly={week} />
       <MemberPredictions predictions={member} />
     </div>
