@@ -74,10 +74,13 @@ export default function ChangeSurvivor() {
       Date.now() - JSON.parse(localStorage.getItem('closedDialog')!) < 1000 * 60 * 10 : false);
   }, [elim, league.members.loggedIn]);
 
-
-  if (availableCastaways.every((castaway) => castaway.pickedBy)) {
+  /*
+   * This will be put into effect next season in combination with a new waiver system
+  if (leagueData.episodes.some(episode => episode.airStatus === 'Airing') ||
+    availableCastaways.every((castaway) => castaway.pickedBy)) {
     return null;
   }
+  */
 
   if (lastEpisode && pickPriority.length > 0 && !dialogOpen) {
     return (
@@ -99,7 +102,6 @@ export default function ChangeSurvivor() {
           ))
         }
       </div >
-
     );
   }
 

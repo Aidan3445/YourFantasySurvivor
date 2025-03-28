@@ -39,21 +39,28 @@ function WeeklyPredictions({ weekly }: WeeklyPredictionsProps) {
   if (!weekly) return null;
   const { predictions, castaways, tribes, nextEpisode } = weekly;
 
-  if (predictions.length === 0) return null;
+  if (predictions.length === 0 || nextEpisode.airStatus === 'Aired') return null;
 
   return (
     <div className='text-center bg-card rounded-lg w-full'>
-      <h1 className='text-3xl'>{'This Week\'s Prediction'}{predictions.length > 1 ? 's' : ''}</h1>
+      {nextEpisode.airStatus === 'Airing' ?
+        <h1 className='text-3xl'>
+          Predictions are locked until the episode ends.
+        </h1> :
+        <h1 className='text-3xl'>{'This Week\'s Prediction'}{predictions.length > 1 ? 's' : ''}</h1>
+      }
       <span className='flex flex-wrap justify-center items-center gap-x-2 text-muted-foreground text-sm'>
         <span className='text-nowrap'>
           {nextEpisode.episodeNumber}: {nextEpisode.episodeTitle}
         </span>
         <AirStatus airDate={nextEpisode.episodeAirDate} airStatus={nextEpisode.airStatus} />
       </span>
-      <PredictionCards
-        predictions={predictions}
-        castaways={castaways}
-        tribes={tribes} />
+      {nextEpisode.airStatus === 'Upcoming' && (
+        <PredictionCards
+          predictions={predictions}
+          castaways={castaways}
+          tribes={tribes} />
+      )}
     </div>
   );
 }
