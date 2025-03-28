@@ -15,6 +15,7 @@ import { chooseCastaway } from '~/app/api/leagues/actions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import { ColorRow } from '../draftOrder';
+import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
@@ -47,42 +48,57 @@ export default function ChangeSurvivor() {
     }
   });
 
-  const pickPriority = useMemo(() => Object.entries(leagueData.selectionTimeline.memberCastaways)
-    .filter(([_, castaways]) => !!leagueData.castaways
-      .find(castaway => castaway.fullName === castaways.slice(-1)[0])?.eliminatedEpisode)
-    .map(([member, _]) => member), [leagueData]);
+  const lastEpisode = useMemo(() => leagueData.episodes.findLast(episode => episode.airStatus === 'Aired'), [leagueData]);
+
+  const { pickPriority, elim } = useMemo(() => {
+    return Object.entries(leagueData.selectionTimeline.memberCastaways)
+      .reduce((acc, [member, castaways]) => {
+        const eliminatedEpisode = leagueData.castaways.find(castaway => castaway.fullName === castaways.slice(-1)[0])?.eliminatedEpisode;
+        if (eliminatedEpisode) {
+          acc.elim.push(member);
+          if (eliminatedEpisode === lastEpisode?.episodeNumber) acc.pickPriority.push(member);
+        }
+        return acc;
+      }, { pickPriority: [], elim: [] } as { pickPriority: LeagueMemberDisplayName[], elim: LeagueMemberDisplayName[] });
+  }, [leagueData, lastEpisode]);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [closedDialog, setClosedDialog] = useState(false);
 
   useEffect(() => {
-    if (pickPriority.includes(league.members.loggedIn?.displayName ?? '')) {
+    if (elim.includes(league.members.loggedIn?.displayName ?? '')) {
       setDialogOpen(true);
     }
     // check if dialog was closed within the last 10 minutes
     setClosedDialog(localStorage.getItem('closedDialog') ?
       Date.now() - JSON.parse(localStorage.getItem('closedDialog')!) < 1000 * 60 * 10 : false);
-  }, [pickPriority, league.members.loggedIn]);
+  }, [elim, league.members.loggedIn]);
+
 
   if (availableCastaways.every((castaway) => castaway.pickedBy)) {
     return null;
   }
 
-  if (pickPriority.length > 0 && !dialogOpen) {
+  if (lastEpisode && pickPriority.length > 0 && !dialogOpen) {
     return (
       <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
         <h1 className='text-2xl font-semibold'>Wait to Swap your Survivor Pick</h1>
-        <h3 className='text-lg font-semibold'>Eliminated members must pick first:</h3>
-        {pickPriority.map((member) => (
-          <span key={member} className='flex items-center gap-2'>
-            <ColorRow
-              className='justify-center leading-tight font-normal'
-              color={league.members.list.find(m => m.displayName === member)?.color}>
-              {member}
-            </ColorRow>
-          </span>
-        ))}
-      </div>
+        <h3 className='text-lg font-semibold'>Eliminated members have{' '}
+          {Math.floor((1000 * 60 * 60 * 48 - (Date.now() - lastEpisode.episodeAirDate.getTime())) / 1000 / 60 / 60)}
+          {' hours left to pick first:'}
+        </h3>
+        {
+          pickPriority.map((member) => (
+            <span key={member} className='flex items-center gap-2'>
+              <ColorRow
+                className='justify-center leading-tight font-normal'
+                color={league.members.list.find(m => m.displayName === member)?.color}>
+                {member}
+              </ColorRow>
+            </span>
+          ))
+        }
+      </div >
 
     );
   }
