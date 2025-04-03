@@ -32,14 +32,26 @@ export async function createBaseEvent(baseEvent: BaseEventInsert) {
         .then((result) => result[0]?.baseEventId);
       if (!baseEventId) throw new Error('Failed to create base event');
 
+      const eventRefs = baseEvent.references.map((referenceId) => ({
+        baseEventId,
+        referenceType: baseEvent.referenceType,
+        referenceId: referenceId,
+      }));
+
+      console.log(baseEvent.updateTribe);
+
+      if (baseEvent.updateTribe) {
+        eventRefs.push({
+          baseEventId,
+          referenceType: 'Tribe',
+          referenceId: baseEvent.updateTribe,
+        });
+      }
+
       // insert the base event references
       await db
         .insert(baseEventReferenceSchema)
-        .values(baseEvent.references.map((referenceId) => ({
-          baseEventId,
-          referenceType: baseEvent.referenceType,
-          referenceId: referenceId,
-        })));
+        .values(eventRefs);
     }
     catch (e) {
       console.error('Failed to create base event', e);

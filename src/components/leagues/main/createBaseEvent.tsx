@@ -14,6 +14,7 @@ import { EpisodeEvents } from './recentActivity';
 import { Button } from '~/components/ui/button';
 import { createBaseEvent } from '~/app/api/seasons/actions';
 import { useEventOptions } from '~/hooks/useEventOptions';
+import { Circle } from 'lucide-react';
 
 export default function CreateCustomEvent() {
   const { leagueData, refresh } = useLeague();
@@ -207,6 +208,35 @@ export default function CreateCustomEvent() {
                       </FormControl>
                     </FormItem>
                   )} />}
+              {selectedEvent === 'tribeUpdate' && (
+                <FormField
+                  name='updateTribe'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Select
+                          defaultValue={field.value as string}
+                          value={field.value as string}
+                          onValueChange={(value) => field.onChange(value)}>
+                          <SelectTrigger className='h-full'>
+                            <SelectValue placeholder='Select Tribe' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {leagueData.tribes.map(tribe => (
+                              <SelectItem
+                                className='place-items-center'
+                                key={tribe.tribeId}
+                                value={`${tribe.tribeId}`}>
+                                {tribe.tribeName}
+                                <Circle className='inline-block ml-2' fill={tribe.tribeColor} />
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItem>
+                  )} />
+              )}
               <FormField
                 name='notes'
                 render={({ field }) => (

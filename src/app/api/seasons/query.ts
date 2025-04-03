@@ -217,5 +217,28 @@ export const QUERIES = {
 
     return Object.values(castawaysWithTribes).sort(
       (a, b) => a.startingTribe.tribeName.localeCompare(b.startingTribe.tribeName));
+  },
+
+  /**
+  * Get all tribes for a season
+  * @param seasonId The season to get tribes from
+  * @returns The tribes for the season
+  * @throws if the season does not exist
+  */
+  getTribes: async function(seasonId: SeasonId) {
+    return db
+      .select({
+        tribeId: tribesSchema.tribeId,
+        tribeName: tribesSchema.tribeName,
+        tribeColor: tribesSchema.tribeColor,
+      })
+      .from(tribesSchema)
+      .innerJoin(seasonsSchema, eq(tribesSchema.seasonId, seasonsSchema.seasonId))
+      .where(eq(seasonsSchema.seasonId, seasonId))
+      .then(rows => rows.map(row => ({
+        tribeId: row.tribeId,
+        tribeName: row.tribeName,
+        tribeColor: row.tribeColor,
+      })));
   }
 };

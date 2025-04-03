@@ -684,7 +684,7 @@ export const QUERIES = {
       .then((settings) => settings[0]);
 
     const [
-      baseEvents, tribesTimeline, elims, castaways,
+      baseEvents, tribesTimeline, elims, castaways, tribes,
       leagueEvents, baseEventRules,
       selectionTimeline, leagueSettings, episodes
     ] = await Promise.all([
@@ -692,6 +692,7 @@ export const QUERIES = {
       SEASON_QUERIES.getTribesTimeline(league.leagueSeason),
       SEASON_QUERIES.getEliminations(league.leagueSeason),
       SEASON_QUERIES.getCastaways(league.leagueSeason),
+      SEASON_QUERIES.getTribes(league.leagueSeason),
 
       QUERIES.getLeagueEvents(leagueHash),
       baseEventRulesPromise,
@@ -714,6 +715,7 @@ export const QUERIES = {
       currentStreaks,
       baseEvents,
       castaways,
+      tribes,
       leagueEvents,
       selectionTimeline,
       episodes,

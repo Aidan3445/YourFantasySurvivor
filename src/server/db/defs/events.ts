@@ -229,6 +229,7 @@ export const BaseEventInsertZod = z.object({
   references: z.number().array().nonempty(),
   label: z.string(),
   notes: z.array(z.string()).nullable(),
+  updateTribe: z.coerce.number().nullable().optional(),
 });
 export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
 
