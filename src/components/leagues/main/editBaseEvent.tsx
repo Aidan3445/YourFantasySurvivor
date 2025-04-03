@@ -28,7 +28,7 @@ export default function EditBaseEvent({ episodeNumber, baseEvent }: EditBaseEven
   const { leagueData, refresh } = useLeague();
   const reactForm = useForm<BaseEventInsert>({
     defaultValues: {
-      episodeId: leagueData.episodes.toReversed()[episodeNumber - 1]?.episodeId,
+      episodeId: leagueData.episodes[episodeNumber - 1]?.episodeId,
       ...baseEvent,
       label: baseEvent.label || (`${baseEventLabelPrefixes[baseEvent.eventName]} ${baseEventLabels[baseEvent.eventName]?.[0] ?? baseEvent.eventName}`)
     },
