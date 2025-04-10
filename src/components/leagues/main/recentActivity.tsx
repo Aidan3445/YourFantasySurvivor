@@ -395,7 +395,11 @@ function NotesPopover({ notes }: NotesPopoverProps) {
           {notes.map((note, index) => (
             <li key={index}>
               {note.startsWith('https://') && note.includes('.com') ?
-                <a href={note} target='_blank' rel='noopener noreferrer'>
+                <a 
+                  className='text-blue-500 underline'
+                  href={note} 
+                  target='_blank' 
+                  rel='noopener noreferrer'>
                   {note}
                 </a> :
                 note}
