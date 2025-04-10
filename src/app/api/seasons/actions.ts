@@ -89,16 +89,22 @@ export async function updateBaseEvent(baseEventId: number, baseEvent: BaseEventI
         .where(eq(baseEventsSchema.baseEventId, baseEventId));
 
       // delete existing references
-      await db
+      const oldRefs = await db
         .delete(baseEventReferenceSchema)
-        .where(eq(baseEventReferenceSchema.baseEventId, baseEventId));
+        .where(eq(baseEventReferenceSchema.baseEventId, baseEventId))
+        .returning({
+          referenceId: baseEventReferenceSchema.referenceId,
+          referenceType: baseEventReferenceSchema.referenceType
+        });
 
       // insert the new references
       await db
         .insert(baseEventReferenceSchema)
         .values(baseEvent.references.map((referenceId) => ({
           baseEventId,
-          referenceType: baseEvent.referenceType,
+          referenceType: oldRefs
+            .find((ref) => ref.referenceId === referenceId)?.referenceType ??
+            baseEvent.referenceType, // use the old reference type if it exists
           referenceId: referenceId,
         })));
     }
