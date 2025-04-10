@@ -137,7 +137,10 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                 <Separator className='col-span-2' />
                 {condensedTimeline.map((castaway, index) => (
                   <span key={index} className='grid col-span-2 grid-cols-subgrid'>
-                    <ColorRow className='px-1 justify-center' color={leagueData.castaways.find((c) => c.fullName === castaway.fullName)?.startingTribe.tribeColor ?? '#AAAAAA'}>
+                    <ColorRow
+                      className='px-1 justify-center'
+                      color={leagueData.castaways
+                        .find((c) => c.fullName === castaway.fullName)?.startingTribe.tribeColor ?? '#AAAAAA'}>
                       {castaway.fullName}
                     </ColorRow>
                     <div className='flex gap-1 items-center text-nowrap'>
@@ -153,10 +156,20 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
               </PopoverContent>
             </Popover>
             {league.settings.survivalCap > 0 && (
-              <div className='ml-1 w-4 flex justify-center'>
-                {Math.min(leagueData.currentStreaks[member]!, league.settings.survivalCap) ||
-                  <Skull size={16} />}
-              </div>
+              <Popover>
+                <PopoverTrigger>
+                  <div className='ml-1 w-4 flex justify-center'>
+                    {Math.min(leagueData.currentStreaks[member]!, league.settings.survivalCap) ||
+                      <Skull size={16} />}
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className='w-min text-nowrap p-1'>
+                  <PopoverArrow />
+                  {`Survival streak: ${leagueData.currentStreaks[member] ?? 0}`}
+                  <Separator className='my-1' />
+                  {`Point cap: ${league.settings.survivalCap} points`}
+                </PopoverContent>
+              </Popover>
             )}
           </div>
         </ColorRow>

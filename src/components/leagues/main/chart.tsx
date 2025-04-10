@@ -70,7 +70,7 @@ export default function Chart() {
               (dataMax: number) => dataMax + 1,
             ]} />
           <Tooltip
-            content={<CustomTooltip />}
+            content={<CustomTooltip data={data} />}
             allowEscapeViewBox={{ x: false, y: false }}
             offset={0} />
           {data.map((line, index) => (
@@ -114,7 +114,7 @@ type ScoreChartProps = {
 };
 
 function formatData({ data }: ScoreChartProps) {
-  const formattedData: FormattedData = [{ episode: '' }];
+  const formattedData: FormattedData = [{ episode: '', shhh: 'hello' }];
   data.forEach((data) => {
     const ep1 = formattedData[0]!;
     ep1[data.name] = 0;
@@ -123,6 +123,7 @@ function formatData({ data }: ScoreChartProps) {
       if (!formattedData[episodeNumber]) {
         formattedData[episodeNumber] = {
           episode: episodeNumber,
+          shhh: 'hello',
         };
       }
       const episode = formattedData[episodeNumber];
@@ -140,9 +141,14 @@ interface CustomTooltipProps {
     stroke: string;
   }[];
   label?: string;
+  data: {
+    name: string;
+    episodeScores: number[];
+    color: string;
+  }[]
 }
 
-function CustomTooltip({ payload, label }: CustomTooltipProps) {
+function CustomTooltip({ payload, label, data }: CustomTooltipProps) {
   if (!label || !payload) return;
 
   payload.sort((a, b) => b.value - a.value);
@@ -157,25 +163,41 @@ function CustomTooltip({ payload, label }: CustomTooltipProps) {
     secondSet = [];
   }
 
+  const episodeNumber = Number(label);
+
   return (
     <div className='flex flex-col p-1 rounded-md border border-black bg-b3/95 scale-75'>
       <div>Episode {label}:</div>
       <Separator className='mb-1' />
       <div className='flex gap-2'>
         <div className='grid gap-1 grid-cols-min'>
-          {firstSet.map((p) => (
-            <ColorRow key={p.dataKey} color={p.stroke}>
-              {p.dataKey} <div className='w-full' /> {p.value}
-            </ColorRow>
-          ))}
+          {firstSet.map((p) => {
+            const prevScore = data.find((d) => d.name === p.dataKey)?.episodeScores[episodeNumber - 1];
+            const delta = prevScore !== undefined ? p.value - prevScore : undefined;
+            return (
+              <ColorRow key={p.dataKey} color={p.stroke}>
+                {p.dataKey}
+                <div className='w-full' />
+                {p.value}
+                {!!delta && ` (${delta < 0 ? '' : '+'}${delta})`}
+              </ColorRow>
+            );
+          })}
         </div>
         {secondSet.length > 0 && (
           <div className='grid gap-1 grid-cols-min'>
-            {secondSet.map((p) => (
-              <ColorRow key={p.dataKey} color={p.stroke}>
-                {p.dataKey} <div className='w-full' /> {p.value}
-              </ColorRow>
-            ))}
+            {secondSet.map((p) => {
+              const prevScore = data.find((d) => d.name === p.dataKey)?.episodeScores[episodeNumber - 1];
+              const delta = prevScore !== undefined ? p.value - prevScore : undefined;
+              return (
+                <ColorRow key={p.dataKey} color={p.stroke}>
+                  {p.dataKey}
+                  <div className='w-full' />
+                  {p.value}
+                  {!!delta && ` (${delta < 0 ? '' : '+'}${delta})`}
+                </ColorRow>
+              );
+            })}
           </div>
         )}
       </div>
