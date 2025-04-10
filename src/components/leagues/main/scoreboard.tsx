@@ -154,7 +154,8 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
             </Popover>
             {league.settings.survivalCap > 0 && (
               <div className='ml-1 w-4 flex justify-center'>
-                {leagueData.currentStreaks[member]! || <Skull size={16} />}
+                {Math.min(leagueData.currentStreaks[member]!, league.settings.survivalCap) ||
+                  <Skull size={16} />}
               </div>
             )}
           </div>

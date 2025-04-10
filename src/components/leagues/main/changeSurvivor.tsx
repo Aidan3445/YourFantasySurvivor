@@ -149,7 +149,7 @@ export default function ChangeSurvivor() {
                                     .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
                                 }}>
                                 {<ColorRow
-                                  className='w-10 px-0 justify-center leading-tight font-normal'
+                                  className='w-14 px-0 justify-center leading-tight font-normal'
                                   color={castaway.tribes.slice(-1)[0]?.tribeColor}>
                                   {castaway.tribes.slice(-1)[0]?.tribeName}
                                 </ColorRow>}
@@ -159,7 +159,7 @@ export default function ChangeSurvivor() {
                             <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
                               <span className='flex items-center gap-1'>
                                 {<ColorRow
-                                  className='w-10 px-0 justify-center leading-tight'
+                                  className='w-14 px-0 justify-center leading-tight'
                                   color={castaway.tribes.slice(-1)[0]?.tribeColor}>
                                   {castaway.tribes.slice(-1)[0]?.tribeName}
                                 </ColorRow>}
