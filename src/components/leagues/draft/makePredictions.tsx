@@ -186,7 +186,7 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
                             referenceType === 'Tribe' ?
                               <SelectItem key={vals.id} value={`${vals.id}`}>
                                 <ColorRow
-                                  className='w-10 px-0 justify-center leading-tight'
+                                  className='w-20 px-0 justify-center leading-tight'
                                   color={vals.color}>
                                   {name}
                                 </ColorRow>
@@ -194,7 +194,7 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
                               <SelectItem key={vals.id} value={`${vals.id}`}>
                                 <span className='flex items-center gap-1'>
                                   <ColorRow
-                                    className='w-10 px-0 justify-center leading-tight'
+                                    className='w-20 px-0 justify-center leading-tight'
                                     color={vals.color}>
                                     {vals.tribeName}
                                   </ColorRow>
