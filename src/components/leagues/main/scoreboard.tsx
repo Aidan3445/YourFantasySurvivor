@@ -17,7 +17,6 @@ import { Separator } from '~/components/ui/separator';
 
 export default function Scoreboard() {
   const { leagueData, league } = useLeague();
-
   const sortedMemberScores = Object.entries(leagueData.scores.Member)
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 

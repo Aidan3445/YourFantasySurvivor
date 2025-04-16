@@ -1,17 +1,12 @@
 'use client';
 
 import { PopoverArrow } from '@radix-ui/react-popover';
-import { Flame, ScrollText, X } from 'lucide-react';
-import { useState } from 'react';
-import {
-  AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
-  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '~/components/ui/alertDialog';
-import { Button } from '~/components/ui/button';
+import { Flame, ScrollText } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
-//import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
 import {
   Table,
   TableBody,
@@ -39,40 +34,41 @@ export default function RecentActivity() {
   } = useLeague();
   const isMobile = useIsMobile();
 
-  const [selectedEpisode, setSelectedEpisode] = useState(1);
   /*const [filterCastaway, setFilterCastaway] = useState();
   const [filterTribe, setFilterTribe] = useState();
   const [filterMember, setFilterMember] = useState();
   const [filterBaseEvent, setFilterBaseEvent] = useState();*/
 
-  const latestEpisode = episodes.find((episode) =>
-    episode.airStatus === 'Airing') ??
-    episodes.findLast((episode) => episode.airStatus === 'Aired') ??
-    episodes[0];
+  const [selectedEpisode, setSelectedEpisode] = useState<number>();
+
+  useEffect(() => {
+    if (selectedEpisode) return;
+
+    const latestEpisode = episodes.find((episode) =>
+      episode.airStatus === 'Airing') ??
+      episodes.findLast((episode) => episode.airStatus === 'Aired') ??
+      episodes[0];
+    setSelectedEpisode(latestEpisode?.episodeNumber);
+  }, [episodes, selectedEpisode]);
 
   return (
     <section className='w-full bg-card rounded-lg relative place-items-center'>
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button className='absolute top-2 right-2 text-xs px-1 h-4' variant='secondary'>
-            View All
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent className='bg-card rounded-lg min-w-max pb-0 max-h-[calc(100vh-4rem)]'>
-          <AlertDialogHeader>
-            <AlertDialogTitle>All Events</AlertDialogTitle>
-            <AlertDialogDescription hidden>View all events from the season</AlertDialogDescription>
-          </AlertDialogHeader>
-          <Select
-            defaultValue={`${selectedEpisode}`}
-            value={`${selectedEpisode}`}
-            onValueChange={(value) => setSelectedEpisode(Number(value))}>
-            <SelectTrigger>
-              <SelectValue placeholder='Select an episode' />
-            </SelectTrigger>
-            <SelectContent>
-              {// eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                episodes.toReversed()
+      <Accordion type='single' collapsible>
+        <AccordionItem value='filter' className='border-none'>
+          <span className='flex flex-wrap gap-x-4 items-baseline px-2 mr-14'>
+            <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
+            <Select
+              defaultValue={`${selectedEpisode}`}
+              value={`${selectedEpisode}`}
+              onValueChange={(value) => setSelectedEpisode(Number(value))}>
+              <SelectTrigger className='w-min my-2'>
+                <SelectValue placeholder='Select an episode' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='-1'>
+                  All Episodes
+                </SelectItem>
+                {episodes.toReversed()
                   .map((episode) => (
                     <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
                       {`${episode.episodeNumber}:`} {episode.episodeTitle}
@@ -85,84 +81,35 @@ export default function RecentActivity() {
                       </div>
                     </SelectItem>
                   ))}
-            </SelectContent>
-          </Select>
-          {/*<Accordion type='single' collapsible>
-            <AccordionItem value='filters'>
-              <AccordionTrigger>
-                Filters
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className='flex flex-wrap gap-4'>
-                  <Select
-                    value={filterCastaway}
-                    onValueChange={(value) => setFilterCastaway(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Castaway' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=''>All Castaways</SelectItem>
-                      <SelectItem value=''>None</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={filterTribe}
-                    onValueChange={(value) => setFilterTribe(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Tribe' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=''>All Tribes</SelectItem>
-                      <SelectItem value=''>None</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={filterMember}
-                    onValueChange={(value) => setFilterMember(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Member' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=''>All Members</SelectItem>
-                      <SelectItem value=''>None</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={filterBaseEvent}
-                    onValueChange={(value) => setFilterBaseEvent(value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Base Event' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=''>All Base Events</SelectItem>
-                      <SelectItem value=''>None</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>*/}
-          <ScrollArea className='max-h-[calc(100vh-12rem)]'>
-            <EpisodeEvents episodeNumber={selectedEpisode} />
-            <ScrollBar hidden orientation='vertical' />
-          </ScrollArea>
-          <AlertDialogFooter className='absolute top-1 right-1'>
-            <AlertDialogCancel className='h-min p-1'>
-              <X stroke='white' />
-            </AlertDialogCancel>
-          </AlertDialogFooter>
-        </AlertDialogContent >
-      </AlertDialog >
-      <span className='flex flex-wrap gap-x-4 items-baseline px-2 mr-14'>
-        <h2 className='text-lg font-bold text-card-foreground'>Recent Events</h2>
-        {latestEpisode && <span className='inline-flex gap-x-4 flex-wrap'>
-          <p className='text-sm text-muted-foreground'>
-            {`${latestEpisode.episodeNumber}:`} {latestEpisode.episodeTitle}
-          </p>
-          <AirStatus airDate={latestEpisode.episodeAirDate} airStatus={latestEpisode.airStatus} />
-        </span>}
-      </span>
-      {latestEpisode && <EpisodeEvents episodeNumber={latestEpisode.episodeNumber} />}
+              </SelectContent>
+            </Select>
+            <AccordionTrigger className='w-full my-2'>
+              Filter
+            </AccordionTrigger>
+          </span>
+          <AccordionContent className='w-full'>
+            <div className='flex flex-col gap-2'>
+              <Select
+                defaultValue='All'
+                value='All'
+                onValueChange={(value) => setSelectedEpisode(Number(value))}>
+                <SelectTrigger className='w-min my-2'>
+                  <SelectValue placeholder='Select an episode' />
+                </SelectTrigger>
+                <SelectContent>
+                  {episodes.toReversed()
+                    .map((episode) => (
+                      <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
+                        {`${episode.episodeNumber}:`} {episode.episodeTitle}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      {selectedEpisode && <EpisodeEvents episodeNumber={selectedEpisode} />}
     </section >
   );
 }
@@ -173,9 +120,72 @@ interface EpisodeEventsProps {
   mockPredictions?: Omit<LeaguePredictionEvent, 'eventId'>[];
   mockDirects?: Omit<LeagueDirectEvent, 'eventId'>[];
   edit?: boolean;
+  labelRow?: boolean;
 }
 
 export function EpisodeEvents({ episodeNumber, mockBases, mockPredictions, mockDirects, edit }: EpisodeEventsProps) {
+  const {
+    leagueData: {
+      baseEvents,
+      leagueEvents,
+      episodes
+    }
+  } = useLeague();
+  const noTribes = episodeNumber === -1 || (
+    baseEvents[episodeNumber] &&
+    !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0) &&
+    !mockBases?.some((event) => event.tribes.length > 0) &&
+    ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
+      ?.some((event) => event.referenceType === 'Tribe') &&
+    ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
+      ?.some((event) => event.referenceType === 'Tribe'));
+
+  return (
+    <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-8rem)] lg:w-full bg-card rounded-lg gap-0'>
+      <Table className='w-full'>
+        <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
+        <TableHeader className='sticky top-0'>
+          <TableRow className='bg-white hover:bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
+            {edit && <TableHead className='w-0'>
+              Edit
+            </TableHead>}
+            <TableHead className='w-0'>Event</TableHead>
+            <TableHead className='text-center'>Points</TableHead>
+            <TableHead className='w-0'>
+              {noTribes ? null : 'Tribes'}
+            </TableHead>
+            <TableHead className='text-right w-0'>Castaways</TableHead>
+            <TableHead>Members</TableHead>
+            <TableHead className='text-right' >Notes</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {episodeNumber === -1 ?
+            episodes.map((episode) => (
+              <EpisodeEventsTableBody
+                key={episode.episodeNumber}
+                episodeNumber={episode.episodeNumber}
+                mockBases={mockBases}
+                mockPredictions={mockPredictions}
+                mockDirects={mockDirects}
+                edit={edit}
+                labelRow />
+            )) : (
+              <EpisodeEventsTableBody
+                episodeNumber={episodeNumber}
+                mockBases={mockBases}
+                mockPredictions={mockPredictions}
+                mockDirects={mockDirects}
+                edit={edit} />)
+          }
+        </TableBody>
+      </Table>
+      <ScrollBar hidden orientation='horizontal' />
+    </ScrollArea>
+  );
+}
+
+function EpisodeEventsTableBody({ labelRow, episodeNumber, mockBases, mockPredictions, mockDirects, edit }: EpisodeEventsProps) {
   const {
     leagueData: {
       baseEvents,
@@ -187,19 +197,14 @@ export function EpisodeEvents({ episodeNumber, mockBases, mockPredictions, mockD
   if (!baseEvents[episodeNumber] && !leagueEvents.predictionEvents[episodeNumber] &&
     !leagueEvents.directEvents[episodeNumber] &&
     !mockBases && !mockPredictions && !mockDirects
-  ) return (
-    <div className='flex items-center justify-center h-48'>
-      <h1 className='text-3xl font-bold'>No events yet</h1>
-    </div>
+  ) return labelRow ? null : (
+    <TableRow className='bg-card'>
+      <TableCell colSpan={7} className='text-center text-muted-foreground'>
+        No events for episode {episodeNumber}
+      </TableCell>
+    </TableRow>
   );
 
-  const noTribes = baseEvents[episodeNumber] &&
-    !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0) &&
-    !mockBases?.some((event) => event.tribes.length > 0) &&
-    ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
-      ?.some((event) => event.referenceType === 'Tribe') &&
-    ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
-      ?.some((event) => event.referenceType === 'Tribe');
   const combinedPredictions = Object.values(
     leagueEvents.predictionEvents[episodeNumber]?.reduce((acc, event) => {
       acc[event.eventId] ??= {
@@ -226,125 +231,109 @@ export function EpisodeEvents({ episodeNumber, mockBases, mockPredictions, mockD
       referenceName: string;
       predictionMakers: LeagueMemberDisplayName[];
     }>) ?? {});
-
   return (
-    <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-8rem)] lg:w-full bg-card rounded-lg gap-0'>
-      <Table className='w-full'>
-        <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
-        <TableHeader className='sticky top-0'>
-          <TableRow className='bg-white hover:bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
-            {edit && <TableHead className='w-0'>
-              Edit
-            </TableHead>}
-            <TableHead className='w-0'>Event</TableHead>
-            <TableHead className='text-center'>Points</TableHead>
-            <TableHead className='w-0'>
-              {noTribes ? null : 'Tribes'}
-            </TableHead>
-            <TableHead className='text-right w-0'>Castaways</TableHead>
-            <TableHead>Members</TableHead>
-            <TableHead className='text-right' >Notes</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {mockBases?.map((mockBase, index) =>
-            <BaseEventRow
-              key={index}
-              className='bg-yellow-500'
-              baseEvent={{ ...mockBase, baseEventId: -1 }}
-              episodeNumber={episodeNumber}
-              baseEventRules={baseEventRules}
-              edit={false} />
-          )}
-          {mockPredictions?.map((mockPrediction, index) =>
-            <LeagueEventRow
-              key={index}
-              className='bg-yellow-500'
-              eventId={-1}
-              eventName={mockPrediction.eventName}
-              points={mockPrediction.points}
-              predictionMakers={[mockPrediction.predictionMaker]}
-              referenceId={mockPrediction.referenceId}
-              referenceType={mockPrediction.referenceType}
-              referenceName={mockPrediction.referenceName}
-              notes={mockPrediction.notes}
-              episodeNumber={episodeNumber}
-              edit={false} />
-          )}
-          {mockDirects?.map((mockDirect, index) =>
-            <LeagueEventRow
-              key={index}
-              className='bg-yellow-500'
-              eventId={-1}
-              eventName={mockDirect.eventName}
-              points={mockDirect.points}
-              referenceId={mockDirect.referenceId}
-              referenceType={mockDirect.referenceType}
-              referenceName={mockDirect.referenceName}
-              notes={mockDirect.notes}
-              episodeNumber={episodeNumber}
-              edit={false} />
-          )}
-          {Object.values(baseEvents[episodeNumber] ?? {}).length > 0 &&
-            <TableRow className='bg-gray-100 hover:bg-gray-200'>
-              <TableCell colSpan={7} className='text-xs text-muted-foreground'>
-                Official Events
-              </TableCell>
-            </TableRow>}
-          {Object.entries(baseEvents[episodeNumber] ?? {})
-            .map(([eventId, event]) => (
-              <BaseEventRow
-                key={eventId}
-                baseEvent={event}
-                episodeNumber={episodeNumber}
-                baseEventRules={baseEventRules}
-                edit={edit} />
-            ))}
-          {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).length > 0 &&
-            <TableRow className='bg-gray-100 hover:bg-gray-200'>
-              <TableCell colSpan={7} className='text-xs text-muted-foreground'>
-                Custom Events
-              </TableCell>
-            </TableRow>}
-          {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).map((directEvents) =>
-            directEvents.map((event, index) => (
-              <LeagueEventRow
-                key={index}
-                eventId={event.eventId}
-                eventName={event.eventName}
-                points={event.points}
-                referenceType={event.referenceType}
-                referenceName={event.referenceName}
-                referenceId={event.referenceId}
-                notes={event.notes}
-                episodeNumber={episodeNumber}
-                edit={edit} />
-            ))
-          )}
-          {Object.values(leagueEvents.predictionEvents[episodeNumber] ?? {}).length > 0 &&
-            <TableRow className='bg-gray-100 hover:bg-gray-200'>
-              <TableCell colSpan={7} className='text-xs text-muted-foreground'>
-                Correct Predictions
-              </TableCell>
-            </TableRow>}
-          {combinedPredictions?.map((event, index) => (
-            <LeagueEventRow
-              key={index}
-              eventId={event.eventId}
-              eventName={event.eventName}
-              points={event.points}
-              referenceType={event.referenceType}
-              referenceName={event.referenceName}
-              referenceId={event.referenceId}
-              predictionMakers={event.predictionMakers}
-              notes={event.notes}
-              episodeNumber={episodeNumber}
-              edit={edit} />
-          ))}
-        </TableBody>
-      </Table>
-      <ScrollBar hidden orientation='horizontal' />
-    </ScrollArea>
+    <>
+      {labelRow &&
+        <TableRow className='bg-secondary/50 hover:bg-secondary/25'>
+          <TableCell colSpan={7} className='text-center font-bold text-secondary-foreground'>
+            Episode {episodeNumber}
+          </TableCell>
+        </TableRow>}
+      {mockBases?.map((mockBase, index) =>
+        <BaseEventRow
+          key={index}
+          className='bg-yellow-500'
+          baseEvent={{ ...mockBase, baseEventId: -1 }}
+          episodeNumber={episodeNumber}
+          baseEventRules={baseEventRules}
+          edit={false} />
+      )}
+      {mockPredictions?.map((mockPrediction, index) =>
+        <LeagueEventRow
+          key={index}
+          className='bg-yellow-500'
+          eventId={-1}
+          eventName={mockPrediction.eventName}
+          points={mockPrediction.points}
+          predictionMakers={[mockPrediction.predictionMaker]}
+          referenceId={mockPrediction.referenceId}
+          referenceType={mockPrediction.referenceType}
+          referenceName={mockPrediction.referenceName}
+          notes={mockPrediction.notes}
+          episodeNumber={episodeNumber}
+          edit={false} />
+      )}
+      {mockDirects?.map((mockDirect, index) =>
+        <LeagueEventRow
+          key={index}
+          className='bg-yellow-500'
+          eventId={-1}
+          eventName={mockDirect.eventName}
+          points={mockDirect.points}
+          referenceId={mockDirect.referenceId}
+          referenceType={mockDirect.referenceType}
+          referenceName={mockDirect.referenceName}
+          notes={mockDirect.notes}
+          episodeNumber={episodeNumber}
+          edit={false} />
+      )}
+      {Object.values(baseEvents[episodeNumber] ?? {}).length > 0 &&
+        <TableRow className='bg-gray-100 hover:bg-gray-200'>
+          <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+            Official Events
+          </TableCell>
+        </TableRow>}
+      {Object.entries(baseEvents[episodeNumber] ?? {})
+        .map(([eventId, event]) => (
+          <BaseEventRow
+            key={eventId}
+            baseEvent={event}
+            episodeNumber={episodeNumber}
+            baseEventRules={baseEventRules}
+            edit={edit} />
+        ))}
+      {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).length > 0 &&
+        <TableRow className='bg-gray-100 hover:bg-gray-200'>
+          <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+            Custom Events
+          </TableCell>
+        </TableRow>}
+      {Object.values(leagueEvents.directEvents[episodeNumber] ?? {}).map((directEvents) =>
+        directEvents.map((event, index) => (
+          <LeagueEventRow
+            key={index}
+            eventId={event.eventId}
+            eventName={event.eventName}
+            points={event.points}
+            referenceType={event.referenceType}
+            referenceName={event.referenceName}
+            referenceId={event.referenceId}
+            notes={event.notes}
+            episodeNumber={episodeNumber}
+            edit={edit} />
+        ))
+      )}
+      {Object.values(leagueEvents.predictionEvents[episodeNumber] ?? {}).length > 0 &&
+        <TableRow className='bg-gray-100 hover:bg-gray-200'>
+          <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+            Correct Predictions
+          </TableCell>
+        </TableRow>}
+      {combinedPredictions?.map((event, index) => (
+        <LeagueEventRow
+          key={index}
+          eventId={event.eventId}
+          eventName={event.eventName}
+          points={event.points}
+          referenceType={event.referenceType}
+          referenceName={event.referenceName}
+          referenceId={event.referenceId}
+          predictionMakers={event.predictionMakers}
+          notes={event.notes}
+          episodeNumber={episodeNumber}
+          edit={edit} />
+      ))}
+    </>
   );
 }
 
@@ -395,10 +384,10 @@ function NotesPopover({ notes }: NotesPopoverProps) {
           {notes.map((note, index) => (
             <li key={index}>
               {note.startsWith('https://') && note.includes('.com') ?
-                <a 
+                <a
                   className='text-blue-500 underline'
-                  href={note} 
-                  target='_blank' 
+                  href={note}
+                  target='_blank'
                   rel='noopener noreferrer'>
                   {note}
                 </a> :
