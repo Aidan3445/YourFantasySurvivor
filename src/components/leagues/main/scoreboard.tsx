@@ -7,18 +7,16 @@ import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { ColorRow } from '../draftOrder';
-import { MoveRight, Circle, Flame, History, Skull } from 'lucide-react';
+import { MoveRight, Circle, Flame, History, Skull, CircleHelp } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/useMobile';
-import { useState } from 'react';
 import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Separator } from '~/components/ui/separator';
 
 export default function Scoreboard() {
   const { leagueData, league } = useLeague();
-  const [selectedMembers] = useState<LeagueMemberDisplayName[]>([]);
 
   const sortedMemberScores = Object.entries(leagueData.scores.Member)
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
@@ -29,15 +27,17 @@ export default function Scoreboard() {
         <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
         <TableHeader>
           <TableRow className={cn(
-            'px-4 bg-white pointer-events-none',
-            selectedMembers.length > 0 && 'pointer-events-auto')}>
+            'px-4 bg-white hover:bg-white')}>
             <TableHead className='text-center w-0'>Place</TableHead>
             <TableHead className='text-center w-0 text-nowrap'>
               Points
               <Flame className='align-top inline w-4 h-4 stroke-muted-foreground' />
             </TableHead>
             <TableHead className='text-center'>Member</TableHead>
-            <TableHead className='text-center w-0'>Survivor</TableHead>
+            <TableHead className='text-center w-0 relative'>
+              Survivor
+              <ScoreboardHelp hasSurvivalCap={league.settings.survivalCap > 0} />
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -120,17 +120,19 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                 <PopoverTrigger>
                   <Circle size={16} fill={tribe.tribeColor} />
                 </PopoverTrigger>
-                <PopoverContent className='w-min text-nowrap p-1'>
+                <PopoverContent className='w-min text-nowrap p-1' align='end'>
                   <PopoverArrow />
                   {tribe.tribeName} - Episode {tribe.episode}
                 </PopoverContent>
               </Popover>
             ))}
             <Popover>
-              <PopoverTrigger className='ml-2'>
+              <PopoverTrigger className='ml-2 mr-1'>
                 <History size={16} />
               </PopoverTrigger>
-              <PopoverContent className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'>
+              <PopoverContent
+                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'
+                align='end'>
                 <PopoverArrow />
                 <div className='text-center'>Survivor</div>
                 <div className='text-center'>Episodes</div>
@@ -144,8 +146,7 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                       {castaway.fullName}
                     </ColorRow>
                     <div className='flex gap-1 items-center text-nowrap'>
-                      {typeof castaway.start === 'number' ?
-                        castaway.start : castaway.start}
+                      {castaway.start}
                       <MoveRight className='w-4 h-4' />
                       {castaway.end ? `${castaway.end}` :
                         leagueData.episodes.find((e) => e.isFinale && e.airStatus !== 'Upcoming') ?
@@ -163,7 +164,7 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                       <Skull size={16} />}
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className='w-min text-nowrap p-1'>
+                <PopoverContent className='w-min text-nowrap p-1' align='end'>
                   <PopoverArrow />
                   {`Survival streak: ${leagueData.currentStreaks[member] ?? 0}`}
                   <Separator className='my-1' />
@@ -175,5 +176,110 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
         </ColorRow>
       </TableCell>
     </TableRow>
+  );
+}
+
+interface ScoreboardHelpProps {
+  hasSurvivalCap?: boolean;
+}
+
+function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
+  const isMobile = useIsMobile();
+  return (
+    <Popover>
+      <PopoverTrigger className='absolute top-3 right-3 z-50 pointer-events-auto'>
+        <CircleHelp className='w-4 h-4 stroke-muted-foreground' />
+      </PopoverTrigger>
+      <PopoverContent className='w-min text-nowrap p-0 border-none text-sm' side='left'>
+        <ColorRow className='justify-center pr-0' color='#FF90CC'>
+          {isMobile ? 'Castaway' : 'Current Survivor'}
+          <div className='ml-auto flex gap-0.5'>
+            <Popover open>
+              <PopoverTrigger>
+                <Circle size={16} fill='#FF90CC' />
+              </PopoverTrigger>
+              <PopoverContent className='w-min text-nowrap p-1' side='top' align='end' alignOffset={-10}>
+                <PopoverArrow />
+                Current Survivor Tribe History
+              </PopoverContent>
+            </Popover>
+            <Popover>
+              <PopoverTrigger>
+                <Circle size={16} fill='#3ADA00' />
+              </PopoverTrigger>
+              <PopoverContent className='w-min text-nowrap p-1' align='end'>
+                <PopoverArrow />
+                Tribe Swap - Episode 4
+              </PopoverContent>
+            </Popover>
+            <Popover open={isMobile ? undefined : true}>
+              <PopoverTrigger>
+                <Circle size={16} fill='#FEF340' />
+              </PopoverTrigger>
+              <PopoverContent className='w-min text-nowrap p-1' side='top' align='start'>
+                <PopoverArrow />
+                Merge Tribe - Episode 8
+              </PopoverContent>
+            </Popover>
+            <Popover open>
+              <PopoverTrigger className='ml-2'>
+                <History size={16} />
+              </PopoverTrigger>
+              <PopoverContent
+                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'
+                align='end'
+                side='bottom'>
+                <PopoverArrow />
+                <div className='text-center'>Selection History</div>
+                <div className='text-center'>Timeline</div>
+                <Separator className='col-span-2' />
+                <span className='grid col-span-2 grid-cols-subgrid'>
+                  <ColorRow
+                    className='px-1 justify-center'
+                    color='#3ADA00'>
+                    First Castaway
+                  </ColorRow>
+                  <div className='flex gap-1 items-center text-nowrap'>
+                    Draft
+                    <MoveRight className='w-4 h-4' />
+                    Eliminated Episode
+                  </div>
+                </span>
+                <span className='grid col-span-2 grid-cols-subgrid'>
+                  <ColorRow
+                    className='px-1 justify-center'
+                    color='#FF90CC'>
+                    Current Survivor
+                  </ColorRow>
+                  <div className='flex gap-1 items-center text-nowrap'>
+                    5
+                    <MoveRight className='w-4 h-4' />
+                    Present
+                  </div>
+                </span>
+              </PopoverContent>
+            </Popover>
+            {hasSurvivalCap && (
+              <Popover open={isMobile ? undefined : true}>
+                <PopoverTrigger>
+                  <div className='ml-1 w-4 flex justify-center'>
+                    <Skull size={16} />
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className='w-min text-nowrap p-1' align='start' side='bottom'>
+                  <PopoverArrow />
+                  Survival streak points available
+                  <br />
+                  <br />
+                  Current streak: 0
+                  <Separator className='my-1' />
+                  Point cap from league settings: 5 points
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
+        </ColorRow>
+      </PopoverContent>
+    </Popover>
   );
 }
