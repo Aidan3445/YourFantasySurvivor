@@ -182,26 +182,30 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
                       Object.keys(references).length === 0 ? null : (
                         <SelectGroup key={referenceType}>
                           <SelectLabel>{referenceType}s</SelectLabel>
-                          {Object.entries(references).map(([name, vals]) => (
-                            referenceType === 'Tribe' ?
-                              <SelectItem key={vals.id} value={`${vals.id}`}>
-                                <ColorRow
-                                  className='w-20 px-0 justify-center leading-tight'
-                                  color={vals.color}>
-                                  {name}
-                                </ColorRow>
-                              </SelectItem> :
-                              <SelectItem key={vals.id} value={`${vals.id}`}>
-                                <span className='flex items-center gap-1'>
+                          {Object.entries(references)
+                            .sort(([name, vals], [name2, vals2]) =>
+                              vals.tribeName?.localeCompare(vals2.tribeName ?? '') ??
+                              name.localeCompare(name2))
+                            .map(([name, vals]) => (
+                              referenceType === 'Tribe' ?
+                                <SelectItem key={vals.id} value={`${vals.id}`}>
                                   <ColorRow
                                     className='w-20 px-0 justify-center leading-tight'
                                     color={vals.color}>
-                                    {vals.tribeName}
+                                    {name}
                                   </ColorRow>
-                                  {name}
-                                </span>
-                              </SelectItem>
-                          ))}
+                                </SelectItem> :
+                                <SelectItem key={vals.id} value={`${vals.id}`}>
+                                  <span className='flex items-center gap-1'>
+                                    <ColorRow
+                                      className='w-20 px-0 justify-center leading-tight'
+                                      color={vals.color}>
+                                      {vals.tribeName}
+                                    </ColorRow>
+                                    {name}
+                                  </span>
+                                </SelectItem>
+                            ))}
                         </SelectGroup>
                       )))}
                   </SelectContent>
