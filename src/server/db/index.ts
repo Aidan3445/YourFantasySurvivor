@@ -8,14 +8,10 @@ import * as leagues from './schema/leagues';
 import * as members from './schema/leagueMembers';
 import * as leagueEvents from './schema/leagueEvents';
 
-import * as customEvents from './schema/customEvents';
-import * as weeklyEvents from './schema/weeklyEvents';
-import * as seasonEvents from './schema/seasonEvents';
-
 // Define your schema
 const schema = {
   seasons, tribes, castaways, episodes, leagues, members, leagueEvents,
-  customEvents, weeklyEvents, seasonEvents,
+  //customEvents, weeklyEvents, seasonEvents,
 };
 
 // Use this object to send drizzle queries to your DB

@@ -1,3 +1,4 @@
+/*
 import { createTable } from './createTable';
 import { castawaysSchema } from './castaways';
 import { tribesSchema } from './tribes';
@@ -92,3 +93,4 @@ export const seasonMemberResults = createTable(
     result: integer('result').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
   }
 );
+//*/

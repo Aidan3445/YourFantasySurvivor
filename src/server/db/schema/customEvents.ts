@@ -1,3 +1,4 @@
+/*
 import 'server-only';
 
 import { createTable } from './createTable';
@@ -68,4 +69,4 @@ export const customMembers = createTable(
     reference: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
   },
 );
-
+//*/
