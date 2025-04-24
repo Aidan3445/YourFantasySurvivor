@@ -557,8 +557,8 @@ function NotesPopover({ notes }: NotesPopoverProps) {
         <PopoverArrow />
         <ul>
           {notes.map((note, index) => (
-            <li key={index}>
-              {note.startsWith('https://') && note.includes('.com') ?
+            <li className='list-disc' key={index}>
+              {note.startsWith('https://') ?
                 <a
                   className='text-blue-500 underline'
                   href={note}
