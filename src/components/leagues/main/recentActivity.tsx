@@ -21,7 +21,11 @@ import {
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
 import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes';
-import { type BaseEvent, BaseEventFullName, baseEventLabelPrefixes, baseEventLabels, type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName, type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames } from '~/server/db/defs/events';
+import {
+  type BaseEvent, BaseEventFullName, baseEventLabelPrefixes, baseEventLabels,
+  type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName,
+  type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames
+} from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import EditBaseEvent from './editBaseEvent';
 import { ColorRow } from '../draftOrder';
@@ -119,13 +123,9 @@ export default function RecentActivity() {
                   label: castaway.fullName
                 }))}
                 value={filterCastaway}
-                onValueChange={(value) => {
-                  setFilterCastaway(value as CastawayName[]);
-                  setFilterTribe([]);
-                  setFilterMember([]);
-                }}
+                onValueChange={(value) => setFilterCastaway(value as CastawayName[])}
                 modalPopover
-                placeholder='Castaways'
+                placeholder='All Castaways'
               />
             </div>
             <div className='w-min flex flex-col items-center'>
@@ -138,13 +138,9 @@ export default function RecentActivity() {
                   label: tribe.tribeName
                 }))}
                 value={filterTribe}
-                onValueChange={(value) => {
-                  setFilterTribe(value as TribeName[]);
-                  setFilterCastaway([]);
-                  setFilterMember([]);
-                }}
+                onValueChange={(value) => setFilterTribe(value as TribeName[])}
                 modalPopover
-                placeholder='Tribes'
+                placeholder='All Tribes'
               />
             </div>
             <div className='w-min flex flex-col items-center'>
@@ -157,13 +153,9 @@ export default function RecentActivity() {
                   label: member.displayName
                 }))}
                 value={filterMember}
-                onValueChange={(value) => {
-                  setFilterMember(value as LeagueMemberDisplayName[]);
-                  setFilterCastaway([]);
-                  setFilterTribe([]);
-                }}
+                onValueChange={(value) => setFilterMember(value as LeagueMemberDisplayName[])}
                 modalPopover
-                placeholder='Members'
+                placeholder='All Members'
               />
             </div>
             <div className='w-min flex flex-col items-center'>
@@ -171,21 +163,25 @@ export default function RecentActivity() {
                 Event Filter
               </Label>
               <MultiSelect
-                options={Object.values(customEventRules)
-                  .map((event) => ({
-                    value: event.eventName,
-                    label: event.eventName
-                  })).concat(Object.entries(BaseEventFullName)
+                options={[
+                  { label: 'Official Events', value: null },
+                  ...Object.entries(BaseEventFullName)
                     .map(([eventName, eventFullName]) => ({
                       value: eventName,
                       label: eventFullName
-                    })))}
+                    })),
+                  { label: 'Custom Events', value: null },
+                  ...Object.values(customEventRules)
+                    .map((event) => ({
+                      value: event.eventName,
+                      label: event.eventName
+                    }))
+                ]}
                 value={filterEvent}
-                onValueChange={(value) => {
-                  setFilterEvent(value as (BaseEventName | LeagueEventName)[]);
-                }}
+                onValueChange={(value) =>
+                  setFilterEvent(value as (BaseEventName | LeagueEventName)[])}
                 modalPopover
-                placeholder='Custom Events'
+                placeholder='All Events'
               />
             </div>
           </AccordionContent>
@@ -219,7 +215,13 @@ interface EpisodeEventsProps {
   };
 }
 
-export function EpisodeEvents({ episodeNumber, mockBases, mockPredictions, mockDirects, edit, filters }: EpisodeEventsProps) {
+export function EpisodeEvents({
+  episodeNumber,
+  mockBases,
+  mockPredictions,
+  mockDirects,
+  edit,
+  filters }: EpisodeEventsProps) {
   const {
     leagueData: {
       baseEvents,

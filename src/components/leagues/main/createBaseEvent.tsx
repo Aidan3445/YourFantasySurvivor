@@ -280,6 +280,12 @@ export default function CreateCustomEvent() {
                 references: selectedReferenceIds,
               }] : undefined}
               edit
+              filters={{
+                castaway: [],
+                tribe: [],
+                member: [],
+                event: []
+              }}
             />
           </span>
         </Form>

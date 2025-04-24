@@ -64,8 +64,8 @@ interface MultiSelectProps
   options: {
     /** The text to display for the option. */
     label: string;
-    /** The unique value associated with the option. */
-    value: string | number;
+    /** The unique value associated with the option. Null indicates a section label */
+    value: string | number | null;
     /** Optional icon component to display alongside the option. */
     icon?: React.ComponentType<{ className?: string }>;
   }[];
@@ -201,7 +201,9 @@ export const MultiSelect = React.forwardRef<
       if (selectedValues.length === options.length) {
         handleClear();
       } else {
-        const allValues = options.map((option) => option.value);
+        const allValues = options
+          .map((option) => option.value)
+          .filter((value) => value !== null);
         setSelectedValues(allValues);
         onValueChange(allValues);
       }
@@ -328,23 +330,29 @@ export const MultiSelect = React.forwardRef<
                   <span>(Select All)</span>
                 </CommandItem>
                 {options.map((option) => {
-                  const isSelected = selectedValues.includes(option.value);
+                  const isLabel = option.value === null;
+                  const isSelected = !isLabel && selectedValues.includes(option.value!);
                   return (
                     <CommandItem
-                      key={option.value}
-                      onSelect={() => toggleOption(option.value)}
-                      className='cursor-pointer'
+                      key={option.value ?? `label-${option.label}`}
+                      disabled={isLabel}
+                      onSelect={() => isLabel ? null : toggleOption(option.value!)}
+                      className={cn('cursor-pointer', isLabel && 'font-bold bg-b3')}
                     >
-                      <div
-                        className={cn(
-                          'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
-                          isSelected
-                            ? 'bg-primary text-primary-foreground'
-                            : 'opacity-50 [&_svg]:invisible'
-                        )}
-                      >
-                        <CheckIcon className='h-4 w-4' color='white' />
-                      </div>
+                      {isLabel ? null : (
+                        <>
+                          <div
+                            className={cn(
+                              'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                              isSelected
+                                ? 'bg-primary text-primary-foreground'
+                                : 'opacity-50 [&_svg]:invisible'
+                            )}
+                          >
+                            <CheckIcon className='h-4 w-4' color='white' />
+                          </div>
+                        </>
+                      )}
                       {option.icon && (
                         <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
                       )}

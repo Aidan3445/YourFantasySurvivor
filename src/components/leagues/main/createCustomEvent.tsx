@@ -225,6 +225,12 @@ export default function CreateCustomEvent() {
                   notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
                 })) : undefined}
               edit
+              filters={{
+                castaway: [],
+                tribe: [],
+                member: [],
+                event: []
+              }}
             />
           </span>
         </Form>
