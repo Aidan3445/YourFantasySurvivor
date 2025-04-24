@@ -82,7 +82,7 @@ export default function ChangeSurvivor() {
   }
   */
 
-  if (!availableCastaways.some(castaway => !castaway.pickedBy && castaway.startingTribe.tribeId > 0)) {
+  if (availableCastaways.every(castaway => castaway.pickedBy)) {
     return (
       <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
         <h1 className='text-xl text-muted-foreground font-semibold'>No Castaways Available</h1>
