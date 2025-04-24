@@ -374,7 +374,7 @@ export const MultiSelect = React.forwardRef<
                       </CommandItem>
                       <Separator
                         orientation='vertical'
-                        className='flex min-h-6 h-full'
+                        className='flex min-h-6 h-full mx-1'
                       />
                     </>
                   )}

@@ -29,7 +29,7 @@ export default function ChangeSurvivor() {
   const [selected, setSelected] = useState('');
 
   const availableCastaways = leagueData.castaways
-    .filter(castaway => !castaway.eliminatedEpisode)
+    .filter(castaway => !castaway.eliminatedEpisode && castaway.startingTribe.tribeId > 0)
     .map(castaway => ({
       ...castaway,
       pickedBy: leagueData.selectionTimeline.castawayMembers[castaway.fullName]?.slice(-1)[0]

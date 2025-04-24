@@ -2,8 +2,11 @@ import 'server-only';
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { type NewCastaway } from '~/server/db/defs/castaways';
+import { type CastawayDetails, type NewCastaway } from '~/server/db/defs/castaways';
 import type { NewTribe, TribeColor, TribeName } from '~/server/db/defs/tribes';
+import { db } from '~/server/db';
+import { castawaysSchema } from '~/server/db/schema/castaways';
+import { isNull } from 'drizzle-orm';
 
 export async function fetchSeasonInfo(seasonName: string) {
   const url = 'https://survivor.fandom.com/api.php';
@@ -108,3 +111,27 @@ export async function fetchSeasonInfo(seasonName: string) {
   }
 }
 
+export async function fetchAdditions(): Promise<CastawayDetails[]> {
+  return db
+    .select()
+    .from(castawaysSchema)
+    .where(isNull(castawaysSchema.seasonId))
+    .then((castaways) => {
+      return castaways.map((castaway) => ({
+        ...castaway,
+        startingTribe: {
+          tribeId: -1,
+          tribeName: 'Production',
+          tribeColor: '#000000',
+          episode: -1
+        },
+        tribes: [{
+          tribeId: -1,
+          tribeName: 'Production',
+          tribeColor: '#000000',
+          episode: -1
+        }],
+        eliminatedEpisode: null
+      }));
+    });
+}

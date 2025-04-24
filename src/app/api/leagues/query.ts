@@ -27,6 +27,7 @@ import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
 import type { EpisodeAirStatus, EpisodeNumber } from '~/server/db/defs/episodes';
 import { compileScores } from './[leagueHash]/scores';
+import { fetchAdditions } from '../sys/query';
 
 export const QUERIES = {
   /**
@@ -686,7 +687,7 @@ export const QUERIES = {
     const [
       baseEvents, tribesTimeline, elims, castaways, tribes,
       leagueEvents, baseEventRules,
-      selectionTimeline, leagueSettings, episodes
+      selectionTimeline, leagueSettings, episodes, additions
     ] = await Promise.all([
       SEASON_QUERIES.getBaseEvents(league.leagueSeason),
       SEASON_QUERIES.getTribesTimeline(league.leagueSeason),
@@ -700,6 +701,7 @@ export const QUERIES = {
       leagueSettingsPromise,
 
       QUERIES.getEpisodes(leagueHash, 100), // move to seasons
+      fetchAdditions(),
     ]);
 
     if (!leagueSettings) {
@@ -714,7 +716,7 @@ export const QUERIES = {
       scores,
       currentStreaks,
       baseEvents,
-      castaways,
+      castaways: [...castaways, ...additions],
       tribes,
       leagueEvents,
       selectionTimeline,
