@@ -41,8 +41,10 @@ export default function Scoreboard() {
         </TableHeader>
         <TableBody>
           {sortedMemberScores.map(([member, scores], index) => {
-            const color = league.members.list.find((m) => m.displayName === member)?.color ?? '#ffffff';
-            const survivorName = leagueData.selectionTimeline.memberCastaways[member]?.slice().pop() ?? 'None';
+            const color = league.members.list
+              .find((m) => m.displayName === member)?.color ?? '#ffffff';
+            const survivorName = leagueData.selectionTimeline.memberCastaways[member]?.slice()
+              .pop() ?? 'None';
             const survivor = leagueData.castaways.find((c) => c.fullName === survivorName)!;
             return (
               <MemberRow

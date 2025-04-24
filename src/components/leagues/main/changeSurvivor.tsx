@@ -82,6 +82,17 @@ export default function ChangeSurvivor() {
   }
   */
 
+  if (!availableCastaways.some(castaway => !castaway.pickedBy && castaway.startingTribe.tribeId > 0)) {
+    return (
+      <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
+        <h1 className='text-xl text-muted-foreground font-semibold'>No Castaways Available</h1>
+        <h3 className='text-md text-muted-foreground font-semibold'>
+          All castaways are either selected or eliminated.
+        </h3>
+      </div>
+    );
+  }
+
   if (lastEpisode && pickPriority.length > 0 && !dialogOpen) {
     return (
       <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
@@ -125,7 +136,6 @@ export default function ChangeSurvivor() {
                     defaultValue={selected}
                     value={selected}
                     onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
-
                     <SelectTrigger>
                       <SelectValue placeholder='Select castaway' />
                     </SelectTrigger>
@@ -140,13 +150,12 @@ export default function ChangeSurvivor() {
                                 backgroundColor:
                                   league.members.list
                                     .find(member => member.displayName === castaway.pickedBy)?.color,
-
                               }}>
                               <span
                                 className='flex items-center gap-1'
                                 style={{
-                                  color: getContrastingColor(league.members.list
-                                    .find(member => member.displayName === castaway.pickedBy)?.color ?? '#000000')
+                                  color: getContrastingColor(league.members.list.find(member =>
+                                    member.displayName === castaway.pickedBy)?.color ?? '#000000')
                                 }}>
                                 {<ColorRow
                                   className='w-20 px-0 justify-center leading-tight font-normal'
