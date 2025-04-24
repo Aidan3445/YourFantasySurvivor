@@ -14,6 +14,7 @@ const config = {
   },
   crossOrigin: 'anonymous',
   images: {
+    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -81,6 +82,13 @@ const config = {
         port: '',
         pathname: '/photo-**',
       },
+      {
+        protocol: 'https',
+        hostname: 'img.buymeacoffee.com',
+        port: '',
+        pathname: '/**',
+
+      }
     ],
   },
 };

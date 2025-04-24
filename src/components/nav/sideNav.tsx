@@ -13,6 +13,7 @@ import { cn } from '~/lib/utils';
 import { useParams } from 'next/navigation';
 import { CreateLeagueModal } from '../leagues/createLeague';
 import { Separator } from '../ui/separator';
+import Image from 'next/image';
 
 export default function SideNav() {
   return (
@@ -36,6 +37,21 @@ export default function SideNav() {
 function SideNavFooter() {
   return (
     <SidebarMenu className='mt-2'>
+      <SidebarMenuButton
+        className='hover:bg-transparent! active:bg-transparent!'
+        asChild
+        size='lg'>
+        <Link href='https://www.buymeacoffee.com/aidanweinberg' target='_blank' rel='noreferrer'>
+          <Image
+            className='hover:scale-105 active:scale-[1.075] transition-all'
+            src={'https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=aidanweinberg&button_colour=40DCA5&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00'}
+            alt='Buy me a coffee'
+            width={200}
+            height={50}
+
+          />
+        </Link>
+      </SidebarMenuButton>
       <ClerkLoading>
         <SidebarMenuButton size='lg'>
           <LoaderCircle className='animate-spin' color='#7f633f' />
