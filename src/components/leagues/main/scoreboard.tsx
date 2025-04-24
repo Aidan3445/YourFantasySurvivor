@@ -167,7 +167,8 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                   <PopoverArrow />
                   {`Survival streak: ${leagueData.currentStreaks[member] ?? 0}`}
                   <Separator className='my-1' />
-                  {`Point cap: ${league.settings.survivalCap} points`}
+                  {`Point cap: ${league.settings.survivalCap}`}
+                  <Flame className='align-baseline inline w-4 h-4' />
                 </PopoverContent>
               </Popover>
             )}
@@ -261,8 +262,8 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
             {hasSurvivalCap && (
               <Popover open={isMobile ? undefined : true}>
                 <PopoverTrigger>
-                  <div className='ml-1 w-4 flex justify-center'>
-                    <Skull size={16} />
+                  <div className='mx-1 flex justify-center'>
+                    2
                   </div>
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='start' side='bottom'>
@@ -270,9 +271,10 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
                   Survival streak points available
                   <br />
                   <br />
-                  Current streak: 0
+                  Current streak: 2
                   <Separator className='my-1' />
-                  Point cap from league settings: 5 points
+                  Point cap from league settings: 5
+                  <Flame className='align-baseline inline w-4 h-4' />
                 </PopoverContent>
               </Popover>
             )}
