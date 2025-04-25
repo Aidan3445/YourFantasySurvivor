@@ -548,7 +548,7 @@ function NotesPopover({ notes }: NotesPopoverProps) {
 
   if (!filteredNotes || filteredNotes.length === 0) return (
     <span className='w-full flex justify-end'>
-      <ScrollText className='stroke-muted-foreground/50' />
+      <ScrollText className='opacity-50' />
     </span>
   );
 
