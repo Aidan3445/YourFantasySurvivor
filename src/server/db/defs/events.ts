@@ -144,6 +144,7 @@ export type LeaguePredictionEvent = {
   referenceId: number,
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
+  hit: boolean,
   predictionMaker: LeagueMemberDisplayName,
   notes: string[] | null
 };

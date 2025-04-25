@@ -2,7 +2,7 @@
 'use client';
 
 import { PopoverArrow } from '@radix-ui/react-popover';
-import { Flame, ScrollText } from 'lucide-react';
+import { Flame, MoveRight, ScrollText } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
@@ -23,7 +23,7 @@ import { cn } from '~/lib/utils';
 import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes';
 import {
   type BaseEvent, BaseEventFullName, baseEventLabelPrefixes, baseEventLabels,
-  type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventName,
+  type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventId, type LeagueEventName,
   type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames
 } from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
@@ -70,15 +70,7 @@ export default function RecentActivity() {
 
   return (
     <section className='w-full bg-card rounded-lg relative place-items-center'>
-      <Accordion
-        type='single'
-        collapsible
-        onValueChange={() => {
-          setFilterCastaway([]);
-          setFilterTribe([]);
-          setFilterMember([]);
-          setFilterEvent([]);
-        }}>
+      <Accordion type='single' collapsible>
         <AccordionItem value='filter' className='border-none'>
           <span className='flex flex-wrap gap-x-4 items-baseline px-2 mr-14 justify-center'>
             <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
@@ -112,7 +104,7 @@ export default function RecentActivity() {
               Filters
             </AccordionTrigger>
           </span>
-          <AccordionContent className='w-full flex justify-evenly gap-4'>
+          <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center gap-4 px-2'>
             <div className='w-min flex flex-col items-center'>
               <Label className='text-sm font-semibold text-muted-foreground'>
                 Castaway Filter
@@ -247,19 +239,18 @@ export function EpisodeEvents({
             {edit && <TableHead className='w-0'>
               Edit
             </TableHead>}
-            <TableHead className='w-0'>Event</TableHead>
+            <TableHead>Event</TableHead>
             <TableHead className='text-center'>Points</TableHead>
-            <TableHead className='w-0'>
-              {noTribes ? null : 'Tribes'}
-            </TableHead>
-            <TableHead className='text-right w-0'>Castaways</TableHead>
-            <TableHead>Members</TableHead>
-            <TableHead className='text-right' >Notes</TableHead>
+            <TableHead>{noTribes ? null : 'Tribes'}</TableHead>
+            <TableHead className='text-right'>Castaways</TableHead>
+            <TableHead className='w-full'>Members</TableHead>
+            <TableHead className='text-right'>Notes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {episodeNumber === -1 ?
-            episodes.map((episode) => (
+          {episodes.filter((episode) =>
+            episodeNumber === -1 || episode.episodeNumber === episodeNumber)
+            .map((episode) => (
               <EpisodeEventsTableBody
                 key={episode.episodeNumber}
                 episodeNumber={episode.episodeNumber}
@@ -268,17 +259,8 @@ export function EpisodeEvents({
                 mockDirects={mockDirects}
                 edit={edit}
                 filters={filters}
-                labelRow />
-            )) : (
-              <EpisodeEventsTableBody
-                episodeNumber={episodeNumber}
-                mockBases={mockBases}
-                mockPredictions={mockPredictions}
-                mockDirects={mockDirects}
-                edit={edit}
-                filters={filters} />
-            )
-          }
+                labelRow={episodeNumber === -1} />
+            ))}
         </TableBody>
       </Table>
       <ScrollBar hidden orientation='horizontal' />
@@ -301,7 +283,8 @@ function EpisodeEventsTableBody({
       leagueEvents,
       baseEventRules,
       selectionTimeline,
-      castaways
+      castaways,
+      tribes
     }
   } = useLeague();
 
@@ -345,22 +328,39 @@ function EpisodeEventsTableBody({
         referenceId: event.referenceId,
         referenceType: event.referenceType,
         referenceName: event.referenceName,
-        predictionMakers: []
+        predictionMakers: [],
+        misses: []
       };
 
-      acc[event.eventId]!.predictionMakers.push(event.predictionMaker);
+      if (event.hit) acc[event.eventId]!.predictionMakers.push(event.predictionMaker);
+      else acc[event.eventId]!.misses.push({
+        predictionMaker: event.predictionMaker,
+        referenceName: (event.referenceType === 'Castaway' ?
+          castaways.find((castaway) => castaway.castawayId === event.referenceId)?.fullName :
+          tribes.find((tribe) => tribe.tribeId === event.referenceId)?.tribeName) ?? ''
+      });
 
       return acc;
-    }, {} as Record<number, {
-      eventId: number;
-      eventName: string;
+    }, {} as Record<LeagueEventId, {
+      eventId: LeagueEventId;
+      eventName: LeagueEventName;
       points: number;
       notes: string[] | null;
       referenceId: number;
       referenceType: ReferenceType;
-      referenceName: string;
+      // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+      referenceName: CastawayName | TribeName;
       predictionMakers: LeagueMemberDisplayName[];
-    }>) ?? {});
+      misses: {
+        predictionMaker: LeagueMemberDisplayName;
+        // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+        referenceName: CastawayName | TribeName;
+      }[]
+    }>) ?? {})
+    .map((event) => {
+      if (event.predictionMakers.length === 0) event.predictionMakers = ['No Correct Predictions'];
+      return event;
+    });
 
   const filteredDirectEvents = Object.values(
     leagueEvents.directEvents[episodeNumber] ?? {})
@@ -491,7 +491,7 @@ function EpisodeEventsTableBody({
       {combinedPredictions?.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
           <TableCell colSpan={7} className='text-xs text-muted-foreground'>
-            Correct Predictions
+            Predictions
           </TableCell>
         </TableRow>}
       {combinedPredictions?.map((event, index) => (
@@ -504,6 +504,8 @@ function EpisodeEventsTableBody({
           referenceName={event.referenceName}
           referenceId={event.referenceId}
           predictionMakers={event.predictionMakers}
+          misses={event.misses}
+          defaultOpenMisses={filters.member.length > 0}
           notes={event.notes}
           episodeNumber={episodeNumber}
           edit={edit} />
@@ -542,7 +544,9 @@ interface NotesPopoverProps {
 }
 
 function NotesPopover({ notes }: NotesPopoverProps) {
-  if (!notes || notes.length === 0) return (
+  const filteredNotes = notes?.filter((note) => !!note);
+
+  if (!filteredNotes || filteredNotes.length === 0) return (
     <span className='w-full flex justify-end'>
       <ScrollText className='stroke-muted-foreground/50' />
     </span>
@@ -553,10 +557,10 @@ function NotesPopover({ notes }: NotesPopoverProps) {
       <PopoverTrigger className='ml-auto flex justify-end'>
         <ScrollText />
       </PopoverTrigger>
-      <PopoverContent side='left'>
+      <PopoverContent className='pl-6 w-max max-w-[40svw] min-w-72' side='left'>
         <PopoverArrow />
         <ul>
-          {notes.map((note, index) => (
+          {filteredNotes.map((note, index) => (
             <li className='list-disc' key={index}>
               {note.startsWith('https://') ?
                 <a
@@ -698,6 +702,12 @@ interface LeagueEventRowProps {
   referenceId: number;
   predictionMakers?: LeagueMemberDisplayName[];
   notes: string[] | null;
+  misses?: {
+    predictionMaker: LeagueMemberDisplayName;
+    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+    referenceName: CastawayName | TribeName;
+  }[];
+  defaultOpenMisses?: boolean;
   episodeNumber: EpisodeNumber;
   edit?: boolean;
 }
@@ -711,6 +721,8 @@ function LeagueEventRow({
   referenceId,
   predictionMakers,
   notes,
+  misses,
+  defaultOpenMisses,
   episodeNumber,
   edit,
   className
@@ -756,7 +768,7 @@ function LeagueEventRow({
       </TableCell>
       <TableCell className='text-xs text-nowrap'>
         <div className={cn(
-          'flex flex-col text-xs h-full gap-0.5',
+          'flex flex-col text-xs h-full gap-0.5 relative',
           predictionMakers?.length === 1 && 'justify-center')}>
           {predictionMakers?.map((member, index) =>
             member ?
@@ -771,6 +783,42 @@ function LeagueEventRow({
                 None
               </ColorRow>
           )}
+          {misses && misses.length > 0 &&
+            <Accordion
+              type='single'
+              collapsible
+              value={defaultOpenMisses ? 'misses' : undefined}>
+              <AccordionItem value='misses' className='border-none'>
+                <AccordionTrigger className='p-0 text-xs leading-tight text-muted-foreground'>
+                  Missed Predictions
+                </AccordionTrigger>
+                <AccordionContent className='p-0'>
+                  <div className='flex flex-col gap-0.5'>
+                    {misses.map((miss, index) => (
+                      <span key={index} className='text-xs flex gap-1 items-center opacity-60'>
+                        <ColorRow
+                          className='leading-tight px-1 w-min'
+                          color={league.members.list.find((listItem) =>
+                            listItem.displayName === miss.predictionMaker)?.color}>
+                          {miss.predictionMaker}
+                        </ColorRow>
+                        <MoveRight size={12} stroke='#000000' />
+                        <ColorRow
+                          className='leading-tight px-1 w-min'
+                          color={referenceType === 'Castaway' ?
+                            leagueData.castaways.find((castaway) =>
+                              castaway.fullName === miss.referenceName)?.tribes
+                              .findLast((tribeEp) => tribeEp.episode <= episodeNumber)?.tribeColor :
+                            leagueData.tribes.find((tribe) =>
+                              tribe.tribeName === miss.referenceName)?.tribeColor}>
+                          {miss.referenceName}
+                        </ColorRow>
+                      </span>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>}
         </div>
       </TableCell>
       <TableCell>

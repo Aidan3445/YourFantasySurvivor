@@ -27,7 +27,7 @@ import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
 import type { EpisodeAirStatus, EpisodeNumber } from '~/server/db/defs/episodes';
 import { compileScores } from './[leagueHash]/scores';
-import { fetchAdditions } from '../sys/query';
+import { QUERIES as SYS_QUERIES } from '../sys/query';
 
 export const QUERIES = {
   /**
@@ -484,7 +484,7 @@ export const QUERIES = {
       }, {} as Record<EpisodeNumber, Record<ReferenceType, LeagueDirectEvent[]>>));
 
 
-    const predictionHitsPromise = db
+    const predictionsPromise = db
       .select({
         leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventId: leagueEventsSchema.leagueEventId,
@@ -492,8 +492,10 @@ export const QUERIES = {
         points: leagueEventsRulesSchema.points,
         episodeNumber: episodesSchema.episodeNumber,
         predictionMaker: leagueMembersSchema.displayName,
-        referenceType: leagueEventsSchema.referenceType,
-        referenceId: leagueEventsSchema.referenceId,
+        referenceType: leagueEventPredictionsSchema.referenceType,
+        referenceId: leagueEventPredictionsSchema.referenceId,
+        resultReferenceType: leagueEventsSchema.referenceType,
+        resultReferenceId: leagueEventsSchema.referenceId,
         castaway: castawaysSchema.fullName,
         tribe: tribesSchema.tribeName,
         notes: leagueEventsSchema.notes,
@@ -507,7 +509,6 @@ export const QUERIES = {
       // prediction
       .innerJoin(leagueEventPredictionsSchema, and(
         eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
-        eq(leagueEventPredictionsSchema.referenceId, leagueEventsSchema.referenceId),
         or(
           // if the prediction episode matches the event for weekly predictions
           and(
@@ -534,6 +535,8 @@ export const QUERIES = {
         predictionMaker: LeagueMemberDisplayName,
         referenceType: ReferenceType,
         referenceId: number,
+        resultReferenceType: ReferenceType,
+        resultReferenceId: number,
         castaway: CastawayName | null,
         tribe: TribeName | null,
         notes: string[] | null
@@ -544,8 +547,10 @@ export const QUERIES = {
           eventId: event.eventId,
           eventName: event.eventName,
           points: event.points,
-          referenceType: event.referenceType,
+          referenceType: event.resultReferenceType,
           referenceId: event.referenceId,
+          hit: event.resultReferenceId === event.referenceId &&
+            event.resultReferenceType === event.referenceType,
           predictionMaker: event.predictionMaker,
           notes: event.notes,
         };
@@ -563,8 +568,10 @@ export const QUERIES = {
       }, {} as Record<EpisodeNumber, LeaguePredictionEvent[]>));
 
     const [directEvents, predictionEvents] = await Promise.all([
-      directEventsPromise, predictionHitsPromise
+      directEventsPromise, predictionsPromise
     ]);
+
+    console.log(predictionEvents);
 
     return { directEvents, predictionEvents };
   },
@@ -701,7 +708,7 @@ export const QUERIES = {
       leagueSettingsPromise,
 
       QUERIES.getEpisodes(leagueHash, 100), // move to seasons
-      fetchAdditions(),
+      SYS_QUERIES.fetchAdditions(),
     ]);
 
     if (!leagueSettings) {

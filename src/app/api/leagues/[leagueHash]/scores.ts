@@ -123,6 +123,7 @@ export function compileScores(
   Object.entries(leagueEvents.predictionEvents).forEach(([episodeNumber, events]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(events).forEach((event) => {
+      if (!event.hit) return;
       // prediction events just earn points for the member who made the prediction
       scores.Member[event.predictionMaker] ??= [];
       scores.Member[event.predictionMaker]![episodeNum] ??= 0;

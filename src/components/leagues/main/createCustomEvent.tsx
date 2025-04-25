@@ -222,6 +222,7 @@ export default function CreateCustomEvent() {
                   referenceName: selectedReferenceType === 'Castaway' ?
                     castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
                     tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
+                  hit: true,
                   notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
                 })) : undefined}
               edit
