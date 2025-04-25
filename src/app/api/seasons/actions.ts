@@ -38,8 +38,6 @@ export async function createBaseEvent(baseEvent: BaseEventInsert) {
         referenceId: referenceId,
       }));
 
-      console.log(baseEvent.updateTribe);
-
       if (baseEvent.updateTribe) {
         eventRefs.push({
           baseEventId,

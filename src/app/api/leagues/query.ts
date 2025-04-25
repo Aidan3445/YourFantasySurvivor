@@ -571,8 +571,6 @@ export const QUERIES = {
       directEventsPromise, predictionsPromise
     ]);
 
-    console.log(predictionEvents);
-
     return { directEvents, predictionEvents };
   },
 
