@@ -789,7 +789,7 @@ function LeagueEventRow({
               collapsible
               value={defaultOpenMisses ? 'misses' : undefined}>
               <AccordionItem value='misses' className='border-none'>
-                <AccordionTrigger className='p-0 text-xs leading-tight text-muted-foreground'>
+                <AccordionTrigger className='p-0 text-xs leading-tight text-muted-foreground stroke-muted-foreground'>
                   Missed Predictions
                 </AccordionTrigger>
                 <AccordionContent className='p-0'>
