@@ -209,7 +209,7 @@ export const baseEventLabelPrefixes: Record<BaseEventName, string> = {
   advPlay: 'Correctly played',
   badAdvPlay: 'Incorrectly played',
   advElim: 'Eliminated with',
-  spokeEpTitle: 'Spoke',
+  spokeEpTitle: '',
   tribe1st: '1st',
   tribe2nd: '2nd',
   indivWin: 'Won',
