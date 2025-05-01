@@ -72,7 +72,7 @@ export default function RecentActivity() {
     <section className='w-full bg-card rounded-lg relative place-items-center'>
       <Accordion type='single' collapsible>
         <AccordionItem value='filter' className='border-none'>
-          <span className='flex flex-wrap gap-x-4 items-baseline px-2 mr-14 justify-center'>
+          <span className='w-full flex flex-col items-center md:flex-row gap-x-4 md:items-baseline px-2 mr-14 justify-center'>
             <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
             <Select
               defaultValue={`${selectedEpisode}`}
