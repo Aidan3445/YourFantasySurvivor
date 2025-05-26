@@ -590,7 +590,7 @@ export function AirStatus({ airDate, airStatus, showDate = true, showTime = true
   return (
     <span className='inline-flex gap-1 items-center text-sm text-muted-foreground'>
       {showDate && (showTime ? airDate.toLocaleString() : airDate.toLocaleDateString())}
-      <div className={cn('text-destructive-foreground text-xs px-1 rounded-md',
+      <div className={cn('text-destructive-foreground text-xs px-1 rounded-md text-nowrap',
         airStatus === 'Aired' && 'bg-destructive',
         airStatus === 'Upcoming' && 'bg-amber-500',
         airStatus === 'Airing' && 'bg-green-600')}>

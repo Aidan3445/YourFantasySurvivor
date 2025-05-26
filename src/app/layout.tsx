@@ -7,6 +7,7 @@ import { SidebarProvider } from '~/components/ui/sidebar';
 import Nav, { BottomNavSpacer } from '~/components/nav/navSelector';
 import UserProvider from '~/context/yfsUserContext';
 import { QUERIES } from './api/leagues/query';
+import { systemAdminAuth } from '~/lib/auth';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -27,6 +28,8 @@ interface RootLayoutProps {
 export default async function RootLayout({ children }: RootLayoutProps) {
   const leagues = await QUERIES.getLeagues();
 
+  const { userId: sys } = await systemAdminAuth();
+
   return (
     <StrictMode>
       <ClerkProvider
@@ -40,7 +43,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <html lang='en'>
             <body className={`font-sans ${inter.variable} `}>
               <SidebarProvider defaultOpen>
-                <Nav />
+                {sys && <Nav />}
                 <div className='w-full'>
                   {children}
                   <BottomNavSpacer />
