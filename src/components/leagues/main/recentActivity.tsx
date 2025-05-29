@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 'use client';
 
 import { PopoverArrow } from '@radix-ui/react-popover';
@@ -72,37 +71,39 @@ export default function RecentActivity() {
     <section className='w-full bg-card rounded-lg relative place-items-center'>
       <Accordion type='single' collapsible>
         <AccordionItem value='filter' className='border-none'>
-          <span className='w-full flex flex-col items-center md:flex-row gap-x-4 md:items-baseline px-2 mr-14 justify-center'>
+          <span className='w-full flex flex-wrap items-center gap-x-4 md:items-baseline px-12 mr-14 justify-center'>
             <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
-            <Select
-              defaultValue={`${selectedEpisode}`}
-              value={`${selectedEpisode}`}
-              onValueChange={(value) => setSelectedEpisode(Number(value))}>
-              <SelectTrigger className='w-min'>
-                <SelectValue placeholder='Select an episode' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='-1'>
-                  All Episodes
-                </SelectItem>
-                {episodes.toReversed()
-                  .map((episode) => (
-                    <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
-                      {`${episode.episodeNumber}:`} {episode.episodeTitle}
-                      <div className='inline ml-1'>
-                        <AirStatus
-                          airDate={episode.episodeAirDate}
-                          airStatus={episode.airStatus}
-                          showTime={false}
-                          showDate={!isMobile} />
-                      </div>
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-            <AccordionTrigger className='w-full'>
-              Filters
-            </AccordionTrigger>
+            <span className='flex flex-wrap gap-x-4 items-center justify-center'>
+              <Select
+                defaultValue={`${selectedEpisode}`}
+                value={`${selectedEpisode}`}
+                onValueChange={(value) => setSelectedEpisode(Number(value))}>
+                <SelectTrigger className='w-min'>
+                  <SelectValue placeholder='Select an episode' />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value='-1'>
+                    All Episodes
+                  </SelectItem>
+                  {episodes.toReversed()
+                    .map((episode) => (
+                      <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
+                        {`${episode.episodeNumber}:`} {episode.episodeTitle}
+                        <div className='inline ml-1'>
+                          <AirStatus
+                            airDate={episode.episodeAirDate}
+                            airStatus={episode.airStatus}
+                            showTime={false}
+                            showDate={!isMobile} />
+                        </div>
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+              <AccordionTrigger className='w-full'>
+                Filters
+              </AccordionTrigger>
+            </span>
           </span>
           <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center gap-4 px-2'>
             <div className='w-min flex flex-col items-center'>
@@ -590,7 +591,7 @@ export function AirStatus({ airDate, airStatus, showDate = true, showTime = true
   return (
     <span className='inline-flex gap-1 items-center text-sm text-muted-foreground'>
       {showDate && (showTime ? airDate.toLocaleString() : airDate.toLocaleDateString())}
-      <div className={cn('text-destructive-foreground text-xs px-1 rounded-md text-nowrap',
+      <div className={cn('text-destructive-foreground text-xs px-1 rounded-md text-nowrap w-full',
         airStatus === 'Aired' && 'bg-destructive',
         airStatus === 'Upcoming' && 'bg-amber-500',
         airStatus === 'Airing' && 'bg-green-600')}>
