@@ -6,7 +6,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { useLeague } from '~/hooks/useLeague';
 import {
   type LeagueEventRule, LeagueEventRuleZod, LeagueEventTypeOptions,
-  LeaguePredictionTimingOptions, ReferenceOptions, defaultLeagueEventRule
+  PredictionTimingOptions, ReferenceOptions, defaultLeagueEventRule
 } from '~/server/db/defs/events';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
@@ -273,7 +273,7 @@ export function CustomEventFields({ predictionDefault, children }: CustomEventFi
               </FormLabel>
               <FormControl>
                 <MultiSelect
-                  options={LeaguePredictionTimingOptions
+                  options={PredictionTimingOptions
                     .map((option) => ({ label: option, value: option }))}
                   onValueChange={field.onChange}
                   defaultValue={field.value as string[]}

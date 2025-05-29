@@ -18,7 +18,7 @@ import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/server/db/def
 import {
   type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent,
   type BaseEventRule, type LeagueEventId, type LeagueEventName,
-  LeaguePredictionTimingOptions,
+  PredictionTimingOptions,
   defaultBaseRules,
   type LeagueEventTiming,
   type Prediction
@@ -516,7 +516,7 @@ export const QUERIES = {
             arrayOverlaps(leagueEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
           // if the event is not weekly, the episode doesn't matter
           // note manual predictions should not be possible but just in case
-          arrayOverlaps(leagueEventsRulesSchema.timing, LeaguePredictionTimingOptions
+          arrayOverlaps(leagueEventsRulesSchema.timing, PredictionTimingOptions
             .filter(timing => !timing.includes('Weekly'))))))
       .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, leagueEventPredictionsSchema.memberId))
       // references
@@ -894,7 +894,7 @@ export const QUERIES = {
             arrayOverlaps(leagueEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
           // if the event is not weekly, the episode doesn't matter
           // note manual predictions should not be possible but just in case
-          arrayOverlaps(leagueEventsRulesSchema.timing, LeaguePredictionTimingOptions
+          arrayOverlaps(leagueEventsRulesSchema.timing, PredictionTimingOptions
             .filter(timing => !timing.includes('Weekly'))))))
       .leftJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
       .leftJoin(castawaysSchema, and(

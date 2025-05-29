@@ -82,11 +82,11 @@ export const LeagueEventTypeOptions = ['Direct', 'Prediction'] as const;
 export type LeagueEventType = typeof LeagueEventTypeOptions[number];
 export const EventTypeZod = z.enum(LeagueEventTypeOptions);
 
-export const LeaguePredictionTimingOptions = [
+export const PredictionTimingOptions = [
   'Draft', 'Weekly', 'After Merge', 'Before Finale',
   'Weekly (Premerge only)', 'Weekly (Postmerge only)'] as const;
-export type LeagueEventTiming = typeof LeaguePredictionTimingOptions[number];
-export const EventTimingZod = z.enum(LeaguePredictionTimingOptions);
+export type LeagueEventTiming = typeof PredictionTimingOptions[number];
+export const EventTimingZod = z.enum(PredictionTimingOptions);
 
 export const ReferenceOptions = ['Castaway', 'Tribe'] as const;
 export type ReferenceType = typeof ReferenceOptions[number];
