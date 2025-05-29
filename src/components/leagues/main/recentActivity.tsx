@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 'use client';
 
 import { PopoverArrow } from '@radix-ui/react-popover';
