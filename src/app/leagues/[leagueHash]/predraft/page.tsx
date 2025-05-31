@@ -13,7 +13,7 @@ export default async function LeaguePage() {
   return (
     <main className='flex flex-col gap-0 w-full md:p-4 pb-0 md:h-auto'>
       <Tabs
-        className='w-full md:bg-secondary rounded-3xl md:border md:h-[calc(100svh-4rem)] md:overflow-hidden'
+        className='w-full md:bg-secondary rounded-3xl md:border md:h-[calc(100svh-5rem)] md:overflow-hidden'
         defaultValue='draft'>
         <TabsList className='sticky top-10 md:static grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
           <TabsTrigger value='draft'>Draft</TabsTrigger>
@@ -41,7 +41,7 @@ export default async function LeaguePage() {
               <LeagueSettings />
             </section>
           </TabsContent>
-          <ScrollBar hidden orientation='vertical' />
+          <ScrollBar orientation='vertical' />
         </ScrollArea>
       </Tabs>
     </main >

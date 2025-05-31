@@ -10,7 +10,8 @@ export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagu
 
 type Response = {
   league: League,
-  leagueData: LeagueData
+  leagueData: LeagueData,
+  episodeAiring: boolean
 };
 
 const leagueFetcher: Fetcher<Response, SWRKey> = ({ leagueHash }) =>
@@ -21,8 +22,16 @@ export function useLeague() {
   const { leagueHash } = useParams();
   const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher,
     {
-      refreshInterval: 60000,
-      refreshWhenHidden: false
+      refreshInterval: (data) => {
+        // no refresh if league is inactive or no data
+        if (!data || data.league.leagueStatus === 'Inactive') return 0;
+        // if an episode is airing, refresh every 10 seconds
+        if (data.episodeAiring) return 10000;
+        // otherwise, refresh every minute
+        return 60000;
+      },
+      refreshWhenHidden: false,
+      refreshWhenOffline: false,
     });
 
   const league = data?.league;

@@ -240,5 +240,5 @@ export const QUERIES = {
         tribeName: row.tribeName,
         tribeColor: row.tribeColor,
       })));
-  }
+  },
 };
