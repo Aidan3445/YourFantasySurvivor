@@ -38,9 +38,9 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
   if (!userId) {
     return (
       <main className='w-full flex justify-center mt-2'>
-        {query?.SignUp ?
+        {query?.signUp ?
           <SignUp forceRedirectUrl={`/i/${leagueHash}`} signInUrl={`/i/${leagueHash}`} /> :
-          <SignIn forceRedirectUrl={`/i/${leagueHash}`} signUpUrl={`/i/${leagueHash}?SignUp=true`} />
+          <SignIn forceRedirectUrl={`/i/${leagueHash}`} signUpUrl={`/i/${leagueHash}?signUp=true`} />
         }
       </main>
     );

@@ -1,8 +1,9 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { type NavLinkProps } from './navSelector';
 import Link from 'next/link';
-import { Home, LoaderCircle, LogIn, Trophy } from 'lucide-react';
+import { LoaderCircle, LogIn, Trophy } from 'lucide-react';
 import { cn } from '~/lib/utils';
+import Image from 'next/image';
 
 export const navHeight = 'h-10';
 
@@ -12,7 +13,13 @@ export default function BottomNav() {
       <span className='flex items-center justify-evenly h-full'>
         <BottomNavLink
           href='/'
-          icon={<Home className='active:stroke-green-800 transition-colors' size={28} />} />
+          icon={
+            <Image
+              src='/Icon.ico'
+              alt='Your Fantasy Survivor Logo'
+              width={28}
+              height={28}
+              className='transition filter brightness-0 active:brightness-100 active:saturate-200 active:hue-rotate-90' />} />
         {/*<BottomNavLink href='/playground' icon={<Flame size={26} />} />*/}
         <BottomNavLink
           href='/leagues'

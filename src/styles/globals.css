@@ -61,6 +61,10 @@ body  {
   @apply pt-0;
 }
 
+.cl-card.cl-signIn-start {
+  @apply pt-10;
+}
+
 .cl-logoBox {
   @apply h-44;
 }

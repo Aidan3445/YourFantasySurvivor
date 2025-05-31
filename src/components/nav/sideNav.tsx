@@ -3,7 +3,7 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
 import { SidebarMenuButton, SidebarMenuSub } from '~/components/ui/sidebar';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/ui/sidebar';
-import { Home, ListPlus, LoaderCircle, Trophy } from 'lucide-react';
+import { ListPlus, LoaderCircle, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { type NavLinkProps } from './navSelector';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
@@ -21,8 +21,19 @@ export default function SideNav() {
       <SidebarContent className='h-svh overflow-y-auto sticky top-0'>
         <SidebarGroup>
           <SidebarMenu>
-            <SideNavLink href='/' icon={<Home />} label='Home' />
-            <SideNavLeagues />
+            <SideNavLink
+              href='/' icon={
+                <Image
+                  src='/Icon.ico'
+                  alt='Your Fantasy Survivor Logo'
+                  width={24}
+                  height={24}
+                  className='brightness-0' />
+              }
+              label='Your Fantasy Survivor' />
+            <SignedIn>
+              <SideNavLeagues />
+            </SignedIn>
             {/*<SideNavLink href='/seasons' icon={<BookUser />} label='Seasons' />
             <SideNavLink href='/playground' icon={<Flame />} label='Playground' />
             <SidebarSeparator />*/}
@@ -58,13 +69,13 @@ function SideNavFooter() {
         </SidebarMenuButton>
       </ClerkLoading>
       <ClerkLoaded>
-        <SidebarMenuButton size='lg'>
-          <SignedIn>
+        <SignedIn>
+          <SidebarMenuButton size='lg'>
             <UserButton showName />
-          </SignedIn>
-        </SidebarMenuButton>
+          </SidebarMenuButton>
+        </SignedIn>
       </ClerkLoaded>
-    </SidebarMenu>
+    </SidebarMenu >
   );
 }
 
