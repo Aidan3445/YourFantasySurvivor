@@ -13,25 +13,26 @@ import LeagueScoring from '~/components/leagues/leagueScoring';
 import CreateCustomEvent from '~/components/leagues/main/createCustomEvent';
 import Predictions from '~/components/leagues/main/predictions';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import LeagueChat from '~/components/leagues/main/leagueChat';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
   const { role } = await leagueMemberAuth(leagueHash);
   const { userId } = await systemAdminAuth();
   return (
-    <main className='flex flex-col gap-0 w-full md:p-4 pb-0 md:h-auto'>
+    <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>
       <Tabs
-        className='w-full md:bg-secondary rounded-3xl md:border md:h-[calc(100svh-5rem)] md:overflow-hidden'
+        className='w-full shadow-lg md:bg-secondary rounded-3xl md:border md:h-[calc(100svh-5rem)] md:overflow-hidden'
         defaultValue='scores'>
-        <TabsList className='sticky md:static flex w-full px-10 rounded-none z-50'>
+        <TabsList className='sticky top-10 md:static flex w-full px-10 rounded-none z-50'>
           <TabsTrigger className='flex-1' value='scores'>Scores</TabsTrigger>
           {role !== 'Member' && <TabsTrigger className='flex-1' value='events'>Commish</TabsTrigger>}
           {userId && <TabsTrigger className='flex-1' value='Base'>Base</TabsTrigger>}
           <TabsTrigger className='flex-0 ml-10' value='settings'>Settings</TabsTrigger>
         </TabsList>
-        <ScrollArea className='h-full'>
+        <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-visible'>
           <TabsContent value='scores'>
-            <section className='space-y-4 w-fit md:pb-14 place-items-center px-4'>
+            <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-14'>
               <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-2 md:grid-rows-1 gap-4 items-center justify-center overflow-x-auto'>
                 <Scoreboard />
                 <Chart />
@@ -64,9 +65,11 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               <CustomEvents />
             </section>
           </TabsContent>
+          <div className='h-2' />
           <ScrollBar orientation='vertical' />
         </ScrollArea>
       </Tabs>
+      <LeagueChat />
     </main >
   );
 }

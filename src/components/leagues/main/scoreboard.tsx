@@ -96,22 +96,22 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
 
   return (
     <TableRow>
-      <TableCell>
+      <TableCell className='px-1'>
         <ColorRow className='justify-center p-0' color={color}>
           {place}
         </ColorRow>
       </TableCell>
-      <TableCell>
+      <TableCell className='px-1'>
         <ColorRow className='justify-center p-0' color={color}>
           {points}
         </ColorRow>
       </TableCell>
-      <TableCell className='text-nowrap'>
+      <TableCell className='text-nowrap px-1'>
         <ColorRow className='justify-center' color={color}>
           {member}
         </ColorRow>
       </TableCell>
-      <TableCell className='text-nowrap'>
+      <TableCell className='text-nowrap px-1'>
         <ColorRow className='justify-center pr-0' color={survivor.eliminatedEpisode
           ? '#AAAAAA' : survivor.startingTribe.tribeColor}>
           {isMobile ? survivor.shortName : survivor.fullName}
