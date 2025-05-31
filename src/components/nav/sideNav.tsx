@@ -58,19 +58,17 @@ function SideNavFooter() {
             src={'https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=aidanweinberg&button_colour=40DCA5&font_colour=000000&font_family=Lato&outline_colour=000000&coffee_colour=FFDD00'}
             alt='Buy me a coffee'
             width={200}
-            height={50}
-
-          />
+            height={50} />
         </Link>
       </SidebarMenuButton>
       <ClerkLoading>
-        <SidebarMenuButton size='lg'>
+        <SidebarMenuButton className='' size='lg'>
           <LoaderCircle className='animate-spin' color='#7f633f' />
         </SidebarMenuButton>
       </ClerkLoading>
       <ClerkLoaded>
         <SignedIn>
-          <SidebarMenuButton size='lg'>
+          <SidebarMenuButton className='' size='lg'>
             <UserButton showName />
           </SidebarMenuButton>
         </SignedIn>
@@ -81,7 +79,7 @@ function SideNavFooter() {
 
 function SideNavLink({ href, icon, label, className }: NavLinkProps) {
   return (
-    <SidebarMenuButton asChild size='lg'>
+    <SidebarMenuButton className='' asChild size='lg'>
       <Link className={cn('w-full flex gap-5 items-center transition-all', className)} href={href}>
         {icon}
         {label}
@@ -120,7 +118,7 @@ function SideNavLeagues() {
       value={open}
       onValueChange={() => toggleOpen()}>
       <AccordionItem value='leagues'>
-        <SidebarMenuButton asChild size='lg'>
+        <SidebarMenuButton className='' asChild size='lg'>
           <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all'>
             <span className='w-full flex gap-5 items-center'>
               <Trophy />
@@ -141,7 +139,7 @@ function SideNavLeagues() {
                   label={league.leagueName} />
               ))}
             <Separator />
-            {leagues.some(league => league.leagueStatus === 'Inactive') && (
+            {(leagues.length > 5 || leagues.some(league => league.leagueStatus === 'Inactive')) && (
               <SideNavLink
                 className='text-nowrap'
                 href='/leagues'
@@ -149,7 +147,7 @@ function SideNavLeagues() {
             )}
             <CreateLeagueModal>
               <SidebarMenuButton asChild size='lg'>
-                <span className='w-full flex gap-5 items-center transition-all text-nowrap'>
+                <span className='w-full flex gap-5  items-center transition-all text-nowrap'>
                   Create League
                   <ListPlus />
                 </span>

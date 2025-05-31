@@ -20,7 +20,7 @@ import {
 
 const SIDEBAR_COOKIE_NAME = 'sidebar:state';
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = '17rem';
+const SIDEBAR_WIDTH = '14rem';
 const SIDEBAR_WIDTH_ICON = '3rem';
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b';
 
@@ -180,7 +180,7 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            'relative h-mvh w-[--sidebar-width] bg-sidebar border-b-10 border-black',
+            'relative h-mvh w-[--sidebar-width] min-w-[--sidebar-width] bg-sidebar border-b-10 border-black',
             className
           )}
           ref={ref}
