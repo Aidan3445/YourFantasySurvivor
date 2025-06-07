@@ -6,12 +6,13 @@ import { DraftCountdown } from '~/components/leagues/draftCountdown';
 import DraftOrder from '~/components/leagues/draftOrder';
 import InviteLink from '~/components/leagues/inviteLink';
 import LeagueScoring from '~/components/leagues/leagueScoring';
+import LeagueChat from '~/components/leagues/main/leagueChat';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 
 export default async function LeaguePage() {
   return (
-    <main className='flex flex-col gap-0 w-full md:p-4 pb-0 md:h-auto'>
+    <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>
       <Tabs
         className='w-full md:bg-secondary rounded-3xl md:border md:h-[calc(100svh-5rem)] md:overflow-hidden'
         defaultValue='draft'>
@@ -44,6 +45,7 @@ export default async function LeaguePage() {
           <ScrollBar orientation='vertical' />
         </ScrollArea>
       </Tabs>
+      <LeagueChat />
     </main >
   );
 }
