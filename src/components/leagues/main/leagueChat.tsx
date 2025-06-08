@@ -1,20 +1,20 @@
 'use client';
+
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '~/lib/utils';
-import Ably from 'ably';
+import { Realtime } from 'ably';
 import { ChatClient } from '@ably/chat';
 import { ChatClientProvider, ChatRoomProvider } from '@ably/chat/react';
-import ChatRoom from './chatRoom';
+import ChatRoom, { type ChatRoomProps } from './chatRoom';
 
-export default function LeagueChat() {
+export default function LeagueChat({ chatHistory }: ChatRoomProps) {
   const params = useParams();
   const leagueHash = params.leagueHash as string;
   const [open, setOpen] = useState(true);
 
-
-  const realtimeClient = new Ably.Realtime({ authUrl: `/api/leagues/${leagueHash}/chat` });
+  const realtimeClient = new Realtime({ authUrl: `/api/leagues/${leagueHash}/chat` });
   const chatClient = new ChatClient(realtimeClient);
   return (
     <div className={cn('relative w-1/2 transition-all', open ? 'w-1/2' : 'w-0')}>
@@ -28,7 +28,7 @@ export default function LeagueChat() {
           </h3>
           <ChatClientProvider client={chatClient}>
             <ChatRoomProvider name={leagueHash}>
-              <ChatRoom />
+              <ChatRoom chatHistory={chatHistory} />
             </ChatRoomProvider>
           </ChatClientProvider>
         </div>

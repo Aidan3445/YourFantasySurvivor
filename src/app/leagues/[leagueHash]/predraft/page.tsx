@@ -1,3 +1,4 @@
+import { QUERIES } from '~/app/api/leagues/query';
 import CustomEvents from '~/components/leagues/customization/customEvents';
 import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
 import MemberEditForm from '~/components/leagues/customization/memberEdit';
@@ -9,8 +10,12 @@ import LeagueScoring from '~/components/leagues/leagueScoring';
 import LeagueChat from '~/components/leagues/main/leagueChat';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { type LeaguePageProps } from '../layout';
 
-export default async function LeaguePage() {
+export default async function LeaguePage({ params }: LeaguePageProps) {
+  const { leagueHash } = await params;
+  const chatHistory = await QUERIES.getChatHistory(leagueHash);
+
   return (
     <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>
       <Tabs
@@ -45,7 +50,7 @@ export default async function LeaguePage() {
           <ScrollBar orientation='vertical' />
         </ScrollArea>
       </Tabs>
-      <LeagueChat />
+      <LeagueChat chatHistory={chatHistory} />
     </main >
   );
 }

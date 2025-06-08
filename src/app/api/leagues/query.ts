@@ -28,6 +28,8 @@ import type { Tribe, TribeName } from '~/server/db/defs/tribes';
 import type { EpisodeAirStatus, EpisodeNumber } from '~/server/db/defs/episodes';
 import { compileScores } from './[leagueHash]/scores';
 import { QUERIES as SYS_QUERIES } from '../sys/query';
+import { leagueChatSchema } from '~/server/db/schema/leagueChat';
+import { type Message } from 'node_modules/@ably/chat/dist/core/message';
 
 export const QUERIES = {
   /**
@@ -122,7 +124,7 @@ export const QUERIES = {
       ...league,
       settings: {
         ...league.settings,
-        draftDate: league.settings.draftDate ? new Date(league.settings.draftDate + 'Z') : null,
+        draftDate: league.settings.draftDate ? new Date(`${league.settings.draftDate} Z`) : null,
       },
       members,
       customEventRules,
@@ -954,5 +956,35 @@ export const QUERIES = {
 
         return acc;
       }, {} as Record<EpisodeNumber, Prediction[]>));
+  },
+
+  /**
+    * Get chat history for a league
+    * @param leagueHash - the hash of the league
+    * @return the chat history for the league
+    * @throws an error if the user is not a member of the league
+    */
+  getChatHistory: async function(leagueHash: LeagueHash) {
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    const messageData = await db
+      .select()
+      .from(leagueChatSchema)
+      .where(eq(leagueChatSchema.leagueHash, leagueHash));
+
+    const messages: Message[] = messageData.map((message) => ({
+      ...message,
+      headers: {
+        'sent-by-id': message.sentById,
+      },
+      clientId: leagueHash,
+      timestamp: new Date(`${message.timestamp} Z`),
+    } as unknown as Message));
+
+    return messages;
   }
 };

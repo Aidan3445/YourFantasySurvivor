@@ -57,7 +57,7 @@ export async function leagueMemberAuth(leagueHash: LeagueHash) {
     memberId: member?.memberId ?? null,
     role: member?.role ?? null,
     member: member?.member ?? null,
-    league: member ? { ...member.league, draftDate: new Date(member.draftDate + 'Z') } : null,
+    league: member ? { ...member.league, draftDate: new Date(`${member.draftDate} Z`) } : null,
     seasonName: member?.seasonName ?? null,
   };
 }

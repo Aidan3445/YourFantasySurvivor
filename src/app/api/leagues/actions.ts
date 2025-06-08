@@ -17,6 +17,7 @@ import { castawaysSchema } from '~/server/db/schema/castaways';
 import { type EpisodeId } from '~/server/db/defs/episodes';
 import { type TribeId } from '~/server/db/defs/tribes';
 import { QUERIES } from './query';
+import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 
 /**
   * Create a new league
@@ -704,4 +705,34 @@ export async function deleteLeagueEvent(leagueHash: LeagueHash, leagueEventId: n
     .delete(leagueEventsSchema)
     .where(eq(leagueEventsSchema.leagueEventId, leagueEventId));
 }
+
+/**
+  * Save a chat message to the database
+  * @param leagueHash - the hash of the league
+  * @param text - the text of the message
+  * @param timestamp - the timestamp of the message
+  * @returns the serial of the message
+  * @throws an error if the user is not authorized
+  * @throws an error if the message cannot be saved
+  */
+export async function saveChatMessage(leagueHash: LeagueHash, message: { serial: string, text: string, timestamp: string }) {
+  const { memberId } = await leagueMemberAuth(leagueHash);
+  if (!memberId) throw new Error('User not authorized');
+
+  // Insert the message into the database
+  const entry = await db
+    .insert(leagueChatSchema)
+    .values({
+      leagueHash,
+      sentById: memberId,
+      ...message,
+    })
+    .returning({ serial: leagueChatSchema.serial })
+    .then((res) => res[0]?.serial);
+
+  if (!entry) throw new Error('Failed to save chat message');
+
+  return entry;
+}
+
 
