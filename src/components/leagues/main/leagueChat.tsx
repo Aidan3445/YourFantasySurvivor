@@ -23,7 +23,7 @@ export default function LeagueChat({ chatHistory }: ChatRoomProps) {
       }>
         <div className={cn('flex flex-col h-full transition-all',
           !open && 'hidden')}>
-          <h3 className='bg-b3 text-xl leading-none text-center font-semibold p-2 border-b h-10 rounded-t-3xl'>
+          <h3 className='bg-b3 text-xl leading-none text-center font-semibold p-2  h-10 rounded-t-3xl shadow-md shadow-primary'>
             League Chat
           </h3>
           <ChatClientProvider client={chatClient}>
