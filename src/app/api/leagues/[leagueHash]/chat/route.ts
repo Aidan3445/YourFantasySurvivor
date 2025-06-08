@@ -19,7 +19,6 @@ export async function GET(_: NextRequest, { params }: LeaguePageProps) {
 
     return NextResponse.json(tokenRequest, { status: 200 });
   } catch (e) {
-    console.error(e);
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
 }

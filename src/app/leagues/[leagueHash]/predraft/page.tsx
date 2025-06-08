@@ -7,7 +7,7 @@ import { DraftCountdown } from '~/components/leagues/draftCountdown';
 import DraftOrder from '~/components/leagues/draftOrder';
 import InviteLink from '~/components/leagues/inviteLink';
 import LeagueScoring from '~/components/leagues/leagueScoring';
-import LeagueChat from '~/components/leagues/main/leagueChat';
+import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { type LeaguePageProps } from '../layout';
@@ -50,7 +50,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           <ScrollBar orientation='vertical' />
         </ScrollArea>
       </Tabs>
-      <LeagueChat chatHistory={chatHistory} />
+      <LeagueChatCard chatHistory={chatHistory} />
     </main >
   );
 }

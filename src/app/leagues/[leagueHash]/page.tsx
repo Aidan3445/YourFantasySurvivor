@@ -13,7 +13,7 @@ import LeagueScoring from '~/components/leagues/leagueScoring';
 import CreateCustomEvent from '~/components/leagues/main/createCustomEvent';
 import Predictions from '~/components/leagues/main/predictions';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
-import LeagueChat from '~/components/leagues/main/leagueChat';
+import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
@@ -69,7 +69,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           <ScrollBar orientation='vertical' />
         </ScrollArea>
       </Tabs>
-      <LeagueChat />
+      <LeagueChatCard />
     </main >
   );
 }

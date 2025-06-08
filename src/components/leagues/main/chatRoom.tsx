@@ -90,7 +90,9 @@ export default function ChatRoom({ chatHistory }: ChatRoomProps) {
 
   return (
     <>
-      <ScrollArea className='flex-1 overflow-auto px-2'>
+      <ScrollArea
+        className='flex-1 overflow-auto px-2'
+        onClick={() => inputRef.current?.focus()}>
         <br />
         {members.list.length > 0 && messages.map((message) => {
           const member = members.list.find(member => member.memberId === message.headers['sent-by-id']);
