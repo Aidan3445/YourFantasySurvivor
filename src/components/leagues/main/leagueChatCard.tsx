@@ -10,13 +10,12 @@ const LeagueChat = dynamic(() => import('./leagueChat'), {
   ssr: false,
 });
 
-
-export default function LeagueChatCard({ chatHistory }: ChatRoomProps) {
-  const [open, setOpen] = useState(true);
+export default function LeagueChatCard({ chatHistory, defaultOpen, className }: ChatRoomProps) {
+  const [open, setOpen] = useState(defaultOpen ?? false);
 
   return (
-    <div className={cn('relative w-1/2 transition-all', open ? 'w-1/2' : 'w-0')}>
-      <section className={cn('w-full border shadow-lg md:bg-secondary overflow-clip rounded-3xl md:h-[calc(100svh-5rem)] transition-all',
+    <div className={cn('relative transition-all', open ? 'w-1/2' : 'w-0', className)}>
+      <section className={cn('w-full border shadow-lg bg-card lg:bg-secondary overflow-clip rounded-3xl md:h-[calc(100svh-5rem)] h-full transition-all',
         !open && 'border-0')
       }>
         <div className={cn('flex flex-col h-full transition-all',
@@ -28,7 +27,7 @@ export default function LeagueChatCard({ chatHistory }: ChatRoomProps) {
         </div>
       </section>
       <div
-        className='absolute bottom-1/2 -left-3.5 h-12 w-3.5 bg-primary rounded-full place-items-center py-3 cursor-pointer hover:bg-primary/80 active:bg-primary/60 transition-all'
+        className='hidden lg:block absolute bottom-1/2 -left-3.5 h-12 w-3.5 bg-primary rounded-full place-items-center py-3 cursor-pointer hover:bg-primary/80 active:bg-primary/60 transition-all'
         onClick={() => setOpen(!open)}>
         {open ? <ChevronRight stroke='white' /> : <ChevronLeft stroke='white' />}
       </div>

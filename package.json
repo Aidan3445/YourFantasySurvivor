@@ -81,6 +81,7 @@
   "devDependencies": {
     "@eslint/js": "^9.19.0",
     "@stylistic/eslint-plugin-js": "^2.6.4",
+    "@tailwindcss/container-queries": "^0.1.1",
     "@types/eslint": "^8.56.11",
     "@types/eslint__js": "^8.42.3",
     "@types/lodash": "^4.17.7",
