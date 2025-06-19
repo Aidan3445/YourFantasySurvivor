@@ -14,6 +14,7 @@ import { useIsMobile } from '~/hooks/useMobile';
 import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Separator } from '~/components/ui/separator';
+import { getContrastingColor } from '@uiw/color-convert';
 
 export default function Scoreboard() {
   const { leagueData, league } = useLeague();
@@ -129,7 +130,11 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
             ))}
             <Popover>
               <PopoverTrigger className='ml-2 mr-1'>
-                <History size={16} />
+                <History
+                  size={16}
+                  color={survivor.eliminatedEpisode
+                    ? 'black'
+                    : getContrastingColor(survivor.startingTribe.tribeColor)} />
               </PopoverTrigger>
               <PopoverContent
                 className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'
@@ -162,7 +167,11 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                 <PopoverTrigger>
                   <div className='ml-1 w-4 flex justify-center'>
                     {Math.min(leagueData.currentStreaks[member]!, league.settings.survivalCap) ||
-                      <Skull size={16} />}
+                      <Skull
+                        size={16}
+                        color={survivor.eliminatedEpisode
+                          ? 'black'
+                          : getContrastingColor(survivor.startingTribe.tribeColor)} />}
                   </div>
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='end'>
