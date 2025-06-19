@@ -38,13 +38,14 @@ const DynamicTabs = React.forwardRef<
   }, [rules]);
 
   React.useEffect(() => {
-    const activeTabDisplay = displayArray.find((display) => display);
-    if (activeTabDisplay === undefined) return;
+    const activeTabRuleIndex = rules.findIndex((rule) => tab === rule.tabName);
+    const activeTabDisplay = displayArray[activeTabRuleIndex];
 
+    if (activeTabDisplay === undefined) return;
     if (!activeTabDisplay) {
       setTab(defaultValue);
     }
-  }, [displayArray, defaultValue]);
+  }, [displayArray, defaultValue, rules, tab]);
 
   return (
     <TabsPrimitive.Root

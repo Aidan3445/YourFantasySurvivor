@@ -69,8 +69,8 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
   }, [onTheClockIndex, leagueStatus, router, leagueHash]);
 
   return (
-    <section className='w-full space-y-4 md:bg-secondary md:rounded-3xl md:border overflow-x-hidden p-4'>
-      <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
+    <section className='w-full space-y-4 overflow-x-hidden p-4'>
+      <article className='flex flex-col w-full p-2 bg-card rounded-lg'>
         <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
         <div className='grid grid-cols-1 gap-2'>
           {draft?.picks.map((pick, index) => (

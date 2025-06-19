@@ -284,7 +284,7 @@ function BounceyCarousel({ items }: BounceyCarouselProps) {
 
 
   return (
-    <Carousel className='select-none gap-4 items-center w-[calc(100svw-2.5rem)] md:w-auto' setApi={setApi} opts={{ align: 'center' }}>
+    <Carousel className='select-none gap-4 items-center w-[calc(100svw-2.5rem)] md:w-max' setApi={setApi} opts={{ align: 'center' }}>
       <CarouselContent>
         {items.map((item, index) => (
           <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
@@ -292,7 +292,7 @@ function BounceyCarousel({ items }: BounceyCarouselProps) {
           })}>
             <article
               className={cn(
-                'flex flex-col bg-secondary rounded-lg shadow-lg my-4 overflow-y-hidden',
+                'flex flex-col w-max bg-secondary rounded-lg shadow-lg my-4 overflow-y-hidden',
                 'text-center transition-transform duration-700',
                 {
                   'scale-75': index !== current - 1,
@@ -301,7 +301,7 @@ function BounceyCarousel({ items }: BounceyCarouselProps) {
                   '-translate-x-6 md:-translate-x-8': index + current + 1 === 2 * items.length,
                   'translate-x-6 md:translate-x-8 lg:translate-x-12': index + current === 1,
                 })} >
-              <span className='flex w-full gap-4 justify-between items-center self-center px-1 lg:w-full'>
+              <span className='flex gap-4 justify-between items-center self-center px-1 lg:w-full'>
                 <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1' />
                 {item.header}
                 <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1' />

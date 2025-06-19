@@ -30,7 +30,7 @@ export default function MakePredictions({ predictions, castaways, tribes }: Make
   if (predictions.length === 0) return null;
 
   return (
-    <div className='bg-card p-2 rounded-lg text-center flex flex-col items-center'>
+    <div className='bg-card rounded-lg text-center flex flex-col items-center'>
       <h3 className='text-xl font-semibold'>While you wait...</h3>
       <p>
         Make your prediction{predictions.length > 1 ? 's! Earn  points throughout the season for\
@@ -82,7 +82,7 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
     const prediction = predictions[0]!;
     return (
       <article
-        className={cn('flex flex-col my-4 text-center', className)}>
+        className={cn('flex flex-col my-4 text-center bg-secondary rounded-lg p-2', className)}>
         <span className='flex gap-1 items-start self-center px-1'>
           <h3 className='text-lg font-semibold text-card-foreground'>
             {prediction.eventName}
@@ -100,27 +100,29 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
   }
 
   return (
-    <BounceyCarousel items={predictions.map((prediction) => ({
-      header: (
-        <h3 className='text-lg font-semibold text-card-foreground'>
-          {prediction.eventName}
-          <span className='ml-2 inline-flex mt-1'>
-            <p className='text-sm'>{prediction.points}</p>
-            <Flame size={16} />
-          </span>
-          <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
-            {prediction.timing.join(' - ')}
-            <PredictionTimingHelp />
-          </div>
-        </h3>
-      ),
-      content: (<p className='text-sm'>{prediction.description}</p>),
-      footer: (
-        <SubmissionCard
-          prediction={prediction}
-          options={getOptions(prediction.referenceTypes)} />
-      ),
-    }))} />
+    <span className={cn('w-full', className)}>
+      <BounceyCarousel items={predictions.map((prediction) => ({
+        header: (
+          <h3 className='text-lg font-semibold text-card-foreground'>
+            {prediction.eventName}
+            <span className='ml-2 inline-flex mt-1'>
+              <p className='text-sm'>{prediction.points}</p>
+              <Flame size={16} />
+            </span>
+            <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+              {prediction.timing.join(' - ')}
+              <PredictionTimingHelp />
+            </div>
+          </h3>
+        ),
+        content: (<p className='text-sm'>{prediction.description}</p>),
+        footer: (
+          <SubmissionCard
+            prediction={prediction}
+            options={getOptions(prediction.referenceTypes)} />
+        ),
+      }))} />
+    </span>
   );
 }
 

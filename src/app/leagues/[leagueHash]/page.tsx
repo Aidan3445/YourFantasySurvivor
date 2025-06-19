@@ -48,7 +48,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
             </section>
           </TabsContent>
           <TabsContent value='chat' className='m-2 mt-0'>
-            <LeagueChatCard className='w-full px-2 h-[calc(100svh-8.5rem)]' chatHistory={chatHistory} />
+            <LeagueChatCard className='w-full px-2 h-[calc(100svh-8.5rem)]' chatHistory={chatHistory} defaultOpen />
           </TabsContent>
           <TabsContent className='mt-0' value='events'>
             <CreateCustomEvent />

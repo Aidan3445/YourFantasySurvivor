@@ -3,14 +3,13 @@ import 'server-only';
 import { createTable } from './createTable';
 import { boolean, index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
-import { LeagueEventTypeOptions, PredictionTimingOptions } from '~/server/db/defs/events';
+import { LeagueEventTypeOptions } from '~/server/db/defs/events';
 import { sql } from 'drizzle-orm';
-import { leagueEventReference } from './baseEvents';
+import { leagueEventReference, predictionEventTiming } from './baseEvents';
 import { episodesSchema } from './episodes';
 import { leagueMembersSchema } from './leagueMembers';
 
 export const leagueEventType = pgEnum('event_league_type', LeagueEventTypeOptions);
-export const leagueEventTiming = pgEnum('event_league_timing', PredictionTimingOptions);
 
 export const leagueEventsRulesSchema = createTable(
   'event_league_rule',
@@ -22,7 +21,7 @@ export const leagueEventsRulesSchema = createTable(
     points: integer('event_points').notNull(),
     eventType: leagueEventType('event_type').notNull(),
     referenceTypes: leagueEventReference('reference_types').array().notNull().default(sql`ARRAY['Castaway', 'Tribe']::event_league_reference[]`),
-    timing: leagueEventTiming('event_timing').array().notNull().default(sql`ARRAY[]::event_league_timing[]`),
+    timing: predictionEventTiming('event_timing').array().notNull().default(sql`ARRAY[]::event_league_timing[]`),
     public: boolean('public').notNull(),
   },
   (table) => [
@@ -61,20 +60,5 @@ export const leagueEventsSchema = createTable(
   (table) => [
     index().on(table.leagueEventRuleId),
     index().on(table.episodeId),
-  ]
-);
-
-export const leagueEventReferenceSchema = createTable(
-  'event_league_reference',
-  {
-    leagueEventReferenceId: serial('league_event_reference_id').notNull().primaryKey(),
-    leagueEventId: integer('league_event_id').notNull().references(() => leagueEventsSchema.leagueEventId, { onDelete: 'cascade' }),
-    referenceType: leagueEventReference('reference_type').notNull(),
-    referenceId: integer('reference_id').notNull(),
-  },
-  (table) => [
-    index().on(table.leagueEventId),
-    index().on(table.referenceId),
-    unique().on(table.leagueEventId, table.referenceType, table.referenceId),
   ]
 );

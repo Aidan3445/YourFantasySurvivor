@@ -24,7 +24,7 @@ export function useLeague() {
     {
       refreshInterval: (data) => {
         // no refresh if league is inactive or no data
-        if (!data || data.league.leagueStatus === 'Inactive') return 0;
+        if (!data?.league || data.league.leagueStatus === 'Inactive') return 0;
         // if an episode is airing, refresh every 10 seconds
         if (data.episodeAiring) return 10000;
         // otherwise, refresh every minute
