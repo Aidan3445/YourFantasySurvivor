@@ -6,7 +6,7 @@ import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues'
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { auth, leagueMemberAuth } from '~/lib/auth';
-import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
+import { baseEventPredictionRulesSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
@@ -20,7 +20,7 @@ import {
   type BaseEventRule, type LeagueEventId, type LeagueEventName,
   PredictionTimingOptions,
   defaultBaseRules,
-  type LeagueEventTiming,
+  type PredictionEventTiming,
   type Prediction
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
@@ -30,6 +30,7 @@ import { compileScores } from './[leagueHash]/scores';
 import { QUERIES as SYS_QUERIES } from '../sys/query';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 import { type Message } from 'node_modules/@ably/chat/dist/core/message';
+import { basePredictionRulesSchemaToObject } from '~/lib/utils';
 
 export const QUERIES = {
   /**
@@ -71,12 +72,14 @@ export const QUERIES = {
         leagueStatus: leaguesSchema.leagueStatus,
         season: seasonsSchema.seasonName,
         settings: leagueSettingsSchema,
-        baseEventRules: baseEventRulesSchema
+        baseEventRules: baseEventRulesSchema,
+        basePredictionRules: baseEventPredictionRulesSchema
       })
       .from(leaguesSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
       .leftJoin(baseEventRulesSchema, eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId))
+      .leftJoin(baseEventPredictionRulesSchema, eq(baseEventPredictionRulesSchema.leagueId, leaguesSchema.leagueId))
       .where(eq(leaguesSchema.leagueHash, leagueHash))
       .then((leagues) => leagues[0]);
 
@@ -122,6 +125,7 @@ export const QUERIES = {
 
     return {
       ...league,
+      basePredictionRules: basePredictionRulesSchemaToObject(league.basePredictionRules),
       settings: {
         ...league.settings,
         draftDate: league.settings.draftDate ? new Date(`${league.settings.draftDate} Z`) : null,
@@ -756,7 +760,7 @@ export const QUERIES = {
     const lastEpisode = episodes[nextEpisode.episodeNumber - 2];
     const mergeEpisode = episodes.find((episode) => episode.isMerge);
 
-    const predictionsFilter = (ruleTiming: LeagueEventTiming[]) => {
+    const predictionsFilter = (ruleTiming: PredictionEventTiming[]) => {
       // Draft takes precedence if included in the list: 
       // - if the league is in draft status
       // - if there are no previous episodes
@@ -914,7 +918,7 @@ export const QUERIES = {
         eventName: LeagueEventName,
         leagueEventRuleId: LeagueEventId,
         points: number,
-        timing: LeagueEventTiming[]
+        timing: PredictionEventTiming[]
         prediction: {
           episodeNumber: EpisodeNumber,
           castaway: CastawayName | null,

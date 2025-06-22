@@ -89,7 +89,8 @@ export default function CustomEvents() {
             <ul className='ml-4 list-decimal text-sm'>
               <li><b>Direct</b>: Points are awarded like <i>Official Events</i>, based on a player’s pick.</li>
               <li><b>Prediction</b>: Points are awarded to members who correctly predict an event’s outcome.
-                Predictions can occur each episode or at specific times in the season.</li>
+                Predictions can be made before each episode or at specific times throughout the season.
+              </li>
             </ul>
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { z } from 'zod';
-import { BaseEventRuleZod, defaultBaseRules } from '~/server/db/defs/events';
+import { BaseEventRuleZod, BasePredictionRulesZod, defaultBaseRules, defaultPredictionRules } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,7 +13,8 @@ import { Lock, LockOpen } from 'lucide-react';
 import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
 
 const formSchema = z.object({
-  baseEventRules: BaseEventRuleZod
+  baseEventRules: BaseEventRuleZod,
+  basePredictionRules: BasePredictionRulesZod
 });
 
 export default function LeagueScoring() {
@@ -21,6 +22,7 @@ export default function LeagueScoring() {
     league: {
       leagueHash,
       baseEventRules,
+      basePredictionRules,
       members: {
         loggedIn
       }
@@ -28,7 +30,10 @@ export default function LeagueScoring() {
     refresh,
   } = useLeague();
   const reactForm = useForm<z.infer<typeof formSchema>>({
-    defaultValues: { baseEventRules: baseEventRules ?? defaultBaseRules },
+    defaultValues: {
+      baseEventRules: baseEventRules ?? defaultBaseRules,
+      basePredictionRules: basePredictionRules ?? defaultPredictionRules
+    },
     resolver: zodResolver(formSchema)
   });
   const [locked, setLocked] = useState(true);
@@ -37,10 +42,15 @@ export default function LeagueScoring() {
     reactForm.setValue('baseEventRules', baseEventRules ?? defaultBaseRules);
   }, [baseEventRules, reactForm]);
 
+  useEffect(() => {
+    reactForm.setValue('basePredictionRules', basePredictionRules ?? defaultPredictionRules);
+  }, [basePredictionRules, reactForm]);
+
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateBaseEventRules(leagueHash, data.baseEventRules);
+      await updateBaseEventRules(leagueHash, data.baseEventRules, data.basePredictionRules);
       await refresh();
+      setLocked(true);
       alert('Base event rules updated.');
     } catch (error) {
       console.error(error);
@@ -60,20 +70,27 @@ export default function LeagueScoring() {
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => { setLocked(true); reactForm.reset(); }} />)}
       <h2 className='text-lg font-bold text-card-foreground'>Official Events</h2>
-      <p className='text-sm mr-12'>
+      <p className='text-sm mr-12 max-w-4xl'>
         These <i>Official Events</i> are <b>automatically scored</b> for your
         league based on what drafted castaways do in the show.
         <br />
         Set the point values for each event—these points will be awarded to the member
         whose current castaway pick scores the event.
+        <br />
+        Additionally, each event can be enabled as <b>predictions</b>.
+        If enabled, members can predict the castaway that will hit this event and
+        earn points if they&apos;re correct. Predictions can be made before each episode or at specific times throughout the season.
       </p>
       <div className='text-sm'>
         For example:
-        <ul className='list-disc pl-4'>
+        <ul className='list-disc pl-4 max-w-4xl'>
           <li>If you set <i>Individual Immunity</i> to <b>5 points</b>, the member whose
             pick wins immunity earns those <b>5 points</b>.</li>
           <li>If you set <i>Tribe 1st Place</i> to <b>3 points</b>, then every member
             whose pick is on the winning tribe receives <b>3 points</b>.</li>
+          <li>If you enable <i>Individual Immunity</i> as a prediction (weekly post-merge)
+            for <b>3 points</b>, then once the individual game starts, each week members will pick the
+            challenge winner. All who guess correctly earn <b>3 points</b>.</li>
         </ul>
       </div>
       <Form {...reactForm}>
@@ -99,6 +116,6 @@ export default function LeagueScoring() {
             </span>)}
         </form>
       </Form>
-    </article >
+    </article>
   );
 }

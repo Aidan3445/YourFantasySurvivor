@@ -33,6 +33,113 @@ export const defaultBaseRules: BaseEventRule = {
   soleSurvivor: 10,
 };
 
+export const PredictionTimingOptions = [
+  'Draft', 'Weekly', 'After Merge', 'Before Finale',
+  'Weekly (Premerge only)', 'Weekly (Postmerge only)'] as const;
+export type PredictionEventTiming = typeof PredictionTimingOptions[number];
+export const PredictionEventTimingZod = z.enum(PredictionTimingOptions);
+export type BaseEventPredictionSetting = {
+  enabled: boolean,
+  points: number,
+  timing: PredictionEventTiming[],
+  pickCount?: number
+};
+
+export type BasePredictionRules = Record<ScoringBaseEventName, BaseEventPredictionSetting>;
+export const defaultPredictionRules: BasePredictionRules = {
+  advFound: {
+    enabled: false,
+    points: 5,
+    timing: ['Draft']
+  },
+  advPlay: {
+    enabled: false,
+    points: 3,
+    timing: ['Weekly']
+  },
+  badAdvPlay: {
+    enabled: false,
+    points: 3,
+    timing: ['Weekly']
+  },
+  advElim: {
+    enabled: false,
+    points: 3,
+    timing: ['Weekly']
+  },
+  spokeEpTitle: {
+    enabled: false,
+    points: 2,
+    timing: ['Weekly']
+  },
+  tribe1st: {
+    enabled: false,
+    points: 5,
+    timing: ['Weekly (Premerge only)']
+  },
+  tribe2nd: {
+    enabled: false,
+    points: 3,
+    timing: ['Weekly (Premerge only)']
+  },
+  indivWin: {
+    enabled: false,
+    points: 10,
+    timing: ['Weekly (Postmerge only)']
+  },
+  indivReward: {
+    enabled: false,
+    points: 5,
+    timing: ['Weekly (Postmerge only)']
+  },
+  finalists: {
+    enabled: false,
+    points: 3,
+    timing: ['Draft', 'After Merge', 'Before Finale'],
+    pickCount: 3
+  },
+  fireWin: {
+    enabled: false,
+    points: 7,
+    timing: ['Before Finale']
+  },
+  soleSurvivor: {
+    enabled: false,
+    points: 10,
+    timing: ['Draft', 'After Merge', 'Before Finale']
+  }
+};
+
+export const BasePredictionRulesZod = z.object(
+  Object.fromEntries(ScoringBaseEventNames
+    .map((name: ScoringBaseEventName) => [
+      name,
+      z.object({
+        enabled: z.boolean(),
+        points: z.coerce.number().gte(0, { message: 'Points must be a positive number' }),
+        timing: z.array(PredictionEventTimingZod),
+        pickCount: z.coerce.number().optional()
+      })
+    ])
+  )
+) as z.ZodObject<Record<ScoringBaseEventName, z.ZodObject<{
+  enabled: z.ZodBoolean;
+  points: z.ZodNumber;
+  timing: z.ZodArray<typeof PredictionEventTimingZod>;
+  pickCount: z.ZodOptional<z.ZodNumber>;
+}, 'strip',
+  z.ZodTypeAny, {
+    enabled: boolean;
+    points: number;
+    timing: PredictionEventTiming[];
+    pickCount?: number;
+  }, {
+    enabled: boolean;
+    points: number;
+    timing: PredictionEventTiming[];
+    pickCount?: number;
+  }>>, 'strip', z.ZodTypeAny, BasePredictionRules, BasePredictionRules>;
+
 export const AllBaseEventNames = [
   ...ScoringBaseEventNames,
   'elim', 'noVoteExit', 'tribeUpdate', 'otherNotes'] as const;
@@ -82,12 +189,6 @@ export const LeagueEventTypeOptions = ['Direct', 'Prediction'] as const;
 export type LeagueEventType = typeof LeagueEventTypeOptions[number];
 export const EventTypeZod = z.enum(LeagueEventTypeOptions);
 
-export const PredictionTimingOptions = [
-  'Draft', 'Weekly', 'After Merge', 'Before Finale',
-  'Weekly (Premerge only)', 'Weekly (Postmerge only)'] as const;
-export type LeagueEventTiming = typeof PredictionTimingOptions[number];
-export const EventTimingZod = z.enum(PredictionTimingOptions);
-
 export const ReferenceOptions = ['Castaway', 'Tribe'] as const;
 export type ReferenceType = typeof ReferenceOptions[number];
 export const EventRefZod = z.enum(ReferenceOptions);
@@ -99,7 +200,7 @@ export const LeagueEventRuleZod = z.object({
   points: EventPointsZod,
   eventType: EventTypeZod,
   referenceTypes: z.array(EventRefZod),
-  timing: EventTimingZod.array(),
+  timing: PredictionEventTimingZod.array(),
   public: z.boolean(),
 });
 export type LeagueEventRule = z.infer<typeof LeagueEventRuleZod>;
@@ -154,7 +255,7 @@ export type Prediction = {
   eventName: LeagueEventName,
   leagueEventRuleId: LeagueEventId,
   points: number,
-  timing: LeagueEventTiming[]
+  timing: PredictionEventTiming[]
   prediction: {
     episodeNumber: EpisodeNumber,
     castaway: CastawayName | null,

@@ -15,6 +15,7 @@ import Predictions from '~/components/leagues/main/predictions';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 import { QUERIES } from '~/app/api/leagues/query';
+import SetSurvivalCap from '~/components/leagues/customization/setSurvivalCap';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
@@ -58,11 +59,15 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           </TabsContent>
           <TabsContent className='mt-0' value='settings'>
             <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-14'>
-              <MemberEditForm className='w-full xl:w-auto' />
+              <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
+                League Settings
+              </h2>
+              <MemberEditForm className='flex-1' />
               <LeagueSettings />
               <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
-                League Scoring
+                Scoring Settings
               </h2>
+              <SetSurvivalCap />
               <LeagueScoring />
               <CustomEvents />
             </section>

@@ -3,7 +3,7 @@ import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
 import { type QUERIES } from '~/app/api/leagues/query';
 import { type SWRKey } from '~/lib/utils';
-import { defaultBaseRules } from '~/server/db/defs/events';
+import { defaultBaseRules, defaultPredictionRules } from '~/server/db/defs/events';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagueLiveData>>>;
@@ -68,6 +68,7 @@ const nonLeague: League = {
   leagueStatus: 'Inactive',
   customEventRules: [],
   baseEventRules: { ...defaultBaseRules, leagueId: 0 },
+  basePredictionRules: { ...defaultPredictionRules },
   members: {
     list: [],
     loggedIn: undefined

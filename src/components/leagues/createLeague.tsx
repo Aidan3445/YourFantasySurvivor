@@ -107,7 +107,9 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
               <NextButton onClick={() => api?.scrollNext()} />
             </CarouselItem>
             <CarouselItem className='pl-14 flex flex-col pt-4'>
-              <LeagueMemberFields />
+              <div className='pr-4'>
+                <LeagueMemberFields />
+              </div>
               <Button
                 className='m-4 mt-auto w-80 self-center'
                 disabled={!reactForm.formState.isValid}
