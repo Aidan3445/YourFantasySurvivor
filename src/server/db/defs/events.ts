@@ -24,8 +24,8 @@ export const defaultBaseRules: BaseEventRule = {
   badAdvPlay: -5,
   advElim: -7,
   spokeEpTitle: 2,
-  tribe1st: 2,
-  tribe2nd: 1,
+  tribe1st: 5,
+  tribe2nd: 2,
   indivWin: 10,
   indivReward: 5,
   finalists: 5,
@@ -165,6 +165,46 @@ export const BaseEventFullName: Record<BaseEventName, string> = {
   otherNotes: 'Other Notes'
 };
 
+export const BaseEventDescriptions: {
+  main: Record<ScoringBaseEventName, string>,
+  italics: Partial<Record<ScoringBaseEventName, string>>
+} = {
+  main: {
+    indivWin: 'Points if your castaway wins an individual immunity challenge',
+    indivReward: 'Points if your castaway wins an individual reward challenge',
+    tribe1st: 'Points if your castaway’s tribe/team wins a challenge',
+    tribe2nd: 'Points if your castaway’s tribe/team comes second in a challenge',
+    advFound: 'Points if your castaway finds or earns an advantage',
+    advPlay: 'Points if your castaway plays an advantage effectively',
+    badAdvPlay: 'Points if your castaway plays an advantage poorly or unnecessarily',
+    advElim: 'Points if your castaway is eliminated with an advantage in their pocket',
+    spokeEpTitle: 'Points if your castaway is quoted in the episode title',
+    finalists: 'Points if your castaway makes it to the final tribal council',
+    fireWin: 'Points if your castaway wins the fire-making challenge',
+    soleSurvivor: 'Points if your castaway wins the season'
+  },
+  italics: {
+    tribe2nd: '(only applies for challenges with 3+ tribes/teams)',
+    badAdvPlay: '(usually negative)',
+    advElim: '(usually negative)',
+  },
+};
+
+export const BasePredictionReferenceTypes: Record<ScoringBaseEventName, ReferenceType[]> = {
+  advFound: ['Castaway'],
+  advPlay: ['Castaway'],
+  badAdvPlay: ['Castaway'],
+  advElim: ['Castaway'],
+  spokeEpTitle: ['Castaway'],
+  tribe1st: ['Tribe', 'Castaway'],
+  tribe2nd: ['Tribe', 'Castaway'],
+  indivWin: ['Castaway'],
+  indivReward: ['Castaway'],
+  finalists: ['Castaway', 'Tribe'],
+  fireWin: ['Castaway'],
+  soleSurvivor: ['Castaway'],
+} as const;
+
 export type BaseEventId = number;
 export type BaseEvent = {
   baseEventId: BaseEventId,
@@ -201,7 +241,6 @@ export const LeagueEventRuleZod = z.object({
   eventType: EventTypeZod,
   referenceTypes: z.array(EventRefZod),
   timing: PredictionEventTimingZod.array(),
-  public: z.boolean(),
 });
 export type LeagueEventRule = z.infer<typeof LeagueEventRuleZod>;
 export const defaultLeagueEventRule: LeagueEventRule = {
@@ -211,10 +250,18 @@ export const defaultLeagueEventRule: LeagueEventRule = {
   eventType: 'Direct',
   referenceTypes: ['Castaway'],
   timing: [],
-  public: false,
 };
 
-export type LeagueEventPrediction = LeagueEventRule & {
+export type BaseEventPrediction = {
+  eventName: BaseEventName,
+  episodeNumber: EpisodeNumber,
+  predictionMade: {
+    referenceType: ReferenceType;
+    referenceId: number;
+  } | null
+};
+
+export type EventPrediction = LeagueEventRule & {
   predictionMade: {
     referenceType: ReferenceType;
     referenceId: number;

@@ -18,28 +18,38 @@ interface PredictionsProps {
 
 export default async function Predictions({ leagueHash }: PredictionsProps) {
 
-  const [week, member] = await Promise.all([
+  const [predictions, history] = await Promise.all([
     QUERIES.getThisWeeksPredictions(leagueHash),
     QUERIES.getMyPredictions(leagueHash),
   ]);
 
   return (
     <div className='w-full space-y-4'>
-      <WeeklyPredictions weekly={week} />
-      <MemberPredictions predictions={member} />
+      <MakePredictions predictions={predictions} />
+      <PredictionHistory history={history} />
     </div>
   );
 }
 
 interface WeeklyPredictionsProps {
-  weekly: Awaited<ReturnType<typeof QUERIES.getThisWeeksPredictions>>;
+  predictions: Awaited<ReturnType<typeof QUERIES.getThisWeeksPredictions>>;
 }
 
-function WeeklyPredictions({ weekly }: WeeklyPredictionsProps) {
+function MakePredictions({ predictions: weekly }: WeeklyPredictionsProps) {
   if (!weekly) return null;
-  const { predictions, castaways, tribes, nextEpisode } = weekly;
+  const {
+    basePredictionRules,
+    basePredictions,
+    customPredictions,
+    castaways,
+    tribes,
+    nextEpisode
+  } = weekly;
 
-  if (predictions.length === 0 || nextEpisode.airStatus === 'Aired') return null;
+  const enabledBasePredictionsCount = Object.entries(basePredictionRules)
+    .filter(([_, rule]) => rule.enabled).length;
+
+  if (customPredictions.length + enabledBasePredictionsCount === 0 || nextEpisode.airStatus === 'Aired') return null;
 
   return (
     <div className='text-center bg-card rounded-lg w-full'>
@@ -47,7 +57,7 @@ function WeeklyPredictions({ weekly }: WeeklyPredictionsProps) {
         <h1 className='text-3xl'>
           Predictions are locked until the episode ends.
         </h1> :
-        <h1 className='text-3xl'>{'This Week\'s Prediction'}{predictions.length > 1 ? 's' : ''}</h1>
+        <h1 className='text-3xl'>{'This Week\'s Prediction'}{customPredictions.length > 1 ? 's' : ''}</h1>
       }
       <span className='flex flex-wrap justify-center items-center gap-x-2 text-muted-foreground text-sm'>
         <span className='text-nowrap'>
@@ -57,7 +67,9 @@ function WeeklyPredictions({ weekly }: WeeklyPredictionsProps) {
       </span>
       {nextEpisode.airStatus === 'Upcoming' && (
         <PredictionCards
-          predictions={predictions}
+          basePredictionRules={basePredictionRules}
+          basePredictions={basePredictions}
+          customPredictions={customPredictions}
           castaways={castaways}
           tribes={tribes} />
       )}
@@ -66,10 +78,10 @@ function WeeklyPredictions({ weekly }: WeeklyPredictionsProps) {
 }
 
 interface MemberPredictionsProps {
-  predictions: Record<EpisodeNumber, Prediction[]>;
+  history: Record<EpisodeNumber, Prediction[]>;
 }
 
-function MemberPredictions({ predictions }: MemberPredictionsProps) {
+function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
   if (Object.keys(predictions).length === 0) return null;
 
   const stats = Object.values(predictions).reduce((acc, preds) => {

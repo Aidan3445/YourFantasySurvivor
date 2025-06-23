@@ -4,7 +4,7 @@ import { Input } from '~/components/ui/input';
 import { MultiSelect } from '~/components/ui/multiSelect';
 import { Switch } from '~/components/ui/switch';
 import { cn } from '~/lib/utils';
-import { BaseEventFullName, PredictionTimingOptions, type ScoringBaseEventName } from '~/server/db/defs/events';
+import { BaseEventDescriptions, BaseEventFullName, PredictionTimingOptions, type ScoringBaseEventName } from '~/server/db/defs/events';
 
 interface BaseEventSettingsProps {
   disabled?: boolean;
@@ -42,7 +42,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway wins an individual immunity challenge
+                {BaseEventDescriptions.main.indivWin}
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'indivWin'} disabled={disabled} />
@@ -77,7 +77,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway wins an individual reward challenge
+                {BaseEventDescriptions.main.indivReward}
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'indivReward'} disabled={disabled} />
@@ -112,7 +112,7 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway wins a tribe challenge
+                {BaseEventDescriptions.main.tribe1st}
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'tribe1st'} disabled={disabled} />
@@ -147,9 +147,8 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway gets second in a tribe or team challenge <i className='text-xs text-muted-foreground'>
-                  (only applies for challenges with 3+ tribes/teams)
-                </i>
+                {BaseEventDescriptions.main.tribe2nd} <i className='text-xs text-muted-foreground'>
+                  {BaseEventDescriptions.italics.tribe2nd}</i>
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'tribe2nd'} disabled={disabled} />
@@ -192,7 +191,7 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway finds an advantage
+                {BaseEventDescriptions.main.advFound}
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'advFound'} disabled={disabled} />
@@ -227,7 +226,7 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway plays an advantage effectively
+                {BaseEventDescriptions.main.advPlay}
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'advPlay'} disabled={disabled} />
@@ -262,10 +261,8 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway plays an advantage
-                poorly or unnecessarily <i className='text-xs text-muted-foreground'>
-                  (usually negative)
-                </i>
+                {BaseEventDescriptions.main.badAdvPlay} <i className='text-xs text-muted-foreground'>
+                  {BaseEventDescriptions.italics.badAdvPlay}</i>
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'badAdvPlay'} disabled={disabled} />
@@ -300,17 +297,16 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway is eliminated with an
-                advantage in their pocket <i className='text-xs text-muted-foreground'>
-                  (usually negative)
-                </i>
+                {BaseEventDescriptions.main.advElim} <i className='text-xs text-muted-foreground'>
+                  {BaseEventDescriptions.italics.advElim}</i>
               </FormDescription>
             </span>
             <BasePredictionFormField eventName={'advElim'} disabled={disabled} />
             <FormMessage />
           </FormItem>
-        )} />
-    </div>
+        )
+        } />
+    </div >
   );
 }
 
@@ -347,7 +343,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway speaks the episode title
+                  {BaseEventDescriptions.main.spokeEpTitle}
                 </FormDescription>
               </span>
               <BasePredictionFormField eventName={'spokeEpTitle'} disabled={disabled} />
@@ -384,7 +380,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway makes it to final tribal council
+                  {BaseEventDescriptions.main.finalists}
                 </FormDescription>
               </span>
               <BasePredictionFormField eventName={'finalists'} disabled={disabled} />
@@ -421,7 +417,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway wins the fire making challenge
+                  {BaseEventDescriptions.main.fireWin}
                 </FormDescription>
               </span>
               <BasePredictionFormField eventName={'fireWin'} disabled={disabled} />
@@ -458,10 +454,7 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway wins the whole
-                  gosh darn thing <i className='text-xs text-muted-foreground'>
-                    (Sole Survivor)
-                  </i>
+                  {BaseEventDescriptions.main.soleSurvivor}
                 </FormDescription>
               </span>
               <BasePredictionFormField eventName={'soleSurvivor'} disabled={disabled} />

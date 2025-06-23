@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createTable } from './createTable';
-import { boolean, index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
+import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
 import { LeagueEventTypeOptions } from '~/server/db/defs/events';
 import { sql } from 'drizzle-orm';
@@ -22,7 +22,6 @@ export const leagueEventsRulesSchema = createTable(
     eventType: leagueEventType('event_type').notNull(),
     referenceTypes: leagueEventReference('reference_types').array().notNull().default(sql`ARRAY['Castaway', 'Tribe']::event_league_reference[]`),
     timing: predictionEventTiming('event_timing').array().notNull().default(sql`ARRAY[]::event_league_timing[]`),
-    public: boolean('public').notNull(),
   },
   (table) => [
     unique().on(table.leagueId, table.eventName),

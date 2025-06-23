@@ -6,43 +6,86 @@ import { Button } from '~/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
 import { BounceyCarousel } from '~/components/ui/carousel';
 import { Flame, HelpCircle } from 'lucide-react';
-import { type ReferenceType, type LeagueEventPrediction } from '~/server/db/defs/events';
+import { type ReferenceType, type BasePredictionRules, type EventPrediction, defaultPredictionRules, BaseEventDescriptions, type ScoringBaseEventName, BasePredictionReferenceTypes, type BaseEventPrediction } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { type CastawayDetails, type CastawayDraftInfo } from '~/server/db/defs/castaways';
+import type { CastawayDetails, CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
-import { type Tribe } from '~/server/db/defs/tribes';
+import type { Tribe } from '~/server/db/defs/tribes';
 import { ColorRow } from '../draftOrder';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { PopoverArrow } from '@radix-ui/react-popover';
 
 interface MakePredictionsProps {
-  predictions: LeagueEventPrediction[];
+  basePredictionRules?: BasePredictionRules;
+  basePredictions?: BaseEventPrediction[];
+  customPredictions?: EventPrediction[];
   castaways: (CastawayDraftInfo | CastawayDetails)[];
   tribes: Tribe[];
   className?: string;
 }
 
-export default function MakePredictions({ predictions, castaways, tribes }: MakePredictionsProps) {
-  if (predictions.length === 0) return null;
+export default function MakePredictions({
+  basePredictionRules = defaultPredictionRules,
+  basePredictions = [],
+  customPredictions = [],
+  castaways,
+  tribes
+}: MakePredictionsProps) {
+  const enabledBasePredictions = Object.values(basePredictionRules)
+    .reduce((count, event) => count + Number(event.enabled), 0);
+  if (customPredictions.length + enabledBasePredictions === 0) return null;
 
   return (
     <div className='bg-card rounded-lg text-center flex flex-col items-center'>
       <h3 className='text-xl font-semibold'>While you wait...</h3>
       <p>
-        Make your prediction{predictions.length > 1 ? 's! Earn  points throughout the season for\
+        Make your prediction{customPredictions.length > 1 ? 's! Earn  points throughout the season for\
         each correct prediction you make.' : ' and earn points if you are correct!'}
       </p>
-      <PredictionCards predictions={predictions} castaways={castaways} tribes={tribes} />
+      <PredictionCards
+        basePredictionRules={basePredictionRules}
+        basePredictions={basePredictions}
+        customPredictions={customPredictions}
+        castaways={castaways}
+        tribes={tribes} />
     </div>
   );
 }
 
-export function PredictionCards({ predictions, castaways, tribes, className }: MakePredictionsProps) {
-  if (predictions.length === 0) return null;
+export function PredictionCards({
+  basePredictionRules = defaultPredictionRules,
+  basePredictions = [],
+  customPredictions = [],
+  castaways,
+  tribes,
+  className
+}: MakePredictionsProps) {
+  const enabledBasePredictions = Object.entries(basePredictionRules)
+    .filter(([_, rule]) => rule.enabled)
+    .map(([baseEventName, rule]) => {
+      const eventName = baseEventName as ScoringBaseEventName;
+      const prediction: EventPrediction = {
+        eventName: eventName,
+        description: `${BaseEventDescriptions.main[eventName]} \
+          ${BaseEventDescriptions.italics[eventName] ?? ''}`,
+        points: rule.points,
+        eventType: 'Prediction',
+        referenceTypes: BasePredictionReferenceTypes[eventName],
+        timing: rule.timing,
+        predictionMade: basePredictions.find((pred) =>
+          pred.eventName === eventName)?.predictionMade ?? null,
+      };
+
+      return prediction;
+    });
+  console.log('Enabled Base Predictions:', enabledBasePredictions);
+
+  const predictionRuleCount = enabledBasePredictions.length + customPredictions.length;
+  if (predictionRuleCount === 0) return null;
 
   const getOptions = (referenceTypes: ReferenceType[]) => {
     const options: Record<ReferenceType, Record<string, {
@@ -77,9 +120,8 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
     return options;
   };
 
-
-  if (predictions.length === 1) {
-    const prediction = predictions[0]!;
+  if (predictionRuleCount === 1) {
+    const prediction = (customPredictions[0] ?? enabledBasePredictions[0])!;
     return (
       <article
         className={cn('flex flex-col my-4 text-center bg-secondary rounded-lg p-2', className)}>
@@ -99,29 +141,31 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
     );
   }
 
+  const customPredictionItems = customPredictions.map((prediction) => ({
+    header: (
+      <h3 className='text-lg font-semibold text-card-foreground'>
+        {prediction.eventName}
+        <span className='ml-2 inline-flex mt-1'>
+          <p className='text-sm'>{prediction.points}</p>
+          <Flame size={16} />
+        </span>
+        <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+          {prediction.timing.join(' - ')}
+          <PredictionTimingHelp />
+        </div>
+      </h3>
+    ),
+    content: (<p className='text-sm'>{prediction.description}</p>),
+    footer: (
+      <SubmissionCard
+        prediction={prediction}
+        options={getOptions(prediction.referenceTypes)} />
+    ),
+  }));
+
   return (
     <span className={cn('w-full', className)}>
-      <BounceyCarousel items={predictions.map((prediction) => ({
-        header: (
-          <h3 className='text-lg font-semibold text-card-foreground'>
-            {prediction.eventName}
-            <span className='ml-2 inline-flex mt-1'>
-              <p className='text-sm'>{prediction.points}</p>
-              <Flame size={16} />
-            </span>
-            <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
-              {prediction.timing.join(' - ')}
-              <PredictionTimingHelp />
-            </div>
-          </h3>
-        ),
-        content: (<p className='text-sm'>{prediction.description}</p>),
-        footer: (
-          <SubmissionCard
-            prediction={prediction}
-            options={getOptions(prediction.referenceTypes)} />
-        ),
-      }))} />
+      <BounceyCarousel items={customPredictionItems} />
     </span>
   );
 }
@@ -131,7 +175,7 @@ const formSchema = z.object({
 });
 
 interface SubmissionCardProps {
-  prediction: LeagueEventPrediction;
+  prediction: EventPrediction;
   options: Record<ReferenceType, Record<string, { id: number, color: string, tribeName?: string }>>;
 }
 

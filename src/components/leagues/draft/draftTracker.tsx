@@ -111,7 +111,7 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
       {(onDeck.loggedIn || onTheClock.loggedIn) &&
         <ChooseCastaway castaways={draft.castaways} onDeck={onDeck.loggedIn} />}
       <MakePredictions
-        predictions={draft.predictions}
+        customPredictions={draft.predictions}
         castaways={draft.castaways}
         tribes={draft.tribes} />
       <AlertDialog open={dialogOpen && !closedDialog} onOpenChange={setDialogOpen}>

@@ -38,7 +38,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         </TabsList>
         <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-visible @container/tabs-content'>
           <TabsContent value='scores'>
-            <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-14 pb-2'>
+            <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-12 pb-2'>
               <span className='w-full grid grid-cols-1 grid-rows-2 md:grid-cols-2 md:grid-rows-1 gap-4 items-center justify-center overflow-x-auto'>
                 <Scoreboard />
                 <Chart />

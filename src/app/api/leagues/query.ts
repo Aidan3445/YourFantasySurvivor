@@ -6,7 +6,7 @@ import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues'
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { auth, leagueMemberAuth } from '~/lib/auth';
-import { baseEventPredictionRulesSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
+import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
@@ -16,12 +16,13 @@ import type { CastawayDraftInfo, CastawayName } from '~/server/db/defs/castaways
 import { tribesSchema } from '~/server/db/schema/tribes';
 import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/server/db/defs/leagueMembers';
 import {
-  type LeagueEventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent,
+  type EventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent,
   type BaseEventRule, type LeagueEventId, type LeagueEventName,
   PredictionTimingOptions,
   defaultBaseRules,
   type PredictionEventTiming,
-  type Prediction
+  type Prediction,
+  defaultPredictionRules
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
@@ -103,7 +104,6 @@ export const QUERIES = {
         eventType: leagueEventsRulesSchema.eventType,
         referenceTypes: leagueEventsRulesSchema.referenceTypes,
         timing: leagueEventsRulesSchema.timing,
-        public: leagueEventsRulesSchema.public,
       })
       .from(leagueEventsRulesSchema)
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
@@ -219,6 +219,47 @@ export const QUERIES = {
   },
 
   /**
+    * Get the league's settings and rules 
+  * @param leagueHash - the hash of the league
+  * @returns the league settings and rules
+  * @throws an error if the user is not a member of the league
+    */
+  getLeagueConfig: async function(leagueHash: LeagueHash) {
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    const { leagueSettings, baseEventRules, basePredictionRules } = await db
+      .select({
+        leagueSettings: leagueSettingsSchema,
+        baseEventRules: baseEventRulesSchema,
+        basePredictionRules: baseEventPredictionRulesSchema,
+      })
+      .from(leagueSettingsSchema)
+      .fullJoin(baseEventRulesSchema, eq(baseEventRulesSchema.leagueId, leagueSettingsSchema.leagueId))
+      .fullJoin(baseEventPredictionRulesSchema, eq(baseEventPredictionRulesSchema.leagueId, leagueSettingsSchema.leagueId))
+      .where(eq(leagueSettingsSchema.leagueId, league.leagueId))
+      .limit(1)
+      .then((results) => results[0] ?? {
+        baseEventRules: null,
+        basePredictionRules: null,
+        leagueSettings: null,
+      });
+
+    if (!leagueSettings) {
+      throw new Error('League settings not found');
+    }
+
+    return {
+      leagueSettings,
+      baseEventRules,
+      basePredictionRules: basePredictionRulesSchemaToObject(basePredictionRules)
+    };
+  },
+
+  /**
     * Get the draft state and information for the league
     * @param leagueHash - the hash of the league
     * @returns the draft state and information
@@ -254,11 +295,10 @@ export const QUERIES = {
         arrayOverlaps(leagueEventsRulesSchema.timing, ['Draft', 'Weekly', 'Weekly (Premerge only)'])))
       .orderBy(asc(leagueEventsRulesSchema.timing))
       .then((predictions) => predictions.map((prediction) => {
-        const draftPrediction: LeagueEventPrediction = {
+        const draftPrediction: EventPrediction = {
           ...prediction,
           timing: ['Draft'],
           eventType: 'Prediction',
-          public: false
         };
         return draftPrediction;
       }));
@@ -421,6 +461,65 @@ export const QUERIES = {
   },
 
   /**
+   * Get the base predictions for a league
+   * @param leagueHash - the hash of the league
+   * @returns the base predictions for the league
+   * @throws an error if the user is not a member of the league
+   */
+  getBasePredictions: async function(leagueHash: LeagueHash) {
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    const basePredictions = await db
+      .select({
+        eventName: baseEventPredictionsSchema.baseEventName,
+        episodeNumber: episodesSchema.episodeNumber,
+        predictionMaker: leagueMembersSchema.displayName,
+        referenceType: baseEventPredictionsSchema.referenceType,
+        referenceId: baseEventPredictionsSchema.referenceId,
+        castaway: castawaysSchema.fullName,
+        tribe: tribesSchema.tribeName,
+      })
+      .from(baseEventPredictionsSchema)
+      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId))
+      .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId))
+      // references
+      .leftJoin(castawaysSchema, and(
+        eq(castawaysSchema.castawayId, baseEventPredictionsSchema.referenceId),
+        eq(baseEventPredictionsSchema.referenceType, 'Castaway')))
+      .leftJoin(tribesSchema, and(
+        eq(tribesSchema.tribeId, baseEventPredictionsSchema.referenceId),
+        eq(baseEventPredictionsSchema.referenceType, 'Tribe')))
+      .where(eq(leagueMembersSchema.leagueId, league.leagueId));
+
+    return basePredictions.map((prediction) => {
+      const basePrediction: {
+        eventName: LeagueEventName,
+        episodeNumber: EpisodeNumber,
+        predictionMaker: LeagueMemberDisplayName,
+        // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+        referenceName: CastawayName | TribeName,
+      } = {
+        eventName: prediction.eventName,
+        episodeNumber: prediction.episodeNumber,
+        predictionMaker: prediction.predictionMaker,
+        referenceName: '',
+      };
+
+      if (prediction.referenceType === 'Castaway') {
+        basePrediction.referenceName = prediction.castaway!;
+      } else if (prediction.referenceType === 'Tribe') {
+        basePrediction.referenceName = prediction.tribe!;
+      }
+
+      return basePrediction;
+    });
+  },
+
+  /**
    * Get the league events for a league
    * @param leagueHash - the hash of the league
    * @returns the league events for the league as a map of episode number to events
@@ -433,7 +532,6 @@ export const QUERIES = {
     if (!memberId || !league) {
       throw new Error('User not a member of the league');
     }
-
 
     const directEventsPromise = db
       .select({
@@ -681,24 +779,11 @@ export const QUERIES = {
       throw new Error('User not a member of the league');
     }
 
-    const baseEventRulesPromise = db
-      .select()
-      .from(baseEventRulesSchema)
-      .where(eq(baseEventRulesSchema.leagueId, league.leagueId))
-      .limit(1)
-      .then((rules) => rules[0]);
-
-    const leagueSettingsPromise = db
-      .select()
-      .from(leagueSettingsSchema)
-      .where(eq(leagueSettingsSchema.leagueId, league.leagueId))
-      .limit(1)
-      .then((settings) => settings[0]);
-
     const [
       baseEvents, tribesTimeline, elims, castaways, tribes,
-      leagueEvents, baseEventRules,
-      selectionTimeline, leagueSettings, episodes, additions
+      { leagueSettings, baseEventRules, basePredictionRules },
+      basePredictions, leagueEvents,
+      selectionTimeline, episodes, additions
     ] = await Promise.all([
       SEASON_QUERIES.getBaseEvents(league.leagueSeason),
       SEASON_QUERIES.getTribesTimeline(league.leagueSeason),
@@ -706,22 +791,20 @@ export const QUERIES = {
       SEASON_QUERIES.getCastaways(league.leagueSeason),
       SEASON_QUERIES.getTribes(league.leagueSeason),
 
+      QUERIES.getLeagueConfig(leagueHash),
+      QUERIES.getBasePredictions(leagueHash),
       QUERIES.getLeagueEvents(leagueHash),
-      baseEventRulesPromise,
       QUERIES.getSelectionTimeline(leagueHash),
-      leagueSettingsPromise,
 
       QUERIES.getEpisodes(leagueHash, 100), // move to seasons
       SYS_QUERIES.fetchAdditions(),
     ]);
 
-    if (!leagueSettings) {
-      throw new Error('League not found');
-    }
-
     const { scores, currentStreaks } = compileScores(
-      baseEvents, tribesTimeline, elims, leagueEvents, baseEventRules ?? defaultBaseRules,
-      selectionTimeline, leagueSettings.survivalCap, leagueSettings.preserveStreak);
+      baseEvents, baseEventRules ?? defaultBaseRules,
+      basePredictions, basePredictionRules ?? defaultPredictionRules,
+      leagueEvents, selectionTimeline, tribesTimeline, elims,
+      leagueSettings.survivalCap, leagueSettings.preserveStreak);
 
     return {
       scores,
@@ -749,6 +832,7 @@ export const QUERIES = {
       throw new Error('User not a member of the league');
     }
 
+    // If the league is inactive, return nothing
     if (league.leagueStatus === 'Inactive') return;
 
     const episodes = await QUERIES.getEpisodes(leagueHash, 100);
@@ -784,7 +868,25 @@ export const QUERIES = {
         !!nextEpisode?.isFinale) return true;
     };
 
-    const predictionsPromise = db
+    const basePredictionRulesPromise = this.getLeagueConfig(leagueHash)
+      .then((config) => config.basePredictionRules);
+
+    const basePredictionsPromise = db
+      .select({
+        eventName: baseEventPredictionsSchema.baseEventName,
+        episodeNumber: episodesSchema.episodeNumber,
+        predictionMade: {
+          referenceType: baseEventPredictionsSchema.referenceType,
+          referenceId: baseEventPredictionsSchema.referenceId,
+        }
+      })
+      .from(baseEventPredictionsSchema)
+      .innerJoin(leagueMembersSchema, and(
+        eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId),
+        eq(leagueMembersSchema.memberId, memberId)))
+      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId));
+
+    const customPredictionsPromise = db
       .select({
         leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventName: leagueEventsRulesSchema.eventName,
@@ -796,29 +898,27 @@ export const QUERIES = {
           referenceType: leagueEventPredictionsSchema.referenceType,
           referenceId: leagueEventPredictionsSchema.referenceId,
         },
-        public: leagueEventsRulesSchema.public
       })
       .from(leagueEventsRulesSchema)
-      .innerJoin(leaguesSchema, and(
-        eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId),
-        eq(leaguesSchema.leagueHash, leagueHash)))
       .leftJoin(leagueEventPredictionsSchema, and(
         eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsRulesSchema.leagueEventRuleId),
         eq(leagueEventPredictionsSchema.memberId, memberId),
         eq(leagueEventPredictionsSchema.episodeId, nextEpisode.episodeId)))
-      .where(eq(leagueEventsRulesSchema.eventType, 'Prediction'))
+      .where(and(
+        eq(leagueEventsRulesSchema.leagueId, league.leagueId),
+        eq(leagueEventsRulesSchema.eventType, 'Prediction')))
       .then((predictions) => predictions
         .filter((prediction) => predictionsFilter(prediction.timing))
         .map((prediction) => {
-          const draftPrediction: LeagueEventPrediction = {
+          const draftPrediction: EventPrediction = {
             ...prediction,
             eventType: 'Prediction',
           };
           return draftPrediction;
         }));
 
-    const [predictions, castaways] = await Promise.all([
-      predictionsPromise,
+    const [basePredictionRules, basePredictions, customPredictions, castaways] = await Promise.all([
+      basePredictionRulesPromise, basePredictionsPromise, customPredictionsPromise,
       SEASON_QUERIES.getCastaways(league.leagueSeason),
     ]);
 
@@ -833,7 +933,14 @@ export const QUERIES = {
     })))
       .filter((tribe) => tribe !== undefined);
 
-    return { predictions, castaways: remainingCastaways, tribes, nextEpisode };
+    return {
+      basePredictionRules,
+      basePredictions,
+      customPredictions,
+      castaways: remainingCastaways,
+      tribes,
+      nextEpisode
+    };
   },
 
   /**

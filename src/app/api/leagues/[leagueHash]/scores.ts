@@ -1,7 +1,7 @@
 import { findTribeCastaways } from '~/lib/utils';
 import { type QUERIES as LEAGUE_QUERIES } from '../query';
 import { type QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
-import { type ScoringBaseEventName, ScoringBaseEventNames, type BaseEventRule, type ReferenceType } from '~/server/db/defs/events';
+import { type ScoringBaseEventName, ScoringBaseEventNames, type BaseEventRule, type ReferenceType, type BasePredictionRules } from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { type LeagueSurvivalCap } from '~/server/db/defs/leagues';
 
@@ -18,12 +18,14 @@ import { type LeagueSurvivalCap } from '~/server/db/defs/leagues';
   */
 export function compileScores(
   baseEvents: Awaited<ReturnType<typeof SEASON_QUERIES.getBaseEvents>>,
+  baseEventRules: BaseEventRule,
+  basePredictions: Awaited<ReturnType<typeof LEAGUE_QUERIES.getBasePredictions>>,
+  basePredictionRules: BasePredictionRules,
+  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>>,
+
+  selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>>,
   tribesTimeline: Awaited<ReturnType<typeof SEASON_QUERIES.getTribesTimeline>>,
   eliminations: Awaited<ReturnType<typeof SEASON_QUERIES.getEliminations>>,
-
-  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>>,
-  baseEventRules: BaseEventRule,
-  selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>>,
 
   survivalCap: LeagueSurvivalCap,
   preserveStreak: boolean
@@ -34,13 +36,14 @@ export function compileScores(
     Member: {},
   };
 
+  console.log(basePredictionRules, basePredictions);
+
   // score base events
   Object.entries(baseEvents).forEach(([episodeNumber, events]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(events).forEach((event) => {
       event.tribes.forEach((tribe) => {
         // add castaways to be scored
-        //if (event.eventName !== 'tribeUpdate') {
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
           if (!event.castaways.includes(castaway)) event.castaways.push(castaway);
         });

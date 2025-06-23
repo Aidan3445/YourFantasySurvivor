@@ -80,7 +80,6 @@ export function basePredictionRulesSchemaToObject(
 export function basePredictionRulesObjectToSchema(
   rules: BasePredictionRules
 ): BaseEventPredictionSchema {
-  console.log(rules);
   const schema: Record<string, boolean | number | PredictionEventTiming[]> = {};
 
   for (const eventName of ScoringBaseEventNames) {
@@ -94,7 +93,6 @@ export function basePredictionRulesObjectToSchema(
     schema[pointsKey] = rule.points;
     schema[timingKey] = rule.timing;
   }
-  console.log(schema);
 
   return schema as BaseEventPredictionSchema;
 }
