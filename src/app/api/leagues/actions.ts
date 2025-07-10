@@ -2,8 +2,8 @@
 
 import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
-import { baseEventPredictionRulesSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert, type LeagueEventId, type BasePredictionRules } from '~/server/db/defs/events';
+import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
+import { type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert, type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName } from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { auth, leagueMemberAuth } from '~/lib/auth';
@@ -583,6 +583,7 @@ export async function makePrediction(
   referenceId: CastawayId | TribeId | LeagueMemberId,
   episodeId?: EpisodeId,
 ) {
+  console.log('Making prediction', rule);
   const { memberId, league } = await leagueMemberAuth(leagueHash);
   if (!memberId || !league) throw new Error('User not authorized');
   if (league.leagueStatus === 'Inactive')
@@ -627,23 +628,44 @@ export async function makePrediction(
   }
   */
 
-  await db
-    .insert(leagueEventPredictionsSchema)
-    .values({
-      leagueEventRuleId: rule.leagueEventRuleId!,
-      episodeId,
-      memberId,
-      referenceType,
-      referenceId,
-    })
-    .onConflictDoUpdate({
-      target: [
-        leagueEventPredictionsSchema.leagueEventRuleId,
-        leagueEventPredictionsSchema.episodeId,
-        leagueEventPredictionsSchema.memberId,
-      ],
-      set: { referenceType, referenceId },
-    });
+  // RuleID defined for custom rules
+  if (rule.leagueEventRuleId) {
+    await db
+      .insert(leagueEventPredictionsSchema)
+      .values({
+        leagueEventRuleId: rule.leagueEventRuleId,
+        episodeId,
+        memberId,
+        referenceType,
+        referenceId,
+      })
+      .onConflictDoUpdate({
+        target: [
+          leagueEventPredictionsSchema.leagueEventRuleId,
+          leagueEventPredictionsSchema.episodeId,
+          leagueEventPredictionsSchema.memberId,
+        ],
+        set: { referenceType, referenceId },
+      });
+  } else {
+    await db
+      .insert(baseEventPredictionsSchema)
+      .values({
+        baseEventName: rule.eventName as ScoringBaseEventName,
+        episodeId,
+        memberId,
+        referenceType,
+        referenceId,
+      })
+      .onConflictDoUpdate({
+        target: [
+          baseEventPredictionsSchema.baseEventName,
+          baseEventPredictionsSchema.episodeId,
+          baseEventPredictionsSchema.memberId,
+        ],
+        set: { referenceType, referenceId },
+      });
+  }
 }
 
 /**

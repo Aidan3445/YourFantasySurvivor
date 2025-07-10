@@ -46,10 +46,10 @@ function MakePredictions({ predictions: weekly }: WeeklyPredictionsProps) {
     nextEpisode
   } = weekly;
 
-  const enabledBasePredictionsCount = Object.entries(basePredictionRules)
+  const totalPredictionsCount = customPredictions.length + Object.entries(basePredictionRules)
     .filter(([_, rule]) => rule.enabled).length;
 
-  if (customPredictions.length + enabledBasePredictionsCount === 0 || nextEpisode.airStatus === 'Aired') return null;
+  if (totalPredictionsCount === 0 || nextEpisode.airStatus === 'Aired') return null;
 
   return (
     <div className='text-center bg-card rounded-lg w-full'>
@@ -57,7 +57,7 @@ function MakePredictions({ predictions: weekly }: WeeklyPredictionsProps) {
         <h1 className='text-3xl'>
           Predictions are locked until the episode ends.
         </h1> :
-        <h1 className='text-3xl'>{'This Week\'s Prediction'}{customPredictions.length > 1 ? 's' : ''}</h1>
+        <h1 className='text-3xl'>{'This Week\'s Prediction'}{totalPredictionsCount > 1 ? 's' : ''}</h1>
       }
       <span className='flex flex-wrap justify-center items-center gap-x-2 text-muted-foreground text-sm'>
         <span className='text-nowrap'>

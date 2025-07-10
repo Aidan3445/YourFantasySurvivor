@@ -22,7 +22,8 @@ import {
   defaultBaseRules,
   type PredictionEventTiming,
   type Prediction,
-  defaultPredictionRules
+  defaultPredictionRules,
+  ScoringBaseEventNames
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
@@ -844,32 +845,40 @@ export const QUERIES = {
     const lastEpisode = episodes[nextEpisode.episodeNumber - 2];
     const mergeEpisode = episodes.find((episode) => episode.isMerge);
 
-    const predictionsFilter = (ruleTiming: PredictionEventTiming[]) => {
+    const timingFilter = ({ timing }: { timing: PredictionEventTiming[] }) => {
       // Draft takes precedence if included in the list: 
       // - if the league is in draft status
       // - if there are no previous episodes
       // - if the draft date is after the last aired episode
-      if (ruleTiming.includes('Draft') && (league.leagueStatus === 'Draft' || !lastEpisode ||
+      if (timing.includes('Draft') && (league.leagueStatus === 'Draft' || !lastEpisode ||
         league.draftDate > lastEpisode.episodeAirDate)) return true;
       // Weekly takes precedence if included in the list and draft checks fail
-      else if (ruleTiming.includes('Weekly')) return true;
+      else if (timing.includes('Weekly')) return true;
       // Likewise for weekly premerge and postmerge
       // Weekly premerge only if included in the list and no merge episode
-      else if (ruleTiming.includes('Weekly (Premerge only)') &&
+      else if (timing.includes('Weekly (Premerge only)') &&
         !mergeEpisode) return true;
       // Weekly postmerge only if included in the list and merge episode exists
-      else if (ruleTiming.includes('Weekly (Postmerge only)') &&
+      else if (timing.includes('Weekly (Postmerge only)') &&
         !!mergeEpisode) return true;
       // After merge only if included in the list and merge episode is last aired
-      else if (ruleTiming.includes('After Merge') &&
+      else if (timing.includes('After Merge') &&
         !!lastEpisode?.isMerge) return true;
       // Before finale only if included in the list and next episode is the finale
-      else if (ruleTiming.includes('Before Finale') &&
+      else if (timing.includes('Before Finale') &&
         !!nextEpisode?.isFinale) return true;
+
+      return false;
     };
 
     const basePredictionRulesPromise = this.getLeagueConfig(leagueHash)
-      .then((config) => config.basePredictionRules);
+      .then((config) => {
+        ScoringBaseEventNames.forEach((eventName) => {
+          const rule = config.basePredictionRules[eventName];
+          config.basePredictionRules[eventName].enabled = rule.enabled && timingFilter(rule);
+        });
+        return config.basePredictionRules;
+      });
 
     const basePredictionsPromise = db
       .select({
@@ -884,7 +893,8 @@ export const QUERIES = {
       .innerJoin(leagueMembersSchema, and(
         eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId),
         eq(leagueMembersSchema.memberId, memberId)))
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId));
+      .innerJoin(episodesSchema,
+        eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId));
 
     const customPredictionsPromise = db
       .select({
@@ -908,7 +918,7 @@ export const QUERIES = {
         eq(leagueEventsRulesSchema.leagueId, league.leagueId),
         eq(leagueEventsRulesSchema.eventType, 'Prediction')))
       .then((predictions) => predictions
-        .filter((prediction) => predictionsFilter(prediction.timing))
+        .filter(timingFilter)
         .map((prediction) => {
           const draftPrediction: EventPrediction = {
             ...prediction,

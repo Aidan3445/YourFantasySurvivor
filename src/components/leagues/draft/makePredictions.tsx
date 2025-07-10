@@ -82,7 +82,6 @@ export function PredictionCards({
 
       return prediction;
     });
-  console.log('Enabled Base Predictions:', enabledBasePredictions);
 
   const predictionRuleCount = enabledBasePredictions.length + customPredictions.length;
   if (predictionRuleCount === 0) return null;
@@ -163,9 +162,31 @@ export function PredictionCards({
     ),
   }));
 
+  const basePredictionItems = enabledBasePredictions.map((prediction) => ({
+    header: (
+      <h3 className='text-lg font-semibold text-card-foreground'>
+        {prediction.eventName}
+        <span className='ml-2 inline-flex mt-1'>
+          <p className='text-sm'>{prediction.points}</p>
+          <Flame size={16} />
+        </span>
+        <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+          {prediction.timing.join(' - ')}
+          <PredictionTimingHelp />
+        </div>
+      </h3>
+    ),
+    content: (<p className='text-sm'>{prediction.description}</p>),
+    footer: (
+      <SubmissionCard
+        prediction={prediction}
+        options={getOptions(prediction.referenceTypes)} />
+    ),
+  }));
+
   return (
     <span className={cn('w-full', className)}>
-      <BounceyCarousel items={customPredictionItems} />
+      <BounceyCarousel items={[...basePredictionItems, ...customPredictionItems]} />
     </span>
   );
 }
@@ -189,7 +210,8 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       const selectedType = Object.keys(options).find((type) =>
-        Object.values(options[type as ReferenceType]).some(({ id }) => id === data.referenceId)) as ReferenceType | undefined;
+        Object.values(options[type as ReferenceType]).some(({ id }) =>
+          id === data.referenceId)) as ReferenceType | undefined;
       if (!selectedType) throw new Error('Invalid reference type');
 
       await makePrediction(league.leagueHash, prediction, selectedType, data.referenceId);

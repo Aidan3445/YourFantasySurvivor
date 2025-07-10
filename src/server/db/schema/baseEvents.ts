@@ -132,6 +132,7 @@ export const baseEventPredictionsSchema = createTable(
     index().on(table.episodeId),
     index().on(table.memberId),
     index().on(table.baseEventName),
+    unique().on(table.baseEventName, table.episodeId, table.memberId)
   ]
 );
 

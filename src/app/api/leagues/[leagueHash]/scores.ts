@@ -36,7 +36,7 @@ export function compileScores(
     Member: {},
   };
 
-  console.log(basePredictionRules, basePredictions);
+  //console.log(basePredictionRules, basePredictions);
 
   // score base events
   Object.entries(baseEvents).forEach(([episodeNumber, events]) => {
