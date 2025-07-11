@@ -108,7 +108,11 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
         </ColorRow>
       </TableCell>
       <TableCell className='text-nowrap px-1'>
-        <ColorRow className='justify-center' color={color}>
+        <ColorRow
+          className={cn('justify-center',
+            member === league.members.loggedIn?.displayName &&
+            'border-white border-2 font-bold leading-snug')}
+          color={color}>
           {member}
         </ColorRow>
       </TableCell>
