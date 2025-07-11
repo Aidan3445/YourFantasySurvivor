@@ -121,9 +121,10 @@ export function PredictionCards({
 
   if (predictionRuleCount === 1) {
     const prediction = (customPredictions[0] ?? enabledBasePredictions[0])!;
+    console.log('Single prediction', prediction);
     return (
       <article
-        className={cn('flex flex-col my-4 text-center bg-secondary rounded-lg p-2', className)}>
+        className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg', className)}>
         <span className='flex gap-1 items-start self-center px-1'>
           <h3 className='text-lg font-semibold text-card-foreground'>
             {prediction.eventName}
