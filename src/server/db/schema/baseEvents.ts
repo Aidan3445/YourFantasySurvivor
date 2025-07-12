@@ -3,11 +3,12 @@ import 'server-only';
 import { createTable } from './createTable';
 import { boolean, index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
-import { AllBaseEventNames, PredictionTimingOptions, ReferenceOptions } from '~/server/db/defs/events';
+import { AllBaseEventNames, PredictionTimingOptions, ReferenceOptions, ScoringBaseEventNames } from '~/server/db/defs/events';
 import { episodesSchema } from './episodes';
 import { leagueMembersSchema } from './leagueMembers';
 
 export const eventName = pgEnum('event_name', AllBaseEventNames);
+export const scoringEventName = pgEnum('scoring_event_name', ScoringBaseEventNames);
 export const baseEventsSchema = createTable(
   'event_base',
   {
@@ -122,7 +123,7 @@ export const baseEventPredictionsSchema = createTable(
   'event_base_prediction',
   {
     baseEventPredictionId: serial('event_base_prediction_id').notNull().primaryKey(),
-    baseEventName: eventName('event_name').notNull(),
+    baseEventName: scoringEventName('event_name').notNull(),
     episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
     memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
     referenceType: leagueEventReference('reference_type').notNull(),

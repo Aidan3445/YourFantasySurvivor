@@ -252,21 +252,19 @@ export const defaultLeagueEventRule: LeagueEventRule = {
   timing: [],
 };
 
-export type BaseEventPrediction = {
-  eventName: BaseEventName,
-  episodeNumber: EpisodeNumber,
-  predictionMade: {
-    referenceType: ReferenceType;
-    referenceId: number;
-  } | null
-};
+type EventPredictionRoot = {
+  points: number,
+  referenceType: ReferenceType,
+  referenceId: number,
+  // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+  referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
+  predictionMaker: LeagueMemberDisplayName,
+  hit: boolean,
+}
 
-export type EventPrediction = LeagueEventRule & {
-  predictionMade: {
-    referenceType: ReferenceType;
-    referenceId: number;
-  } | null
-};
+export type EventPrediction = EventPredictionRoot & {
+  eventName: ScoringBaseEventName
+}
 
 export type LeagueEventId = number;
 export type LeagueEventName = string;
@@ -283,19 +281,23 @@ export type LeagueDirectEvent = {
   notes: string[] | null
 };
 
-export type LeaguePredictionEvent = {
+export type LeaguePredictionEvent = EventPredictionRoot & {
+  eventName: LeagueEventName,
   leagueEventRuleId: number,
   eventId: LeagueEventId,
-  eventName: LeagueEventName,
-  points: number,
-  referenceType: ReferenceType,
-  referenceId: number,
-  // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-  referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
-  hit: boolean,
-  predictionMaker: LeagueMemberDisplayName,
   notes: string[] | null
 };
+
+export type BasePredictionDraft = {
+  eventName: LeagueEventName,
+  episodeNumber?: EpisodeNumber,
+  predictionMade: {
+    referenceType: ReferenceType
+    referenceId: number,
+  } | null,
+}
+
+export type LeaguePredictionDraft = BasePredictionDraft & LeagueEventRule;
 
 export type Prediction = {
   leagueMember: LeagueMemberDisplayName,

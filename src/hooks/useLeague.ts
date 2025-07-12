@@ -84,24 +84,26 @@ const nonLeague: League = {
 };
 
 const emptyData: LeagueData = {
-  scores: {
-    Castaway: {},
-    Tribe: {},
-    Member: {}
-  },
-  currentStreaks: {},
-  baseEvents: {},
+  episodes: [],
   castaways: [],
   tribes: [],
   leagueEvents: {
     directEvents: [],
     predictionEvents: []
   },
+  baseEvents: {},
+  baseEventRules: defaultBaseRules,
+  basePredictions: [],
+  basePredictionRules: defaultPredictionRules,
   selectionTimeline: {
     memberCastaways: {},
     castawayMembers: {}
   },
-  episodes: [],
-  baseEventRules: defaultBaseRules
+  scores: {
+    Castaway: {},
+    Tribe: {},
+    Member: {}
+  },
+  currentStreaks: {},
 };
 

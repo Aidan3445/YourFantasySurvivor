@@ -6,7 +6,11 @@ import { Button } from '~/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
 import { BounceyCarousel } from '~/components/ui/carousel';
 import { Flame, HelpCircle } from 'lucide-react';
-import { type ReferenceType, type BasePredictionRules, type EventPrediction, defaultPredictionRules, BaseEventDescriptions, type ScoringBaseEventName, BasePredictionReferenceTypes, type BaseEventPrediction } from '~/server/db/defs/events';
+import {
+  type ReferenceType, type BasePredictionRules, defaultPredictionRules,
+  BaseEventDescriptions, type ScoringBaseEventName, BasePredictionReferenceTypes,
+  type BasePredictionDraft, type LeaguePredictionDraft
+} from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
@@ -21,8 +25,8 @@ import { PopoverArrow } from '@radix-ui/react-popover';
 
 interface MakePredictionsProps {
   basePredictionRules?: BasePredictionRules;
-  basePredictions?: BaseEventPrediction[];
-  customPredictions?: EventPrediction[];
+  basePredictions?: BasePredictionDraft[];
+  customPredictions?: LeaguePredictionDraft[];
   castaways: (CastawayDraftInfo | CastawayDetails)[];
   tribes: Tribe[];
   className?: string;
@@ -68,7 +72,7 @@ export function PredictionCards({
     .filter(([_, rule]) => rule.enabled)
     .map(([baseEventName, rule]) => {
       const eventName = baseEventName as ScoringBaseEventName;
-      const prediction: EventPrediction = {
+      const prediction: LeaguePredictionDraft = {
         eventName: eventName,
         description: `${BaseEventDescriptions.main[eventName]} \
           ${BaseEventDescriptions.italics[eventName] ?? ''}`,
@@ -121,7 +125,6 @@ export function PredictionCards({
 
   if (predictionRuleCount === 1) {
     const prediction = (customPredictions[0] ?? enabledBasePredictions[0])!;
-    console.log('Single prediction', prediction);
     return (
       <article
         className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg', className)}>
@@ -197,7 +200,7 @@ const formSchema = z.object({
 });
 
 interface SubmissionCardProps {
-  prediction: EventPrediction;
+  prediction: LeaguePredictionDraft;
   options: Record<ReferenceType, Record<string, { id: number, color: string, tribeName?: string }>>;
 }
 

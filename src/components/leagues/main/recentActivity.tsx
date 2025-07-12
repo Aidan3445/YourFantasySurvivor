@@ -218,15 +218,22 @@ export function EpisodeEvents({
   filters }: EpisodeEventsProps) {
   const {
     leagueData: {
-      baseEvents,
       leagueEvents,
+      baseEvents,
+      basePredictions,
       episodes
     }
   } = useLeague();
   const noTribes = episodeNumber === -1 || (
-    baseEvents[episodeNumber] &&
-    !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0) &&
+    (
+      baseEvents[episodeNumber] &&
+      !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0)
+    ) &&
     !mockBases?.some((event) => event.tribes.length > 0) &&
+    (
+      basePredictions[episodeNumber] &&
+      !Object.values(basePredictions[episodeNumber]).some((event) => event.referenceType === 'Tribe')
+    ) &&
     ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
       ?.some((event) => event.referenceType === 'Tribe') &&
     ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
@@ -282,6 +289,7 @@ function EpisodeEventsTableBody({
   const {
     leagueData: {
       baseEvents,
+      basePredictions,
       leagueEvents,
       baseEventRules,
       selectionTimeline,
@@ -308,7 +316,10 @@ function EpisodeEventsTableBody({
     });
 
   const combinedPredictions = Object.values(
-    leagueEvents.predictionEvents[episodeNumber]?.reduce((acc, event) => {
+    [
+      ...basePredictions[episodeNumber] ?? [],
+      ...leagueEvents.predictionEvents[episodeNumber] ?? []
+    ].reduce((acc, event) => {
       if (filters.event.length > 0 && !filters.event.includes(event.eventName)) return acc;
       if (filters.castaway.length > 0 && event.referenceType === 'Castaway' &&
         !filters.castaway.some((castaway) => event.referenceName === castaway)) return acc;
@@ -322,11 +333,12 @@ function EpisodeEventsTableBody({
       if (filters.member.length > 0 &&
         !filters.member.some((member) => event.predictionMaker === member)) return acc;
 
-      acc[event.eventId] ??= {
-        eventId: event.eventId,
+      const key = 'eventId' in event ? event.eventId : event.eventName;
+
+      acc[key] ??= {
         eventName: event.eventName,
         points: event.points,
-        notes: event.notes,
+        notes: 'notes' in event ? event.notes : null,
         referenceId: event.referenceId,
         referenceType: event.referenceType,
         referenceName: event.referenceName,
@@ -334,8 +346,8 @@ function EpisodeEventsTableBody({
         misses: []
       };
 
-      if (event.hit) acc[event.eventId]!.predictionMakers.push(event.predictionMaker);
-      else acc[event.eventId]!.misses.push({
+      if (event.hit) acc[key].predictionMakers.push(event.predictionMaker);
+      else acc[key].misses.push({
         predictionMaker: event.predictionMaker,
         referenceName: (event.referenceType === 'Castaway' ?
           castaways.find((castaway) => castaway.castawayId === event.referenceId)?.fullName :
@@ -343,9 +355,9 @@ function EpisodeEventsTableBody({
       });
 
       return acc;
-    }, {} as Record<LeagueEventId, {
-      eventId: LeagueEventId;
+    }, {} as Record<LeagueEventId | ScoringBaseEventName, {
       eventName: LeagueEventName;
+      eventId?: LeagueEventId;
       points: number;
       notes: string[] | null;
       referenceId: number;
@@ -697,7 +709,7 @@ function BaseEventRow({
 interface LeagueEventRowProps {
   className?: string;
   eventName: LeagueEventName;
-  eventId: number;
+  eventId?: number;
   points: number;
   referenceType: ReferenceType;
   referenceName?: string;
@@ -733,7 +745,7 @@ function LeagueEventRow({
 
   return (
     <TableRow className={className}>
-      {edit ? <TableCell className='w-0'>
+      {edit && eventId ? <TableCell className='w-0'>
         <EditLeagueEvent episodeNumber={episodeNumber} leagueEvent={{
           eventId,
           eventName,

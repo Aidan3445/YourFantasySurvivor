@@ -59,7 +59,7 @@ function MakePredictions({ predictions: weekly }: WeeklyPredictionsProps) {
         </h1> :
         <h1 className='text-3xl'>{'This Week\'s Prediction'}{totalPredictionsCount > 1 ? 's' : ''}</h1>
       }
-      <span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm'>
+      <span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1'>
         <span className='text-nowrap'>
           {nextEpisode.episodeNumber}: {nextEpisode.episodeTitle}
         </span>

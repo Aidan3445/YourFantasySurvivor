@@ -23,7 +23,8 @@ import {
   type PredictionEventTiming,
   type Prediction,
   defaultPredictionRules,
-  ScoringBaseEventNames
+  ScoringBaseEventNames,
+  type LeaguePredictionDraft
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
@@ -296,7 +297,7 @@ export const QUERIES = {
         arrayOverlaps(leagueEventsRulesSchema.timing, ['Draft', 'Weekly', 'Weekly (Premerge only)'])))
       .orderBy(asc(leagueEventsRulesSchema.timing))
       .then((predictions) => predictions.map((prediction) => {
-        const draftPrediction: EventPrediction = {
+        const draftPrediction: LeaguePredictionDraft = {
           ...prediction,
           timing: ['Draft'],
           eventType: 'Prediction',
@@ -474,6 +475,8 @@ export const QUERIES = {
       throw new Error('User not a member of the league');
     }
 
+    const { basePredictionRules } = await QUERIES.getLeagueConfig(leagueHash);
+
     const basePredictions = await db
       .select({
         eventName: baseEventPredictionsSchema.baseEventName,
@@ -481,12 +484,19 @@ export const QUERIES = {
         predictionMaker: leagueMembersSchema.displayName,
         referenceType: baseEventPredictionsSchema.referenceType,
         referenceId: baseEventPredictionsSchema.referenceId,
+        resultReferenceType: baseEventReferenceSchema.referenceType,
+        resultReferenceId: baseEventReferenceSchema.referenceId,
         castaway: castawaysSchema.fullName,
         tribe: tribesSchema.tribeName,
       })
       .from(baseEventPredictionsSchema)
       .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId))
       .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId))
+      // result
+      .leftJoin(baseEventsSchema, and(
+        eq(baseEventsSchema.eventName, baseEventPredictionsSchema.baseEventName),
+        eq(baseEventsSchema.episodeId, episodesSchema.episodeId)))
+      .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventsSchema.baseEventId))
       // references
       .leftJoin(castawaysSchema, and(
         eq(castawaysSchema.castawayId, baseEventPredictionsSchema.referenceId),
@@ -494,30 +504,50 @@ export const QUERIES = {
       .leftJoin(tribesSchema, and(
         eq(tribesSchema.tribeId, baseEventPredictionsSchema.referenceId),
         eq(baseEventPredictionsSchema.referenceType, 'Tribe')))
-      .where(eq(leagueMembersSchema.leagueId, league.leagueId));
+      .where(eq(leagueMembersSchema.leagueId, league.leagueId))
+      .then((rows) => rows.reduce((acc, row) => {
+        acc[row.episodeNumber] ??= [];
+        const newEvent = {
+          eventName: row.eventName,
+          points: basePredictionRules[row.eventName]?.points ?? 0,
+          predictionMaker: row.predictionMaker,
+          referenceType: row.referenceType,
+          referenceId: row.referenceId,
+          hit: row.resultReferenceId === row.referenceId &&
+            row.resultReferenceType === row.referenceType
+        };
 
-    return basePredictions.map((prediction) => {
-      const basePrediction: {
-        eventName: LeagueEventName,
-        episodeNumber: EpisodeNumber,
-        predictionMaker: LeagueMemberDisplayName,
-        // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-        referenceName: CastawayName | TribeName,
-      } = {
-        eventName: prediction.eventName,
-        episodeNumber: prediction.episodeNumber,
-        predictionMaker: prediction.predictionMaker,
-        referenceName: '',
-      };
+        // Check if there's double prediction
+        // if there is only keep the hit or the first miss
+        const doubleIndex = acc[row.episodeNumber]!.findIndex((event) =>
+          event.eventName === newEvent.eventName &&
+          event.referenceType === newEvent.referenceType &&
+          event.predictionMaker === newEvent.predictionMaker);
+        if (doubleIndex !== -1) {
+          if (acc[row.episodeNumber]![doubleIndex]!.hit || !newEvent.hit) return acc;
+          // if the new event is a hit and the double is a miss, remove the double
+          acc[row.episodeNumber]!.splice(doubleIndex, 1);
+        }
 
-      if (prediction.referenceType === 'Castaway') {
-        basePrediction.referenceName = prediction.castaway!;
-      } else if (prediction.referenceType === 'Tribe') {
-        basePrediction.referenceName = prediction.tribe!;
-      }
+        switch (row.referenceType) {
+          case 'Castaway':
+            acc[row.episodeNumber]!.push({
+              ...newEvent,
+              referenceName: row.castaway!,
+            });
+            break;
+          case 'Tribe':
+            acc[row.episodeNumber]!.push({
+              ...newEvent,
+              referenceName: row.tribe!,
+            });
+            break;
+        }
 
-      return basePrediction;
-    });
+        return acc;
+      }, {} as Record<EpisodeNumber, EventPrediction[]>));
+
+    return basePredictions;
   },
 
   /**
@@ -808,15 +838,17 @@ export const QUERIES = {
       leagueSettings.survivalCap, leagueSettings.preserveStreak);
 
     return {
-      scores,
-      currentStreaks,
-      baseEvents,
+      episodes,
       castaways: [...castaways, ...additions],
       tribes,
       leagueEvents,
-      selectionTimeline,
-      episodes,
+      baseEvents,
       baseEventRules: baseEventRules as BaseEventRule,
+      basePredictions,
+      basePredictionRules,
+      selectionTimeline,
+      scores,
+      currentStreaks,
     };
   },
 
@@ -893,8 +925,9 @@ export const QUERIES = {
       .innerJoin(leagueMembersSchema, and(
         eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId),
         eq(leagueMembersSchema.memberId, memberId)))
-      .innerJoin(episodesSchema,
-        eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId));
+      .innerJoin(episodesSchema, and(
+        eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId),
+        eq(episodesSchema.episodeId, nextEpisode.episodeId)));
 
     const customPredictionsPromise = db
       .select({
@@ -920,7 +953,7 @@ export const QUERIES = {
       .then((predictions) => predictions
         .filter(timingFilter)
         .map((prediction) => {
-          const draftPrediction: EventPrediction = {
+          const draftPrediction: LeaguePredictionDraft = {
             ...prediction,
             eventType: 'Prediction',
           };
