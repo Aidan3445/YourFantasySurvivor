@@ -36,12 +36,11 @@ export function compileScores(
     Member: {},
   };
 
-  //console.log(basePredictionRules, basePredictions);
-
   // score base events
   Object.entries(baseEvents).forEach(([episodeNumber, events]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(events).forEach((event) => {
+      const baseEvent = event.eventName as ScoringBaseEventName;
       event.tribes.forEach((tribe) => {
         // add castaways to be scored
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
@@ -50,13 +49,23 @@ export function compileScores(
         //}
         // here we want to align the castaways for non scoring events so we
         // push this check inside, later we skip iteration entirely for castaways
-        if (!ScoringBaseEventNames.includes(event.eventName as ScoringBaseEventName)) return;
+        if (!ScoringBaseEventNames.includes(baseEvent)) return;
         // initialize tribe score if it doesn't exist
         scores.Tribe[tribe] ??= [];
         scores.Tribe[tribe][episodeNum] ??= 0;
         // add points to tribe score
-        const points = baseEventRules[event.eventName as ScoringBaseEventName];
+        const points = baseEventRules[baseEvent];
         scores.Tribe[tribe][episodeNum] += points;
+        // check predictions
+        basePredictions[episodeNum]?.filter((p) =>
+          p.referenceType === 'Tribe' && p.referenceName === tribe && p.eventName === event.eventName)
+          .forEach((prediction) => {
+            // initialize member score if it doesn't exist
+            scores.Member[prediction.predictionMaker] ??= [];
+            scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
+            // add points to member score
+            scores.Member[prediction.predictionMaker]![episodeNum]! += basePredictionRules[baseEvent].points;
+          });
       });
 
       if (!ScoringBaseEventNames.includes(event.eventName as ScoringBaseEventName)) return;
@@ -76,6 +85,16 @@ export function compileScores(
         scores.Member[leagueMember] ??= [];
         scores.Member[leagueMember][episodeNum] ??= 0;
         scores.Member[leagueMember][episodeNum] += points;
+        // check predictions
+        basePredictions[episodeNum]?.filter((p) =>
+          p.referenceType === 'Castaway' && p.referenceName === castaway && p.eventName === event.eventName)
+          .forEach((prediction) => {
+            // initialize member score if it doesn't exist
+            scores.Member[prediction.predictionMaker] ??= [];
+            scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
+            // add points to member score
+            scores.Member[prediction.predictionMaker]![episodeNum]! += basePredictionRules[baseEvent].points;
+          });
       });
     });
   });
@@ -147,6 +166,7 @@ export function compileScores(
     scores.Member[member] ??= [0];
     // iterate to add the streak bonus
     let streak = 0;
+
     for (let episodeNumber = firstPickEpisode; episodeNumber < eliminations.length; episodeNumber++) {
       // get the castaways who were eliminated at any point before this episode
       const eliminated = eliminations.slice(0, episodeNumber + 1).flat();
@@ -168,6 +188,7 @@ export function compileScores(
       scores.Member[member][episodeNumber] ??= 0;
       scores.Member[member][episodeNumber]! += bonus;
     }
+
     currentStreaks[member] = streak;
   });
 

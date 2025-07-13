@@ -1,4 +1,4 @@
-import { aliasedTable, and, desc, eq, inArray } from 'drizzle-orm';
+import { aliasedTable, and, desc, eq, inArray, lte } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
@@ -121,17 +121,21 @@ export const QUERIES = {
         castaway: castawaysSchema.fullName,
       })
       .from(episodesSchema)
-      .innerJoin(baseEventsSchema, and(
+      .leftJoin(baseEventsSchema, and(
         eq(episodesSchema.episodeId, baseEventsSchema.episodeId),
         inArray(baseEventsSchema.eventName, ['elim', 'noVoteExit'])))
-      .innerJoin(baseEventReferenceSchema, and(
+      .leftJoin(baseEventReferenceSchema, and(
         eq(baseEventsSchema.baseEventId, baseEventReferenceSchema.baseEventId),
         eq(baseEventReferenceSchema.referenceType, 'Castaway')))
-      .innerJoin(castawaysSchema, eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId))
-      .where(eq(episodesSchema.seasonId, seasonId))
+      .leftJoin(castawaysSchema, eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId))
+      .where(and(
+        eq(episodesSchema.seasonId, seasonId),
+        lte(episodesSchema.airDate, new Date().toUTCString())))
       .then((rows) => rows.reduce((acc, row) => {
         acc[row.episodeNumber] ??= [];
-        acc[row.episodeNumber]!.push(row.castaway);
+        if (row.castaway !== null) {
+          acc[row.episodeNumber]!.push(row.castaway);
+        }
 
         return acc;
       }, [] as CastawayName[][]));

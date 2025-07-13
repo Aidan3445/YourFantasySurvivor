@@ -336,7 +336,9 @@ function EpisodeEventsTableBody({
       const key = 'eventId' in event ? event.eventId : event.eventName;
 
       acc[key] ??= {
-        eventName: event.eventName,
+        eventName: typeof key === 'string' ?
+          BaseEventFullName[event.eventName as ScoringBaseEventName] :
+          event.eventName,
         points: event.points,
         notes: 'notes' in event ? event.notes : null,
         referenceId: event.referenceId,
