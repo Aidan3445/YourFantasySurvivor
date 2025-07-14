@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { type ChatRoomProps } from './chatRoom';
@@ -13,6 +13,17 @@ const LeagueChat = dynamic(() => import('./leagueChat'), {
 export default function LeagueChatCard({ chatHistory, defaultOpen, className }: ChatRoomProps) {
   const [open, setOpen] = useState(defaultOpen ?? false);
 
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  const messageEnd = (
+    <div ref={messageEndRef} className='h-0 w-0 invisible' />
+  );
+
+  useEffect(() => {
+    if (!open) return;
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [open]);
+
   return (
     <div className={cn('relative transition-all', open ? 'w-1/2' : 'w-0', className)}>
       <section className={cn('w-full border shadow-lg bg-card lg:bg-secondary overflow-clip rounded-3xl md:h-[calc(100svh-5rem)] h-full transition-all',
@@ -23,7 +34,7 @@ export default function LeagueChatCard({ chatHistory, defaultOpen, className }: 
           <h3 className='bg-b3 text-xl leading-none text-center font-semibold p-2  h-10 rounded-t-3xl shadow-md shadow-primary'>
             League Chat
           </h3>
-          <LeagueChat chatHistory={chatHistory} />
+          <LeagueChat chatHistory={chatHistory} messageEnd={messageEnd} />
         </div>
       </section>
       <div

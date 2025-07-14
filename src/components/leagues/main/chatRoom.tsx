@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import { useState, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { useMessages } from '@ably/chat/react';
 import { type Message } from 'node_modules/@ably/chat/dist/core/message';
 import { Input } from '~/components/ui/input';
@@ -17,14 +17,14 @@ export interface ChatRoomProps {
   chatHistory?: Message[];
   defaultOpen?: boolean;
   className?: string;
+  messageEnd?: ReactNode;
 }
 
-export default function ChatRoom({ chatHistory }: ChatRoomProps) {
+export default function ChatRoom({ chatHistory, messageEnd }: ChatRoomProps) {
   const { league: { members, leagueHash } } = useLeague();
   const loggedInUser = members?.loggedIn;
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const messageEndRef = useRef<HTMLDivElement>(null);
 
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<Message[]>(chatHistory ?? []);
@@ -51,10 +51,6 @@ export default function ChatRoom({ chatHistory }: ChatRoomProps) {
       });
     }
   });
-
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, members]);
 
   const sendChatMessage = async (text: string) => {
     if (!sendMessage) return;
@@ -118,7 +114,7 @@ export default function ChatRoom({ chatHistory }: ChatRoomProps) {
             </div>
           );
         })}
-        <div ref={messageEndRef} className='h-0' />
+        {messageEnd}
         <ScrollBar orientation='vertical' />
       </ScrollArea >
       <form action={() => handleSubmit()} className='relative flex items-center justify-between border-t'>
