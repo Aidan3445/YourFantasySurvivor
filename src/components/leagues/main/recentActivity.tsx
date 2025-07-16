@@ -320,6 +320,8 @@ function EpisodeEventsTableBody({
       ...basePredictions[episodeNumber] ?? [],
       ...leagueEvents.predictionEvents[episodeNumber] ?? []
     ].reduce((acc, event) => {
+      if (event.hit === null) return acc; // Skip events without results
+
       if (filters.event.length > 0 && !filters.event.includes(event.eventName)) return acc;
       if (filters.castaway.length > 0 && event.referenceType === 'Castaway' &&
         !filters.castaway.some((castaway) => event.referenceName === castaway)) return acc;

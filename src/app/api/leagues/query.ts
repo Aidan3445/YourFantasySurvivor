@@ -513,8 +513,10 @@ export const QUERIES = {
           predictionMaker: row.predictionMaker,
           referenceType: row.referenceType,
           referenceId: row.referenceId,
-          hit: row.resultReferenceId === row.referenceId &&
-            row.resultReferenceType === row.referenceType
+          hit: row.resultReferenceId === null
+            ? null
+            : row.resultReferenceId === row.referenceId
+            && row.resultReferenceType === row.referenceType
         };
 
         // Check if there's double prediction

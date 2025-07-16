@@ -259,7 +259,7 @@ type EventPredictionRoot = {
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
   predictionMaker: LeagueMemberDisplayName,
-  hit: boolean,
+  hit: boolean | null,
 }
 
 export type EventPrediction = EventPredictionRoot & {
