@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { type ChatRoomProps } from './chatRoom';
 import dynamic from 'next/dynamic';
@@ -40,7 +40,7 @@ export default function LeagueChatCard({ chatHistory, defaultOpen, className }: 
       <div
         className='hidden lg:block absolute bottom-1/2 -left-3.5 h-12 w-3.5 bg-primary rounded-full place-items-center py-3 cursor-pointer hover:bg-primary/80 active:bg-primary/60 transition-all'
         onClick={() => setOpen(!open)}>
-        {open ? <ChevronRight stroke='white' /> : <ChevronLeft stroke='white' />}
+        <ChevronRight stroke='white' className={open ? 'rotate-180' : ''} />
       </div>
     </div>
   );
