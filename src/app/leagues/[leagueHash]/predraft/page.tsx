@@ -11,6 +11,7 @@ import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { type LeaguePageProps } from '../layout';
+import ShauhinMode from '~/components/leagues/customization/shauhinMode';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
@@ -37,6 +38,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               <SetSurvivalCap />
               <LeagueScoring />
               <CustomEvents />
+              <ShauhinMode />
             </div>
           </TabsContent>
           <TabsContent

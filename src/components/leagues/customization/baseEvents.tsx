@@ -475,20 +475,22 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
     <FormField
       name={`basePredictionRules.${eventName}.enabled`}
       render={({ field: enabledField }) => (
-        <span className='pl-4 inline-flex flex-wrap gap-1 items-start font-normal text-xs'>
-          Prediction:
-          <FormItem>
-            {disabled && !enabledField.value &&
-              <h2 className='font-semibold text-destructive'>Off</h2>}
-            {!disabled &&
-              <FormControl>
-                <Switch
-                  checked={enabledField.value as boolean}
-                  onCheckedChange={(checked) => enabledField.onChange(checked)} />
-              </FormControl>}
-          </FormItem>
-          {enabledField.value && (
-            <>
+        <>
+          <span className='pl-4 inline-flex flex-wrap gap-1 items-start font-normal text-xs'>
+            <FormItem className='flex gap-2 mb-2 items-center'>
+              <FormLabel>
+                Prediction:
+              </FormLabel>
+              {disabled && !enabledField.value &&
+                <h2 className='font-semibold text-destructive'>Off</h2>}
+              {!disabled &&
+                <FormControl>
+                  <Switch
+                    checked={enabledField.value as boolean}
+                    onCheckedChange={(checked) => enabledField.onChange(checked)} />
+                </FormControl>}
+            </FormItem>
+            {enabledField.value && (
               <FormField
                 name={`basePredictionRules.${eventName}.points`}
                 render={({ field: pointsField }) => (
@@ -509,34 +511,35 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
                           {...pointsField} />
                       </FormControl>}
                   </FormItem>
-                )} />
-              <FormField
-                name={`basePredictionRules.${eventName}.timing`}
-                render={({ field: timingField }) => (
-                  <FormItem>
-                    {disabled &&
-                      <i className='text-muted-foreground'>- {(timingField.value as string[]).join(', ')}</i>
-                    }
-                    {!disabled &&
-                      <FormControl className='animate-scale-in-fast'>
-                        <MultiSelect
-                          options={PredictionTimingOptions
-                            .map((option) => ({ label: option, value: option }))}
-                          onValueChange={timingField.onChange}
-                          defaultValue={timingField.value as string[]}
-                          value={timingField.value as string[]}
-                          maxCount={1}
-                          disabled={disabled}
-                          empty={disabled}
-                          modalPopover
-                          placeholder='Select prediction timing' />
-                      </FormControl>
-                    }
-                  </FormItem>
-                )} />
-            </>
+                )} />)}
+          </span>
+          {enabledField.value && (
+            <FormField
+              name={`basePredictionRules.${eventName}.timing`}
+              render={({ field: timingField }) => (
+                <FormItem>
+                  {disabled &&
+                    <i className='text-muted-foreground'>- {(timingField.value as string[]).join(', ')}</i>
+                  }
+                  {!disabled &&
+                    <FormControl className='animate-scale-in-fast mb-2'>
+                      <MultiSelect
+                        options={PredictionTimingOptions
+                          .map((option) => ({ label: option, value: option }))}
+                        onValueChange={timingField.onChange}
+                        defaultValue={timingField.value as string[]}
+                        value={timingField.value as string[]}
+                        maxCount={1}
+                        disabled={disabled}
+                        empty={disabled}
+                        modalPopover
+                        placeholder='Select prediction timing' />
+                    </FormControl>
+                  }
+                </FormItem>
+              )} />
           )}
-        </span>
+        </>
       )} />
   );
 }

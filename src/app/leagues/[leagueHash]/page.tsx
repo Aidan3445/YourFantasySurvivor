@@ -16,6 +16,7 @@ import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 import { QUERIES } from '~/app/api/leagues/query';
 import SetSurvivalCap from '~/components/leagues/customization/setSurvivalCap';
+import ShauhinMode from '~/components/leagues/customization/shauhinMode';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;
@@ -70,6 +71,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               <SetSurvivalCap />
               <LeagueScoring />
               <CustomEvents />
+              <ShauhinMode />
             </section>
           </TabsContent>
           <ScrollBar orientation='vertical' />

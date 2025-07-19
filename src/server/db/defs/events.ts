@@ -393,3 +393,8 @@ export const LeagueEventInsertZod = z.object({
 });
 export type LeagueEventInsert = z.infer<typeof LeagueEventInsertZod>;
 
+export const ShauhinModeTimings = [
+  'After Merge',
+  'Before Finale',
+  'Custom'
+] as const;

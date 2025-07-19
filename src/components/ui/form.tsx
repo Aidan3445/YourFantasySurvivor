@@ -93,7 +93,7 @@ const FormLabel = React.forwardRef<
   const { error, formItemId } = useFormField();
 
   return (
-    <div className='mt-2'>
+    <div>
       <Label
         ref={ref}
         className={cn(error && 'text-destructive', className)}
