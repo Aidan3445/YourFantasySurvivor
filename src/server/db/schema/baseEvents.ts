@@ -3,7 +3,7 @@ import 'server-only';
 import { createTable } from './createTable';
 import { boolean, index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from './leagues';
-import { AllBaseEventNames, PredictionTimingOptions, ReferenceOptions, ScoringBaseEventNames } from '~/server/db/defs/events';
+import { AllBaseEventNames, PredictionTimingOptions, ReferenceOptions, ScoringBaseEventNames, ShauhinModeTimings } from '~/server/db/defs/events';
 import { episodesSchema } from './episodes';
 import { leagueMembersSchema } from './leagueMembers';
 
@@ -128,6 +128,7 @@ export const baseEventPredictionsSchema = createTable(
     memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
     referenceType: leagueEventReference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
+    bet: integer('bet')
   },
   (table) => [
     index().on(table.episodeId),
@@ -137,4 +138,19 @@ export const baseEventPredictionsSchema = createTable(
   ]
 );
 
-
+export const shauhinModeStart = pgEnum('event_shauhin_mode_start', ShauhinModeTimings);
+export const shauhinModeSettingsSchema = createTable(
+  'event_shauhin_mode_settings',
+  {
+    leagueId: integer('league_id')
+      .references(() => leaguesSchema.leagueId, { onDelete: 'cascade' })
+      .primaryKey(),
+    enabled: boolean('enabled').notNull(),
+    maxBet: integer('max_bet').notNull(),
+    maxBetsPerWeek: integer('max_bets_per_week').notNull(),
+    startWeek: shauhinModeStart('start_week').notNull(),
+    customStartWeek: integer('custom_start_week').notNull(),
+    enabledBets: scoringEventName('enabled_bets').array().notNull(),
+    noEventIsMiss: boolean('no_event_is_miss').notNull()
+  }
+);

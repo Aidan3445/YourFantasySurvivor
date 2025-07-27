@@ -394,7 +394,35 @@ export const LeagueEventInsertZod = z.object({
 export type LeagueEventInsert = z.infer<typeof LeagueEventInsertZod>;
 
 export const ShauhinModeTimings = [
+  'Premiere',
   'After Merge',
   'Before Finale',
   'Custom'
 ] as const;
+
+export const ShauhinModeSettingsZod = z.object({
+  enabled: z.boolean(),
+  maxBet: z.number().min(0).max(1000),
+  maxBetsPerWeek: z.number().min(0),
+  startWeek: z.enum(ShauhinModeTimings),
+  customStartWeek: z.number().min(2).max(15),
+  enabledBets: z.array(z.enum(ScoringBaseEventNames)).nonempty('At least one event must be selected'),
+  noEventIsMiss: z.boolean().default(false),
+});
+
+export type ShauhinModeSettings = z.infer<typeof ShauhinModeSettingsZod>;
+
+export const defaultShauhinModeSettings: ShauhinModeSettings = {
+  enabled: true,
+  maxBet: 100,
+  maxBetsPerWeek: 5,
+  startWeek: 'After Merge',
+  customStartWeek: 0,
+  enabledBets: [
+    'indivWin',
+    'finalists',
+    'fireWin',
+    'soleSurvivor'
+  ],
+  noEventIsMiss: false
+};

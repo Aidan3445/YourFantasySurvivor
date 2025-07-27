@@ -2,16 +2,26 @@
 
 import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
-import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert, type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName } from '~/server/db/defs/events';
+import {
+  baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema,
+  baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema
+} from '~/server/db/schema/baseEvents';
+import {
+  type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert,
+  type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName, ShauhinModeSettings
+} from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { auth, leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
-import { type LeagueMember, type LeagueMemberId, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
+import {
+  type LeagueMember, type LeagueMemberId, type NewLeagueMember
+} from '~/server/db/defs/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
-import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
+import {
+  leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema
+} from '~/server/db/schema/leagueEvents';
 import { type CastawayId } from '~/server/db/defs/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { type EpisodeId } from '~/server/db/defs/episodes';
@@ -275,6 +285,42 @@ export async function updateBaseEventRules(
       throw new Error('An error occurred while updating the base event rules. Please try again.');
     }
   });
+}
+
+/**
+  * Update the Shauhin Mode settings for a league
+  * @param leagueHash - the hash of the league
+  * @param shauhinMode - the new Shauhin Mode settings
+  * @param customStartWeek - the custom start week for Shauhin Mode, if any
+  * @throws an error if the user is not authorized
+  * @throws an error if the Shauhin Mode settings cannot be updated
+  */
+export async function updateShauhinMode(
+  leagueHash: LeagueHash,
+  shauhinMode: ShauhinModeSettings,
+) {
+  const { role, league } = await leagueMemberAuth(leagueHash);
+  if (!role || role !== 'Owner' || !league) throw new Error('User not authorized');
+  if (league.leagueStatus === 'Inactive')
+    throw new Error('Shauhin Mode settings cannot be updated while the league is inactive');
+
+  // customStartWeek is only used if the startWeek is 'Custom'
+  const customStartWeek = shauhinMode.startWeek === 'Custom' ? shauhinMode.customStartWeek : 0;
+
+  await db
+    .insert(shauhinModeSettingsSchema)
+    .values({
+      leagueId: league.leagueId,
+      ...shauhinMode,
+      customStartWeek
+    })
+    .onConflictDoUpdate({
+      target: shauhinModeSettingsSchema.leagueId,
+      set: {
+        ...shauhinMode,
+        customStartWeek
+      },
+    });
 }
 
 /**
@@ -583,7 +629,6 @@ export async function makePrediction(
   referenceId: CastawayId | TribeId | LeagueMemberId,
   episodeId?: EpisodeId,
 ) {
-  console.log('Making prediction', rule);
   const { memberId, league } = await leagueMemberAuth(leagueHash);
   if (!memberId || !league) throw new Error('User not authorized');
   if (league.leagueStatus === 'Inactive')
@@ -599,7 +644,7 @@ export async function makePrediction(
   let timing: LeagueEventTiming | undefined;
   const lastEpisode = episodes[nextEpisode.episodeNumber - 2];
   const mergeEpisode = episodes.find((episode) => episode.isMerge);
-
+ 
   // Draft takes precedence if included in the list: 
   // - if the league is in draft status
   // - if there are no previous episodes

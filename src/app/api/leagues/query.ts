@@ -6,7 +6,7 @@ import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues'
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { auth, leagueMemberAuth } from '~/lib/auth';
-import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
+import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema } from '~/server/db/schema/baseEvents';
 import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
@@ -24,7 +24,8 @@ import {
   type Prediction,
   defaultPredictionRules,
   ScoringBaseEventNames,
-  type LeaguePredictionDraft
+  type LeaguePredictionDraft,
+  ShauhinModeSettings
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
@@ -76,13 +77,15 @@ export const QUERIES = {
         season: seasonsSchema.seasonName,
         settings: leagueSettingsSchema,
         baseEventRules: baseEventRulesSchema,
-        basePredictionRules: baseEventPredictionRulesSchema
+        basePredictionRules: baseEventPredictionRulesSchema,
+        shauhinModeSettings: shauhinModeSettingsSchema,
       })
       .from(leaguesSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
       .leftJoin(baseEventRulesSchema, eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId))
       .leftJoin(baseEventPredictionRulesSchema, eq(baseEventPredictionRulesSchema.leagueId, leaguesSchema.leagueId))
+      .leftJoin(shauhinModeSettingsSchema, eq(shauhinModeSettingsSchema.leagueId, leaguesSchema.leagueId))
       .where(eq(leaguesSchema.leagueHash, leagueHash))
       .then((leagues) => leagues[0]);
 
@@ -494,7 +497,10 @@ export const QUERIES = {
       .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId))
       // result
       .leftJoin(baseEventsSchema, and(
-        eq(baseEventsSchema.eventName, baseEventPredictionsSchema.baseEventName),
+        eq(
+          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`,
+          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`
+        ),
         eq(baseEventsSchema.episodeId, episodesSchema.episodeId)))
       .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventsSchema.baseEventId))
       // references
@@ -1142,5 +1148,27 @@ export const QUERIES = {
     } as unknown as Message));
 
     return messages;
+  },
+
+  /**
+    * Get the ShauhinMode settings for a league
+    * @param leagueHash - the hash of the league
+    * @return the ShauhinMode settings for the league
+    * @throws an error if the user is not a member of the league
+    */
+  getShauhinModeSettings: async function(leagueHash: LeagueHash) {
+    const { memberId, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    const shauhinModeSettings = await db
+      .select()
+      .from(shauhinModeSettingsSchema)
+      .where(eq(shauhinModeSettingsSchema.leagueId, league.leagueId))
+      .then((settings) => settings[0]);
+
+    return shauhinModeSettings
   }
 };

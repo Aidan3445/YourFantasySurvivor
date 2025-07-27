@@ -4,62 +4,53 @@ import { useForm } from "react-hook-form";
 import { ColorRow } from "../draftOrder";
 import { z } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { BaseEventFullName, BaseEventName, PredictionTimingOptions, ScoringBaseEventName, ScoringBaseEventNames, ShauhinModeTimings } from "~/server/db/defs/events";
+import { BaseEventFullName, ScoringBaseEventName, ScoringBaseEventNames, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from "~/server/db/defs/events";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
 import { Input } from "~/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MultiSelect } from "~/components/ui/multiSelect";
 import { Lock, LockOpen } from "lucide-react";
 import { useLeague } from "~/hooks/useLeague";
 import { cn } from "~/lib/utils";
+import { updateShauhinMode } from "~/app/api/leagues/actions";
 
-
-const formSchema = z.object({
-  enabled: z.boolean(),
-  maxBet: z.number().min(0).max(1000),
-  maxBetsPerWeek: z.number().min(0),
-  startWeek: z.union([z.number().min(0).max(15), z.enum(ShauhinModeTimings)]),
-  enabledBets: z.array(z.enum(ScoringBaseEventNames)).nonempty('At least one event must be selected'),
-  noEventIsMiss: z.boolean().default(false),
-});
 
 export default function ShauhinMode() {
   const {
     league: {
       members: {
         loggedIn
-      }
+      },
+      leagueHash,
+      shauhinModeSettings
     },
+    refresh
   } = useLeague();
 
-  const reactForm = useForm<z.infer<typeof formSchema>>({
-    defaultValues: {
-      enabled: true,
-      maxBet: 100,
-      maxBetsPerWeek: 5,
-      startWeek: 'After Merge',
-      enabledBets: [
-        'indivWin',
-        'finalists',
-        'fireWin',
-        'soleSurvivor'
-      ],
-      noEventIsMiss: false
-    },
-    resolver: zodResolver(formSchema)
+  const reactForm = useForm<z.infer<typeof ShauhinModeSettingsZod>>({
+    defaultValues: shauhinModeSettings ?? defaultShauhinModeSettings,
+    resolver: zodResolver(ShauhinModeSettingsZod),
   });
   const [locked, setLocked] = useState(true);
-  const [customStartWeeks, setCustomStartWeeks] = useState<number>(8);
+
+  useEffect(() => {
+    reactForm.reset(shauhinModeSettings ?? defaultShauhinModeSettings);
+  }, [shauhinModeSettings, reactForm]);
+
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    alert('Shauhin Mode settings saved successfully!');
-    console.log('Shauhin Mode settings:', data);
-
-    setLocked(true);
-    reactForm.reset(data);
+    try {
+      await updateShauhinMode(leagueHash, data)
+      await refresh();
+      setLocked(true);
+      alert('Shauhin Mode settings saved successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to save Shauhin Mode settings.');
+    }
   });
 
   const disabled = loggedIn?.role !== 'Owner';
@@ -126,7 +117,7 @@ export default function ShauhinMode() {
                           <span className='text-muted-foreground text-sm w-full'>
                             <h4 className='font-medium inline mr-1'>Start Timing:</h4>
                             {field.value === 'Custom'
-                              ? `Custom (after ${customStartWeeks} episodes)`
+                              ? `Custom (after ${reactForm.watch('customStartWeek')} episodes)`
                               : field.value}
                           </span>
                         );
@@ -147,16 +138,27 @@ export default function ShauhinMode() {
                                       {timing}
                                     </SelectItem>
                                   ))}
+                                  <SelectItem value='Custom'>Custom</SelectItem>
+
                                 </SelectContent>
                               </Select>
                               {field.value === 'Custom' && (
-                                <Input
-                                  type='number'
-                                  min={formSchema.shape.startWeek._def.options[0]!.minValue ?? undefined}
-                                  max={formSchema.shape.startWeek._def.options[0]!.maxValue ?? undefined}
-                                  placeholder='Enable after episode...'
-                                  value={customStartWeeks}
-                                  onChange={(e) => setCustomStartWeeks(Number(e.target.value))} />
+                                <FormField
+                                  name='customStartWeek'
+                                  render={(customField) => (
+                                    <FormItem>
+                                      <FormControl>
+                                        <Input
+                                          {...customField}
+                                          type='number'
+                                          min={ShauhinModeSettingsZod.shape.customStartWeek.minValue ?? undefined}
+                                          max={ShauhinModeSettingsZod.shape.customStartWeek.maxValue ?? undefined}
+                                          placeholder='Enable after episode...'
+                                          {...customField.field}
+                                          onChange={(e) => customField.field.onChange(+e.target.value)} />
+                                      </FormControl>
+                                    </FormItem>
+                                  )} />
                               )}
                             </span>
                           </FormControl>
@@ -191,12 +193,12 @@ export default function ShauhinMode() {
                                 type='number'
                                 placeholder='Max Bet'
                                 className='input'
-                                min={formSchema.shape.maxBet.minValue ?? undefined}
-                                max={formSchema.shape.maxBet.maxValue ?? undefined}
+                                min={ShauhinModeSettingsZod.shape.maxBet.minValue ?? undefined}
+                                max={ShauhinModeSettingsZod.shape.maxBet.maxValue ?? undefined}
                                 {...field}
+                                onChange={(e) => field.onChange(+e.target.value)}
                               />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )
                       }} />
@@ -220,13 +222,12 @@ export default function ShauhinMode() {
                                 type='number'
                                 placeholder='Max Bets Per Week'
                                 className='input'
-                                min={formSchema.shape.maxBet.minValue ?? undefined}
-                                max={formSchema.shape.maxBet.maxValue ?? undefined}
+                                min={ShauhinModeSettingsZod.shape.maxBet.minValue ?? undefined}
+                                max={ShauhinModeSettingsZod.shape.maxBet.maxValue ?? undefined}
                                 {...field}
-                                value={field.value === 0 ? 'Unlimited' : field.value}
+                                onChange={(e) => field.onChange(+e.target.value)}
                               />
                             </FormControl>
-                            <FormMessage />
                           </FormItem>
                         )
                       }} />
@@ -308,7 +309,7 @@ export default function ShauhinMode() {
               <Button
                 type='button'
                 variant='destructive'
-                onClick={() => reactForm.reset()}>
+                onClick={() => { reactForm.reset(); setLocked(true); }}>
                 Cancel
               </Button>
               <Button
@@ -319,6 +320,6 @@ export default function ShauhinMode() {
             </span>)}
         </form>
       </Form>
-    </article>
+    </article >
   );
 }

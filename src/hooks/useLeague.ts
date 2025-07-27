@@ -3,7 +3,7 @@ import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
 import { type QUERIES } from '~/app/api/leagues/query';
 import { type SWRKey } from '~/lib/utils';
-import { defaultBaseRules, defaultPredictionRules } from '~/server/db/defs/events';
+import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/server/db/defs/events';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagueLiveData>>>;
@@ -69,6 +69,7 @@ const nonLeague: League = {
   customEventRules: [],
   baseEventRules: { ...defaultBaseRules, leagueId: 0 },
   basePredictionRules: { ...defaultPredictionRules },
+  shauhinModeSettings: { ...defaultShauhinModeSettings, leagueId: 0 },
   members: {
     list: [],
     loggedIn: undefined
