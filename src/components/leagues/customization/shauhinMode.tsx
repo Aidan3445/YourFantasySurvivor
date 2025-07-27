@@ -138,24 +138,22 @@ export default function ShauhinMode() {
                                       {timing}
                                     </SelectItem>
                                   ))}
-                                  <SelectItem value='Custom'>Custom</SelectItem>
-
                                 </SelectContent>
                               </Select>
                               {field.value === 'Custom' && (
                                 <FormField
                                   name='customStartWeek'
-                                  render={(customField) => (
-                                    <FormItem>
+                                  render={({ field: customField }) => (
+                                    <FormItem className='w-full'>
                                       <FormControl>
                                         <Input
-                                          {...customField}
                                           type='number'
                                           min={ShauhinModeSettingsZod.shape.customStartWeek.minValue ?? undefined}
                                           max={ShauhinModeSettingsZod.shape.customStartWeek.maxValue ?? undefined}
                                           placeholder='Enable after episode...'
-                                          {...customField.field}
-                                          onChange={(e) => customField.field.onChange(+e.target.value)} />
+                                          {...customField}
+                                          onChange={(e) => customField.onChange(+e.target.value)}
+                                          value={Math.max(2, customField.value || 2)} />
                                       </FormControl>
                                     </FormItem>
                                   )} />
@@ -278,7 +276,7 @@ export default function ShauhinMode() {
                   name='noEventIsMiss'
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className={cn('text-sm text-nowrap', !locked && 'ml-4')}>
+                      <FormLabel className={cn('text-sm text-nowrap', locked ? '-ml-1' : 'ml-4')}>
                         'No Event' is <div
                           className={cn('inline', field.value ? 'text-destructive' : 'text-green-600')}>
                           {field.value ? 'Missed' : 'Refunded'}

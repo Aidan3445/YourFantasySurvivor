@@ -417,7 +417,7 @@ export const defaultShauhinModeSettings: ShauhinModeSettings = {
   maxBet: 100,
   maxBetsPerWeek: 5,
   startWeek: 'After Merge',
-  customStartWeek: 0,
+  customStartWeek: 8,
   enabledBets: [
     'indivWin',
     'finalists',
