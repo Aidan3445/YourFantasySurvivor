@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { ColorRow } from "../draftOrder";
 import { z } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { BaseEventFullName, PredictionTimingOptions, ScoringBaseEventNames, ShauhinModeTimings } from "~/server/db/defs/events";
+import { BaseEventFullName, BaseEventName, PredictionTimingOptions, ScoringBaseEventName, ScoringBaseEventNames, ShauhinModeTimings } from "~/server/db/defs/events";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
@@ -22,7 +22,7 @@ const formSchema = z.object({
   maxBet: z.number().min(0).max(1000),
   maxBetsPerWeek: z.number().min(0),
   startWeek: z.union([z.number().min(0).max(15), z.enum(ShauhinModeTimings)]),
-  enabledBets: z.array(z.enum(ScoringBaseEventNames)),
+  enabledBets: z.array(z.enum(ScoringBaseEventNames)).nonempty('At least one event must be selected'),
   noEventIsMiss: z.boolean().default(false),
 });
 
@@ -57,6 +57,9 @@ export default function ShauhinMode() {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     alert('Shauhin Mode settings saved successfully!');
     console.log('Shauhin Mode settings:', data);
+
+    setLocked(true);
+    reactForm.reset(data);
   });
 
   const disabled = loggedIn?.role !== 'Owner';
@@ -111,125 +114,205 @@ export default function ShauhinMode() {
               </FormItem>
             )} />
           {reactForm.watch('enabled') && (
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-2 max-w-4xl animate-scale-in-fast'>
-              <FormField
-                name='startWeek'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm ml-4'>Start Timing</FormLabel>
-                    <FormControl>
+            <>
+              <hr className='my-1 stroke-primary' />
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-2 max-w-4xl animate-scale-in-fast'>
+                <div>
+                  <FormField
+                    name='startWeek'
+                    render={({ field }) => {
+                      if (locked) {
+                        return (
+                          <span className='text-muted-foreground text-sm w-full'>
+                            <h4 className='font-medium inline mr-1'>Start Timing:</h4>
+                            {field.value === 'Custom'
+                              ? `Custom (after ${customStartWeeks} episodes)`
+                              : field.value}
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <FormItem>
+                          <FormLabel className='text-sm ml-4'>Start Timing</FormLabel>
+                          <FormControl>
+                            <span className='flex items-center gap-2'>
+                              <Select value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger>
+                                  <SelectValue placeholder='Select Betting Start Week' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {ShauhinModeTimings.map((timing) => (
+                                    <SelectItem key={timing} value={timing}>
+                                      {timing}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              {field.value === 'Custom' && (
+                                <Input
+                                  type='number'
+                                  min={formSchema.shape.startWeek._def.options[0]!.minValue ?? undefined}
+                                  max={formSchema.shape.startWeek._def.options[0]!.maxValue ?? undefined}
+                                  placeholder='Enable after episode...'
+                                  value={customStartWeeks}
+                                  onChange={(e) => setCustomStartWeeks(Number(e.target.value))} />
+                              )}
+                            </span>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }} />
+                  <FormDescription>
+                    Choose when Shauhin Mode activates. You can choose from predefined timings or
+                    set a custom week for betting to start.
+                  </FormDescription>
+                </div>
+                <div>
+                  <span className='flex w-full items-center gap-2'>
+                    <FormField
+                      name='maxBet'
+                      render={({ field }) => {
+                        if (locked) {
+                          return (
+                            <span className='text-muted-foreground text-sm w-full'>
+                              <h4 className='font-medium inline mr-1'>Max Points Per Bet:</h4>
+                              {field.value}
+                            </span>
+                          );
+                        }
+
+                        return (
+                          <FormItem className='w-full'>
+                            <FormLabel className='text-sm ml-4'>Max Points Per Bet</FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                placeholder='Max Bet'
+                                className='input'
+                                min={formSchema.shape.maxBet.minValue ?? undefined}
+                                max={formSchema.shape.maxBet.maxValue ?? undefined}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )
+                      }} />
+                    <FormField
+                      name='maxBetsPerWeek'
+                      render={({ field }) => {
+                        if (locked) {
+                          return (
+                            <span className='text-muted-foreground text-sm w-full'>
+                              <h4 className='font-medium inline mr-1'>Max Bets Per Week:</h4>
+                              {field.value === 0 ? 'Unlimited' : field.value}
+                            </span>
+                          );
+                        }
+
+                        return (
+                          <FormItem className='w-full'>
+                            <FormLabel className='text-sm ml-4'>Max Bets Per Week</FormLabel>
+                            <FormControl>
+                              <Input
+                                type='number'
+                                placeholder='Max Bets Per Week'
+                                className='input'
+                                min={formSchema.shape.maxBet.minValue ?? undefined}
+                                max={formSchema.shape.maxBet.maxValue ?? undefined}
+                                {...field}
+                                value={field.value === 0 ? 'Unlimited' : field.value}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )
+                      }} />
+                  </span>
+                  <FormDescription>
+                    <i className='text-muted-foreground'>Max Points Per Bet</i>: max points you can bet on a prediction<br />
+                    <i className='text-muted-foreground'>Max Bets Per Week</i>: max number of bets you can place in a single week
+                  </FormDescription>
+                </div>
+                <div>
+                  <FormField
+                    name='enabledBets'
+                    render={({ field }) => {
+                      if (locked) {
+                        return (
+                          <span className='text-muted-foreground text-sm/3 w-full'>
+                            <h4 className='font-medium inline mr-1'>Enabled Bets:</h4>
+                            {field.value.length > 0
+                              ? field.value.map((name: ScoringBaseEventName) => BaseEventFullName[name]).join(', ')
+                              : 'None'}
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <FormItem>
+                          <FormLabel className='text-sm ml-4'>Enabled Bets</FormLabel>
+                          <FormControl>
+                            <MultiSelect
+                              options={ScoringBaseEventNames.map(name =>
+                                ({ value: name, label: BaseEventFullName[name] }))}
+                              onValueChange={field.onChange}
+                              defaultValue={field.value as string[]}
+                              placeholder='Select enabled bets'
+                              maxCount={1}
+                              className='w-full'
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }} />
+                  <FormDescription>
+                    Select which bets are enabled for Shauhin Mode
+                  </FormDescription>
+                </div>
+                <FormField
+                  name='noEventIsMiss'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className={cn('text-sm text-nowrap', !locked && 'ml-4')}>
+                        'No Event' is <div
+                          className={cn('inline', field.value ? 'text-destructive' : 'text-green-600')}>
+                          {field.value ? 'Missed' : 'Refunded'}
+                        </div></FormLabel>
                       <span className='flex items-center gap-2'>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select Betting Start Week' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {ShauhinModeTimings.map((timing) => (
-                              <SelectItem key={timing} value={timing}>
-                                {timing}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {field.value === 'Custom' && (
-                          <Input
-                            type='number'
-                            min={0}
-                            max={12}
-                            placeholder='Enable after episode...'
-                            value={customStartWeeks}
-                            onChange={(e) => setCustomStartWeeks(Number(e.target.value))} />
+                        {!locked && (
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={(checked) => field.onChange(checked)}
+                              className='' />
+                          </FormControl>
                         )}
+                        <FormDescription>
+                          <i className='text-muted-foreground'>Missed</i>: bets on events
+                          that do not occur will not be considered a missed prediction<br />
+                          <i className='text-muted-foreground'>Refunded</i>:
+                          if an event does not occur, you get your bet back
+                        </FormDescription>
                       </span>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              <span className='flex w-full items-center gap-2'>
-                <FormField
-                  name='maxBet'
-                  render={({ field }) => (
-                    <FormItem className='w-full'>
-                      <FormLabel className='text-sm ml-4'>Max Points Per Bet</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          placeholder='Max Bet'
-                          className='input'
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )} />
-                <FormField
-                  name='maxBetsPerWeek'
-                  render={({ field }) => (
-                    <FormItem className='w-full'>
-                      <FormLabel className='text-sm ml-4'>Max Bets Per Week</FormLabel>
-                      <FormControl>
-                        <Input
-                          type='number'
-                          placeholder='Max Bets Per Week'
-                          className='input'
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-              </span>
-              <FormField
-                name='enabledBets'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm ml-4'>Enabled Bets</FormLabel>
-                    <FormControl>
-                      <MultiSelect
-                        options={ScoringBaseEventNames.map(name =>
-                          ({ value: name, label: BaseEventFullName[name] }))}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value as string[]}
-                        placeholder='Select enabled bets'
-                        maxCount={1}
-                        className='w-full'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              <FormField
-                name='noEventIsMiss'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='text-sm text-nowrap ml-4'>
-                      No Event is <div className='text-destructive inline'>Miss</div></FormLabel>
-                    <span className='flex items-center gap-2'>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={(checked) => field.onChange(checked)}
-                          className='' />
-                      </FormControl>
-                      <FormDescription>
-                        If enabled, bets on events that do not occur will not be considered a missed
-                        prediction. By default, if an event does not occur, you get your bet back.
-                      </FormDescription>
-                    </span>
-                  </FormItem>
-                )} />
-            </div>
+              </div>
+            </>
           )}
           {!(disabled || locked) && (
             <span className='w-fit ml-auto grid grid-cols-2 gap-2 mt-4'>
               <Button
                 type='button'
                 variant='destructive'
-                onClick={() => { reactForm.reset(); }}>
+                onClick={() => reactForm.reset()}>
                 Cancel
               </Button>
               <Button
-                disabled={!reactForm.formState.isDirty}
+                disabled={!reactForm.formState.isDirty || !reactForm.formState.isValid}
                 type='submit'>
                 Save
               </Button>
