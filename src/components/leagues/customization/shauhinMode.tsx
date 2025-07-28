@@ -43,6 +43,8 @@ export default function ShauhinMode() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
+      ShauhinModeSettingsZod.parse(data); // Validate data before sending
+
       await updateShauhinMode(leagueHash, data)
       await refresh();
       setLocked(true);
@@ -184,7 +186,7 @@ export default function ShauhinMode() {
                         }
 
                         return (
-                          <FormItem className='w-full'>
+                          <FormItem className='w-full relative'>
                             <FormLabel className='text-sm ml-4'>Max Points Per Bet</FormLabel>
                             <FormControl>
                               <Input
@@ -197,6 +199,9 @@ export default function ShauhinMode() {
                                 onChange={(e) => field.onChange(+e.target.value)}
                               />
                             </FormControl>
+                            <p className='absolute text-xs right-8 top-1/2 translate-y-1 text-muted-foreground pointer-events-none'>
+                              (0 for Unlimited)
+                            </p>
                           </FormItem>
                         )
                       }} />
@@ -213,7 +218,7 @@ export default function ShauhinMode() {
                         }
 
                         return (
-                          <FormItem className='w-full'>
+                          <FormItem className='w-full relative'>
                             <FormLabel className='text-sm ml-4'>Max Bets Per Week</FormLabel>
                             <FormControl>
                               <Input
@@ -226,13 +231,16 @@ export default function ShauhinMode() {
                                 onChange={(e) => field.onChange(+e.target.value)}
                               />
                             </FormControl>
+                            <p className='absolute text-xs right-8 top-1/2 translate-y-1 text-muted-foreground pointer-events-none'>
+                              (0 for Unlimited)
+                            </p>
                           </FormItem>
                         )
                       }} />
                   </span>
                   <FormDescription>
                     <i className='text-muted-foreground'>Max Points Per Bet</i>: max points you can bet on a prediction<br />
-                    <i className='text-muted-foreground'>Max Bets Per Week</i>: max number of bets you can place in a single week
+                    <i className='text-muted-foreground'>Max Bets Per Week</i>: max number of bets you can place in a single week<br />
                   </FormDescription>
                 </div>
                 <div>
@@ -311,7 +319,7 @@ export default function ShauhinMode() {
                 Cancel
               </Button>
               <Button
-                disabled={!reactForm.formState.isDirty || !reactForm.formState.isValid}
+                disabled={!reactForm.formState.isDirty}
                 type='submit'>
                 Save
               </Button>
