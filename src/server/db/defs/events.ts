@@ -406,7 +406,7 @@ export const ShauhinModeSettingsZod = z.object({
   maxBetsPerWeek: z.number().min(0),
   startWeek: z.enum(ShauhinModeTimings),
   customStartWeek: z.number().min(2).max(15),
-  enabledBets: z.array(z.enum(ScoringBaseEventNames)).nonempty('At least one event must be selected'),
+  enabledBets: z.array(z.enum(ScoringBaseEventNames)),
   noEventIsMiss: z.boolean().default(false),
 });
 

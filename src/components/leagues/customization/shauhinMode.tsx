@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { ColorRow } from "../draftOrder";
 import { z } from "zod";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { BaseEventFullName, ScoringBaseEventName, ScoringBaseEventNames, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from "~/server/db/defs/events";
+import { BaseEventFullName, ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings, PredictionEventTiming } from "~/server/db/defs/events";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "~/components/ui/button";
 import { Switch } from "~/components/ui/switch";
@@ -25,7 +25,8 @@ export default function ShauhinMode() {
         loggedIn
       },
       leagueHash,
-      shauhinModeSettings
+      shauhinModeSettings,
+      basePredictionRules
     },
     refresh
   } = useLeague();
@@ -36,14 +37,18 @@ export default function ShauhinMode() {
   });
   const [locked, setLocked] = useState(true);
 
-  useEffect(() => {
-    reactForm.reset(shauhinModeSettings ?? defaultShauhinModeSettings);
-  }, [shauhinModeSettings, reactForm]);
 
+  useEffect(() => {
+    const settings = shauhinModeSettings ?? defaultShauhinModeSettings;
+    // settings.enabledBets = settings.enabledBets.filter((bet) =>
+    // basePredictionRules[bet as ScoringBaseEventName]?.enabled);
+
+    reactForm.reset(settings);
+  }, [shauhinModeSettings, /*basePredictionRules,*/ reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      ShauhinModeSettingsZod.parse(data); // Validate data before sending
+      //ShauhinModeSettingsZod.parse(data); // Validate data before sending
 
       await updateShauhinMode(leagueHash, data)
       await refresh();
@@ -86,12 +91,12 @@ export default function ShauhinMode() {
       </p>
       <br />
       <Form {...reactForm}>
-        <form action={() => handleSubmit()}>
+        <form onSubmit={handleSubmit}>
           <FormField
             name='enabled'
             render={({ field }) => (
               <FormItem className='flex items-center gap-2'>
-                <FormLabel className='text-sm'>Enable Shauhin Mode:</FormLabel>
+                <FormLabel className='text-sm'>Shauhin Mode</FormLabel>
                 <FormControl>
                   {locked ? (
                     <h2 className={cn('font-semibold', field.value ? 'text-green-600' : 'text-destructive')}>
@@ -155,6 +160,7 @@ export default function ShauhinMode() {
                                           placeholder='Enable after episode...'
                                           {...customField}
                                           onChange={(e) => customField.onChange(+e.target.value)}
+                                          onFocus={(e) => e.target.select()}
                                           value={Math.max(2, customField.value || 2)} />
                                       </FormControl>
                                     </FormItem>
@@ -197,6 +203,7 @@ export default function ShauhinMode() {
                                 max={ShauhinModeSettingsZod.shape.maxBet.maxValue ?? undefined}
                                 {...field}
                                 onChange={(e) => field.onChange(+e.target.value)}
+                                onFocus={(e) => e.target.select()}
                               />
                             </FormControl>
                             <p className='absolute text-xs right-8 top-1/2 translate-y-1 text-muted-foreground pointer-events-none'>
@@ -229,6 +236,7 @@ export default function ShauhinMode() {
                                 max={ShauhinModeSettingsZod.shape.maxBet.maxValue ?? undefined}
                                 {...field}
                                 onChange={(e) => field.onChange(+e.target.value)}
+                                onFocus={(e) => e.target.select()}
                               />
                             </FormControl>
                             <p className='absolute text-xs right-8 top-1/2 translate-y-1 text-muted-foreground pointer-events-none'>
@@ -263,8 +271,12 @@ export default function ShauhinMode() {
                           <FormLabel className='text-sm ml-4'>Enabled Bets</FormLabel>
                           <FormControl>
                             <MultiSelect
-                              options={ScoringBaseEventNames.map(name =>
-                                ({ value: name, label: BaseEventFullName[name] }))}
+                              options={Object.entries(basePredictionRules)
+                                .filter(([_, setting]) => setting.enabled)
+                                .map(([eventName]) => ({
+                                  value: eventName as ScoringBaseEventName,
+                                  label: BaseEventFullName[eventName as ScoringBaseEventName],
+                                }))}
                               onValueChange={field.onChange}
                               defaultValue={field.value as string[]}
                               placeholder='Select enabled bets'
@@ -277,7 +289,7 @@ export default function ShauhinMode() {
                       )
                     }} />
                   <FormDescription>
-                    Select which bets are enabled for Shauhin Mode
+                    Select what you can bet on from your enabled official and custom prediction events.
                   </FormDescription>
                 </div>
                 <FormField
@@ -319,7 +331,7 @@ export default function ShauhinMode() {
                 Cancel
               </Button>
               <Button
-                disabled={!reactForm.formState.isDirty}
+                disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
                 type='submit'>
                 Save
               </Button>

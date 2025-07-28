@@ -294,6 +294,7 @@ export async function updateBaseEventRules(
   * @param customStartWeek - the custom start week for Shauhin Mode, if any
   * @throws an error if the user is not authorized
   * @throws an error if the Shauhin Mode settings cannot be updated
+  * @throws an error if the league is inactive
   */
 export async function updateShauhinMode(
   leagueHash: LeagueHash,
@@ -305,21 +306,16 @@ export async function updateShauhinMode(
     throw new Error('Shauhin Mode settings cannot be updated while the league is inactive');
 
   // customStartWeek is only used if the startWeek is 'Custom'
-  const customStartWeek = shauhinMode.startWeek === 'Custom' ? shauhinMode.customStartWeek : 0;
 
   await db
     .insert(shauhinModeSettingsSchema)
     .values({
       leagueId: league.leagueId,
-      ...shauhinMode,
-      customStartWeek
+      ...shauhinMode
     })
     .onConflictDoUpdate({
       target: shauhinModeSettingsSchema.leagueId,
-      set: {
-        ...shauhinMode,
-        customStartWeek
-      },
+      set: { ...shauhinMode },
     });
 }
 

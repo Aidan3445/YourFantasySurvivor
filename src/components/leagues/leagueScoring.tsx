@@ -109,7 +109,7 @@ export default function LeagueScoring() {
                 Cancel
               </Button>
               <Button
-                disabled={!reactForm.formState.isDirty}
+                disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
                 type='submit'>
                 Save
               </Button>
