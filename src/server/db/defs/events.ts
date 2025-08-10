@@ -290,10 +290,12 @@ export type LeaguePredictionEvent = EventPredictionRoot & {
 
 export type BasePredictionDraft = {
   eventName: LeagueEventName,
+  label?: string,
   episodeNumber?: EpisodeNumber,
   predictionMade: {
     referenceType: ReferenceType
     referenceId: number,
+    bet: number | null,
   } | null,
 }
 

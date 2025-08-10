@@ -24,7 +24,6 @@ import {
 } from '~/server/db/schema/leagueEvents';
 import { type CastawayId } from '~/server/db/defs/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
-import { type EpisodeId } from '~/server/db/defs/episodes';
 import { type TribeId } from '~/server/db/defs/tribes';
 import { QUERIES } from './query';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
@@ -613,7 +612,7 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
   * @param leagueHash - the hash of the league
   * @param rule - the rule to predict
   * @param referenceId - the id of the reference (castaway, tribe, member)
-  * @param episodeId - the id of the episode (optional)
+  * @param betAmount - the amount of points to bet on the prediction (optional)
   * @throws an error if the user is not authorized
   * @throws an error if the prediction cannot be made
   */
@@ -623,7 +622,7 @@ export async function makePrediction(
   referenceType: ReferenceType,
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceId: CastawayId | TribeId | LeagueMemberId,
-  episodeId?: EpisodeId,
+  betAmount?: number,
 ) {
   const { memberId, league } = await leagueMemberAuth(leagueHash);
   if (!memberId || !league) throw new Error('User not authorized');
@@ -634,7 +633,7 @@ export async function makePrediction(
   if (!episodes || episodes.length === 0) throw new Error('Episodes not found');
   const nextEpisode = episodes.find((episode) => episode.airStatus === 'Upcoming');
   if (!nextEpisode) throw new Error('Next episode not found');
-  episodeId ??= nextEpisode.episodeId;
+  const episodeId = nextEpisode.episodeId;
 
   /*
   let timing: LeagueEventTiming | undefined;
@@ -697,6 +696,7 @@ export async function makePrediction(
         memberId,
         referenceType,
         referenceId,
+        bet: betAmount ? betAmount : null,
       })
       .onConflictDoUpdate({
         target: [
@@ -704,7 +704,7 @@ export async function makePrediction(
           baseEventPredictionsSchema.episodeId,
           baseEventPredictionsSchema.memberId,
         ],
-        set: { referenceType, referenceId },
+        set: { referenceType, referenceId, bet: betAmount ? betAmount : null },
       });
   }
 }
@@ -822,5 +822,3 @@ export async function saveChatMessage(leagueHash: LeagueHash, message: { serial:
 
   return entry;
 }
-
-

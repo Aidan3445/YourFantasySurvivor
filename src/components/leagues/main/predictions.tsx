@@ -1,31 +1,33 @@
+'use client';
 import { QUERIES } from '~/app/api/leagues/query';
-import { type LeagueHash } from '~/server/db/defs/leagues';
 import { PredictionCards } from '../draft/makePredictions';
 import { AirStatus } from './recentActivity';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type Prediction } from '~/server/db/defs/events';
+import { ShauhinModeSettings, type Prediction } from '~/server/db/defs/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
 import { BounceyCarousel } from '~/components/ui/carousel';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
+import { usePredictions } from '~/hooks/usePredictions';
+import { useLeague } from '~/hooks/useLeague';
+
+export default function Predictions() {
+  const { leagueData, league } = useLeague();
+  const { predictions, history, betRules } = usePredictions();
+
+  const displayName = league?.members?.loggedIn?.displayName
+
+  if (!displayName) return null;
 
 
-interface PredictionsProps {
-  leagueHash: LeagueHash;
-}
-
-export default async function Predictions({ leagueHash }: PredictionsProps) {
-
-  const [predictions, history] = await Promise.all([
-    QUERIES.getThisWeeksPredictions(leagueHash),
-    QUERIES.getMyPredictions(leagueHash),
-  ]);
+  console.log(leagueData?.scores?.Member?.[displayName]);
+  const myScore = leagueData?.scores?.Member?.[displayName]!.toReversed()[0];
 
   return (
     <div className='w-full space-y-4'>
-      <MakePredictions predictions={predictions} />
+      <MakePredictions predictions={predictions} betRules={betRules} myScore={myScore} />
       <PredictionHistory history={history} />
     </div>
   );
@@ -33,9 +35,11 @@ export default async function Predictions({ leagueHash }: PredictionsProps) {
 
 interface WeeklyPredictionsProps {
   predictions: Awaited<ReturnType<typeof QUERIES.getThisWeeksPredictions>>;
+  betRules: ShauhinModeSettings | undefined;
+  myScore: number | undefined;
 }
 
-function MakePredictions({ predictions: weekly }: WeeklyPredictionsProps) {
+function MakePredictions({ predictions: weekly, betRules, myScore }: WeeklyPredictionsProps) {
   if (!weekly) return null;
   const {
     basePredictionRules,
@@ -51,38 +55,50 @@ function MakePredictions({ predictions: weekly }: WeeklyPredictionsProps) {
 
   if (totalPredictionsCount === 0 || nextEpisode.airStatus === 'Aired') return null;
 
+  const betTotal = basePredictions.reduce((acc, pred) =>
+    acc + (pred?.predictionMade?.bet ?? 0), 0);
+
+  const balance = (myScore ?? 0) - betTotal;
+
   return (
-    <div className='text-center bg-card rounded-lg w-full pb-2'>
+    <div className='text-center bg-card rounded-lg w-full pb-2 relative'>
+      {betRules?.enabled && betRules?.enabledBets.length > 0 &&
+        <div className='absolute top-2 right-4 text-sm italic text-muted-foreground'>
+          Shauhin Mode Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
+        </div>
+      }
       {nextEpisode.airStatus === 'Airing' ?
         <h1 className='text-3xl'>
           Predictions are locked until the episode ends.
         </h1> :
         <h1 className='text-3xl'>{'This Week\'s Prediction'}{totalPredictionsCount > 1 ? 's' : ''}</h1>
       }
-      <span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1'>
+      < span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1' >
         <span className='text-nowrap'>
           {nextEpisode.episodeNumber}: {nextEpisode.episodeTitle}
         </span>
         <AirStatus airDate={nextEpisode.episodeAirDate} airStatus={nextEpisode.airStatus} />
       </span>
-      {nextEpisode.airStatus === 'Upcoming' && (
-        <PredictionCards
-          basePredictionRules={basePredictionRules}
-          basePredictions={basePredictions}
-          customPredictions={customPredictions}
-          castaways={castaways}
-          tribes={tribes} />
-      )}
-    </div>
+      {
+        nextEpisode.airStatus === 'Upcoming' && (
+          <PredictionCards
+            basePredictionRules={basePredictionRules}
+            basePredictions={basePredictions}
+            customPredictions={customPredictions}
+            castaways={castaways}
+            tribes={tribes} />
+        )
+      }
+    </div >
   );
 }
 
 interface MemberPredictionsProps {
-  history: Record<EpisodeNumber, Prediction[]>;
+  history?: Record<EpisodeNumber, Prediction[]>;
 }
 
 function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
-  if (Object.keys(predictions).length === 0) return null;
+  if (!predictions || Object.keys(predictions).length === 0) return null;
 
   const stats = Object.values(predictions).reduce((acc, preds) => {
     preds.forEach((pred) => {

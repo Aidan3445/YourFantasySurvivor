@@ -427,7 +427,7 @@ function EpisodeEventsTableBody({
 
   return (
     <>
-      {labelRow &&
+      {labelRow && // TODO: wrap in accordion
         <TableRow className='bg-secondary/50 hover:bg-secondary/25'>
           <TableCell colSpan={7} className='text-center font-bold text-secondary-foreground'>
             Episode {episodeNumber}

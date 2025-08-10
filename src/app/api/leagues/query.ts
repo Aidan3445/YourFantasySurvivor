@@ -25,7 +25,6 @@ import {
   defaultPredictionRules,
   ScoringBaseEventNames,
   type LeaguePredictionDraft,
-  ShauhinModeSettings
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
@@ -304,6 +303,11 @@ export const QUERIES = {
           ...prediction,
           timing: ['Draft'],
           eventType: 'Prediction',
+          // TODO: Handle custom prediction betting
+          predictionMade: prediction.predictionMade ? {
+            ...prediction.predictionMade,
+            bet: null,
+          } : null,
         };
         return draftPrediction;
       }));
@@ -478,7 +482,7 @@ export const QUERIES = {
       throw new Error('User not a member of the league');
     }
 
-    const { basePredictionRules } = await QUERIES.getLeagueConfig(leagueHash);
+    const { basePredictionRules } = await this.getLeagueConfig(leagueHash);
 
     const basePredictions = await db
       .select({
@@ -487,6 +491,7 @@ export const QUERIES = {
         predictionMaker: leagueMembersSchema.displayName,
         referenceType: baseEventPredictionsSchema.referenceType,
         referenceId: baseEventPredictionsSchema.referenceId,
+        bet: baseEventPredictionsSchema.bet,
         resultReferenceType: baseEventReferenceSchema.referenceType,
         resultReferenceId: baseEventReferenceSchema.referenceId,
         castaway: castawaysSchema.fullName,
@@ -519,6 +524,7 @@ export const QUERIES = {
           predictionMaker: row.predictionMaker,
           referenceType: row.referenceType,
           referenceId: row.referenceId,
+          bet: row.bet ?? undefined,
           hit: row.resultReferenceId === null
             ? null
             : row.resultReferenceId === row.referenceId
@@ -830,12 +836,12 @@ export const QUERIES = {
       SEASON_QUERIES.getCastaways(league.leagueSeason),
       SEASON_QUERIES.getTribes(league.leagueSeason),
 
-      QUERIES.getLeagueConfig(leagueHash),
-      QUERIES.getBasePredictions(leagueHash),
-      QUERIES.getLeagueEvents(leagueHash),
-      QUERIES.getSelectionTimeline(leagueHash),
+      this.getLeagueConfig(leagueHash),
+      this.getBasePredictions(leagueHash),
+      this.getLeagueEvents(leagueHash),
+      this.getSelectionTimeline(leagueHash),
 
-      QUERIES.getEpisodes(leagueHash, 100), // move to seasons
+      this.getEpisodes(leagueHash, 100), // move to seasons
       SYS_QUERIES.fetchAdditions(),
     ]);
 
@@ -876,7 +882,7 @@ export const QUERIES = {
     // If the league is inactive, return nothing
     if (league.leagueStatus === 'Inactive') return;
 
-    const episodes = await QUERIES.getEpisodes(leagueHash, 100);
+    const episodes = await this.getEpisodes(leagueHash, 100);
     if (!episodes || episodes.length === 0) return;
     if (episodes.some((episode) => episode.airStatus === 'Airing')) return;
     const nextEpisode = episodes.find((episode) => episode.airStatus === 'Upcoming');
@@ -927,6 +933,7 @@ export const QUERIES = {
         predictionMade: {
           referenceType: baseEventPredictionsSchema.referenceType,
           referenceId: baseEventPredictionsSchema.referenceId,
+          bet: baseEventPredictionsSchema.bet,
         }
       })
       .from(baseEventPredictionsSchema)
@@ -964,6 +971,11 @@ export const QUERIES = {
           const draftPrediction: LeaguePredictionDraft = {
             ...prediction,
             eventType: 'Prediction',
+            // TODO: handle custom predictions with bets
+            predictionMade: prediction.predictionMade ? {
+              ...prediction.predictionMade,
+              bet: null
+            } : null
           };
           return draftPrediction;
         }));
@@ -1163,12 +1175,75 @@ export const QUERIES = {
       throw new Error('User not a member of the league');
     }
 
-    const shauhinModeSettings = await db
+    const episodesPromise = this.getEpisodes(leagueHash, 100);
+
+    const shauhinModeSettingsPromise = db
       .select()
       .from(shauhinModeSettingsSchema)
       .where(eq(shauhinModeSettingsSchema.leagueId, league.leagueId))
       .then((settings) => settings[0]);
 
+    const [episodes, shauhinModeSettings] = await Promise.all([
+      episodesPromise, shauhinModeSettingsPromise
+    ]);
+
+    if (shauhinModeSettings) {
+      const { startWeek, customStartWeek } = shauhinModeSettings;
+
+      // If start week is Custom make sure we are past the week
+      if (startWeek === 'Custom' &&
+        episodes.find((ep) => ep.episodeNumber === customStartWeek - 1)?.airStatus === 'Upcoming') {
+        // MARK AS NOT READY
+      }
+      // If start week is After Merge and we are not past the merge episode, mark as not ready
+
+      // If start week is Before Finale and we are not past the finale episode, mark as not ready
+
+      // NOTE: If start week is Premiere, we are always ready
+    }
+
     return shauhinModeSettings
+  },
+
+  /**
+    * Get and calculate the score for the logged in user for a league
+    * @param leagueHash - the hash of the league
+    * @return the score for the logged in user
+    * @throws an error if the user is not a member of the league
+    */
+  getMyScore: async function(leagueHash: LeagueHash) {
+    const { memberId, member, league } = await leagueMemberAuth(leagueHash);
+    // If the user is not a member of the league, throw an error
+    if (!memberId || !league) {
+      throw new Error('User not a member of the league');
+    }
+
+    const [
+      baseEvents, tribesTimeline, elims,
+      { leagueSettings, baseEventRules, basePredictionRules },
+      basePredictions, leagueEvents,
+      selectionTimeline
+    ] = await Promise.all([
+      SEASON_QUERIES.getBaseEvents(league.leagueSeason),
+      SEASON_QUERIES.getTribesTimeline(league.leagueSeason),
+      SEASON_QUERIES.getEliminations(league.leagueSeason),
+
+      this.getLeagueConfig(leagueHash),
+      this.getBasePredictions(leagueHash),
+      this.getLeagueEvents(leagueHash),
+      this.getSelectionTimeline(leagueHash),
+    ]);
+
+    const { scores, currentStreaks } = compileScores(
+      baseEvents, baseEventRules ?? defaultBaseRules,
+      basePredictions, basePredictionRules ?? defaultPredictionRules,
+      leagueEvents, selectionTimeline, tribesTimeline, elims,
+      leagueSettings.survivalCap, leagueSettings.preserveStreak);
+
+    return {
+      points: scores.Member?.[member!.displayName]?.pop() ?? 0,
+      currentStreak: currentStreaks[member!.displayName] ?? 0
+    };
   }
+
 };
