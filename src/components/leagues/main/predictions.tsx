@@ -21,8 +21,6 @@ export default function Predictions() {
 
   if (!displayName) return null;
 
-
-  console.log(leagueData?.scores?.Member?.[displayName]);
   const myScore = leagueData?.scores?.Member?.[displayName]!.toReversed()[0];
 
   return (

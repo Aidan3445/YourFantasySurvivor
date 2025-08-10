@@ -45,7 +45,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
                 <Chart />
               </span>
               <ChangeSurvivor />
-              <Predictions leagueHash={leagueHash} />
+              <Predictions />
               <RecentActivity />
             </section>
           </TabsContent>

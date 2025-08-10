@@ -260,6 +260,7 @@ type EventPredictionRoot = {
   referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
   predictionMaker: LeagueMemberDisplayName,
   hit: boolean | null,
+  bet?: number,
 }
 
 export type EventPrediction = EventPredictionRoot & {

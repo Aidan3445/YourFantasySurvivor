@@ -6,16 +6,16 @@ import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { type LeagueSurvivalCap } from '~/server/db/defs/leagues';
 
 /**
-  * Compile the scores for a league 
-  * @param baseEvents The base events for the season
-  * @param tribesTimeline The tribe updates for the season
-  * @param eliminations The eliminations for the season
-  * @param leagueEvents The league events
-  * @param baseEventRules The league's base event scoring
-  * @param selectionTimeline The selection timeline for the league
-  * @param survivalCap The survival cap for the league
-  * @returns The scores for the league as running totals
-  */
+* Compile the scores for a league 
+* @param baseEvents The base events for the season
+* @param tribesTimeline The tribe updates for the season
+* @param eliminations The eliminations for the season
+* @param leagueEvents The league events
+* @param baseEventRules The league's base event scoring
+* @param selectionTimeline The selection timeline for the league
+* @param survivalCap The survival cap for the league
+* @returns The scores for the league as running totals
+*/
 export function compileScores(
   baseEvents: Awaited<ReturnType<typeof SEASON_QUERIES.getBaseEvents>>,
   baseEventRules: BaseEventRule,
@@ -46,7 +46,6 @@ export function compileScores(
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
           if (!event.castaways.includes(castaway)) event.castaways.push(castaway);
         });
-        //}
         // here we want to align the castaways for non scoring events so we
         // push this check inside, later we skip iteration entirely for castaways
         if (!ScoringBaseEventNames.includes(baseEvent)) return;
@@ -58,13 +57,21 @@ export function compileScores(
         scores.Tribe[tribe][episodeNum] += points;
         // check predictions
         basePredictions[episodeNum]?.filter((p) =>
-          p.referenceType === 'Tribe' && p.referenceName === tribe && p.eventName === event.eventName)
+          p.referenceType === 'Tribe' && p.eventName === event.eventName)
           .forEach((prediction) => {
             // initialize member score if it doesn't exist
             scores.Member[prediction.predictionMaker] ??= [];
             scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
-            // add points to member score
-            scores.Member[prediction.predictionMaker]![episodeNum]! += basePredictionRules[baseEvent].points;
+
+            if (prediction.referenceName === tribe) {
+              // add points to member score
+              scores.Member[prediction.predictionMaker]![episodeNum]!
+                += basePredictionRules[baseEvent].points
+                + (prediction.bet ?? 0);
+            } else {
+              // subtract bet for incorrect tribe prediction
+              scores.Member[prediction.predictionMaker]![episodeNum]! -= prediction.bet ?? 0;
+            }
           });
       });
 
@@ -87,13 +94,21 @@ export function compileScores(
         scores.Member[leagueMember][episodeNum] += points;
         // check predictions
         basePredictions[episodeNum]?.filter((p) =>
-          p.referenceType === 'Castaway' && p.referenceName === castaway && p.eventName === event.eventName)
+          p.referenceType === 'Castaway' && p.eventName === event.eventName)
           .forEach((prediction) => {
             // initialize member score if it doesn't exist
             scores.Member[prediction.predictionMaker] ??= [];
             scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
-            // add points to member score
-            scores.Member[prediction.predictionMaker]![episodeNum]! += basePredictionRules[baseEvent].points;
+
+            if (prediction.referenceName === castaway) {
+              // add points to member score
+              scores.Member[prediction.predictionMaker]![episodeNum]! +=
+                basePredictionRules[event.eventName as ScoringBaseEventName].points
+                + (prediction.bet ?? 0);
+            } else {
+              // subtract bet for incorrect castaway prediction
+              scores.Member[prediction.predictionMaker]![episodeNum]! -= prediction.bet ?? 0;
+            }
           });
       });
     });
