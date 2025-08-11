@@ -24,10 +24,10 @@ export default function Predictions() {
   const myScore = [...leagueData?.scores?.Member?.[displayName]!].pop()!;
 
   return (
-    <div className='w-full space-y-4'>
+    <>
       <MakePredictions predictions={predictions} betRules={betRules} myScore={myScore} />
       <PredictionHistory history={history} />
-    </div>
+    </>
   );
 }
 
@@ -127,7 +127,7 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
 
     const [episode, preds] = prediction;
     return (
-      <div className='text-center bg-card rounded-lg md:w-[calc(100svw-8rem)] lg:w-[calc(100svw-19rem)]'>
+      <div className='text-center bg-card rounded-lg'>
         <h1 className='text-3xl'>Prediction History</h1>
         <span className='flex justify-center items-center gap-2 text-sm'>
           <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
@@ -142,7 +142,7 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
   }
 
   return (
-    <div className='text-center bg-card rounded-lg md:w-[calc(100svw-8rem)] lg:w-[calc(100svw-19rem)]'>
+    <div className='text-center bg-card rounded-lg w-full'>
       <h1 className='text-3xl'>Prediction History</h1>
       <span className='flex justify-center items-center gap-2 text-sm'>
         <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>

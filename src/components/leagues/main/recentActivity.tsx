@@ -749,8 +749,6 @@ function LeagueEventRow({
 }: LeagueEventRowProps) {
   const { leagueData, league } = useLeague();
 
-  console.log(referenceName, predictionMakers, misses);
-
   return (
     <TableRow className={className}>
       {edit && eventId ? <TableCell className='w-0'>
