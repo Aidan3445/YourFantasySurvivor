@@ -21,7 +21,7 @@ export default function Predictions() {
 
   if (!displayName) return null;
 
-  const myScore = leagueData?.scores?.Member?.[displayName]!.toReversed()[0];
+  const myScore = [...leagueData?.scores?.Member?.[displayName]!].pop()!;
 
   return (
     <div className='w-full space-y-4'>
@@ -75,7 +75,7 @@ function MakePredictions({ predictions: weekly, betRules, myScore }: WeeklyPredi
         <span className='text-nowrap'>
           {nextEpisode.episodeNumber}: {nextEpisode.episodeTitle}
         </span>
-        <AirStatus airDate={nextEpisode.episodeAirDate} airStatus={nextEpisode.airStatus} />
+        <AirStatus airDate={new Date(nextEpisode.episodeAirDate)} airStatus={nextEpisode.airStatus} />
       </span>
       {
         nextEpisode.airStatus === 'Upcoming' && (

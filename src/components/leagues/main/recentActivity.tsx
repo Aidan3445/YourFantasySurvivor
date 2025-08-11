@@ -35,6 +35,8 @@ import { type CastawayName } from '~/server/db/defs/castaways';
 import { type TribeName } from '~/server/db/defs/tribes';
 import { Label } from '~/components/ui/label';
 
+// TODO: add survivor streak to timeline
+
 export default function RecentActivity() {
   const {
     leagueData: {
@@ -746,6 +748,8 @@ function LeagueEventRow({
   className
 }: LeagueEventRowProps) {
   const { leagueData, league } = useLeague();
+
+  console.log(referenceName, predictionMakers, misses);
 
   return (
     <TableRow className={className}>

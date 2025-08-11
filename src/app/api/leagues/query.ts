@@ -503,9 +503,8 @@ export const QUERIES = {
       // result
       .leftJoin(baseEventsSchema, and(
         eq(
-          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`,
-          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`
-        ),
+          sql`cast(${baseEventsSchema.eventName} as varchar)`,
+          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`),
         eq(baseEventsSchema.episodeId, episodesSchema.episodeId)))
       .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventsSchema.baseEventId))
       // references
@@ -560,6 +559,8 @@ export const QUERIES = {
 
         return acc;
       }, {} as Record<EpisodeNumber, EventPrediction[]>));
+
+    console.log('Base Predictions:', basePredictions);
 
     return basePredictions;
   },
