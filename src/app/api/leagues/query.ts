@@ -560,8 +560,6 @@ export const QUERIES = {
         return acc;
       }, {} as Record<EpisodeNumber, EventPrediction[]>));
 
-    console.log('Base Predictions:', basePredictions);
-
     return basePredictions;
   },
 
