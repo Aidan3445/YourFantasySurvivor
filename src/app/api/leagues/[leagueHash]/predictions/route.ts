@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { QUERIES } from '~/app/api/leagues/query';
+import { LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 
 const fetchPredictions = async (leagueHash: string) => {
   try {
@@ -39,8 +40,8 @@ const fetchAllData = async (leagueHash: string) => {
   ]);
 };
 
-export async function GET(request: NextRequest, { params }: { params: { leagueHash: string } }) {
-  const { leagueHash } = params;
+export async function GET(_: NextRequest, { params }: LeaguePageProps) {
+  const { leagueHash } = await params;
   try {
     const [predictions, history, betRules] = await fetchAllData(leagueHash);
     return NextResponse.json({ predictions, history, betRules }, { status: 200 });
