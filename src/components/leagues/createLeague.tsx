@@ -16,7 +16,7 @@ import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from './joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useUser } from '@clerk/nextjs';
 import {

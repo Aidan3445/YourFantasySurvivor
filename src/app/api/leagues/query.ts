@@ -537,7 +537,7 @@ export const QUERIES = {
           event.referenceType === newEvent.referenceType &&
           event.predictionMaker === newEvent.predictionMaker);
         if (doubleIndex !== -1) {
-          if (acc[row.episodeNumber]![doubleIndex]!.hit || !newEvent.hit) return acc;
+          if (acc[row.episodeNumber]![doubleIndex]!.hit ?? !newEvent.hit) return acc;
           // if the new event is a hit and the double is a miss, remove the double
           acc[row.episodeNumber]!.splice(doubleIndex, 1);
         }
@@ -1201,7 +1201,7 @@ export const QUERIES = {
       // NOTE: If start week is Premiere, we are always ready
     }
 
-    return shauhinModeSettings
+    return shauhinModeSettings;
   },
 
   /**

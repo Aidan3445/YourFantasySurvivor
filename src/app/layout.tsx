@@ -7,7 +7,7 @@ import { SidebarProvider } from '~/components/ui/sidebar';
 import Nav from '~/components/nav/navSelector';
 import UserProvider from '~/context/yfsUserContext';
 import { QUERIES } from './api/leagues/query';
-import { Metadata } from 'next';
+import { type Metadata } from 'next';
 
 const inter = Inter({
   subsets: ['latin'],

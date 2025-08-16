@@ -1,7 +1,7 @@
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { QUERIES } from '~/app/api/leagues/query';
-import { defaultShauhinModeSettings, ShauhinModeSettings } from '~/server/db/defs/events';
+import { type QUERIES } from '~/app/api/leagues/query';
+import { defaultShauhinModeSettings, type ShauhinModeSettings } from '~/server/db/defs/events';
 import useSWR, { type Fetcher } from 'swr';
 import { type SWRKey } from '~/lib/utils';
 
@@ -25,7 +25,7 @@ export function usePredictions() {
     refreshWhenOffline: false,
     onError: (err) => {
       console.error('Error fetching predictions:', err);
-      setError(err.message);
+      setError(err instanceof Error ? err.message : 'An error occurred while fetching predictions');
     },
   });
 

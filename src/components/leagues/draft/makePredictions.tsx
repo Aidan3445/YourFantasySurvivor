@@ -323,7 +323,7 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
                       type='number'
                       placeholder='Enter bet amount (optional)'
                       {...betField}
-                      value={betField.value ?? ''}
+                      value={betField.value as string ?? ''}
                     />
                   </FormControl>
                   <Popover>
@@ -350,7 +350,8 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
           <Button
             disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
             type='submit'>
-            {prediction.predictionMade || reactForm.formState.isSubmitSuccessful ? 'Update' : 'Submit'} Prediction
+            {prediction.predictionMade ?? reactForm.formState.isSubmitSuccessful
+              ? 'Update' : 'Submit'} Prediction
           </Button>
         </span>
       </form>

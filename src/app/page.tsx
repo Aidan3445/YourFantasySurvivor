@@ -1,51 +1,96 @@
-import { ClerkLoading, SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
-import { CirclePlus, List } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { CreateLeagueModal } from '~/components/leagues/createLeague';
+import { ClerkLoading, SignedIn, SignedOut } from '@clerk/nextjs';
 import { Skeleton } from '~/components/ui/skeleton';
+import { HeroSection } from '~/components/home/heroSection';
+import { TopLeaguesCard } from '~/components/home/topLeaguesCard';
+import { QuickActions } from '~/components/home/quickActions';
+import { GlobalCastawayScoreboard } from '~/components/home/globalCastawayScoreboard';
 
 export default async function HomePage() {
   return (
-    <main className='flex flex-col gap-4 w-full p-4 items-center'>
-      <span className='flex flex-col lg:flex-row items-center lg:items-end gap-8'>
-        <div className='flex flex-col items-center gap-4'>
-          <Image src='https://i.imgur.com/xS6JQdr.png' priority width={256} height={256} alt='Header Image' />
-          <section className='bg-card rounded-lg p-4 space-y-4 shadow-2xl'>
-            <h1 className='text-4xl font-bold text-center'>Welcome to Your Fantasy Survivor!</h1>
-            <div>
-              Compete with friends in <i>Your Fantasy Survivor</i>, the ultimate Survivor fantasy league.
-              <ul className='list-disc list-inside'>
-                <li>Create your own league, draft a Survivor, and rack up points as they navigate the game.</li>
-                <li>Score points for their victories, bold moves, and even the chaos they create.</li>
-                <li>Change your pick at any time—switch to any remaining castaway if your Survivor gets eliminated, or shake things up with a strategic swap.</li>
-                <li>Customize your league’s scoring system, create unique events, and make the game your own.</li>
-              </ul>
-              <b>Outdraft your rivals. Outpredict the game. Outwatch every moment.</b>
-            </div>
-          </section>
+    <main className='flex flex-col gap-6 w-full p-4 max-w-7xl mx-auto'>
+      {/* Loading State */}
+      <ClerkLoading>
+        <div className='flex flex-col gap-6 items-center'>
+          <Skeleton className='w-full h-96 rounded-lg' />
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 w-full'>
+            <Skeleton className='h-48 rounded-lg' />
+            <Skeleton className='h-48 rounded-lg' />
+            <Skeleton className='h-48 rounded-lg' />
+          </div>
         </div>
-        <ClerkLoading>
-          <Skeleton className='w-[550px] h-[463px] rounded-lg bg-card/50' />
-        </ClerkLoading>
-        <SignedOut>
-          <SignIn routing='hash' appearance={{ layout: { logoPlacement: 'none' } }} />
-        </SignedOut>
-      </span>
+      </ClerkLoading>
+
+      {/* Non-logged in users */}
+      <SignedOut>
+        <div className='flex flex-col gap-8'>
+          <HeroSection />
+
+          {/* Global Castaway Scoreboard for non-logged in users */}
+          <div className='w-full'>
+            <GlobalCastawayScoreboard />
+          </div>
+
+          {/* Call to action section */}
+          <div className='text-center py-8'>
+            <h2 className='text-2xl font-bold mb-4'>Ready to Start Playing?</h2>
+            <p className='text-muted-foreground mb-6 max-w-2xl mx-auto'>
+              Join thousands of Survivor fans in the ultimate fantasy experience.
+              Create leagues, draft castaways, and compete with friends!
+            </p>
+          </div>
+        </div>
+      </SignedOut>
+
+      {/* Logged in users */}
       <SignedIn>
-        <div className='flex flex-col lg:flex-row gap-4'>
-          <Link href='/leagues'>
-            <section className='flex justify-center items-center gap-2 p-4 rounded-lg bg-card'>
-              <h2 className='sm:text-4xl text-2xl'>View Your Leagues</h2>
-              <List size={36} />
-            </section>
-          </Link>
-          <CreateLeagueModal className='w-full md:w-fit'>
-            <section className='flex justify-center items-center gap-2 p-4 rounded-lg bg-card'>
-              <h3 className='sm:text-4xl text-2xl'>Create New League</h3>
-              <CirclePlus size={36} />
-            </section>
-          </CreateLeagueModal>
+        <div className='space-y-6'>
+          {/* Welcome back section */}
+          <div className='text-center py-6'>
+            <h1 className='text-4xl font-bold mb-2'>Welcome back!</h1>
+            <p className='text-muted-foreground text-lg'>
+              Ready to dominate your fantasy leagues?
+            </p>
+          </div>
+
+          {/* Main dashboard grid */}
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+            {/* Left column - Top leagues */}
+            <div className='lg:col-span-2'>
+              <TopLeaguesCard />
+            </div>
+
+            {/* Right column - Quick actions */}
+            <div>
+              <QuickActions />
+            </div>
+          </div>
+
+          {/* Global Castaway Scoreboard */}
+          <GlobalCastawayScoreboard />
+
+          {/* Additional feature placeholders */}
+          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+            <div className='bg-card rounded-lg p-6 border-2 border-dashed border-muted-foreground/20'>
+              <h3 className='font-semibold mb-2'>Recent Activity</h3>
+              <p className='text-sm text-muted-foreground'>
+                See recent moves, eliminations, and league updates across all your leagues.
+              </p>
+            </div>
+
+            <div className='bg-card rounded-lg p-6 border-2 border-dashed border-muted-foreground/20'>
+              <h3 className='font-semibold mb-2'>Performance Stats</h3>
+              <p className='text-sm text-muted-foreground'>
+                Track your win rate, average points, and seasonal performance across leagues.
+              </p>
+            </div>
+
+            <div className='bg-card rounded-lg p-6 border-2 border-dashed border-muted-foreground/20'>
+              <h3 className='font-semibold mb-2'>Upcoming Episodes</h3>
+              <p className='text-sm text-muted-foreground'>
+                Never miss an episode with episode schedules and reminders.
+              </p>
+            </div>
+          </div>
         </div>
       </SignedIn>
     </main>

@@ -1,12 +1,12 @@
 'use client';
-import { QUERIES } from '~/app/api/leagues/query';
+import { type QUERIES } from '~/app/api/leagues/query';
 import { PredictionCards } from '../draft/makePredictions';
 import { AirStatus } from './recentActivity';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { ShauhinModeSettings, type Prediction } from '~/server/db/defs/events';
+import { type ShauhinModeSettings, type Prediction } from '~/server/db/defs/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { CoverCarousel, Carousel } from '~/components/ui/carousel';
+import { CoverCarousel } from '~/components/ui/carousel';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
@@ -17,11 +17,11 @@ export default function Predictions() {
   const { leagueData, league } = useLeague();
   const { predictions, history, betRules } = usePredictions();
 
-  const displayName = league?.members?.loggedIn?.displayName
+  const displayName = league?.members?.loggedIn?.displayName;
 
   if (!displayName) return null;
 
-  const myScore = [...leagueData?.scores?.Member?.[displayName]!].pop()!;
+  const myScore = [...leagueData.scores.Member[displayName]!].pop();
 
   return (
     <>
