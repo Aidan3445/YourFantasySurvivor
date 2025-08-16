@@ -16,7 +16,7 @@ import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from './joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
-import { type ReactNode, useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useUser } from '@clerk/nextjs';
 import {
@@ -44,7 +44,8 @@ interface CreateLeagueFormProps {
 export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
   const router = useRouter();
   const { user } = useUser();
-  const { api, setApi, current, count, progress } = useCarouselProgress();
+  const { api, setApi, current, count } = useCarouselProgress();
+  const progress = count > 0 ? current / (count - 1) * 100 : 0;
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
       leagueName: '',
