@@ -167,6 +167,7 @@ export const BaseEventFullName: Record<BaseEventName, string> = {
 
 export const BaseEventDescriptions: {
   main: Record<ScoringBaseEventName, string>,
+  prediction: Record<ScoringBaseEventName, string>,
   italics: Partial<Record<ScoringBaseEventName, string>>
 } = {
   main: {
@@ -182,6 +183,20 @@ export const BaseEventDescriptions: {
     finalists: 'Points if your castaway makes it to the final tribal council',
     fireWin: 'Points if your castaway wins the fire-making challenge',
     soleSurvivor: 'Points if your castaway wins the season'
+  },
+  prediction: {
+    indivWin: 'Predict which castaway will win an individual immunity challenge',
+    indivReward: 'Predict which castaway will win an individual reward challenge',
+    tribe1st: 'Predict which tribe/team will win a challenge',
+    tribe2nd: 'Predict which tribe/team will come second in a challenge',
+    advFound: 'Predict which castaway will find or earn an advantage',
+    advPlay: 'Predict which castaway will play an advantage effectively',
+    badAdvPlay: 'Predict which castaway will play an advantage poorly or unnecessarily',
+    advElim: 'Predict which castaway will be eliminated with an advantage in their pocket',
+    spokeEpTitle: 'Predict which castaway will be quoted in the episode title',
+    finalists: 'Predict which castaway will make it to the final tribal council',
+    fireWin: 'Predict which castaway will win the fire-making challenge',
+    soleSurvivor: 'Predict which castaway will win the season'
   },
   italics: {
     tribe2nd: '(only applies for challenges with 3+ tribes/teams)',

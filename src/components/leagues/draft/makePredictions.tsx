@@ -25,6 +25,7 @@ import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useMemo } from 'react';
 import { Input } from '~/components/ui/input';
+import { CoverCarousel } from '~/components/ui/carousel';
 
 interface MakePredictionsProps {
   basePredictionRules?: BasePredictionRules;
@@ -79,7 +80,7 @@ export function PredictionCards({
       const prediction: LeaguePredictionDraft = {
         eventName: eventName,
         label: fullName,
-        description: `${BaseEventDescriptions.main[eventName]} \
+        description: `${BaseEventDescriptions.prediction[eventName]} \
           ${BaseEventDescriptions.italics[eventName] ?? ''}`,
         points: rule.points,
         eventType: 'Prediction',
@@ -185,7 +186,7 @@ export function PredictionCards({
         </div>
       </h3>
     ),
-    content: (<p className='text-sm'>{prediction.description}</p>),
+    content: (<p className='text-sm bg-b3'>{prediction.description}</p>),
     footer: (
       <SubmissionCard
         prediction={prediction}
@@ -195,7 +196,7 @@ export function PredictionCards({
 
   return (
     <span className={cn('w-full', className)}>
-      {/*<BounceyCarousel items={[...basePredictionItems, ...customPredictionItems]} />*/}
+      <CoverCarousel items={[...basePredictionItems, ...customPredictionItems]} />
     </span>
   );
 }

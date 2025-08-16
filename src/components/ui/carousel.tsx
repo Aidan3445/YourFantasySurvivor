@@ -270,8 +270,8 @@ interface BounceyCarouselProps {
 
 function CoverCarousel({ items }: BounceyCarouselProps) {
   const isMobile = useIsMobile();
+  const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
-  const { api, scrollPrev, scrollNext, canScrollPrev, canScrollNext } = useCarousel();
 
   React.useEffect(() => {
     if (!api) {
@@ -287,7 +287,7 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
 
 
   return (
-    <div className='relative'>
+    <Carousel className='relative' setApi={setApi} opts={{ containScroll: false }}>
       <CarouselContent className='ml-0 -mx-2'>
         {items.map((item, index) => {
           const offset = index - (current - 1);
@@ -298,7 +298,7 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
               key={index}
               className={cn(
                 'z-10 transition-all duration-500 drop-shadow-md bg-secondary rounded-md',
-                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
+                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip select-none',
                 isMobile ? 'basis-[90%]' : 'basis-1/2',
                 {
                   'scale-50 translate-y-2 -z-10 blur-[1px] duration-[400ms]': absOffset === 1,
@@ -321,16 +321,16 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                   {`Slide ${index + 1} of ${items.length}`}
                 </TableCaption>
                 <TableHeader>
-                  <TableRow className='bg-secondary hover:bg-secondary'>
-                    <TableHead className='text-center'>
+                  <TableRow className='bg-transparent hover:bg-transparent'>
+                    <TableHead className='text-center w-16'>
                       <Button
                         variant={'outline'}
                         type='button'
                         className={cn(
                           'rounded-full z-10',
                         )}
-                        disabled={!canScrollPrev || index !== current - 1}
-                        onClick={scrollPrev}>
+                        disabled={!api?.canScrollPrev() || index !== current - 1}
+                        onClick={() => api?.scrollPrev()}>
                         <ArrowLeft className='h-4 w-4' />
                         <span className='sr-only'>Previous slide</span>
                       </Button>
@@ -338,15 +338,15 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                     <TableHead className='text-center font-normal'>
                       {item.header}
                     </TableHead>
-                    <TableHead className='text-center'>
+                    <TableHead className='text-center w-16'>
                       <Button
                         variant={'outline'}
                         type='button'
                         className={cn(
                           'rounded-full z-10',
                         )}
-                        disabled={!canScrollNext || index !== current - 1}
-                        onClick={scrollNext}>
+                        disabled={!api?.canScrollNext() || index !== current - 1}
+                        onClick={() => api?.scrollNext()}>
                         <ArrowRight className='h-4 w-4' />
                         <span className='sr-only'>Next slide</span>
                       </Button>
@@ -354,7 +354,7 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
+                  <TableRow className='bg-transparent hover:bg-transparent'>
                     <TableCell colSpan={3} className='p-0'>
                       <div className={cn('max-h-52 scrollbar-thin scrollbar-thumb-primary/75 scrollbar-track-secondary',
                         offset === 0 ? 'overflow-y-auto' : 'overflow-hidden')}>
@@ -363,14 +363,15 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                     </TableCell>
                   </TableRow>
                 </TableBody>
-                {item.footer &&
+                {item.footer && (
                   <TableFooter>
-                    <TableRow>
-                      <TableCell colSpan={3} className='p-0' />
-                      {item.footer}
+                    <TableRow className='bg-b2 hover:bg-b2'>
+                      <TableCell colSpan={3} className='p-0'>
+                        {item.footer}
+                      </TableCell>
                     </TableRow>
                   </TableFooter>
-                }
+                )}
               </Table>
             </CarouselItem>
           );
@@ -379,13 +380,13 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
       {/* progress bar */}
       <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
         <div
-          className='h-full bg-primary rounded-full transition-all'
+          className='h-full bg-primary rounded-full transition-all ease-linear duration-300'
           style={{
-            width: `${(current / items.length) * 100}%`,
+            width: `${((current - 1) / (items.length - 1)) * 100}%`,
           }}
         />
       </div>
-    </div>
+    </Carousel>
   );
 }
 

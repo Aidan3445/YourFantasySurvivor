@@ -59,7 +59,7 @@ function MakePredictions({ predictions: weekly, betRules, myScore }: WeeklyPredi
   const balance = (myScore ?? 0) - betTotal;
 
   return (
-    <div className='text-center bg-card rounded-lg w-full pb-2 relative'>
+    <div className='text-center bg-card rounded-lg w-full relative'>
       {betRules?.enabled && betRules?.enabledBets.length > 0 &&
         <div className='absolute top-2 right-4 text-sm italic text-muted-foreground'>
           Shauhin Mode Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
@@ -142,19 +142,17 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
   }
 
   return (
-    <Carousel opts={{ containScroll: false }}>
-      <div className='text-center bg-card rounded-lg w-full'>
-        <h1 className='text-3xl'>Prediction History</h1>
-        <span className='flex justify-center items-center gap-2 text-sm'>
-          <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
-          <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
-        </span>
-        <CoverCarousel items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
-          header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
-          content: (<PredctionTable predictions={preds} />),
-        }))} />
-      </div>
-    </Carousel>
+    <div className='text-center bg-card rounded-lg w-full'>
+      <h1 className='text-3xl'>Prediction History</h1>
+      <span className='flex justify-center items-center gap-2 text-sm'>
+        <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
+        <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
+      </span>
+      <CoverCarousel items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
+        header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
+        content: (<PredctionTable predictions={preds} />),
+      }))} />
+    </div>
   );
 }
 
