@@ -86,7 +86,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
         <Carousel setApi={setApi} opts={{ watchDrag: false, ignoreKeys: true }}>
           <span className='flex w-full justify-center items-end gap-4'>
             <CarouselPrevious className='static translate-y-0' />
-            <div className='space-y-1 flex-grow'>
+            <div className='space-y-1 grow'>
               {count > 0 &&
                 <p className='w-full text-center text-sm'>
                   Step {current + 1} of {count}
@@ -197,7 +197,7 @@ interface BaseEventRuleTabsProps {
 
 export function BaseEventRuleTabs({ rightSide, locked: disabled }: BaseEventRuleTabsProps) {
   return (
-    <Tabs defaultValue='challenges' className='h-[27rem] mt-2'>
+    <Tabs defaultValue='challenges' className='h-108 mt-2'>
       <TabsList className='w-full grid grid-cols-3'>
         <TabsTrigger value='challenges'>Challenges</TabsTrigger>
         <TabsTrigger value='advantages'>Advantages</TabsTrigger>
@@ -232,7 +232,7 @@ export function CreateLeagueModal({ children, className }: CreateLeagueModalProp
       <AlertDialogTrigger className={className}>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className='sm:w-[40rem] w-96 flex flex-col'>
+      <AlertDialogContent className='sm:w-160 w-96 flex flex-col'>
         <AlertDialogHeader>
           <AlertDialogTitle className='text-2xl'>Create a New League</AlertDialogTitle>
           <AlertDialogDescription className='sr-only'>

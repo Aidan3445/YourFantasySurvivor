@@ -141,7 +141,7 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                     : getContrastingColor(survivor.startingTribe.tribeColor)} />
               </PopoverTrigger>
               <PopoverContent
-                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'
+                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content_1fr] gap-x-2 w-full'
                 align='end'>
                 <PopoverArrow />
                 <div className='text-center'>Survivor</div>
@@ -241,7 +241,7 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
                 <History size={16} />
               </PopoverTrigger>
               <PopoverContent
-                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'
+                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content_1fr] gap-x-2 w-full'
                 align='end'
                 side='bottom'>
                 <PopoverArrow />

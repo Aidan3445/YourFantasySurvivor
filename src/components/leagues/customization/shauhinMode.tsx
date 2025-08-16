@@ -82,7 +82,7 @@ export default function ShauhinMode() {
           rel='noopener noreferrer'>
           video
         </a> that
-        <ColorRow color='#d05dbd' className='inline w-min px-0.5 ml-1 !text-white'>
+        <ColorRow color='#d05dbd' className='inline w-min px-0.5 ml-1 text-white!'>
           Shauhin Davari
         </ColorRow>,
         from Survivor 48, posted, this twist allows you to bet points you've earned

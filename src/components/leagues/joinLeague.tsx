@@ -159,7 +159,7 @@ export function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProp
                       <div
                         className={cn(
                           'border border-primary flex justify-center items-center',
-                          !ensureNewColor(hexToHsva(props.color)) ? '!cursor-not-allowed' : '')}
+                          !ensureNewColor(hexToHsva(props.color)) ? 'cursor-not-allowed!' : '')}
                         {...props}>
                         <Point color={props.color} checked={props.checked} />
                       </div>

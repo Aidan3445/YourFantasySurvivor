@@ -72,7 +72,7 @@ export default function CreateCustomEvent() {
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
             <form
-              className='flex flex-col gap-1 px-2 max-md:w-full flex-grow'
+              className='flex flex-col gap-1 px-2 max-md:w-full grow'
               action={() => handleSubmit()}>
               <h2 className='text-2xl self-center'>Create Custom Event</h2>
               <FormField

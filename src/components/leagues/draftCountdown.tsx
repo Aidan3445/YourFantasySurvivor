@@ -56,7 +56,7 @@ export function DraftCountdown() {
           {editable && <SetDraftDate />}
         </div>
       </span>
-      <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow shadow-black'>
+      <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow-sm shadow-black'>
         <Countdown endDate={draftDate} replacedBy={
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'

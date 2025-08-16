@@ -40,7 +40,7 @@ export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
           {Object.entries(castawaysByTribe ?? {}).map(([tribeName, castaways]) => (
             <div
               key={tribeName}
-              className='flex flex-grow flex-col gap-1 bg-b2 rounded-lg p-2 min-w-56'
+              className='flex grow flex-col gap-1 bg-b2 rounded-lg p-2 min-w-56'
               style={{ border: `5px solid ${castaways[0]?.tribe.tribeColor}` }}>
               <h2 className='text-lg font-semibold'>{tribeName}</h2>
               {castaways.map((castaway) => (

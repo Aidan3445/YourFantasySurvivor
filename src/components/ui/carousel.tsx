@@ -297,7 +297,7 @@ function BouncyCarouselContent({ items }: BounceyCarouselProps) {
               key={index}
               className={cn(
                 'basis-1/2 z-10 duration-300 transition-all drop-shadow-md bg-secondary rounded-md',
-                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip transition-[max-height,transform]',
+                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip transition-all',
                 {
                   'scale-0': absOffset > 3,
 
@@ -306,8 +306,8 @@ function BouncyCarouselContent({ items }: BounceyCarouselProps) {
                   '-translate-x-1/3': offset === 1,
 
                   'scale-[25%] translate-y-4 -z-20 blur-[2px]': absOffset === 2,
-                  'translate-x-[100%]': offset === -2,
-                  '-translate-x-[100%]': offset === 2,
+                  'translate-x-full': offset === -2,
+                  '-translate-x-full': offset === 2,
 
                   'scale-[12.5%] translate-y-6 -z-30 blur-[3px]': absOffset === 3,
                   'translate-x-[185%]': offset <= -3,
@@ -352,10 +352,9 @@ function BouncyCarouselContent({ items }: BounceyCarouselProps) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow >
+                  <TableRow>
                     <TableCell colSpan={3} className='p-0'>
-                      {/*you can set a max on the content container*/}
-                      <div className={cn('max-h-52',
+                      <div className={cn('max-h-52 scrollbar-thin scrollbar-thumb-primary/75 scrollbar-track-secondary',
                         offset === 0 ? 'overflow-y-auto' : 'overflow-hidden')}>
                         {item.content}
                       </div>

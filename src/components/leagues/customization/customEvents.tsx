@@ -267,7 +267,7 @@ export function CustomEventFields({ predictionDefault, children }: CustomEventFi
         <FormField
           name='timing'
           render={({ field }) => (
-            <FormItem className={!isPrediction ? '!pointer-events-none w-full' : 'w-full'}>
+            <FormItem className={!isPrediction ? 'pointer-events-none! w-full' : 'w-full'}>
               <FormLabel className='flex items-center gap-1'>
                 Timing
                 <PredictionTimingHelp />
