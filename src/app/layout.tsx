@@ -7,13 +7,14 @@ import { SidebarProvider } from '~/components/ui/sidebar';
 import Nav from '~/components/nav/navSelector';
 import UserProvider from '~/context/yfsUserContext';
 import { QUERIES } from './api/leagues/query';
+import { Metadata } from 'next';
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
 });
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Your Fantasy Survivor',
   description: 'A fantasy league for the TV show Survivor',
   icons: [{ rel: 'icon', url: '/Icon.ico' }],
@@ -27,7 +28,6 @@ interface RootLayoutProps {
 export default async function RootLayout({ children }: RootLayoutProps) {
   const leagues = await QUERIES.getLeagues();
 
-
   return (
     <StrictMode>
       <ClerkProvider
@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         }}>
         <UserProvider leagues={leagues}>
           <html lang='en'>
-            <body className={`font-sans ${inter.variable} `}>
+            <body className={`font-sans ${inter.variable}`}>
               <SidebarProvider defaultOpen>
                 <Nav />
                 <div className='w-full'>

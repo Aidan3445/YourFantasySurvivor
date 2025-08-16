@@ -6,13 +6,12 @@ import { type EpisodeNumber } from '~/server/db/defs/episodes';
 import { ShauhinModeSettings, type Prediction } from '~/server/db/defs/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { BouncyCarouselContent, Carousel } from '~/components/ui/carousel';
+import { CoverCarousel, Carousel } from '~/components/ui/carousel';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
 import { usePredictions } from '~/hooks/usePredictions';
 import { useLeague } from '~/hooks/useLeague';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 
 export default function Predictions() {
   const { leagueData, league } = useLeague();
@@ -150,7 +149,7 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
           <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
           <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
         </span>
-        <BouncyCarouselContent items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
+        <CoverCarousel items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
           header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
           content: (<PredctionTable predictions={preds} />),
         }))} />

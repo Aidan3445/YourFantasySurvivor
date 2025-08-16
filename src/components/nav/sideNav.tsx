@@ -18,7 +18,7 @@ import Image from 'next/image';
 export default function SideNav() {
   return (
     <Sidebar className='hidden md:block' variant='sidebar' collapsible='none'>
-      <SidebarContent className='h-svh overflow-y-auto sticky top-0'>
+      <SidebarContent className='overflow-y-auto sticky top-0'>
         <SidebarGroup>
           <SidebarMenu>
             <SideNavLink

@@ -9,6 +9,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from './table';
+import { useIsMobile } from '~/hooks/useMobile';
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -267,8 +268,8 @@ interface BounceyCarouselProps {
   }[]
 }
 
-function BouncyCarouselContent({ items }: BounceyCarouselProps) {
-  //const [api, setApi] = React.useState<CarouselApi>();
+function CoverCarousel({ items }: BounceyCarouselProps) {
+  const isMobile = useIsMobile();
   const [current, setCurrent] = React.useState(0);
   const { api, scrollPrev, scrollNext, canScrollPrev, canScrollNext } = useCarousel();
 
@@ -296,22 +297,23 @@ function BouncyCarouselContent({ items }: BounceyCarouselProps) {
             <CarouselItem
               key={index}
               className={cn(
-                'basis-1/2 z-10 duration-300 transition-all drop-shadow-md bg-secondary rounded-md',
-                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip transition-all',
+                'z-10 transition-all duration-500 drop-shadow-md bg-secondary rounded-md',
+                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
+                isMobile ? 'basis-[90%]' : 'basis-1/2',
                 {
-                  'scale-0': absOffset > 3,
-
-                  'scale-50 translate-y-2 -z-10 blur-[1px]': absOffset === 1,
+                  'scale-50 translate-y-2 -z-10 blur-[1px] duration-[400ms]': absOffset === 1,
                   'translate-x-1/3': offset === -1,
                   '-translate-x-1/3': offset === 1,
 
-                  'scale-[25%] translate-y-4 -z-20 blur-[2px]': absOffset === 2,
+                  'scale-[25%] translate-y-4 -z-20 blur-[2px] duration-300': absOffset === 2,
                   'translate-x-full': offset === -2,
                   '-translate-x-full': offset === 2,
 
-                  'scale-[12.5%] translate-y-6 -z-30 blur-[3px]': absOffset === 3,
+                  'scale-[12.5%] translate-y-6 -z-30 blur-[3px] duration-200': absOffset === 3,
                   'translate-x-[185%]': offset <= -3,
                   '-translate-x-[185%]': offset >= 3,
+
+                  'scale-0 duration-100': absOffset > 3,
                 }
               )}>
               <Table className='table-fixed'>
@@ -374,7 +376,16 @@ function BouncyCarouselContent({ items }: BounceyCarouselProps) {
           );
         })}
       </CarouselContent>
-    </div >
+      {/* progress bar */}
+      <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
+        <div
+          className='h-full bg-primary rounded-full transition-all'
+          style={{
+            width: `${(current / items.length) * 100}%`,
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -385,5 +396,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-  BouncyCarouselContent
+  CoverCarousel
 };

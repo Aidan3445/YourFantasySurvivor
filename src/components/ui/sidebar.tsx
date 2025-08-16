@@ -180,7 +180,7 @@ const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            'relative h-mvh w-(--sidebar-width) min-w-(--sidebar-width) bg-sidebar border-b-10 border-black',
+            'relative h-mvh w-(--sidebar-width) min-w-(--sidebar-width) bg-sidebar',
             className
           )}
           ref={ref}
