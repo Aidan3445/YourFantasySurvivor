@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
-import { BounceyCarousel } from '~/components/ui/carousel';
+//import { BouncyCarouselContent } from '~/components/ui/carousel';
 import { Flame, HelpCircle } from 'lucide-react';
 import {
   type ReferenceType, type BasePredictionRules, defaultPredictionRules,
@@ -195,7 +195,7 @@ export function PredictionCards({
 
   return (
     <span className={cn('w-full', className)}>
-      <BounceyCarousel items={[...basePredictionItems, ...customPredictionItems]} />
+      {/*<BounceyCarousel items={[...basePredictionItems, ...customPredictionItems]} />*/}
     </span>
   );
 }

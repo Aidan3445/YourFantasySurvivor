@@ -6,12 +6,13 @@ import { type EpisodeNumber } from '~/server/db/defs/episodes';
 import { ShauhinModeSettings, type Prediction } from '~/server/db/defs/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { BounceyCarousel } from '~/components/ui/carousel';
+import { BouncyCarouselContent, Carousel } from '~/components/ui/carousel';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
 import { usePredictions } from '~/hooks/usePredictions';
 import { useLeague } from '~/hooks/useLeague';
+import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 
 export default function Predictions() {
   const { leagueData, league } = useLeague();
@@ -142,18 +143,19 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
   }
 
   return (
-    <div className='text-center bg-card rounded-lg w-full'>
-      <h1 className='text-3xl'>Prediction History</h1>
-      <span className='flex justify-center items-center gap-2 text-sm'>
-        <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
-        <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
-      </span>
-      <BounceyCarousel items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
-        header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
-        content: (<PredctionTable predictions={preds} />),
-        footer: null,
-      }))} />
-    </div>
+    <Carousel opts={{ containScroll: false }}>
+      <div className='text-center bg-card rounded-lg w-full'>
+        <h1 className='text-3xl'>Prediction History</h1>
+        <span className='flex justify-center items-center gap-2 text-sm'>
+          <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
+          <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
+        </span>
+        <BouncyCarouselContent items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
+          header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
+          content: (<PredctionTable predictions={preds} />),
+        }))} />
+      </div>
+    </Carousel>
   );
 }
 

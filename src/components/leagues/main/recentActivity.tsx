@@ -242,7 +242,7 @@ export function EpisodeEvents({
       ?.some((event) => event.referenceType === 'Tribe'));
 
   return (
-    <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-8rem)] lg:w-full bg-card rounded-lg gap-0'>
+    <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-var(--sidebar-width)-3rem)] lg:w-full bg-card rounded-lg gap-0'>
       <Table className='w-full'>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader className='sticky top-0'>

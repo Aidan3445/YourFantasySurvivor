@@ -1,5 +1,5 @@
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { QUERIES } from '~/app/api/leagues/query';
 import { defaultShauhinModeSettings, ShauhinModeSettings } from '~/server/db/defs/events';
 import useSWR, { type Fetcher } from 'swr';

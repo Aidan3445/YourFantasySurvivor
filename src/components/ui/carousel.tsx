@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
+import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from './table';
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -241,7 +242,7 @@ const CarouselNext = React.forwardRef<
       size={size}
       type='button'
       className={cn(
-        'absolute h-8 w-8 rounded-full',
+        'h-8 w-8 rounded-full',
         orientation === 'horizontal'
           ? '-right-12 top-1/2 -translate-y-1/2'
           : '-bottom-12 left-1/2 -translate-x-1/2 rotate-90',
@@ -262,13 +263,14 @@ interface BounceyCarouselProps {
   items: {
     header: React.ReactNode
     content: React.ReactNode
-    footer: React.ReactNode
+    footer?: React.ReactNode
   }[]
 }
 
-function BounceyCarousel({ items }: BounceyCarouselProps) {
-  const [api, setApi] = React.useState<CarouselApi>();
+function BouncyCarouselContent({ items }: BounceyCarouselProps) {
+  //const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
+  const { api, scrollPrev, scrollNext, canScrollPrev, canScrollNext } = useCarousel();
 
   React.useEffect(() => {
     if (!api) {
@@ -284,35 +286,96 @@ function BounceyCarousel({ items }: BounceyCarouselProps) {
 
 
   return (
-    <Carousel className='select-none gap-4 items-center w-[calc(100svw-2.5rem)] md:w-max' setApi={setApi} opts={{ align: 'center' }}>
-      <CarouselContent>
-        {items.map((item, index) => (
-          <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
-            'opacity-50 -z-10': index !== current - 1,
-          })}>
-            <article
+    <div className='relative'>
+      <CarouselContent className='ml-0 -mx-2'>
+        {items.map((item, index) => {
+          const offset = index - (current - 1);
+          const absOffset = Math.abs(offset);
+
+          return (
+            <CarouselItem
+              key={index}
               className={cn(
-                'flex flex-col w-max bg-secondary rounded-lg shadow-lg my-4 overflow-y-hidden',
-                'text-center transition-transform duration-700',
+                'basis-1/2 z-10 duration-300 transition-all drop-shadow-md bg-secondary rounded-md',
+                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip transition-[max-height,transform]',
                 {
-                  'scale-75': index !== current - 1,
-                  '-translate-x-1/2': index === current % items.length,
-                  'translate-x-1/2': index === (current - 2) % items.length,
-                  '-translate-x-6 md:-translate-x-8': index + current + 1 === 2 * items.length,
-                  'translate-x-6 md:translate-x-8 lg:translate-x-12': index + current === 1,
-                })} >
-              <span className='flex gap-4 justify-between items-center self-center px-1 lg:w-full'>
-                <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1' />
-                {item.header}
-                <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1' />
-              </span>
-              {item.content}
-              {item.footer}
-            </article>
-          </CarouselItem>
-        ))}
+                  'scale-0': absOffset > 3,
+
+                  'scale-50 translate-y-2 -z-10 blur-[1px]': absOffset === 1,
+                  'translate-x-1/3': offset === -1,
+                  '-translate-x-1/3': offset === 1,
+
+                  'scale-[25%] translate-y-4 -z-20 blur-[2px]': absOffset === 2,
+                  'translate-x-[100%]': offset === -2,
+                  '-translate-x-[100%]': offset === 2,
+
+                  'scale-[12.5%] translate-y-6 -z-30 blur-[3px]': absOffset === 3,
+                  'translate-x-[185%]': offset <= -3,
+                  '-translate-x-[185%]': offset >= 3,
+                }
+              )}>
+              <Table className='table-fixed'>
+                <TableCaption className='sr-only'>
+                  {`Slide ${index + 1} of ${items.length}`}
+                </TableCaption>
+                <TableHeader>
+                  <TableRow className='bg-secondary hover:bg-secondary'>
+                    <TableHead className='text-center'>
+                      <Button
+                        variant={'outline'}
+                        type='button'
+                        className={cn(
+                          'rounded-full z-10',
+                        )}
+                        disabled={!canScrollPrev || index !== current - 1}
+                        onClick={scrollPrev}>
+                        <ArrowLeft className='h-4 w-4' />
+                        <span className='sr-only'>Previous slide</span>
+                      </Button>
+                    </TableHead>
+                    <TableHead className='text-center font-normal'>
+                      {item.header}
+                    </TableHead>
+                    <TableHead className='text-center'>
+                      <Button
+                        variant={'outline'}
+                        type='button'
+                        className={cn(
+                          'rounded-full z-10',
+                        )}
+                        disabled={!canScrollNext || index !== current - 1}
+                        onClick={scrollNext}>
+                        <ArrowRight className='h-4 w-4' />
+                        <span className='sr-only'>Next slide</span>
+                      </Button>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow >
+                    <TableCell colSpan={3} className='p-0'>
+                      {/*you can set a max on the content container*/}
+                      <div className={cn('max-h-52',
+                        offset === 0 ? 'overflow-y-auto' : 'overflow-hidden')}>
+                        {item.content}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                {item.footer &&
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell colSpan={3} className='p-0' />
+                      {item.footer}
+                    </TableRow>
+                  </TableFooter>
+                }
+              </Table>
+            </CarouselItem>
+          );
+        })}
       </CarouselContent>
-    </Carousel>
+    </div >
   );
 }
 
@@ -323,5 +386,5 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-  BounceyCarousel,
+  BouncyCarouselContent
 };
