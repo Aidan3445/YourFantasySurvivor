@@ -322,7 +322,7 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                 </TableCaption>
                 <TableHeader>
                   <TableRow className='bg-transparent hover:bg-transparent'>
-                    <TableHead className='text-center w-16'>
+                    <TableHead className='text-center'>
                       <Button
                         variant={'outline'}
                         type='button'
@@ -335,10 +335,10 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                         <span className='sr-only'>Previous slide</span>
                       </Button>
                     </TableHead>
-                    <TableHead className='text-center font-normal'>
+                    <TableHead className='text-center font-normal w-3/4'>
                       {item.header}
                     </TableHead>
-                    <TableHead className='text-center w-16'>
+                    <TableHead className='text-center'>
                       <Button
                         variant={'outline'}
                         type='button'
@@ -353,6 +353,8 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                     </TableHead>
                   </TableRow>
                 </TableHeader>
+                {/*
+                  */}
                 <TableBody>
                   <TableRow className='bg-transparent hover:bg-transparent'>
                     <TableCell colSpan={3} className='p-0'>

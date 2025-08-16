@@ -59,7 +59,7 @@ function MakePredictions({ predictions: weekly, betRules, myScore }: WeeklyPredi
   const balance = (myScore ?? 0) - betTotal;
 
   return (
-    <div className='text-center bg-card rounded-lg w-full relative'>
+    <div className='text-center bg-card rounded-lg w-full relative overflow-clip'>
       {betRules?.enabled && betRules?.enabledBets.length > 0 &&
         <div className='absolute top-2 right-4 text-sm italic text-muted-foreground'>
           Shauhin Mode Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
@@ -142,7 +142,7 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
   }
 
   return (
-    <div className='text-center bg-card rounded-lg w-full'>
+    <div className='text-center bg-card rounded-lg w-full overflow-clip'>
       <h1 className='text-3xl'>Prediction History</h1>
       <span className='flex justify-center items-center gap-2 text-sm'>
         <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
