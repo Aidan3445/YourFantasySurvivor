@@ -260,7 +260,7 @@ const CarouselNext = React.forwardRef<
 });
 CarouselNext.displayName = 'CarouselNext';
 
-interface BounceyCarouselProps {
+interface CoverCarouselProps {
   items: {
     header: React.ReactNode
     content: React.ReactNode
@@ -268,7 +268,7 @@ interface BounceyCarouselProps {
   }[]
 }
 
-function CoverCarousel({ items }: BounceyCarouselProps) {
+function CoverCarousel({ items }: CoverCarouselProps) {
   const isMobile = useIsMobile();
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
@@ -301,6 +301,8 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                 'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip select-none',
                 isMobile ? 'basis-[90%]' : 'basis-1/2',
                 {
+                  'pointer-events-none': offset !== 0,
+
                   'scale-50 translate-y-2 -z-10 blur-[1px] duration-[400ms]': absOffset === 1,
                   'translate-x-1/3': offset === -1,
                   '-translate-x-1/3': offset === 1,
@@ -321,7 +323,7 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                   {`Slide ${index + 1} of ${items.length}`}
                 </TableCaption>
                 <TableHeader>
-                  <TableRow className='bg-transparent hover:bg-transparent'>
+                  <TableRow className='bg-transparent hover:bg-transparent border-none'>
                     <TableHead className='text-center'>
                       <Button
                         variant={'outline'}
@@ -353,21 +355,18 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                {/*
-                  */}
                 <TableBody>
-                  <TableRow className='bg-transparent hover:bg-transparent'>
-                    <TableCell colSpan={3} className='p-0'>
-                      <div className={cn('max-h-52 scrollbar-thin scrollbar-thumb-primary/75 scrollbar-track-secondary',
-                        offset === 0 ? 'overflow-y-auto' : 'overflow-hidden')}>
-                        {item.content}
-                      </div>
+                  <TableRow className='bg-transparent hover:bg-transparent border-none'>
+                    <TableCell colSpan={3} className={cn(
+                      'p-0 max-h-52 scrollbar-thin scrollbar-thumb-primary/75 scrollbar-track-secondary',
+                      offset === 0 ? 'overflow-y-auto' : 'overflow-hidden')}>
+                      {item.content}
                     </TableCell>
                   </TableRow>
                 </TableBody>
                 {item.footer && (
-                  <TableFooter>
-                    <TableRow className='bg-b2 hover:bg-b2'>
+                  <TableFooter className='border-none'>
+                    <TableRow className='bg-b2 hover:bg-b2 border-none'>
                       <TableCell colSpan={3} className='p-0'>
                         {item.footer}
                       </TableCell>
@@ -379,7 +378,6 @@ function CoverCarousel({ items }: BounceyCarouselProps) {
           );
         })}
       </CarouselContent>
-      {/* progress bar */}
       <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
         <div
           className='h-full bg-primary rounded-full transition-all ease-linear duration-300'

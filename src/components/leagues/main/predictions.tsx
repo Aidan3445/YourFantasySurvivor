@@ -162,7 +162,7 @@ interface PredictionTableProps {
 
 function PredctionTable({ predictions }: PredictionTableProps) {
   return (
-    <Table>
+    <Table className='transform-gpu will-change-transform'>
       <TableCaption className='sr-only'>Member Predictions</TableCaption>
       <TableHeader>
         <TableRow className='px-4 bg-white pointer-events-none'>
@@ -181,7 +181,7 @@ function PredctionTable({ predictions }: PredictionTableProps) {
             return (
               <TableRow key={pred.leagueEventRuleId} className='bg-b3'>
                 <TableCell>
-                  <div className='flex flex-col'>
+                  <div className='flex flex-col text-nowrap'>
                     {pred.eventName}
                     <span className='text-xs italic'>
                       {pred.timing.join(' - ')}

@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
-//import { BouncyCarouselContent } from '~/components/ui/carousel';
 import { Flame, HelpCircle } from 'lucide-react';
 import {
   type ReferenceType, type BasePredictionRules, defaultPredictionRules,
@@ -174,7 +173,7 @@ export function PredictionCards({
 
   const basePredictionItems = enabledBasePredictions.map((prediction) => ({
     header: (
-      <h3 className='text-lg font-semibold text-card-foreground'>
+      <h3 className='text-lg font-semibold text-card-foreground py-1'>
         {prediction.label ?? prediction.eventName}
         <span className='ml-2 inline-flex mt-1'>
           <p className='text-sm'>{prediction.points}</p>
@@ -186,7 +185,9 @@ export function PredictionCards({
         </div>
       </h3>
     ),
-    content: (<p className='text-sm bg-b3'>{prediction.description}</p>),
+    content: (
+      <p className='text-sm bg-b3 py-1'>{prediction.description}</p>
+    ),
     footer: (
       <SubmissionCard
         prediction={prediction}

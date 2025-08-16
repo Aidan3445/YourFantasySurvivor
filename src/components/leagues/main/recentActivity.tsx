@@ -352,9 +352,13 @@ function EpisodeEventsTableBody({
         misses: []
       };
 
-      if (event.hit) acc[key].predictionMakers.push(event.predictionMaker);
+      if (event.hit) acc[key].predictionMakers.push({
+        displayName: event.predictionMaker,
+        bet: event.bet
+      });
       else acc[key].misses.push({
-        predictionMaker: event.predictionMaker,
+        displayName: event.predictionMaker,
+        bet: event.bet,
         referenceName: (event.referenceType === 'Castaway' ?
           castaways.find((castaway) => castaway.castawayId === event.referenceId)?.fullName :
           tribes.find((tribe) => tribe.tribeId === event.referenceId)?.tribeName) ?? ''
@@ -370,15 +374,21 @@ function EpisodeEventsTableBody({
       referenceType: ReferenceType;
       // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
       referenceName: CastawayName | TribeName;
-      predictionMakers: LeagueMemberDisplayName[];
+      predictionMakers: {
+        displayName: LeagueMemberDisplayName;
+        bet?: number | null;
+      }[];
       misses: {
-        predictionMaker: LeagueMemberDisplayName;
+        displayName: LeagueMemberDisplayName;
+        bet?: number | null;
         // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
         referenceName: CastawayName | TribeName;
       }[]
     }>) ?? {})
     .map((event) => {
-      if (event.predictionMakers.length === 0) event.predictionMakers = ['No Correct Predictions'];
+      if (event.predictionMakers.length === 0) event.predictionMakers = [{
+        displayName: 'No Correct Predictions'
+      }];
       return event;
     });
 
@@ -451,7 +461,7 @@ function EpisodeEventsTableBody({
           eventId={-1}
           eventName={mockPrediction.eventName}
           points={mockPrediction.points}
-          predictionMakers={[mockPrediction.predictionMaker]}
+          predictionMakers={[{ displayName: mockPrediction.predictionMaker }]}
           referenceId={mockPrediction.referenceId}
           referenceType={mockPrediction.referenceType}
           referenceName={mockPrediction.referenceName}
@@ -720,10 +730,14 @@ interface LeagueEventRowProps {
   referenceType: ReferenceType;
   referenceName?: string;
   referenceId: number;
-  predictionMakers?: LeagueMemberDisplayName[];
+  predictionMakers?: {
+    displayName: LeagueMemberDisplayName,
+    bet?: number | null
+  }[];
   notes: string[] | null;
   misses?: {
-    predictionMaker: LeagueMemberDisplayName;
+    displayName: LeagueMemberDisplayName;
+    bet?: number | null;
     // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
     referenceName: CastawayName | TribeName;
   }[];
@@ -790,18 +804,27 @@ function LeagueEventRow({
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5 relative',
           predictionMakers?.length === 1 && 'justify-center')}>
-          {predictionMakers?.map((member, index) =>
-            member ?
-              <ColorRow
-                key={index}
-                className='leading-tight px-1 w-min'
-                color={league.members.list.find((listItem) =>
-                  listItem.displayName === member)?.color}>
-                {member}
-              </ColorRow> :
-              <ColorRow className='invisible leading-tight px-1 w-min' key={index}>
-                None
-              </ColorRow>
+          {predictionMakers?.map(({ displayName, bet }, index) =>
+            <span className='flex items-center gap-1' key={index}>
+              {
+                displayName ?
+                  <ColorRow
+                    className='leading-tight px-1 w-min'
+                    color={league.members.list.find((listItem) =>
+                      listItem.displayName === displayName)?.color}>
+                    {displayName}
+                  </ColorRow> :
+                  <ColorRow className='invisible leading-tight px-1 w-min' key={index}>
+                    None
+                  </ColorRow>
+              }
+              {bet !== undefined && bet !== null && (
+                <span className='text-xs text-green-600'>
+                  +{bet}
+                  <Flame className='inline align-baseline w-3 h-min stroke-green-600' />
+                </span>
+              )}
+            </span>
           )}
           {misses && misses.length > 0 &&
             <Accordion
@@ -819,8 +842,8 @@ function LeagueEventRow({
                         <ColorRow
                           className='leading-tight px-1 w-min'
                           color={league.members.list.find((listItem) =>
-                            listItem.displayName === miss.predictionMaker)?.color}>
-                          {miss.predictionMaker}
+                            listItem.displayName === miss.displayName)?.color}>
+                          {miss.displayName}
                         </ColorRow>
                         <MoveRight size={12} stroke='#000000' />
                         <ColorRow
@@ -833,6 +856,12 @@ function LeagueEventRow({
                               tribe.tribeName === miss.referenceName)?.tribeColor}>
                           {miss.referenceName}
                         </ColorRow>
+                        {miss.bet !== undefined && miss.bet !== null && (
+                          <span className='text-xs text-destructive'>
+                            -{miss.bet}
+                            <Flame className='inline align-baseline w-3 h-min stroke-destructive' />
+                          </span>
+                        )}
                       </span>
                     ))}
                   </div>
