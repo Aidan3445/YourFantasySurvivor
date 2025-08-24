@@ -1248,7 +1248,6 @@ export const QUERIES = {
       combinedPredictions[+episodeNumber]!.push(...predictions);
     });
 
-    console.log(combinedPredictions);
     return combinedPredictions;
   },
 
