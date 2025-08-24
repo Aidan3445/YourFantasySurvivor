@@ -268,6 +268,7 @@ export const defaultLeagueEventRule: LeagueEventRule = {
 };
 
 type EventPredictionRoot = {
+  eventId: number | null,
   points: number,
   referenceType: ReferenceType,
   referenceId: number,
@@ -300,7 +301,6 @@ export type LeagueDirectEvent = {
 export type LeaguePredictionEvent = EventPredictionRoot & {
   eventName: LeagueEventName,
   leagueEventRuleId: number,
-  eventId: LeagueEventId,
   notes: string[] | null
 };
 
@@ -320,7 +320,7 @@ export type LeaguePredictionDraft = BasePredictionDraft & LeagueEventRule;
 export type Prediction = {
   leagueMember: LeagueMemberDisplayName,
   eventName: LeagueEventName,
-  leagueEventRuleId: LeagueEventId,
+  leagueEventRuleId: LeagueEventId | null,
   points: number,
   timing: PredictionEventTiming[]
   prediction: {
@@ -330,6 +330,7 @@ export type Prediction = {
     tribe: TribeName | null
     referenceType: ReferenceType,
     referenceId: number,
+    bet: number | null,
   },
   results: {
     episodeNumber: EpisodeNumber | null,

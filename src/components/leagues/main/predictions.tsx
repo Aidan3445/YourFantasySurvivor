@@ -62,14 +62,14 @@ function MakePredictions({ predictions: weekly, betRules, myScore }: WeeklyPredi
     <div className='text-center bg-card rounded-lg w-full relative overflow-clip'>
       {betRules?.enabled && betRules?.enabledBets.length > 0 &&
         <div className='absolute top-2 right-4 text-sm italic text-muted-foreground'>
-          Shauhin Mode Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
+          Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
         </div>
       }
       {nextEpisode.airStatus === 'Airing' ?
         <h1 className='text-3xl'>
           Predictions are locked until the episode ends.
         </h1> :
-        <h1 className='text-3xl'>{'This Week\'s Prediction'}{totalPredictionsCount > 1 ? 's' : ''}</h1>
+        <h1 className='text-3xl mt-8 lg:mt-0'>{'This Week\'s Prediction'}{totalPredictionsCount > 1 ? 's' : ''}</h1>
       }
       < span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1' >
         <span className='text-nowrap'>
@@ -95,8 +95,8 @@ interface MemberPredictionsProps {
   history?: Record<EpisodeNumber, Prediction[]>;
 }
 
-function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
-  if (!predictions || Object.keys(predictions).length === 0) return null;
+function PredictionHistory({ history }: MemberPredictionsProps) {
+  const predictions = history ?? {};
 
   const stats = Object.values(predictions).reduce((acc, preds) => {
     preds.forEach((pred) => {
@@ -105,9 +105,11 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
         res.referenceType === pred.prediction.referenceType)) {
         acc.count.correct++;
         acc.points.earned += pred.points;
+        acc.points.earnedBets += pred.prediction.bet ?? 0;
       }
       acc.count.total++;
       acc.points.possible += pred.points;
+      acc.points.possibleBets += pred.prediction.bet ?? 0;
     });
     return acc;
   }, {
@@ -118,6 +120,8 @@ function PredictionHistory({ history: predictions }: MemberPredictionsProps) {
     points: {
       earned: 0,
       possible: 0,
+      earnedBets: 0,
+      possibleBets: 0,
     }
   });
 
@@ -161,6 +165,8 @@ interface PredictionTableProps {
 }
 
 function PredctionTable({ predictions }: PredictionTableProps) {
+  const hasBets = predictions.some((pred) => pred.prediction.bet && pred.prediction.bet > 0);
+
   return (
     <Table className='transform-gpu will-change-transform'>
       <TableCaption className='sr-only'>Member Predictions</TableCaption>
@@ -168,6 +174,7 @@ function PredctionTable({ predictions }: PredictionTableProps) {
         <TableRow className='px-4 bg-white pointer-events-none'>
           <TableHead className='text-center'>Event</TableHead>
           <TableHead className='text-center'>Points</TableHead>
+          {hasBets && <TableHead className='text-center'>Bet</TableHead>}
           <TableHead className='text-center'>Prediction</TableHead>
           <TableHead className='text-center'>Results</TableHead>
         </TableRow>
@@ -179,7 +186,7 @@ function PredctionTable({ predictions }: PredictionTableProps) {
               res.referenceId === pred.prediction.referenceId &&
               res.referenceType === pred.prediction.referenceType);
             return (
-              <TableRow key={pred.leagueEventRuleId} className='bg-b3'>
+              <TableRow key={pred.leagueEventRuleId ?? pred.eventName} className='bg-b3'>
                 <TableCell>
                   <div className='flex flex-col text-nowrap'>
                     {pred.eventName}
@@ -202,6 +209,24 @@ function PredctionTable({ predictions }: PredictionTableProps) {
                     )} />
                   </span>
                 </TableCell>
+                {hasBets &&
+                  <TableCell>
+                    {pred.prediction.bet && pred.prediction.bet > 0 ? (
+                      hit ? (
+                        <span className='text-sm text-center text-green-800'>
+                          +{pred.prediction.bet}
+                          <Flame className='inline align-top w-4 h-min stroke-green-800' />
+                        </span>
+                      ) : (
+                        <span className='text-sm text-center text-red-800'>
+                          -{pred.prediction.bet}
+                          <Flame className='inline align-top w-4 h-min stroke-red-800' />
+                        </span>
+                      )
+                    ) : <span className='text-sm text-center text-muted-foreground'>-</span>
+                    }
+                  </TableCell>
+                }
                 <TableCell>
                   <div className='md:hidden'>{pred.prediction.castawayShort ?? pred.prediction.tribe}</div>
                   <div className='hidden md:block'>{pred.prediction.castaway ?? pred.prediction.tribe}</div>

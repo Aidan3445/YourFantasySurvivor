@@ -9,7 +9,6 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from './table';
-import { useIsMobile } from '~/hooks/useMobile';
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -269,7 +268,6 @@ interface CoverCarouselProps {
 }
 
 function CoverCarousel({ items }: CoverCarouselProps) {
-  const isMobile = useIsMobile();
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
 
@@ -285,10 +283,10 @@ function CoverCarousel({ items }: CoverCarouselProps) {
     });
   }, [api]);
 
-
   return (
     <Carousel className='relative' setApi={setApi} opts={{ containScroll: false }}>
-      <CarouselContent className='ml-0 -mx-2'>
+      <CarouselContent
+        className='ml-0 -mx-2'>
         {items.map((item, index) => {
           const offset = index - (current - 1);
           const absOffset = Math.abs(offset);
@@ -299,7 +297,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
               className={cn(
                 'z-10 transition-all duration-500 drop-shadow-md bg-secondary rounded-md',
                 'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip select-none',
-                isMobile ? 'basis-[90%]' : 'basis-1/2',
+                'basis-[90%] lg:basis-1/2',
                 {
                   'pointer-events-none': offset !== 0,
 
@@ -330,6 +328,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                         type='button'
                         className={cn(
                           'rounded-full z-10',
+                          index === 0 && 'invisible',
                         )}
                         disabled={!api?.canScrollPrev() || index !== current - 1}
                         onClick={() => api?.scrollPrev()}>
@@ -337,7 +336,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                         <span className='sr-only'>Previous slide</span>
                       </Button>
                     </TableHead>
-                    <TableHead className='text-center font-normal w-3/4'>
+                    <TableHead className='place-items-center text-center font-normal text-nowrap'>
                       {item.header}
                     </TableHead>
                     <TableHead className='text-center'>
@@ -346,6 +345,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                         type='button'
                         className={cn(
                           'rounded-full z-10',
+                          index === items.length - 1 && 'invisible',
                         )}
                         disabled={!api?.canScrollNext() || index !== current - 1}
                         onClick={() => api?.scrollNext()}>
