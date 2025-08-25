@@ -6,38 +6,35 @@ import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
-import { CreateLeagueModal } from '~/components/leagues/createLeague';
-import { Plus, Users, Zap } from 'lucide-react';
+import CreateLeagueForm from '~/components/leagues/createLeague';
+import { Users, Zap } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export function QuickActions() {
+  const router = useRouter();
   const [joinCode, setJoinCode] = useState('');
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
 
   const handleJoinLeague = () => {
     if (joinCode.trim()) {
-      window.location.href = `/leagues/join/${joinCode.trim()}`;
+      router.push(`/i/${joinCode.trim()}`);
     }
   };
 
   return (
-    <Card>
+    <Card className='h-full'>
       <CardHeader>
-        <CardTitle className='flex items-center gap-2'>
+        <CardTitle className='flex justify-center items-center gap-2'>
           <Zap className='w-5 h-5 text-blue-500' />
-          Quick Actions
+          Create a new league
         </CardTitle>
       </CardHeader>
-      <CardContent className='space-y-3'>
-        <CreateLeagueModal className='w-full'>
-          <Button className='w-full' size='lg'>
-            <Plus className='w-4 h-4 mr-2' />
-            Create New League
-          </Button>
-        </CreateLeagueModal>
-
+      <CardContent className='space-y-4'>
+        <CreateLeagueForm />
+        <h3 className='text-center text-lg font-semibold text-muted-foreground -mt-4'>OR</h3>
         <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
           <DialogTrigger asChild>
-            <Button variant='outline' className='w-full' size='lg'>
+            <Button variant='outline' className='w-80'>
               <Users className='w-4 h-4 mr-2' />
               Join League
             </Button>

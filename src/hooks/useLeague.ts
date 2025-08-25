@@ -1,9 +1,12 @@
+'use client';
+
 import { redirect, useParams } from 'next/navigation';
 import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
 import { type QUERIES } from '~/app/api/leagues/query';
 import { type SWRKey } from '~/lib/utils';
 import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/server/db/defs/events';
+import { type LeagueHash } from '~/server/db/defs/leagues';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagueLiveData>>>;
@@ -18,8 +21,14 @@ const leagueFetcher: Fetcher<Response, SWRKey> = ({ leagueHash }) =>
   fetch(`/api/leagues/${leagueHash}`)
     .then((res) => res.json());
 
-export function useLeague() {
-  const { leagueHash } = useParams();
+interface UseLeagueProps {
+  overrideLeagueHash?: LeagueHash;
+}
+
+export function useLeague({ overrideLeagueHash }: UseLeagueProps = {}) {
+  const { leagueHash: paramHash } = useParams();
+  const leagueHash = overrideLeagueHash ?? paramHash;
+
   const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher,
     {
       refreshInterval: (data) => {
@@ -62,7 +71,7 @@ export function useLeague() {
   }
 }
 
-const nonLeague: League = {
+export const nonLeague: League = {
   leagueHash: '',
   leagueName: '',
   leagueStatus: 'Inactive',
@@ -84,7 +93,7 @@ const nonLeague: League = {
   },
 };
 
-const emptyData: LeagueData = {
+export const emptyData: LeagueData = {
   episodes: [],
   castaways: [],
   tribes: [],

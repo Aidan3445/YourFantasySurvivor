@@ -189,7 +189,7 @@ const CarouselItem = React.forwardRef<
       role='group'
       aria-roledescription='slide'
       className={cn(
-        'min-w-0 shrink-0 grow-0 basis-full',
+        'min-w-0 shrink-0 grow-0 basis-full select-none',
         orientation === 'horizontal' ? 'pl-4' : 'pt-4',
         className
       )}
@@ -296,7 +296,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
               key={index}
               className={cn(
                 'z-10 transition-all duration-500 drop-shadow-md bg-secondary rounded-md',
-                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip select-none',
+                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
                 'basis-[90%] lg:basis-1/2',
                 {
                   'pointer-events-none': offset !== 0,
@@ -378,15 +378,26 @@ function CoverCarousel({ items }: CoverCarouselProps) {
           );
         })}
       </CarouselContent>
-      <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
-        <div
-          className='h-full bg-primary rounded-full transition-all ease-linear duration-300'
-          style={{
-            width: `${((current - 1) / (items.length - 1)) * 100}%`,
-          }}
-        />
-      </div>
+      <CarouselProgress current={current} count={items.length} />
     </Carousel>
+  );
+}
+
+interface CarouselProgressProps {
+  current: number
+  count: number
+}
+
+function CarouselProgress({ current, count }: CarouselProgressProps) {
+  return (
+    <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
+      <div
+        className='h-full bg-primary rounded-full transition-all ease-linear duration-300'
+        style={{
+          width: `${((current - 1) / (count - 1)) * 100}%`,
+        }}
+      />
+    </div>
   );
 }
 
@@ -397,5 +408,6 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-  CoverCarousel
+  CoverCarousel,
+  CarouselProgress,
 };
