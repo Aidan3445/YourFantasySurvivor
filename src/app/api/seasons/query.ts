@@ -1,10 +1,10 @@
-import { aliasedTable, and, desc, eq, inArray, lte } from 'drizzle-orm';
+import { aliasedTable, and, asc, desc, eq, inArray, lte } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
 import { type CastawayImage, type CastawayDetails, type CastawayName, type CastawayId } from '~/server/db/defs/castaways';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type BaseEventName, type BaseEvent, type BaseEventId } from '~/server/db/defs/events';
+import { type BaseEventName, type BaseEvent, type BaseEventId, defaultBaseRules, defaultPredictionRules } from '~/server/db/defs/events';
 import { type SeasonId } from '~/server/db/defs/seasons';
 import { type TribeEp, type TribeName, type TribeUpdate } from '~/server/db/defs/tribes';
 import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
@@ -12,8 +12,22 @@ import { castawaysSchema } from '~/server/db/schema/castaways';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { tribesSchema } from '~/server/db/schema/tribes';
+import { compileScores } from '../leagues/[leagueHash]/scores';
 
 export const QUERIES = {
+  /**
+    * Get the current seasons
+    * @returns The current seasons
+    */
+  getCurrentSeasons: async function() {
+    return await db
+      .select()
+      .from(seasonsSchema)
+      .orderBy(asc(seasonsSchema.premiereDate))
+      .then(rows => rows.filter(row =>
+        new Date(`${row.premiereDate} Z`) <= new Date() &&
+        (row.finaleDate === null || new Date(`${row.finaleDate} Z`) >= new Date())));
+  },
   /**
     * Get the base events for a season
     * @param seasonId The season to get scores for
@@ -222,7 +236,6 @@ export const QUERIES = {
     return Object.values(castawaysWithTribes).sort(
       (a, b) => a.startingTribe.tribeName.localeCompare(b.startingTribe.tribeName));
   },
-
   /**
   * Get all tribes for a season
   * @param seasonId The season to get tribes from
@@ -245,4 +258,35 @@ export const QUERIES = {
         tribeColor: row.tribeColor,
       })));
   },
+  /**
+    * Get season scores for the current seasons
+    * @param seasonId The season to get scores for
+    * @returns The scores for the season
+    */
+  getSeasonScores: async function() {
+    const currentSeasons = await this.getCurrentSeasons();
+    if (currentSeasons.length === 0) return [];
+
+    const seasonScores = await Promise.all(currentSeasons.map(async (season) => {
+      const [baseEvents, tribesTimeline, eliminations] = await Promise.all([
+        this.getBaseEvents(season.seasonId),
+        this.getTribesTimeline(season.seasonId),
+        this.getEliminations(season.seasonId),
+      ]);
+
+      return compileScores(
+        baseEvents,
+        defaultBaseRules,
+        {}, defaultPredictionRules,
+        { directEvents: {}, predictionEvents: {} },
+        { castawayMembers: {}, memberCastaways: {} },
+        tribesTimeline,
+        eliminations,
+        0,
+        false
+      );
+    }));
+
+    return seasonScores;
+  }
 };
