@@ -3,7 +3,7 @@ import { type QUERIES } from '~/app/api/leagues/query';
 import { PredictionCards } from '../draft/makePredictions';
 import { AirStatus } from './recentActivity';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type ShauhinModeSettings, type Prediction } from '~/server/db/defs/events';
+import { type ShauhinModeSettings, type Prediction, BaseEventFullName } from '~/server/db/defs/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
 import { CoverCarousel } from '~/components/ui/carousel';
@@ -189,7 +189,8 @@ function PredctionTable({ predictions }: PredictionTableProps) {
               <TableRow key={pred.leagueEventRuleId ?? pred.eventName} className='bg-b3'>
                 <TableCell>
                   <div className='flex flex-col text-nowrap'>
-                    {pred.eventName}
+                    {BaseEventFullName[pred.eventName as keyof typeof BaseEventFullName] ??
+                      pred.eventName}
                     <span className='text-xs italic'>
                       {pred.timing.join(' - ')}
                     </span>
