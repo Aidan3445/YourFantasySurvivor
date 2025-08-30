@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { type CarouselApi } from '~/components/ui/carousel';
 
-export function useCarouselProgress(startAtZero?: boolean) {
+export function useCarouselProgress() {
   const [api, setApi] = useState<CarouselApi>();
   const [count, setCount] = useState(0);
   const [current, setCurrent] = useState(0);
@@ -18,8 +18,8 @@ export function useCarouselProgress(startAtZero?: boolean) {
 
   const progress = useMemo(() => {
     if (count === 0) return 0;
-    return (current + (startAtZero ? 0 : 1)) / count * 100;
-  }, [current, count, startAtZero]);
+    return (current) / (count - 1) * 100;
+  }, [current, count]);
 
 
   return { api, setApi, current, count, progress };

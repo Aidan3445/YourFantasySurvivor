@@ -2,22 +2,32 @@
 
 import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { db } from '~/server/db';
-import { baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert, type LeagueEventId } from '~/server/db/defs/events';
+import {
+  baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema,
+  baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema
+} from '~/server/db/schema/baseEvents';
+import {
+  type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert,
+  type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName, type ShauhinModeSettings
+} from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { auth, leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
-import { type LeagueMember, type LeagueMemberId, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
+import {
+  type LeagueMember, type LeagueMemberId, type NewLeagueMember
+} from '~/server/db/defs/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
-import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
+import {
+  leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema
+} from '~/server/db/schema/leagueEvents';
 import { type CastawayId } from '~/server/db/defs/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
-import { type EpisodeId } from '~/server/db/defs/episodes';
 import { type TribeId } from '~/server/db/defs/tribes';
 import { QUERIES } from './query';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
+import { basePredictionRulesObjectToSchema } from '~/lib/utils';
 
 /**
   * Create a new league
@@ -232,38 +242,80 @@ export async function updateLeagueSettings(
 /**
   * Update the base event rules for a league
   * @param leagueHash - the hash of the league
-  * @param rules - the new base event rules
+  * @param baseRules - the new base event rules
+  * @param predictionRules - the new prediction rules
   * @throws an error if the user is not authorized
   * @throws an error if the rules cannot be updated
   */
-export async function updateBaseEventRules(leagueHash: LeagueHash, rules: BaseEventRule) {
+export async function updateBaseEventRules(
+  leagueHash: LeagueHash,
+  baseRules: BaseEventRule,
+  predictionRules: BasePredictionRules
+) {
   const { role, league } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner' || !league) throw new Error('User not authorized');
+  if (league.leagueStatus === 'Inactive')
+    throw new Error('League rules cannot be updated while the league is inactive');
 
-  // See if the league is still using the default rules
-  const noRulesSet = await db
-    .select({ leagueId: baseEventRulesSchema.leagueId })
-    .from(baseEventRulesSchema)
-    .where(eq(baseEventRulesSchema.leagueId, league.leagueId))
-    .then((res) => !res[0]?.leagueId);
+  // Create a transaction to update the rules
+  await db.transaction(async (trx) => {
+    try {
+      // Error can be ignored, the where clause is not understood by the type system
+      // eslint-disable-next-line drizzle/enforce-update-with-where
+      await trx.insert(baseEventRulesSchema)
+        .values({ ...baseRules, leagueId: league.leagueId })
+        .onConflictDoUpdate({
+          target: baseEventRulesSchema.leagueId,
+          set: { ...baseRules },
+        });
 
-  // if no rules we're inserting
-  if (noRulesSet) {
-    await db
-      .insert(baseEventRulesSchema)
-      .values({ ...rules, leagueId: league.leagueId });
-    return;
-  }
+      const predictionSchema = basePredictionRulesObjectToSchema(predictionRules);
 
-  // Error can be ignored, the where clause is not understood by the type system
-  // eslint-disable-next-line drizzle/enforce-update-with-where
+      await trx.insert(baseEventPredictionRulesSchema)
+        .values({ ...predictionSchema, leagueId: league.leagueId })
+        .onConflictDoUpdate({
+          target: baseEventPredictionRulesSchema.leagueId,
+          set: { ...predictionSchema },
+        });
+    } catch (error) {
+      console.error('Error updating base event rules:', error);
+      // Rollback the transaction
+      trx.rollback();
+      throw new Error('An error occurred while updating the base event rules. Please try again.');
+    }
+  });
+}
+
+/**
+  * Update the Shauhin Mode settings for a league
+  * @param leagueHash - the hash of the league
+  * @param shauhinMode - the new Shauhin Mode settings
+  * @param customStartWeek - the custom start week for Shauhin Mode, if any
+  * @throws an error if the user is not authorized
+  * @throws an error if the Shauhin Mode settings cannot be updated
+  * @throws an error if the league is inactive
+  */
+export async function updateShauhinMode(
+  leagueHash: LeagueHash,
+  shauhinMode: ShauhinModeSettings,
+) {
+  const { role, league } = await leagueMemberAuth(leagueHash);
+  if (!role || role !== 'Owner' || !league) throw new Error('User not authorized');
+  if (league.leagueStatus === 'Inactive')
+    throw new Error('Shauhin Mode settings cannot be updated while the league is inactive');
+
+  // customStartWeek is only used if the startWeek is 'Custom'
+
   await db
-    .update(baseEventRulesSchema)
-    .set(rules)
-    .from(leaguesSchema)
-    .where(and(
-      eq(baseEventRulesSchema.leagueId, leaguesSchema.leagueId),
-      eq(leaguesSchema.leagueHash, leagueHash)));
+    .insert(shauhinModeSettingsSchema)
+    .values({
+      leagueId: league.leagueId,
+      ...shauhinMode
+    })
+    .onConflictDoUpdate({
+      target: shauhinModeSettingsSchema.leagueId,
+      set: { ...shauhinMode },
+    });
 }
 
 /**
@@ -380,8 +432,10 @@ export async function updateAdmins(leagueHash: LeagueHash, admins: number[]) {
   * @throws an error if the rule cannot be created
   */
 export async function createLeagueEventRule(leagueHash: LeagueHash, rule: LeagueEventRule) {
-  const { role } = await leagueMemberAuth(leagueHash);
+  const { role, league } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
+  if (league?.leagueStatus === 'Inactive')
+    throw new Error('League rules cannot be created while the league is inactive');
 
   // Transaction to create the rule
   await db.transaction(async (trx) => {
@@ -409,8 +463,10 @@ export async function createLeagueEventRule(leagueHash: LeagueHash, rule: League
   * @throws an error if the rule cannot be updated
   */
 export async function updateLeagueEventRule(leagueHash: LeagueHash, rule: LeagueEventRule) {
-  const { role } = await leagueMemberAuth(leagueHash);
+  const { role, league } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
+  if (league?.leagueStatus === 'Inactive')
+    throw new Error('League rules cannot be updated while the league is inactive');
 
   // Error can be ignored, the where clause is not understood by the type system
   // eslint-disable-next-line drizzle/enforce-update-with-where
@@ -437,6 +493,8 @@ export async function updateLeagueEventRule(leagueHash: LeagueHash, rule: League
 export async function deleteLeagueEventRule(leagueHash: LeagueHash, eventName: string) {
   const { role, league } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner' || !league) throw new Error('User not authorized');
+  if (league.leagueStatus === 'Inactive')
+    throw new Error('League rules cannot be deleted while the league is inactive');
 
   const deleted = await db
     .delete(leagueEventsRulesSchema)
@@ -458,8 +516,10 @@ export async function deleteLeagueEventRule(leagueHash: LeagueHash, eventName: s
   * @throws an error if the castaway cannot be chosen
   */
 export async function chooseCastaway(leagueHash: LeagueHash, castawayId: CastawayId, isDraft: boolean) {
-  const { memberId } = await leagueMemberAuth(leagueHash);
+  const { memberId, league } = await leagueMemberAuth(leagueHash);
   if (!memberId) throw new Error('User not authorized');
+  if (league?.leagueStatus === 'Inactive')
+    throw new Error('League is inactive, cannot choose castaway');
 
   // castaways that are not eliminated
   const survivingCastawaysPromise = db
@@ -552,7 +612,7 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
   * @param leagueHash - the hash of the league
   * @param rule - the rule to predict
   * @param referenceId - the id of the reference (castaway, tribe, member)
-  * @param episodeId - the id of the episode (optional)
+  * @param betAmount - the amount of points to bet on the prediction (optional)
   * @throws an error if the user is not authorized
   * @throws an error if the prediction cannot be made
   */
@@ -562,22 +622,24 @@ export async function makePrediction(
   referenceType: ReferenceType,
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceId: CastawayId | TribeId | LeagueMemberId,
-  episodeId?: EpisodeId,
+  betAmount?: number,
 ) {
   const { memberId, league } = await leagueMemberAuth(leagueHash);
   if (!memberId || !league) throw new Error('User not authorized');
+  if (league.leagueStatus === 'Inactive')
+    throw new Error('League is inactive, cannot make predictions');
 
   const episodes = await QUERIES.getEpisodes(leagueHash, 100);
   if (!episodes || episodes.length === 0) throw new Error('Episodes not found');
   const nextEpisode = episodes.find((episode) => episode.airStatus === 'Upcoming');
   if (!nextEpisode) throw new Error('Next episode not found');
-  episodeId ??= nextEpisode.episodeId;
+  const episodeId = nextEpisode.episodeId;
 
   /*
   let timing: LeagueEventTiming | undefined;
   const lastEpisode = episodes[nextEpisode.episodeNumber - 2];
   const mergeEpisode = episodes.find((episode) => episode.isMerge);
-
+ 
   // Draft takes precedence if included in the list: 
   // - if the league is in draft status
   // - if there are no previous episodes
@@ -606,23 +668,45 @@ export async function makePrediction(
   }
   */
 
-  await db
-    .insert(leagueEventPredictionsSchema)
-    .values({
-      leagueEventRuleId: rule.leagueEventRuleId!,
-      episodeId,
-      memberId,
-      referenceType,
-      referenceId,
-    })
-    .onConflictDoUpdate({
-      target: [
-        leagueEventPredictionsSchema.leagueEventRuleId,
-        leagueEventPredictionsSchema.episodeId,
-        leagueEventPredictionsSchema.memberId,
-      ],
-      set: { referenceType, referenceId },
-    });
+  // RuleID defined for custom rules
+  if (rule.leagueEventRuleId) {
+    await db
+      .insert(leagueEventPredictionsSchema)
+      .values({
+        leagueEventRuleId: rule.leagueEventRuleId,
+        episodeId,
+        memberId,
+        referenceType,
+        referenceId,
+      })
+      .onConflictDoUpdate({
+        target: [
+          leagueEventPredictionsSchema.leagueEventRuleId,
+          leagueEventPredictionsSchema.episodeId,
+          leagueEventPredictionsSchema.memberId,
+        ],
+        set: { referenceType, referenceId },
+      });
+  } else {
+    await db
+      .insert(baseEventPredictionsSchema)
+      .values({
+        baseEventName: rule.eventName as ScoringBaseEventName,
+        episodeId,
+        memberId,
+        referenceType,
+        referenceId,
+        bet: betAmount ? betAmount : null,
+      })
+      .onConflictDoUpdate({
+        target: [
+          baseEventPredictionsSchema.baseEventName,
+          baseEventPredictionsSchema.episodeId,
+          baseEventPredictionsSchema.memberId,
+        ],
+        set: { referenceType, referenceId, bet: betAmount ? betAmount : null },
+      });
+  }
 }
 
 /**
@@ -670,6 +754,8 @@ export async function updateLeagueEvent(
 ) {
   const { memberId, role, league } = await leagueMemberAuth(leagueHash);
   if (!memberId || role === 'Member') throw new Error('User not authorized');
+  if (league?.leagueStatus === 'Inactive')
+    throw new Error('League events cannot be updated while the league is inactive');
 
   // ensure the rule is in the league
   const rule = await db
@@ -696,8 +782,10 @@ export async function updateLeagueEvent(
   * @throws if the event cannot be deleted
   */
 export async function deleteLeagueEvent(leagueHash: LeagueHash, leagueEventId: number) {
-  const { memberId, role } = await leagueMemberAuth(leagueHash);
+  const { memberId, role, league } = await leagueMemberAuth(leagueHash);
   if (!memberId || role === 'Member') throw new Error('User not authorized');
+  if (league?.leagueStatus === 'Inactive')
+    throw new Error('League events cannot be deleted while the league is inactive');
 
   // unlike update and insert, cascade delete will take care of deleting
   // the references as well, nice!
@@ -734,5 +822,3 @@ export async function saveChatMessage(leagueHash: LeagueHash, message: { serial:
 
   return entry;
 }
-
-

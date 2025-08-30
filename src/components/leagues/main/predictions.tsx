@@ -1,76 +1,102 @@
-import { QUERIES } from '~/app/api/leagues/query';
-import { type LeagueHash } from '~/server/db/defs/leagues';
+'use client';
+import { type QUERIES } from '~/app/api/leagues/query';
 import { PredictionCards } from '../draft/makePredictions';
 import { AirStatus } from './recentActivity';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type Prediction } from '~/server/db/defs/events';
+import { type ShauhinModeSettings, type Prediction, BaseEventFullName } from '~/server/db/defs/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { BounceyCarousel } from '~/components/ui/carousel';
+import { CoverCarousel } from '~/components/ui/carousel';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/ui/table';
+import { usePredictions } from '~/hooks/usePredictions';
+import { useLeague } from '~/hooks/useLeague';
 
+export default function Predictions() {
+  const { leagueData, league } = useLeague();
+  const { predictions, history, betRules } = usePredictions();
 
-interface PredictionsProps {
-  leagueHash: LeagueHash;
-}
+  const displayName = league?.members?.loggedIn?.displayName;
 
-export default async function Predictions({ leagueHash }: PredictionsProps) {
+  if (!displayName) return null;
 
-  const [week, member] = await Promise.all([
-    QUERIES.getThisWeeksPredictions(leagueHash),
-    QUERIES.getMyPredictions(leagueHash),
-  ]);
+  const myScore = [...leagueData.scores.Member[displayName]!].pop();
 
   return (
-    <div className='w-full space-y-4'>
-      <WeeklyPredictions weekly={week} />
-      <MemberPredictions predictions={member} />
-    </div>
+    <>
+      <MakePredictions predictions={predictions} betRules={betRules} myScore={myScore} />
+      <PredictionHistory history={history} />
+    </>
   );
 }
 
 interface WeeklyPredictionsProps {
-  weekly: Awaited<ReturnType<typeof QUERIES.getThisWeeksPredictions>>;
+  predictions: Awaited<ReturnType<typeof QUERIES.getThisWeeksPredictions>>;
+  betRules: ShauhinModeSettings | undefined;
+  myScore: number | undefined;
 }
 
-function WeeklyPredictions({ weekly }: WeeklyPredictionsProps) {
+function MakePredictions({ predictions: weekly, betRules, myScore }: WeeklyPredictionsProps) {
   if (!weekly) return null;
-  const { predictions, castaways, tribes, nextEpisode } = weekly;
+  const {
+    basePredictionRules,
+    basePredictions,
+    customPredictions,
+    castaways,
+    tribes,
+    nextEpisode
+  } = weekly;
 
-  if (predictions.length === 0 || nextEpisode.airStatus === 'Aired') return null;
+  const totalPredictionsCount = customPredictions.length + Object.entries(basePredictionRules)
+    .filter(([_, rule]) => rule.enabled).length;
+
+  if (totalPredictionsCount === 0 || nextEpisode.airStatus === 'Aired') return null;
+
+  const betTotal = basePredictions.reduce((acc, pred) =>
+    acc + (pred?.predictionMade?.bet ?? 0), 0);
+
+  const balance = (myScore ?? 0) - betTotal;
 
   return (
-    <div className='text-center bg-card rounded-lg w-full'>
+    <div className='text-center bg-card rounded-lg w-full relative overflow-clip'>
+      {betRules?.enabled && betRules?.enabledBets.length > 0 &&
+        <div className='absolute top-2 right-4 text-sm italic text-muted-foreground'>
+          Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
+        </div>
+      }
       {nextEpisode.airStatus === 'Airing' ?
         <h1 className='text-3xl'>
           Predictions are locked until the episode ends.
         </h1> :
-        <h1 className='text-3xl'>{'This Week\'s Prediction'}{predictions.length > 1 ? 's' : ''}</h1>
+        <h1 className='text-3xl mt-8 lg:mt-0'>{'This Week\'s Prediction'}{totalPredictionsCount > 1 ? 's' : ''}</h1>
       }
-      <span className='flex flex-wrap justify-center items-center gap-x-2 text-muted-foreground text-sm'>
+      < span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1' >
         <span className='text-nowrap'>
           {nextEpisode.episodeNumber}: {nextEpisode.episodeTitle}
         </span>
-        <AirStatus airDate={nextEpisode.episodeAirDate} airStatus={nextEpisode.airStatus} />
+        <AirStatus airDate={new Date(nextEpisode.episodeAirDate)} airStatus={nextEpisode.airStatus} />
       </span>
-      {nextEpisode.airStatus === 'Upcoming' && (
-        <PredictionCards
-          predictions={predictions}
-          castaways={castaways}
-          tribes={tribes} />
-      )}
-    </div>
+      {
+        nextEpisode.airStatus === 'Upcoming' && (
+          <PredictionCards
+            basePredictionRules={basePredictionRules}
+            basePredictions={basePredictions}
+            customPredictions={customPredictions}
+            castaways={castaways}
+            tribes={tribes} />
+        )
+      }
+    </div >
   );
 }
 
 interface MemberPredictionsProps {
-  predictions: Record<EpisodeNumber, Prediction[]>;
+  history?: Record<EpisodeNumber, Prediction[]>;
 }
 
-function MemberPredictions({ predictions }: MemberPredictionsProps) {
-  if (Object.keys(predictions).length === 0) return null;
+function PredictionHistory({ history }: MemberPredictionsProps) {
+  const predictions = history ?? {};
 
   const stats = Object.values(predictions).reduce((acc, preds) => {
     preds.forEach((pred) => {
@@ -79,9 +105,11 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
         res.referenceType === pred.prediction.referenceType)) {
         acc.count.correct++;
         acc.points.earned += pred.points;
+        acc.points.earnedBets += pred.prediction.bet ?? 0;
       }
       acc.count.total++;
       acc.points.possible += pred.points;
+      acc.points.possibleBets += pred.prediction.bet ?? 0;
     });
     return acc;
   }, {
@@ -92,6 +120,8 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
     points: {
       earned: 0,
       possible: 0,
+      earnedBets: 0,
+      possibleBets: 0,
     }
   });
 
@@ -101,7 +131,7 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
 
     const [episode, preds] = prediction;
     return (
-      <div className='text-center bg-card rounded-lg md:w-[calc(100svw-8rem)] lg:w-[calc(100svw-19rem)]'>
+      <div className='text-center bg-card rounded-lg'>
         <h1 className='text-3xl'>Prediction History</h1>
         <span className='flex justify-center items-center gap-2 text-sm'>
           <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
@@ -116,16 +146,15 @@ function MemberPredictions({ predictions }: MemberPredictionsProps) {
   }
 
   return (
-    <div className='text-center bg-card rounded-lg md:w-[calc(100svw-8rem)] lg:w-[calc(100svw-19rem)]'>
+    <div className='text-center bg-card rounded-lg w-full overflow-clip'>
       <h1 className='text-3xl'>Prediction History</h1>
       <span className='flex justify-center items-center gap-2 text-sm'>
         <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
         <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
       </span>
-      <BounceyCarousel items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
+      <CoverCarousel items={Object.entries(predictions).toReversed().map(([episode, preds]) => ({
         header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
         content: (<PredctionTable predictions={preds} />),
-        footer: null,
       }))} />
     </div>
   );
@@ -136,13 +165,16 @@ interface PredictionTableProps {
 }
 
 function PredctionTable({ predictions }: PredictionTableProps) {
+  const hasBets = predictions.some((pred) => pred.prediction.bet && pred.prediction.bet > 0);
+
   return (
-    <Table>
+    <Table className='transform-gpu will-change-transform'>
       <TableCaption className='sr-only'>Member Predictions</TableCaption>
       <TableHeader>
         <TableRow className='px-4 bg-white pointer-events-none'>
           <TableHead className='text-center'>Event</TableHead>
           <TableHead className='text-center'>Points</TableHead>
+          {hasBets && <TableHead className='text-center'>Bet</TableHead>}
           <TableHead className='text-center'>Prediction</TableHead>
           <TableHead className='text-center'>Results</TableHead>
         </TableRow>
@@ -154,10 +186,11 @@ function PredctionTable({ predictions }: PredictionTableProps) {
               res.referenceId === pred.prediction.referenceId &&
               res.referenceType === pred.prediction.referenceType);
             return (
-              <TableRow key={pred.leagueEventRuleId} className='bg-b3'>
+              <TableRow key={pred.leagueEventRuleId ?? pred.eventName} className='bg-b3'>
                 <TableCell>
-                  <div className='flex flex-col'>
-                    {pred.eventName}
+                  <div className='flex flex-col text-nowrap'>
+                    {BaseEventFullName[pred.eventName as keyof typeof BaseEventFullName] ??
+                      pred.eventName}
                     <span className='text-xs italic'>
                       {pred.timing.join(' - ')}
                     </span>
@@ -177,6 +210,24 @@ function PredctionTable({ predictions }: PredictionTableProps) {
                     )} />
                   </span>
                 </TableCell>
+                {hasBets &&
+                  <TableCell>
+                    {pred.prediction.bet && pred.prediction.bet > 0 ? (
+                      hit ? (
+                        <span className='text-sm text-center text-green-800'>
+                          +{pred.prediction.bet}
+                          <Flame className='inline align-top w-4 h-min stroke-green-800' />
+                        </span>
+                      ) : (
+                        <span className='text-sm text-center text-red-800'>
+                          -{pred.prediction.bet}
+                          <Flame className='inline align-top w-4 h-min stroke-red-800' />
+                        </span>
+                      )
+                    ) : <span className='text-sm text-center text-muted-foreground'>-</span>
+                    }
+                  </TableCell>
+                }
                 <TableCell>
                   <div className='md:hidden'>{pred.prediction.castawayShort ?? pred.prediction.tribe}</div>
                   <div className='hidden md:block'>{pred.prediction.castaway ?? pred.prediction.tribe}</div>

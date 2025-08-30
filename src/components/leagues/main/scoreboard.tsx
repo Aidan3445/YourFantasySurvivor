@@ -14,11 +14,22 @@ import { useIsMobile } from '~/hooks/useMobile';
 import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { Separator } from '~/components/ui/separator';
+import { getContrastingColor } from '@uiw/color-convert';
+import { type LeagueHash } from '~/server/db/defs/leagues';
 
-export default function Scoreboard() {
-  const { leagueData, league } = useLeague();
+interface ScoreboardProps {
+  overrideLeagueHash?: LeagueHash;
+  maxRows?: number;
+}
+
+export default function Scoreboard({ overrideLeagueHash, maxRows }: ScoreboardProps = {}) {
+  const { leagueData, league } = useLeague({ overrideLeagueHash });
   const sortedMemberScores = Object.entries(leagueData.scores.Member)
     .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
+
+  const loggedInIndex = sortedMemberScores.findIndex(([member]) =>
+    member === league.members.loggedIn?.displayName
+  );
 
   return (
     <ScrollArea className='bg-card rounded-lg gap-0'>
@@ -33,7 +44,7 @@ export default function Scoreboard() {
               <Flame className='align-top inline w-4 h-4 stroke-muted-foreground' />
             </TableHead>
             <TableHead className='text-center'>Member</TableHead>
-            <TableHead className='text-center w-0 relative'>
+            <TableHead className='text-center w-0 relative pr-8'>
               Survivor
               <ScoreboardHelp hasSurvivalCap={league.settings.survivalCap > 0} />
             </TableHead>
@@ -41,11 +52,16 @@ export default function Scoreboard() {
         </TableHeader>
         <TableBody>
           {sortedMemberScores.map(([member, scores], index) => {
+            if (maxRows && index !== loggedInIndex && (
+              loggedInIndex >= maxRows ? index >= maxRows - 1 : index >= maxRows
+            )) return null;
+
             const color = league.members.list
               .find((m) => m.displayName === member)?.color ?? '#ffffff';
             const survivorName = leagueData.selectionTimeline.memberCastaways[member]?.slice()
               .pop() ?? 'None';
             const survivor = leagueData.castaways.find((c) => c.fullName === survivorName)!;
+
             return (
               <MemberRow
                 key={index}
@@ -53,7 +69,10 @@ export default function Scoreboard() {
                 member={member}
                 points={scores.slice().pop() ?? 0}
                 survivor={survivor}
-                color={color} />
+                color={color}
+                overrideLeagueHash={overrideLeagueHash}
+                doubleBelow={maxRows ? loggedInIndex > maxRows && index >= (maxRows - 2) : false}
+              />
             );
           })}
         </TableBody>
@@ -69,10 +88,12 @@ interface MemberRowProps {
   points: number;
   survivor: CastawayDetails;
   color: string;
+  overrideLeagueHash?: LeagueHash;
+  doubleBelow?: boolean;
 }
 
-function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
-  const { leagueData, league } = useLeague();
+function MemberRow({ place, member, points, survivor, color, doubleBelow, overrideLeagueHash }: MemberRowProps) {
+  const { leagueData, league } = useLeague({ overrideLeagueHash });
   const isMobile = useIsMobile();
 
   const condensedTimeline = (leagueData.selectionTimeline.memberCastaways[member] ?? []).reduce((acc, castaway, index) => {
@@ -95,19 +116,23 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
   }, [] as { fullName: CastawayName, start: number | string, end?: number | null }[]);
 
   return (
-    <TableRow>
+    <TableRow className={cn(doubleBelow && 'border-double border-b-3')}>
       <TableCell className='px-1'>
         <ColorRow className='justify-center p-0' color={color}>
           {place}
         </ColorRow>
-      </TableCell>
+      </TableCell >
       <TableCell className='px-1'>
         <ColorRow className='justify-center p-0' color={color}>
           {points}
         </ColorRow>
       </TableCell>
       <TableCell className='text-nowrap px-1'>
-        <ColorRow className='justify-center' color={color}>
+        <ColorRow
+          className={cn('justify-center',
+            member === league.members.loggedIn?.displayName &&
+            'border-white border-2 font-bold leading-snug')}
+          color={color}>
           {member}
         </ColorRow>
       </TableCell>
@@ -129,10 +154,14 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
             ))}
             <Popover>
               <PopoverTrigger className='ml-2 mr-1'>
-                <History size={16} />
+                <History
+                  size={16}
+                  color={survivor.eliminatedEpisode
+                    ? 'black'
+                    : getContrastingColor(survivor.startingTribe.tribeColor)} />
               </PopoverTrigger>
               <PopoverContent
-                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'
+                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content_1fr] gap-x-2 w-full'
                 align='end'>
                 <PopoverArrow />
                 <div className='text-center'>Survivor</div>
@@ -162,7 +191,11 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
                 <PopoverTrigger>
                   <div className='ml-1 w-4 flex justify-center'>
                     {Math.min(leagueData.currentStreaks[member]!, league.settings.survivalCap) ||
-                      <Skull size={16} />}
+                      <Skull
+                        size={16}
+                        color={survivor.eliminatedEpisode
+                          ? 'black'
+                          : getContrastingColor(survivor.startingTribe.tribeColor)} />}
                   </div>
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='end'>
@@ -177,7 +210,7 @@ function MemberRow({ place, member, points, survivor, color }: MemberRowProps) {
           </div>
         </ColorRow>
       </TableCell>
-    </TableRow>
+    </TableRow >
   );
 }
 
@@ -200,7 +233,7 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
               <PopoverTrigger>
                 <Circle size={16} fill='#FF90CC' />
               </PopoverTrigger>
-              <PopoverContent className='w-min text-nowrap p-1' side='top' align='end' alignOffset={-10}>
+              <PopoverContent className='w-min text-nowrap p-1 animate-scale-in-fast' side='top' align='end' alignOffset={-10}>
                 <PopoverArrow />
                 Current Survivor Tribe History
               </PopoverContent>
@@ -209,7 +242,7 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
               <PopoverTrigger>
                 <Circle size={16} fill='#3ADA00' />
               </PopoverTrigger>
-              <PopoverContent className='w-min text-nowrap p-1' align='end'>
+              <PopoverContent className='w-min text-nowrap p-1 animate-scale-in-fast' align='end'>
                 <PopoverArrow />
                 Tribe Swap - Episode 4
               </PopoverContent>
@@ -218,7 +251,7 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
               <PopoverTrigger>
                 <Circle size={16} fill='#FEF340' />
               </PopoverTrigger>
-              <PopoverContent className='w-min text-nowrap p-1' side='top' align='start'>
+              <PopoverContent className='w-min text-nowrap p-1 animate-scale-in-fast' side='top' align='start'>
                 <PopoverArrow />
                 Merge Tribe - Episode 8
               </PopoverContent>
@@ -228,7 +261,7 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
                 <History size={16} />
               </PopoverTrigger>
               <PopoverContent
-                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content,1fr] gap-x-2 w-full'
+                className='p-1 space-y-1 pt-0 grid grid-cols-[max-content_1fr] gap-x-2 w-full animate-scale-in-fast'
                 align='end'
                 side='bottom'>
                 <PopoverArrow />
@@ -268,7 +301,7 @@ function ScoreboardHelp({ hasSurvivalCap }: ScoreboardHelpProps) {
                     2
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className='w-min text-nowrap p-1' align='start' side='bottom'>
+                <PopoverContent className='w-min text-nowrap p-1 animate-scale-in-fast' align='start' side='bottom'>
                   <PopoverArrow />
                   Survival streak points available
                   <br />

@@ -19,7 +19,7 @@ export const leaguesSchema = createTable(
     leagueStatus: leagueStatus('league_status').notNull().default('Predraft'),
   },
   (table) => [
-    uniqueIndex().on(table.leagueHash),
+    uniqueIndex('league_hash_idx').on(table.leagueHash),
   ]
 );
 

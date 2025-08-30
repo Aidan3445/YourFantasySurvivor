@@ -1,8 +1,10 @@
 import { Flame } from 'lucide-react';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
+import { MultiSelect } from '~/components/ui/multiSelect';
+import { Switch } from '~/components/ui/switch';
 import { cn } from '~/lib/utils';
-import { BaseEventFullName } from '~/server/db/defs/events';
+import { BaseEventDescriptions, BaseEventFullName, PredictionTimingOptions, type ScoringBaseEventName } from '~/server/db/defs/events';
 
 interface BaseEventSettingsProps {
   disabled?: boolean;
@@ -40,9 +42,10 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway wins an individual immunity challenge
+                {BaseEventDescriptions.main.indivWin}
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'indivWin'} disabled={disabled} />
             <FormMessage />
           </FormItem>
         )} />
@@ -74,9 +77,10 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway wins an individual reward challenge
+                {BaseEventDescriptions.main.indivReward}
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'indivReward'} disabled={disabled} />
             <FormMessage />
           </FormItem>
         )} />
@@ -108,9 +112,10 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway wins a tribe challenge
+                {BaseEventDescriptions.main.tribe1st}
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'tribe1st'} disabled={disabled} />
             <FormMessage />
           </FormItem>
         )} />
@@ -142,11 +147,11 @@ export function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway gets second in a tribe or team challenge
-                <br />
-                (only applies for 3+ tribe or team challenges)
+                {BaseEventDescriptions.main.tribe2nd} <i className='text-xs text-muted-foreground'>
+                  {BaseEventDescriptions.italics.tribe2nd}</i>
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'tribe2nd'} disabled={disabled} />
             <FormMessage />
           </FormItem>
         )} />
@@ -186,9 +191,10 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway finds an advantage
+                {BaseEventDescriptions.main.advFound}
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'advFound'} disabled={disabled} />
             <FormMessage />
           </FormItem>
         )} />
@@ -220,9 +226,10 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway plays an advantage effectively
+                {BaseEventDescriptions.main.advPlay}
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'advPlay'} disabled={disabled} />
             <FormMessage />
           </FormItem>
         )} />
@@ -254,9 +261,11 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway plays an advantage poorly or unnecessarily (usually negative)
+                {BaseEventDescriptions.main.badAdvPlay} <i className='text-xs text-muted-foreground'>
+                  {BaseEventDescriptions.italics.badAdvPlay}</i>
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'badAdvPlay'} disabled={disabled} />
             <FormMessage />
           </FormItem>
         )} />
@@ -276,7 +285,6 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                   )} />
                 </h2>}
             </FormLabel>
-
             <span className='flex gap-4 items-top'>
               {!disabled &&
                 <FormControl>
@@ -289,13 +297,16 @@ export function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
                     {...field} />
                 </FormControl>}
               <FormDescription className='max-w-72 text-wrap'>
-                Points if your castaway is eliminated with an advantage in their pocket (usually negative)
+                {BaseEventDescriptions.main.advElim} <i className='text-xs text-muted-foreground'>
+                  {BaseEventDescriptions.italics.advElim}</i>
               </FormDescription>
             </span>
+            <BasePredictionFormField eventName={'advElim'} disabled={disabled} />
             <FormMessage />
           </FormItem>
-        )} />
-    </div>
+        )
+        } />
+    </div >
   );
 }
 
@@ -332,9 +343,10 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway speaks the episode title
+                  {BaseEventDescriptions.main.spokeEpTitle}
                 </FormDescription>
               </span>
+              <BasePredictionFormField eventName={'spokeEpTitle'} disabled={disabled} />
               <FormMessage />
             </FormItem>
           )} />
@@ -368,9 +380,10 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway makes it to final tribal council
+                  {BaseEventDescriptions.main.finalists}
                 </FormDescription>
               </span>
+              <BasePredictionFormField eventName={'finalists'} disabled={disabled} />
               <FormMessage />
             </FormItem>
           )} />
@@ -404,9 +417,10 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway wins the fire making challenge
+                  {BaseEventDescriptions.main.fireWin}
                 </FormDescription>
               </span>
+              <BasePredictionFormField eventName={'fireWin'} disabled={disabled} />
               <FormMessage />
             </FormItem>
           )} />
@@ -440,13 +454,92 @@ export function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 text-wrap'>
-                  Points if your castaway wins the whole gosh darn thing (Sole Survivor)
+                  {BaseEventDescriptions.main.soleSurvivor}
                 </FormDescription>
               </span>
+              <BasePredictionFormField eventName={'soleSurvivor'} disabled={disabled} />
               <FormMessage />
             </FormItem>
           )} />
       </div>
     </div>
+  );
+}
+
+interface BasePredictionFormFieldProps extends BaseEventSettingsProps {
+  eventName: ScoringBaseEventName;
+}
+
+export function BasePredictionFormField({ disabled, eventName }: BasePredictionFormFieldProps) {
+  return (
+    <FormField
+      name={`basePredictionRules.${eventName}.enabled`}
+      render={({ field: enabledField }) => (
+        <>
+          <span className='pl-4 inline-flex flex-wrap gap-1 items-start font-normal text-xs'>
+            <FormItem className='flex gap-2 mb-2 items-center'>
+              <FormLabel>
+                Prediction:
+              </FormLabel>
+              {disabled && !enabledField.value &&
+                <h2 className='font-semibold text-destructive'>Off</h2>}
+              {!disabled &&
+                <FormControl>
+                  <Switch
+                    checked={enabledField.value as boolean}
+                    onCheckedChange={(checked) => enabledField.onChange(checked)} />
+                </FormControl>}
+            </FormItem>
+            {enabledField.value && (
+              <FormField
+                name={`basePredictionRules.${eventName}.points`}
+                render={({ field: pointsField }) => (
+                  <FormItem>
+                    {disabled &&
+                      <h2 className='font-bold text-card-foreground text-green-600 text-nowrap'>
+                        {pointsField.value}
+                        <Flame size={14} className='inline align-text-bottom mb-0.5 stroke-green-600' />
+                      </h2>}
+                    {!disabled &&
+                      <FormControl className='animate-scale-in-fast'>
+                        <Input
+                          className='w-14 h-min py-0 px-2 text-black'
+                          type='number'
+                          step={1}
+                          placeholder='Points'
+                          disabled={disabled}
+                          {...pointsField} />
+                      </FormControl>}
+                  </FormItem>
+                )} />)}
+          </span>
+          {enabledField.value && (
+            <FormField
+              name={`basePredictionRules.${eventName}.timing`}
+              render={({ field: timingField }) => (
+                <FormItem>
+                  {disabled &&
+                    <i className='text-muted-foreground'>- {(timingField.value as string[]).join(', ')}</i>
+                  }
+                  {!disabled &&
+                    <FormControl className='animate-scale-in-fast mb-2'>
+                      <MultiSelect
+                        options={PredictionTimingOptions
+                          .map((option) => ({ label: option, value: option }))}
+                        onValueChange={timingField.onChange}
+                        defaultValue={timingField.value as string[]}
+                        value={timingField.value as string[]}
+                        maxCount={1}
+                        disabled={disabled}
+                        empty={disabled}
+                        modalPopover
+                        placeholder='Select prediction timing' />
+                    </FormControl>
+                  }
+                </FormItem>
+              )} />
+          )}
+        </>
+      )} />
   );
 }

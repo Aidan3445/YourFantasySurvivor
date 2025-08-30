@@ -154,7 +154,7 @@ export default function EditBaseEvent({ episodeNumber, baseEvent }: EditBaseEven
                 </FormItem>
               )} />
             <br />
-            <AlertDialogFooter className='flex w-full !justify-between !flex-row-reverse'>
+            <AlertDialogFooter className='flex w-full justify-between! flex-row-reverse!'>
               <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
                 <X stroke='white' />
               </AlertDialogCancel>

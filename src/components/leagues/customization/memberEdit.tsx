@@ -70,17 +70,20 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
   return (
     <Form {...reactForm}>
       <form className={cn(
-        'flex flex-col p-2 gap-2 bg-card rounded-xl w-96',
+        'flex flex-col p-2 gap-2 bg-card rounded-xl w-full items-center',
         className
       )} action={() => handleSubmit()}>
-        <FormLabel className='text-lg font-bold text-card-foreground'>Edit Member Details</FormLabel>
+        <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit Member Details</FormLabel>
         <LeagueMemberFields
           memberColors={memberColors
             .filter((m) => m.memberId !== loggedIn?.memberId)
             .map((m) => m.color)} />
         <Button
           disabled={!reactForm.formState.isDirty}
-          type='submit'>Save</Button>
+          type='submit'
+          className='w-full'>
+          Save
+        </Button>
       </form>
     </Form>
   );

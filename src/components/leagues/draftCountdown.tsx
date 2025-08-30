@@ -11,7 +11,11 @@ import {
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/ui/alertDialog';
 
-export function DraftCountdown() {
+interface DraftCountdownProps {
+  overrideLeagueHash?: string;
+}
+
+export function DraftCountdown({ overrideLeagueHash }: DraftCountdownProps) {
   const {
     league: {
       leagueHash,
@@ -20,8 +24,9 @@ export function DraftCountdown() {
       settings: { draftDate }
     },
     refresh
-  } = useLeague();
+  } = useLeague({ overrideLeagueHash });
   const router = useRouter();
+
 
   const editable =
     (loggedIn && loggedIn.role === 'Owner') &&
@@ -45,24 +50,26 @@ export function DraftCountdown() {
         <div className='flex flex-wrap gap-x-2 items-baseline'>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
           <p className='text-sm text-muted-foreground'>
-            {draftDate ?
-              `Starts at: ${draftDate.toLocaleString()}` :
-              'Draft set to manual start by commissioner'}
+            {draftDate
+              ? (draftDate.getTime() > Date.now()
+                ? `Starts at: ${draftDate.toLocaleString()}`
+                : 'Draft is live')
+              : 'Draft set to manual start by commissioner'}
           </p>
         </div>
         <div className='flex gap-2 ml-auto'>
           {editable && list.length > 1 && leagueStatus === 'Predraft' &&
             <StartDraft startDraft={onDraftJoin} />}
-          {editable && <SetDraftDate />}
+          {editable && <SetDraftDate overrideLeagueHash={overrideLeagueHash} />}
         </div>
       </span>
-      <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow shadow-black'>
+      <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow-sm shadow-black'>
         <Countdown endDate={draftDate} replacedBy={
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'
             variant='positive'
             onClick={onDraftJoin}>
-            Draft in progress, join now!
+            Join now!
           </Button>
         } />
       </span>

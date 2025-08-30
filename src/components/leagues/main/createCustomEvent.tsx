@@ -36,6 +36,15 @@ export default function CreateCustomEvent() {
 
   const { castawayOptions, tribeOptions } = useEventOptions(selectedEpisode);
 
+  if (league.customEventRules.length === 0) return (
+    <div className='px-4 w-full md:pb-14 text-center'>
+      <section className='bg-card rounded-xl pb-4 w-full'>
+        <h2 className='text-2xl self-center text-muted-foreground'>No Custom Events</h2>
+        <p className='text-center text-muted-foreground'>You can create a custom event in the <span className='font-bold'>Settings</span> tab.</p>
+      </section>
+    </div>
+  );
+
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       await createLeagueEvent(league.leagueHash, data);
@@ -63,7 +72,7 @@ export default function CreateCustomEvent() {
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
             <form
-              className='flex flex-col gap-1 px-2 max-md:w-full flex-grow'
+              className='flex flex-col gap-1 px-2 max-md:w-full grow'
               action={() => handleSubmit()}>
               <h2 className='text-2xl self-center'>Create Custom Event</h2>
               <FormField
@@ -239,23 +248,4 @@ export default function CreateCustomEvent() {
     </div>
   );
 }
-/*
-            mockBase={selectedEvent ? {
-              eventName: selectedEvent,
-              label: 'hey',
-              notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
-              castaways: selectedReferenceType === 'Castaway' ?
-                selectedReferenceIds?.map(castawayId =>
-                  castawayOptions.find(castaway => castaway.value === castawayId)?.label)
-                  .filter((castaway): castaway is string => castaway !== undefined) :
-                selectedReferenceIds?.map(tribeId =>
-                  tribeOptions.find(tribe => tribe.value === tribeId)?.castaways).flat()
-                  .filter((castaway): castaway is string => castaway !== undefined),
-              tribes: selectedReferenceType === 'Tribe' ?
-                selectedReferenceIds?.map(tribeId =>
-                  tribeOptions.find(tribe => tribe.value === tribeId)?.label)
-                  .filter((tribe): tribe is string => tribe !== undefined) : [] as string[],
-              referenceType: selectedReferenceType,
-              references: selectedReferenceIds,
-            } : undefined}
-            */
+

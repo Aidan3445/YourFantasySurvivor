@@ -12,6 +12,7 @@ import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { Flame, Lock, LockOpen } from 'lucide-react';
 import { useState } from 'react';
+import { cn } from '~/lib/utils';
 
 
 export default function SetSurvivalCap() {
@@ -30,6 +31,7 @@ export default function SetSurvivalCap() {
       await updateLeagueSettings(league.leagueHash, data);
       alert('Survival cap updated successfully');
       setLocked(true);
+      reactForm.reset(data);
       await refresh();
     } catch (error) {
       alert('Failed to update survival cap');
@@ -62,62 +64,77 @@ export default function SetSurvivalCap() {
         <form className='flex flex-wrap gap-x-12' action={() => handleSubmit()}>
           <FormField
             name='survivalCap'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='inline-flex gap-2 items-center'>Streak Cap
-                  {locked &&
-                    <h2 className='text-lg font-bold text-card-foreground'>{league.settings.survivalCap}</h2>}
-                </FormLabel>
-                <FormControl>
-                  {!locked &&
-                    <SurvivalCapSlider value={field.value as number} onChange={field.onChange} />}
-                </FormControl>
-                <FormDescription>
-                  Set a cap on the maximum points a player can earn from their streak.
-                  <br />
-                  <b className='text-muted-foreground'>Note:</b> A cap
-                  of <i className='text-muted-foreground'>0</i> will disable survival points
-                  entirely, while an <i className='text-muted-foreground'>unlimited</i> cap will
-                  heavily favor the player who drafts the winner.
-                </FormDescription>
-              </FormItem>
-            )} />
-          <span className='flex justify-between w-full items-end'>
-            <FormField
-              name='preserveStreak'
-              render={({ field }) => (
+            render={({ field: valueField }) => (
+              <>
                 <FormItem>
-                  <FormLabel className='inline-flex gap-2 items-center'>Preserve Streak
-                    {locked &&
-                      <h2 className='text-lg font-bold text-card-foreground'>
-                        {league.settings.preserveStreak ? 'On' : 'Off'}
-                      </h2>}
+                  <FormLabel className='inline-flex gap-2 items-center'>Streak Cap
+                    {locked && <>
+                      <h2 className={cn('text-lg font-bold text-card-foreground',
+                        valueField.value > 0 ? 'text-green-600' : 'text-destructive')}>
+                        {valueField.value === 0
+                          ? 'Off'
+                          : valueField.value === MAX_SURVIVAL_CAP
+                            ? 'Unlimited'
+                            : valueField.value}
+                      </h2>
+                      {valueField.value > 0 && valueField.value < MAX_SURVIVAL_CAP &&
+                        <Flame className={cn('inline align-top',
+                          valueField.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                        )} />}
+                    </>}
                   </FormLabel>
                   <FormControl>
                     {!locked &&
-                      <Switch checked={field.value as boolean} onCheckedChange={field.onChange} />}
+                      <SurvivalCapSlider value={valueField.value as number} onChange={valueField.onChange} />}
                   </FormControl>
                   <FormDescription>
-                    Should streaks be <i className='text-muted-foreground'>preserved</i> if a
-                    player switches their pick voluntarily, or reset to zero?
+                    Set a cap on the maximum points a player can earn from their streak.
+                    <br />
+                    <b className='text-muted-foreground'>Note:</b> A cap
+                    of <i className='text-muted-foreground'>0</i> will disable survival points
+                    entirely, while an <i className='text-muted-foreground'>unlimited</i> cap will
+                    heavily favor the player who drafts the winner.
                   </FormDescription>
                 </FormItem>
-              )} />
-            {!locked &&
-              <span className='grid grid-cols-2 gap-2'>
-                <Button
-                  type='button'
-                  variant='destructive'
-                  onClick={() => { setLocked(true); reactForm.reset(); }}>
-                  Cancel
-                </Button>
-                <Button
-                  disabled={!reactForm.formState.isDirty}
-                  type='submit'>
-                  Save
-                </Button>
-              </span>}
-          </span>
+                <span className='flex justify-between w-full items-end'>
+                  <FormField
+                    name='preserveStreak'
+                    render={({ field: preserveField }) => (
+                      <FormItem className={valueField.value === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}>
+                        <FormLabel className='inline-flex gap-2 items-center'>Preserve Streak
+                          {locked &&
+                            <h2 className={cn('text-lg font-bold text-card-foreground',
+                              preserveField.value ? 'text-green-600' : 'text-destructive')}>
+                              {preserveField.value ? 'On' : 'Off'}
+                            </h2>}
+                        </FormLabel>
+                        <FormControl>
+                          {!locked &&
+                            <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
+                        </FormControl>
+                        <FormDescription>
+                          Should streaks be <i className='text-muted-foreground'>preserved</i> if a
+                          player switches their pick voluntarily, or reset to zero?
+                        </FormDescription>
+                      </FormItem>
+                    )} />
+                  {!locked &&
+                    <span className='grid grid-cols-2 gap-2'>
+                      <Button
+                        type='button'
+                        variant='destructive'
+                        onClick={() => { setLocked(true); reactForm.reset(); }}>
+                        Cancel
+                      </Button>
+                      <Button
+                        disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
+                        type='submit'>
+                        Save
+                      </Button>
+                    </span>}
+                </span>
+              </>
+            )} />
         </form>
       </Form>
     </article>

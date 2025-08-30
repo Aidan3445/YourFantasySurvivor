@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
+import { useState, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { useMessages } from '@ably/chat/react';
 import { type Message } from 'node_modules/@ably/chat/dist/core/message';
 import { Input } from '~/components/ui/input';
@@ -15,14 +15,16 @@ import { saveChatMessage } from '~/app/api/leagues/actions';
 
 export interface ChatRoomProps {
   chatHistory?: Message[];
+  defaultOpen?: boolean;
+  className?: string;
+  messageEnd?: ReactNode;
 }
 
-export default function ChatRoom({ chatHistory }: ChatRoomProps) {
+export default function ChatRoom({ chatHistory, messageEnd }: ChatRoomProps) {
   const { league: { members, leagueHash } } = useLeague();
   const loggedInUser = members?.loggedIn;
 
   const inputRef = useRef<HTMLInputElement>(null);
-  const messageEndRef = useRef<HTMLDivElement>(null);
 
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState<Message[]>(chatHistory ?? []);
@@ -49,10 +51,6 @@ export default function ChatRoom({ chatHistory }: ChatRoomProps) {
       });
     }
   });
-
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, members]);
 
   const sendChatMessage = async (text: string) => {
     if (!sendMessage) return;
@@ -98,7 +96,7 @@ export default function ChatRoom({ chatHistory }: ChatRoomProps) {
           const member = members.list.find(member => member.memberId === message.headers['sent-by-id']);
 
           return (
-            <div key={message.serial} className={cn('mb-2 bg-white/60 rounded-lg px-2 animate-scale-in-fast w-fit max-w-[80%]',
+            <div key={message.serial} className={cn('mb-2 bg-white/60 rounded-lg px-2 animate-scale-in-fast w-fit max-w-[80%] text-wrap break-all',
               message.headers['sent-by-id'] === loggedInUser?.memberId ? 'ml-auto bg-card/50' : 'mr-auto')}>
               <div className='text-base'>{message.text}</div>
               <span className='flex items-center gap-1 text-xs border-t pt-0.5'>
@@ -116,10 +114,10 @@ export default function ChatRoom({ chatHistory }: ChatRoomProps) {
             </div>
           );
         })}
-        <div ref={messageEndRef} className='h-0' />
+        {messageEnd}
         <ScrollBar orientation='vertical' />
       </ScrollArea >
-      <form action={() => handleSubmit()} className='relative flex items-center justify-between border-t'>          <ScrollArea className='w-full'>
+      <form action={() => handleSubmit()} className='relative flex items-center justify-between border-t'>
         <Input
           ref={inputRef}
           type='text'
@@ -128,8 +126,6 @@ export default function ChatRoom({ chatHistory }: ChatRoomProps) {
           value={messageText}
           onChange={(e) => setMessageText(e.target.value)}
           onKeyDown={handleKeyPress} />
-        <ScrollBar orientation='horizontal' />
-      </ScrollArea>
         <Button
           className='absolute right-0 h-full w-16 p-0 rounded-none'
           disabled={messageTextIsEmpty}>

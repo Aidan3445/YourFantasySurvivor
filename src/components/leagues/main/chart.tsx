@@ -53,7 +53,8 @@ export default function Chart() {
             right: 10,
             // add padding depending on the length of the highest score
             // we multiply by 0.6 to get the value near the label where numbers may overlap
-            left: Math.floor(highestScore * 0.6).toString().length * 10 - 30,
+            left: highestScore < 100 && highestScore > 10 ? -10 :
+              Math.floor(highestScore * 0.6).toString().length * 10 - 30,
             bottom: 12,
           }}>
           <CartesianGrid stroke='#4D4D4D' />

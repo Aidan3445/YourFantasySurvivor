@@ -35,6 +35,8 @@ import { type CastawayName } from '~/server/db/defs/castaways';
 import { type TribeName } from '~/server/db/defs/tribes';
 import { Label } from '~/components/ui/label';
 
+// TODO: add survivor streak to timeline
+
 export default function RecentActivity() {
   const {
     leagueData: {
@@ -218,22 +220,29 @@ export function EpisodeEvents({
   filters }: EpisodeEventsProps) {
   const {
     leagueData: {
-      baseEvents,
       leagueEvents,
+      baseEvents,
+      basePredictions,
       episodes
     }
   } = useLeague();
-  const noTribes = episodeNumber === -1 || (
-    baseEvents[episodeNumber] &&
-    !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0) &&
+  const noTribes = episodeNumber !== -1 && (
+    !(
+      baseEvents[episodeNumber] &&
+      Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0)
+    ) &&
     !mockBases?.some((event) => event.tribes.length > 0) &&
+    !(
+      basePredictions[episodeNumber] &&
+      Object.values(basePredictions[episodeNumber]).some((event) => event.referenceType === 'Tribe' && event.eventId !== null)
+    ) &&
     ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
       ?.some((event) => event.referenceType === 'Tribe') &&
     ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
       ?.some((event) => event.referenceType === 'Tribe'));
 
   return (
-    <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-8rem)] lg:w-full bg-card rounded-lg gap-0'>
+    <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-var(--sidebar-width)-3rem)] lg:w-full bg-card rounded-lg gap-0'>
       <Table className='w-full'>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader className='sticky top-0'>
@@ -282,6 +291,7 @@ function EpisodeEventsTableBody({
   const {
     leagueData: {
       baseEvents,
+      basePredictions,
       leagueEvents,
       baseEventRules,
       selectionTimeline,
@@ -308,7 +318,12 @@ function EpisodeEventsTableBody({
     });
 
   const combinedPredictions = Object.values(
-    leagueEvents.predictionEvents[episodeNumber]?.reduce((acc, event) => {
+    [
+      ...basePredictions[episodeNumber] ?? [],
+      ...leagueEvents.predictionEvents[episodeNumber] ?? []
+    ].reduce((acc, event) => {
+      if (event.hit === null || event.eventId === null) return acc; // Skip events without results
+
       if (filters.event.length > 0 && !filters.event.includes(event.eventName)) return acc;
       if (filters.castaway.length > 0 && event.referenceType === 'Castaway' &&
         !filters.castaway.some((castaway) => event.referenceName === castaway)) return acc;
@@ -322,45 +337,65 @@ function EpisodeEventsTableBody({
       if (filters.member.length > 0 &&
         !filters.member.some((member) => event.predictionMaker === member)) return acc;
 
+      const referenceIds = 'leagueEventRuleId' in event ?
+        [event.referenceId] :
+        baseEvents[episodeNumber]?.[event.eventId]?.references ?? [];
+      const referenceNames = 'leagueEventRuleId' in event ?
+        [event.referenceName] :
+        referenceIds.map((referenceId) => (event.referenceType === 'Castaway' ?
+          castaways.find((castaway) => castaway.castawayId === referenceId)?.fullName :
+          tribes.find((tribe) => tribe.tribeId === referenceId)?.tribeName) ?? '');
+
       acc[event.eventId] ??= {
-        eventId: event.eventId,
-        eventName: event.eventName,
+        eventName: typeof event.eventId === 'string' ?
+          BaseEventFullName[event.eventName as ScoringBaseEventName] :
+          event.eventName,
         points: event.points,
-        notes: event.notes,
-        referenceId: event.referenceId,
+        notes: 'notes' in event ? event.notes : null,
+        referenceIds: referenceIds,
+        referenceNames: referenceNames,
         referenceType: event.referenceType,
-        referenceName: event.referenceName,
         predictionMakers: [],
         misses: []
       };
 
-      if (event.hit) acc[event.eventId]!.predictionMakers.push(event.predictionMaker);
+      if (event.hit) acc[event.eventId]!.predictionMakers.push({
+        displayName: event.predictionMaker,
+        bet: event.bet
+      });
       else acc[event.eventId]!.misses.push({
-        predictionMaker: event.predictionMaker,
+        displayName: event.predictionMaker,
+        bet: event.bet,
         referenceName: (event.referenceType === 'Castaway' ?
           castaways.find((castaway) => castaway.castawayId === event.referenceId)?.fullName :
           tribes.find((tribe) => tribe.tribeId === event.referenceId)?.tribeName) ?? ''
       });
 
       return acc;
-    }, {} as Record<LeagueEventId, {
-      eventId: LeagueEventId;
+    }, {} as Record<LeagueEventId | ScoringBaseEventName, {
       eventName: LeagueEventName;
+      eventId?: LeagueEventId;
       points: number;
       notes: string[] | null;
-      referenceId: number;
+      referenceIds: number[];
       referenceType: ReferenceType;
       // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-      referenceName: CastawayName | TribeName;
-      predictionMakers: LeagueMemberDisplayName[];
+      referenceNames: (CastawayName | TribeName)[];
+      predictionMakers: {
+        displayName: LeagueMemberDisplayName;
+        bet?: number | null;
+      }[];
       misses: {
-        predictionMaker: LeagueMemberDisplayName;
+        displayName: LeagueMemberDisplayName;
+        bet?: number | null;
         // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
         referenceName: CastawayName | TribeName;
       }[]
     }>) ?? {})
     .map((event) => {
-      if (event.predictionMakers.length === 0) event.predictionMakers = ['No Correct Predictions'];
+      if (event.predictionMakers.length === 0) event.predictionMakers = [{
+        displayName: 'No Correct Predictions'
+      }];
       return event;
     });
 
@@ -411,7 +446,7 @@ function EpisodeEventsTableBody({
 
   return (
     <>
-      {labelRow &&
+      {labelRow && // TODO: wrap in accordion
         <TableRow className='bg-secondary/50 hover:bg-secondary/25'>
           <TableCell colSpan={7} className='text-center font-bold text-secondary-foreground'>
             Episode {episodeNumber}
@@ -433,10 +468,10 @@ function EpisodeEventsTableBody({
           eventId={-1}
           eventName={mockPrediction.eventName}
           points={mockPrediction.points}
-          predictionMakers={[mockPrediction.predictionMaker]}
-          referenceId={mockPrediction.referenceId}
+          predictionMakers={[{ displayName: mockPrediction.predictionMaker }]}
+          referenceIds={[mockPrediction.referenceId]}
           referenceType={mockPrediction.referenceType}
-          referenceName={mockPrediction.referenceName}
+          referenceNames={[mockPrediction.referenceName]}
           notes={mockPrediction.notes}
           episodeNumber={episodeNumber}
           edit={false} />
@@ -448,9 +483,9 @@ function EpisodeEventsTableBody({
           eventId={-1}
           eventName={mockDirect.eventName}
           points={mockDirect.points}
-          referenceId={mockDirect.referenceId}
+          referenceIds={[mockDirect.referenceId]}
           referenceType={mockDirect.referenceType}
-          referenceName={mockDirect.referenceName}
+          referenceNames={[mockDirect.referenceName]}
           notes={mockDirect.notes}
           episodeNumber={episodeNumber}
           edit={false} />
@@ -484,8 +519,8 @@ function EpisodeEventsTableBody({
           eventName={event.eventName}
           points={event.points}
           referenceType={event.referenceType}
-          referenceName={event.referenceName}
-          referenceId={event.referenceId}
+          referenceNames={[event.referenceName]}
+          referenceIds={[event.referenceId]}
           notes={event.notes}
           episodeNumber={episodeNumber}
           edit={edit} />
@@ -503,8 +538,8 @@ function EpisodeEventsTableBody({
           eventName={event.eventName}
           points={event.points}
           referenceType={event.referenceType}
-          referenceName={event.referenceName}
-          referenceId={event.referenceId}
+          referenceNames={event.referenceNames}
+          referenceIds={event.referenceIds}
           predictionMakers={event.predictionMakers}
           misses={event.misses}
           defaultOpenMisses={filters.member.length > 0}
@@ -590,7 +625,7 @@ type AirStatusProps = {
 
 export function AirStatus({ airDate, airStatus, showDate = true, showTime = true }: AirStatusProps) {
   return (
-    <span className='inline-flex gap-1 items-center text-sm text-muted-foreground'>
+    <span className='inline-flex gap-1 items-center text-sm text-muted-foreground text-nowrap'>
       {showDate && (showTime ? airDate.toLocaleString() : airDate.toLocaleDateString())}
       <div className={cn('text-destructive-foreground text-xs px-1 rounded-md text-nowrap w-full',
         airStatus === 'Aired' && 'bg-destructive',
@@ -697,15 +732,19 @@ function BaseEventRow({
 interface LeagueEventRowProps {
   className?: string;
   eventName: LeagueEventName;
-  eventId: number;
+  eventId?: number;
   points: number;
   referenceType: ReferenceType;
-  referenceName?: string;
-  referenceId: number;
-  predictionMakers?: LeagueMemberDisplayName[];
+  referenceNames?: string[];
+  referenceIds?: number[];
+  predictionMakers?: {
+    displayName: LeagueMemberDisplayName,
+    bet?: number | null
+  }[];
   notes: string[] | null;
   misses?: {
-    predictionMaker: LeagueMemberDisplayName;
+    displayName: LeagueMemberDisplayName;
+    bet?: number | null;
     // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
     referenceName: CastawayName | TribeName;
   }[];
@@ -719,8 +758,8 @@ function LeagueEventRow({
   eventId,
   points,
   referenceType,
-  referenceName,
-  referenceId,
+  referenceNames,
+  referenceIds,
   predictionMakers,
   notes,
   misses,
@@ -733,13 +772,13 @@ function LeagueEventRow({
 
   return (
     <TableRow className={className}>
-      {edit ? <TableCell className='w-0'>
+      {edit && eventId ? <TableCell className='w-0'>
         <EditLeagueEvent episodeNumber={episodeNumber} leagueEvent={{
           eventId,
           eventName,
           points,
           referenceType,
-          referenceId,
+          referenceId: referenceIds?.[0] ? referenceIds[0] : 0,
           notes
         }} />
       </TableCell> :
@@ -748,42 +787,55 @@ function LeagueEventRow({
       <PointsCell points={points} />
       <TableCell className='text-right text-xs text-nowrap'>
         <div className='h-full grid auto-rows-fr items-center'>
-          {referenceType === 'Tribe' && referenceName &&
+          {referenceType === 'Tribe' && referenceNames?.map((referenceName) => (
             <ColorRow
+              key={referenceName}
               className='leading-tight px-1 w-min'
               color={leagueData.castaways.find((listItem) =>
                 listItem.tribes.some((tribeEp) => tribeEp.tribeName === referenceName))?.tribes
                 .find((tribeEp) => tribeEp.tribeName === referenceName)?.tribeColor}>
               {referenceName}
-            </ColorRow>}
+            </ColorRow>
+          ))}
         </div>
       </TableCell>
       <TableCell className='text-right text-xs text-nowrap justify-items-end'>
-        {referenceType === 'Castaway' && referenceName &&
+        {referenceType === 'Castaway' && referenceNames?.map((referenceName) => (
           <ColorRow
+            key={referenceName}
             className='leading-tight px-1 w-min'
             color={leagueData.castaways.find((listItem) =>
               listItem.fullName === referenceName)?.tribes.findLast((tribeEp) =>
                 tribeEp.episode <= episodeNumber)?.tribeColor}>
             {referenceName}
-          </ColorRow>}
+          </ColorRow>
+        ))}
       </TableCell>
       <TableCell className='text-xs text-nowrap'>
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5 relative',
           predictionMakers?.length === 1 && 'justify-center')}>
-          {predictionMakers?.map((member, index) =>
-            member ?
-              <ColorRow
-                key={index}
-                className='leading-tight px-1 w-min'
-                color={league.members.list.find((listItem) =>
-                  listItem.displayName === member)?.color}>
-                {member}
-              </ColorRow> :
-              <ColorRow className='invisible leading-tight px-1 w-min' key={index}>
-                None
-              </ColorRow>
+          {predictionMakers?.map(({ displayName, bet }, index) =>
+            <span className='flex items-center gap-1' key={index}>
+              {
+                displayName ?
+                  <ColorRow
+                    className='leading-tight px-1 w-min'
+                    color={league.members.list.find((listItem) =>
+                      listItem.displayName === displayName)?.color}>
+                    {displayName}
+                  </ColorRow> :
+                  <ColorRow className='invisible leading-tight px-1 w-min' key={index}>
+                    None
+                  </ColorRow>
+              }
+              {bet !== undefined && bet !== null && (
+                <span className='text-xs text-green-600'>
+                  +{bet}
+                  <Flame className='inline align-baseline w-3 h-min stroke-green-600' />
+                </span>
+              )}
+            </span>
           )}
           {misses && misses.length > 0 &&
             <Accordion
@@ -801,8 +853,8 @@ function LeagueEventRow({
                         <ColorRow
                           className='leading-tight px-1 w-min'
                           color={league.members.list.find((listItem) =>
-                            listItem.displayName === miss.predictionMaker)?.color}>
-                          {miss.predictionMaker}
+                            listItem.displayName === miss.displayName)?.color}>
+                          {miss.displayName}
                         </ColorRow>
                         <MoveRight size={12} stroke='#000000' />
                         <ColorRow
@@ -815,6 +867,12 @@ function LeagueEventRow({
                               tribe.tribeName === miss.referenceName)?.tribeColor}>
                           {miss.referenceName}
                         </ColorRow>
+                        {miss.bet !== undefined && miss.bet !== null && (
+                          <span className='text-xs text-destructive'>
+                            -{miss.bet}
+                            <Flame className='inline align-baseline w-3 h-min stroke-destructive' />
+                          </span>
+                        )}
                       </span>
                     ))}
                   </div>

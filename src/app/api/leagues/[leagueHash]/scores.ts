@@ -1,29 +1,31 @@
 import { findTribeCastaways } from '~/lib/utils';
 import { type QUERIES as LEAGUE_QUERIES } from '../query';
 import { type QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
-import { type ScoringBaseEventName, ScoringBaseEventNames, type BaseEventRule, type ReferenceType } from '~/server/db/defs/events';
+import { type ScoringBaseEventName, ScoringBaseEventNames, type BaseEventRule, type ReferenceType, type BasePredictionRules } from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { type LeagueSurvivalCap } from '~/server/db/defs/leagues';
 
 /**
-  * Compile the scores for a league 
-  * @param baseEvents The base events for the season
-  * @param tribesTimeline The tribe updates for the season
-  * @param eliminations The eliminations for the season
-  * @param leagueEvents The league events
-  * @param baseEventRules The league's base event scoring
-  * @param selectionTimeline The selection timeline for the league
-  * @param survivalCap The survival cap for the league
-  * @returns The scores for the league as running totals
-  */
+* Compile the scores for a league 
+* @param baseEvents The base events for the season
+* @param tribesTimeline The tribe updates for the season
+* @param eliminations The eliminations for the season
+* @param leagueEvents The league events
+* @param baseEventRules The league's base event scoring
+* @param selectionTimeline The selection timeline for the league
+* @param survivalCap The survival cap for the league
+* @returns The scores for the league as running totals
+*/
 export function compileScores(
   baseEvents: Awaited<ReturnType<typeof SEASON_QUERIES.getBaseEvents>>,
+  baseEventRules: BaseEventRule,
+  basePredictions: Awaited<ReturnType<typeof LEAGUE_QUERIES.getBasePredictions>>,
+  basePredictionRules: BasePredictionRules,
+  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>>,
+
+  selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>>,
   tribesTimeline: Awaited<ReturnType<typeof SEASON_QUERIES.getTribesTimeline>>,
   eliminations: Awaited<ReturnType<typeof SEASON_QUERIES.getEliminations>>,
-
-  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>>,
-  baseEventRules: BaseEventRule,
-  selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>>,
 
   survivalCap: LeagueSurvivalCap,
   preserveStreak: boolean
@@ -38,22 +40,39 @@ export function compileScores(
   Object.entries(baseEvents).forEach(([episodeNumber, events]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(events).forEach((event) => {
+      const baseEvent = event.eventName as ScoringBaseEventName;
       event.tribes.forEach((tribe) => {
         // add castaways to be scored
-        //if (event.eventName !== 'tribeUpdate') {
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
           if (!event.castaways.includes(castaway)) event.castaways.push(castaway);
         });
-        //}
         // here we want to align the castaways for non scoring events so we
         // push this check inside, later we skip iteration entirely for castaways
-        if (!ScoringBaseEventNames.includes(event.eventName as ScoringBaseEventName)) return;
+        if (!ScoringBaseEventNames.includes(baseEvent)) return;
         // initialize tribe score if it doesn't exist
         scores.Tribe[tribe] ??= [];
         scores.Tribe[tribe][episodeNum] ??= 0;
         // add points to tribe score
-        const points = baseEventRules[event.eventName as ScoringBaseEventName];
+        const points = baseEventRules[baseEvent];
         scores.Tribe[tribe][episodeNum] += points;
+        // check predictions
+        basePredictions[episodeNum]?.filter((p) =>
+          p.referenceType === 'Tribe' && p.eventName === event.eventName)
+          .forEach((prediction) => {
+            // initialize member score if it doesn't exist
+            scores.Member[prediction.predictionMaker] ??= [];
+            scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
+
+            if (prediction.referenceName === tribe) {
+              // add points to member score
+              scores.Member[prediction.predictionMaker]![episodeNum]!
+                += basePredictionRules[baseEvent].points
+                + (prediction.bet ?? 0);
+            } else {
+              // subtract bet for incorrect tribe prediction
+              scores.Member[prediction.predictionMaker]![episodeNum]! -= prediction.bet ?? 0;
+            }
+          });
       });
 
       if (!ScoringBaseEventNames.includes(event.eventName as ScoringBaseEventName)) return;
@@ -73,6 +92,24 @@ export function compileScores(
         scores.Member[leagueMember] ??= [];
         scores.Member[leagueMember][episodeNum] ??= 0;
         scores.Member[leagueMember][episodeNum] += points;
+        // check predictions
+        basePredictions[episodeNum]?.filter((p) =>
+          p.referenceType === 'Castaway' && p.eventName === event.eventName)
+          .forEach((prediction) => {
+            // initialize member score if it doesn't exist
+            scores.Member[prediction.predictionMaker] ??= [];
+            scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
+
+            if (prediction.referenceName === castaway) {
+              // add points to member score
+              scores.Member[prediction.predictionMaker]![episodeNum]! +=
+                basePredictionRules[event.eventName as ScoringBaseEventName].points
+                + (prediction.bet ?? 0);
+            } else {
+              // subtract bet for incorrect castaway prediction
+              scores.Member[prediction.predictionMaker]![episodeNum]! -= prediction.bet ?? 0;
+            }
+          });
       });
     });
   });
@@ -144,6 +181,7 @@ export function compileScores(
     scores.Member[member] ??= [0];
     // iterate to add the streak bonus
     let streak = 0;
+
     for (let episodeNumber = firstPickEpisode; episodeNumber < eliminations.length; episodeNumber++) {
       // get the castaways who were eliminated at any point before this episode
       const eliminated = eliminations.slice(0, episodeNumber + 1).flat();
@@ -165,6 +203,7 @@ export function compileScores(
       scores.Member[member][episodeNumber] ??= 0;
       scores.Member[member][episodeNumber]! += bonus;
     }
+
     currentStreaks[member] = streak;
   });
 

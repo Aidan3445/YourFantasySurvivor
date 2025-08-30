@@ -4,45 +4,96 @@ import { z } from 'zod';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
-import { BounceyCarousel } from '~/components/ui/carousel';
 import { Flame, HelpCircle } from 'lucide-react';
-import { type ReferenceType, type LeagueEventPrediction } from '~/server/db/defs/events';
+import {
+  type ReferenceType, type BasePredictionRules, defaultPredictionRules,
+  BaseEventDescriptions, type ScoringBaseEventName, BasePredictionReferenceTypes,
+  type BasePredictionDraft, type LeaguePredictionDraft,
+  BaseEventFullName
+} from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { type CastawayDetails, type CastawayDraftInfo } from '~/server/db/defs/castaways';
+import type { CastawayDetails, CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
-import { type Tribe } from '~/server/db/defs/tribes';
+import type { Tribe } from '~/server/db/defs/tribes';
 import { ColorRow } from '../draftOrder';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
 import { PopoverArrow } from '@radix-ui/react-popover';
+import { useMemo } from 'react';
+import { Input } from '~/components/ui/input';
+import { CoverCarousel } from '~/components/ui/carousel';
 
 interface MakePredictionsProps {
-  predictions: LeagueEventPrediction[];
+  basePredictionRules?: BasePredictionRules;
+  basePredictions?: BasePredictionDraft[];
+  customPredictions?: LeaguePredictionDraft[];
   castaways: (CastawayDraftInfo | CastawayDetails)[];
   tribes: Tribe[];
   className?: string;
 }
 
-export default function MakePredictions({ predictions, castaways, tribes }: MakePredictionsProps) {
-  if (predictions.length === 0) return null;
+export default function MakePredictions({
+  basePredictionRules = defaultPredictionRules,
+  basePredictions = [],
+  customPredictions = [],
+  castaways,
+  tribes
+}: MakePredictionsProps) {
+  const enabledBasePredictions = Object.values(basePredictionRules)
+    .reduce((count, event) => count + Number(event.enabled), 0);
+  if (customPredictions.length + enabledBasePredictions === 0) return null;
 
   return (
-    <div className='bg-card p-2 rounded-lg text-center flex flex-col items-center'>
+    <div className='bg-card rounded-lg text-center flex flex-col items-center'>
       <h3 className='text-xl font-semibold'>While you wait...</h3>
       <p>
-        Make your prediction{predictions.length > 1 ? 's! Earn  points throughout the season for\
+        Make your prediction{customPredictions.length > 1 ? 's! Earn  points throughout the season for\
         each correct prediction you make.' : ' and earn points if you are correct!'}
       </p>
-      <PredictionCards predictions={predictions} castaways={castaways} tribes={tribes} />
+      <PredictionCards
+        basePredictionRules={basePredictionRules}
+        basePredictions={basePredictions}
+        customPredictions={customPredictions}
+        castaways={castaways}
+        tribes={tribes} />
     </div>
   );
 }
 
-export function PredictionCards({ predictions, castaways, tribes, className }: MakePredictionsProps) {
-  if (predictions.length === 0) return null;
+export function PredictionCards({
+  basePredictionRules = defaultPredictionRules,
+  basePredictions = [],
+  customPredictions = [],
+  castaways,
+  tribes,
+  className
+}: MakePredictionsProps) {
+  const enabledBasePredictions = Object.entries(basePredictionRules)
+    .filter(([_, rule]) => rule.enabled)
+    .map(([baseEventName, rule]) => {
+      const eventName = baseEventName as ScoringBaseEventName;
+      const fullName = BaseEventFullName[baseEventName as ScoringBaseEventName] ?? baseEventName;
+      const prediction: LeaguePredictionDraft = {
+        eventName: eventName,
+        label: fullName,
+        description: `${BaseEventDescriptions.prediction[eventName]} \
+          ${BaseEventDescriptions.italics[eventName] ?? ''}`,
+        points: rule.points,
+        eventType: 'Prediction',
+        referenceTypes: BasePredictionReferenceTypes[eventName],
+        timing: rule.timing,
+        predictionMade: basePredictions.find((pred) =>
+          pred.eventName === eventName)?.predictionMade ?? null,
+      };
+
+      return prediction;
+    });
+
+  const predictionRuleCount = enabledBasePredictions.length + customPredictions.length;
+  if (predictionRuleCount === 0) return null;
 
   const getOptions = (referenceTypes: ReferenceType[]) => {
     const options: Record<ReferenceType, Record<string, {
@@ -77,15 +128,14 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
     return options;
   };
 
-
-  if (predictions.length === 1) {
-    const prediction = predictions[0]!;
+  if (predictionRuleCount === 1) {
+    const prediction = (customPredictions[0] ?? enabledBasePredictions[0])!;
     return (
       <article
-        className={cn('flex flex-col my-4 text-center', className)}>
+        className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg min-w-96', className)}>
         <span className='flex gap-1 items-start self-center px-1'>
           <h3 className='text-lg font-semibold text-card-foreground'>
-            {prediction.eventName}
+            {prediction.label ?? prediction.eventName}
           </h3>
           -
           <div className='inline-flex mt-1'>
@@ -99,54 +149,105 @@ export function PredictionCards({ predictions, castaways, tribes, className }: M
     );
   }
 
+  const customPredictionItems = customPredictions.map((prediction) => ({
+    header: (
+      <h3 className='text-lg font-semibold text-card-foreground'>
+        {prediction.label ?? prediction.eventName}
+        <span className='ml-2 inline-flex mt-1'>
+          <p className='text-sm'>{prediction.points}</p>
+          <Flame size={16} />
+        </span>
+        <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+          {prediction.timing.join(' - ')}
+          <PredictionTimingHelp />
+        </div>
+      </h3>
+    ),
+    content: (<p className='text-sm'>{prediction.description}</p>),
+    footer: (
+      <SubmissionCard
+        prediction={prediction}
+        options={getOptions(prediction.referenceTypes)} />
+    ),
+  }));
+
+  const basePredictionItems = enabledBasePredictions.map((prediction) => ({
+    header: (
+      <h3 className='text-lg font-semibold text-card-foreground py-1'>
+        {prediction.label ?? prediction.eventName}
+        <span className='ml-2 inline-flex mt-1'>
+          <p className='text-sm'>{prediction.points}</p>
+          <Flame size={16} />
+        </span>
+        <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+          {prediction.timing.join(' - ')}
+          <PredictionTimingHelp />
+        </div>
+      </h3>
+    ),
+    content: (
+      <p className='text-sm bg-b3 py-1'>{prediction.description}</p>
+    ),
+    footer: (
+      <SubmissionCard
+        prediction={prediction}
+        options={getOptions(prediction.referenceTypes)} />
+    ),
+  }));
+
   return (
-    <BounceyCarousel items={predictions.map((prediction) => ({
-      header: (
-        <h3 className='text-lg font-semibold text-card-foreground'>
-          {prediction.eventName}
-          <span className='ml-2 inline-flex mt-1'>
-            <p className='text-sm'>{prediction.points}</p>
-            <Flame size={16} />
-          </span>
-          <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
-            {prediction.timing.join(' - ')}
-            <PredictionTimingHelp />
-          </div>
-        </h3>
-      ),
-      content: (<p className='text-sm'>{prediction.description}</p>),
-      footer: (
-        <SubmissionCard
-          prediction={prediction}
-          options={getOptions(prediction.referenceTypes)} />
-      ),
-    }))} />
+    <span className={cn('w-full', className)}>
+      <CoverCarousel items={[...basePredictionItems, ...customPredictionItems]} />
+    </span>
   );
 }
 
 const formSchema = z.object({
   referenceId: z.coerce.number(),
+  bet: z.coerce.number().nullable().optional(),
 });
 
 interface SubmissionCardProps {
-  prediction: LeagueEventPrediction;
+  prediction: LeaguePredictionDraft;
   options: Record<ReferenceType, Record<string, { id: number, color: string, tribeName?: string }>>;
 }
 
 function SubmissionCard({ prediction, options }: SubmissionCardProps) {
   const { league, refresh } = useLeague();
-  const reactForm = useForm<z.infer<typeof formSchema>>({
-    defaultValues: { referenceId: prediction.predictionMade?.referenceId },
-    resolver: zodResolver(formSchema),
+
+  const schema = useMemo(() => {
+    return formSchema.extend({
+      bet: z.coerce.number()
+        .min(0, 'Bet must be a positive number')
+        .max(league.shauhinModeSettings?.maxBet ?? 1000, 'Bet exceeds maximum allowed')
+        .default(0)
+        .optional(),
+    });
+  }, [league.shauhinModeSettings?.maxBet]);
+
+
+  const reactForm = useForm<z.infer<typeof schema>>({
+    defaultValues: {
+      referenceId: prediction.predictionMade?.referenceId,
+      bet: prediction.predictionMade?.bet ?? undefined,
+    },
+    resolver: zodResolver(schema),
   });
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
       const selectedType = Object.keys(options).find((type) =>
-        Object.values(options[type as ReferenceType]).some(({ id }) => id === data.referenceId)) as ReferenceType | undefined;
+        Object.values(options[type as ReferenceType]).some(({ id }) =>
+          id === data.referenceId)) as ReferenceType | undefined;
       if (!selectedType) throw new Error('Invalid reference type');
 
-      await makePrediction(league.leagueHash, prediction, selectedType, data.referenceId);
+      await makePrediction(
+        league.leagueHash,
+        prediction,
+        selectedType,
+        data.referenceId,
+        data.bet
+      );
       await refresh();
       alert('Prediction submitted');
     } catch (error) {
@@ -155,64 +256,105 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
     }
   });
 
+  const shauhinEnabled = league.shauhinModeSettings?.enabled &&
+    league.shauhinModeSettings.enabledBets
+      .includes(prediction.eventName as ScoringBaseEventName);
+
   return (
     <Form {...reactForm}>
       <form action={() => handleSubmit()}>
-        <FormField
-          name='referenceId'
-          render={({ field }) => (
-            <FormItem className='p-2'>
-              <FormLabel className='sr-only'>Prediction</FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  value={`${field.value ?? ''}`}>
-                  <span className='grid lg:grid-cols-4 grid-cols-1 gap-2'>
-                    <SelectTrigger className='lg:col-span-3'>
+        <span className='grid lg:grid-cols-6 grid-cols-1 gap-2 items-center py-2 px-4'>
+          <FormField
+            name='referenceId'
+            render={({ field }) => (
+              <FormItem className={shauhinEnabled ? 'lg:col-span-3' : 'lg:col-span-4'}>
+                <FormLabel className='sr-only'>Prediction</FormLabel>
+                <FormControl>
+                  <Select
+                    onValueChange={field.onChange}
+                    value={`${field.value ?? ''}`}>
+                    <SelectTrigger className=''>
                       <SelectValue placeholder='Select prediction' />
                     </SelectTrigger>
-                    <Button
-                      disabled={!field.value}
-                      type='submit'>
-                      {prediction.predictionMade ? 'Update' : 'Submit'} Prediction
-                    </Button>
-                  </span>
-                  <SelectContent>
-                    {Object.entries(options).map(([referenceType, references]) => (
-                      Object.keys(references).length === 0 ? null : (
-                        <SelectGroup key={referenceType}>
-                          <SelectLabel>{referenceType}s</SelectLabel>
-                          {Object.entries(references)
-                            .sort(([name, vals], [name2, vals2]) =>
-                              vals.tribeName?.localeCompare(vals2.tribeName ?? '') ??
-                              name.localeCompare(name2))
-                            .map(([name, vals]) => (
-                              referenceType === 'Tribe' ?
-                                <SelectItem key={vals.id} value={`${vals.id}`}>
-                                  <ColorRow
-                                    className='w-20 px-0 justify-center leading-tight'
-                                    color={vals.color}>
-                                    {name}
-                                  </ColorRow>
-                                </SelectItem> :
-                                <SelectItem key={vals.id} value={`${vals.id}`}>
-                                  <span className='flex items-center gap-1'>
+                    <SelectContent>
+                      {Object.entries(options).map(([referenceType, references]) => (
+                        Object.keys(references).length === 0 ? null : (
+                          <SelectGroup key={referenceType}>
+                            <SelectLabel>{referenceType}s</SelectLabel>
+                            {Object.entries(references)
+                              .sort(([name, vals], [name2, vals2]) =>
+                                vals.tribeName?.localeCompare(vals2.tribeName ?? '') ??
+                                name.localeCompare(name2))
+                              .map(([name, vals]) => (
+                                referenceType === 'Tribe' ?
+                                  <SelectItem key={vals.id} value={`${vals.id}`}>
                                     <ColorRow
                                       className='w-20 px-0 justify-center leading-tight'
                                       color={vals.color}>
-                                      {vals.tribeName}
+                                      {name}
                                     </ColorRow>
-                                    {name}
-                                  </span>
-                                </SelectItem>
-                            ))}
-                        </SelectGroup>
-                      )))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-            </FormItem>
-          )} />
+                                  </SelectItem> :
+                                  <SelectItem key={vals.id} value={`${vals.id}`}>
+                                    <span className='flex items-center gap-1'>
+                                      <ColorRow
+                                        className='w-20 px-0 justify-center leading-tight'
+                                        color={vals.color}>
+                                        {vals.tribeName}
+                                      </ColorRow>
+                                      {name}
+                                    </span>
+                                  </SelectItem>
+                              ))}
+                          </SelectGroup>
+                        )))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+              </FormItem>
+            )} />
+          {shauhinEnabled && (
+            <FormField
+              name='bet'
+              render={({ field: betField }) => (
+                <FormItem className='relative col-span-2'>
+                  <FormLabel className='sr-only'>Bet</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='number'
+                      placeholder='Enter bet'
+                      {...betField}
+                      value={betField.value as string ?? ''}
+                    />
+                  </FormControl>
+                  <Popover>
+                    <PopoverTrigger className='absolute -translate-y-1/2 top-1/2 right-8'>
+                      <HelpCircle size={12} />
+                    </PopoverTrigger>
+                    <PopoverContent className='w-80'>
+                      <PopoverArrow />
+                      <h3 className='text-lg font-semibold'>Shauhin Mode</h3>
+                      <p className='text-sm'>
+                        If your prediction is correct, you will earn the bet amount in points.
+                        Miss it, and you lose the bet amount.<br />
+                        Bets are limited to a maximum of {league.shauhinModeSettings?.maxBet ?? 1000} points.<br />
+                        <br />
+                        <b>Note:</b> Bets are only available for certain predictions as defined in the league settings.
+                        <br /><br />
+                        Good luck!
+                      </p>
+                    </PopoverContent>
+                  </Popover>
+                </FormItem>
+              )} />
+          )}
+          <Button
+            className={cn(shauhinEnabled ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
+            disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
+            type='submit'>
+            {prediction.predictionMade ?? reactForm.formState.isSubmitSuccessful
+              ? 'Update' : 'Submit'}
+          </Button>
+        </span>
       </form>
     </Form>
   );

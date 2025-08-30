@@ -61,7 +61,7 @@ export default function CustomEvents() {
   const disabled = loggedIn?.role !== 'Owner';
 
   return (
-    <article className='bg-card p-2 rounded-xl w-full relative space-y-2'>
+    <article className='bg-card p-2 rounded-xl w-full relative'>
       {!disabled && (locked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
@@ -72,24 +72,25 @@ export default function CustomEvents() {
       <div>
         <h2 className='text-lg font-bold text-card-foreground'>Custom Events</h2>
         <div className='flex flex-col gap-2'>
-          <p className='text-sm mr-12'>
+          <p className='text-sm mr-12 max-w-4xl'>
             These <i>Custom Events</i> let you make your league truly unique!
             Anything can be scored—from speaking the first word of the episode to orchestrating a blindside.
             <br />
             The possibilities are endless!
           </p>
-          <p className='text-sm'>
-            Most custom events require manual scoring. Once your league drafts, you’ll see a new
-            tab on this page where you can track and score events as they happen.
+          <p className='text-sm mr-12 max-w-4xl'>
+            Custom events require manual scoring. Once your league drafts, you’ll see a new
+            tab on this page where you can score, edit and delete custom events during the season.
           </p>
           <div>
             <p className='text-sm'>
               <i>Custom Events</i> can be scored in two ways:
             </p>
-            <ul className='ml-4 list-decimal text-sm'>
+            <ul className='ml-4 list-decimal text-sm max-w-4xl'>
               <li><b>Direct</b>: Points are awarded like <i>Official Events</i>, based on a player’s pick.</li>
               <li><b>Prediction</b>: Points are awarded to members who correctly predict an event’s outcome.
-                Predictions can occur each episode or at specific times in the season.</li>
+                Predictions can be made before each episode or at specific times throughout the season.
+              </li>
             </ul>
           </div>
         </div>
@@ -266,7 +267,7 @@ export function CustomEventFields({ predictionDefault, children }: CustomEventFi
         <FormField
           name='timing'
           render={({ field }) => (
-            <FormItem className={!isPrediction ? '!pointer-events-none w-full' : 'w-full'}>
+            <FormItem className={!isPrediction ? 'pointer-events-none! w-full' : 'w-full'}>
               <FormLabel className='flex items-center gap-1'>
                 Timing
                 <PredictionTimingHelp />

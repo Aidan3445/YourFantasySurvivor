@@ -8,6 +8,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
+import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from './table';
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -188,7 +189,7 @@ const CarouselItem = React.forwardRef<
       role='group'
       aria-roledescription='slide'
       className={cn(
-        'min-w-0 shrink-0 grow-0 basis-full',
+        'min-w-0 shrink-0 grow-0 basis-full select-none',
         orientation === 'horizontal' ? 'pl-4' : 'pt-4',
         className
       )}
@@ -241,7 +242,7 @@ const CarouselNext = React.forwardRef<
       size={size}
       type='button'
       className={cn(
-        'absolute h-8 w-8 rounded-full',
+        'h-8 w-8 rounded-full',
         orientation === 'horizontal'
           ? '-right-12 top-1/2 -translate-y-1/2'
           : '-bottom-12 left-1/2 -translate-x-1/2 rotate-90',
@@ -258,15 +259,15 @@ const CarouselNext = React.forwardRef<
 });
 CarouselNext.displayName = 'CarouselNext';
 
-interface BounceyCarouselProps {
+interface CoverCarouselProps {
   items: {
     header: React.ReactNode
     content: React.ReactNode
-    footer: React.ReactNode
+    footer?: React.ReactNode
   }[]
 }
 
-function BounceyCarousel({ items }: BounceyCarouselProps) {
+function CoverCarousel({ items }: CoverCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
 
@@ -282,37 +283,121 @@ function BounceyCarousel({ items }: BounceyCarouselProps) {
     });
   }, [api]);
 
-
   return (
-    <Carousel className='select-none gap-4 items-center w-[calc(100svw-2.5rem)] md:w-auto' setApi={setApi} opts={{ align: 'center' }}>
-      <CarouselContent>
-        {items.map((item, index) => (
-          <CarouselItem key={index} className={cn('basis-[90%] z-10 transition-all', {
-            'opacity-50 -z-10': index !== current - 1,
-          })}>
-            <article
+    <Carousel className='relative' setApi={setApi} opts={{ containScroll: false }}>
+      <CarouselContent
+        className='ml-0 -mx-2'>
+        {items.map((item, index) => {
+          const offset = index - (current - 1);
+          const absOffset = Math.abs(offset);
+
+          return (
+            <CarouselItem
+              key={index}
               className={cn(
-                'flex flex-col bg-secondary rounded-lg shadow-lg my-4 overflow-y-hidden',
-                'text-center transition-transform duration-700',
+                'z-10 transition-all duration-500 drop-shadow-md bg-secondary rounded-md',
+                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
+                'basis-[90%] lg:basis-1/2',
                 {
-                  'scale-75': index !== current - 1,
-                  '-translate-x-1/2': index === current % items.length,
-                  'translate-x-1/2': index === (current - 2) % items.length,
-                  '-translate-x-6 md:-translate-x-8': index + current + 1 === 2 * items.length,
-                  'translate-x-6 md:translate-x-8 lg:translate-x-12': index + current === 1,
-                })} >
-              <span className='flex w-full gap-4 justify-between items-center self-center px-1 lg:w-full'>
-                <CarouselPrevious className='static min-w-8 translate-y-0 mt-1 ml-1' />
-                {item.header}
-                <CarouselNext className='static min-w-8 translate-y-0 mt-1 mr-1' />
-              </span>
-              {item.content}
-              {item.footer}
-            </article>
-          </CarouselItem>
-        ))}
+                  'pointer-events-none': offset !== 0,
+
+                  'scale-50 translate-y-2 -z-10 blur-[1px] duration-[400ms]': absOffset === 1,
+                  'translate-x-1/3': offset === -1,
+                  '-translate-x-1/3': offset === 1,
+
+                  'scale-[25%] translate-y-4 -z-20 blur-[2px] duration-300': absOffset === 2,
+                  'translate-x-full': offset === -2,
+                  '-translate-x-full': offset === 2,
+
+                  'scale-[12.5%] translate-y-6 -z-30 blur-[3px] duration-200': absOffset === 3,
+                  'translate-x-[185%]': offset <= -3,
+                  '-translate-x-[185%]': offset >= 3,
+
+                  'scale-0 duration-100': absOffset > 3,
+                }
+              )}>
+              <Table className='table-fixed'>
+                <TableCaption className='sr-only'>
+                  {`Slide ${index + 1} of ${items.length}`}
+                </TableCaption>
+                <TableHeader>
+                  <TableRow className='bg-transparent hover:bg-transparent border-none'>
+                    <TableHead className='text-center'>
+                      <Button
+                        variant={'outline'}
+                        type='button'
+                        className={cn(
+                          'rounded-full z-10',
+                          index === 0 && 'invisible',
+                        )}
+                        disabled={!api?.canScrollPrev() || index !== current - 1}
+                        onClick={() => api?.scrollPrev()}>
+                        <ArrowLeft className='h-4 w-4' />
+                        <span className='sr-only'>Previous slide</span>
+                      </Button>
+                    </TableHead>
+                    <TableHead className='place-items-center text-center font-normal text-nowrap'>
+                      {item.header}
+                    </TableHead>
+                    <TableHead className='text-center'>
+                      <Button
+                        variant={'outline'}
+                        type='button'
+                        className={cn(
+                          'rounded-full z-10',
+                          index === items.length - 1 && 'invisible',
+                        )}
+                        disabled={!api?.canScrollNext() || index !== current - 1}
+                        onClick={() => api?.scrollNext()}>
+                        <ArrowRight className='h-4 w-4' />
+                        <span className='sr-only'>Next slide</span>
+                      </Button>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  <TableRow className='bg-transparent hover:bg-transparent border-none'>
+                    <TableCell colSpan={3} className={cn(
+                      'p-0 max-h-52 scrollbar-thin scrollbar-thumb-primary/75 scrollbar-track-secondary',
+                      offset === 0 ? 'overflow-y-auto' : 'overflow-hidden')}>
+                      {item.content}
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+                {item.footer && (
+                  <TableFooter className='border-none'>
+                    <TableRow className='bg-b2 hover:bg-b2 border-none'>
+                      <TableCell colSpan={3} className='p-0'>
+                        {item.footer}
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                )}
+              </Table>
+            </CarouselItem>
+          );
+        })}
       </CarouselContent>
+      <CarouselProgress current={current} count={items.length} />
     </Carousel>
+  );
+}
+
+interface CarouselProgressProps {
+  current: number
+  count: number
+}
+
+function CarouselProgress({ current, count }: CarouselProgressProps) {
+  return (
+    <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
+      <div
+        className='h-full bg-primary rounded-full transition-all ease-linear duration-300'
+        style={{
+          width: `${((current - 1) / (count - 1)) * 100}%`,
+        }}
+      />
+    </div>
   );
 }
 
@@ -323,5 +408,6 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-  BounceyCarousel,
+  CoverCarousel,
+  CarouselProgress,
 };

@@ -6,7 +6,7 @@ import { ChatClient } from '@ably/chat';
 import { ChatClientProvider, ChatRoomProvider } from '@ably/chat/react';
 import ChatRoom, { type ChatRoomProps } from './chatRoom';
 
-export default function LeagueChat({ chatHistory }: ChatRoomProps) {
+export default function LeagueChat({ chatHistory, messageEnd }: ChatRoomProps) {
   const params = useParams();
   const leagueHash = params.leagueHash as string;
 
@@ -16,7 +16,7 @@ export default function LeagueChat({ chatHistory }: ChatRoomProps) {
   return (
     <ChatClientProvider client={chatClient}>
       <ChatRoomProvider name={leagueHash}>
-        <ChatRoom chatHistory={chatHistory} />
+        <ChatRoom chatHistory={chatHistory} messageEnd={messageEnd} />
       </ChatRoomProvider>
     </ChatClientProvider>
   );
