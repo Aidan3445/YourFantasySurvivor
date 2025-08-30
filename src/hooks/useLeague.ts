@@ -5,8 +5,8 @@ import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
 import { type QUERIES } from '~/app/api/leagues/query';
 import { type SWRKey } from '~/lib/utils';
-import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/server/db/defs/events';
-import { type LeagueHash } from '~/server/db/defs/leagues';
+import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/types/events';
+import { type LeagueHash } from '~/types/leagues';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagueLiveData>>>;

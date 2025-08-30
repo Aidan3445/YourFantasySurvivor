@@ -10,14 +10,14 @@ import {
   BaseEventDescriptions, type ScoringBaseEventName, BasePredictionReferenceTypes,
   type BasePredictionDraft, type LeaguePredictionDraft,
   BaseEventFullName
-} from '~/server/db/defs/events';
+} from '~/types/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
-import type { CastawayDetails, CastawayDraftInfo } from '~/server/db/defs/castaways';
+import type { CastawayDetails, CastawayDraftInfo } from '~/types/castaways';
 import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
-import type { Tribe } from '~/server/db/defs/tribes';
+import type { Tribe } from '~/types/tribes';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';

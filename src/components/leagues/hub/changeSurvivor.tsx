@@ -15,7 +15,7 @@ import { chooseCastaway } from '~/app/api/leagues/actions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
-import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),

@@ -20,19 +20,19 @@ import {
 } from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
-import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes';
+import type { EpisodeNumber, EpisodeAirStatus } from '~/types/episodes';
 import {
   type BaseEvent, BaseEventFullName, baseEventLabelPrefixes, baseEventLabels,
   type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventId, type LeagueEventName,
   type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames
-} from '~/server/db/defs/events';
-import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+} from '~/types/events';
+import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import EditBaseEvent from '~/components/leagues/actions/editBaseEvent';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import EditLeagueEvent from '~/components/leagues/actions/editLeagueEvent';
 import { useIsMobile } from '~/hooks/useMobile';
-import { type CastawayName } from '~/server/db/defs/castaways';
-import { type TribeName } from '~/server/db/defs/tribes';
+import { type CastawayName } from '~/types/castaways';
+import { type TribeName } from '~/types/tribes';
 import { Label } from '~/components/common/label';
 
 // TODO: add survivor streak to timeline

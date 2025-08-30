@@ -4,8 +4,8 @@ import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
-import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';
-import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+import type { CastawayDetails, CastawayName } from '~/types/castaways';
+import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { MoveRight, Circle, Flame, History, Skull, CircleHelp } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
@@ -15,7 +15,7 @@ import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Separator } from '~/components/common/separator';
 import { getContrastingColor } from '@uiw/color-convert';
-import { type LeagueHash } from '~/server/db/defs/leagues';
+import { type LeagueHash } from '~/types/leagues';
 
 interface ScoreboardProps {
   overrideLeagueHash?: LeagueHash;

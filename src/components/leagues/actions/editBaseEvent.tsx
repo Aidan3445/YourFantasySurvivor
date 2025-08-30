@@ -10,7 +10,7 @@ import {
 } from '~/components/common/alertDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { MultiSelect } from '~/components/common/multiSelect';
-import { type BaseEventInsert, BaseEventInsertZod, baseEventLabelPrefixes, baseEventLabels, type BaseEvent } from '~/server/db/defs/events';
+import { type BaseEventInsert, BaseEventInsertZod, baseEventLabelPrefixes, baseEventLabels, type BaseEvent } from '~/types/events';
 import { useState } from 'react';
 import { Input } from '~/components/common/input';
 import { useEventOptions } from '~/hooks/useEventOptions';

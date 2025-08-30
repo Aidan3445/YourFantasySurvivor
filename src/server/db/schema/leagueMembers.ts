@@ -5,7 +5,7 @@ import { leaguesSchema } from '~/server/db/schema/leagues';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { boolean, index, integer, pgEnum, primaryKey, serial, unique, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
-import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '~/server/db/defs/leagueMembers';
+import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '~/types/leagueMembers';
 
 export const leagueMemberRole = pgEnum('league_member_role', LeagueMemberRoleOptions);
 

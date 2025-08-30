@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem } from '~/components/common/form';
 import { Button } from '~/components/common/button';
 import { useLeague } from '~/hooks/useLeague';
-import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
+import { type CastawayDraftInfo } from '~/types/castaways';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import { chooseCastaway } from '~/app/api/leagues/actions';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';

@@ -15,7 +15,7 @@ import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
 import { deleteLeagueEvent, updateLeagueEvent } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
-import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/server/db/defs/events';
+import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 
 interface EditLeagueEventProps {
   episodeNumber: number;

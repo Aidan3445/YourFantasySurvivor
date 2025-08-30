@@ -5,11 +5,11 @@ import {
 } from '~/components/common/table';
 
 import { compileScores } from '~/app/api/seasons/scores';
-import { type BaseEventRule } from '~/server/db/defs/events';
+import { type BaseEventRule } from '~/types/events';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { cn } from '~/lib/utils';
 import { Circle, Flame, FlameKindling } from 'lucide-react';
-import { type CastawayDetails, type CastawayName } from '~/server/db/defs/castaways';
+import { type CastawayDetails, type CastawayName } from '~/types/castaways';
 import { newtwentyColors } from '~/lib/colors';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';

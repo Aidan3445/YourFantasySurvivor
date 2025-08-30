@@ -6,9 +6,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/pop
 import { useDraft } from '~/hooks/useDraft';
 import { useIsMobile } from '~/hooks/useMobile';
 import { cn } from '~/lib/utils';
-import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
-import { type LeagueHash } from '~/server/db/defs/leagues';
-import { type TribeName } from '~/server/db/defs/tribes';
+import { type CastawayDraftInfo } from '~/types/castaways';
+import { type LeagueHash } from '~/types/leagues';
+import { type TribeName } from '~/types/tribes';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 

@@ -7,7 +7,7 @@ import { useLeague } from '~/hooks/useLeague';
 import {
   type LeagueEventRule, LeagueEventRuleZod, LeagueEventTypeOptions,
   PredictionTimingOptions, ReferenceOptions, defaultLeagueEventRule
-} from '~/server/db/defs/events';
+} from '~/types/events';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';

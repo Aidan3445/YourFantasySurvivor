@@ -3,7 +3,7 @@ import 'server-only';
 import { createTable } from '~/server/db/schema/createTable';
 import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from '~/server/db/schema/leagues';
-import { LeagueEventTypeOptions } from '~/server/db/defs/events';
+import { LeagueEventTypeOptions } from '~/types/events';
 import { sql } from 'drizzle-orm';
 import { leagueEventReference, predictionEventTiming } from '~/server/db/schema/baseEvents';
 import { episodesSchema } from '~/server/db/schema/episodes';

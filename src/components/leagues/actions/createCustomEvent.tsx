@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
-import { type LeagueEventInsert, LeagueEventInsertZod } from '~/server/db/defs/events';
+import { type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useMemo } from 'react';

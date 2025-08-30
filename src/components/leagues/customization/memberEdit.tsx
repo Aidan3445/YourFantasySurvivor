@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form, FormLabel } from '~/components/common/form';
-import { ColorZod, DisplayNameZod, type LeagueMember } from '~/server/db/defs/leagueMembers';
+import { ColorZod, DisplayNameZod, type LeagueMember } from '~/types/leagueMembers';
 import { updateMemberDetails } from '~/app/api/leagues/actions';
 import { useEffect } from 'react';
 import { useLeague } from '~/hooks/useLeague';

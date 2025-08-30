@@ -2,8 +2,8 @@ import 'server-only';
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { type CastawayDetails, type NewCastaway } from '~/server/db/defs/castaways';
-import type { NewTribe, TribeColor, TribeName } from '~/server/db/defs/tribes';
+import { type CastawayDetails, type NewCastaway } from '~/types/castaways';
+import type { NewTribe, TribeColor, TribeName } from '~/types/tribes';
 import { db } from '~/server/db';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { isNull } from 'drizzle-orm';

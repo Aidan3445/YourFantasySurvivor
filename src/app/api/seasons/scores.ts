@@ -1,4 +1,4 @@
-import { defaultBaseRules, defaultPredictionRules, type BaseEventRule } from '~/server/db/defs/events';
+import { defaultBaseRules, defaultPredictionRules, type BaseEventRule } from '~/types/events';
 import { compileScores as scoresCompiler } from '~/app/api/leagues/[leagueHash]/scores';
 import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
 

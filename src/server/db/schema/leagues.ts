@@ -5,7 +5,7 @@ import { seasonsSchema } from '~/server/db/schema/seasons';
 import { boolean, integer, pgEnum, serial, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 import { sql } from 'drizzle-orm';
-import { DEFAULT_SURVIVAL_CAP, LeagueStatusOptions } from '~/server/db/defs/leagues';
+import { DEFAULT_SURVIVAL_CAP, LeagueStatusOptions } from '~/types/leagues';
 
 export const leagueStatus = pgEnum('league_status', LeagueStatusOptions);
 

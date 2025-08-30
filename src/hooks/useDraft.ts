@@ -2,7 +2,7 @@ import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
 import { type QUERIES } from '~/app/api/leagues/query';
 import { type SWRKey } from '~/lib/utils';
-import { type LeagueHash } from '~/server/db/defs/leagues';
+import { type LeagueHash } from '~/types/leagues';
 
 export type Draft = NonUndefined<Awaited<ReturnType<typeof QUERIES.getDraft>>>;
 

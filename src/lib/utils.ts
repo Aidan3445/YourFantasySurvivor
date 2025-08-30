@@ -1,11 +1,11 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
-import { type CastawayDetails } from '~/server/db/defs/castaways';
-import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type BasePredictionRules, defaultPredictionRules, type PredictionEventTiming, ScoringBaseEventNames } from '~/server/db/defs/events';
-import { type LeagueHash } from '~/server/db/defs/leagues';
-import { type TribeName } from '~/server/db/defs/tribes';
+import { type CastawayDetails } from '~/types/castaways';
+import { type EpisodeNumber } from '~/types/episodes';
+import { type BasePredictionRules, defaultPredictionRules, type PredictionEventTiming, ScoringBaseEventNames } from '~/types/events';
+import { type LeagueHash } from '~/types/leagues';
+import { type TribeName } from '~/types/tribes';
 import { type baseEventPredictionRulesSchema } from '~/server/db/schema/baseEvents';
 
 export function cn(...inputs: ClassValue[]) {

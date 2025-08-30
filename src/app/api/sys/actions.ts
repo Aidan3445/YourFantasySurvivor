@@ -3,9 +3,9 @@
 import { eq } from 'drizzle-orm';
 import { systemAdminAuth } from '~/lib/auth';
 import { db } from '~/server/db';
-import { type NewCastaway } from '~/server/db/defs/castaways';
-import { type NewSeason } from '~/server/db/defs/seasons';
-import { type NewTribe } from '~/server/db/defs/tribes';
+import { type NewCastaway } from '~/types/castaways';
+import { type NewSeason } from '~/types/seasons';
+import { type NewTribe } from '~/types/tribes';
 import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { episodesSchema } from '~/server/db/schema/episodes';

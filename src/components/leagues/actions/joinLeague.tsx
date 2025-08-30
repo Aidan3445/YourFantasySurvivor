@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Input } from '~/components/common/input';
 import { Button } from '~/components/common/button';
-import { ColorZod, DisplayNameZod, type LeagueMemberColor, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
+import { ColorZod, DisplayNameZod, type LeagueMemberColor, type NewLeagueMember } from '~/types/leagueMembers';
 import Swatch, { type SwatchRectRenderProps } from '@uiw/react-color-swatch';
 import { type HsvaColor, getContrastingColor, hexToHsva, hexToRgba, hsvaToHex, rgbaToHex } from '@uiw/color-convert';
 import { twentyColors } from '~/lib/colors';

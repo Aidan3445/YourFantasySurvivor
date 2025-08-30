@@ -1,6 +1,6 @@
 'use server';
 
-import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
+import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/types/leagues';
 import { db } from '~/server/db';
 import {
   baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema,
@@ -9,22 +9,22 @@ import {
 import {
   type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert,
   type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName, type ShauhinModeSettings
-} from '~/server/db/defs/events';
+} from '~/types/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
 import { auth, leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import {
   type LeagueMember, type LeagueMemberId, type NewLeagueMember
-} from '~/server/db/defs/leagueMembers';
+} from '~/types/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import {
   leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema
 } from '~/server/db/schema/leagueEvents';
-import { type CastawayId } from '~/server/db/defs/castaways';
+import { type CastawayId } from '~/types/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
-import { type TribeId } from '~/server/db/defs/tribes';
+import { type TribeId } from '~/types/tribes';
 import { QUERIES } from '~/app/api/leagues/query';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 import { basePredictionRulesObjectToSchema } from '~/lib/utils';

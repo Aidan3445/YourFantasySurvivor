@@ -1,7 +1,7 @@
-import { type EpisodeNumber } from '~/server/db/defs/episodes';
+import { type EpisodeNumber } from '~/types/episodes';
 import { useLeague } from '~/hooks/useLeague';
 import { useMemo } from 'react';
-import { type TribeId, type TribeName } from '~/server/db/defs/tribes';
+import { type TribeId, type TribeName } from '~/types/tribes';
 
 export function useEventOptions(selectedEpisode: EpisodeNumber) {
   const { leagueData } = useLeague();

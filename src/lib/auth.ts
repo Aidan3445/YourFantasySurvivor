@@ -6,7 +6,7 @@ import { db } from '~/server/db';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { systemSchema } from '~/server/db/schema/system';
-import { type LeagueHash } from '~/server/db/defs/leagues';
+import { type LeagueHash } from '~/types/leagues';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 
 /**

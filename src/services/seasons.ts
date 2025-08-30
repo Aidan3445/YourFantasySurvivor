@@ -2,11 +2,11 @@ import { aliasedTable, and, asc, desc, eq, inArray, lte } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
-import { type CastawayImage, type CastawayDetails, type CastawayName, type CastawayId } from '~/server/db/defs/castaways';
-import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type BaseEventName, type BaseEvent, type BaseEventId } from '~/server/db/defs/events';
-import { type SeasonId } from '~/server/db/defs/seasons';
-import { type TribeEp, type TribeName, type TribeUpdate } from '~/server/db/defs/tribes';
+import { type CastawayImage, type CastawayDetails, type CastawayName, type CastawayId } from '~/types/castaways';
+import { type EpisodeNumber } from '~/types/episodes';
+import { type BaseEventName, type BaseEvent, type BaseEventId } from '~/types/events';
+import { type SeasonId } from '~/types/seasons';
+import { type TribeEp, type TribeName, type TribeUpdate } from '~/types/tribes';
 import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { episodesSchema } from '~/server/db/schema/episodes';

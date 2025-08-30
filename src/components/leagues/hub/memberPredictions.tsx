@@ -4,7 +4,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger
 } from '~/components/common/alertDialog';
-import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 
 interface MemberPredictionsProps {
   member: LeagueMemberDisplayName;

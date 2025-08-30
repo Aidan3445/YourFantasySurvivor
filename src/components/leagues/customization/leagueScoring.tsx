@@ -1,7 +1,7 @@
 'use client';
 
 import { z } from 'zod';
-import { BaseEventRuleZod, BasePredictionRulesZod, defaultBaseRules, defaultPredictionRules } from '~/server/db/defs/events';
+import { BaseEventRuleZod, BasePredictionRulesZod, defaultBaseRules, defaultPredictionRules } from '~/types/events';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';

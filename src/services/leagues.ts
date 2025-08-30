@@ -10,11 +10,11 @@ import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventRe
 import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
-import type { LeagueStatus, LeagueHash, LeagueName } from '~/server/db/defs/leagues';
-import type { SeasonName } from '~/server/db/defs/seasons';
-import type { CastawayDraftInfo, CastawayName } from '~/server/db/defs/castaways';
+import type { LeagueStatus, LeagueHash, LeagueName } from '~/types/leagues';
+import type { SeasonName } from '~/types/seasons';
+import type { CastawayDraftInfo, CastawayName } from '~/types/castaways';
 import { tribesSchema } from '~/server/db/schema/tribes';
-import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/server/db/defs/leagueMembers';
+import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/types/leagueMembers';
 import {
   type EventPrediction, type LeagueDirectEvent, type ReferenceType, type LeaguePredictionEvent,
   type BaseEventRule, type LeagueEventId, type LeagueEventName,
@@ -26,10 +26,10 @@ import {
   ScoringBaseEventNames,
   type LeaguePredictionDraft,
   type ScoringBaseEventName,
-} from '~/server/db/defs/events';
+} from '~/types/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
-import type { Tribe, TribeName } from '~/server/db/defs/tribes';
-import type { EpisodeAirStatus, EpisodeNumber } from '~/server/db/defs/episodes';
+import type { Tribe, TribeName } from '~/types/tribes';
+import type { EpisodeAirStatus, EpisodeNumber } from '~/types/episodes';
 import { compileScores } from '~/app/api/leagues/[leagueHash]/scores';
 import { QUERIES as SYS_QUERIES } from '~/app/api/sys/query';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';

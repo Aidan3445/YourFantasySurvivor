@@ -4,7 +4,7 @@ import { Input } from '~/components/common/input';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Switch } from '~/components/common/switch';
 import { cn } from '~/lib/utils';
-import { BaseEventDescriptions, BaseEventFullName, PredictionTimingOptions, type ScoringBaseEventName } from '~/server/db/defs/events';
+import { BaseEventDescriptions, BaseEventFullName, PredictionTimingOptions, type ScoringBaseEventName } from '~/types/events';
 
 interface BaseEventSettingsProps {
   disabled?: boolean;

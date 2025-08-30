@@ -1,7 +1,7 @@
 'use client';
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
-import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/server/db/defs/leagues';
+import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/types/leagues';
 import { useLeague } from '~/hooks/useLeague';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';

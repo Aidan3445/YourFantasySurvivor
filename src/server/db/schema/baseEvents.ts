@@ -3,7 +3,7 @@ import 'server-only';
 import { createTable } from '~/server/db/schema/createTable';
 import { boolean, index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from '~/server/db/schema/leagues';
-import { AllBaseEventNames, PredictionTimingOptions, ReferenceOptions, ScoringBaseEventNames, ShauhinModeTimings } from '~/server/db/defs/events';
+import { AllBaseEventNames, PredictionTimingOptions, ReferenceOptions, ScoringBaseEventNames, ShauhinModeTimings } from '~/types/events';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 

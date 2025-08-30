@@ -3,8 +3,8 @@
 import { type QUERIES } from '~/app/api/leagues/query';
 import { PredictionCards } from '~/components/leagues/draft/makePredictions';
 import { AirStatus } from '~/components/leagues/hub/recentActivity';
-import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type ShauhinModeSettings, type Prediction, BaseEventFullName } from '~/server/db/defs/events';
+import { type EpisodeNumber } from '~/types/episodes';
+import { type ShauhinModeSettings, type Prediction, BaseEventFullName } from '~/types/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
 import { CoverCarousel } from '~/components/common/carousel';

@@ -1,7 +1,7 @@
 'use client';
 
 import { Slider } from '~/components/common/slider';
-import { DEFAULT_SURVIVAL_CAP, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
+import { DEFAULT_SURVIVAL_CAP, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/types/leagues';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { type z } from 'zod';

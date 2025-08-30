@@ -2,7 +2,7 @@
 
 import { Settings, X } from 'lucide-react';
 import { z } from 'zod';
-import { type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
+import { type LeagueSettingsUpdate } from '~/types/leagues';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Button } from '~/components/common/button';

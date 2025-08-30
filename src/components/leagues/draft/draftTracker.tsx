@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDraft } from '~/hooks/useDraft';
 import { useLeague } from '~/hooks/useLeague';
-import { type LeagueHash } from '~/server/db/defs/leagues';
+import { type LeagueHash } from '~/types/leagues';
 import { getContrastingColor } from '@uiw/color-convert';
 import ChooseCastaway from '~/components/leagues/draft/chooseCastaway';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';

@@ -2,7 +2,7 @@
 
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { type BaseEventInsert } from '~/server/db/defs/events';
+import { type BaseEventInsert } from '~/types/events';
 import { eq } from 'drizzle-orm';
 import { systemAdminAuth } from '~/lib/auth';
 

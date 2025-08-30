@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { type z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
-import { BaseEventFullName, type ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from '~/server/db/defs/events';
+import { BaseEventFullName, type ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from '~/types/events';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '~/components/common/button';
 import { Switch } from '~/components/common/switch';
