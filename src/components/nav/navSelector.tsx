@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
-import BottomNav from '~/components/nav/bottomNav/view';
-import SideNav from '~/components/nav/sideNav/view';
+import BottomNav from '~/components/nav/bottom/view';
+import SideNav from '~/components/nav/side/view';
 
 export interface NavLinkProps {
   href: string;

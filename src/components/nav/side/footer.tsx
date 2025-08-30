@@ -4,7 +4,7 @@ import { LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-export function SideNavFooter() {
+export default function SideNavFooter() {
   return (
     <SidebarMenu className='mt-2'>
       <SidebarMenuButton

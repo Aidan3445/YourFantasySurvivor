@@ -1,7 +1,7 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { LoaderCircle, LogIn } from 'lucide-react';
 
-export function BottomNavUser() {
+export default function BottomNavUser() {
   return (<>
     <ClerkLoading>
       <LoaderCircle className='animate-spin' color='#7f633f' size={28} />

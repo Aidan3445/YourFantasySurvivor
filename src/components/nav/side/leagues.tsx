@@ -1,14 +1,16 @@
+'use client';
+
 import { SidebarMenuButton, SidebarMenuSub } from '~/components/common/sidebar';
 import { ListPlus, Trophy } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { CreateLeagueModal } from '~/components/leagues/actions/createLeague';
+import { CreateLeagueModal } from '~/components/leagues/actions/league/create/view';
 import { Separator } from '~/components/common/separator';
-import { SideNavLink } from '~/components/nav/sideNav/link';
+import SideNavLink from '~/components/nav/side/link';
 
-export function SideNavLeagues() {
+export default function SideNavLeagues() {
   const { leagues } = useYfsUser();
   const [open, setOpen] = useState('');
   const { leagueHash } = useParams();

@@ -2,9 +2,9 @@ import { SignedIn } from '@clerk/nextjs';
 import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/common/sidebar';
 
 import Image from 'next/image';
-import { SideNavFooter } from '~/components/nav/sideNav/footer';
-import { SideNavLink } from '~/components/nav/sideNav/link';
-import { SideNavLeagues } from '~/components/nav/sideNav/leagues';
+import SideNavFooter from '~/components/nav/side/footer';
+import SideNavLink from '~/components/nav/side/link';
+import SideNavLeagues from '~/components/nav/side/leagues';
 
 export default function SideNav() {
   return (

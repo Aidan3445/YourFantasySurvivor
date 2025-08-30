@@ -1,9 +1,8 @@
-
 import { Trophy } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import Image from 'next/image';
-import { BottomNavUser } from '~/components/nav/bottomNav/user';
-import { BottomNavLink } from '~/components/nav/bottomNav/link';
+import BottomNavUser from '~/components/nav/bottom/user';
+import BottomNavLink from '~/components/nav/bottom/link';
 
 export const navHeight = 'h-10';
 
