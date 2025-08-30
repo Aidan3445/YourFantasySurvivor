@@ -2,7 +2,7 @@ import { type LeagueInfo } from '~/context/yfsUserContext';
 import Link from 'next/link';
 import { Badge } from '~/components/common/badge';
 import { Eye } from 'lucide-react';
-import Scoreboard from '~/components/leagues/hub/scoreboard';
+import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DraftCountdown } from '~/components/leagues/predraft/countdown/view';
 
 interface ActiveLeagueProps {

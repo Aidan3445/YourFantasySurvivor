@@ -14,7 +14,7 @@ import {
 import { chooseCastaway } from '~/services/leagues/settings/leagueSettingActions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
-import { ColorRow } from '~/components/leagues/predraft/order/view';
+import ColorRow from '~/components/common/colorRow';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 
 const formSchema = z.object({

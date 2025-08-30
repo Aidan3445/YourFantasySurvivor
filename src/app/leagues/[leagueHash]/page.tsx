@@ -1,7 +1,7 @@
 import MemberEditForm from '~/components/leagues/customization/memberEdit';
 import Chart from '~/components/leagues/hub/chart';
 import RecentActivity from '~/components/leagues/hub/recentActivity';
-import Scoreboard from '~/components/leagues/hub/scoreboard';
+import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';

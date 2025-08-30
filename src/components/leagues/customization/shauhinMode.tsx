@@ -1,7 +1,7 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { ColorRow } from '~/components/leagues/predraft/order/view';
+import ColorRow from '~/components/common/colorRow';
 import { type z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { BaseEventFullName, type ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from '~/types/events';

@@ -2,7 +2,7 @@
 
 import { useLeague } from '~/hooks/useLeague';
 import { getContrastingColor } from '@uiw/color-convert';
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
@@ -13,6 +13,7 @@ import { handleDragEnd } from '~/hooks/useSortableItem';
 import { updateDraftOrder } from '~/services/leagues/settings/leagueSettingActions';
 import { Button } from '~/components/common/button';
 import { useRouter } from 'next/navigation';
+import ColorRow from '~/components/common/colorRow';
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -152,25 +153,3 @@ export default function DraftOrder({ className }: DraftOrderProps) {
     </article>
   );
 }
-
-export interface ColorRowProps {
-  color?: string;
-  loggedIn?: boolean;
-  className?: string;
-  children: ReactNode;
-}
-
-export function ColorRow({ color, loggedIn, className, children }: ColorRowProps) {
-  return (
-    <span
-      className={cn(
-        'px-4 gap-4 rounded border border-black flex items-center text-nowrap',
-        loggedIn && 'border-none ring-2 ring-white',
-        className
-      )}
-      style={{ backgroundColor: color, color: color ? getContrastingColor(color) : '' }}>
-      {children}
-    </span>
-  );
-}
-

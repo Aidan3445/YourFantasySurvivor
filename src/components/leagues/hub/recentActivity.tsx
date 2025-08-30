@@ -28,7 +28,7 @@ import {
 } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import EditBaseEvent from '~/components/leagues/actions/events/base/edit';
-import { ColorRow } from '~/components/leagues/predraft/order/view';
+import ColorRow from '~/components/common/colorRow';
 import EditCustomEvent from '~/components/leagues/actions/events/custom/edit';
 import { useIsMobile } from '~/hooks/useMobile';
 import { type CastawayName } from '~/types/castaways';
