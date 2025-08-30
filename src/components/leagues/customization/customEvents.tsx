@@ -5,15 +5,15 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { useLeague } from '~/hooks/useLeague';
 import {
-  type LeagueEventRule, LeagueEventRuleZod, LeagueEventTypeOptions,
-  PredictionTimingOptions, ReferenceOptions, defaultLeagueEventRule
+  type CustomEventRule, CustomEventRuleZod, CustomEventTypeOptions,
+  PredictionTimingOptions, ReferenceOptions, defaultCustomEventRule
 } from '~/types/events';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Button } from '~/components/common/button';
-import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/services/leagues/settings/leagueSettingActions';
+import { createCustomEventRule, deleteCustomEventRule, updateCustomEventRule } from '~/services/leagues/settings/leagueSettingActions';
 import { Flame, Lock, LockOpen, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -35,21 +35,21 @@ export default function CustomEvents() {
     refresh
   } = useLeague();
 
-  const reactForm = useForm<LeagueEventRule>({
-    defaultValues: defaultLeagueEventRule,
-    resolver: zodResolver(LeagueEventRuleZod),
+  const reactForm = useForm<CustomEventRule>({
+    defaultValues: defaultCustomEventRule,
+    resolver: zodResolver(CustomEventRuleZod),
   });
   const [locked, setLocked] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    const newRule: LeagueEventRule = {
+    const newRule: CustomEventRule = {
       ...data,
       timing: data.eventType === 'Prediction' ? data.timing : [],
     };
 
     try {
-      await createLeagueEventRule(leagueHash, newRule);
+      await createCustomEventRule(leagueHash, newRule);
       await refresh();
       alert(`Custom event ${newRule.eventName} created.`);
       reactForm.reset();
@@ -248,7 +248,7 @@ export function CustomEventFields({ predictionDefault, children }: CustomEventFi
                     <SelectValue placeholder='Select event type' />
                   </SelectTrigger>
                   <SelectContent>
-                    {LeagueEventTypeOptions.map((type) => (
+                    {CustomEventTypeOptions.map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
                       </SelectItem>
@@ -297,7 +297,7 @@ export function CustomEventFields({ predictionDefault, children }: CustomEventFi
 }
 
 interface CustomEventCardProps {
-  rule: LeagueEventRule;
+  rule: CustomEventRule;
   locked?: boolean;
 }
 
@@ -313,14 +313,14 @@ function CustomEventCard({ rule, locked }: CustomEventCardProps) {
   } = useLeague();
   const [isEditing, setIsEditing] = useState(false);
 
-  const reactForm = useForm<LeagueEventRule>({
+  const reactForm = useForm<CustomEventRule>({
     defaultValues: rule,
-    resolver: zodResolver(LeagueEventRuleZod),
+    resolver: zodResolver(CustomEventRuleZod),
   });
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateLeagueEventRule(leagueHash, data);
+      await updateCustomEventRule(leagueHash, data);
       await refresh();
       alert(`Custom event ${data.eventName} updated.`);
     } catch (error) {
@@ -331,7 +331,7 @@ function CustomEventCard({ rule, locked }: CustomEventCardProps) {
 
   const handleDelete = async () => {
     try {
-      await deleteLeagueEventRule(leagueHash, rule.eventName);
+      await deleteCustomEventRule(leagueHash, rule.eventName);
       setIsEditing(false);
       alert(`Custom event ${rule.eventName} deleted.`);
     } catch (error) {

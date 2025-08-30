@@ -244,12 +244,12 @@ export const EventDescZod = z.coerce.string()
   .min(3, { message: 'Description must be between 3 and 256 characters, or blank' })
   .max(256, { message: 'Description must be between 3 and 256 characters, or blank' });
 
-export const LeagueEventTypeOptions = ['Direct', 'Prediction'] as const;
-export type LeagueEventType = typeof LeagueEventTypeOptions[number];
-export const EventTypeZod = z.enum(LeagueEventTypeOptions);
+export const CustomEventTypeOptions = ['Direct', 'Prediction'] as const;
+export type CustomEventType = typeof CustomEventTypeOptions[number];
+export const EventTypeZod = z.enum(CustomEventTypeOptions);
 
-export const LeagueEventRuleZod = z.object({
-  leagueEventRuleId: z.number().optional(),
+export const CustomEventRuleZod = z.object({
+  customEventRuleId: z.number().optional(),
   eventName: EventNameZod,
   description: EventDescZod,
   points: EventPointsZod,
@@ -257,8 +257,8 @@ export const LeagueEventRuleZod = z.object({
   referenceTypes: z.array(EventRefZod),
   timing: PredictionEventTimingZod.array(),
 });
-export type LeagueEventRule = z.infer<typeof LeagueEventRuleZod>;
-export const defaultLeagueEventRule: LeagueEventRule = {
+export type CustomEventRule = z.infer<typeof CustomEventRuleZod>;
+export const defaultCustomEventRule: CustomEventRule = {
   eventName: '',
   description: '',
   points: 5,
@@ -283,13 +283,13 @@ export type EventPrediction = EventPredictionRoot & {
   eventName: ScoringBaseEventName
 }
 
-export type LeagueEventId = number;
-export type LeagueEventName = string;
+export type CustomEventId = number;
+export type CustomEventName = string;
 
 export type LeagueDirectEvent = {
-  leagueEventRuleId: LeagueEventId,
-  eventId: LeagueEventId,
-  eventName: LeagueEventName,
+  customEventRuleId: CustomEventId,
+  eventId: CustomEventId,
+  eventName: CustomEventName,
   points: number,
   referenceType: ReferenceType,
   referenceId: number,
@@ -298,14 +298,14 @@ export type LeagueDirectEvent = {
   notes: string[] | null
 };
 
-export type LeaguePredictionEvent = EventPredictionRoot & {
-  eventName: LeagueEventName,
-  leagueEventRuleId: number,
+export type CustomPredictionEvent = EventPredictionRoot & {
+  eventName: CustomEventName,
+  customEventRuleId: number,
   notes: string[] | null
 };
 
 export type BasePredictionDraft = {
-  eventName: LeagueEventName,
+  eventName: CustomEventName,
   label?: string,
   episodeNumber?: EpisodeNumber,
   predictionMade: {
@@ -315,12 +315,12 @@ export type BasePredictionDraft = {
   } | null,
 }
 
-export type LeaguePredictionDraft = BasePredictionDraft & LeagueEventRule;
+export type LeaguePredictionDraft = BasePredictionDraft & CustomEventRule;
 
 export type Prediction = {
   leagueMember: LeagueMemberDisplayName,
-  eventName: LeagueEventName,
-  leagueEventRuleId: LeagueEventId | null,
+  eventName: CustomEventName,
+  customEventRuleId: CustomEventId | null,
   points: number,
   timing: PredictionEventTiming[]
   prediction: {
@@ -342,9 +342,9 @@ export type Prediction = {
   }[]
 };
 
-export type LeagueEvent = {
-  eventId: LeagueEventId,
-  eventName: LeagueEventName,
+export type CustomEvent = {
+  eventId: CustomEventId,
+  eventName: CustomEventName,
   points: number,
   referenceType: ReferenceType,
   referenceId: number,
@@ -403,14 +403,14 @@ export const BaseEventInsertZod = z.object({
 });
 export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
 
-export const LeagueEventInsertZod = z.object({
-  leagueEventRuleId: z.coerce.number(),
+export const CustomEventInsertZod = z.object({
+  customEventRuleId: z.coerce.number(),
   episodeId: z.coerce.number(),
   referenceType: EventRefZod,
   referenceId: z.coerce.number(),
   notes: z.array(z.string()).nullable(),
 });
-export type LeagueEventInsert = z.infer<typeof LeagueEventInsertZod>;
+export type CustomEventInsert = z.infer<typeof CustomEventInsertZod>;
 
 export const ShauhinModeTimings = [
   'Premiere',

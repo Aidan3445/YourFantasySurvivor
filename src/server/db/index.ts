@@ -6,11 +6,11 @@ import * as castaways from '~/server/db/schema/castaways';
 import * as episodes from '~/server/db/schema/episodes';
 import * as leagues from '~/server/db/schema/leagues';
 import * as members from '~/server/db/schema/leagueMembers';
-import * as leagueEvents from '~/server/db/schema/leagueEvents';
+import * as customEvents from '~/server/db/schema/customEvents';
 
 // Define your schema
 const schema = {
-  seasons, tribes, castaways, episodes, leagues, members, leagueEvents,
+  seasons, tribes, castaways, episodes, leagues, members, customEvents,
   //customEvents, weeklyEvents, seasonEvents,
 };
 

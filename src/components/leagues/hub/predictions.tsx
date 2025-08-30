@@ -188,7 +188,7 @@ function PredctionTable({ predictions }: PredictionTableProps) {
               res.referenceId === pred.prediction.referenceId &&
               res.referenceType === pred.prediction.referenceType);
             return (
-              <TableRow key={pred.leagueEventRuleId ?? pred.eventName} className='bg-b3'>
+              <TableRow key={pred.customEventRuleId ?? pred.eventName} className='bg-b3'>
                 <TableCell>
                   <div className='flex flex-col text-nowrap'>
                     {BaseEventFullName[pred.eventName as keyof typeof BaseEventFullName] ??

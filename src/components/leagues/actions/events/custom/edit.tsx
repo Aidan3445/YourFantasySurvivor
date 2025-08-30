@@ -13,23 +13,23 @@ import { useState } from 'react';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { deleteLeagueEvent, updateLeagueEvent } from '~/services/leagues/settings/leagueSettingActions';
+import { deleteCustomEvent, updateCustomEvent } from '~/services/leagues/settings/leagueSettingActions';
 import { useLeague } from '~/hooks/useLeague';
-import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
+import { type CustomEvent, type CustomEventInsert, CustomEventInsertZod } from '~/types/events';
 
-interface EditLeagueEventProps {
+interface EditCustomEventProps {
   episodeNumber: number;
-  leagueEvent: LeagueEvent;
+  customEvent: CustomEvent;
 }
 
-export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeagueEventProps) {
+export default function EditCustomEvent({ episodeNumber, customEvent }: EditCustomEventProps) {
   const { league, leagueData, refresh } = useLeague();
-  const reactForm = useForm<LeagueEventInsert>({
+  const reactForm = useForm<CustomEventInsert>({
     defaultValues: {
       episodeId: leagueData.episodes.toReversed()[episodeNumber - 1]?.episodeId,
-      ...leagueEvent,
+      ...customEvent,
     },
-    resolver: zodResolver(LeagueEventInsertZod)
+    resolver: zodResolver(CustomEventInsertZod)
   });
   const selectedReferenceType = reactForm.watch('referenceType');
   const { castawayOptions, tribeOptions } = useEventOptions(episodeNumber);
@@ -40,7 +40,7 @@ export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeag
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateLeagueEvent(league.leagueHash, leagueEvent.eventId, data);
+      await updateCustomEvent(league.leagueHash, customEvent.eventId, data);
       alert('Event updated successfully');
       await refresh();
     } catch (e) {
@@ -51,7 +51,7 @@ export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeag
 
   const handleDelete = async () => {
     try {
-      await deleteLeagueEvent(league.leagueHash, leagueEvent.eventId);
+      await deleteCustomEvent(league.leagueHash, customEvent.eventId);
       alert('Event deleted successfully');
       await refresh();
     } catch (e) {
@@ -70,7 +70,7 @@ export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeag
         </AlertDialogTrigger>
         <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max'>
           <AlertDialogHeader>
-            <AlertDialogTitle>Edit {leagueEvent.eventName}</AlertDialogTitle>
+            <AlertDialogTitle>Edit {customEvent.eventName}</AlertDialogTitle>
             <AlertDialogDescription hidden>Edit the event details</AlertDialogDescription>
           </AlertDialogHeader>
           <form

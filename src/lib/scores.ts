@@ -11,7 +11,7 @@ import { type LeagueSurvivalCap } from '~/types/leagues';
 * @param baseEvents The base events for the season
 * @param tribesTimeline The tribe updates for the season
 * @param eliminations The eliminations for the season
-* @param leagueEvents The league events
+* @param customEvents The league events
 * @param baseEventRules The league's base event scoring
 * @param selectionTimeline The selection timeline for the league
 * @param survivalCap The survival cap for the league
@@ -25,7 +25,7 @@ export function compileScores(
 
   basePredictions: Awaited<ReturnType<typeof LEAGUE_QUERIES.getBasePredictions>> = {},
   basePredictionRules: BasePredictionRules = defaultPredictionRules,
-  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>> = { directEvents: {}, predictionEvents: {} },
+  customEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getCustomEvents>> = { directEvents: {}, predictionEvents: {} },
   selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>> = { castawayMembers: {}, memberCastaways: {} },
   survivalCap: LeagueSurvivalCap = 0,
   preserveStreak = false
@@ -116,7 +116,7 @@ export function compileScores(
 
   /* score league events */
   // direct events
-  Object.entries(leagueEvents.directEvents).forEach(([episodeNumber, refEvents]) => {
+  Object.entries(customEvents.directEvents).forEach(([episodeNumber, refEvents]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(refEvents).forEach((events) => {
       events.forEach((event) => {
@@ -157,7 +157,7 @@ export function compileScores(
   });
 
   // prediction events
-  Object.entries(leagueEvents.predictionEvents).forEach(([episodeNumber, events]) => {
+  Object.entries(customEvents.predictionEvents).forEach(([episodeNumber, events]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(events).forEach((event) => {
       if (!event.hit) return;

@@ -23,13 +23,13 @@ import { cn } from '~/lib/utils';
 import type { EpisodeNumber, EpisodeAirStatus } from '~/types/episodes';
 import {
   type BaseEvent, BaseEventFullName, baseEventLabelPrefixes, baseEventLabels,
-  type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type LeagueEventId, type LeagueEventName,
-  type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames
+  type BaseEventName, type BaseEventRule, type LeagueDirectEvent, type CustomEventId, type CustomEventName,
+  type CustomPredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames
 } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
-import EditBaseEvent from '~/components/leagues/actions/events/editBaseEvent';
+import EditBaseEvent from '~/components/leagues/actions/events/base/edit';
 import { ColorRow } from '~/components/leagues/predraft/order/view';
-import EditLeagueEvent from '~/components/leagues/actions/events/editLeagueEvent';
+import EditCustomEvent from '~/components/leagues/actions/events/custom/edit';
 import { useIsMobile } from '~/hooks/useMobile';
 import { type CastawayName } from '~/types/castaways';
 import { type TribeName } from '~/types/tribes';
@@ -56,7 +56,7 @@ export default function RecentActivity() {
   const [filterCastaway, setFilterCastaway] = useState<CastawayName[]>([]);
   const [filterTribe, setFilterTribe] = useState<TribeName[]>([]);
   const [filterMember, setFilterMember] = useState<LeagueMemberDisplayName[]>([]);
-  const [filterEvent, setFilterEvent] = useState<(BaseEventName | LeagueEventName)[]>([]);
+  const [filterEvent, setFilterEvent] = useState<(BaseEventName | CustomEventName)[]>([]);
 
   const [selectedEpisode, setSelectedEpisode] = useState<number>();
 
@@ -175,7 +175,7 @@ export default function RecentActivity() {
                 ]}
                 value={filterEvent}
                 onValueChange={(value) =>
-                  setFilterEvent(value as (BaseEventName | LeagueEventName)[])}
+                  setFilterEvent(value as (BaseEventName | CustomEventName)[])}
                 modalPopover
                 placeholder='All Events'
               />
@@ -199,7 +199,7 @@ export default function RecentActivity() {
 interface EpisodeEventsProps {
   episodeNumber: EpisodeNumber;
   mockBases?: Omit<BaseEvent, 'baseEventId'>[];
-  mockPredictions?: Omit<LeaguePredictionEvent, 'eventId'>[];
+  mockPredictions?: Omit<CustomPredictionEvent, 'eventId'>[];
   mockDirects?: Omit<LeagueDirectEvent, 'eventId'>[];
   edit?: boolean;
   labelRow?: boolean;
@@ -207,7 +207,7 @@ interface EpisodeEventsProps {
     castaway: CastawayName[];
     tribe: TribeName[];
     member: LeagueMemberDisplayName[];
-    event: (BaseEventName | LeagueEventName)[];
+    event: (BaseEventName | CustomEventName)[];
   };
 }
 
@@ -220,7 +220,7 @@ export function EpisodeEvents({
   filters }: EpisodeEventsProps) {
   const {
     leagueData: {
-      leagueEvents,
+      customEvents,
       baseEvents,
       basePredictions,
       episodes
@@ -236,9 +236,9 @@ export function EpisodeEvents({
       basePredictions[episodeNumber] &&
       Object.values(basePredictions[episodeNumber]).some((event) => event.referenceType === 'Tribe' && event.eventId !== null)
     ) &&
-    ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
+    ![...customEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
       ?.some((event) => event.referenceType === 'Tribe') &&
-    ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
+    ![...customEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
       ?.some((event) => event.referenceType === 'Tribe'));
 
   return (
@@ -292,7 +292,7 @@ function EpisodeEventsTableBody({
     leagueData: {
       baseEvents,
       basePredictions,
-      leagueEvents,
+      customEvents,
       baseEventRules,
       selectionTimeline,
       castaways,
@@ -320,7 +320,7 @@ function EpisodeEventsTableBody({
   const combinedPredictions = Object.values(
     [
       ...basePredictions[episodeNumber] ?? [],
-      ...leagueEvents.predictionEvents[episodeNumber] ?? []
+      ...customEvents.predictionEvents[episodeNumber] ?? []
     ].reduce((acc, event) => {
       if (event.hit === null || event.eventId === null) return acc; // Skip events without results
 
@@ -337,10 +337,10 @@ function EpisodeEventsTableBody({
       if (filters.member.length > 0 &&
         !filters.member.some((member) => event.predictionMaker === member)) return acc;
 
-      const referenceIds = 'leagueEventRuleId' in event ?
+      const referenceIds = 'customEventRuleId' in event ?
         [event.referenceId] :
         baseEvents[episodeNumber]?.[event.eventId]?.references ?? [];
-      const referenceNames = 'leagueEventRuleId' in event ?
+      const referenceNames = 'customEventRuleId' in event ?
         [event.referenceName] :
         referenceIds.map((referenceId) => (event.referenceType === 'Castaway' ?
           castaways.find((castaway) => castaway.castawayId === referenceId)?.fullName :
@@ -372,9 +372,9 @@ function EpisodeEventsTableBody({
       });
 
       return acc;
-    }, {} as Record<LeagueEventId | ScoringBaseEventName, {
-      eventName: LeagueEventName;
-      eventId?: LeagueEventId;
+    }, {} as Record<CustomEventId | ScoringBaseEventName, {
+      eventName: CustomEventName;
+      eventId?: CustomEventId;
       points: number;
       notes: string[] | null;
       referenceIds: number[];
@@ -400,7 +400,7 @@ function EpisodeEventsTableBody({
     });
 
   const filteredDirectEvents = Object.values(
-    leagueEvents.directEvents[episodeNumber] ?? {})
+    customEvents.directEvents[episodeNumber] ?? {})
     .flat()
     .filter((event) => {
       if (filters.member.length > 0 &&
@@ -462,7 +462,7 @@ function EpisodeEventsTableBody({
           edit={false} />
       )}
       {mockPredictions?.map((mockPrediction, index) =>
-        <LeagueEventRow
+        <CustomEventRow
           key={index}
           className='bg-yellow-500'
           eventId={-1}
@@ -477,7 +477,7 @@ function EpisodeEventsTableBody({
           edit={false} />
       )}
       {mockDirects?.map((mockDirect, index) =>
-        <LeagueEventRow
+        <CustomEventRow
           key={index}
           className='bg-yellow-500'
           eventId={-1}
@@ -513,7 +513,7 @@ function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {filteredDirectEvents.map((event, index) => (
-        <LeagueEventRow
+        <CustomEventRow
           key={index}
           eventId={event.eventId}
           eventName={event.eventName}
@@ -532,7 +532,7 @@ function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {combinedPredictions?.map((event, index) => (
-        <LeagueEventRow
+        <CustomEventRow
           key={index}
           eventId={event.eventId}
           eventName={event.eventName}
@@ -729,9 +729,9 @@ function BaseEventRow({
   );
 }
 
-interface LeagueEventRowProps {
+interface CustomEventRowProps {
   className?: string;
-  eventName: LeagueEventName;
+  eventName: CustomEventName;
   eventId?: number;
   points: number;
   referenceType: ReferenceType;
@@ -753,7 +753,7 @@ interface LeagueEventRowProps {
   edit?: boolean;
 }
 
-function LeagueEventRow({
+function CustomEventRow({
   eventName,
   eventId,
   points,
@@ -767,13 +767,13 @@ function LeagueEventRow({
   episodeNumber,
   edit,
   className
-}: LeagueEventRowProps) {
+}: CustomEventRowProps) {
   const { leagueData, league } = useLeague();
 
   return (
     <TableRow className={className}>
       {edit && eventId ? <TableCell className='w-0'>
-        <EditLeagueEvent episodeNumber={episodeNumber} leagueEvent={{
+        <EditCustomEvent episodeNumber={episodeNumber} customEvent={{
           eventId,
           eventName,
           points,

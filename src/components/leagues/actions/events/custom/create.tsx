@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
-import { type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
+import { type CustomEventInsert, CustomEventInsertZod } from '~/types/events';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useMemo } from 'react';
@@ -11,23 +11,23 @@ import { Textarea } from '~/components/common/textarea';
 import { EpisodeEvents } from '~/components/leagues/hub/recentActivity';
 import { Button } from '~/components/common/button';
 import { useEventOptions } from '~/hooks/useEventOptions';
-import { createLeagueEvent } from '~/services/leagues/settings/leagueSettingActions';
+import { createCustomEvent } from '~/services/leagues/settings/leagueSettingActions';
 
 export default function CreateCustomEvent() {
   const { leagueData, league, refresh } = useLeague();
-  const reactForm = useForm<LeagueEventInsert>({
+  const reactForm = useForm<CustomEventInsert>({
     defaultValues: {
       episodeId: leagueData.episodes.find(episode => episode.airStatus === 'Airing')?.episodeId ??
         leagueData.episodes.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
         leagueData.episodes[0]?.episodeId,
       notes: null,
     },
-    resolver: zodResolver(LeagueEventInsertZod),
+    resolver: zodResolver(CustomEventInsertZod),
   });
 
   const selectedReferenceType = reactForm.watch('referenceType');
   const selectedEvent = league.customEventRules.find(rule =>
-    rule.leagueEventRuleId === +reactForm.watch('leagueEventRuleId'));
+    rule.customEventRuleId === +reactForm.watch('customEventRuleId'));
   const selectedEpisodeId = reactForm.watch('episodeId');
   const selectedEpisode = useMemo(() => leagueData.episodes
     .find(episode =>
@@ -47,7 +47,7 @@ export default function CreateCustomEvent() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await createLeagueEvent(league.leagueHash, data);
+      await createCustomEvent(league.leagueHash, data);
       alert('Base event created successfully');
       reactForm.reset();
       await refresh();
@@ -59,8 +59,8 @@ export default function CreateCustomEvent() {
 
 
   const correctPredictions: { predictionMaker: string }[] =
-    leagueData.leagueEvents.predictionEvents[selectedEpisode]
-      ?.filter((prediction) => prediction.leagueEventRuleId === +reactForm.watch('leagueEventRuleId') &&
+    leagueData.customEvents.predictionEvents[selectedEpisode]
+      ?.filter((prediction) => prediction.customEventRuleId === +reactForm.watch('customEventRuleId') &&
         prediction.referenceId === +reactForm.watch('referenceId')) ?? [];
   if (correctPredictions.length === 0) {
     correctPredictions.push({ predictionMaker: 'No Correct Predictions' });
@@ -102,7 +102,7 @@ export default function CreateCustomEvent() {
                 )} />
               <FormLabel>Event</FormLabel>
               <FormField
-                name='leagueEventRuleId'
+                name='customEventRuleId'
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormControl>
@@ -118,8 +118,8 @@ export default function CreateCustomEvent() {
                           <SelectValue placeholder='Select Event' />
                         </SelectTrigger>
                         <SelectContent>
-                          {league.customEventRules.map(({ eventName, leagueEventRuleId }) => (
-                            <SelectItem key={eventName} value={leagueEventRuleId.toString()}>
+                          {league.customEventRules.map(({ eventName, customEventRuleId }) => (
+                            <SelectItem key={eventName} value={customEventRuleId.toString()}>
                               {eventName}
                             </SelectItem>
                           ))}
@@ -210,7 +210,7 @@ export default function CreateCustomEvent() {
             <EpisodeEvents
               episodeNumber={selectedEpisode}
               mockDirects={selectedEvent?.eventType === 'Direct' ? [{
-                leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
+                customEventRuleId: +reactForm.watch('customEventRuleId'),
                 eventName: selectedEvent.eventName,
                 referenceType: selectedReferenceType,
                 points: selectedEvent.points,
@@ -222,7 +222,7 @@ export default function CreateCustomEvent() {
               }] : undefined}
               mockPredictions={selectedEvent?.eventType === 'Prediction' ?
                 correctPredictions.map(prediction => ({
-                  leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
+                  customEventRuleId: +reactForm.watch('customEventRuleId'),
                   eventName: selectedEvent.eventName,
                   referenceType: selectedReferenceType,
                   points: selectedEvent.points,

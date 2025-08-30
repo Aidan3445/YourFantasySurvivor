@@ -97,7 +97,7 @@ export const emptyData: LeagueData = {
   episodes: [],
   castaways: [],
   tribes: [],
-  leagueEvents: {
+  customEvents: {
     directEvents: [],
     predictionEvents: []
   },
