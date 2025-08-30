@@ -10,7 +10,7 @@ import { Flame } from 'lucide-react';
 import { type CastawayName } from '~/types/castaways';
 import { Fragment, useState } from 'react';
 import ScorboardBody from '~/components/home/scoreboard/body';
-import { SelectSeason } from '~/components/home/scoreboard/selectSeason';
+import SelectSeason from '~/components/home/scoreboard/selectSeason';
 
 export interface ScoreboardTableProps {
   scoresBySeason: {
@@ -21,7 +21,7 @@ export interface ScoreboardTableProps {
   }[];
 }
 
-export function ScoreboardTable({ scoresBySeason }: ScoreboardTableProps) {
+export default function ScoreboardTable({ scoresBySeason }: ScoreboardTableProps) {
   const [selectedSeason, setSelectedSeason] = useState(scoresBySeason[0]);
 
   if (!selectedSeason) return <div className='text-center py-6'>No seasons available.</div>;

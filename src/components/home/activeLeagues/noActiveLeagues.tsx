@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/common/card';
 import { Trophy } from 'lucide-react';
 
-export function NoActiveLeagues() {
+export default function NoActiveLeagues() {
   return (
     <Card className='h-full'>
       <CardHeader>

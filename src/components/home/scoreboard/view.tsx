@@ -3,7 +3,7 @@ import { compileScores } from '~/lib/scores';
 import { defaultBaseRules } from '~/types/events';
 import { type CastawayName } from '~/types/castaways';
 import { newtwentyColors } from '~/lib/colors';
-import { ScoreboardTable } from '~/components/home/scoreboard/table';
+import ScoreboardTable from '~/components/home/scoreboard/table';
 
 export async function CastawayScoreboard() {
   const scoreData = await SEASON_QUERIES.getSeasonScoreData();

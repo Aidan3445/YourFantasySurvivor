@@ -9,7 +9,7 @@ interface ActiveLeagueProps {
   league: LeagueInfo;
 }
 
-export function ActiveLeague({ league }: ActiveLeagueProps) {
+export default function ActiveLeague({ league }: ActiveLeagueProps) {
   return (
     <div className='px-2 space-y-2'>
       <Link

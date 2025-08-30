@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/common/card';
-import CreateLeagueForm from '~/components/leagues/actions/createLeague';
+import CreateLeagueForm from '~/components/leagues/actions/league/create/view';
 import { Zap } from 'lucide-react';
-import { JoinLeagueDialog } from '~/components/home/quickActions/joinDialogue';
+import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
 
 export function QuickActions() {
   return (

@@ -1,6 +1,6 @@
 import { TableBody, TableRow } from '~/components/common/table';
 import { type CastawayDetails } from '~/types/castaways';
-import { CastawayEntry } from '~/components/home/scoreboard/entry';
+import CastawayEntry from '~/components/home/scoreboard/entry';
 
 export interface BodyProps {
   sortedCastaways: [string, number[]][];

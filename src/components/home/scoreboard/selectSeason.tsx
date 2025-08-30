@@ -25,7 +25,7 @@ interface ComboboxProps {
   setValue: (value: string) => void;
 }
 
-export function SelectSeason({ seasons, value, setValue }: ComboboxProps) {
+export default function SelectSeason({ seasons, value, setValue }: ComboboxProps) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
 

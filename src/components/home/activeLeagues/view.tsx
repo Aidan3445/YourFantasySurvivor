@@ -8,8 +8,8 @@ import { useYfsUser } from '~/hooks/useYfsUser';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/common/carousel';
 import { cn } from '~/lib/utils';
 import Autoplay from 'embla-carousel-autoplay';
-import { NoActiveLeagues } from '~/components/home/activeLeagues/noActiveLeagues';
-import { ActiveLeague } from '~/components/home/activeLeagues/activeLeague';
+import NoActiveLeagues from '~/components/home/activeLeagues/noActiveLeagues';
+import ActiveLeague from '~/components/home/activeLeagues/activeLeague';
 
 export function ActiveLeagues() {
   const { leagues } = useYfsUser();

@@ -6,7 +6,7 @@ export interface FeatureCardProps {
   description: string;
 }
 
-export function FeatureCard({ icon, title, description }: FeatureCardProps) {
+export default function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
     <div className='flex flex-col items-center text-center p-3 rounded-lg bg-accent/50'>
       <div className='text-primary mb-2'>

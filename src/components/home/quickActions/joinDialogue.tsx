@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
 
-export function JoinLeagueDialog() {
+export default function JoinLeagueDialog() {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState('');
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);

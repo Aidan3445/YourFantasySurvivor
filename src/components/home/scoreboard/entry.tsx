@@ -15,7 +15,7 @@ interface CastawayRowProps {
   color: string;
 }
 
-export function CastawayEntry({ place, castaway, points, color }: CastawayRowProps) {
+export default function CastawayEntry({ place, castaway, points, color }: CastawayRowProps) {
   return (
     <>
       <TableCell className='px-1'>
