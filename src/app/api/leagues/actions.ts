@@ -8,7 +8,7 @@ import {
 } from '~/server/db/schema/baseEvents';
 import {
   type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert,
-  type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName, ShauhinModeSettings
+  type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName, type ShauhinModeSettings
 } from '~/server/db/defs/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';

@@ -132,7 +132,7 @@ export function PredictionCards({
     const prediction = (customPredictions[0] ?? enabledBasePredictions[0])!;
     return (
       <article
-        className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg', className)}>
+        className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg min-w-96', className)}>
         <span className='flex gap-1 items-start self-center px-1'>
           <h3 className='text-lg font-semibold text-card-foreground'>
             {prediction.label ?? prediction.eventName}
@@ -263,11 +263,11 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
   return (
     <Form {...reactForm}>
       <form action={() => handleSubmit()}>
-        <span className='grid lg:grid-cols-4 grid-cols-1 gap-2 items-center py-2 px-4'>
+        <span className='grid lg:grid-cols-6 grid-cols-1 gap-2 items-center py-2 px-4'>
           <FormField
             name='referenceId'
             render={({ field }) => (
-              <FormItem className={shauhinEnabled ? 'lg:col-span-2' : 'lg:col-span-3'}>
+              <FormItem className={shauhinEnabled ? 'lg:col-span-3' : 'lg:col-span-4'}>
                 <FormLabel className='sr-only'>Prediction</FormLabel>
                 <FormControl>
                   <Select
@@ -316,20 +316,20 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
             <FormField
               name='bet'
               render={({ field: betField }) => (
-                <FormItem className='relative'>
+                <FormItem className='relative col-span-2'>
                   <FormLabel className='sr-only'>Bet</FormLabel>
                   <FormControl>
                     <Input
                       type='number'
-                      placeholder='Enter bet amount (optional)'
+                      placeholder='Enter bet'
                       {...betField}
-                      value={betField.value ?? ''}
+                      value={betField.value as string ?? ''}
                     />
                   </FormControl>
                   <Popover>
                     <PopoverTrigger className='absolute -translate-y-1/2 top-1/2 right-8'>
-                      <HelpCircle size={16} />
-                    </PopoverTrigger>
+                      <HelpCircle size={12} />
+                    </PopoverTrigger >
                     <PopoverContent className='w-80'>
                       <PopoverArrow />
                       <h3 className='text-lg font-semibold'>Shauhin Mode</h3>
@@ -343,18 +343,21 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
                         Good luck!
                       </p>
                     </PopoverContent>
-                  </Popover>
-                </FormItem>
-              )} />
+                  </Popover >
+                </FormItem >
+              )
+              } />
           )}
           <Button
+            className={cn(shauhinEnabled ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
             disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
             type='submit'>
-            {prediction.predictionMade || reactForm.formState.isSubmitSuccessful ? 'Update' : 'Submit'} Prediction
+            {prediction.predictionMade ?? reactForm.formState.isSubmitSuccessful
+              ? 'Update' : 'Submit'}
           </Button>
-        </span>
-      </form>
-    </Form>
+        </span >
+      </form >
+    </Form >
   );
 }
 

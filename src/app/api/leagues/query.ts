@@ -25,6 +25,7 @@ import {
   defaultPredictionRules,
   ScoringBaseEventNames,
   type LeaguePredictionDraft,
+  type ScoringBaseEventName,
 } from '~/server/db/defs/events';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import type { Tribe, TribeName } from '~/server/db/defs/tribes';
@@ -487,6 +488,7 @@ export const QUERIES = {
     const basePredictions = await db
       .select({
         eventName: baseEventPredictionsSchema.baseEventName,
+        eventId: baseEventsSchema.baseEventId,
         episodeNumber: episodesSchema.episodeNumber,
         predictionMaker: leagueMembersSchema.displayName,
         referenceType: baseEventPredictionsSchema.referenceType,
@@ -519,6 +521,7 @@ export const QUERIES = {
         acc[row.episodeNumber] ??= [];
         const newEvent = {
           eventName: row.eventName,
+          eventId: row.eventId,
           points: basePredictionRules[row.eventName]?.points ?? 0,
           predictionMaker: row.predictionMaker,
           referenceType: row.referenceType,
@@ -537,7 +540,7 @@ export const QUERIES = {
           event.referenceType === newEvent.referenceType &&
           event.predictionMaker === newEvent.predictionMaker);
         if (doubleIndex !== -1) {
-          if (acc[row.episodeNumber]![doubleIndex]!.hit || !newEvent.hit) return acc;
+          if (acc[row.episodeNumber]![doubleIndex]!.hit ?? !newEvent.hit) return acc;
           // if the new event is a hit and the double is a miss, remove the double
           acc[row.episodeNumber]!.splice(doubleIndex, 1);
         }
@@ -1023,7 +1026,7 @@ export const QUERIES = {
     const tribePrediction = aliasedTable(tribesSchema, 'tribePrediction');
     const episodesPrediction = aliasedTable(episodesSchema, 'episodesPrediction');
 
-    return await db
+    const leaguePredictions = db
       .select({
         leagueMember: leagueMembersSchema.displayName,
         eventName: leagueEventsRulesSchema.eventName,
@@ -1117,7 +1120,7 @@ export const QUERIES = {
             leagueEventRuleId: prediction.leagueEventRuleId,
             points: prediction.points,
             timing: prediction.timing,
-            prediction: prediction.prediction,
+            prediction: { ...prediction.prediction, bet: null },
             results: [],
           });
           predictionIndex = acc[episodeNumber].length - 1;
@@ -1129,6 +1132,123 @@ export const QUERIES = {
 
         return acc;
       }, {} as Record<EpisodeNumber, Prediction[]>));
+
+    const baseEventRules = db
+      .select()
+      .from(baseEventRulesSchema)
+      .where(eq(baseEventRulesSchema.leagueId, league.leagueId))
+      .then((rules) => rules[0] as BaseEventRule);
+
+    const [leaguePredictionsData, baseEventRulesData] = await Promise.all([
+      leaguePredictions, baseEventRules
+    ]);
+
+    const basePredictionsData = await db
+      .select({
+        leagueMember: leagueMembersSchema.displayName,
+        eventName: baseEventPredictionsSchema.baseEventName,
+        episodeNumber: episodesSchema.episodeNumber,
+        prediction: {
+          castaway: castawayPrediction.fullName,
+          castawayShort: castawayPrediction.shortName,
+          tribe: tribePrediction.tribeName,
+          referenceType: baseEventPredictionsSchema.referenceType,
+          referenceId: baseEventPredictionsSchema.referenceId,
+          bet: baseEventPredictionsSchema.bet,
+        },
+        result: {
+          castaway: castawaysSchema.fullName,
+          castawayShort: castawaysSchema.shortName,
+          tribe: tribesSchema.tribeName,
+          referenceType: baseEventReferenceSchema.referenceType,
+          referenceId: baseEventReferenceSchema.referenceId,
+        }
+      })
+      .from(baseEventPredictionsSchema)
+      .innerJoin(leagueMembersSchema, and(
+        eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId),
+        eq(leagueMembersSchema.leagueId, league.leagueId)))
+      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId))
+      .leftJoin(castawayPrediction, and(
+        eq(castawayPrediction.castawayId, baseEventPredictionsSchema.referenceId),
+        eq(baseEventPredictionsSchema.referenceType, 'Castaway')))
+      .leftJoin(tribePrediction, and(
+        eq(tribePrediction.tribeId, baseEventPredictionsSchema.referenceId),
+        eq(baseEventPredictionsSchema.referenceType, 'Tribe')))
+      .leftJoin(baseEventsSchema, and(
+        eq(
+          sql`cast(${baseEventsSchema.eventName} as varchar)`,
+          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`),
+        eq(baseEventsSchema.episodeId, episodesSchema.episodeId)))
+      .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventsSchema.baseEventId))
+      .leftJoin(castawaysSchema, and(
+        eq(castawaysSchema.castawayId, baseEventReferenceSchema.referenceId),
+        eq(baseEventReferenceSchema.referenceType, 'Castaway')))
+      .leftJoin(tribesSchema, and(
+        eq(tribesSchema.tribeId, baseEventReferenceSchema.referenceId),
+        eq(baseEventReferenceSchema.referenceType, 'Tribe')))
+      .where(and(
+        eq(baseEventPredictionsSchema.memberId, otherMemberId ?? memberId),
+        sql`(${episodesSchema.airDate} < ${new Date().toUTCString()})`))
+      .then((predictions: {
+        leagueMember: LeagueMemberDisplayName,
+        eventName: ScoringBaseEventName,
+        episodeNumber: EpisodeNumber,
+        prediction: {
+          castaway: CastawayName | null,
+          castawayShort: CastawayName | null,
+          tribe: TribeName | null
+          referenceType: ReferenceType,
+          referenceId: number,
+          bet: number | null,
+        },
+        result: {
+          castaway: CastawayName | null,
+          castawayShort: CastawayName | null,
+          tribe: TribeName | null
+          referenceType: ReferenceType | null,
+          referenceId: number | null,
+        }
+      }[]) => predictions.reduce((acc, prediction) => {
+        acc[prediction.episodeNumber] ??= [];
+        let predictionIndex = acc[prediction.episodeNumber]!.findIndex((p) =>
+          p.eventName === prediction.eventName &&
+          p.prediction.episodeNumber === prediction.episodeNumber);
+
+        if (predictionIndex === -1) {
+          acc[prediction.episodeNumber]!.push({
+            leagueMember: prediction.leagueMember,
+            eventName: prediction.eventName,
+            leagueEventRuleId: null,
+            points: baseEventRulesData[prediction.eventName],
+            timing: [],
+            prediction: { ...prediction.prediction, episodeNumber: prediction.episodeNumber },
+            results: [],
+          });
+          predictionIndex = acc[prediction.episodeNumber]!.length - 1;
+        }
+
+        if (prediction.result.referenceId !== null) {
+          acc[prediction.episodeNumber]![predictionIndex]!.results.push({
+            ...prediction.result,
+            episodeNumber: prediction.episodeNumber
+          });
+        }
+
+        return acc;
+      }, {} as Record<EpisodeNumber, Prediction[]>));
+
+
+    const combinedPredictions: Record<EpisodeNumber, Prediction[]> = {};
+    Object.entries(basePredictionsData).forEach(([episodeNumber, predictions]) => {
+      combinedPredictions[+episodeNumber] = predictions;
+    });
+    Object.entries(leaguePredictionsData).forEach(([episodeNumber, predictions]) => {
+      combinedPredictions[+episodeNumber] ??= [];
+      combinedPredictions[+episodeNumber]!.push(...predictions);
+    });
+
+    return combinedPredictions;
   },
 
   /**
@@ -1201,7 +1321,7 @@ export const QUERIES = {
       // NOTE: If start week is Premiere, we are always ready
     }
 
-    return shauhinModeSettings
+    return shauhinModeSettings;
   },
 
   /**

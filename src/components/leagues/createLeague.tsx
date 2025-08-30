@@ -230,7 +230,7 @@ export function CreateLeagueModal({ children, className }: CreateLeagueModalProp
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger className={className}>
+      <AlertDialogTrigger className={className} asChild>
         {children}
       </AlertDialogTrigger>
       <AlertDialogContent className='sm:w-160 w-96 flex flex-col'>

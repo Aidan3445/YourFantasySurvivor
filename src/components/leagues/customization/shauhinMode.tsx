@@ -1,22 +1,21 @@
 'use client';
 
-import { useForm } from "react-hook-form";
-import { ColorRow } from "../draftOrder";
-import { z } from "zod";
+import { useForm } from 'react-hook-form';
+import { ColorRow } from '../draftOrder';
+import { type z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { BaseEventFullName, ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings, PredictionEventTiming } from "~/server/db/defs/events";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "~/components/ui/button";
-import { Switch } from "~/components/ui/switch";
-import { Input } from "~/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select";
-import { useEffect, useState } from "react";
-import { MultiSelect } from "~/components/ui/multiSelect";
-import { Lock, LockOpen } from "lucide-react";
-import { useLeague } from "~/hooks/useLeague";
-import { cn } from "~/lib/utils";
-import { updateShauhinMode } from "~/app/api/leagues/actions";
-
+import { BaseEventFullName, type ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from '~/server/db/defs/events';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from '~/components/ui/button';
+import { Switch } from '~/components/ui/switch';
+import { Input } from '~/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { useEffect, useState } from 'react';
+import { MultiSelect } from '~/components/ui/multiSelect';
+import { Lock, LockOpen } from 'lucide-react';
+import { useLeague } from '~/hooks/useLeague';
+import { cn } from '~/lib/utils';
+import { updateShauhinMode } from '~/app/api/leagues/actions';
 
 export default function ShauhinMode() {
   const {
@@ -40,17 +39,17 @@ export default function ShauhinMode() {
 
   useEffect(() => {
     const settings = shauhinModeSettings ?? defaultShauhinModeSettings;
-    // settings.enabledBets = settings.enabledBets.filter((bet) =>
-    // basePredictionRules[bet as ScoringBaseEventName]?.enabled);
+    //settings.enabledBets = settings.enabledBets.filter((bet) =>
+    //basePredictionRules[bet as ScoringBaseEventName]?.enabled);
 
     reactForm.reset(settings);
   }, [shauhinModeSettings, /*basePredictionRules,*/ reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      //ShauhinModeSettingsZod.parse(data); // Validate data before sending
+      ShauhinModeSettingsZod.parse(data); // Validate data before sending
 
-      await updateShauhinMode(leagueHash, data)
+      await updateShauhinMode(leagueHash, data);
       await refresh();
       setLocked(true);
       alert('Shauhin Mode settings saved successfully!');
@@ -85,10 +84,10 @@ export default function ShauhinMode() {
         <ColorRow color='#d05dbd' className='inline w-min px-0.5 ml-1 text-white!'>
           Shauhin Davari
         </ColorRow>,
-        from Survivor 48, posted, this twist allows you to bet points you've earned
-        throughout the season on predictions. If you win, you gain those points in addition to
-        the base points for the event. If you miss the prediction, you get nothing.
-      </p>
+        from Survivor 48, posted, this twist allows you to bet points {'you\'ve'} earned
+        throughout the season on predictions.If you win, you gain those points in addition to
+        the base points for the event.If you miss the prediction, you get nothing.
+      </p >
       <br />
       <Form {...reactForm}>
         <form onSubmit={handleSubmit}>
@@ -104,7 +103,7 @@ export default function ShauhinMode() {
                     </h2>
                   ) : (
                     <Switch
-                      checked={field.value}
+                      checked={field.value as boolean}
                       onCheckedChange={(checked) => field.onChange(checked)}
                       className='' />
                   )}
@@ -135,7 +134,7 @@ export default function ShauhinMode() {
                           <FormLabel className='text-sm ml-4'>Start Timing</FormLabel>
                           <FormControl>
                             <span className='flex items-center gap-2'>
-                              <Select value={field.value} onValueChange={field.onChange}>
+                              <Select value={field.value as string} onValueChange={field.onChange}>
                                 <SelectTrigger>
                                   <SelectValue placeholder='Select Betting Start Week' />
                                 </SelectTrigger>
@@ -161,22 +160,22 @@ export default function ShauhinMode() {
                                           {...customField}
                                           onChange={(e) => customField.onChange(+e.target.value)}
                                           onFocus={(e) => e.target.select()}
-                                          value={Math.max(2, customField.value || 2)} />
+                                          value={Math.max(2, customField.value as number || 2)} />
                                       </FormControl>
                                     </FormItem>
                                   )} />
                               )}
                             </span>
-                          </FormControl>
+                          </FormControl >
                           <FormMessage />
-                        </FormItem>
-                      )
+                        </FormItem >
+                      );
                     }} />
                   <FormDescription>
-                    Choose when Shauhin Mode activates. You can choose from predefined timings or
+                    Choose when Shauhin Mode activates.You can choose from predefined timings or
                     set a custom week for betting to start.
-                  </FormDescription>
-                </div>
+                  </FormDescription >
+                </div >
                 <div>
                   <span className='flex w-full items-center gap-2'>
                     <FormField
@@ -210,7 +209,7 @@ export default function ShauhinMode() {
                               (0 for Unlimited)
                             </p>
                           </FormItem>
-                        )
+                        );
                       }} />
                     <FormField
                       name='maxBetsPerWeek'
@@ -243,7 +242,7 @@ export default function ShauhinMode() {
                               (0 for Unlimited)
                             </p>
                           </FormItem>
-                        )
+                        );
                       }} />
                   </span>
                   <FormDescription>
@@ -255,14 +254,16 @@ export default function ShauhinMode() {
                   <FormField
                     name='enabledBets'
                     render={({ field }) => {
+                      const values = field.value as ScoringBaseEventName[] | undefined;
                       if (locked) {
                         return (
                           <span className='text-muted-foreground text-sm/3 w-full'>
                             <h4 className='font-medium inline mr-1'>Enabled Bets:</h4>
-                            {field.value.length > 0
-                              ? field.value.map((name: ScoringBaseEventName) => BaseEventFullName[name]).join(', ')
-                              : 'None'}
-                          </span>
+                            {values && values.length > 0
+                              ? values.map((name: ScoringBaseEventName) => BaseEventFullName[name]).join(', ')
+                              : 'None'
+                            }
+                          </span >
                         );
                       }
 
@@ -286,26 +287,26 @@ export default function ShauhinMode() {
                           </FormControl>
                           <FormMessage />
                         </FormItem>
-                      )
+                      );
                     }} />
                   <FormDescription>
                     Select what you can bet on from your enabled official and custom prediction events.
-                  </FormDescription>
-                </div>
+                  </FormDescription >
+                </div >
                 <FormField
                   name='noEventIsMiss'
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className={cn('text-sm text-nowrap', locked ? '-ml-1' : 'ml-4')}>
-                        'No Event' is <div
-                          className={cn('inline', field.value ? 'text-destructive' : 'text-green-600')}>
+                        {'\'No Event\''} is <div
+                          className={cn('inline', field.value ? 'text-destructive' : 'text-green-600')} >
                           {field.value ? 'Missed' : 'Refunded'}
-                        </div></FormLabel>
+                        </div ></FormLabel >
                       <span className='flex items-center gap-2'>
                         {!locked && (
                           <FormControl>
                             <Switch
-                              checked={field.value}
+                              checked={field.value as boolean}
                               onCheckedChange={(checked) => field.onChange(checked)}
                               className='' />
                           </FormControl>
@@ -317,27 +318,30 @@ export default function ShauhinMode() {
                           if an event does not occur, you get your bet back
                         </FormDescription>
                       </span>
-                    </FormItem>
-                  )} />
-              </div>
+                    </FormItem >
+                  )
+                  } />
+              </div >
             </>
           )}
-          {!(disabled || locked) && (
-            <span className='w-fit ml-auto grid grid-cols-2 gap-2 mt-4'>
-              <Button
-                type='button'
-                variant='destructive'
-                onClick={() => { reactForm.reset(); setLocked(true); }}>
-                Cancel
-              </Button>
-              <Button
-                disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
-                type='submit'>
-                Save
-              </Button>
-            </span>)}
-        </form>
-      </Form>
+          {
+            !(disabled || locked) && (
+              <span className='w-fit ml-auto grid grid-cols-2 gap-2 mt-4'>
+                <Button
+                  type='button'
+                  variant='destructive'
+                  onClick={() => { reactForm.reset(); setLocked(true); }}>
+                  Cancel
+                </Button>
+                <Button
+                  disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
+                  type='submit'>
+                  Save
+                </Button>
+              </span>)
+          }
+        </form >
+      </Form >
     </article >
   );
 }

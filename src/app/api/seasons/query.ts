@@ -1,4 +1,4 @@
-import { aliasedTable, and, desc, eq, inArray, lte } from 'drizzle-orm';
+import { aliasedTable, and, asc, desc, eq, inArray, lte } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
@@ -14,6 +14,19 @@ import { seasonsSchema } from '~/server/db/schema/seasons';
 import { tribesSchema } from '~/server/db/schema/tribes';
 
 export const QUERIES = {
+  /**
+    * Get the current seasons
+    * @returns The current seasons
+    */
+  getCurrentSeasons: async function() {
+    return await db
+      .select()
+      .from(seasonsSchema)
+      .orderBy(asc(seasonsSchema.premiereDate))
+      .then(rows => rows.filter(row =>
+        new Date(`${row.premiereDate} Z`) <= new Date() &&
+        (row.finaleDate === null || new Date(`${row.finaleDate} Z`) >= new Date())));
+  },
   /**
     * Get the base events for a season
     * @param seasonId The season to get scores for
@@ -222,7 +235,6 @@ export const QUERIES = {
     return Object.values(castawaysWithTribes).sort(
       (a, b) => a.startingTribe.tribeName.localeCompare(b.startingTribe.tribeName));
   },
-
   /**
   * Get all tribes for a season
   * @param seasonId The season to get tribes from
@@ -245,4 +257,32 @@ export const QUERIES = {
         tribeColor: row.tribeColor,
       })));
   },
+  /**
+    * Get season scores for the current seasons
+    * @returns The scores for the season
+    * @throws if the league does not exist
+    */
+  getSeasonScoreData: async function() {
+    const currentSeasons = [{ seasonId: 15 }]; //await this.getCurrentSeasons();
+    if (currentSeasons.length === 0) return [];
+
+    const seasonScores = await Promise.all(currentSeasons.map(async (season) => {
+      const [castaways, baseEvents, tribesTimeline, eliminations] = await Promise.all([
+        this.getCastaways(season.seasonId),
+        this.getBaseEvents(season.seasonId),
+        this.getTribesTimeline(season.seasonId),
+        this.getEliminations(season.seasonId),
+      ]);
+
+      return {
+        castaways,
+        baseEvents,
+        tribesTimeline,
+        eliminations,
+        season: season,
+      };
+    }));
+
+    return seasonScores;
+  }
 };

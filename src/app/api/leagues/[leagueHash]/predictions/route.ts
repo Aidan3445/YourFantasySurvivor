@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { QUERIES } from '~/app/api/leagues/query';
-import { LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
+import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 
 const fetchPredictions = async (leagueHash: string) => {
   try {

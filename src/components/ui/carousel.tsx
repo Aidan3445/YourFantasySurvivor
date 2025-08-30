@@ -9,7 +9,6 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/ui/button';
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from './table';
-import { useIsMobile } from '~/hooks/useMobile';
 
 type CarouselApi = UseEmblaCarouselType[1]
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
@@ -190,7 +189,7 @@ const CarouselItem = React.forwardRef<
       role='group'
       aria-roledescription='slide'
       className={cn(
-        'min-w-0 shrink-0 grow-0 basis-full',
+        'min-w-0 shrink-0 grow-0 basis-full select-none',
         orientation === 'horizontal' ? 'pl-4' : 'pt-4',
         className
       )}
@@ -269,7 +268,6 @@ interface CoverCarouselProps {
 }
 
 function CoverCarousel({ items }: CoverCarouselProps) {
-  const isMobile = useIsMobile();
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
 
@@ -285,10 +283,10 @@ function CoverCarousel({ items }: CoverCarouselProps) {
     });
   }, [api]);
 
-
   return (
     <Carousel className='relative' setApi={setApi} opts={{ containScroll: false }}>
-      <CarouselContent className='ml-0 -mx-2'>
+      <CarouselContent
+        className='ml-0 -mx-2'>
         {items.map((item, index) => {
           const offset = index - (current - 1);
           const absOffset = Math.abs(offset);
@@ -298,8 +296,8 @@ function CoverCarousel({ items }: CoverCarouselProps) {
               key={index}
               className={cn(
                 'z-10 transition-all duration-500 drop-shadow-md bg-secondary rounded-md',
-                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip select-none',
-                isMobile ? 'basis-[90%]' : 'basis-1/2',
+                'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
+                'basis-[90%] lg:basis-1/2',
                 {
                   'pointer-events-none': offset !== 0,
 
@@ -330,6 +328,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                         type='button'
                         className={cn(
                           'rounded-full z-10',
+                          index === 0 && 'invisible',
                         )}
                         disabled={!api?.canScrollPrev() || index !== current - 1}
                         onClick={() => api?.scrollPrev()}>
@@ -337,7 +336,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                         <span className='sr-only'>Previous slide</span>
                       </Button>
                     </TableHead>
-                    <TableHead className='text-center font-normal w-3/4'>
+                    <TableHead className='place-items-center text-center font-normal text-nowrap'>
                       {item.header}
                     </TableHead>
                     <TableHead className='text-center'>
@@ -346,6 +345,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                         type='button'
                         className={cn(
                           'rounded-full z-10',
+                          index === items.length - 1 && 'invisible',
                         )}
                         disabled={!api?.canScrollNext() || index !== current - 1}
                         onClick={() => api?.scrollNext()}>
@@ -354,7 +354,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                       </Button>
                     </TableHead>
                   </TableRow>
-                </TableHeader>
+                </TableHeader >
                 <TableBody>
                   <TableRow className='bg-transparent hover:bg-transparent border-none'>
                     <TableCell colSpan={3} className={cn(
@@ -364,29 +364,42 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                     </TableCell>
                   </TableRow>
                 </TableBody>
-                {item.footer && (
-                  <TableFooter className='border-none'>
-                    <TableRow className='bg-b2 hover:bg-b2 border-none'>
-                      <TableCell colSpan={3} className='p-0'>
-                        {item.footer}
-                      </TableCell>
-                    </TableRow>
-                  </TableFooter>
-                )}
-              </Table>
-            </CarouselItem>
+                {
+                  item.footer && (
+                    <TableFooter className='border-none'>
+                      <TableRow className='bg-b2 hover:bg-b2 border-none'>
+                        <TableCell colSpan={3} className='p-0'>
+                          {item.footer}
+                        </TableCell>
+                      </TableRow>
+                    </TableFooter>
+                  )
+                }
+              </Table >
+            </CarouselItem >
           );
         })}
-      </CarouselContent>
-      <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
-        <div
-          className='h-full bg-primary rounded-full transition-all ease-linear duration-300'
-          style={{
-            width: `${((current - 1) / (items.length - 1)) * 100}%`,
-          }}
-        />
-      </div>
-    </Carousel>
+      </CarouselContent >
+      <CarouselProgress current={current} count={items.length} />
+    </Carousel >
+  );
+}
+
+interface CarouselProgressProps {
+  current: number
+  count: number
+}
+
+function CarouselProgress({ current, count }: CarouselProgressProps) {
+  return (
+    <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
+      <div
+        className='h-full bg-primary rounded-full transition-all ease-linear duration-300'
+        style={{
+          width: `${((current - 1) / (count - 1)) * 100}%`,
+        }}
+      />
+    </div>
   );
 }
 
@@ -397,5 +410,6 @@ export {
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
-  CoverCarousel
+  CoverCarousel,
+  CarouselProgress,
 };

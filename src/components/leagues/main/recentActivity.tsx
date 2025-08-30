@@ -226,15 +226,15 @@ export function EpisodeEvents({
       episodes
     }
   } = useLeague();
-  const noTribes = episodeNumber === -1 || (
-    (
+  const noTribes = episodeNumber !== -1 && (
+    !(
       baseEvents[episodeNumber] &&
-      !Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0)
+      Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0)
     ) &&
     !mockBases?.some((event) => event.tribes.length > 0) &&
-    (
+    !(
       basePredictions[episodeNumber] &&
-      !Object.values(basePredictions[episodeNumber]).some((event) => event.referenceType === 'Tribe')
+      Object.values(basePredictions[episodeNumber]).some((event) => event.referenceType === 'Tribe' && event.eventId !== null)
     ) &&
     ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
       ?.some((event) => event.referenceType === 'Tribe') &&
@@ -322,7 +322,7 @@ function EpisodeEventsTableBody({
       ...basePredictions[episodeNumber] ?? [],
       ...leagueEvents.predictionEvents[episodeNumber] ?? []
     ].reduce((acc, event) => {
-      if (event.hit === null) return acc; // Skip events without results
+      if (event.hit === null || event.eventId === null) return acc; // Skip events without results
 
       if (filters.event.length > 0 && !filters.event.includes(event.eventName)) return acc;
       if (filters.castaway.length > 0 && event.referenceType === 'Castaway' &&
@@ -337,26 +337,33 @@ function EpisodeEventsTableBody({
       if (filters.member.length > 0 &&
         !filters.member.some((member) => event.predictionMaker === member)) return acc;
 
-      const key = 'eventId' in event ? event.eventId : event.eventName;
+      const referenceIds = 'leagueEventRuleId' in event ?
+        [event.referenceId] :
+        baseEvents[episodeNumber]?.[event.eventId]?.references ?? [];
+      const referenceNames = 'leagueEventRuleId' in event ?
+        [event.referenceName] :
+        referenceIds.map((referenceId) => (event.referenceType === 'Castaway' ?
+          castaways.find((castaway) => castaway.castawayId === referenceId)?.fullName :
+          tribes.find((tribe) => tribe.tribeId === referenceId)?.tribeName) ?? '');
 
-      acc[key] ??= {
-        eventName: typeof key === 'string' ?
+      acc[event.eventId] ??= {
+        eventName: typeof event.eventId === 'string' ?
           BaseEventFullName[event.eventName as ScoringBaseEventName] :
           event.eventName,
         points: event.points,
         notes: 'notes' in event ? event.notes : null,
-        referenceId: event.referenceId,
+        referenceIds: referenceIds,
+        referenceNames: referenceNames,
         referenceType: event.referenceType,
-        referenceName: event.referenceName,
         predictionMakers: [],
         misses: []
       };
 
-      if (event.hit) acc[key].predictionMakers.push({
+      if (event.hit) acc[event.eventId]!.predictionMakers.push({
         displayName: event.predictionMaker,
         bet: event.bet
       });
-      else acc[key].misses.push({
+      else acc[event.eventId]!.misses.push({
         displayName: event.predictionMaker,
         bet: event.bet,
         referenceName: (event.referenceType === 'Castaway' ?
@@ -370,10 +377,10 @@ function EpisodeEventsTableBody({
       eventId?: LeagueEventId;
       points: number;
       notes: string[] | null;
-      referenceId: number;
+      referenceIds: number[];
       referenceType: ReferenceType;
       // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-      referenceName: CastawayName | TribeName;
+      referenceNames: (CastawayName | TribeName)[];
       predictionMakers: {
         displayName: LeagueMemberDisplayName;
         bet?: number | null;
@@ -462,9 +469,9 @@ function EpisodeEventsTableBody({
           eventName={mockPrediction.eventName}
           points={mockPrediction.points}
           predictionMakers={[{ displayName: mockPrediction.predictionMaker }]}
-          referenceId={mockPrediction.referenceId}
+          referenceIds={[mockPrediction.referenceId]}
           referenceType={mockPrediction.referenceType}
-          referenceName={mockPrediction.referenceName}
+          referenceNames={[mockPrediction.referenceName]}
           notes={mockPrediction.notes}
           episodeNumber={episodeNumber}
           edit={false} />
@@ -476,9 +483,9 @@ function EpisodeEventsTableBody({
           eventId={-1}
           eventName={mockDirect.eventName}
           points={mockDirect.points}
-          referenceId={mockDirect.referenceId}
+          referenceIds={[mockDirect.referenceId]}
           referenceType={mockDirect.referenceType}
-          referenceName={mockDirect.referenceName}
+          referenceNames={[mockDirect.referenceName]}
           notes={mockDirect.notes}
           episodeNumber={episodeNumber}
           edit={false} />
@@ -512,8 +519,8 @@ function EpisodeEventsTableBody({
           eventName={event.eventName}
           points={event.points}
           referenceType={event.referenceType}
-          referenceName={event.referenceName}
-          referenceId={event.referenceId}
+          referenceNames={[event.referenceName]}
+          referenceIds={[event.referenceId]}
           notes={event.notes}
           episodeNumber={episodeNumber}
           edit={edit} />
@@ -531,8 +538,8 @@ function EpisodeEventsTableBody({
           eventName={event.eventName}
           points={event.points}
           referenceType={event.referenceType}
-          referenceName={event.referenceName}
-          referenceId={event.referenceId}
+          referenceNames={event.referenceNames}
+          referenceIds={event.referenceIds}
           predictionMakers={event.predictionMakers}
           misses={event.misses}
           defaultOpenMisses={filters.member.length > 0}
@@ -728,8 +735,8 @@ interface LeagueEventRowProps {
   eventId?: number;
   points: number;
   referenceType: ReferenceType;
-  referenceName?: string;
-  referenceId: number;
+  referenceNames?: string[];
+  referenceIds?: number[];
   predictionMakers?: {
     displayName: LeagueMemberDisplayName,
     bet?: number | null
@@ -751,8 +758,8 @@ function LeagueEventRow({
   eventId,
   points,
   referenceType,
-  referenceName,
-  referenceId,
+  referenceNames,
+  referenceIds,
   predictionMakers,
   notes,
   misses,
@@ -771,7 +778,7 @@ function LeagueEventRow({
           eventName,
           points,
           referenceType,
-          referenceId,
+          referenceId: referenceIds?.[0] ? referenceIds[0] : 0,
           notes
         }} />
       </TableCell> :
@@ -780,25 +787,29 @@ function LeagueEventRow({
       <PointsCell points={points} />
       <TableCell className='text-right text-xs text-nowrap'>
         <div className='h-full grid auto-rows-fr items-center'>
-          {referenceType === 'Tribe' && referenceName &&
+          {referenceType === 'Tribe' && referenceNames?.map((referenceName) => (
             <ColorRow
+              key={referenceName}
               className='leading-tight px-1 w-min'
               color={leagueData.castaways.find((listItem) =>
                 listItem.tribes.some((tribeEp) => tribeEp.tribeName === referenceName))?.tribes
                 .find((tribeEp) => tribeEp.tribeName === referenceName)?.tribeColor}>
               {referenceName}
-            </ColorRow>}
+            </ColorRow>
+          ))}
         </div>
       </TableCell>
       <TableCell className='text-right text-xs text-nowrap justify-items-end'>
-        {referenceType === 'Castaway' && referenceName &&
+        {referenceType === 'Castaway' && referenceNames?.map((referenceName) => (
           <ColorRow
+            key={referenceName}
             className='leading-tight px-1 w-min'
             color={leagueData.castaways.find((listItem) =>
               listItem.fullName === referenceName)?.tribes.findLast((tribeEp) =>
                 tribeEp.episode <= episodeNumber)?.tribeColor}>
             {referenceName}
-          </ColorRow>}
+          </ColorRow>
+        ))}
       </TableCell>
       <TableCell className='text-xs text-nowrap'>
         <div className={cn(

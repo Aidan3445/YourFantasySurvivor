@@ -7,19 +7,24 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
 import { Button } from '~/components/ui/button';
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialog, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/ui/alertDialog';
 import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { DateTimePicker } from '~/components/ui/dateTimePicker';
+import { useState } from 'react';
 
 const formSchema = z.object({
   draftDate: z.date().nullable(),
 });
 
-export default function SetDraftDate() {
+interface SetDraftDateProps {
+  overrideLeagueHash?: string;
+}
+
+export default function SetDraftDate({ overrideLeagueHash }: SetDraftDateProps) {
   const {
     league: {
       leagueHash,
@@ -28,7 +33,8 @@ export default function SetDraftDate() {
       }
     },
     refresh
-  } = useLeague();
+  } = useLeague({ overrideLeagueHash });
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
@@ -45,8 +51,10 @@ export default function SetDraftDate() {
 
     try {
       await updateLeagueSettings(leagueHash, leagueUpdate);
+      console.log('Draft timing updated:', data.draftDate);
       await refresh();
       alert(`Draft timing updated: ${data.draftDate?.toLocaleString() ?? 'Manual Draft'}`);
+      setDialogOpen(false);
     } catch (error) {
       console.error(error);
       alert('Failed to update draft timing');
@@ -55,7 +63,7 @@ export default function SetDraftDate() {
 
   return (
     <Form {...reactForm}>
-      <AlertDialog>
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogTrigger>
           <Settings
             className='cursor-pointer stroke-primary hover:stroke-secondary transition-all'
@@ -82,9 +90,7 @@ export default function SetDraftDate() {
               <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
                 <X stroke='white' />
               </AlertDialogCancel>
-              <AlertDialogAction asChild>
-                <Button type='submit'>Save</Button>
-              </AlertDialogAction>
+              <Button type='submit'>Save</Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>
@@ -112,7 +118,7 @@ export function DraftDateField({ disabled }: DraftDateFieldProps) {
                 side='top'
                 disabled={disabled}
                 placeholder='Select draft start date and time'
-                rangeStart={new Date()} />
+                rangeStart={new Date(new Date().setHours(0, 0, 0, 0))} />
             </span>
           </FormControl>
           <FormDescription className='text-sm text-left'>
