@@ -7,7 +7,7 @@ import { DraftCountdown } from '~/components/leagues/predraft/draftCountdown';
 import DraftOrder from '~/components/leagues/predraft/draftOrder';
 import InviteLink from '~/components/leagues/predraft/inviteLink';
 import LeagueScoring from '~/components/leagues/customization/leagueScoring';
-import LeagueChatCard from '~/components/leagues/chat/leagueChatCard';
+import LeagueChatCard from '~/components/leagues/chat/card';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';

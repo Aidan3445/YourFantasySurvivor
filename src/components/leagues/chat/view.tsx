@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { Realtime } from 'ably';
 import { ChatClient } from '@ably/chat';
 import { ChatClientProvider, ChatRoomProvider } from '@ably/chat/react';
-import ChatRoom, { type ChatRoomProps } from '~/components/leagues/chat/chatRoom';
+import ChatRoom, { type ChatRoomProps } from '~/components/leagues/chat/room';
 
 export default function LeagueChat({ chatHistory, messageEnd }: ChatRoomProps) {
   const params = useParams();

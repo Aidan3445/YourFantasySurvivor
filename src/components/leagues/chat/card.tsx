@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { cn } from '~/lib/utils';
-import { type ChatRoomProps } from '~/components/leagues/chat/chatRoom';
+import { type ChatRoomProps } from '~/components/leagues/chat/room';
 import dynamic from 'next/dynamic';
 
-const LeagueChat = dynamic(() => import('~/components/leagues/chat/leagueChat'), {
+const LeagueChat = dynamic(() => import('~/components/leagues/chat/view'), {
   ssr: false,
 });
 
