@@ -1,27 +1,21 @@
 'use client';
 
-import Image from 'next/image';
 import { Card, CardContent } from '~/components/ui/card';
-//import { Button } from "~/components/ui/button";
 import { SignIn } from '@clerk/nextjs';
-import { Trophy, Users, Gamepad2, BarChart } from 'lucide-react';
+import { Trophy, Users, Gamepad2, BarChart, CirclePlus } from 'lucide-react';
 import { type ReactNode } from 'react';
+import { Button } from '../ui/button';
+import { CreateLeagueModal } from '../leagues/createLeague';
+import { JoinLeagueDialog } from './quickActions';
 
 export function HeroSection() {
   return (
     <div className='flex flex-col lg:flex-row items-center lg:items-start gap-8'>
       <div className='flex flex-col items-center gap-4'>
-        <Image
-          src='https://i.imgur.com/xS6JQdr.png'
-          priority
-          width={256}
-          height={256}
-          alt='Your Fantasy Survivor Logo'
-        />
-        <Card className='shadow-2xl'>
-          <CardContent className='p-6 space-y-4 max-w-lg'>
+        <Card className='shadow-2xl h-[35rem]'>
+          <CardContent className='p-6 space-y-4'>
             <h1 className='text-4xl font-bold text-center'>Welcome to Your Fantasy Survivor!</h1>
-            <div className='space-y-3'>
+            <div className='space-y-3 mb-0'>
               <p className='text-center'>
                 Compete with friends in <i>Your Fantasy Survivor</i>, the ultimate Survivor fantasy league.
               </p>
@@ -53,6 +47,17 @@ export function HeroSection() {
                 </p>
               </div>
             </div>
+            <hr className='my-8' />
+            <span className='flex w-full justify-evenly items-center pt-2'>
+              <CreateLeagueModal>
+                <Button className='w-60'>
+                  <CirclePlus stroke='white' className='mr-2' />
+                  Get Started
+                </Button>
+              </CreateLeagueModal>
+              <h3 className='text-center text-lg font-semibold text-muted-foreground'>OR</h3>
+              <JoinLeagueDialog />
+            </span>
           </CardContent>
         </Card>
       </div>
@@ -63,7 +68,8 @@ export function HeroSection() {
           appearance={{
             layout: { logoPlacement: 'none' },
             elements: {
-              card: 'shadow-2xl'
+              card: '!h-full',
+              cardBox: '!h-[35rem] shadow-2xl',
             }
           }}
         />
