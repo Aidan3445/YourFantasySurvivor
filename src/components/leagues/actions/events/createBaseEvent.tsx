@@ -16,7 +16,7 @@ import { createBaseEvent } from '~/services/leagues/events/baseEventActions';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { Circle } from 'lucide-react';
 
-export default function CreateCustomEvent() {
+export default function CreateBaseEvent() {
   const { leagueData, refresh } = useLeague();
   const reactForm = useForm<BaseEventInsert>({
     defaultValues: {

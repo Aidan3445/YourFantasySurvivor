@@ -8,7 +8,7 @@ import { ColorZod, DisplayNameZod, type LeagueMember } from '~/types/leagueMembe
 import { updateMemberDetails } from '~/services/leagues/settings/leagueSettingActions';
 import { useEffect } from 'react';
 import { useLeague } from '~/hooks/useLeague';
-import { LeagueMemberFields } from '~/components/leagues/actions/joinLeague';
+import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
 import { Button } from '~/components/common/button';
 import { cn } from '~/lib/utils';
 

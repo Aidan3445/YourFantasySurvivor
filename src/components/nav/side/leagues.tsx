@@ -6,7 +6,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { CreateLeagueModal } from '~/components/leagues/actions/league/create/view';
+import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import { Separator } from '~/components/common/separator';
 import SideNavLink from '~/components/nav/side/link';
 

@@ -6,11 +6,11 @@ import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/co
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import ChangeSurvivor from '~/components/leagues/hub/changeSurvivor';
-import CreateBaseEvent from '~/components/leagues/actions/createBaseEvent';
+import CreateBaseEvent from '~/components/leagues/actions/events/createBaseEvent';
 import CustomEvents from '~/components/leagues/customization/customEvents';
 import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
 import LeagueScoring from '~/components/leagues/customization/leagueScoring';
-import CreateCustomEvent from '~/components/leagues/actions/createCustomEvent';
+import CreateCustomEvent from '~/components/leagues/actions/events/createCustomEvent';
 import Predictions from '~/components/leagues/hub/predictions';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import LeagueChatCard from '~/components/leagues/main/leagueChatCard';

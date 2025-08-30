@@ -1,4 +1,4 @@
-import JoinLeagueForm from '~/components/leagues/actions/joinLeague';
+import JoinLeagueForm from '~/components/leagues/actions/league/join/form';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import { SignIn, SignUp } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';

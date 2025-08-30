@@ -27,9 +27,9 @@ import {
   type LeaguePredictionEvent, type ReferenceType, type ScoringBaseEventName, ScoringBaseEventNames
 } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
-import EditBaseEvent from '~/components/leagues/actions/editBaseEvent';
+import EditBaseEvent from '~/components/leagues/actions/events/editBaseEvent';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';
-import EditLeagueEvent from '~/components/leagues/actions/editLeagueEvent';
+import EditLeagueEvent from '~/components/leagues/actions/events/editLeagueEvent';
 import { useIsMobile } from '~/hooks/useMobile';
 import { type CastawayName } from '~/types/castaways';
 import { type TribeName } from '~/types/tribes';

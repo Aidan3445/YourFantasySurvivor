@@ -1,7 +1,7 @@
 'use client';
 
 import { ListPlus } from 'lucide-react';
-import { CreateLeagueModal } from '~/components/leagues/actions/createLeague';
+import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { type LeagueInfo } from '~/context/yfsUserContext';
 import { SignIn, useUser } from '@clerk/nextjs';
