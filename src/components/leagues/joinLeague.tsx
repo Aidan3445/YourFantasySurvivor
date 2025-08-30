@@ -3,9 +3,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
-import { Button } from '~/components/ui/button';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../common/form';
+import { Input } from '../common/input';
+import { Button } from '../common/button';
 import { ColorZod, DisplayNameZod, type LeagueMemberColor, type NewLeagueMember } from '~/server/db/defs/leagueMembers';
 import Swatch, { type SwatchRectRenderProps } from '@uiw/react-color-swatch';
 import { type HsvaColor, getContrastingColor, hexToHsva, hexToRgba, hsvaToHex, rgbaToHex } from '@uiw/color-convert';

@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../common/card';
+import { Badge } from '../common/badge';
+import { Button } from '../common/button';
 import { Trophy, Eye } from 'lucide-react';
 import { useYfsUser } from '~/hooks/useYfsUser';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../common/carousel';
 import Scoreboard from '../leagues/main/scoreboard';
 import { cn } from '~/lib/utils';
 import { DraftCountdown } from '../leagues/draftCountdown';

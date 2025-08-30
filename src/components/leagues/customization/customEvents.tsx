@@ -2,23 +2,23 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../common/form';
 import { useLeague } from '~/hooks/useLeague';
 import {
   type LeagueEventRule, LeagueEventRuleZod, LeagueEventTypeOptions,
   PredictionTimingOptions, ReferenceOptions, defaultLeagueEventRule
 } from '~/server/db/defs/events';
-import { Input } from '~/components/ui/input';
-import { Textarea } from '~/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { MultiSelect } from '~/components/ui/multiSelect';
-import { Button } from '~/components/ui/button';
+import { Input } from '../../common/input';
+import { Textarea } from '../../common/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../common/select';
+import { MultiSelect } from '../../common/multiSelect';
+import { Button } from '../../common/button';
 import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/app/api/leagues/actions';
 import { Flame, Lock, LockOpen, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '~/components/ui/alertDialog';
+} from '../../common/alertDialog';
 import { type ReactNode, useState } from 'react';
 import { cn } from '~/lib/utils';
 import { PredictionTimingHelp } from '../draft/makePredictions';

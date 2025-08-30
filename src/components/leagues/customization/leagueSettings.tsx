@@ -1,14 +1,14 @@
 'use client';
 
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../common/form';
 import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/server/db/defs/leagues';
 import { useLeague } from '~/hooks/useLeague';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { MultiSelect } from '~/components/ui/multiSelect';
-import { Button } from '~/components/ui/button';
+import { MultiSelect } from '../../common/multiSelect';
+import { Button } from '../../common/button';
 import { updateAdmins, updateLeagueSettings } from '~/app/api/leagues/actions';
-import { Input } from '~/components/ui/input';
+import { Input } from '../../common/input';
 
 const formSchema = z.object({
   leagueName: z.string(),

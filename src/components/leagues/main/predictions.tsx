@@ -7,10 +7,10 @@ import { type EpisodeNumber } from '~/server/db/defs/episodes';
 import { type ShauhinModeSettings, type Prediction, BaseEventFullName } from '~/server/db/defs/events';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { CoverCarousel } from '~/components/ui/carousel';
+import { CoverCarousel } from '~/components/common/carousel';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
-} from '~/components/ui/table';
+} from '~/components/common/table';
 import { usePredictions } from '~/hooks/usePredictions';
 import { useLeague } from '~/hooks/useLeague';
 

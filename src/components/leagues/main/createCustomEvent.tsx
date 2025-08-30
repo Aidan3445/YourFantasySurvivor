@@ -4,12 +4,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
 import { type LeagueEventInsert, LeagueEventInsertZod } from '~/server/db/defs/events';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useMemo } from 'react';
-import { Textarea } from '~/components/ui/textarea';
+import { Textarea } from '~/components/common/textarea';
 import { EpisodeEvents } from './recentActivity';
-import { Button } from '~/components/ui/button';
+import { Button } from '~/components/common/button';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { createLeagueEvent } from '~/app/api/leagues/actions';
 

@@ -2,8 +2,8 @@
 
 import { z } from 'zod';
 import { cn } from '~/lib/utils';
-import { Button } from '~/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/ui/form';
+import { Button } from '../../common/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '../../common/form';
 import { Flame, HelpCircle } from 'lucide-react';
 import {
   type ReferenceType, type BasePredictionRules, defaultPredictionRules,
@@ -13,18 +13,18 @@ import {
 } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../common/select';
 import type { CastawayDetails, CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import type { Tribe } from '~/server/db/defs/tribes';
 import { ColorRow } from '../draftOrder';
-import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import { Popover, PopoverContent, PopoverTrigger } from '../../common/popover';
+import { ScrollArea, ScrollBar } from '../../common/scrollArea';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useMemo } from 'react';
-import { Input } from '~/components/ui/input';
-import { CoverCarousel } from '~/components/ui/carousel';
+import { Input } from '../../common/input';
+import { CoverCarousel } from '../../common/carousel';
 
 interface MakePredictionsProps {
   basePredictionRules?: BasePredictionRules;

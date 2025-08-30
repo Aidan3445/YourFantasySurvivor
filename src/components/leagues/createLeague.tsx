@@ -3,27 +3,27 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../common/form';
+import { Input } from '../common/input';
 import { LeagueNameZod } from '~/server/db/defs/leagues';
 import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '~/components/ui/carousel';
-import { Button } from '~/components/ui/button';
-import { Progress } from '~/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '../common/carousel';
+import { Button } from '../common/button';
+import { Progress } from '../common/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../common/tabs';
 import { useCarouselProgress } from '~/hooks/useCarouselProgress';
 import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from './joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useUser } from '@clerk/nextjs';
 import {
   AlertDialog, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '~/components/ui/alertDialog';
+} from '../common/alertDialog';
 import { X } from 'lucide-react';
 import { DraftDateField } from './customization/setDraftDate';
 

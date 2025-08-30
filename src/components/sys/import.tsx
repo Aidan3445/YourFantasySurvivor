@@ -1,15 +1,15 @@
 'use client';
 
-import { Button } from '~/components/ui/button';
+import { Button } from '../common/button';
 import { importContestants, importEpisode } from '~/app/api/sys/actions';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import Image from 'next/image';
-import { Input } from '~/components/ui/input';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '~/components/ui/form';
-import { DateTimePicker } from '~/components/ui/dateTimePicker';
+import { Input } from '../common/input';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../common/form';
+import { DateTimePicker } from '../common/dateTimePicker';
 import { type NewCastaway } from '~/server/db/defs/castaways';
 import { type NewTribe } from '~/server/db/defs/tribes';
 import { Circle } from 'lucide-react';

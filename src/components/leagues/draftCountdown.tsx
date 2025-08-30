@@ -1,7 +1,7 @@
 'use client';
 
 import { type ReactNode, useEffect, useState } from 'react';
-import { Button } from '~/components/ui/button';
+import { Button } from '../common/button';
 import SetDraftDate from './customization/setDraftDate';
 import { useLeague } from '~/hooks/useLeague';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '~/components/ui/alertDialog';
+} from '../common/alertDialog';
 
 interface DraftCountdownProps {
   overrideLeagueHash?: string;

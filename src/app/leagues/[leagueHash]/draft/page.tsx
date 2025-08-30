@@ -2,8 +2,8 @@ import DraftCastaways from '~/components/leagues/draft/draftCastaways';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import DraftTracker from '~/components/leagues/draft/draftTracker';
 import { QUERIES } from '~/app/api/leagues/query';
-import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 
 /*

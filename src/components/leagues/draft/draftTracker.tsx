@@ -10,7 +10,7 @@ import { ColorRow } from '~/components/leagues/draftOrder';
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
-} from '~/components/ui/alertDialog';
+} from '../../common/alertDialog';
 import MakePredictions from './makePredictions';
 import { useRouter } from 'next/navigation';
 

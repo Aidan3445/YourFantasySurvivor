@@ -1,11 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
-import { Label } from '~/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/ui/dialog';
+import { Button } from '../common/button';
+import { Card, CardContent, CardHeader, CardTitle } from '../common/card';
+import { Input } from '../common/input';
+import { Label } from '../common/label';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../common/dialog';
 import CreateLeagueForm from '~/components/leagues/createLeague';
 import { Users, Zap } from 'lucide-react';
 import { useRouter } from 'next/navigation';

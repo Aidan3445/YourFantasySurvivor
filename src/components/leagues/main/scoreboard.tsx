@@ -2,18 +2,18 @@
 
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
-} from '~/components/ui/table';
+} from '../../common/table';
 import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { ColorRow } from '../draftOrder';
 import { MoveRight, Circle, Flame, History, Skull, CircleHelp } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../../common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/useMobile';
 import { cn } from '~/lib/utils';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
-import { Separator } from '~/components/ui/separator';
+import { ScrollArea, ScrollBar } from '../../common/scrollArea';
+import { Separator } from '../../common/separator';
 import { getContrastingColor } from '@uiw/color-convert';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 
@@ -25,7 +25,8 @@ interface ScoreboardProps {
 export default function Scoreboard({ overrideLeagueHash, maxRows }: ScoreboardProps = {}) {
   const { leagueData, league } = useLeague({ overrideLeagueHash });
   const sortedMemberScores = Object.entries(leagueData.scores.Member)
-    .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
+    .sort(([_, scoresA], [__, scoresB]) =>
+      (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
   const loggedInIndex = sortedMemberScores.findIndex(([member]) =>
     member === league.members.loggedIn?.displayName
@@ -189,7 +190,11 @@ function MemberRow({ place, member, points, survivor, color, doubleBelow, overri
             {league.settings.survivalCap > 0 && (
               <Popover>
                 <PopoverTrigger>
-                  <div className='ml-1 w-4 flex justify-center'>
+                  <div className='ml-1 w-4 flex justify-center' style={{
+                    color: survivor.eliminatedEpisode
+                      ? 'black'
+                      : getContrastingColor(survivor.startingTribe.tribeColor)
+                  }}>
                     {Math.min(leagueData.currentStreaks[member]!, league.settings.survivalCap) ||
                       <Skull
                         size={16}

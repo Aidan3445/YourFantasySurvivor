@@ -3,14 +3,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem } from '~/components/ui/form';
-import { Button } from '~/components/ui/button';
+import { Form, FormControl, FormField, FormItem } from '../../common/form';
+import { Button } from '../../common/button';
 import { useLeague } from '~/hooks/useLeague';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../common/select';
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
-} from '~/components/ui/alertDialog';
+} from '../../common/alertDialog';
 import { chooseCastaway } from '~/app/api/leagues/actions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';

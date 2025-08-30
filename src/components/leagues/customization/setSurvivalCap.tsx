@@ -1,13 +1,13 @@
 'use client';
 
-import { Slider } from '~/components/ui/slider';
+import { Slider } from '../../common/slider';
 import { DEFAULT_SURVIVAL_CAP, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/server/db/defs/leagues';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { type z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '~/components/ui/form';
-import { Switch } from '~/components/ui/switch';
-import { Button } from '~/components/ui/button';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '../../common/form';
+import { Switch } from '../../common/switch';
+import { Button } from '../../common/button';
 import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { Flame, Lock, LockOpen } from 'lucide-react';

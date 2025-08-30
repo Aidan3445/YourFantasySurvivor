@@ -1,18 +1,18 @@
 'use client';
 
 import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
-import { SidebarMenuButton, SidebarMenuSub } from '~/components/ui/sidebar';
-import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '~/components/ui/sidebar';
+import { SidebarMenuButton, SidebarMenuSub } from '../common/sidebar';
+import { Sidebar, SidebarContent, SidebarGroup, SidebarMenu } from '../common/sidebar';
 import { ListPlus, LoaderCircle, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { type NavLinkProps } from './navSelector';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../common/accordion';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useEffect, useState } from 'react';
 import { cn } from '~/lib/utils';
 import { useParams } from 'next/navigation';
 import { CreateLeagueModal } from '../leagues/createLeague';
-import { Separator } from '../ui/separator';
+import { Separator } from '../common/separator';
 import Image from 'next/image';
 
 export default function SideNav() {

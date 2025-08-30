@@ -3,9 +3,9 @@
 import { useState, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { useMessages } from '@ably/chat/react';
 import { type Message } from 'node_modules/@ably/chat/dist/core/message';
-import { Input } from '~/components/ui/input';
-import { Button } from '~/components/ui/button';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import { Input } from '~/components/common/input';
+import { Button } from '~/components/common/button';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { useLeague } from '~/hooks/useLeague';
 import { type Headers } from '@ably/chat';
 import { ColorRow } from '../draftOrder';

@@ -3,19 +3,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '~/components/ui/alertDialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { MultiSelect } from '~/components/ui/multiSelect';
+} from '~/components/common/alertDialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
+import { MultiSelect } from '~/components/common/multiSelect';
 import { type BaseEventInsert, BaseEventInsertZod, baseEventLabelPrefixes, baseEventLabels, type BaseEvent } from '~/server/db/defs/events';
 import { useState } from 'react';
-import { Input } from '~/components/ui/input';
+import { Input } from '~/components/common/input';
 import { useEventOptions } from '~/hooks/useEventOptions';
-import { Textarea } from '~/components/ui/textarea';
-import { Button } from '~/components/ui/button';
+import { Textarea } from '~/components/common/textarea';
+import { Button } from '~/components/common/button';
 import { deleteBaseEvent, updateBaseEvent } from '~/app/api/seasons/actions';
 import { useLeague } from '~/hooks/useLeague';
 

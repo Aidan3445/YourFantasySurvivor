@@ -3,13 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormLabel } from '~/components/ui/form';
+import { Form, FormLabel } from '../../common/form';
 import { ColorZod, DisplayNameZod, type LeagueMember } from '~/server/db/defs/leagueMembers';
 import { updateMemberDetails } from '~/app/api/leagues/actions';
 import { useEffect } from 'react';
 import { useLeague } from '~/hooks/useLeague';
 import { LeagueMemberFields } from '~/components/leagues/joinLeague';
-import { Button } from '~/components/ui/button';
+import { Button } from '../../common/button';
 import { cn } from '~/lib/utils';
 
 const formSchema = z.object({

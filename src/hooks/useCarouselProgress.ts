@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { type CarouselApi } from '~/components/ui/carousel';
+import { type CarouselApi } from '../components/common/carousel';
 
 export function useCarouselProgress() {
   const [api, setApi] = useState<CarouselApi>();

@@ -3,7 +3,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
   AlertDialogTrigger
-} from '~/components/ui/alertDialog';
+} from '~/components/common/alertDialog';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 
 interface MemberPredictionsProps {

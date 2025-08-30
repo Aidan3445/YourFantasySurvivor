@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { Separator } from '~/components/ui/separator';
+import { Separator } from '~/components/common/separator';
 import { useLeague } from '~/hooks/useLeague';
 import { ColorRow } from '../draftOrder';
 import { useMemo } from 'react';

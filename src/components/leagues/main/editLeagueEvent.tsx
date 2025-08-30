@@ -3,16 +3,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Pencil, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '~/components/ui/alertDialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
+} from '~/components/common/alertDialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useState } from 'react';
 import { useEventOptions } from '~/hooks/useEventOptions';
-import { Textarea } from '~/components/ui/textarea';
-import { Button } from '~/components/ui/button';
+import { Textarea } from '~/components/common/textarea';
+import { Button } from '~/components/common/button';
 import { deleteLeagueEvent, updateLeagueEvent } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/server/db/defs/events';

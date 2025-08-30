@@ -8,8 +8,8 @@ import DraftOrder from '~/components/leagues/draftOrder';
 import InviteLink from '~/components/leagues/inviteLink';
 import LeagueScoring from '~/components/leagues/leagueScoring';
 import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { type LeaguePageProps } from '../layout';
 import ShauhinMode from '~/components/leagues/customization/shauhinMode';
 

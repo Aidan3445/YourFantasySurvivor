@@ -4,11 +4,11 @@
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Flame, MoveRight, ScrollText } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { MultiSelect } from '~/components/ui/multiSelect';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
+import { MultiSelect } from '~/components/common/multiSelect';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import {
   Table,
   TableBody,
@@ -17,7 +17,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '~/components/ui/table';
+} from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
 import type { EpisodeNumber, EpisodeAirStatus } from '~/server/db/defs/episodes';
@@ -33,7 +33,7 @@ import EditLeagueEvent from './editLeagueEvent';
 import { useIsMobile } from '~/hooks/useMobile';
 import { type CastawayName } from '~/server/db/defs/castaways';
 import { type TribeName } from '~/server/db/defs/tribes';
-import { Label } from '~/components/ui/label';
+import { Label } from '~/components/common/label';
 
 // TODO: add survivor streak to timeline
 

@@ -2,7 +2,7 @@ import MemberEditForm from '~/components/leagues/customization/memberEdit';
 import Chart from '~/components/leagues/main/chart';
 import RecentActivity from '~/components/leagues/main/recentActivity';
 import Scoreboard from '~/components/leagues/main/scoreboard';
-import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from './layout';
 import ChangeSurvivor from '~/components/leagues/main/changeSurvivor';
@@ -12,7 +12,7 @@ import { LeagueSettings } from '~/components/leagues/customization/leagueSetting
 import LeagueScoring from '~/components/leagues/leagueScoring';
 import CreateCustomEvent from '~/components/leagues/main/createCustomEvent';
 import Predictions from '~/components/leagues/main/predictions';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 //import { QUERIES } from '~/app/api/leagues/query';
 import SetSurvivalCap from '~/components/leagues/customization/setSurvivalCap';

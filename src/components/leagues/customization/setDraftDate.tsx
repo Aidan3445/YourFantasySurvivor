@@ -4,16 +4,16 @@ import { Settings, X } from 'lucide-react';
 import { z } from 'zod';
 import { type LeagueSettingsUpdate } from '~/server/db/defs/leagues';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { Button } from '~/components/ui/button';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../common/form';
+import { Button } from '../../common/button';
 import {
   AlertDialog, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '~/components/ui/alertDialog';
+} from '../../common/alertDialog';
 import { updateLeagueSettings } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
-import { DateTimePicker } from '~/components/ui/dateTimePicker';
+import { DateTimePicker } from '../../common/dateTimePicker';
 import { useState } from 'react';
 
 const formSchema = z.object({

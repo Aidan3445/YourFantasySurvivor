@@ -3,7 +3,7 @@ import '~/styles/globals.css';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
-import { SidebarProvider } from '~/components/ui/sidebar';
+import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
 import UserProvider from '~/context/yfsUserContext';
 import { QUERIES } from './api/leagues/query';

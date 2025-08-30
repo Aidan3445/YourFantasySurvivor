@@ -1,10 +1,10 @@
 'use client';
 
-import { Card, CardContent } from '~/components/ui/card';
+import { Card, CardContent } from '../common/card';
 import { SignIn } from '@clerk/nextjs';
 import { Trophy, Users, Gamepad2, BarChart, CirclePlus } from 'lucide-react';
 import { type ReactNode } from 'react';
-import { Button } from '../ui/button';
+import { Button } from '../common/button';
 import { CreateLeagueModal } from '../leagues/createLeague';
 import { JoinLeagueDialog } from './quickActions';
 

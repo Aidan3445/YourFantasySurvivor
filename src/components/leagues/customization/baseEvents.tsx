@@ -1,8 +1,8 @@
 import { Flame } from 'lucide-react';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/ui/form';
-import { Input } from '~/components/ui/input';
-import { MultiSelect } from '~/components/ui/multiSelect';
-import { Switch } from '~/components/ui/switch';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../common/form';
+import { Input } from '../../common/input';
+import { MultiSelect } from '../../common/multiSelect';
+import { Switch } from '../../common/switch';
 import { cn } from '~/lib/utils';
 import { BaseEventDescriptions, BaseEventFullName, PredictionTimingOptions, type ScoringBaseEventName } from '~/server/db/defs/events';
 
@@ -496,7 +496,7 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
                 render={({ field: pointsField }) => (
                   <FormItem>
                     {disabled &&
-                      <h2 className='font-bold text-card-foreground text-green-600 text-nowrap'>
+                      <h2 className='font-bold text-card-foreground text-nowrap'>
                         {pointsField.value}
                         <Flame size={14} className='inline align-text-bottom mb-0.5 stroke-green-600' />
                       </h2>}

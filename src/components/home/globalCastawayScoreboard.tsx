@@ -2,17 +2,17 @@ import { QUERIES as LEAGUE_QUERIES } from '~/app/api/leagues/query';
 import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
-} from '~/components/ui/table';
+} from '../common/table';
 
 import { compileScores } from '~/app/api/seasons/scores';
 import { type BaseEventRule } from '~/server/db/defs/events';
-import { ScrollArea, ScrollBar } from '~/components/ui/scrollArea';
+import { ScrollArea, ScrollBar } from '../common/scrollArea';
 import { cn } from '~/lib/utils';
 import { Circle, Flame, FlameKindling } from 'lucide-react';
 import { type CastawayDetails, type CastawayName } from '~/server/db/defs/castaways';
 import { newtwentyColors } from '~/lib/colors';
 import { ColorRow } from '../leagues/draftOrder';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Fragment } from 'react';
 
