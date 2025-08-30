@@ -1,8 +1,6 @@
-'use client';
-
 import { type ReactNode } from 'react';
-import BottomNav from '~/components/nav/bottomNav';
-import SideNav from '~/components/nav/sideNav';
+import BottomNav from '~/components/nav/bottomNav/view';
+import SideNav from '~/components/nav/sideNav/view';
 
 export interface NavLinkProps {
   href: string;

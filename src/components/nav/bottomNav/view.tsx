@@ -1,9 +1,9 @@
-import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
-import { type NavLinkProps } from '~/components/nav/navSelector';
-import Link from 'next/link';
-import { LoaderCircle, LogIn, Trophy } from 'lucide-react';
+
+import { Trophy } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import Image from 'next/image';
+import { BottomNavUser } from '~/components/nav/bottomNav/user';
+import { BottomNavLink } from '~/components/nav/bottomNav/link';
 
 export const navHeight = 'h-10';
 
@@ -24,38 +24,8 @@ export default function BottomNav() {
         <BottomNavLink
           href='/leagues'
           icon={<Trophy className='active:stroke-green-800 transition-colors' size={28} />} />
-        {/*<BottomNavLink href='/seasons' icon={<BookUser size={26} />} />*/}
         <BottomNavUser />
       </span>
     </div>
-  );
-}
-
-function BottomNavUser() {
-  return (<>
-    <ClerkLoading>
-      <LoaderCircle className='animate-spin' color='#7f633f' size={28} />
-    </ClerkLoading>
-    <ClerkLoaded>
-      <SignedIn>
-        <div className='mt-2 w-7'>
-          <UserButton />
-        </div>
-      </SignedIn>
-      <SignedOut>
-        <SignInButton>
-          <LogIn size={28} />
-        </SignInButton>
-      </SignedOut>
-    </ClerkLoaded>
-  </>
-  );
-}
-
-function BottomNavLink({ href, icon }: NavLinkProps) {
-  return (
-    <Link href={href}>
-      {icon}
-    </Link>
   );
 }
