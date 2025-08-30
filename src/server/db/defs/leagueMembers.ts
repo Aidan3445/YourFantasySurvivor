@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { type CastawayName } from './castaways';
-import { type EpisodeNumber } from './episodes';
+import { type CastawayName } from '~/server/db/defs/castaways';
+import { type EpisodeNumber } from '~/server/db/defs/episodes';
 
 export const DISPLAY_NAME_MAX_LENGTH = 16;
 export const DisplayNameZod = z.string().min(2).max(DISPLAY_NAME_MAX_LENGTH);

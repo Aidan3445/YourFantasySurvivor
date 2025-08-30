@@ -1,12 +1,12 @@
 'use client';
 
 import { ListPlus } from 'lucide-react';
-import { CreateLeagueModal } from '~/components/leagues/createLeague';
+import { CreateLeagueModal } from '~/components/leagues/actions/createLeague';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { type LeagueInfo } from '~/context/yfsUserContext';
 import { SignIn, useUser } from '@clerk/nextjs';
 import { Separator } from '~/components/common/separator';
-import { LeagueGrid } from '~/components/features/leagues/leagueGrid';
+import { LeagueGrid } from '~/components/leagues/grid/leagueGrid';
 
 export default function LeaguesPage() {
   const user = useUser();

@@ -2,26 +2,26 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../common/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { useLeague } from '~/hooks/useLeague';
 import {
   type LeagueEventRule, LeagueEventRuleZod, LeagueEventTypeOptions,
   PredictionTimingOptions, ReferenceOptions, defaultLeagueEventRule
 } from '~/server/db/defs/events';
-import { Input } from '../../common/input';
-import { Textarea } from '../../common/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../common/select';
-import { MultiSelect } from '../../common/multiSelect';
-import { Button } from '../../common/button';
+import { Input } from '~/components/common/input';
+import { Textarea } from '~/components/common/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
+import { MultiSelect } from '~/components/common/multiSelect';
+import { Button } from '~/components/common/button';
 import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/app/api/leagues/actions';
 import { Flame, Lock, LockOpen, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '../../common/alertDialog';
+} from '~/components/common/alertDialog';
 import { type ReactNode, useState } from 'react';
 import { cn } from '~/lib/utils';
-import { PredictionTimingHelp } from '../draft/makePredictions';
+import { PredictionTimingHelp } from '~/components/leagues/draft/makePredictions';
 
 export default function CustomEvents() {
   const {
@@ -40,6 +40,7 @@ export default function CustomEvents() {
     resolver: zodResolver(LeagueEventRuleZod),
   });
   const [locked, setLocked] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     const newRule: LeagueEventRule = {
@@ -52,6 +53,7 @@ export default function CustomEvents() {
       await refresh();
       alert(`Custom event ${newRule.eventName} created.`);
       reactForm.reset();
+      setModalOpen(false);
     } catch (error) {
       console.error(error);
       alert('Failed to create custom event');
@@ -61,7 +63,7 @@ export default function CustomEvents() {
   const disabled = loggedIn?.role !== 'Owner';
 
   return (
-    <article className='bg-card p-2 rounded-xl w-full relative'>
+    <article className='bg-card p-2 rounded-xl w-full relative space-y-2'>
       {!disabled && (locked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
@@ -96,7 +98,7 @@ export default function CustomEvents() {
         </div>
       </div>
       {!(disabled || locked) &&
-        <AlertDialog>
+        <AlertDialog open={modalOpen} onOpenChange={setModalOpen}>
           <Form {...reactForm}>
             <form action={() => handleSubmit()}>
               <AlertDialogTrigger asChild>
@@ -112,9 +114,7 @@ export default function CustomEvents() {
                 <CustomEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
                 <AlertDialogFooter>
                   <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
-                  <AlertDialogAction asChild>
-                    <Button type='submit' onClick={() => handleSubmit()}>Create Event</Button>
-                  </AlertDialogAction>
+                  <Button type='submit' onClick={() => handleSubmit()}>Create Event</Button>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </form>

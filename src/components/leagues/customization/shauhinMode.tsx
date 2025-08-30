@@ -1,17 +1,17 @@
 'use client';
 
 import { useForm } from 'react-hook-form';
-import { ColorRow } from '../draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { type z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../common/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { BaseEventFullName, type ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from '~/server/db/defs/events';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '../../common/button';
-import { Switch } from '../../common/switch';
-import { Input } from '../../common/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../common/select';
+import { Button } from '~/components/common/button';
+import { Switch } from '~/components/common/switch';
+import { Input } from '~/components/common/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useEffect, useState } from 'react';
-import { MultiSelect } from '../../common/multiSelect';
+import { MultiSelect } from '~/components/common/multiSelect';
 import { Lock, LockOpen } from 'lucide-react';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';

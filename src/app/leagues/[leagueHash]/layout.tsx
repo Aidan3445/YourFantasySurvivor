@@ -1,6 +1,6 @@
 import { SignIn } from '@clerk/nextjs';
 import { type ReactNode } from 'react';
-import LeagueHeader from '~/components/leagues/leagueHeader';
+import LeagueHeader from '~/components/leagues/layout/leagueHeader';
 import { leagueMemberAuth } from '~/lib/auth';
 
 export interface LeaguePageProps {

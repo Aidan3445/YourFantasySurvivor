@@ -1,6 +1,6 @@
 import { findTribeCastaways } from '~/lib/utils';
-import { type QUERIES as LEAGUE_QUERIES } from '../query';
-import { type QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
+import { type leaguesService as LEAGUE_QUERIES } from '~/services/leagues';
+import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
 import { type ScoringBaseEventName, ScoringBaseEventNames, type BaseEventRule, type ReferenceType, type BasePredictionRules } from '~/server/db/defs/events';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 import { type LeagueSurvivalCap } from '~/server/db/defs/leagues';

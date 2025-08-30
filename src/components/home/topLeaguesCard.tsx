@@ -1,15 +1,15 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '../common/card';
-import { Badge } from '../common/badge';
-import { Button } from '../common/button';
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/common/card';
+import { Badge } from '~/components/common/badge';
+import { Button } from '~/components/common/button';
 import { Trophy, Eye } from 'lucide-react';
 import { useYfsUser } from '~/hooks/useYfsUser';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../common/carousel';
-import Scoreboard from '../leagues/main/scoreboard';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/common/carousel';
+import Scoreboard from '~/components/leagues/hub/scoreboard';
 import { cn } from '~/lib/utils';
-import { DraftCountdown } from '../leagues/draftCountdown';
+import { DraftCountdown } from '~/components/leagues/predraft/draftCountdown';
 import Autoplay from 'embla-carousel-autoplay';
 
 export function TopLeaguesCard() {

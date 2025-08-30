@@ -8,10 +8,10 @@ import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-ki
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { cn } from '~/lib/utils';
 import { GripVertical, Lock, LockOpen, Shuffle } from 'lucide-react';
-import SortableItem from '../common/sortableItem';
+import SortableItem from '~/components/common/sortableItem';
 import { handleDragEnd } from '~/hooks/useSortableItem';
 import { updateDraftOrder } from '~/app/api/leagues/actions';
-import { Button } from '../common/button';
+import { Button } from '~/components/common/button';
 import { useRouter } from 'next/navigation';
 
 const SUFFLE_DURATION = 500;

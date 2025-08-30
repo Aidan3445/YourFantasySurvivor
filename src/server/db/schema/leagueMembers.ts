@@ -1,9 +1,9 @@
 import 'server-only';
 
-import { createTable } from './createTable';
-import { leaguesSchema } from './leagues';
-import { episodesSchema } from './episodes';
-import { castawaysSchema } from './castaways';
+import { createTable } from '~/server/db/schema/createTable';
+import { leaguesSchema } from '~/server/db/schema/leagues';
+import { episodesSchema } from '~/server/db/schema/episodes';
+import { castawaysSchema } from '~/server/db/schema/castaways';
 import { boolean, index, integer, pgEnum, primaryKey, serial, unique, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '~/server/db/defs/leagueMembers';
 

@@ -1,5 +1,5 @@
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { useLeague } from './useLeague';
+import { useLeague } from '~/hooks/useLeague';
 import { useMemo } from 'react';
 import { type TribeId, type TribeName } from '~/server/db/defs/tribes';
 

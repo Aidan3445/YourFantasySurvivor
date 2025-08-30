@@ -1,6 +1,6 @@
 import { defaultBaseRules, defaultPredictionRules, type BaseEventRule } from '~/server/db/defs/events';
-import { compileScores as scoresCompiler } from '../leagues/[leagueHash]/scores';
-import { type QUERIES as SEASON_QUERIES } from './query';
+import { compileScores as scoresCompiler } from '~/app/api/leagues/[leagueHash]/scores';
+import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
 
 export function compileScores(
   baseEvents: Awaited<ReturnType<typeof SEASON_QUERIES.getBaseEvents>>,

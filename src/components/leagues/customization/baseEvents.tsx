@@ -1,8 +1,8 @@
 import { Flame } from 'lucide-react';
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../../common/form';
-import { Input } from '../../common/input';
-import { MultiSelect } from '../../common/multiSelect';
-import { Switch } from '../../common/switch';
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { Input } from '~/components/common/input';
+import { MultiSelect } from '~/components/common/multiSelect';
+import { Switch } from '~/components/common/switch';
 import { cn } from '~/lib/utils';
 import { BaseEventDescriptions, BaseEventFullName, PredictionTimingOptions, type ScoringBaseEventName } from '~/server/db/defs/events';
 

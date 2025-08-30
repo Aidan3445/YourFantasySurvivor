@@ -15,7 +15,8 @@ const config =
     'eslint-plugin-react-compiler',
     '@typescript-eslint',
     'react',
-    '@stylistic/js'
+    '@stylistic/js',
+    'no-relative-import-paths'
   ],
   extends: [
     'next/core-web-vitals',
@@ -103,6 +104,14 @@ const config =
         drizzleObjectName: [
           'db'
         ]
+      }
+    ],
+    'no-relative-import-paths/no-relative-import-paths': [
+      'warn',
+      {
+        allowSameFolder: false,
+        rootDir: 'src',
+        prefix: '~'
       }
     ]
   }

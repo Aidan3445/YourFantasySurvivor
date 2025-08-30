@@ -5,12 +5,12 @@ import { BaseEventRuleZod, BasePredictionRulesZod, defaultBaseRules, defaultPred
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Form } from '../common/form';
-import { Button } from '../common/button';
+import { Form } from '~/components/common/form';
+import { Button } from '~/components/common/button';
 import { updateBaseEventRules } from '~/app/api/leagues/actions';
 import { useEffect, useState } from 'react';
 import { Lock, LockOpen } from 'lucide-react';
-import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
+import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from '~/components/leagues/customization/baseEvents';
 
 const formSchema = z.object({
   baseEventRules: BaseEventRuleZod,

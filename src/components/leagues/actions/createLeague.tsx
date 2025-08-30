@@ -3,18 +3,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '../common/form';
-import { Input } from '../common/input';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { Input } from '~/components/common/input';
 import { LeagueNameZod } from '~/server/db/defs/leagues';
-import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from './customization/baseEvents';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '../common/carousel';
-import { Button } from '../common/button';
-import { Progress } from '../common/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../common/tabs';
+import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from '~/components/leagues/customization/baseEvents';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '~/components/common/carousel';
+import { Button } from '~/components/common/button';
+import { Progress } from '~/components/common/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { useCarouselProgress } from '~/hooks/useCarouselProgress';
 import { createNewLeague } from '~/app/api/leagues/actions';
 import { useRouter } from 'next/navigation';
-import { LeagueMemberFields } from './joinLeague';
+import { LeagueMemberFields } from '~/components/leagues/actions/joinLeague';
 import { ColorZod, DisplayNameZod } from '~/server/db/defs/leagueMembers';
 import { type ReactNode, useEffect, useState } from 'react';
 import { useYfsUser } from '~/hooks/useYfsUser';
@@ -23,9 +23,9 @@ import {
   AlertDialog, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
-} from '../common/alertDialog';
+} from '~/components/common/alertDialog';
 import { X } from 'lucide-react';
-import { DraftDateField } from './customization/setDraftDate';
+import { DraftDateField } from '~/components/leagues/customization/setDraftDate';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,

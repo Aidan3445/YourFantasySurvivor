@@ -2,8 +2,8 @@
 
 import { z } from 'zod';
 import { cn } from '~/lib/utils';
-import { Button } from '../../common/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../../common/form';
+import { Button } from '~/components/common/button';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/common/form';
 import { Flame, HelpCircle } from 'lucide-react';
 import {
   type ReferenceType, type BasePredictionRules, defaultPredictionRules,
@@ -13,18 +13,18 @@ import {
 } from '~/server/db/defs/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../common/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import type { CastawayDetails, CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { makePrediction } from '~/app/api/leagues/actions';
 import { useLeague } from '~/hooks/useLeague';
 import type { Tribe } from '~/server/db/defs/tribes';
-import { ColorRow } from '../draftOrder';
-import { Popover, PopoverContent, PopoverTrigger } from '../../common/popover';
-import { ScrollArea, ScrollBar } from '../../common/scrollArea';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useMemo } from 'react';
-import { Input } from '../../common/input';
-import { CoverCarousel } from '../../common/carousel';
+import { Input } from '~/components/common/input';
+import { CoverCarousel } from '~/components/common/carousel';
 
 interface MakePredictionsProps {
   basePredictionRules?: BasePredictionRules;
@@ -163,7 +163,7 @@ export function PredictionCards({
         </div>
       </h3>
     ),
-    content: (<p className='text-sm'>{prediction.description}</p>),
+    content: (<p className='text-sm bg-b3 py-1'>{prediction.description}</p>),
     footer: (
       <SubmissionCard
         prediction={prediction}
@@ -224,7 +224,6 @@ function SubmissionCard({ prediction, options }: SubmissionCardProps) {
         .optional(),
     });
   }, [league.shauhinModeSettings?.maxBet]);
-
 
   const reactForm = useForm<z.infer<typeof schema>>({
     defaultValues: {

@@ -6,7 +6,7 @@ import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
 import UserProvider from '~/context/yfsUserContext';
-import { QUERIES } from './api/leagues/query';
+import { QUERIES } from '~/app/api/leagues/query';
 import { type Metadata } from 'next';
 
 const inter = Inter({

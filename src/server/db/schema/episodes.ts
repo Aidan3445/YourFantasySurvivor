@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { createTable } from './createTable';
-import { seasonsSchema } from './seasons';
+import { createTable } from '~/server/db/schema/createTable';
+import { seasonsSchema } from '~/server/db/schema/seasons';
 import { boolean, integer, serial, smallint, timestamp, unique, varchar } from 'drizzle-orm/pg-core';
 
 export const episodesSchema = createTable(

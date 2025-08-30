@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { createTable } from './createTable';
+import { createTable } from '~/server/db/schema/createTable';
 import { serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const seasonsSchema = createTable(

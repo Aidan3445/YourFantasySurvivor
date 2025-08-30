@@ -1,6 +1,6 @@
 import { Fragment } from 'react';
 import { type LeagueInfo } from '~/context/yfsUserContext';
-import { LeagueCard } from './leagueCard';
+import { LeagueCard } from '~/components/leagues/grid/leagueCard';
 
 interface LeagueGridProps {
   leagues: LeagueInfo[];

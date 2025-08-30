@@ -4,7 +4,7 @@ import DraftTracker from '~/components/leagues/draft/draftTracker';
 import { QUERIES } from '~/app/api/leagues/query';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
+import LeagueChatCard from '~/components/leagues/chat/leagueChatCard';
 
 /*
 export default async function DraftPage({ params }: LeaguePageProps) {

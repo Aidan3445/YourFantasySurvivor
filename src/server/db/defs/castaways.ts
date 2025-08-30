@@ -1,6 +1,6 @@
-import { type EpisodeId } from './episodes';
-import { type LeagueMemberDisplayName } from './leagueMembers';
-import { type Tribe, type TribeEp, type TribeName } from './tribes';
+import { type EpisodeId } from '~/server/db/defs/episodes';
+import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+import { type Tribe, type TribeEp, type TribeName } from '~/server/db/defs/tribes';
 
 export type CastawayId = number;
 export type CastawayName = string;

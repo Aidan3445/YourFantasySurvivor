@@ -1,7 +1,7 @@
 'use client';
 
 import { Link } from 'lucide-react';
-import { Input } from '../common/input';
+import { Input } from '~/components/common/input';
 import { useMemo, useState } from 'react';
 import { cn } from '~/lib/utils';
 import { useLeague } from '~/hooks/useLeague';

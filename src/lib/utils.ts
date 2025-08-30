@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { type QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
+import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
 import { type CastawayDetails } from '~/server/db/defs/castaways';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
 import { type BasePredictionRules, defaultPredictionRules, type PredictionEventTiming, ScoringBaseEventNames } from '~/server/db/defs/events';

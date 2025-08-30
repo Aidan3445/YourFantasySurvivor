@@ -1,16 +1,16 @@
-import { QUERIES } from '~/app/api/leagues/query';
+import { leaguesService as QUERIES } from '~/services/leagues';
 import CustomEvents from '~/components/leagues/customization/customEvents';
 import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
 import MemberEditForm from '~/components/leagues/customization/memberEdit';
 import SetSurvivalCap from '~/components/leagues/customization/setSurvivalCap';
-import { DraftCountdown } from '~/components/leagues/draftCountdown';
-import DraftOrder from '~/components/leagues/draftOrder';
-import InviteLink from '~/components/leagues/inviteLink';
-import LeagueScoring from '~/components/leagues/leagueScoring';
-import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
+import { DraftCountdown } from '~/components/leagues/predraft/draftCountdown';
+import DraftOrder from '~/components/leagues/predraft/draftOrder';
+import InviteLink from '~/components/leagues/predraft/inviteLink';
+import LeagueScoring from '~/components/leagues/customization/leagueScoring';
+import LeagueChatCard from '~/components/leagues/chat/leagueChatCard';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
-import { type LeaguePageProps } from '../layout';
+import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import ShauhinMode from '~/components/leagues/customization/shauhinMode';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {

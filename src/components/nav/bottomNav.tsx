@@ -1,5 +1,5 @@
 import { ClerkLoaded, ClerkLoading, SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
-import { type NavLinkProps } from './navSelector';
+import { type NavLinkProps } from '~/components/nav/navSelector';
 import Link from 'next/link';
 import { LoaderCircle, LogIn, Trophy } from 'lucide-react';
 import { cn } from '~/lib/utils';

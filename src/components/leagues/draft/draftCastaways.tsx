@@ -2,15 +2,15 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Popover, PopoverContent, PopoverTrigger } from '../../common/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { useDraft } from '~/hooks/useDraft';
 import { useIsMobile } from '~/hooks/useMobile';
 import { cn } from '~/lib/utils';
 import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 import { type TribeName } from '~/server/db/defs/tribes';
-import { ColorRow } from '~/components/leagues/draftOrder';
-import { ScrollArea, ScrollBar } from '../../common/scrollArea';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 interface CastawayCardsProps {
   leagueHash: LeagueHash;

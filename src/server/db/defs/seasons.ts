@@ -1,4 +1,4 @@
-import { type EpisodeTitle } from './episodes';
+import { type EpisodeTitle } from '~/server/db/defs/episodes';
 
 export type SeasonId = number;
 export type SeasonName = string;

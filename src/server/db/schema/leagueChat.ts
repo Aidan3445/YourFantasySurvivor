@@ -1,9 +1,9 @@
 import 'server-only';
 
-import { createTable } from './createTable';
-import { leaguesSchema } from './leagues';
+import { createTable } from '~/server/db/schema/createTable';
+import { leaguesSchema } from '~/server/db/schema/leagues';
 import { index, integer, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
-import { leagueMembersSchema } from './leagueMembers';
+import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 
 export const leagueChatSchema = createTable(
   'league_chat',

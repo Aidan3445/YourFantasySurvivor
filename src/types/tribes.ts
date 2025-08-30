@@ -1,6 +1,6 @@
-import { type CastawayName } from './castaways';
-import { type EpisodeNumber } from './episodes';
-import { type SeasonName } from './seasons';
+import { type CastawayName } from '~/types/castaways';
+import { type EpisodeNumber } from '~/types/episodes';
+import { type SeasonName } from '~/types/seasons';
 
 export type TribeId = number;
 export type TribeName = string;

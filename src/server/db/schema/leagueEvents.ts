@@ -1,13 +1,13 @@
 import 'server-only';
 
-import { createTable } from './createTable';
+import { createTable } from '~/server/db/schema/createTable';
 import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
-import { leaguesSchema } from './leagues';
+import { leaguesSchema } from '~/server/db/schema/leagues';
 import { LeagueEventTypeOptions } from '~/server/db/defs/events';
 import { sql } from 'drizzle-orm';
-import { leagueEventReference, predictionEventTiming } from './baseEvents';
-import { episodesSchema } from './episodes';
-import { leagueMembersSchema } from './leagueMembers';
+import { leagueEventReference, predictionEventTiming } from '~/server/db/schema/baseEvents';
+import { episodesSchema } from '~/server/db/schema/episodes';
+import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 
 export const leagueEventType = pgEnum('event_league_type', LeagueEventTypeOptions);
 

@@ -10,7 +10,7 @@ import { MultiSelect } from '~/components/common/multiSelect';
 import { useMemo, useState } from 'react';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
-import { EpisodeEvents } from './recentActivity';
+import { EpisodeEvents } from '~/components/leagues/hub/recentActivity';
 import { Button } from '~/components/common/button';
 import { createBaseEvent } from '~/app/api/seasons/actions';
 import { useEventOptions } from '~/hooks/useEventOptions';

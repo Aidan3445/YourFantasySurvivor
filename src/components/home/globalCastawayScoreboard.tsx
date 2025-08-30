@@ -1,18 +1,18 @@
-import { QUERIES as LEAGUE_QUERIES } from '~/app/api/leagues/query';
-import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
+import { leaguesService as LEAGUE_QUERIES } from '~/services/leagues';
+import { seasonsService as SEASON_QUERIES } from '~/services/seasons';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
-} from '../common/table';
+} from '~/components/common/table';
 
 import { compileScores } from '~/app/api/seasons/scores';
 import { type BaseEventRule } from '~/server/db/defs/events';
-import { ScrollArea, ScrollBar } from '../common/scrollArea';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { cn } from '~/lib/utils';
 import { Circle, Flame, FlameKindling } from 'lucide-react';
 import { type CastawayDetails, type CastawayName } from '~/server/db/defs/castaways';
 import { newtwentyColors } from '~/lib/colors';
-import { ColorRow } from '../leagues/draftOrder';
-import { Popover, PopoverContent, PopoverTrigger } from '../common/popover';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Fragment } from 'react';
 
@@ -62,7 +62,7 @@ export async function GlobalCastawayScoreboard() {
   const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
 
   return (
-    <ScrollArea className='bg-card rounded-lg gap-0'>
+    <ScrollArea className='bg-card rounded-xl gap-0'>
       <Table>
         <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
         <TableHeader>
@@ -157,7 +157,7 @@ function CastawayRow({ place, castaway, points, color }: CastawayRowProps) {
             {castaway && castaway.tribes.length > 1 && castaway.tribes.map((tribe) => (
               <Popover key={`${tribe.tribeName}-${tribe.episode}`}>
                 <PopoverTrigger>
-                  <Circle size={16} fill={tribe.tribeColor} />
+                  <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='end'>
                   <PopoverArrow />

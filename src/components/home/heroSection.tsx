@@ -1,12 +1,12 @@
 'use client';
 
-import { Card, CardContent } from '../common/card';
+import { Card, CardContent } from '~/components/common/card';
 import { SignIn } from '@clerk/nextjs';
 import { Trophy, Users, Gamepad2, BarChart, CirclePlus } from 'lucide-react';
 import { type ReactNode } from 'react';
-import { Button } from '../common/button';
-import { CreateLeagueModal } from '../leagues/createLeague';
-import { JoinLeagueDialog } from './quickActions';
+import { Button } from '~/components/common/button';
+import { CreateLeagueModal } from '~/components/leagues/actions/createLeague';
+import { JoinLeagueDialog } from '~/components/home/quickActions';
 
 export function HeroSection() {
   return (

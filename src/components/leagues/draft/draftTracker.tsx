@@ -5,13 +5,13 @@ import { useDraft } from '~/hooks/useDraft';
 import { useLeague } from '~/hooks/useLeague';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 import { getContrastingColor } from '@uiw/color-convert';
-import ChooseCastaway from './chooseCastaway';
-import { ColorRow } from '~/components/leagues/draftOrder';
+import ChooseCastaway from '~/components/leagues/draft/chooseCastaway';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
-} from '../../common/alertDialog';
-import MakePredictions from './makePredictions';
+} from '~/components/common/alertDialog';
+import MakePredictions from '~/components/leagues/draft/makePredictions';
 import { useRouter } from 'next/navigation';
 
 interface DraftTrackerProps {

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useLeague } from '~/hooks/useLeague';
-import { Skeleton } from '../common/skeleton';
+import { Skeleton } from '~/components/common/skeleton';
 
 export default function LeagueHeader() {
   const {

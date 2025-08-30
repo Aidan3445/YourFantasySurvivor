@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { QUERIES } from './query';
+import { QUERIES } from '~/app/api/sys/query';
 
 export async function GET(req: NextRequest) {
   try {

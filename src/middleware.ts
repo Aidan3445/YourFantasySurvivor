@@ -2,10 +2,10 @@
 
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
-import { db } from './server/db';
-import { leaguesSchema } from './server/db/schema/leagues';
+import { db } from '~/server/db';
+import { leaguesSchema } from '~/server/db/schema/leagues';
 import { and, count, eq } from 'drizzle-orm';
-import { leagueMembersSchema } from './server/db/schema/leagueMembers';
+import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 
 
 /* Routing Logic

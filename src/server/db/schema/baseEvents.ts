@@ -1,11 +1,11 @@
 import 'server-only';
 
-import { createTable } from './createTable';
+import { createTable } from '~/server/db/schema/createTable';
 import { boolean, index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
-import { leaguesSchema } from './leagues';
+import { leaguesSchema } from '~/server/db/schema/leagues';
 import { AllBaseEventNames, PredictionTimingOptions, ReferenceOptions, ScoringBaseEventNames, ShauhinModeTimings } from '~/server/db/defs/events';
-import { episodesSchema } from './episodes';
-import { leagueMembersSchema } from './leagueMembers';
+import { episodesSchema } from '~/server/db/schema/episodes';
+import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
 
 export const eventName = pgEnum('event_name', AllBaseEventNames);
 export const scoringEventName = pgEnum('scoring_event_name', ScoringBaseEventNames);

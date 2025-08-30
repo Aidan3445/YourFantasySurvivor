@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { type CastawayName } from './castaways';
-import { type TribeName } from './tribes';
-import { type LeagueMemberDisplayName } from './leagueMembers';
-import { type EpisodeNumber } from './episodes';
+import { type CastawayName } from '~/server/db/defs/castaways';
+import { type TribeName } from '~/server/db/defs/tribes';
+import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
+import { type EpisodeNumber } from '~/server/db/defs/episodes';
 
 // Base Events
 export const EventPointsZod = z.coerce.number()

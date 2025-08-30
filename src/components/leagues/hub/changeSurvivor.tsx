@@ -3,18 +3,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem } from '../../common/form';
-import { Button } from '../../common/button';
+import { Form, FormControl, FormField, FormItem } from '~/components/common/form';
+import { Button } from '~/components/common/button';
 import { useLeague } from '~/hooks/useLeague';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../common/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
-} from '../../common/alertDialog';
+} from '~/components/common/alertDialog';
 import { chooseCastaway } from '~/app/api/leagues/actions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
-import { ColorRow } from '../draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
 
 const formSchema = z.object({

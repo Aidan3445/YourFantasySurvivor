@@ -2,18 +2,18 @@
 
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
-} from '../../common/table';
+} from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/server/db/defs/castaways';
 import { type LeagueMemberDisplayName } from '~/server/db/defs/leagueMembers';
-import { ColorRow } from '../draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { MoveRight, Circle, Flame, History, Skull, CircleHelp } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '../../common/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/useMobile';
 import { cn } from '~/lib/utils';
-import { ScrollArea, ScrollBar } from '../../common/scrollArea';
-import { Separator } from '../../common/separator';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { Separator } from '~/components/common/separator';
 import { getContrastingColor } from '@uiw/color-convert';
 import { type LeagueHash } from '~/server/db/defs/leagues';
 
@@ -145,7 +145,7 @@ function MemberRow({ place, member, points, survivor, color, doubleBelow, overri
             {survivor.tribes.length > 1 && survivor.tribes.map((tribe) => (
               <Popover key={`${tribe.tribeName}-${tribe.episode}`}>
                 <PopoverTrigger>
-                  <Circle size={16} fill={tribe.tribeColor} />
+                  <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='end'>
                   <PopoverArrow />
@@ -159,7 +159,8 @@ function MemberRow({ place, member, points, survivor, color, doubleBelow, overri
                   size={16}
                   color={survivor.eliminatedEpisode
                     ? 'black'
-                    : getContrastingColor(survivor.startingTribe.tribeColor)} />
+                    : getContrastingColor(survivor.startingTribe.tribeColor)}
+                  className='cursor-help' />
               </PopoverTrigger>
               <PopoverContent
                 className='p-1 space-y-1 pt-0 grid grid-cols-[max-content_1fr] gap-x-2 w-full'

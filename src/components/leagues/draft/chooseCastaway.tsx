@@ -3,13 +3,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { Form, FormControl, FormField, FormItem } from '../../common/form';
-import { Button } from '../../common/button';
+import { Form, FormControl, FormField, FormItem } from '~/components/common/form';
+import { Button } from '~/components/common/button';
 import { useLeague } from '~/hooks/useLeague';
 import { type CastawayDraftInfo } from '~/server/db/defs/castaways';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../../common/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import { chooseCastaway } from '~/app/api/leagues/actions';
-import { ColorRow } from '../draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { getContrastingColor } from '@uiw/color-convert';
 
 interface ChooseCastawayProps {
