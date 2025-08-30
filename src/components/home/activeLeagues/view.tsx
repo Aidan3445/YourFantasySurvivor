@@ -2,17 +2,16 @@
 
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/common/card';
-import { Badge } from '~/components/common/badge';
 import { Button } from '~/components/common/button';
-import { Trophy, Eye } from 'lucide-react';
+import { Trophy } from 'lucide-react';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/common/carousel';
-import Scoreboard from '~/components/leagues/hub/scoreboard';
 import { cn } from '~/lib/utils';
-import { DraftCountdown } from '~/components/leagues/predraft/draftCountdown';
 import Autoplay from 'embla-carousel-autoplay';
+import { NoActiveLeagues } from '~/components/home/activeLeagues/noActiveLeagues';
+import { ActiveLeague } from '~/components/home/activeLeagues/activeLeague';
 
-export function TopLeaguesCard() {
+export function ActiveLeagues() {
   const { leagues } = useYfsUser();
 
   const topLeagues = leagues
@@ -26,24 +25,7 @@ export function TopLeaguesCard() {
     });
 
   if (topLeagues.length === 0) {
-    return (
-      <Card className='h-full'>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <Trophy className='w-5 h-5 text-yellow-500' />
-            Current Leagues
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className='text-center py-6'>
-            <Trophy className='w-12 h-12 text-muted-foreground mx-auto mb-4' />
-            <p className='text-muted-foreground mb-4'>
-              No active leagues yet. Create one to get started!
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <NoActiveLeagues />;
   }
 
   return (
@@ -76,21 +58,7 @@ export function TopLeaguesCard() {
           <CarouselContent>
             {topLeagues.map((league) => (
               <CarouselItem key={league.leagueHash}>
-                <div className='px-2 space-y-2'>
-                  <Link
-                    key={league.leagueHash}
-                    href={`/leagues/${league.leagueHash}`}
-                    className='block'>
-                    <div className='px-2 py-1 rounded-lg border hover:bg-accent/50 transition-colors flex items-center justify-between mb-2'>
-                      <h4 className='font-semibold mr-auto'>{league.leagueName}</h4>
-                      <Badge variant='secondary'>{league.season}</Badge>
-                      <Eye className='ml-2' />
-                    </div>
-                  </Link>
-                  {league.leagueStatus === 'Active'
-                    ? <Scoreboard overrideLeagueHash={league.leagueHash} maxRows={5} />
-                    : <DraftCountdown overrideLeagueHash={league.leagueHash} />}
-                </div>
+                <ActiveLeague league={league} />
               </CarouselItem>
             ))}
           </CarouselContent>

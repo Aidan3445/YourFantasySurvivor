@@ -263,7 +263,7 @@ export const seasonsService = {
     * @throws if the league does not exist
     */
   getSeasonScoreData: async function() {
-    const currentSeasons = [{ seasonId: 15 }]; //await this.getCurrentSeasons();
+    const currentSeasons = await this.getCurrentSeasons();
     if (currentSeasons.length === 0) return [];
 
     const seasonScores = await Promise.all(currentSeasons.map(async (season) => {

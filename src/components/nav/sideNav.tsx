@@ -158,7 +158,5 @@ function SideNavLeagues() {
       </AccordionItem>
     </Accordion >
   );
-
-
 }
 

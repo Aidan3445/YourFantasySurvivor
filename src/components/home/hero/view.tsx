@@ -1,12 +1,10 @@
-'use client';
-
 import { Card, CardContent } from '~/components/common/card';
 import { SignIn } from '@clerk/nextjs';
 import { Trophy, Users, Gamepad2, BarChart, CirclePlus } from 'lucide-react';
-import { type ReactNode } from 'react';
 import { Button } from '~/components/common/button';
 import { CreateLeagueModal } from '~/components/leagues/actions/createLeague';
-import { JoinLeagueDialog } from '~/components/home/quickActions';
+import { JoinLeagueDialog } from '~/components/home/quickActions/joinDialogue';
+import { FeatureCard } from '~/components/home/hero/featureCard';
 
 export function HeroSection() {
   return (
@@ -74,24 +72,6 @@ export function HeroSection() {
           }}
         />
       </div>
-    </div>
-  );
-}
-
-interface FeatureCardProps {
-  icon: ReactNode;
-  title: string;
-  description: string;
-}
-
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
-  return (
-    <div className='flex flex-col items-center text-center p-3 rounded-lg bg-accent/50'>
-      <div className='text-primary mb-2'>
-        {icon}
-      </div>
-      <h3 className='font-semibold text-sm mb-1'>{title}</h3>
-      <p className='text-xs text-muted-foreground'>{description}</p>
     </div>
   );
 }
