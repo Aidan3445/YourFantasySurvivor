@@ -6,7 +6,7 @@ import {
 import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/types/castaways';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
-import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/order/view';
 import { MoveRight, Circle, Flame, History, Skull, CircleHelp } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';

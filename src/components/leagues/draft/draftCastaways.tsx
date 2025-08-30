@@ -9,7 +9,7 @@ import { cn } from '~/lib/utils';
 import { type CastawayDraftInfo } from '~/types/castaways';
 import { type LeagueHash } from '~/types/leagues';
 import { type TribeName } from '~/types/tribes';
-import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/order/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 interface CastawayCardsProps {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Badge } from '~/components/common/badge';
 import { Eye } from 'lucide-react';
 import Scoreboard from '~/components/leagues/hub/scoreboard';
-import { DraftCountdown } from '~/components/leagues/predraft/draftCountdown';
+import { DraftCountdown } from '~/components/leagues/predraft/countdown/view';
 
 interface ActiveLeagueProps {
   league: LeagueInfo;

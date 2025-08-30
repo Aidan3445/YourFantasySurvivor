@@ -6,7 +6,7 @@ interface LeagueCardProps {
   league: LeagueInfo;
 }
 
-export function LeagueCard({ league }: LeagueCardProps) {
+export default function LeagueCard({ league }: LeagueCardProps) {
   return (
     <Link
       key={league.leagueHash}

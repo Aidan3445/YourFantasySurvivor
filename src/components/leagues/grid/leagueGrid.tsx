@@ -1,13 +1,13 @@
 import { Fragment } from 'react';
 import { type LeagueInfo } from '~/context/yfsUserContext';
-import { LeagueCard } from '~/components/leagues/grid/leagueCard';
+import LeagueCard from '~/components/leagues/grid/leagueCard';
 
 interface LeagueGridProps {
   leagues: LeagueInfo[];
   isInactive?: boolean;
 }
 
-export function LeagueGrid({ leagues, isInactive = false }: LeagueGridProps) {
+export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridProps) {
   if (leagues.length === 0) return null;
 
   if (isInactive) {

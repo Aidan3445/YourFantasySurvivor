@@ -9,7 +9,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { type CastawayDraftInfo } from '~/types/castaways';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import { chooseCastaway } from '~/services/leagues/settings/leagueSettingActions';
-import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/order/view';
 import { getContrastingColor } from '@uiw/color-convert';
 
 interface ChooseCastawayProps {

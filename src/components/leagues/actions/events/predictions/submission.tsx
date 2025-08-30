@@ -11,7 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import { makePrediction } from '~/services/leagues/settings/leagueSettingActions';
 import { useLeague } from '~/hooks/useLeague';
-import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/order/view';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useMemo } from 'react';

@@ -4,7 +4,7 @@ import {
 
 import { Circle, FlameKindling } from 'lucide-react';
 import { type CastawayDetails } from '~/types/castaways';
-import { ColorRow } from '~/components/leagues/predraft/draftOrder';
+import { ColorRow } from '~/components/leagues/predraft/order/view';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 

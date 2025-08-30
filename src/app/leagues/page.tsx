@@ -6,7 +6,7 @@ import { useYfsUser } from '~/hooks/useYfsUser';
 import { type LeagueInfo } from '~/context/yfsUserContext';
 import { SignIn, useUser } from '@clerk/nextjs';
 import { Separator } from '~/components/common/separator';
-import { LeagueGrid } from '~/components/leagues/grid/leagueGrid';
+import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 
 export default function LeaguesPage() {
   const user = useUser();
