@@ -1,6 +1,4 @@
 'use client';
-
-import * as React from 'react';
 import { CheckIcon, Ellipsis } from 'lucide-react';
 
 import { cn } from '~/lib/utils';
@@ -18,6 +16,7 @@ import {
   PopoverTrigger,
 } from '~/components/common/popover';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface ComboboxProps {
   seasons: { value: string; label: string }[];
@@ -27,7 +26,7 @@ interface ComboboxProps {
 
 export default function SelectSeason({ seasons, value, setValue }: ComboboxProps) {
   const router = useRouter();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

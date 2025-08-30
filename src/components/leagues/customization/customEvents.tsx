@@ -21,7 +21,7 @@ import {
 } from '~/components/common/alertDialog';
 import { type ReactNode, useState } from 'react';
 import { cn } from '~/lib/utils';
-import { PredictionTimingHelp } from '~/components/leagues/draft/makePredictions';
+import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
 
 export default function CustomEvents() {
   const {

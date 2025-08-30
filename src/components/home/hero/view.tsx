@@ -2,8 +2,8 @@ import { Card, CardContent } from '~/components/common/card';
 import { SignIn } from '@clerk/nextjs';
 import { Trophy, Users, Gamepad2, BarChart, CirclePlus } from 'lucide-react';
 import { Button } from '~/components/common/button';
-import { CreateLeagueModal } from '~/components/leagues/actions/league/create/view';
-import { JoinLeagueDialog } from '~/components/home/quickActions/joinDialogue';
+import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
+import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
 import FeatureCard from '~/components/home/hero/featureCard';
 
 export function HeroSection() {

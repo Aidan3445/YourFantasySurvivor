@@ -11,7 +11,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/common/alertDialog';
-import MakePredictions from '~/components/leagues/draft/makePredictions';
+import MakePredictions from '~/components/leagues/actions/events/predictions/view';
 import { useRouter } from 'next/navigation';
 
 interface DraftTrackerProps {

@@ -1,7 +1,7 @@
 'use client';
 
 import { type leaguesService as QUERIES } from '~/services/leagues';
-import { PredictionCards } from '~/components/leagues/draft/makePredictions';
+import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 import { AirStatus } from '~/components/leagues/hub/recentActivity';
 import { type EpisodeNumber } from '~/types/episodes';
 import { type ShauhinModeSettings, type Prediction, BaseEventFullName } from '~/types/events';
