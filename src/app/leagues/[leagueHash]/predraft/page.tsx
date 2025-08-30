@@ -5,7 +5,7 @@ import MemberEditForm from '~/components/leagues/customization/memberEdit';
 import SetSurvivalCap from '~/components/leagues/customization/setSurvivalCap';
 import { DraftCountdown } from '~/components/leagues/predraft/countdown/view';
 import DraftOrder from '~/components/leagues/predraft/order/view';
-import InviteLink from '~/components/leagues/predraft/inviteLink';
+import InviteLink from '~/components/leagues/predraft/inviteLink/view';
 import LeagueScoring from '~/components/leagues/customization/leagueScoring';
 import LeagueChatCard from '~/components/leagues/chat/card';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
