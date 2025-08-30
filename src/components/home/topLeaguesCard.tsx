@@ -10,12 +10,13 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import Scoreboard from '../leagues/main/scoreboard';
 import { cn } from '~/lib/utils';
 import { DraftCountdown } from '../leagues/draftCountdown';
+import Autoplay from 'embla-carousel-autoplay';
 
 export function TopLeaguesCard() {
   const { leagues } = useYfsUser();
 
   const topLeagues = leagues
-    //.filter(league => league.leagueStatus !== 'Inactive')
+    .filter(league => league.leagueStatus !== 'Inactive')
     .sort((a, b) => {
       const statusOrder = { Draft: 0, Predraft: 1, Active: 2, Inactive: 3 };
       if (a.leagueStatus !== b.leagueStatus) {
@@ -48,9 +49,16 @@ export function TopLeaguesCard() {
   return (
     <Card className='h-full'>
       <CardContent className='px-0 overflow-y-auto'>
-        <Carousel opts={{ watchDrag: topLeagues.length > 1, ignoreKeys: topLeagues.length > 1 }}>
-          <CardHeader className='grid grid-cols-5 items-center px-4 mb-4'>
-            <div className='invisible' />
+        <Carousel
+          opts={{
+            loop: true,
+            watchDrag: topLeagues.length > 1,
+            ignoreKeys: topLeagues.length > 1
+          }}
+          plugins={[Autoplay({ delay: 8000, stopOnInteraction: true })]}
+        >
+          <CardHeader className='grid grid-cols-[min-content_1fr_auto_1fr_min-content] items-center px-4 mb-4'>
+            <div className='w-full invisible' />
             <CarouselPrevious className={cn('static !translate-0 place-self-center',
               topLeagues.length > 1 ? 'visible' : 'invisible')} />
             <CardTitle className='flex items-center gap-2 place-self-center text-nowrap'>

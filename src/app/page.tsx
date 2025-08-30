@@ -1,5 +1,4 @@
-import { ClerkLoading, SignedIn, SignedOut } from '@clerk/nextjs';
-import { Skeleton } from '~/components/ui/skeleton';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
 import { HeroSection } from '~/components/home/heroSection';
 import { TopLeaguesCard } from '~/components/home/topLeaguesCard';
 import { QuickActions } from '~/components/home/quickActions';
@@ -8,22 +7,10 @@ import { Trophy, Users, BarChart } from 'lucide-react';
 
 export default async function HomePage() {
   return (
-    <main className='flex flex-col gap-6 w-full p-4 max-w-7xl mx-auto'>
-      {/* Loading State */}
-      <ClerkLoading>
-        <div className='flex flex-col gap-6 items-center'>
-          <Skeleton className='w-full h-96 rounded-lg' />
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 w-full'>
-            <Skeleton className='h-48 rounded-lg' />
-            <Skeleton className='h-48 rounded-lg' />
-            <Skeleton className='h-48 rounded-lg' />
-          </div>
-        </div>
-      </ClerkLoading>
-
+    <main className='flex flex-col gap-2 w-full p-4 max-w-7xl mx-auto pb-12 lg:pb-0'>
       {/* Non-logged in users */}
       <SignedOut>
-        <div className='space-y-12'>
+        <div>
           <HeroSection />
 
           {/* Features Grid */}
@@ -117,23 +104,22 @@ export default async function HomePage() {
 
       {/* Logged in users */}
       <SignedIn>
-        <div className='space-y-6'>
+        <div className='space-y-2'>
           {/* Welcome back section */}
-          <div className='text-center py-2'>
+          <div className='text-center'>
             <h1 className='text-4xl font-bold mb-2'>Welcome back!</h1>
             <p className='text-muted-foreground text-lg'>
               Ready to dominate your fantasy leagues?
             </p>
           </div>
-
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-6 grid-rows-[1fr]'>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 grid-rows-[1fr]'>
             <div className='lg:col-span-2'>
               <TopLeaguesCard />
             </div>
             <div className='lg:col-span-2 lg:row-start-2'>
               <GlobalCastawayScoreboard />
             </div>
-            <div className='lg:row-span-2'>
+            <div className='lg:row-span-2 min-w-96'>
               <QuickActions />
             </div>
           </div>

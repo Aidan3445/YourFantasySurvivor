@@ -4,7 +4,7 @@ import 'server-only';
 import { db } from '~/server/db';
 import { type CastawayImage, type CastawayDetails, type CastawayName, type CastawayId } from '~/server/db/defs/castaways';
 import { type EpisodeNumber } from '~/server/db/defs/episodes';
-import { type BaseEventName, type BaseEvent, type BaseEventId, defaultBaseRules, defaultPredictionRules } from '~/server/db/defs/events';
+import { type BaseEventName, type BaseEvent, type BaseEventId } from '~/server/db/defs/events';
 import { type SeasonId } from '~/server/db/defs/seasons';
 import { type TribeEp, type TribeName, type TribeUpdate } from '~/server/db/defs/tribes';
 import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
@@ -12,7 +12,6 @@ import { castawaysSchema } from '~/server/db/schema/castaways';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { tribesSchema } from '~/server/db/schema/tribes';
-import { compileScores } from '../leagues/[leagueHash]/scores';
 
 export const QUERIES = {
   /**
@@ -260,31 +259,28 @@ export const QUERIES = {
   },
   /**
     * Get season scores for the current seasons
-    * @param seasonId The season to get scores for
     * @returns The scores for the season
+    * @throws if the league does not exist
     */
-  getSeasonScores: async function() {
-    const currentSeasons = await this.getCurrentSeasons();
+  getSeasonScoreData: async function() {
+    const currentSeasons = [{ seasonId: 15 }]; //await this.getCurrentSeasons();
     if (currentSeasons.length === 0) return [];
 
     const seasonScores = await Promise.all(currentSeasons.map(async (season) => {
-      const [baseEvents, tribesTimeline, eliminations] = await Promise.all([
+      const [castaways, baseEvents, tribesTimeline, eliminations] = await Promise.all([
+        this.getCastaways(season.seasonId),
         this.getBaseEvents(season.seasonId),
         this.getTribesTimeline(season.seasonId),
         this.getEliminations(season.seasonId),
       ]);
 
-      return compileScores(
+      return {
+        castaways,
         baseEvents,
-        defaultBaseRules,
-        {}, defaultPredictionRules,
-        { directEvents: {}, predictionEvents: {} },
-        { castawayMembers: {}, memberCastaways: {} },
         tribesTimeline,
         eliminations,
-        0,
-        false
-      );
+        season: season,
+      };
     }));
 
     return seasonScores;
