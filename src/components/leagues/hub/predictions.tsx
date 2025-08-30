@@ -1,6 +1,6 @@
 'use client';
 
-import { type QUERIES } from '~/app/api/leagues/query';
+import { type leaguesService as QUERIES } from '~/services/leagues';
 import { PredictionCards } from '~/components/leagues/draft/makePredictions';
 import { AirStatus } from '~/components/leagues/hub/recentActivity';
 import { type EpisodeNumber } from '~/types/episodes';

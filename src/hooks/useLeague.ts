@@ -3,7 +3,7 @@
 import { redirect, useParams } from 'next/navigation';
 import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
-import { type QUERIES } from '~/app/api/leagues/query';
+import { type leaguesService as QUERIES } from '~/services/leagues';
 import { type SWRKey } from '~/lib/utils';
 import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/types/events';
 import { type LeagueHash } from '~/types/leagues';

@@ -27,11 +27,11 @@ import {
   type LeaguePredictionDraft,
   type ScoringBaseEventName,
 } from '~/types/events';
-import { QUERIES as SEASON_QUERIES } from '~/app/api/seasons/query';
+import { seasonsService as SEASON_QUERIES } from '~/services/seasons';
 import type { Tribe, TribeName } from '~/types/tribes';
 import type { EpisodeAirStatus, EpisodeNumber } from '~/types/episodes';
-import { compileScores } from '~/app/api/leagues/[leagueHash]/scores';
-import { QUERIES as SYS_QUERIES } from '~/app/api/sys/query';
+import { compileScores } from '~/lib/scores';
+import { sysService as SYS_QUERIES } from '~/services/sys/query';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 import { type Message } from 'node_modules/@ably/chat/dist/core/message';
 import { basePredictionRulesSchemaToObject } from '~/lib/utils';
@@ -848,10 +848,17 @@ export const leaguesService = {
     ]);
 
     const { scores, currentStreaks } = compileScores(
-      baseEvents, baseEventRules ?? defaultBaseRules,
-      basePredictions, basePredictionRules ?? defaultPredictionRules,
-      leagueEvents, selectionTimeline, tribesTimeline, elims,
-      leagueSettings.survivalCap, leagueSettings.preserveStreak);
+      baseEvents,
+      baseEventRules ?? defaultBaseRules,
+      tribesTimeline,
+      elims,
+
+      basePredictions,
+      basePredictionRules ?? defaultPredictionRules,
+      leagueEvents,
+      selectionTimeline,
+      leagueSettings.survivalCap,
+      leagueSettings.preserveStreak);
 
     return {
       episodes,
@@ -1354,10 +1361,17 @@ export const leaguesService = {
     ]);
 
     const { scores, currentStreaks } = compileScores(
-      baseEvents, baseEventRules ?? defaultBaseRules,
-      basePredictions, basePredictionRules ?? defaultPredictionRules,
-      leagueEvents, selectionTimeline, tribesTimeline, elims,
-      leagueSettings.survivalCap, leagueSettings.preserveStreak);
+      baseEvents,
+      baseEventRules ?? defaultBaseRules,
+      tribesTimeline,
+      elims,
+
+      basePredictions,
+      basePredictionRules ?? defaultPredictionRules,
+      leagueEvents,
+      selectionTimeline,
+      leagueSettings.survivalCap,
+      leagueSettings.preserveStreak);
 
     return {
       points: scores.Member?.[member!.displayName]?.pop() ?? 0,

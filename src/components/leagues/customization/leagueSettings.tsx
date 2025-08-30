@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Button } from '~/components/common/button';
-import { updateAdmins, updateLeagueSettings } from '~/app/api/leagues/actions';
+import { updateAdmins, updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
 import { Input } from '~/components/common/input';
 
 const formSchema = z.object({

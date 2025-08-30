@@ -1,6 +1,6 @@
 import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
-import { type QUERIES } from '~/app/api/leagues/query';
+import { type leaguesService as QUERIES } from '~/services/leagues';
 import { type SWRKey } from '~/lib/utils';
 import { type LeagueHash } from '~/types/leagues';
 

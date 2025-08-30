@@ -11,7 +11,7 @@ import Swatch, { type SwatchRectRenderProps } from '@uiw/react-color-swatch';
 import { type HsvaColor, getContrastingColor, hexToHsva, hexToRgba, hsvaToHex, rgbaToHex } from '@uiw/color-convert';
 import { twentyColors } from '~/lib/colors';
 import { Check } from 'lucide-react';
-import { joinLeague } from '~/app/api/leagues/actions';
+import { joinLeague } from '~/services/leagues/settings/leagueSettingActions';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useMemo, useState } from 'react';

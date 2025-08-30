@@ -1,3 +1,4 @@
+import { defaultBaseRules, defaultPredictionRules } from '~/types/events';
 import { findTribeCastaways } from '~/lib/utils';
 import { type leaguesService as LEAGUE_QUERIES } from '~/services/leagues';
 import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
@@ -18,17 +19,16 @@ import { type LeagueSurvivalCap } from '~/types/leagues';
 */
 export function compileScores(
   baseEvents: Awaited<ReturnType<typeof SEASON_QUERIES.getBaseEvents>>,
-  baseEventRules: BaseEventRule,
-  basePredictions: Awaited<ReturnType<typeof LEAGUE_QUERIES.getBasePredictions>>,
-  basePredictionRules: BasePredictionRules,
-  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>>,
-
-  selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>>,
+  baseEventRules: BaseEventRule = defaultBaseRules,
   tribesTimeline: Awaited<ReturnType<typeof SEASON_QUERIES.getTribesTimeline>>,
   eliminations: Awaited<ReturnType<typeof SEASON_QUERIES.getEliminations>>,
 
-  survivalCap: LeagueSurvivalCap,
-  preserveStreak: boolean
+  basePredictions: Awaited<ReturnType<typeof LEAGUE_QUERIES.getBasePredictions>> = {},
+  basePredictionRules: BasePredictionRules = defaultPredictionRules,
+  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>> = { directEvents: {}, predictionEvents: {} },
+  selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>> = { castawayMembers: {}, memberCastaways: {} },
+  survivalCap: LeagueSurvivalCap = 0,
+  preserveStreak = false
 ) {
   const scores: Record<ReferenceType | 'Member', Record<LeagueMemberDisplayName, number[]>> = {
     Castaway: {},

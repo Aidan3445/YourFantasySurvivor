@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import type { CastawayDetails, CastawayDraftInfo } from '~/types/castaways';
-import { makePrediction } from '~/app/api/leagues/actions';
+import { makePrediction } from '~/services/leagues/settings/leagueSettingActions';
 import { useLeague } from '~/hooks/useLeague';
 import type { Tribe } from '~/types/tribes';
 import { ColorRow } from '~/components/leagues/predraft/draftOrder';

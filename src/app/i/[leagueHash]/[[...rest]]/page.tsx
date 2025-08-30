@@ -1,4 +1,4 @@
-import JoinLeagueForm from '~/components/leagues/joinLeague';
+import JoinLeagueForm from '~/components/leagues/actions/joinLeague';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import { SignIn, SignUp } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
@@ -6,7 +6,7 @@ import { leagueMemberAuth } from '~/lib/auth';
 import { Button } from '~/components/common/button';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { QUERIES } from '~/app/api/leagues/query';
+import { leaguesService as QUERIES } from '~/services/leagues';
 import { metadata } from '~/app/layout';
 
 interface JoinPageProps extends LeaguePageProps {

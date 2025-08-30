@@ -1,11 +1,10 @@
-import { leaguesService as LEAGUE_QUERIES } from '~/services/leagues';
 import { seasonsService as SEASON_QUERIES } from '~/services/seasons';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
 
-import { compileScores } from '~/app/api/seasons/scores';
-import { type BaseEventRule } from '~/types/events';
+import { compileScores } from '~/lib/scores';
+import { defaultBaseRules } from '~/types/events';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { cn } from '~/lib/utils';
 import { Circle, Flame, FlameKindling } from 'lucide-react';
@@ -15,22 +14,10 @@ import { ColorRow } from '~/components/leagues/predraft/draftOrder';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Fragment } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 
 export async function GlobalCastawayScoreboard() {
-  const [leagues, scoreData] = await Promise.all([
-    LEAGUE_QUERIES.getLeagues(),
-    SEASON_QUERIES.getSeasonScoreData()
-  ]);
-
-  const leagueBaseRules = await Promise.all(
-    leagues
-      .filter(league => league.leagueStatus === 'Active')
-      .map(async league => ({
-        ...league,
-        baseEventRules: await LEAGUE_QUERIES.getLeagueConfig(league.leagueHash)
-          .then(config => config?.baseEventRules as BaseEventRule | undefined)
-      }))
-  );
+  const scoreData = await SEASON_QUERIES.getSeasonScoreData();
 
   if (scoreData.length === 0) {
     return (
@@ -42,25 +29,64 @@ export async function GlobalCastawayScoreboard() {
     );
   }
 
-  const { Castaway: castawayScores } = compileScores(
-    scoreData[0]!.baseEvents,
-    scoreData[0]!.tribesTimeline,
-    scoreData[0]!.eliminations,
-    leagueBaseRules[0]?.baseEventRules
-  ).scores;
+  const scoresBySeason = scoreData.map((data) => {
+    const { Castaway: castawayScores } = compileScores(
+      data.baseEvents,
+      defaultBaseRules,
+      data.tribesTimeline,
+      data.eliminations,
+    ).scores;
 
-  const sortedCastaways = Object.entries(castawayScores)
-    .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
+    const sortedCastaways = Object.entries(castawayScores)
+      .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
-  const castawayColors: Record<CastawayName, string> =
-    scoreData[0]!.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
-      .reduce((acc, { fullName }, index) => {
-        acc[fullName] = newtwentyColors[index % newtwentyColors.length]!;
-        return acc;
-      }, {} as Record<CastawayName, string>);
+    const castawayColors: Record<CastawayName, string> =
+      scoreData[0]!.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
+        .reduce((acc, { fullName }, index) => {
+          acc[fullName] = newtwentyColors[index % newtwentyColors.length]!;
+          return acc;
+        }, {} as Record<CastawayName, string>);
 
-  const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
+    const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
 
+    return { sortedCastaways, castawayColors, castawaySplitIndex, data };
+  });
+
+
+  return (
+    <Tabs defaultValue={`season-${scoresBySeason[0]!.data.season.seasonId}`} className='w-full'>
+      <TabsList>
+        {scoresBySeason.map(({ data: { season: { seasonId } } }) => (
+          <TabsTrigger key={seasonId} value={`season-${seasonId}`} className='data-[state=active]:bg-primary data-[state=active]:text-primary-foreground'>
+            Season {seasonId}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      {scoresBySeason.map(({ sortedCastaways, castawayColors, castawaySplitIndex, data }) => (
+        <TabsContent
+          key={data.season.seasonId}
+          value={`season-${data.season.seasonId}`}
+          className='mt-4'>
+          <SeasonScoreboard
+            sortedCastaways={sortedCastaways}
+            castawayColors={castawayColors}
+            castawaySplitIndex={castawaySplitIndex}
+            scoreData={data}
+          />
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
+}
+
+interface SeasonScoreboardProps {
+  sortedCastaways: [CastawayName, number[]][];
+  castawayColors: Record<CastawayName, string>;
+  castawaySplitIndex: number;
+  scoreData: Awaited<ReturnType<typeof SEASON_QUERIES.getSeasonScoreData>>[0];
+}
+
+function SeasonScoreboard({ sortedCastaways, castawayColors, castawaySplitIndex, scoreData }: SeasonScoreboardProps) {
   return (
     <ScrollArea className='bg-card rounded-xl gap-0'>
       <Table>
@@ -84,7 +110,7 @@ export async function GlobalCastawayScoreboard() {
           {sortedCastaways.slice(0, castawaySplitIndex).map(([castawayName, scores], index) => {
             const totalPoints = scores.slice().pop() ?? 0;
             const color = castawayColors[castawayName] ?? '#ffffff';
-            const castaway = scoreData[0]!.castaways.find(c => c.fullName === castawayName);
+            const castaway = scoreData.castaways.find(c => c.fullName === castawayName);
 
             const [secondCastawayName, secondScores] = sortedCastaways[index + castawaySplitIndex] ?? [];
 
@@ -99,7 +125,7 @@ export async function GlobalCastawayScoreboard() {
                 {secondCastawayName && secondScores && (
                   <CastawayRow
                     place={index + 1 + castawaySplitIndex}
-                    castaway={scoreData[0]!.castaways.find(c => c.fullName === secondCastawayName)}
+                    castaway={scoreData.castaways.find(c => c.fullName === secondCastawayName)}
                     points={secondScores.slice().pop() ?? 0}
                     color={castawayColors[secondCastawayName] ?? '#ffffff'}
                   />

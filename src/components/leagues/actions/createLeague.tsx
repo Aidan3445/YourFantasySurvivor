@@ -12,7 +12,7 @@ import { Button } from '~/components/common/button';
 import { Progress } from '~/components/common/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { useCarouselProgress } from '~/hooks/useCarouselProgress';
-import { createNewLeague } from '~/app/api/leagues/actions';
+import { createNewLeague } from '~/services/leagues/settings/leagueSettingActions';
 import { useRouter } from 'next/navigation';
 import { LeagueMemberFields } from '~/components/leagues/actions/joinLeague';
 import { ColorZod, DisplayNameZod } from '~/types/leagueMembers';

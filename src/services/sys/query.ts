@@ -8,7 +8,7 @@ import { db } from '~/server/db';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { isNull } from 'drizzle-orm';
 
-export const QUERIES = {
+export const sysService = {
   fetchSeasonInfo: async function(seasonName: string) {
     const url = 'https://survivor.fandom.com/api.php';
 

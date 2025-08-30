@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '~/components/common/button';
-import { importContestants, importEpisode } from '~/app/api/sys/actions';
+import { importContestants, importEpisode } from '~/services/sys/actions';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';

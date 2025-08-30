@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
-import { UPDATES } from '~/app/api/leagues/update';
+import { UPDATES } from '~/services/leagues/status/leagueStatusUpdate';
 
 export async function POST(_: NextRequest, { params }: LeaguePageProps) {
   const { leagueHash } = await params;

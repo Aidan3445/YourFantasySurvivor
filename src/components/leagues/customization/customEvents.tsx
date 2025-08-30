@@ -13,7 +13,7 @@ import { Textarea } from '~/components/common/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Button } from '~/components/common/button';
-import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/app/api/leagues/actions';
+import { createLeagueEventRule, deleteLeagueEventRule, updateLeagueEventRule } from '~/services/leagues/settings/leagueSettingActions';
 import { Flame, Lock, LockOpen, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,

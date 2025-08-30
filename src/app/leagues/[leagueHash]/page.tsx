@@ -14,7 +14,7 @@ import CreateCustomEvent from '~/components/leagues/actions/createCustomEvent';
 import Predictions from '~/components/leagues/hub/predictions';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
-//import { QUERIES } from '~/app/api/leagues/query';
+//import { leaguesService as QUERIES } from '~/services/leagues';
 import SetSurvivalCap from '~/components/leagues/customization/setSurvivalCap';
 import ShauhinMode from '~/components/leagues/customization/shauhinMode';
 

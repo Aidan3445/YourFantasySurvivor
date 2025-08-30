@@ -10,7 +10,7 @@ import { cn } from '~/lib/utils';
 import { GripVertical, Lock, LockOpen, Shuffle } from 'lucide-react';
 import SortableItem from '~/components/common/sortableItem';
 import { handleDragEnd } from '~/hooks/useSortableItem';
-import { updateDraftOrder } from '~/app/api/leagues/actions';
+import { updateDraftOrder } from '~/services/leagues/settings/leagueSettingActions';
 import { Button } from '~/components/common/button';
 import { useRouter } from 'next/navigation';
 

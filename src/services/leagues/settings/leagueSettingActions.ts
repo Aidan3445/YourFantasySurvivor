@@ -25,7 +25,7 @@ import {
 import { type CastawayId } from '~/types/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import { type TribeId } from '~/types/tribes';
-import { QUERIES } from '~/app/api/leagues/query';
+import { leaguesService as QUERIES } from '~/services/leagues';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 import { basePredictionRulesObjectToSchema } from '~/lib/utils';
 
