@@ -11,14 +11,15 @@ export default function NotesCell({ notes }: NotesCellProps) {
   const filteredNotes = notes?.filter((note) => !!note);
 
   if (!filteredNotes || filteredNotes.length === 0) return (
-    <span className='w-full flex justify-end'>
-      <ScrollText className='opacity-50' />
-    </span>
+    <TableCell>
+      <span className='w-full flex justify-end'>
+        <ScrollText className='opacity-50' />
+      </span>
+    </TableCell>
   );
 
   return (
     <TableCell>
-
       <Popover>
         <PopoverTrigger className='ml-auto flex justify-end'>
           <ScrollText />

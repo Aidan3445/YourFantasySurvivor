@@ -11,7 +11,6 @@ import * as customEvents from '~/server/db/schema/customEvents';
 // Define your schema
 const schema = {
   seasons, tribes, castaways, episodes, leagues, members, customEvents,
-  //customEvents, weeklyEvents, seasonEvents,
 };
 
 // Use this object to send drizzle queries to your DB
