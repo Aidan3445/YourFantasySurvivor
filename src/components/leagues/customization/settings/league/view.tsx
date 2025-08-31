@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import { Button } from '~/components/common/button';
 import { updateAdmins, updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
 import { Input } from '~/components/common/input';
-import LeagueAdminsField from '../admin';
+import LeagueAdminsField from '~/components/leagues/customization/settings/league/admin';
 
 const formSchema = z.object({
   leagueName: z.string(),

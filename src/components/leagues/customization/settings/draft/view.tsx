@@ -14,7 +14,7 @@ import {
 import { updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
 import { useLeague } from '~/hooks/useLeague';
 import { useState } from 'react';
-import { DraftDateField } from './date';
+import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
 
 const formSchema = z.object({
   draftDate: z.date().nullable(),

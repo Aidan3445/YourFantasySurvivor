@@ -3,7 +3,7 @@ import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessa
 import { Input } from '~/components/common/input';
 import { cn } from '~/lib/utils';
 import { BaseEventDescriptions, BaseEventFullName } from '~/types/events';
-import { BaseEventSettingsProps, BasePredictionFormField } from './predictions';
+import { type BaseEventSettingsProps, BasePredictionFormField } from '~/components/leagues/customization/events/base/predictions';
 
 export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (

@@ -12,7 +12,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { Flame, Lock, LockOpen } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
-import SurvivalCapSlider from './slider';
+import SurvivalCapSlider from '~/components/leagues/customization/settings/cap/slider';
 
 
 export default function SetSurvivalCap() {

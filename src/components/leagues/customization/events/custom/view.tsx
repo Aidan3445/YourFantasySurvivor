@@ -8,14 +8,14 @@ import { type CustomEventRule, CustomEventRuleZod, defaultCustomEventRule } from
 
 import { Button } from '~/components/common/button';
 import { createCustomEventRule } from '~/services/leagues/settings/leagueSettingActions';
-import {  Lock, LockOpen } from 'lucide-react';
+import { Lock, LockOpen } from 'lucide-react';
 import {
   AlertDialog, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
 import { useState } from 'react';
-import  CustomEventFields from './fields';
-import CustomEventCard from './card';
+import CustomEventFields from '~/components/leagues/customization/events/custom/fields';
+import CustomEventCard from '~/components/leagues/customization/events/custom/card';
 
 export default function CustomEvents() {
   const {
