@@ -10,7 +10,9 @@ import { Button } from '~/components/common/button';
 import { updateBaseEventRules } from '~/services/leagues/settings/leagueSettingActions';
 import { useEffect, useState } from 'react';
 import { Lock, LockOpen } from 'lucide-react';
-import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from '~/components/leagues/customization/baseEvents';
+import ChallengeScoreSettings from './challenges';
+import AdvantageScoreSettings from './advantages';
+import OtherScoreSettings from './other';
 
 const formSchema = z.object({
   baseEventRules: BaseEventRuleZod,

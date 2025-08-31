@@ -4,7 +4,7 @@ import { Settings, X } from 'lucide-react';
 import { z } from 'zod';
 import { type LeagueSettingsUpdate } from '~/types/leagues';
 import { useForm } from 'react-hook-form';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
 import {
   AlertDialog, AlertDialogCancel,
@@ -13,8 +13,8 @@ import {
 } from '~/components/common/alertDialog';
 import { updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
 import { useLeague } from '~/hooks/useLeague';
-import { DateTimePicker } from '~/components/common/dateTimePicker';
 import { useState } from 'react';
+import { DraftDateField } from './date';
 
 const formSchema = z.object({
   draftDate: z.date().nullable(),
@@ -96,38 +96,5 @@ export default function SetDraftDate({ overrideLeagueHash }: SetDraftDateProps) 
         </AlertDialogContent>
       </AlertDialog>
     </Form>
-  );
-}
-
-interface DraftDateFieldProps {
-  disabled?: boolean;
-}
-
-export function DraftDateField({ disabled }: DraftDateFieldProps) {
-  return (
-    <FormField
-      name='draftDate'
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel className='text-lg'>Draft Start Date</FormLabel>
-          <FormControl>
-            <span className='flex w-full justify-center'>
-              <DateTimePicker
-                date={field.value as Date}
-                setDate={field.onChange}
-                side='top'
-                disabled={disabled}
-                placeholder='Select draft start date and time'
-                rangeStart={new Date(new Date().setHours(0, 0, 0, 0))} />
-            </span>
-          </FormControl>
-          <FormDescription className='text-sm text-left'>
-            Set when your league’s draft will take place or manually start the draft later.
-            <br />
-            Everyone in your league will draft their main Survivor pick on this date.
-          </FormDescription>
-          <FormMessage />
-        </ FormItem>
-      )} />
   );
 }

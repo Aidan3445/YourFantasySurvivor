@@ -1,4 +1,4 @@
-import MemberEditForm from '~/components/leagues/customization/memberEdit';
+import MemberEditForm from '~/components/leagues/customization/member/view';
 import Chart from '~/components/leagues/hub/chart/view';
 import Timeline from '~/components/leagues/hub/activity/timeline/view';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
@@ -7,16 +7,16 @@ import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import ChangeSurvivor from '~/components/leagues/hub/picks/changeSurvivor/view';
 import CreateBaseEvent from '~/components/leagues/actions/events/base/create';
-import CustomEvents from '~/components/leagues/customization/customEvents';
-import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
-import LeagueScoring from '~/components/leagues/customization/leagueScoring';
+import CustomEvents from '~/components/leagues/customization/events/custom/view';
+import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
+import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
 import Predictions from '~/components/leagues/hub/picks/predictions/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 //import { leaguesService as QUERIES } from '~/services/leagues';
-import SetSurvivalCap from '~/components/leagues/customization/setSurvivalCap';
-import ShauhinMode from '~/components/leagues/customization/shauhinMode';
+import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
+import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { leagueHash } = await params;

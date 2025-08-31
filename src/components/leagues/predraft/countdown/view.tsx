@@ -1,11 +1,11 @@
 'use client';
 
 import { Button } from '~/components/common/button';
-import SetDraftDate from '~/components/leagues/customization/setDraftDate';
+import SetDraftDate from '~/components/leagues/customization/settings/draft/view';
 import { useLeague } from '~/hooks/useLeague';
 import { useRouter } from 'next/navigation';
-import Clock from './clock';
-import StartDraft from './start';
+import Clock from '~/components/leagues/predraft/countdown/clock';
+import StartDraft from '~/components/leagues/predraft/countdown/start';
 
 interface DraftCountdownProps {
   overrideLeagueHash?: string;

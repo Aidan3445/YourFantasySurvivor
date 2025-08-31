@@ -1,6 +1,5 @@
 'use client';
 
-import { Slider } from '~/components/common/slider';
 import { DEFAULT_SURVIVAL_CAP, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/types/leagues';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -13,6 +12,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { Flame, Lock, LockOpen } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
+import SurvivalCapSlider from './slider';
 
 
 export default function SetSurvivalCap() {
@@ -138,31 +138,5 @@ export default function SetSurvivalCap() {
         </form>
       </Form>
     </article>
-  );
-}
-
-interface SurvivalCapSliderProps {
-  value: number;
-  onChange: (value: number) => void;
-  disabled?: boolean;
-}
-
-function SurvivalCapSlider({ value, onChange, disabled }: SurvivalCapSliderProps) {
-  return (
-    <span className='flex gap-2 items-center mb-4'>
-      0
-      <Slider
-        max={MAX_SURVIVAL_CAP}
-        step={1}
-        min={0}
-        disabled={disabled}
-        value={[value]}
-        onValueChange={(v) => onChange(v[0]!)}>
-        <div className='mt-3 font-semibold'>
-          {value === 0 ? 'Off' : value === MAX_SURVIVAL_CAP ? 'Unlimited' : value}
-        </div>
-      </Slider>
-      {MAX_SURVIVAL_CAP}
-    </span>
   );
 }

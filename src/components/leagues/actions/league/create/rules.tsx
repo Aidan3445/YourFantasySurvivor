@@ -1,6 +1,8 @@
 import { type ReactNode } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
-import { AdvantageScoreSettings, ChallengeScoreSettings, OtherScoreSettings } from '~/components/leagues/customization/baseEvents';
+import AdvantageScoreSettings from '~/components/leagues/customization/events/base/advantages';
+import ChallengeScoreSettings from '~/components/leagues/customization/events/base/challenges';
+import OtherScoreSettings from '~/components/leagues/customization/events/base/other';
 
 interface BaseEventRuleTabsProps {
   rightSide?: ReactNode;

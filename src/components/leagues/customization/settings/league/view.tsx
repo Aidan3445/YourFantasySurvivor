@@ -1,14 +1,14 @@
 'use client';
 
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/types/leagues';
 import { useLeague } from '~/hooks/useLeague';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { MultiSelect } from '~/components/common/multiSelect';
 import { Button } from '~/components/common/button';
 import { updateAdmins, updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
 import { Input } from '~/components/common/input';
+import LeagueAdminsField from '../admin';
 
 const formSchema = z.object({
   leagueName: z.string(),
@@ -101,31 +101,5 @@ export function LeagueSettings() {
         </>}
       </form>
     </Form>
-  );
-}
-interface LeagueAdminsFieldProps {
-  members: { value: number, label: string, role: string }[];
-}
-
-function LeagueAdminsField({ members }: LeagueAdminsFieldProps) {
-  return (
-    <FormField
-      name='admins'
-      render={({ field }) => (
-        <FormItem className='w-full'>
-          <FormLabel>Admins</FormLabel>
-          <FormDescription>
-            Admins can edit league settings and help score custom events throughout the season.
-          </FormDescription>
-          <FormControl>
-            <MultiSelect
-              options={members}
-              onValueChange={field.onChange}
-              defaultValue={field.value as string[]}
-              placeholder='Select admins' />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
   );
 }

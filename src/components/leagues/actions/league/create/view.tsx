@@ -16,9 +16,9 @@ import { ColorZod, DisplayNameZod } from '~/types/leagueMembers';
 import { useEffect } from 'react';
 import { useYfsUser } from '~/hooks/useYfsUser';
 import { useUser } from '@clerk/nextjs';
-import { DraftDateField } from '~/components/leagues/customization/setDraftDate';
 import NextButton from '~/components/leagues/actions/league/create/next';
 import LeagueNameField from '~/components/leagues/actions/league/create/name';
+import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
