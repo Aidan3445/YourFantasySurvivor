@@ -6,7 +6,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { Button } from '~/components/common/button';
-import { updateAdmins, updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
+import { updateAdmins, updateLeagueSettings } from '~/services/leagues/settings/leagueActions';
 import { Input } from '~/components/common/input';
 import LeagueAdminsField from '~/components/leagues/customization/settings/league/admin';
 

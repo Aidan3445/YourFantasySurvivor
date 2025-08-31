@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form, FormLabel } from '~/components/common/form';
 import { ColorZod, DisplayNameZod, type LeagueMember } from '~/types/leagueMembers';
-import { updateMemberDetails } from '~/services/leagues/settings/leagueSettingActions';
+import { updateMemberDetails } from '~/services/leagues/settings/leagueActions';
 import { useEffect } from 'react';
 import { useLeague } from '~/hooks/useLeague';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';

@@ -9,7 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '~/com
 import { Button } from '~/components/common/button';
 import { Progress } from '~/components/common/progress';
 import { useCarouselProgress } from '~/hooks/useCarouselProgress';
-import { createNewLeague } from '~/services/leagues/settings/leagueSettingActions';
+import { createNewLeague } from '~/services/leagues/settings/leagueActions';
 import { useRouter } from 'next/navigation';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
 import { ColorZod, DisplayNameZod } from '~/types/leagueMembers';

@@ -11,7 +11,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/common/alertDialog';
-import { chooseCastaway } from '~/services/leagues/settings/leagueSettingActions';
+import { chooseCastaway } from '~/services/leagues/settings/leagueActions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import ColorRow from '~/components/shared/colorRow';

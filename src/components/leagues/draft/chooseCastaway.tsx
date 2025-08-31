@@ -8,7 +8,7 @@ import { Button } from '~/components/common/button';
 import { useLeague } from '~/hooks/useLeague';
 import { type CastawayDraftInfo } from '~/types/castaways';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
-import { chooseCastaway } from '~/services/leagues/settings/leagueSettingActions';
+import { chooseCastaway } from '~/services/leagues/settings/leagueActions';
 import ColorRow from '~/components/shared/colorRow';
 import { getContrastingColor } from '@uiw/color-convert';
 

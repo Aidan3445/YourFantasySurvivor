@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { deleteCustomEvent, updateCustomEvent } from '~/services/leagues/settings/leagueSettingActions';
+import { deleteCustomEvent, updateCustomEvent } from '~/services/leagues/settings/leagueActions';
 import { useLeague } from '~/hooks/useLeague';
 import { type CustomEvent, type CustomEventInsert, CustomEventInsertZod } from '~/types/events';
 

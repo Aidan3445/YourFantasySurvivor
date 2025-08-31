@@ -15,7 +15,7 @@ import { MultiSelect } from '~/components/common/multiSelect';
 import { Lock, LockOpen } from 'lucide-react';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
-import { updateShauhinMode } from '~/services/leagues/settings/leagueSettingActions';
+import { updateShauhinMode } from '~/services/leagues/settings/leagueActions';
 
 export default function ShauhinMode() {
   const {

@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { createBaseEvent } from '~/services/leagues/events/baseEventActions';
+import { createBaseEvent } from '~/services/leagues/events/baseActions';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { Circle } from 'lucide-react';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';

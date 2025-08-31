@@ -11,7 +11,7 @@ import { type Headers } from '@ably/chat';
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { UserCog2, Crown } from 'lucide-react';
-import { saveChatMessage } from '~/services/leagues/settings/leagueSettingActions';
+import { saveChatMessage } from '~/services/leagues/settings/leagueActions';
 
 export interface ChatRoomProps {
   chatHistory?: Message[];

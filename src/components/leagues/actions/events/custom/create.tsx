@@ -11,7 +11,7 @@ import { Textarea } from '~/components/common/textarea';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
 import { Button } from '~/components/common/button';
 import { useEventOptions } from '~/hooks/useEventOptions';
-import { createCustomEvent } from '~/services/leagues/settings/leagueSettingActions';
+import { createCustomEvent } from '~/services/leagues/settings/leagueActions';
 
 export default function CreateCustomEvent() {
   const { leagueData, league, refresh } = useLeague();

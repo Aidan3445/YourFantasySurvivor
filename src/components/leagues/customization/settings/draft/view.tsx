@@ -11,7 +11,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
-import { updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
+import { updateLeagueSettings } from '~/services/leagues/settings/leagueActions';
 import { useLeague } from '~/hooks/useLeague';
 import { useState } from 'react';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';

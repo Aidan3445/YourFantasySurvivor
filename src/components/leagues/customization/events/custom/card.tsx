@@ -7,7 +7,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { type CustomEventRule, CustomEventRuleZod } from '~/types/events';
 
 import { Button } from '~/components/common/button';
-import { deleteCustomEventRule, updateCustomEventRule } from '~/services/leagues/settings/leagueSettingActions';
+import { deleteCustomEventRule, updateCustomEventRule } from '~/services/leagues/settings/leagueActions';
 import { Flame, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,

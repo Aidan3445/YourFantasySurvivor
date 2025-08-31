@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
 import { ColorZod, DisplayNameZod, type LeagueMemberColor, type NewLeagueMember } from '~/types/leagueMembers';
-import { joinLeague } from '~/services/leagues/settings/leagueSettingActions';
+import { joinLeague } from '~/services/leagues/settings/leagueActions';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';

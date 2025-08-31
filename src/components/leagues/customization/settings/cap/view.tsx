@@ -7,7 +7,7 @@ import { type z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '~/components/common/form';
 import { Switch } from '~/components/common/switch';
 import { Button } from '~/components/common/button';
-import { updateLeagueSettings } from '~/services/leagues/settings/leagueSettingActions';
+import { updateLeagueSettings } from '~/services/leagues/settings/leagueActions';
 import { useLeague } from '~/hooks/useLeague';
 import { Flame, Lock, LockOpen } from 'lucide-react';
 import { useState } from 'react';
