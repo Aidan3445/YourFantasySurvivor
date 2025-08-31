@@ -82,6 +82,8 @@ export default function ChangeSurvivor() {
   }
   */
 
+  if (league.leagueStatus === 'Inactive') return null;
+
   if (availableCastaways.every(castaway => castaway.pickedBy)) {
     return (
       <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>

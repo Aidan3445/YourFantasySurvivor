@@ -14,7 +14,7 @@ import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import EditBaseEvent from '~/components/leagues/actions/events/base/edit';
 import ColorRow from '~/components/shared/colorRow';
 import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
-import NotesCell from '~/components/leagues/hub/activity/timeline/notesCell';
+import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 
 interface BaseEventRowProps {
   className?: string;

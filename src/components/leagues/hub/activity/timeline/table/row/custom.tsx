@@ -12,7 +12,7 @@ import ColorRow from '~/components/shared/colorRow';
 import EditCustomEvent from '~/components/leagues/actions/events/custom/edit';
 import { type CastawayName } from '~/types/castaways';
 import { type TribeName } from '~/types/tribes';
-import NotesCell from '~/components/leagues/hub/activity/timeline/notesCell';
+import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
 
 interface CustomEventRowProps {
