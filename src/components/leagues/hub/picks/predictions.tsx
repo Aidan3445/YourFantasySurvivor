@@ -2,7 +2,7 @@
 
 import { type leaguesService as QUERIES } from '~/services/leagues';
 import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
-import { AirStatus } from '~/components/leagues/hub/recentActivity';
+import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { type EpisodeNumber } from '~/types/episodes';
 import { type ShauhinModeSettings, type Prediction, BaseEventFullName } from '~/types/events';
 import { cn } from '~/lib/utils';

@@ -8,7 +8,7 @@ import { Button } from '~/components/common/button';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { useLeague } from '~/hooks/useLeague';
 import { type Headers } from '@ably/chat';
-import { ColorRow } from '~/components/leagues/predraft/order/view';
+import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { UserCog2, Crown } from 'lucide-react';
 import { saveChatMessage } from '~/services/leagues/settings/leagueSettingActions';

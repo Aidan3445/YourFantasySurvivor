@@ -6,7 +6,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { type LeagueHash } from '~/types/leagues';
 import { getContrastingColor } from '@uiw/color-convert';
 import ChooseCastaway from '~/components/leagues/draft/chooseCastaway';
-import ColorRow from '~/components/common/colorRow';
+import ColorRow from '~/components/shared/colorRow';
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle

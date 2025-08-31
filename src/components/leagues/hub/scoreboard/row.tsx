@@ -4,7 +4,7 @@ import { TableCell, TableRow } from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
 import type { CastawayDetails, CastawayName } from '~/types/castaways';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
-import ColorRow from '~/components/common/colorRow';
+import ColorRow from '~/components/shared/colorRow';
 import { MoveRight, Circle, Flame, History, Skull } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';

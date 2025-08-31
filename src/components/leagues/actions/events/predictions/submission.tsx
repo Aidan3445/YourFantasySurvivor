@@ -15,7 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/pop
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useMemo } from 'react';
 import { Input } from '~/components/common/input';
-import ColorRow from '~/components/common/colorRow';
+import ColorRow from '~/components/shared/colorRow';
 
 const formSchema = z.object({
   referenceId: z.coerce.number(),

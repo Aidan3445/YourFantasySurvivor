@@ -13,7 +13,7 @@ import { handleDragEnd } from '~/hooks/useSortableItem';
 import { updateDraftOrder } from '~/services/leagues/settings/leagueSettingActions';
 import { Button } from '~/components/common/button';
 import { useRouter } from 'next/navigation';
-import ColorRow from '~/components/common/colorRow';
+import ColorRow from '~/components/shared/colorRow';
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;

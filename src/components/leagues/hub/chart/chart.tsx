@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { Separator } from '~/components/common/separator';
 import { useLeague } from '~/hooks/useLeague';
-import ColorRow from '~/components/common/colorRow';
+import ColorRow from '~/components/shared/colorRow';
 import { useMemo } from 'react';
 
 export default function Chart() {

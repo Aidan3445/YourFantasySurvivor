@@ -1,17 +1,17 @@
 import MemberEditForm from '~/components/leagues/customization/memberEdit';
-import Chart from '~/components/leagues/hub/chart';
-import RecentActivity from '~/components/leagues/hub/recentActivity';
+import Chart from '~/components/leagues/hub/chart/chart';
+import Timeline from '~/components/leagues/hub/activity/timeline/view';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
-import ChangeSurvivor from '~/components/leagues/hub/changeSurvivor';
+import ChangeSurvivor from '~/components/leagues/hub/picks/changeSurvivor';
 import CreateBaseEvent from '~/components/leagues/actions/events/base/create';
 import CustomEvents from '~/components/leagues/customization/customEvents';
 import { LeagueSettings } from '~/components/leagues/customization/leagueSettings';
 import LeagueScoring from '~/components/leagues/customization/leagueScoring';
 import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
-import Predictions from '~/components/leagues/hub/predictions';
+import Predictions from '~/components/leagues/hub/picks/predictions';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
 //import { leaguesService as QUERIES } from '~/services/leagues';
@@ -50,7 +50,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </span>
               <ChangeSurvivor />
               <Predictions />
-              <RecentActivity />
+              <Timeline />
             </section>
           </TabsContent>
           {/*

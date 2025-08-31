@@ -6,7 +6,7 @@ import { Circle, FlameKindling } from 'lucide-react';
 import { type CastawayDetails } from '~/types/castaways';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
-import ColorRow from '~/components/common/colorRow';
+import ColorRow from '~/components/shared/colorRow';
 
 interface CastawayRowProps {
   place: number;

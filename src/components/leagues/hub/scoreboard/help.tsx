@@ -1,6 +1,6 @@
 'use client';
 
-import ColorRow from '~/components/common/colorRow';
+import ColorRow from '~/components/shared/colorRow';
 import { MoveRight, Circle, Flame, History, CircleHelp } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';

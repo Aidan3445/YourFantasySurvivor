@@ -8,7 +8,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useMemo } from 'react';
 import { Textarea } from '~/components/common/textarea';
-import { EpisodeEvents } from '~/components/leagues/hub/recentActivity';
+import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
 import { Button } from '~/components/common/button';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { createCustomEvent } from '~/services/leagues/settings/leagueSettingActions';
