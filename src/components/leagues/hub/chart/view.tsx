@@ -11,8 +11,8 @@ import {
 } from 'recharts';
 import { useLeague } from '~/hooks/useLeague';
 import { useMemo } from 'react';
-import CustomTooltip from './tooltip';
-import { formatData } from './utils';
+import CustomTooltip from '~/components/leagues/hub/chart/tooltip';
+import { formatData } from '~/components/leagues/hub/chart/utils';
 
 export default function Chart() {
   const {

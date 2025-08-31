@@ -2,8 +2,8 @@
 
 import { usePredictions } from '~/hooks/usePredictions';
 import { useLeague } from '~/hooks/useLeague';
-import PredictionHistory from '../../activity/predictionHistory/view';
-import MakePredictions from './makePredictions';
+import PredictionHistory from '~/components/leagues/hub/activity/predictionHistory/view';
+import MakePredictions from '~/components/leagues/hub/picks/predictions/makePredictions';
 
 export default function Predictions() {
   const { leagueData, league } = useLeague();
