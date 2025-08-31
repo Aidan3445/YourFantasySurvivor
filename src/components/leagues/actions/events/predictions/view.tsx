@@ -1,10 +1,10 @@
 import {
- type BasePredictionRules, defaultPredictionRules,
+  type BasePredictionRules, defaultPredictionRules,
   type BasePredictionDraft, type LeaguePredictionDraft,
 } from '~/types/events';
 import type { CastawayDetails, CastawayDraftInfo } from '~/types/castaways';
 import type { Tribe } from '~/types/tribes';
-import PredictionCards from './cards';
+import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 
 export interface MakePredictionsProps {
   basePredictionRules?: BasePredictionRules;
