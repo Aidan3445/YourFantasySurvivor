@@ -9,7 +9,17 @@ import { type VariantProps } from 'class-variance-authority';
 
 const AlertDialog = AlertDialogPrimitive.Root;
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
+const AlertDialogTrigger = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Trigger
+    ref={ref}
+    className={cn('cursor-pointer', className)}
+    {...props}
+  />
+));
+AlertDialogTrigger.displayName = AlertDialogPrimitive.Trigger.displayName;
 
 const AlertDialogPortal = AlertDialogPrimitive.Portal;
 
