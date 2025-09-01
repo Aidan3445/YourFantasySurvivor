@@ -58,26 +58,17 @@ export default function EpisodeEventsTableBody({
       if (event.hit === null || event.eventId === null) return acc; // Skip events without results
 
       if (filters.event.length > 0 && !filters.event.includes(event.eventName)) return acc;
-      if (filters.castaway.length > 0 && event.referenceType === 'Castaway' &&
-        !filters.castaway.some((castaway) => event.referenceName === castaway)) return acc;
+      if (filters.castaway.length > 0 && event.reference.referenceType === 'Castaway' &&
+        !filters.castaway.some((castaway) => event.reference.referenceName === castaway)) return acc;
       if (filters.tribe.length > 0 &&
-        (event.referenceType === 'Tribe' &&
-          !filters.tribe.some((tribe) => event.referenceName === tribe) ||
-          event.referenceType === 'Castaway' &&
+        (event.reference.referenceType === 'Tribe' &&
+          !filters.tribe.some((tribe) => event.reference.referenceName === tribe) ||
+          event.reference.referenceType === 'Castaway' &&
           !filters.tribe.includes(castaways
-            .find((castaway) => castaway.fullName === event.referenceName)?.tribes
+            .find((castaway) => castaway.fullName === event.reference.referenceName)?.tribes
             .findLast((tribeEp) => tribeEp.episode <= episodeNumber)?.tribeName ?? ''))) return acc;
       if (filters.member.length > 0 &&
         !filters.member.some((member) => event.predictionMaker === member)) return acc;
-
-      const referenceIds = 'customEventRuleId' in event ?
-        [event.referenceId] :
-        baseEvents[episodeNumber]?.[event.eventId]?.references ?? [];
-      const referenceNames = 'customEventRuleId' in event ?
-        [event.referenceName] :
-        referenceIds.map((referenceId) => (event.referenceType === 'Castaway' ?
-          castaways.find((castaway) => castaway.castawayId === referenceId)?.fullName :
-          tribes.find((tribe) => tribe.tribeId === referenceId)?.tribeName) ?? '');
 
       acc[event.eventId] ??= {
         eventName: typeof event.eventId === 'string' ?
@@ -85,24 +76,57 @@ export default function EpisodeEventsTableBody({
           event.eventName,
         points: event.points,
         notes: 'notes' in event ? event.notes : null,
-        referenceIds: referenceIds,
-        referenceNames: referenceNames,
-        referenceType: event.referenceType,
+        references: [],
         predictionMakers: [],
         misses: []
       };
 
-      if (event.hit) acc[event.eventId]!.predictionMakers.push({
-        displayName: event.predictionMaker,
-        bet: event.bet
-      });
-      else acc[event.eventId]!.misses.push({
-        displayName: event.predictionMaker,
-        bet: event.bet,
-        referenceName: (event.referenceType === 'Castaway' ?
-          castaways.find((castaway) => castaway.castawayId === event.referenceId)?.fullName :
-          tribes.find((tribe) => tribe.tribeId === event.referenceId)?.tribeName) ?? ''
-      });
+      const references: {
+        referenceId: number;
+        referenceType: ReferenceType;
+        // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+        referenceName: CastawayName | TribeName;
+      }[] = [];
+
+      const isCustomEvent = 'customEventRuleId' in event;
+      if (isCustomEvent) {
+        references.push(event.reference);
+      } else {
+        const referenceType = baseEvents[episodeNumber]?.[event.eventId]?.referenceType ?? 'Castaway';
+        baseEvents[episodeNumber]?.[event.eventId]?.references.forEach((reference) => {
+          references.push({
+            referenceId: reference,
+            referenceType: referenceType,
+            referenceName: (referenceType === 'Castaway' ?
+              castaways.find((castaway) => castaway.castawayId === reference)?.fullName :
+              tribes.find((tribe) => tribe.tribeId === reference)?.tribeName) ?? ''
+          });
+        });
+      }
+
+
+      if (event.hit === undefined) {
+        acc[event.eventId]!.references.push(...references);
+        return acc;
+      }
+
+      if (event.hit) {
+        acc[event.eventId]!.predictionMakers.push({
+          displayName: event.predictionMaker,
+          bet: event.bet
+        });
+        acc[event.eventId]!.references.push(...references);
+      } else {
+        acc[event.eventId]!.misses.push({
+          displayName: event.predictionMaker,
+          bet: event.bet,
+          reference: {
+            referenceId: event.reference.referenceId,
+            referenceType: event.reference.referenceType,
+            referenceName: event.reference.referenceName
+          }
+        });
+      }
 
       return acc;
     }, {} as Record<CustomEventId | ScoringBaseEventName, {
@@ -110,10 +134,12 @@ export default function EpisodeEventsTableBody({
       eventId?: CustomEventId;
       points: number;
       notes: string[] | null;
-      referenceIds: number[];
-      referenceType: ReferenceType;
-      // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-      referenceNames: (CastawayName | TribeName)[];
+      references: {
+        referenceId: number;
+        referenceType: ReferenceType;
+        // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+        referenceName: CastawayName | TribeName;
+      }[];
       predictionMakers: {
         displayName: LeagueMemberDisplayName;
         bet?: number | null;
@@ -122,7 +148,12 @@ export default function EpisodeEventsTableBody({
         displayName: LeagueMemberDisplayName;
         bet?: number | null;
         // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-        referenceName: CastawayName | TribeName;
+        reference: {
+          referenceId: number;
+          referenceType: ReferenceType;
+          // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+          referenceName: CastawayName | TribeName;
+        };
       }[]
     }>) ?? {})
     .map((event) => {
@@ -131,6 +162,7 @@ export default function EpisodeEventsTableBody({
       }];
       return event;
     });
+  console.log({ HEY: combinedPredictions });
 
   const filteredDirectEvents = Object.values(
     customEvents.directEvents[episodeNumber] ?? {})
@@ -202,9 +234,7 @@ export default function EpisodeEventsTableBody({
           eventName={mockPrediction.eventName}
           points={mockPrediction.points}
           predictionMakers={[{ displayName: mockPrediction.predictionMaker }]}
-          referenceIds={[mockPrediction.referenceId]}
-          referenceType={mockPrediction.referenceType}
-          referenceNames={[mockPrediction.referenceName]}
+          references={[mockPrediction.reference]}
           notes={mockPrediction.notes}
           episodeNumber={episodeNumber}
           edit={false} />
@@ -216,17 +246,37 @@ export default function EpisodeEventsTableBody({
           eventId={-1}
           eventName={mockDirect.eventName}
           points={mockDirect.points}
-          referenceIds={[mockDirect.referenceId]}
-          referenceType={mockDirect.referenceType}
-          referenceNames={[mockDirect.referenceName]}
+          references={[{
+            referenceId: mockDirect.referenceId,
+            referenceType: mockDirect.referenceType,
+            referenceName: mockDirect.referenceName
+          }]}
           notes={mockDirect.notes}
           episodeNumber={episodeNumber}
           edit={false} />
       )}
       {filteredBaseEvents.length > 0 &&
-        <TableRow className='bg-gray-100 hover:bg-gray-200'>
-          <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+        <TableRow className='bg-gray-100 hover:bg-gray-200 text-xs text-muted-foreground'>
+          {edit && <TableCell className='w-0'>
+            Edit
+          </TableCell>}
+          <TableCell>
             Official Events
+          </TableCell>
+          <TableCell className='text-center'>
+            Points
+          </TableCell>
+          <TableCell className='text-left'>
+            Tribes
+          </TableCell>
+          <TableCell className='text-right'>
+            Castaways
+          </TableCell>
+          <TableCell className='text-left'>
+            Members
+          </TableCell>
+          <TableCell className='text-right'>
+            Notes
           </TableCell>
         </TableRow>}
       {filteredBaseEvents
@@ -251,9 +301,11 @@ export default function EpisodeEventsTableBody({
           eventId={event.eventId}
           eventName={event.eventName}
           points={event.points}
-          referenceType={event.referenceType}
-          referenceNames={[event.referenceName]}
-          referenceIds={[event.referenceId]}
+          references={[{
+            referenceId: event.referenceId,
+            referenceType: event.referenceType,
+            referenceName: event.referenceName
+          }]}
           notes={event.notes}
           episodeNumber={episodeNumber}
           edit={edit} />
@@ -270,9 +322,7 @@ export default function EpisodeEventsTableBody({
           eventId={event.eventId}
           eventName={event.eventName}
           points={event.points}
-          referenceType={event.referenceType}
-          referenceNames={event.referenceNames}
-          referenceIds={event.referenceIds}
+          references={event.references}
           predictionMakers={event.predictionMakers}
           misses={event.misses}
           defaultOpenMisses={filters.member.length > 0}

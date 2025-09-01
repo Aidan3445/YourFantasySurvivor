@@ -3,7 +3,7 @@ import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
 import { cn } from '~/lib/utils';
-import { BaseEventFullName, type Prediction } from '~/types/events';
+import { BaseEventFullName, type BaseEventName, type Prediction } from '~/types/events';
 
 interface PredictionTableProps {
   predictions: Prediction[];
@@ -34,14 +34,14 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
               <TableRow key={pred.customEventRuleId ?? pred.eventName} className='bg-b3'>
                 <TableCell>
                   <div className='flex flex-col text-nowrap'>
-                    {BaseEventFullName[pred.eventName as keyof typeof BaseEventFullName] ??
+                    {BaseEventFullName[pred.eventName as BaseEventName] ??
                       pred.eventName}
                     <span className='text-xs italic'>
                       {pred.timing.join(' - ')}
                     </span>
                   </div >
-                </TableCell >
-                <TableCell>
+                </TableCell>
+                <TableCell className='text-nowrap'>
                   <span className={cn('text-sm text-center',
                     hit ?
                       pred.points > 0 ? 'text-green-800' : 'text-red-800' :
@@ -57,7 +57,7 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                 </TableCell>
                 {
                   hasBets &&
-                  <TableCell>
+                  <TableCell className='text-nowrap'>
                     {pred.prediction.bet && pred.prediction.bet > 0 ? (
                       hit ? (
                         <span className='text-sm text-center text-green-800'>

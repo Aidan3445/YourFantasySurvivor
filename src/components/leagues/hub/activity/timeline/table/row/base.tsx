@@ -43,8 +43,7 @@ export default function BaseEventRow({
     <TableRow className={className}>
       {edit ? <TableCell className='w-0'>
         <EditBaseEvent episodeNumber={episodeNumber} baseEvent={baseEvent} />
-      </TableCell> :
-        edit === false ? <TableCell className='w-0' /> : null}
+      </TableCell> : null}
       <TableCell className='text-nowrap'>
         <p className='text-xs text-muted-foreground'>{BaseEventFullName[eventName]}</p>
         { // disable because we want label to be ignored if empty string as well as undefined

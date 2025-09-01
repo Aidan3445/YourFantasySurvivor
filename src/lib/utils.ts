@@ -44,6 +44,42 @@ export function findTribeCastaways(
   return [...onTribe];
 }
 
+/**
+  * Determine if a prediction is correct based on tribe and castaway of the event and prediction
+  * @param prediction the referenceId and referenceType of the prediction
+  * @param event the referenceId and referenceType of the event result
+  * @param tribeUpdates The tribe updates for the season
+  * @param eliminations The eliminations for the season
+  * @returns true if the prediction is correct, false otherwise
+  */
+export function isPredictionCorrect(
+  prediction: { referenceName: string, referenceType: 'Castaway' | 'Tribe' },
+  event: { referenceName: string, referenceType: 'Castaway' | 'Tribe' },
+  tribeUpdates: Awaited<ReturnType<typeof SEASON_QUERIES.getTribesTimeline>>,
+  eliminations: Awaited<ReturnType<typeof SEASON_QUERIES.getEliminations>>,
+  episodeNumber: EpisodeNumber
+) {
+  if (prediction.referenceType === event.referenceType) {
+    return prediction.referenceName === event.referenceName;
+  }
+
+  if (event.referenceType === 'Tribe') {
+    const castawayOnTribe = findTribeCastaways(
+      tribeUpdates, eliminations, event.referenceName, episodeNumber
+    ).includes(prediction.referenceName);
+    return castawayOnTribe;
+  }
+
+  if (prediction.referenceType === 'Tribe') {
+    const castawayOnTribe = findTribeCastaways(
+      tribeUpdates, eliminations, prediction.referenceName, episodeNumber
+    ).includes(event.referenceName);
+    return castawayOnTribe;
+  }
+
+  return false;
+}
+
 type BaseEventPredictionSchema = typeof baseEventPredictionRulesSchema.$inferSelect;
 
 export function basePredictionRulesSchemaToObject(

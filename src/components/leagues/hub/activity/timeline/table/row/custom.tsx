@@ -6,7 +6,7 @@ import { TableCell, TableRow } from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
 import type { EpisodeNumber } from '~/types/episodes';
-import { type CustomEventName, type ReferenceType } from '~/types/events';
+import { BaseEventFullName, type BaseEventName, type CustomEventName, type ReferenceType } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import ColorRow from '~/components/shared/colorRow';
 import EditCustomEvent from '~/components/leagues/actions/events/custom/edit';
@@ -20,9 +20,12 @@ interface CustomEventRowProps {
   eventName: CustomEventName;
   eventId?: number;
   points: number;
-  referenceType: ReferenceType;
-  referenceNames?: string[];
-  referenceIds?: number[];
+  references: {
+    referenceType: ReferenceType;
+    referenceId: number;
+    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+    referenceName: CastawayName | TribeName;
+  }[];
   predictionMakers?: {
     displayName: LeagueMemberDisplayName,
     bet?: number | null
@@ -31,8 +34,12 @@ interface CustomEventRowProps {
   misses?: {
     displayName: LeagueMemberDisplayName;
     bet?: number | null;
-    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-    referenceName: CastawayName | TribeName;
+    reference: {
+      referenceType: ReferenceType;
+      referenceId: number;
+      // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+      referenceName: CastawayName | TribeName;
+    };
   }[];
   defaultOpenMisses?: boolean;
   episodeNumber: EpisodeNumber;
@@ -43,9 +50,7 @@ export default function CustomEventRow({
   eventName,
   eventId,
   points,
-  referenceType,
-  referenceNames,
-  referenceIds,
+  references,
   predictionMakers,
   notes,
   misses,
@@ -56,46 +61,59 @@ export default function CustomEventRow({
 }: CustomEventRowProps) {
   const { leagueData, league } = useLeague();
 
+  console.log({
+    eventName,
+    points,
+    references,
+    predictionMakers,
+    misses,
+    episodeNumber,
+  });
+
   return (
     <TableRow className={className}>
-      {edit && eventId ? <TableCell className='w-0'>
+      {edit && (eventId ? <TableCell className='w-0'>
         <EditCustomEvent episodeNumber={episodeNumber} customEvent={{
           eventId,
           eventName,
           points,
-          referenceType,
-          referenceId: referenceIds?.[0] ? referenceIds[0] : 0,
+          referenceType: references[0]?.referenceType ?? 'Castaway',
+          referenceId: references[0]?.referenceId ?? 0,
           notes
         }} />
-      </TableCell> :
-        edit === false ? <TableCell className='w-0' /> : null}
-      <TableCell className='text-nowrap sticky'>{eventName}</TableCell>
+      </TableCell> : <TableCell className='w-0' />
+      )}
+      <TableCell className='text-nowrap sticky'>
+        {BaseEventFullName[eventName as BaseEventName] ?? eventName}
+      </TableCell>
       <PointsCell points={points} />
-      <TableCell className='text-right text-xs text-nowrap'>
+      <TableCell className='text-right text-nowrap'>
         <div className='h-full grid auto-rows-fr items-center'>
-          {referenceType === 'Tribe' && referenceNames?.map((referenceName) => (
+          {references.filter(({ referenceType }) => referenceType === 'Tribe')
+            .map(({ referenceName }) => (
+              <ColorRow
+                key={referenceName}
+                className='leading-tight px-1 w-min'
+                color={leagueData.castaways.find((listItem) =>
+                  listItem.tribes.some((tribeEp) => tribeEp.tribeName === referenceName))?.tribes
+                  .find((tribeEp) => tribeEp.tribeName === referenceName)?.tribeColor}>
+                {referenceName}
+              </ColorRow>
+            ))}
+        </div>
+      </TableCell>
+      <TableCell className='text-right text-xs text-nowrap justify-items-end'>
+        {references.filter(({ referenceType }) => referenceType === 'Castaway')
+          .map(({ referenceName }) => (
             <ColorRow
               key={referenceName}
               className='leading-tight px-1 w-min'
               color={leagueData.castaways.find((listItem) =>
-                listItem.tribes.some((tribeEp) => tribeEp.tribeName === referenceName))?.tribes
-                .find((tribeEp) => tribeEp.tribeName === referenceName)?.tribeColor}>
+                listItem.fullName === referenceName)?.tribes.findLast((tribeEp) =>
+                  tribeEp.episode <= episodeNumber)?.tribeColor}>
               {referenceName}
             </ColorRow>
           ))}
-        </div>
-      </TableCell>
-      <TableCell className='text-right text-xs text-nowrap justify-items-end'>
-        {referenceType === 'Castaway' && referenceNames?.map((referenceName) => (
-          <ColorRow
-            key={referenceName}
-            className='leading-tight px-1 w-min'
-            color={leagueData.castaways.find((listItem) =>
-              listItem.fullName === referenceName)?.tribes.findLast((tribeEp) =>
-                tribeEp.episode <= episodeNumber)?.tribeColor}>
-            {referenceName}
-          </ColorRow>
-        ))}
       </TableCell>
       <TableCell className='text-xs text-nowrap'>
         <div className={cn(
@@ -145,13 +163,13 @@ export default function CustomEventRow({
                         <MoveRight size={12} stroke='#000000' />
                         <ColorRow
                           className='leading-tight px-1 w-min'
-                          color={referenceType === 'Castaway' ?
+                          color={miss.reference.referenceType === 'Castaway' ?
                             leagueData.castaways.find((castaway) =>
-                              castaway.fullName === miss.referenceName)?.tribes
+                              castaway.fullName === miss.reference.referenceName)?.tribes
                               .findLast((tribeEp) => tribeEp.episode <= episodeNumber)?.tribeColor :
                             leagueData.tribes.find((tribe) =>
-                              tribe.tribeName === miss.referenceName)?.tribeColor}>
-                          {miss.referenceName}
+                              tribe.tribeName === miss.reference.referenceName)?.tribeColor}>
+                          {miss.reference.referenceName}
                         </ColorRow>
                         {miss.bet !== undefined && miss.bet !== null && (
                           <span className='text-xs text-destructive'>

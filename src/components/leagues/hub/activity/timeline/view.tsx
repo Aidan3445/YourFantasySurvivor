@@ -32,7 +32,6 @@ export default function Timeline() {
         setFilterEvent={setFilterEvent}
         selectedEpisode={selectedEpisode}
         setSelectedEpisode={setSelectedEpisode} />
-
       {selectedEpisode &&
         <EpisodeEvents
           episodeNumber={selectedEpisode}

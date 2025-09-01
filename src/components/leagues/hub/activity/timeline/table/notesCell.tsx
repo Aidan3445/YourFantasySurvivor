@@ -13,7 +13,7 @@ export default function NotesCell({ notes }: NotesCellProps) {
   if (!filteredNotes || filteredNotes.length === 0) return (
     <TableCell>
       <span className='w-full flex justify-end'>
-        <ScrollText className='opacity-50' />
+        <ScrollText className='opacity-50 cursor-not-allowed' />
       </span>
     </TableCell>
   );

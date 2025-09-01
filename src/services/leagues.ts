@@ -25,7 +25,6 @@ import {
   defaultPredictionRules,
   ScoringBaseEventNames,
   type LeaguePredictionDraft,
-  type ScoringBaseEventName,
 } from '~/types/events';
 import { seasonsService as SEASON_QUERIES } from '~/services/seasons';
 import type { Tribe, TribeName } from '~/types/tribes';
@@ -34,7 +33,7 @@ import { compileScores } from '~/lib/scores';
 import { sysService as SYS_QUERIES } from '~/services/sys/query';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 import { type Message } from 'node_modules/@ably/chat/dist/core/message';
-import { basePredictionRulesSchemaToObject } from '~/lib/utils';
+import { basePredictionRulesSchemaToObject, isPredictionCorrect } from '~/lib/utils';
 
 export const leaguesService = {
   /**
@@ -524,20 +523,23 @@ export const leaguesService = {
           eventId: row.eventId,
           points: basePredictionRules[row.eventName]?.points ?? 0,
           predictionMaker: row.predictionMaker,
-          referenceType: row.referenceType,
-          referenceId: row.referenceId,
+          reference: {
+            referenceType: row.referenceType,
+            referenceId: row.referenceId,
+            referenceName: row.referenceType === 'Castaway' ? row.castaway! : row.tribe!,
+          },
           bet: row.bet ?? undefined,
           hit: row.resultReferenceId === null
             ? null
             : row.resultReferenceId === row.referenceId
-            && row.resultReferenceType === row.referenceType
+            && row.resultReferenceType === row.referenceType,
         };
 
         // Check if there's double prediction
         // if there is only keep the hit or the first miss
         const doubleIndex = acc[row.episodeNumber]!.findIndex((event) =>
           event.eventName === newEvent.eventName &&
-          event.referenceType === newEvent.referenceType &&
+          event.reference.referenceType === newEvent.reference.referenceType &&
           event.predictionMaker === newEvent.predictionMaker);
         if (doubleIndex !== -1) {
           if (acc[row.episodeNumber]![doubleIndex]!.hit ?? !newEvent.hit) return acc;
@@ -545,20 +547,7 @@ export const leaguesService = {
           acc[row.episodeNumber]!.splice(doubleIndex, 1);
         }
 
-        switch (row.referenceType) {
-          case 'Castaway':
-            acc[row.episodeNumber]!.push({
-              ...newEvent,
-              referenceName: row.castaway!,
-            });
-            break;
-          case 'Tribe':
-            acc[row.episodeNumber]!.push({
-              ...newEvent,
-              referenceName: row.tribe!,
-            });
-            break;
-        }
+        acc[row.episodeNumber]!.push({ ...newEvent });
 
         return acc;
       }, {} as Record<EpisodeNumber, EventPrediction[]>));
@@ -579,6 +568,9 @@ export const leaguesService = {
     if (!memberId || !league) {
       throw new Error('User not a member of the league');
     }
+
+    const tribesTimeline = await SEASON_QUERIES.getTribesTimeline(league.leagueSeason);
+    const eliminations = await SEASON_QUERIES.getEliminations(league.leagueSeason);
 
     const directEventsPromise = db
       .select({
@@ -635,6 +627,9 @@ export const leaguesService = {
       }, {} as Record<EpisodeNumber, Record<ReferenceType, LeagueDirectEvent[]>>));
 
 
+    const predictionCastaway = aliasedTable(castawaysSchema, 'predictionCastaway');
+    const predictionTribe = aliasedTable(tribesSchema, 'predictionTribe');
+
     const predictionsPromise = db
       .select({
         customEventRuleId: customEventsRulesSchema.customEventRuleId,
@@ -645,10 +640,12 @@ export const leaguesService = {
         predictionMaker: leagueMembersSchema.displayName,
         referenceType: customEventPredictionsSchema.referenceType,
         referenceId: customEventPredictionsSchema.referenceId,
+        predictionCastaway: predictionCastaway.fullName,
+        predictionTribe: predictionTribe.tribeName,
         resultReferenceType: customEventsSchema.referenceType,
         resultReferenceId: customEventsSchema.referenceId,
-        castaway: castawaysSchema.fullName,
-        tribe: tribesSchema.tribeName,
+        resultCastaway: castawaysSchema.fullName,
+        resultTribe: tribesSchema.tribeName,
         notes: customEventsSchema.notes,
       })
       .from(customEventsSchema)
@@ -671,49 +668,55 @@ export const leaguesService = {
             .filter(timing => !timing.includes('Weekly'))))))
       .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, customEventPredictionsSchema.memberId))
       // references
+      .leftJoin(predictionCastaway, and(
+        eq(predictionCastaway.castawayId, customEventPredictionsSchema.referenceId),
+        eq(customEventPredictionsSchema.referenceType, 'Castaway')))
+      .leftJoin(predictionTribe, and(
+        eq(predictionTribe.tribeId, customEventPredictionsSchema.referenceId),
+        eq(customEventPredictionsSchema.referenceType, 'Tribe')))
+      // result
       .leftJoin(castawaysSchema, and(
         eq(castawaysSchema.castawayId, customEventsSchema.referenceId),
         eq(customEventsSchema.referenceType, 'Castaway')))
       .leftJoin(tribesSchema, and(
         eq(tribesSchema.tribeId, customEventsSchema.referenceId),
         eq(customEventsSchema.referenceType, 'Tribe')))
-      .then((events: {
-        customEventRuleId: CustomEventId,
-        eventId: CustomEventId,
-        eventName: CustomEventName
-        points: number,
-        episodeNumber: EpisodeNumber,
-        predictionMaker: LeagueMemberDisplayName,
-        referenceType: ReferenceType,
-        referenceId: number,
-        resultReferenceType: ReferenceType,
-        resultReferenceId: number,
-        castaway: CastawayName | null,
-        tribe: TribeName | null,
-        notes: string[] | null
-      }[]) => events.reduce((acc, event) => {
-        acc[event.episodeNumber] ??= [];
+      .then((rows) => rows.reduce((acc, row) => {
+        acc[row.episodeNumber] ??= [];
         const newEvent = {
-          customEventRuleId: event.customEventRuleId,
-          eventId: event.eventId,
-          eventName: event.eventName,
-          points: event.points,
-          referenceType: event.resultReferenceType,
-          referenceId: event.referenceId,
-          hit: event.resultReferenceId === event.referenceId &&
-            event.resultReferenceType === event.referenceType,
-          predictionMaker: event.predictionMaker,
-          notes: event.notes,
+          customEventRuleId: row.customEventRuleId,
+          eventId: row.eventId,
+          eventName: row.eventName,
+          points: row.points,
+          reference: {
+            referenceType: row.referenceType,
+            referenceId: row.referenceId,
+            referenceName: row.referenceType === 'Castaway' ? row.predictionCastaway! : row.predictionTribe!,
+          },
+          hit: isPredictionCorrect(
+            { referenceName: row.predictionCastaway ?? row.predictionTribe!, referenceType: row.referenceType },
+            { referenceName: row.resultCastaway ?? row.resultTribe!, referenceType: row.resultReferenceType },
+            tribesTimeline,
+            eliminations,
+            row.episodeNumber
+          ),
+          predictionMaker: row.predictionMaker,
+          notes: row.notes,
         };
 
-        switch (event.referenceType) {
-          case 'Castaway':
-            acc[event.episodeNumber]!.push({ ...newEvent, referenceName: event.castaway! });
-            break;
-          case 'Tribe':
-            acc[event.episodeNumber]!.push({ ...newEvent, referenceName: event.tribe! });
-            break;
+        // Check if there's double prediction
+        // if there is only keep the hit or the first miss
+        const doubleIndex = acc[row.episodeNumber]!.findIndex((event) =>
+          event.eventName === newEvent.eventName &&
+          event.reference.referenceType === newEvent.reference.referenceType &&
+          event.predictionMaker === newEvent.predictionMaker);
+        if (doubleIndex !== -1) {
+          if (acc[row.episodeNumber]![doubleIndex]!.hit ?? !newEvent.hit) return acc;
+          // if the new event is a hit and the double is a miss, remove the double
+          acc[row.episodeNumber]!.splice(doubleIndex, 1);
         }
+
+        acc[row.episodeNumber]!.push({ ...newEvent });
 
         return acc;
       }, {} as Record<EpisodeNumber, CustomPredictionEvent[]>));
@@ -1197,26 +1200,7 @@ export const leaguesService = {
       .where(and(
         eq(baseEventPredictionsSchema.memberId, otherMemberId ?? memberId),
         sql`(${episodesSchema.airDate} < ${new Date().toUTCString()})`))
-      .then((predictions: {
-        leagueMember: LeagueMemberDisplayName,
-        eventName: ScoringBaseEventName,
-        episodeNumber: EpisodeNumber,
-        prediction: {
-          castaway: CastawayName | null,
-          castawayShort: CastawayName | null,
-          tribe: TribeName | null
-          referenceType: ReferenceType,
-          referenceId: number,
-          bet: number | null,
-        },
-        result: {
-          castaway: CastawayName | null,
-          castawayShort: CastawayName | null,
-          tribe: TribeName | null
-          referenceType: ReferenceType | null,
-          referenceId: number | null,
-        }
-      }[]) => predictions.reduce((acc, prediction) => {
+      .then((predictions) => predictions.reduce((acc, prediction) => {
         acc[prediction.episodeNumber] ??= [];
         let predictionIndex = acc[prediction.episodeNumber]!.findIndex((p) =>
           p.eventName === prediction.eventName &&

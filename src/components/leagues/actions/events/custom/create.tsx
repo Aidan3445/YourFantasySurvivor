@@ -61,14 +61,14 @@ export default function CreateCustomEvent() {
   const correctPredictions: { predictionMaker: string }[] =
     leagueData.customEvents.predictionEvents[selectedEpisode]
       ?.filter((prediction) => prediction.customEventRuleId === +reactForm.watch('customEventRuleId') &&
-        prediction.referenceId === +reactForm.watch('referenceId')) ?? [];
+        prediction.reference.referenceId === +reactForm.watch('referenceId')) ?? [];
   if (correctPredictions.length === 0) {
     correctPredictions.push({ predictionMaker: 'No Correct Predictions' });
   }
 
   return (
     <div className='px-4 w-full md:pb-14'>
-      <section className='bg-card rounded-xl pb-4 w-full'>
+      <section className='bg-card rounded-xl w-full'>
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
             <form
@@ -224,13 +224,15 @@ export default function CreateCustomEvent() {
                 correctPredictions.map(prediction => ({
                   customEventRuleId: +reactForm.watch('customEventRuleId'),
                   eventName: selectedEvent.eventName,
-                  referenceType: selectedReferenceType,
                   points: selectedEvent.points,
                   predictionMaker: prediction.predictionMaker,
-                  referenceId: +reactForm.watch('referenceId'),
-                  referenceName: selectedReferenceType === 'Castaway' ?
-                    castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
-                    tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
+                  reference: {
+                    referenceType: selectedReferenceType,
+                    referenceId: +reactForm.watch('referenceId'),
+                    referenceName: selectedReferenceType === 'Castaway' ?
+                      castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
+                      tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
+                  },
                   hit: true,
                   notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
                 })) : undefined}

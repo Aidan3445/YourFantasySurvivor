@@ -51,6 +51,11 @@ export default function EpisodeEvents({
       episodes
     }
   } = useLeague();
+
+  if (episodeNumber === 5) {
+    console.log({ baseEvents, basePredictions, customEvents, mockBases, mockPredictions, mockDirects });
+  }
+
   const noTribes = episodeNumber !== -1 && (
     !(
       baseEvents[episodeNumber] &&
@@ -59,12 +64,13 @@ export default function EpisodeEvents({
     !mockBases?.some((event) => event.tribes.length > 0) &&
     !(
       basePredictions[episodeNumber] &&
-      Object.values(basePredictions[episodeNumber]).some((event) => event.referenceType === 'Tribe' && event.eventId !== null)
+      Object.values(basePredictions[episodeNumber]).some((event) => event.reference.referenceType === 'Tribe' && event.eventId !== null)
     ) &&
     ![...customEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
-      ?.some((event) => event.referenceType === 'Tribe') &&
+      ?.some((event) => event.reference.referenceType === 'Tribe') &&
     ![...customEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
       ?.some((event) => event.referenceType === 'Tribe'));
+
 
   return (
     <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-var(--sidebar-width)-3rem)] lg:w-full bg-card rounded-lg gap-0'>

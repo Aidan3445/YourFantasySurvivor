@@ -270,10 +270,12 @@ export const defaultCustomEventRule: CustomEventRule = {
 type EventPredictionRoot = {
   eventId: number | null,
   points: number,
-  referenceType: ReferenceType,
-  referenceId: number,
-  // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
-  referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
+  reference: {
+    referenceType: ReferenceType,
+    referenceId: number,
+    // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
+    referenceName: CastawayName | TribeName | LeagueMemberDisplayName,
+  },
   predictionMaker: LeagueMemberDisplayName,
   hit: boolean | null,
   bet?: number,
