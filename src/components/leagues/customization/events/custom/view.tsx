@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
 import { useLeague } from '~/hooks/useLeague';
-import { type CustomEventRule, CustomEventRuleZod, defaultCustomEventRule } from '~/types/events';
+import { type LeagueEventRule, LeagueEventRuleZod, defaultLeagueEventRule } from '~/types/events';
 
 import { Button } from '~/components/common/button';
 import { createCustomEventRule } from '~/services/leagues/settings/leagueActions';
@@ -29,15 +29,15 @@ export default function CustomEvents() {
     refresh
   } = useLeague();
 
-  const reactForm = useForm<CustomEventRule>({
-    defaultValues: defaultCustomEventRule,
-    resolver: zodResolver(CustomEventRuleZod),
+  const reactForm = useForm<LeagueEventRule>({
+    defaultValues: defaultLeagueEventRule,
+    resolver: zodResolver(LeagueEventRuleZod),
   });
   const [locked, setLocked] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    const newRule: CustomEventRule = {
+    const newRule: LeagueEventRule = {
       ...data,
       timing: data.eventType === 'Prediction' ? data.timing : [],
     };

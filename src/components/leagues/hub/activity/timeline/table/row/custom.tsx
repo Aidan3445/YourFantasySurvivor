@@ -6,7 +6,7 @@ import { TableCell, TableRow } from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
 import type { EpisodeNumber } from '~/types/episodes';
-import { BaseEventFullName, type BaseEventName, type CustomEventName, type ReferenceType } from '~/types/events';
+import { BaseEventFullName, type BaseEventName, type LeagueEventName, type ReferenceType } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import ColorRow from '~/components/shared/colorRow';
 import EditCustomEvent from '~/components/leagues/actions/events/custom/edit';
@@ -17,7 +17,7 @@ import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsC
 
 interface CustomEventRowProps {
   className?: string;
-  eventName: CustomEventName;
+  eventName: LeagueEventName;
   eventId?: number;
   points: number;
   references: {

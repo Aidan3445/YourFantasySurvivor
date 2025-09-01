@@ -7,7 +7,7 @@ import { SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/compone
 import { useIsMobile } from '~/hooks/useMobile';
 import { Label } from '~/components/common/label';
 import { MultiSelect } from '~/components/common/multiSelect';
-import { BaseEventFullName, type BaseEventName, type CustomEventName, } from '~/types/events';
+import { BaseEventFullName, type BaseEventName, type LeagueEventName, } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import { type CastawayName } from '~/types/castaways';
 import { type TribeName } from '~/types/tribes';
@@ -20,12 +20,12 @@ export interface TimelineFiltersProps {
   setFilterCastaway: (castaways: CastawayName[]) => void;
   setFilterTribe: (tribes: TribeName[]) => void;
   setFilterMember: (members: LeagueMemberDisplayName[]) => void;
-  setFilterEvent: (events: (BaseEventName | CustomEventName)[]) => void;
+  setFilterEvent: (events: (BaseEventName | LeagueEventName)[]) => void;
   setSelectedEpisode: (episodeNumber?: number) => void;
   filterCastaway: CastawayName[];
   filterTribe: TribeName[];
   filterMember: LeagueMemberDisplayName[];
-  filterEvent: (BaseEventName | CustomEventName)[];
+  filterEvent: (BaseEventName | LeagueEventName)[];
   selectedEpisode?: number;
 }
 
@@ -170,7 +170,7 @@ export default function TimelineFilters({
               ]}
               value={filterEvent}
               onValueChange={(value) =>
-                setFilterEvent(value as (BaseEventName | CustomEventName)[])}
+                setFilterEvent(value as (BaseEventName | LeagueEventName)[])}
               modalPopover
               placeholder='All Events'
             />

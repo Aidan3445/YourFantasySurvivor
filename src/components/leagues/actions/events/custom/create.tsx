@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useLeague } from '~/hooks/useLeague';
-import { type CustomEventInsert, CustomEventInsertZod } from '~/types/events';
+import { type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useMemo } from 'react';
@@ -15,14 +15,14 @@ import { createCustomEvent } from '~/services/leagues/settings/leagueActions';
 
 export default function CreateCustomEvent() {
   const { leagueData, league, refresh } = useLeague();
-  const reactForm = useForm<CustomEventInsert>({
+  const reactForm = useForm<LeagueEventInsert>({
     defaultValues: {
       episodeId: leagueData.episodes.find(episode => episode.airStatus === 'Airing')?.episodeId ??
         leagueData.episodes.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
         leagueData.episodes[0]?.episodeId,
       notes: null,
     },
-    resolver: zodResolver(CustomEventInsertZod),
+    resolver: zodResolver(LeagueEventInsertZod),
   });
 
   const selectedReferenceType = reactForm.watch('referenceType');

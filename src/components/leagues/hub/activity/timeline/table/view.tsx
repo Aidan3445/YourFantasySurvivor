@@ -13,7 +13,7 @@ import {
 import { useLeague } from '~/hooks/useLeague';
 import type { EpisodeNumber } from '~/types/episodes';
 import {
-  type BaseEvent, type BaseEventName, type LeagueDirectEvent, type CustomEventName, type CustomPredictionEvent
+  type BaseEvent, type BaseEventName, type LeagueDirectEvent, type LeagueEventName, type CustomPredictionEvent
 } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import { type CastawayName } from '~/types/castaways';
@@ -32,7 +32,7 @@ export interface EpisodeEventsProps {
     castaway: CastawayName[];
     tribe: TribeName[];
     member: LeagueMemberDisplayName[];
-    event: (BaseEventName | CustomEventName)[];
+    event: (BaseEventName | LeagueEventName)[];
   };
 }
 

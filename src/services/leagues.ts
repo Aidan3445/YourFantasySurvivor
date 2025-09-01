@@ -7,7 +7,7 @@ import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { auth, leagueMemberAuth } from '~/lib/auth';
 import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema } from '~/server/db/schema/baseEvents';
-import { customEventPredictionsSchema, customEventsRulesSchema, customEventsSchema } from '~/server/db/schema/customEvents';
+import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/customEvents';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import type { LeagueStatus, LeagueHash, LeagueName } from '~/types/leagues';
@@ -17,7 +17,7 @@ import { tribesSchema } from '~/server/db/schema/tribes';
 import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/types/leagueMembers';
 import {
   type EventPrediction, type LeagueDirectEvent, type ReferenceType, type CustomPredictionEvent,
-  type BaseEventRule, type CustomEventId, type CustomEventName,
+  type BaseEventRule, type LeagueEventId, type LeagueEventName,
   PredictionTimingOptions,
   defaultBaseRules,
   type PredictionEventTiming,
@@ -101,16 +101,16 @@ export const leaguesService = {
 
     const customEventRulesPromise = db
       .select({
-        customEventRuleId: customEventsRulesSchema.customEventRuleId,
-        eventName: customEventsRulesSchema.eventName,
-        description: customEventsRulesSchema.description,
-        points: customEventsRulesSchema.points,
-        eventType: customEventsRulesSchema.eventType,
-        referenceTypes: customEventsRulesSchema.referenceTypes,
-        timing: customEventsRulesSchema.timing,
+        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        eventName: leagueEventsRulesSchema.eventName,
+        description: leagueEventsRulesSchema.description,
+        points: leagueEventsRulesSchema.points,
+        eventType: leagueEventsRulesSchema.eventType,
+        referenceTypes: leagueEventsRulesSchema.referenceTypes,
+        timing: leagueEventsRulesSchema.timing,
       })
-      .from(customEventsRulesSchema)
-      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, customEventsRulesSchema.leagueId))
+      .from(leagueEventsRulesSchema)
+      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
       .where(eq(leaguesSchema.leagueHash, leagueHash));
 
 
@@ -278,26 +278,26 @@ export const leaguesService = {
 
     const predictionsPromise = db
       .select({
-        customEventRuleId: customEventsRulesSchema.customEventRuleId,
-        eventName: customEventsRulesSchema.eventName,
-        description: customEventsRulesSchema.description,
-        points: customEventsRulesSchema.points,
-        referenceTypes: customEventsRulesSchema.referenceTypes,
+        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        eventName: leagueEventsRulesSchema.eventName,
+        description: leagueEventsRulesSchema.description,
+        points: leagueEventsRulesSchema.points,
+        referenceTypes: leagueEventsRulesSchema.referenceTypes,
         predictionMade: {
-          referenceType: customEventPredictionsSchema.referenceType,
-          referenceId: customEventPredictionsSchema.referenceId,
+          referenceType: leagueEventPredictionsSchema.referenceType,
+          referenceId: leagueEventPredictionsSchema.referenceId,
         }
       })
-      .from(customEventsRulesSchema)
-      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, customEventsRulesSchema.leagueId))
-      .leftJoin(customEventPredictionsSchema, and(
-        eq(customEventPredictionsSchema.customEventRuleId, customEventsRulesSchema.customEventRuleId),
-        eq(customEventPredictionsSchema.memberId, memberId)))
+      .from(leagueEventsRulesSchema)
+      .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
+      .leftJoin(leagueEventPredictionsSchema, and(
+        eq(leagueEventPredictionsSchema.customEventRuleId, leagueEventsRulesSchema.customEventRuleId),
+        eq(leagueEventPredictionsSchema.memberId, memberId)))
       .where(and(
         eq(leaguesSchema.leagueHash, leagueHash),
-        eq(customEventsRulesSchema.eventType, 'Prediction'),
-        arrayOverlaps(customEventsRulesSchema.timing, ['Draft', 'Weekly', 'Weekly (Premerge only)'])))
-      .orderBy(asc(customEventsRulesSchema.timing))
+        eq(leagueEventsRulesSchema.eventType, 'Prediction'),
+        arrayOverlaps(leagueEventsRulesSchema.timing, ['Draft', 'Weekly', 'Weekly (Premerge only)'])))
+      .orderBy(asc(leagueEventsRulesSchema.timing))
       .then((predictions) => predictions.map((prediction) => {
         const draftPrediction: LeaguePredictionDraft = {
           ...prediction,
@@ -574,30 +574,30 @@ export const leaguesService = {
 
     const directEventsPromise = db
       .select({
-        customEventRuleId: customEventsRulesSchema.customEventRuleId,
+        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
         episodeNumber: episodesSchema.episodeNumber,
-        eventId: customEventsSchema.customEventId,
-        eventName: customEventsRulesSchema.eventName,
-        points: customEventsRulesSchema.points,
-        referenceType: customEventsSchema.referenceType,
-        referenceId: customEventsSchema.referenceId,
+        eventId: leagueEventsSchema.customEventId,
+        eventName: leagueEventsRulesSchema.eventName,
+        points: leagueEventsRulesSchema.points,
+        referenceType: leagueEventsSchema.referenceType,
+        referenceId: leagueEventsSchema.referenceId,
         castaway: castawaysSchema.fullName,
         tribe: tribesSchema.tribeName,
-        notes: customEventsSchema.notes,
+        notes: leagueEventsSchema.notes,
       })
-      .from(customEventsSchema)
-      .innerJoin(customEventsRulesSchema, and(
-        eq(customEventsRulesSchema.customEventRuleId, customEventsSchema.customEventRuleId),
-        eq(customEventsRulesSchema.leagueId, league.leagueId),
-        eq(customEventsRulesSchema.eventType, 'Direct')))
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, customEventsSchema.episodeId))
+      .from(leagueEventsSchema)
+      .innerJoin(leagueEventsRulesSchema, and(
+        eq(leagueEventsRulesSchema.customEventRuleId, leagueEventsSchema.customEventRuleId),
+        eq(leagueEventsRulesSchema.leagueId, league.leagueId),
+        eq(leagueEventsRulesSchema.eventType, 'Direct')))
+      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
       // references
       .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, customEventsSchema.referenceId),
-        eq(customEventsSchema.referenceType, 'Castaway')))
+        eq(castawaysSchema.castawayId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Castaway')))
       .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, customEventsSchema.referenceId),
-        eq(customEventsSchema.referenceType, 'Tribe')))
+        eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Tribe')))
       .then((events) => events.reduce((acc, event) => {
         acc[event.episodeNumber] ??= {
           Castaway: [],
@@ -632,55 +632,55 @@ export const leaguesService = {
 
     const predictionsPromise = db
       .select({
-        customEventRuleId: customEventsRulesSchema.customEventRuleId,
-        eventId: customEventsSchema.customEventId,
-        eventName: customEventsRulesSchema.eventName,
-        points: customEventsRulesSchema.points,
+        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        eventId: leagueEventsSchema.customEventId,
+        eventName: leagueEventsRulesSchema.eventName,
+        points: leagueEventsRulesSchema.points,
         episodeNumber: episodesSchema.episodeNumber,
         predictionMaker: leagueMembersSchema.displayName,
-        referenceType: customEventPredictionsSchema.referenceType,
-        referenceId: customEventPredictionsSchema.referenceId,
+        referenceType: leagueEventPredictionsSchema.referenceType,
+        referenceId: leagueEventPredictionsSchema.referenceId,
         predictionCastaway: predictionCastaway.fullName,
         predictionTribe: predictionTribe.tribeName,
-        resultReferenceType: customEventsSchema.referenceType,
-        resultReferenceId: customEventsSchema.referenceId,
+        resultReferenceType: leagueEventsSchema.referenceType,
+        resultReferenceId: leagueEventsSchema.referenceId,
         resultCastaway: castawaysSchema.fullName,
         resultTribe: tribesSchema.tribeName,
-        notes: customEventsSchema.notes,
+        notes: leagueEventsSchema.notes,
       })
-      .from(customEventsSchema)
-      .innerJoin(customEventsRulesSchema, and(
-        eq(customEventsRulesSchema.customEventRuleId, customEventsSchema.customEventRuleId),
-        eq(customEventsRulesSchema.leagueId, league.leagueId),
-        eq(customEventsRulesSchema.eventType, 'Prediction')))
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, customEventsSchema.episodeId))
+      .from(leagueEventsSchema)
+      .innerJoin(leagueEventsRulesSchema, and(
+        eq(leagueEventsRulesSchema.customEventRuleId, leagueEventsSchema.customEventRuleId),
+        eq(leagueEventsRulesSchema.leagueId, league.leagueId),
+        eq(leagueEventsRulesSchema.eventType, 'Prediction')))
+      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
       // prediction
-      .innerJoin(customEventPredictionsSchema, and(
-        eq(customEventPredictionsSchema.customEventRuleId, customEventsSchema.customEventRuleId),
+      .innerJoin(leagueEventPredictionsSchema, and(
+        eq(leagueEventPredictionsSchema.customEventRuleId, leagueEventsSchema.customEventRuleId),
         or(
           // if the prediction episode matches the event for weekly predictions
           and(
-            eq(customEventPredictionsSchema.episodeId, customEventsSchema.episodeId),
-            arrayOverlaps(customEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
+            eq(leagueEventPredictionsSchema.episodeId, leagueEventsSchema.episodeId),
+            arrayOverlaps(leagueEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
           // if the event is not weekly, the episode doesn't matter
           // note manual predictions should not be possible but just in case
-          arrayOverlaps(customEventsRulesSchema.timing, PredictionTimingOptions
+          arrayOverlaps(leagueEventsRulesSchema.timing, PredictionTimingOptions
             .filter(timing => !timing.includes('Weekly'))))))
-      .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, customEventPredictionsSchema.memberId))
+      .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, leagueEventPredictionsSchema.memberId))
       // references
       .leftJoin(predictionCastaway, and(
-        eq(predictionCastaway.castawayId, customEventPredictionsSchema.referenceId),
-        eq(customEventPredictionsSchema.referenceType, 'Castaway')))
+        eq(predictionCastaway.castawayId, leagueEventPredictionsSchema.referenceId),
+        eq(leagueEventPredictionsSchema.referenceType, 'Castaway')))
       .leftJoin(predictionTribe, and(
-        eq(predictionTribe.tribeId, customEventPredictionsSchema.referenceId),
-        eq(customEventPredictionsSchema.referenceType, 'Tribe')))
+        eq(predictionTribe.tribeId, leagueEventPredictionsSchema.referenceId),
+        eq(leagueEventPredictionsSchema.referenceType, 'Tribe')))
       // result
       .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, customEventsSchema.referenceId),
-        eq(customEventsSchema.referenceType, 'Castaway')))
+        eq(castawaysSchema.castawayId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Castaway')))
       .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, customEventsSchema.referenceId),
-        eq(customEventsSchema.referenceType, 'Tribe')))
+        eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Tribe')))
       .then((rows) => rows.reduce((acc, row) => {
         acc[row.episodeNumber] ??= [];
         const newEvent = {
@@ -958,25 +958,25 @@ export const leaguesService = {
 
     const customPredictionsPromise = db
       .select({
-        customEventRuleId: customEventsRulesSchema.customEventRuleId,
-        eventName: customEventsRulesSchema.eventName,
-        description: customEventsRulesSchema.description,
-        points: customEventsRulesSchema.points,
-        referenceTypes: customEventsRulesSchema.referenceTypes,
-        timing: customEventsRulesSchema.timing,
+        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        eventName: leagueEventsRulesSchema.eventName,
+        description: leagueEventsRulesSchema.description,
+        points: leagueEventsRulesSchema.points,
+        referenceTypes: leagueEventsRulesSchema.referenceTypes,
+        timing: leagueEventsRulesSchema.timing,
         predictionMade: {
-          referenceType: customEventPredictionsSchema.referenceType,
-          referenceId: customEventPredictionsSchema.referenceId,
+          referenceType: leagueEventPredictionsSchema.referenceType,
+          referenceId: leagueEventPredictionsSchema.referenceId,
         },
       })
-      .from(customEventsRulesSchema)
-      .leftJoin(customEventPredictionsSchema, and(
-        eq(customEventPredictionsSchema.customEventRuleId, customEventsRulesSchema.customEventRuleId),
-        eq(customEventPredictionsSchema.memberId, memberId),
-        eq(customEventPredictionsSchema.episodeId, nextEpisode.episodeId)))
+      .from(leagueEventsRulesSchema)
+      .leftJoin(leagueEventPredictionsSchema, and(
+        eq(leagueEventPredictionsSchema.customEventRuleId, leagueEventsRulesSchema.customEventRuleId),
+        eq(leagueEventPredictionsSchema.memberId, memberId),
+        eq(leagueEventPredictionsSchema.episodeId, nextEpisode.episodeId)))
       .where(and(
-        eq(customEventsRulesSchema.leagueId, league.leagueId),
-        eq(customEventsRulesSchema.eventType, 'Prediction')))
+        eq(leagueEventsRulesSchema.leagueId, league.leagueId),
+        eq(leagueEventsRulesSchema.eventType, 'Prediction')))
       .then((predictions) => predictions
         .filter(timingFilter)
         .map((prediction) => {
@@ -1039,66 +1039,66 @@ export const leaguesService = {
     const leaguePredictions = db
       .select({
         leagueMember: leagueMembersSchema.displayName,
-        eventName: customEventsRulesSchema.eventName,
-        customEventRuleId: customEventPredictionsSchema.customEventRuleId,
-        points: customEventsRulesSchema.points,
-        timing: customEventsRulesSchema.timing,
+        eventName: leagueEventsRulesSchema.eventName,
+        customEventRuleId: leagueEventPredictionsSchema.customEventRuleId,
+        points: leagueEventsRulesSchema.points,
+        timing: leagueEventsRulesSchema.timing,
         prediction: {
           episodeNumber: episodesPrediction.episodeNumber,
           castaway: castawayPrediction.fullName,
           castawayShort: castawayPrediction.shortName,
           tribe: tribePrediction.tribeName,
-          referenceType: customEventPredictionsSchema.referenceType,
-          referenceId: customEventPredictionsSchema.referenceId,
+          referenceType: leagueEventPredictionsSchema.referenceType,
+          referenceId: leagueEventPredictionsSchema.referenceId,
         },
         result: {
           episodeNumber: episodesSchema.episodeNumber,
           castaway: castawaysSchema.fullName,
           castawayShort: castawaysSchema.shortName,
           tribe: tribesSchema.tribeName,
-          referenceType: customEventsSchema.referenceType,
-          referenceId: customEventsSchema.referenceId,
+          referenceType: leagueEventsSchema.referenceType,
+          referenceId: leagueEventsSchema.referenceId,
         }
       })
-      .from(customEventPredictionsSchema)
-      .innerJoin(customEventsRulesSchema, eq(customEventsRulesSchema.customEventRuleId, customEventPredictionsSchema.customEventRuleId))
+      .from(leagueEventPredictionsSchema)
+      .innerJoin(leagueEventsRulesSchema, eq(leagueEventsRulesSchema.customEventRuleId, leagueEventPredictionsSchema.customEventRuleId))
       .innerJoin(leagueMembersSchema, and(
-        eq(leagueMembersSchema.memberId, customEventPredictionsSchema.memberId),
-        eq(leagueMembersSchema.leagueId, customEventsRulesSchema.leagueId),
+        eq(leagueMembersSchema.memberId, leagueEventPredictionsSchema.memberId),
+        eq(leagueMembersSchema.leagueId, leagueEventsRulesSchema.leagueId),
         eq(leagueMembersSchema.leagueId, league.leagueId)))
-      .innerJoin(episodesPrediction, eq(episodesPrediction.episodeId, customEventPredictionsSchema.episodeId))
+      .innerJoin(episodesPrediction, eq(episodesPrediction.episodeId, leagueEventPredictionsSchema.episodeId))
       .leftJoin(castawayPrediction, and(
-        eq(castawayPrediction.castawayId, customEventPredictionsSchema.referenceId),
-        eq(customEventPredictionsSchema.referenceType, 'Castaway')))
+        eq(castawayPrediction.castawayId, leagueEventPredictionsSchema.referenceId),
+        eq(leagueEventPredictionsSchema.referenceType, 'Castaway')))
       .leftJoin(tribePrediction, and(
-        eq(tribePrediction.tribeId, customEventPredictionsSchema.referenceId),
-        eq(customEventPredictionsSchema.referenceType, 'Tribe')))
-      .leftJoin(customEventsSchema, and(
-        eq(customEventsSchema.customEventRuleId, customEventPredictionsSchema.customEventRuleId),
+        eq(tribePrediction.tribeId, leagueEventPredictionsSchema.referenceId),
+        eq(leagueEventPredictionsSchema.referenceType, 'Tribe')))
+      .leftJoin(leagueEventsSchema, and(
+        eq(leagueEventsSchema.customEventRuleId, leagueEventPredictionsSchema.customEventRuleId),
         or(
           // if the prediction episode matches the event for weekly predictions
           and(
-            eq(customEventPredictionsSchema.episodeId, customEventsSchema.episodeId),
-            arrayOverlaps(customEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
+            eq(leagueEventPredictionsSchema.episodeId, leagueEventsSchema.episodeId),
+            arrayOverlaps(leagueEventsRulesSchema.timing, ['Weekly', 'Weekly (Premerge only)', 'Weekly (Postmerge only)'])),
           // if the event is not weekly, the episode doesn't matter
           // note manual predictions should not be possible but just in case
-          arrayOverlaps(customEventsRulesSchema.timing, PredictionTimingOptions
+          arrayOverlaps(leagueEventsRulesSchema.timing, PredictionTimingOptions
             .filter(timing => !timing.includes('Weekly'))))))
-      .leftJoin(episodesSchema, eq(episodesSchema.episodeId, customEventsSchema.episodeId))
+      .leftJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
       .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, customEventsSchema.referenceId),
-        eq(customEventsSchema.referenceType, 'Castaway')))
+        eq(castawaysSchema.castawayId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Castaway')))
       .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, customEventsSchema.referenceId),
-        eq(customEventsSchema.referenceType, 'Tribe')))
+        eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
+        eq(leagueEventsSchema.referenceType, 'Tribe')))
       .where(and(
-        eq(customEventPredictionsSchema.memberId, otherMemberId ?? memberId),
+        eq(leagueEventPredictionsSchema.memberId, otherMemberId ?? memberId),
         eq(leagueMembersSchema.leagueId, league.leagueId),
         sql`(${episodesPrediction.airDate} < ${new Date().toUTCString()})`))
       .then((predictions: {
         leagueMember: LeagueMemberDisplayName,
-        eventName: CustomEventName,
-        customEventRuleId: CustomEventId,
+        eventName: LeagueEventName,
+        customEventRuleId: LeagueEventId,
         points: number,
         timing: PredictionEventTiming[]
         prediction: {

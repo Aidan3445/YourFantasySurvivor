@@ -24,13 +24,13 @@ export const baseEventsSchema = createTable(
   ]
 );
 
-export const customEventReference = pgEnum('event_league_reference', ReferenceOptions);
+export const leagueEventReference = pgEnum('event_league_reference', ReferenceOptions);
 export const baseEventReferenceSchema = createTable(
   'event_base_reference',
   {
     baseEventReferenceId: serial('event_base_reference_id').notNull().primaryKey(),
     baseEventId: integer('event_id').references(() => baseEventsSchema.baseEventId, { onDelete: 'cascade' }).notNull(),
-    referenceType: customEventReference('reference_type').notNull(),
+    referenceType: leagueEventReference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
   },
   (table) => [
@@ -126,7 +126,7 @@ export const baseEventPredictionsSchema = createTable(
     baseEventName: scoringEventName('event_name').notNull(),
     episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
     memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
-    referenceType: customEventReference('reference_type').notNull(),
+    referenceType: leagueEventReference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
     bet: integer('bet')
   },

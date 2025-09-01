@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { type BaseEventName, type CustomEventName } from '~/types/events';
+import { type BaseEventName, type LeagueEventName } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import { type CastawayName } from '~/types/castaways';
 import { type TribeName } from '~/types/tribes';
@@ -15,7 +15,7 @@ export default function Timeline() {
   const [filterCastaway, setFilterCastaway] = useState<CastawayName[]>([]);
   const [filterTribe, setFilterTribe] = useState<TribeName[]>([]);
   const [filterMember, setFilterMember] = useState<LeagueMemberDisplayName[]>([]);
-  const [filterEvent, setFilterEvent] = useState<(BaseEventName | CustomEventName)[]>([]);
+  const [filterEvent, setFilterEvent] = useState<(BaseEventName | LeagueEventName)[]>([]);
 
   const [selectedEpisode, setSelectedEpisode] = useState<number>();
 

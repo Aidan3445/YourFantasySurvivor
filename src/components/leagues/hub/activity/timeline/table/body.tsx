@@ -3,7 +3,7 @@
 import { TableCell, TableRow } from '~/components/common/table';
 import { useLeague } from '~/hooks/useLeague';
 import {
-  BaseEventFullName, type CustomEventId, type CustomEventName, type ReferenceType, type ScoringBaseEventName
+  BaseEventFullName, type LeagueEventId, type LeagueEventName, type ReferenceType, type ScoringBaseEventName
 } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import { type CastawayName } from '~/types/castaways';
@@ -129,9 +129,9 @@ export default function EpisodeEventsTableBody({
       }
 
       return acc;
-    }, {} as Record<CustomEventId | ScoringBaseEventName, {
-      eventName: CustomEventName;
-      eventId?: CustomEventId;
+    }, {} as Record<LeagueEventId | ScoringBaseEventName, {
+      eventName: LeagueEventName;
+      eventId?: LeagueEventId;
       points: number;
       notes: string[] | null;
       references: {

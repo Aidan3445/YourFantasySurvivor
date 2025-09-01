@@ -7,8 +7,8 @@ import {
   baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema
 } from '~/server/db/schema/baseEvents';
 import {
-  type ReferenceType, type BaseEventRule, type CustomEventRule, type CustomEventInsert,
-  type CustomEventId, type BasePredictionRules, type ScoringBaseEventName, type ShauhinModeSettings
+  type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert,
+  type LeagueEventId, type BasePredictionRules, type ScoringBaseEventName, type ShauhinModeSettings
 } from '~/types/events';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { and, asc, desc, eq, inArray, notInArray, } from 'drizzle-orm';
@@ -20,7 +20,7 @@ import {
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import {
-  customEventPredictionsSchema, customEventsRulesSchema, customEventsSchema
+  leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema
 } from '~/server/db/schema/customEvents';
 import { type CastawayId } from '~/types/castaways';
 import { castawaysSchema } from '~/server/db/schema/castaways';
@@ -431,7 +431,7 @@ export async function updateAdmins(leagueHash: LeagueHash, admins: number[]) {
   * @throws an error if the user is not authorized
   * @throws an error if the rule cannot be created
   */
-export async function createCustomEventRule(leagueHash: LeagueHash, rule: CustomEventRule) {
+export async function createCustomEventRule(leagueHash: LeagueHash, rule: LeagueEventRule) {
   const { role, league } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
   if (league?.leagueStatus === 'Inactive')
@@ -450,7 +450,7 @@ export async function createCustomEventRule(leagueHash: LeagueHash, rule: Custom
     // Error can be ignored, the where clause is not understood by the type system
     // eslint-disable-next-line drizzle/enforce-update-with-where
     await trx
-      .insert(customEventsRulesSchema)
+      .insert(leagueEventsRulesSchema)
       .values({ ...rule, leagueId });
   });
 }
@@ -462,7 +462,7 @@ export async function createCustomEventRule(leagueHash: LeagueHash, rule: Custom
   * @throws an error if the user is not authorized
   * @throws an error if the rule cannot be updated
   */
-export async function updateCustomEventRule(leagueHash: LeagueHash, rule: CustomEventRule) {
+export async function updateCustomEventRule(leagueHash: LeagueHash, rule: LeagueEventRule) {
   const { role, league } = await leagueMemberAuth(leagueHash);
   if (!role || role !== 'Owner') throw new Error('User not authorized');
   if (league?.leagueStatus === 'Inactive')
@@ -471,14 +471,14 @@ export async function updateCustomEventRule(leagueHash: LeagueHash, rule: Custom
   // Error can be ignored, the where clause is not understood by the type system
   // eslint-disable-next-line drizzle/enforce-update-with-where
   const update = await db
-    .update(customEventsRulesSchema)
+    .update(leagueEventsRulesSchema)
     .set(rule)
     .from(leaguesSchema)
     .where(and(
-      eq(customEventsRulesSchema.leagueId, leaguesSchema.leagueId),
+      eq(leagueEventsRulesSchema.leagueId, leaguesSchema.leagueId),
       eq(leaguesSchema.leagueHash, leagueHash),
-      eq(customEventsRulesSchema.customEventRuleId, rule.customEventRuleId!)))
-    .returning({ customEventRuleId: customEventsRulesSchema.customEventRuleId })
+      eq(leagueEventsRulesSchema.customEventRuleId, rule.customEventRuleId!)))
+    .returning({ customEventRuleId: leagueEventsRulesSchema.customEventRuleId })
     .then(res => res[0]);
   if (!update) throw new Error('Rule not found');
 }
@@ -497,12 +497,12 @@ export async function deleteCustomEventRule(leagueHash: LeagueHash, eventName: s
     throw new Error('League rules cannot be deleted while the league is inactive');
 
   const deleted = await db
-    .delete(customEventsRulesSchema)
+    .delete(leagueEventsRulesSchema)
     .where(and(
       // DB keeps unique constraints on leagueId and eventName
-      eq(customEventsRulesSchema.leagueId, league.leagueId),
-      eq(customEventsRulesSchema.eventName, eventName)))
-    .returning({ customEventRuleId: customEventsRulesSchema.customEventRuleId })
+      eq(leagueEventsRulesSchema.leagueId, league.leagueId),
+      eq(leagueEventsRulesSchema.eventName, eventName)))
+    .returning({ customEventRuleId: leagueEventsRulesSchema.customEventRuleId })
     .then(res => res[0]);
   if (!deleted) throw new Error('Rule not found');
 }
@@ -618,7 +618,7 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
   */
 export async function makePrediction(
   leagueHash: LeagueHash,
-  rule: CustomEventRule,
+  rule: LeagueEventRule,
   referenceType: ReferenceType,
   // eslint-disable-next-line @typescript-eslint/no-duplicate-type-constituents
   referenceId: CastawayId | TribeId | LeagueMemberId,
@@ -671,7 +671,7 @@ export async function makePrediction(
   // RuleID defined for custom rules
   if (rule.customEventRuleId) {
     await db
-      .insert(customEventPredictionsSchema)
+      .insert(leagueEventPredictionsSchema)
       .values({
         customEventRuleId: rule.customEventRuleId,
         episodeId,
@@ -681,9 +681,9 @@ export async function makePrediction(
       })
       .onConflictDoUpdate({
         target: [
-          customEventPredictionsSchema.customEventRuleId,
-          customEventPredictionsSchema.episodeId,
-          customEventPredictionsSchema.memberId,
+          leagueEventPredictionsSchema.customEventRuleId,
+          leagueEventPredictionsSchema.episodeId,
+          leagueEventPredictionsSchema.memberId,
         ],
         set: { referenceType, referenceId },
       });
@@ -716,26 +716,26 @@ export async function makePrediction(
   * @throws if the user is not a system admin
   * @throws if the event cannot be created
   */
-export async function createCustomEvent(leagueHash: LeagueHash, customEvent: CustomEventInsert) {
+export async function createCustomEvent(leagueHash: LeagueHash, customEvent: LeagueEventInsert) {
   const { memberId, role } = await leagueMemberAuth(leagueHash);
   if (!memberId || role === 'Member') throw new Error('User not authorized');
 
   // ensure the rule is in the league
   const rule = await db
-    .select({ customEventRuleId: customEventsRulesSchema.customEventRuleId })
-    .from(customEventsRulesSchema)
-    .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, customEventsRulesSchema.leagueId))
+    .select({ customEventRuleId: leagueEventsRulesSchema.customEventRuleId })
+    .from(leagueEventsRulesSchema)
+    .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
     .where(and(
       eq(leaguesSchema.leagueHash, leagueHash),
-      eq(customEventsRulesSchema.customEventRuleId, customEvent.customEventRuleId)))
+      eq(leagueEventsRulesSchema.customEventRuleId, customEvent.customEventRuleId)))
     .then((res) => res[0]);
   if (!rule) throw new Error('Rule not found');
 
   // insert the league event
   const customEventId = await db
-    .insert(customEventsSchema)
+    .insert(leagueEventsSchema)
     .values(customEvent)
-    .returning({ customEventId: customEventsSchema.customEventId })
+    .returning({ customEventId: leagueEventsSchema.customEventId })
     .then((result) => result[0]?.customEventId);
   if (!customEventId) throw new Error('Failed to create league event');
 }
@@ -749,8 +749,8 @@ export async function createCustomEvent(leagueHash: LeagueHash, customEvent: Cus
   */
 export async function updateCustomEvent(
   leagueHash: LeagueHash,
-  customEventId: CustomEventId,
-  customEvent: CustomEventInsert
+  customEventId: LeagueEventId,
+  customEvent: LeagueEventInsert
 ) {
   const { memberId, role, league } = await leagueMemberAuth(leagueHash);
   if (!memberId || role === 'Member') throw new Error('User not authorized');
@@ -759,19 +759,19 @@ export async function updateCustomEvent(
 
   // ensure the rule is in the league
   const rule = await db
-    .select({ customEventRuleId: customEventsRulesSchema.customEventRuleId })
-    .from(customEventsRulesSchema)
+    .select({ customEventRuleId: leagueEventsRulesSchema.customEventRuleId })
+    .from(leagueEventsRulesSchema)
     .where(and(
-      eq(customEventsRulesSchema.leagueId, league!.leagueId),
-      eq(customEventsRulesSchema.customEventRuleId, customEvent.customEventRuleId)))
+      eq(leagueEventsRulesSchema.leagueId, league!.leagueId),
+      eq(leagueEventsRulesSchema.customEventRuleId, customEvent.customEventRuleId)))
     .then((res) => res[0]);
   if (!rule) throw new Error('Rule not found');
 
   // update the base event
   await db
-    .update(customEventsSchema)
+    .update(leagueEventsSchema)
     .set(customEvent)
-    .where(eq(customEventsSchema.customEventId, customEventId));
+    .where(eq(leagueEventsSchema.customEventId, customEventId));
 }
 
 /**
@@ -790,8 +790,8 @@ export async function deleteCustomEvent(leagueHash: LeagueHash, customEventId: n
   // unlike update and insert, cascade delete will take care of deleting
   // the references as well, nice!
   await db
-    .delete(customEventsSchema)
-    .where(eq(customEventsSchema.customEventId, customEventId));
+    .delete(leagueEventsSchema)
+    .where(eq(leagueEventsSchema.customEventId, customEventId));
 }
 
 /**

@@ -15,21 +15,21 @@ import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
 import { deleteCustomEvent, updateCustomEvent } from '~/services/leagues/settings/leagueActions';
 import { useLeague } from '~/hooks/useLeague';
-import { type CustomEvent, type CustomEventInsert, CustomEventInsertZod } from '~/types/events';
+import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 
 interface EditCustomEventProps {
   episodeNumber: number;
-  customEvent: CustomEvent;
+  customEvent: LeagueEvent;
 }
 
 export default function EditCustomEvent({ episodeNumber, customEvent }: EditCustomEventProps) {
   const { league, leagueData, refresh } = useLeague();
-  const reactForm = useForm<CustomEventInsert>({
+  const reactForm = useForm<LeagueEventInsert>({
     defaultValues: {
       episodeId: leagueData.episodes.toReversed()[episodeNumber - 1]?.episodeId,
       ...customEvent,
     },
-    resolver: zodResolver(CustomEventInsertZod)
+    resolver: zodResolver(LeagueEventInsertZod)
   });
   const selectedReferenceType = reactForm.watch('referenceType');
   const { castawayOptions, tribeOptions } = useEventOptions(episodeNumber);

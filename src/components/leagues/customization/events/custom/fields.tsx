@@ -1,7 +1,7 @@
 'use client';
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
-import { CustomEventTypeOptions, PredictionTimingOptions, ReferenceOptions } from '~/types/events';
+import { LeagueEventTypeOptions, PredictionTimingOptions, ReferenceOptions } from '~/types/events';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
@@ -114,7 +114,7 @@ export default function CustomEventFields({ predictionDefault, children }: Custo
                     <SelectValue placeholder='Select event type' />
                   </SelectTrigger>
                   <SelectContent>
-                    {CustomEventTypeOptions.map((type) => (
+                    {LeagueEventTypeOptions.map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
                       </SelectItem>

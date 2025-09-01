@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
 import { useLeague } from '~/hooks/useLeague';
-import { type CustomEventRule, CustomEventRuleZod } from '~/types/events';
+import { type LeagueEventRule, LeagueEventRuleZod } from '~/types/events';
 
 import { Button } from '~/components/common/button';
 import { deleteCustomEventRule, updateCustomEventRule } from '~/services/leagues/settings/leagueActions';
@@ -18,7 +18,7 @@ import { cn } from '~/lib/utils';
 import CustomEventFields from '~/components/leagues/customization/events/custom/fields';
 
 interface CustomEventCardProps {
-  rule: CustomEventRule;
+  rule: LeagueEventRule;
   locked?: boolean;
 }
 
@@ -34,9 +34,9 @@ export default function CustomEventCard({ rule, locked }: CustomEventCardProps) 
   } = useLeague();
   const [isEditing, setIsEditing] = useState(false);
 
-  const reactForm = useForm<CustomEventRule>({
+  const reactForm = useForm<LeagueEventRule>({
     defaultValues: rule,
-    resolver: zodResolver(CustomEventRuleZod),
+    resolver: zodResolver(LeagueEventRuleZod),
   });
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
