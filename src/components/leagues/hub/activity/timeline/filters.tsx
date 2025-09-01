@@ -51,7 +51,7 @@ export default function TimelineFilters({
       members: {
         list: members
       },
-      customEventRules
+      leagueEventRules
     }
   } = useLeague();
   const isMobile = useIsMobile();
@@ -162,7 +162,7 @@ export default function TimelineFilters({
                     label: eventFullName
                   })),
                 { label: 'Custom Events', value: null },
-                ...Object.values(customEventRules)
+                ...Object.values(leagueEventRules)
                   .map((event) => ({
                     value: event.eventName,
                     label: event.eventName

@@ -11,7 +11,7 @@ import { type LeagueSurvivalCap } from '~/types/leagues';
 * @param baseEvents The base events for the season
 * @param tribesTimeline The tribe updates for the season
 * @param eliminations The eliminations for the season
-* @param customEvents The league events
+* @param leagueEvents The league events
 * @param baseEventRules The league's base event scoring
 * @param selectionTimeline The selection timeline for the league
 * @param survivalCap The survival cap for the league
@@ -25,7 +25,7 @@ export function compileScores(
 
   basePredictions: Awaited<ReturnType<typeof LEAGUE_QUERIES.getBasePredictions>> = {},
   basePredictionRules: BasePredictionRules = defaultPredictionRules,
-  customEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getCustomEvents>> = { directEvents: {}, predictionEvents: {} },
+  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>> = { directEvents: {}, predictionEvents: {} },
   selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>> = { castawayMembers: {}, memberCastaways: {} },
   survivalCap: LeagueSurvivalCap = 0,
   preserveStreak = false
@@ -57,13 +57,13 @@ export function compileScores(
         scores.Tribe[tribe][episodeNum] += points;
         // check predictions
         basePredictions[episodeNum]?.filter((p) =>
-          p.referenceType === 'Tribe' && p.eventName === event.eventName)
+          p.reference.referenceType === 'Tribe' && p.eventName === event.eventName)
           .forEach((prediction) => {
             // initialize member score if it doesn't exist
             scores.Member[prediction.predictionMaker] ??= [];
             scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
 
-            if (prediction.referenceName === tribe) {
+            if (prediction.reference.referenceType === tribe) {
               // add points to member score
               scores.Member[prediction.predictionMaker]![episodeNum]!
                 += basePredictionRules[baseEvent].points
@@ -94,13 +94,13 @@ export function compileScores(
         scores.Member[leagueMember][episodeNum] += points;
         // check predictions
         basePredictions[episodeNum]?.filter((p) =>
-          p.referenceType === 'Castaway' && p.eventName === event.eventName)
+          p.reference.referenceType === 'Castaway' && p.eventName === event.eventName)
           .forEach((prediction) => {
             // initialize member score if it doesn't exist
             scores.Member[prediction.predictionMaker] ??= [];
             scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
 
-            if (prediction.referenceName === castaway) {
+            if (prediction.reference.referenceType === castaway) {
               // add points to member score
               scores.Member[prediction.predictionMaker]![episodeNum]! +=
                 basePredictionRules[event.eventName as ScoringBaseEventName].points
@@ -116,7 +116,7 @@ export function compileScores(
 
   /* score league events */
   // direct events
-  Object.entries(customEvents.directEvents).forEach(([episodeNumber, refEvents]) => {
+  Object.entries(leagueEvents.directEvents).forEach(([episodeNumber, refEvents]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(refEvents).forEach((events) => {
       events.forEach((event) => {
@@ -157,7 +157,7 @@ export function compileScores(
   });
 
   // prediction events
-  Object.entries(customEvents.predictionEvents).forEach(([episodeNumber, events]) => {
+  Object.entries(leagueEvents.predictionEvents).forEach(([episodeNumber, events]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(events).forEach((event) => {
       if (!event.hit) return;

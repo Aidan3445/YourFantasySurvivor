@@ -7,21 +7,21 @@ import { useLeague } from '~/hooks/useLeague';
 import { type LeagueEventRule, LeagueEventRuleZod, defaultLeagueEventRule } from '~/types/events';
 
 import { Button } from '~/components/common/button';
-import { createCustomEventRule } from '~/services/leagues/settings/leagueActions';
+import { createLeagueEventRule } from '~/services/leagues/settings/leagueActions';
 import { Lock, LockOpen } from 'lucide-react';
 import {
   AlertDialog, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
 import { useState } from 'react';
-import CustomEventFields from '~/components/leagues/customization/events/custom/fields';
-import CustomEventCard from '~/components/leagues/customization/events/custom/card';
+import LeagueEventFields from '~/components/leagues/customization/events/custom/fields';
+import LeagueEventCard from '~/components/leagues/customization/events/custom/card';
 
-export default function CustomEvents() {
+export default function LeagueEvents() {
   const {
     league: {
       leagueHash,
-      customEventRules,
+      leagueEventRules,
       members: {
         loggedIn
       }
@@ -43,7 +43,7 @@ export default function CustomEvents() {
     };
 
     try {
-      await createCustomEventRule(leagueHash, newRule);
+      await createLeagueEventRule(leagueHash, newRule);
       await refresh();
       alert(`Custom event ${newRule.eventName} created.`);
       reactForm.reset();
@@ -105,7 +105,7 @@ export default function CustomEvents() {
                     Create a custom event to score in your league.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <CustomEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
+                <LeagueEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
                 <AlertDialogFooter>
                   <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
                   <Button type='submit' onClick={() => handleSubmit()}>Create Event</Button>
@@ -115,14 +115,14 @@ export default function CustomEvents() {
           </Form>
         </AlertDialog>}
       {
-        customEventRules.length === 0 &&
+        leagueEventRules.length === 0 &&
         <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
           No custom events have been created yet.
         </h3>
       }
       <article className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-        {customEventRules.map((rule, index) => (
-          <CustomEventCard key={index} rule={rule} locked={disabled || locked} />
+        {leagueEventRules.map((rule, index) => (
+          <LeagueEventCard key={index} rule={rule} locked={disabled || locked} />
         ))}
       </article>
     </article >

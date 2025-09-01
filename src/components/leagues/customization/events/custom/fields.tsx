@@ -9,12 +9,12 @@ import { MultiSelect } from '~/components/common/multiSelect';
 import { type ReactNode, useState } from 'react';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
 
-interface CustomEventFieldsProps {
+interface LeagueEventFieldsProps {
   predictionDefault?: boolean;
   children?: ReactNode;
 }
 
-export default function CustomEventFields({ predictionDefault, children }: CustomEventFieldsProps) {
+export default function LeagueEventFields({ predictionDefault, children }: LeagueEventFieldsProps) {
   const [isPrediction, setIsPrediction] = useState(predictionDefault ?? false);
 
   const onTypeChange = (type: string) => {

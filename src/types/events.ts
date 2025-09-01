@@ -249,7 +249,7 @@ export type LeagueEventType = typeof LeagueEventTypeOptions[number];
 export const EventTypeZod = z.enum(LeagueEventTypeOptions);
 
 export const LeagueEventRuleZod = z.object({
-  customEventRuleId: z.number().optional(),
+  leagueEventRuleId: z.number().optional(),
   eventName: EventNameZod,
   description: EventDescZod,
   points: EventPointsZod,
@@ -289,7 +289,7 @@ export type LeagueEventId = number;
 export type LeagueEventName = string;
 
 export type LeagueDirectEvent = {
-  customEventRuleId: LeagueEventId,
+  leagueEventRuleId: LeagueEventId,
   eventId: LeagueEventId,
   eventName: LeagueEventName,
   points: number,
@@ -302,7 +302,7 @@ export type LeagueDirectEvent = {
 
 export type CustomPredictionEvent = EventPredictionRoot & {
   eventName: LeagueEventName,
-  customEventRuleId: number,
+  leagueEventRuleId: number,
   notes: string[] | null
 };
 
@@ -322,7 +322,7 @@ export type LeaguePredictionDraft = BasePredictionDraft & LeagueEventRule;
 export type Prediction = {
   leagueMember: LeagueMemberDisplayName,
   eventName: LeagueEventName,
-  customEventRuleId: LeagueEventId | null,
+  leagueEventRuleId: LeagueEventId | null,
   points: number,
   timing: PredictionEventTiming[]
   prediction: {
@@ -406,7 +406,7 @@ export const BaseEventInsertZod = z.object({
 export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
 
 export const LeagueEventInsertZod = z.object({
-  customEventRuleId: z.coerce.number(),
+  leagueEventRuleId: z.coerce.number(),
   episodeId: z.coerce.number(),
   referenceType: EventRefZod,
   referenceId: z.coerce.number(),

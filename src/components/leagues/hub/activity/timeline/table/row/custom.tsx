@@ -9,13 +9,13 @@ import type { EpisodeNumber } from '~/types/episodes';
 import { BaseEventFullName, type BaseEventName, type LeagueEventName, type ReferenceType } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import ColorRow from '~/components/shared/colorRow';
-import EditCustomEvent from '~/components/leagues/actions/events/custom/edit';
+import EditLeagueEvent from '~/components/leagues/actions/events/custom/edit';
 import { type CastawayName } from '~/types/castaways';
 import { type TribeName } from '~/types/tribes';
 import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
 
-interface CustomEventRowProps {
+interface LeagueEventRowProps {
   className?: string;
   eventName: LeagueEventName;
   eventId?: number;
@@ -46,7 +46,7 @@ interface CustomEventRowProps {
   edit?: boolean;
 }
 
-export default function CustomEventRow({
+export default function LeagueEventRow({
   eventName,
   eventId,
   points,
@@ -58,7 +58,7 @@ export default function CustomEventRow({
   episodeNumber,
   edit,
   className
-}: CustomEventRowProps) {
+}: LeagueEventRowProps) {
   const { leagueData, league } = useLeague();
 
   console.log({
@@ -73,7 +73,7 @@ export default function CustomEventRow({
   return (
     <TableRow className={className}>
       {edit && (eventId ? <TableCell className='w-0'>
-        <EditCustomEvent episodeNumber={episodeNumber} customEvent={{
+        <EditLeagueEvent episodeNumber={episodeNumber} leagueEvent={{
           eventId,
           eventName,
           points,

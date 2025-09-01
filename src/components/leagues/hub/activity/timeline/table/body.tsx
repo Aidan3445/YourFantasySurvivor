@@ -10,7 +10,7 @@ import { type CastawayName } from '~/types/castaways';
 import { type TribeName } from '~/types/tribes';
 import { type EpisodeEventsProps } from '~/components/leagues/hub/activity/timeline/table/view';
 import BaseEventRow from '~/components/leagues/hub/activity/timeline/table/row/base';
-import CustomEventRow from '~/components/leagues/hub/activity/timeline/table/row/custom';
+import LeagueEventRow from '~/components/leagues/hub/activity/timeline/table/row/custom';
 
 export default function EpisodeEventsTableBody({
   labelRow,
@@ -25,7 +25,7 @@ export default function EpisodeEventsTableBody({
     leagueData: {
       baseEvents,
       basePredictions,
-      customEvents,
+      leagueEvents,
       baseEventRules,
       selectionTimeline,
       castaways,
@@ -53,7 +53,7 @@ export default function EpisodeEventsTableBody({
   const combinedPredictions = Object.values(
     [
       ...basePredictions[episodeNumber] ?? [],
-      ...customEvents.predictionEvents[episodeNumber] ?? []
+      ...leagueEvents.predictionEvents[episodeNumber] ?? []
     ].reduce((acc, event) => {
       if (event.hit === null || event.eventId === null) return acc; // Skip events without results
 
@@ -88,8 +88,8 @@ export default function EpisodeEventsTableBody({
         referenceName: CastawayName | TribeName;
       }[] = [];
 
-      const isCustomEvent = 'customEventRuleId' in event;
-      if (isCustomEvent) {
+      const isLeagueEvent = 'leagueEventRuleId' in event;
+      if (isLeagueEvent) {
         references.push(event.reference);
       } else {
         const referenceType = baseEvents[episodeNumber]?.[event.eventId]?.referenceType ?? 'Castaway';
@@ -165,7 +165,7 @@ export default function EpisodeEventsTableBody({
   console.log({ HEY: combinedPredictions });
 
   const filteredDirectEvents = Object.values(
-    customEvents.directEvents[episodeNumber] ?? {})
+    leagueEvents.directEvents[episodeNumber] ?? {})
     .flat()
     .filter((event) => {
       if (filters.member.length > 0 &&
@@ -227,7 +227,7 @@ export default function EpisodeEventsTableBody({
           edit={false} />
       )}
       {mockPredictions?.map((mockPrediction, index) =>
-        <CustomEventRow
+        <LeagueEventRow
           key={index}
           className='bg-yellow-500'
           eventId={-1}
@@ -240,7 +240,7 @@ export default function EpisodeEventsTableBody({
           edit={false} />
       )}
       {mockDirects?.map((mockDirect, index) =>
-        <CustomEventRow
+        <LeagueEventRow
           key={index}
           className='bg-yellow-500'
           eventId={-1}
@@ -296,7 +296,7 @@ export default function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {filteredDirectEvents.map((event, index) => (
-        <CustomEventRow
+        <LeagueEventRow
           key={index}
           eventId={event.eventId}
           eventName={event.eventName}
@@ -317,7 +317,7 @@ export default function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {combinedPredictions?.map((event, index) => (
-        <CustomEventRow
+        <LeagueEventRow
           key={index}
           eventId={event.eventId}
           eventName={event.eventName}

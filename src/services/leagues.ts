@@ -7,7 +7,7 @@ import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { auth, leagueMemberAuth } from '~/lib/auth';
 import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema } from '~/server/db/schema/baseEvents';
-import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/customEvents';
+import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
 import { episodesSchema } from '~/server/db/schema/episodes';
 import { castawaysSchema } from '~/server/db/schema/castaways';
 import type { LeagueStatus, LeagueHash, LeagueName } from '~/types/leagues';
@@ -99,9 +99,9 @@ export const leaguesService = {
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
       .where(eq(leaguesSchema.leagueHash, leagueHash));
 
-    const customEventRulesPromise = db
+    const leagueEventRulesPromise = db
       .select({
-        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventName: leagueEventsRulesSchema.eventName,
         description: leagueEventsRulesSchema.description,
         points: leagueEventsRulesSchema.points,
@@ -114,8 +114,8 @@ export const leaguesService = {
       .where(eq(leaguesSchema.leagueHash, leagueHash));
 
 
-    const [league, membersList, customEventRules] = await Promise.all([
-      leaguePromise, membersPromise, customEventRulesPromise
+    const [league, membersList, leagueEventRules] = await Promise.all([
+      leaguePromise, membersPromise, leagueEventRulesPromise
     ]);
 
     if (!league) {
@@ -135,7 +135,7 @@ export const leaguesService = {
         draftDate: league.settings.draftDate ? new Date(`${league.settings.draftDate} Z`) : null,
       },
       members,
-      customEventRules,
+      leagueEventRules,
     };
   },
 
@@ -278,7 +278,7 @@ export const leaguesService = {
 
     const predictionsPromise = db
       .select({
-        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventName: leagueEventsRulesSchema.eventName,
         description: leagueEventsRulesSchema.description,
         points: leagueEventsRulesSchema.points,
@@ -291,7 +291,7 @@ export const leaguesService = {
       .from(leagueEventsRulesSchema)
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueEventsRulesSchema.leagueId))
       .leftJoin(leagueEventPredictionsSchema, and(
-        eq(leagueEventPredictionsSchema.customEventRuleId, leagueEventsRulesSchema.customEventRuleId),
+        eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsRulesSchema.leagueEventRuleId),
         eq(leagueEventPredictionsSchema.memberId, memberId)))
       .where(and(
         eq(leaguesSchema.leagueHash, leagueHash),
@@ -562,7 +562,7 @@ export const leaguesService = {
    * split into direct and prediction events
    * @throws an error if the user is not a member of the league
    */
-  getCustomEvents: async function(leagueHash: LeagueHash) {
+  getLeagueEvents: async function(leagueHash: LeagueHash) {
     const { memberId, league } = await leagueMemberAuth(leagueHash);
     // If the user is not a member of the league, throw an error
     if (!memberId || !league) {
@@ -574,9 +574,9 @@ export const leaguesService = {
 
     const directEventsPromise = db
       .select({
-        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         episodeNumber: episodesSchema.episodeNumber,
-        eventId: leagueEventsSchema.customEventId,
+        eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
         points: leagueEventsRulesSchema.points,
         referenceType: leagueEventsSchema.referenceType,
@@ -587,7 +587,7 @@ export const leaguesService = {
       })
       .from(leagueEventsSchema)
       .innerJoin(leagueEventsRulesSchema, and(
-        eq(leagueEventsRulesSchema.customEventRuleId, leagueEventsSchema.customEventRuleId),
+        eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
         eq(leagueEventsRulesSchema.leagueId, league.leagueId),
         eq(leagueEventsRulesSchema.eventType, 'Direct')))
       .innerJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
@@ -605,7 +605,7 @@ export const leaguesService = {
         };
 
         const newEvent = {
-          customEventRuleId: event.customEventRuleId,
+          leagueEventRuleId: event.leagueEventRuleId,
           eventId: event.eventId,
           eventName: event.eventName,
           points: event.points,
@@ -632,8 +632,8 @@ export const leaguesService = {
 
     const predictionsPromise = db
       .select({
-        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
-        eventId: leagueEventsSchema.customEventId,
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
+        eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
         points: leagueEventsRulesSchema.points,
         episodeNumber: episodesSchema.episodeNumber,
@@ -650,13 +650,13 @@ export const leaguesService = {
       })
       .from(leagueEventsSchema)
       .innerJoin(leagueEventsRulesSchema, and(
-        eq(leagueEventsRulesSchema.customEventRuleId, leagueEventsSchema.customEventRuleId),
+        eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
         eq(leagueEventsRulesSchema.leagueId, league.leagueId),
         eq(leagueEventsRulesSchema.eventType, 'Prediction')))
       .innerJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
       // prediction
       .innerJoin(leagueEventPredictionsSchema, and(
-        eq(leagueEventPredictionsSchema.customEventRuleId, leagueEventsSchema.customEventRuleId),
+        eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
         or(
           // if the prediction episode matches the event for weekly predictions
           and(
@@ -684,7 +684,7 @@ export const leaguesService = {
       .then((rows) => rows.reduce((acc, row) => {
         acc[row.episodeNumber] ??= [];
         const newEvent = {
-          customEventRuleId: row.customEventRuleId,
+          leagueEventRuleId: row.leagueEventRuleId,
           eventId: row.eventId,
           eventName: row.eventName,
           points: row.points,
@@ -832,7 +832,7 @@ export const leaguesService = {
     const [
       baseEvents, tribesTimeline, elims, castaways, tribes,
       { leagueSettings, baseEventRules, basePredictionRules },
-      basePredictions, customEvents,
+      basePredictions, leagueEvents,
       selectionTimeline, episodes, additions
     ] = await Promise.all([
       SEASON_QUERIES.getBaseEvents(league.leagueSeason),
@@ -843,7 +843,7 @@ export const leaguesService = {
 
       this.getLeagueConfig(leagueHash),
       this.getBasePredictions(leagueHash),
-      this.getCustomEvents(leagueHash),
+      this.getLeagueEvents(leagueHash),
       this.getSelectionTimeline(leagueHash),
 
       this.getEpisodes(leagueHash, 100), // move to seasons
@@ -858,7 +858,7 @@ export const leaguesService = {
 
       basePredictions,
       basePredictionRules ?? defaultPredictionRules,
-      customEvents,
+      leagueEvents,
       selectionTimeline,
       leagueSettings.survivalCap,
       leagueSettings.preserveStreak);
@@ -867,7 +867,7 @@ export const leaguesService = {
       episodes,
       castaways: [...castaways, ...additions],
       tribes,
-      customEvents,
+      leagueEvents,
       baseEvents,
       baseEventRules: baseEventRules as BaseEventRule,
       basePredictions,
@@ -958,7 +958,7 @@ export const leaguesService = {
 
     const customPredictionsPromise = db
       .select({
-        customEventRuleId: leagueEventsRulesSchema.customEventRuleId,
+        leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
         eventName: leagueEventsRulesSchema.eventName,
         description: leagueEventsRulesSchema.description,
         points: leagueEventsRulesSchema.points,
@@ -971,7 +971,7 @@ export const leaguesService = {
       })
       .from(leagueEventsRulesSchema)
       .leftJoin(leagueEventPredictionsSchema, and(
-        eq(leagueEventPredictionsSchema.customEventRuleId, leagueEventsRulesSchema.customEventRuleId),
+        eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsRulesSchema.leagueEventRuleId),
         eq(leagueEventPredictionsSchema.memberId, memberId),
         eq(leagueEventPredictionsSchema.episodeId, nextEpisode.episodeId)))
       .where(and(
@@ -1040,7 +1040,7 @@ export const leaguesService = {
       .select({
         leagueMember: leagueMembersSchema.displayName,
         eventName: leagueEventsRulesSchema.eventName,
-        customEventRuleId: leagueEventPredictionsSchema.customEventRuleId,
+        leagueEventRuleId: leagueEventPredictionsSchema.leagueEventRuleId,
         points: leagueEventsRulesSchema.points,
         timing: leagueEventsRulesSchema.timing,
         prediction: {
@@ -1061,7 +1061,7 @@ export const leaguesService = {
         }
       })
       .from(leagueEventPredictionsSchema)
-      .innerJoin(leagueEventsRulesSchema, eq(leagueEventsRulesSchema.customEventRuleId, leagueEventPredictionsSchema.customEventRuleId))
+      .innerJoin(leagueEventsRulesSchema, eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEventPredictionsSchema.leagueEventRuleId))
       .innerJoin(leagueMembersSchema, and(
         eq(leagueMembersSchema.memberId, leagueEventPredictionsSchema.memberId),
         eq(leagueMembersSchema.leagueId, leagueEventsRulesSchema.leagueId),
@@ -1074,7 +1074,7 @@ export const leaguesService = {
         eq(tribePrediction.tribeId, leagueEventPredictionsSchema.referenceId),
         eq(leagueEventPredictionsSchema.referenceType, 'Tribe')))
       .leftJoin(leagueEventsSchema, and(
-        eq(leagueEventsSchema.customEventRuleId, leagueEventPredictionsSchema.customEventRuleId),
+        eq(leagueEventsSchema.leagueEventRuleId, leagueEventPredictionsSchema.leagueEventRuleId),
         or(
           // if the prediction episode matches the event for weekly predictions
           and(
@@ -1098,7 +1098,7 @@ export const leaguesService = {
       .then((predictions: {
         leagueMember: LeagueMemberDisplayName,
         eventName: LeagueEventName,
-        customEventRuleId: LeagueEventId,
+        leagueEventRuleId: LeagueEventId,
         points: number,
         timing: PredictionEventTiming[]
         prediction: {
@@ -1122,12 +1122,12 @@ export const leaguesService = {
         acc[episodeNumber] ??= [];
 
         let predictionIndex = acc[episodeNumber].findIndex((p) =>
-          p.customEventRuleId === prediction.customEventRuleId);
+          p.leagueEventRuleId === prediction.leagueEventRuleId);
         if (predictionIndex === -1) {
           acc[episodeNumber].push({
             leagueMember: prediction.leagueMember,
             eventName: prediction.eventName,
-            customEventRuleId: prediction.customEventRuleId,
+            leagueEventRuleId: prediction.leagueEventRuleId,
             points: prediction.points,
             timing: prediction.timing,
             prediction: { ...prediction.prediction, bet: null },
@@ -1210,7 +1210,7 @@ export const leaguesService = {
           acc[prediction.episodeNumber]!.push({
             leagueMember: prediction.leagueMember,
             eventName: prediction.eventName,
-            customEventRuleId: null,
+            leagueEventRuleId: null,
             points: baseEventRulesData[prediction.eventName],
             timing: [],
             prediction: { ...prediction.prediction, episodeNumber: prediction.episodeNumber },
@@ -1331,7 +1331,7 @@ export const leaguesService = {
     const [
       baseEvents, tribesTimeline, elims,
       { leagueSettings, baseEventRules, basePredictionRules },
-      basePredictions, customEvents,
+      basePredictions, leagueEvents,
       selectionTimeline
     ] = await Promise.all([
       SEASON_QUERIES.getBaseEvents(league.leagueSeason),
@@ -1340,7 +1340,7 @@ export const leaguesService = {
 
       this.getLeagueConfig(leagueHash),
       this.getBasePredictions(leagueHash),
-      this.getCustomEvents(leagueHash),
+      this.getLeagueEvents(leagueHash),
       this.getSelectionTimeline(leagueHash),
     ]);
 
@@ -1352,7 +1352,7 @@ export const leaguesService = {
 
       basePredictions,
       basePredictionRules ?? defaultPredictionRules,
-      customEvents,
+      leagueEvents,
       selectionTimeline,
       leagueSettings.survivalCap,
       leagueSettings.preserveStreak);

@@ -6,11 +6,11 @@ import * as castaways from '~/server/db/schema/castaways';
 import * as episodes from '~/server/db/schema/episodes';
 import * as leagues from '~/server/db/schema/leagues';
 import * as members from '~/server/db/schema/leagueMembers';
-import * as customEvents from '~/server/db/schema/customEvents';
+import * as leagueEvents from '~/server/db/schema/leagueEvents';
 
 // Define your schema
 const schema = {
-  seasons, tribes, castaways, episodes, leagues, members, customEvents,
+  seasons, tribes, castaways, episodes, leagues, members, leagueEvents,
 };
 
 // Use this object to send drizzle queries to your DB

@@ -1,27 +1,23 @@
 import 'server-only';
+import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
 
 import { createTable } from '~/server/db/schema/createTable';
-import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from '~/server/db/schema/leagues';
-import { LeagueEventTypeOptions } from '~/types/events';
-import { sql } from 'drizzle-orm';
-import { leagueEventReference, predictionEventTiming } from '~/server/db/schema/baseEvents';
-import { episodesSchema } from '~/server/db/schema/episodes';
-import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
+import { CustomEventTypes } from '~/types/sharedEvents';
+import { keywords, notes, reference, timing } from '~/server/db/schema/sharedEvents';
 
-export const leagueEventType = pgEnum('event_league_type', LeagueEventTypeOptions);
-
-export const leagueEventsRulesSchema = createTable(
-  'event_league_rule',
+export const eventType = pgEnum('event_type', CustomEventTypes);
+export const customEventRuleSchema = createTable(
+  'event_custom_rule',
   {
-    customEventRuleId: serial('league_event_rule_id').notNull().primaryKey(),
+    customEventRuleId: serial('custom_event_rule_id').notNull().primaryKey(),
     leagueId: integer('league_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
-    eventName: varchar('event_name', { length: 32 }).notNull(),
+    eventName: varchar('event_name', { length: 64 }).notNull(),
     description: varchar('event_desc', { length: 256 }).notNull(),
     points: integer('event_points').notNull(),
-    eventType: leagueEventType('event_type').notNull(),
-    referenceTypes: leagueEventReference('reference_types').array().notNull().default(sql`ARRAY['Castaway', 'Tribe']::event_league_reference[]`),
-    timing: predictionEventTiming('event_timing').array().notNull().default(sql`ARRAY[]::event_league_timing[]`),
+    eventType: eventType('event_type').notNull(),
+    referenceTypes: reference('reference_types').array().notNull(),
+    timing: timing('event_timing').array().notNull(),
   },
   (table) => [
     unique().on(table.leagueId, table.eventName),
@@ -29,13 +25,43 @@ export const leagueEventsRulesSchema = createTable(
   ]
 );
 
-export const leagueEventPredictionsSchema = createTable(
-  'event_league_prediction',
+export const customEventSchema = createTable(
+  'event_custom',
   {
-    customEventRuleId: integer('league_event_rule_id').notNull().references(() => leagueEventsRulesSchema.customEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }),
-    memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }),
-    referenceType: leagueEventReference('reference_type').notNull(),
+    customEventId: serial('custom_event_id').notNull().primaryKey(),
+    episodeId: integer('episode_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
+    customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
+    keywords: keywords('keywords'),
+    notes: notes('notes'),
+  },
+  (table) => [
+    index().on(table.episodeId),
+    index().on(table.customEventRuleId),
+  ]
+);
+
+export const customEventReferenceSchema = createTable(
+  'event_custom_reference',
+  {
+    customEventReferenceId: serial('custom_event_reference_id').notNull().primaryKey(),
+    customEventId: integer('custom_event_id').notNull().references(() => customEventSchema.customEventId, { onDelete: 'cascade' }),
+    referenceType: reference('reference_type').notNull(),
+    referenceId: integer('reference_id').notNull(),
+  },
+  (table) => [
+    index().on(table.customEventId),
+    index().on(table.referenceId, table.referenceType),
+    unique().on(table.customEventId, table.referenceType, table.referenceId)
+  ]
+);
+
+export const customEventPredictionSchema = createTable(
+  'event_custom_prediction',
+  {
+    customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
+    memberId: integer('member_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
+    refernceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
   },
   (table) => [
@@ -46,18 +72,3 @@ export const leagueEventPredictionsSchema = createTable(
   ]
 );
 
-export const leagueEventsSchema = createTable(
-  'event_league',
-  {
-    customEventId: serial('league_event_id').notNull().primaryKey(),
-    customEventRuleId: integer('league_event_rule_id').notNull().references(() => leagueEventsRulesSchema.customEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }),
-    referenceType: leagueEventReference('reference_type').notNull(),
-    referenceId: integer('reference_id').notNull(),
-    notes: varchar('notes', { length: 256 }).array(),
-  },
-  (table) => [
-    index().on(table.customEventRuleId),
-    index().on(table.episodeId),
-  ]
-);

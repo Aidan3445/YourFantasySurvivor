@@ -75,7 +75,7 @@ export const nonLeague: League = {
   leagueHash: '',
   leagueName: '',
   leagueStatus: 'Inactive',
-  customEventRules: [],
+  leagueEventRules: [],
   baseEventRules: { ...defaultBaseRules, leagueId: 0 },
   basePredictionRules: { ...defaultPredictionRules },
   shauhinModeSettings: { ...defaultShauhinModeSettings, leagueId: 0 },
@@ -97,7 +97,7 @@ export const emptyData: LeagueData = {
   episodes: [],
   castaways: [],
   tribes: [],
-  customEvents: {
+  leagueEvents: {
     directEvents: [],
     predictionEvents: []
   },

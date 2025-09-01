@@ -45,7 +45,7 @@ export default function EpisodeEvents({
   filters }: EpisodeEventsProps) {
   const {
     leagueData: {
-      customEvents,
+      leagueEvents,
       baseEvents,
       basePredictions,
       episodes
@@ -53,7 +53,7 @@ export default function EpisodeEvents({
   } = useLeague();
 
   if (episodeNumber === 5) {
-    console.log({ baseEvents, basePredictions, customEvents, mockBases, mockPredictions, mockDirects });
+    console.log({ baseEvents, basePredictions, leagueEvents, mockBases, mockPredictions, mockDirects });
   }
 
   const noTribes = episodeNumber !== -1 && (
@@ -66,9 +66,9 @@ export default function EpisodeEvents({
       basePredictions[episodeNumber] &&
       Object.values(basePredictions[episodeNumber]).some((event) => event.reference.referenceType === 'Tribe' && event.eventId !== null)
     ) &&
-    ![...customEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
+    ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
       ?.some((event) => event.reference.referenceType === 'Tribe') &&
-    ![...customEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
+    ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
       ?.some((event) => event.referenceType === 'Tribe'));
 
 

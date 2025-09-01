@@ -11,9 +11,9 @@ import { Textarea } from '~/components/common/textarea';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
 import { Button } from '~/components/common/button';
 import { useEventOptions } from '~/hooks/useEventOptions';
-import { createCustomEvent } from '~/services/leagues/settings/leagueActions';
+import { createLeagueEvent } from '~/services/leagues/settings/leagueActions';
 
-export default function CreateCustomEvent() {
+export default function CreateLeagueEvent() {
   const { leagueData, league, refresh } = useLeague();
   const reactForm = useForm<LeagueEventInsert>({
     defaultValues: {
@@ -26,8 +26,8 @@ export default function CreateCustomEvent() {
   });
 
   const selectedReferenceType = reactForm.watch('referenceType');
-  const selectedEvent = league.customEventRules.find(rule =>
-    rule.customEventRuleId === +reactForm.watch('customEventRuleId'));
+  const selectedEvent = league.leagueEventRules.find(rule =>
+    rule.leagueEventRuleId === +reactForm.watch('leagueEventRuleId'));
   const selectedEpisodeId = reactForm.watch('episodeId');
   const selectedEpisode = useMemo(() => leagueData.episodes
     .find(episode =>
@@ -36,7 +36,7 @@ export default function CreateCustomEvent() {
 
   const { castawayOptions, tribeOptions } = useEventOptions(selectedEpisode);
 
-  if (league.customEventRules.length === 0) return (
+  if (league.leagueEventRules.length === 0) return (
     <div className='px-4 w-full md:pb-14 text-center'>
       <section className='bg-card rounded-xl pb-4 w-full'>
         <h2 className='text-2xl self-center text-muted-foreground'>No Custom Events</h2>
@@ -47,7 +47,7 @@ export default function CreateCustomEvent() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await createCustomEvent(league.leagueHash, data);
+      await createLeagueEvent(league.leagueHash, data);
       alert('Base event created successfully');
       reactForm.reset();
       await refresh();
@@ -59,8 +59,8 @@ export default function CreateCustomEvent() {
 
 
   const correctPredictions: { predictionMaker: string }[] =
-    leagueData.customEvents.predictionEvents[selectedEpisode]
-      ?.filter((prediction) => prediction.customEventRuleId === +reactForm.watch('customEventRuleId') &&
+    leagueData.leagueEvents.predictionEvents[selectedEpisode]
+      ?.filter((prediction) => prediction.leagueEventRuleId === +reactForm.watch('leagueEventRuleId') &&
         prediction.reference.referenceId === +reactForm.watch('referenceId')) ?? [];
   if (correctPredictions.length === 0) {
     correctPredictions.push({ predictionMaker: 'No Correct Predictions' });
@@ -102,7 +102,7 @@ export default function CreateCustomEvent() {
                 )} />
               <FormLabel>Event</FormLabel>
               <FormField
-                name='customEventRuleId'
+                name='leagueEventRuleId'
                 render={({ field }) => (
                   <FormItem className='w-full'>
                     <FormControl>
@@ -118,8 +118,8 @@ export default function CreateCustomEvent() {
                           <SelectValue placeholder='Select Event' />
                         </SelectTrigger>
                         <SelectContent>
-                          {league.customEventRules.map(({ eventName, customEventRuleId }) => (
-                            <SelectItem key={eventName} value={customEventRuleId.toString()}>
+                          {league.leagueEventRules.map(({ eventName, leagueEventRuleId }) => (
+                            <SelectItem key={eventName} value={leagueEventRuleId.toString()}>
                               {eventName}
                             </SelectItem>
                           ))}
@@ -210,7 +210,7 @@ export default function CreateCustomEvent() {
             <EpisodeEvents
               episodeNumber={selectedEpisode}
               mockDirects={selectedEvent?.eventType === 'Direct' ? [{
-                customEventRuleId: +reactForm.watch('customEventRuleId'),
+                leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
                 eventName: selectedEvent.eventName,
                 referenceType: selectedReferenceType,
                 points: selectedEvent.points,
@@ -222,7 +222,7 @@ export default function CreateCustomEvent() {
               }] : undefined}
               mockPredictions={selectedEvent?.eventType === 'Prediction' ?
                 correctPredictions.map(prediction => ({
-                  customEventRuleId: +reactForm.watch('customEventRuleId'),
+                  leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
                   eventName: selectedEvent.eventName,
                   points: selectedEvent.points,
                   predictionMaker: prediction.predictionMaker,

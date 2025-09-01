@@ -7,7 +7,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { type LeagueEventRule, LeagueEventRuleZod } from '~/types/events';
 
 import { Button } from '~/components/common/button';
-import { deleteCustomEventRule, updateCustomEventRule } from '~/services/leagues/settings/leagueActions';
+import { deleteLeagueEventRule, updateLeagueEventRule } from '~/services/leagues/settings/leagueActions';
 import { Flame, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -15,14 +15,14 @@ import {
 } from '~/components/common/alertDialog';
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
-import CustomEventFields from '~/components/leagues/customization/events/custom/fields';
+import LeagueEventFields from '~/components/leagues/customization/events/custom/fields';
 
-interface CustomEventCardProps {
+interface LeagueEventCardProps {
   rule: LeagueEventRule;
   locked?: boolean;
 }
 
-export default function CustomEventCard({ rule, locked }: CustomEventCardProps) {
+export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) {
   const {
     league: {
       leagueHash,
@@ -41,7 +41,7 @@ export default function CustomEventCard({ rule, locked }: CustomEventCardProps) 
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateCustomEventRule(leagueHash, data);
+      await updateLeagueEventRule(leagueHash, data);
       await refresh();
       alert(`Custom event ${data.eventName} updated.`);
     } catch (error) {
@@ -52,7 +52,7 @@ export default function CustomEventCard({ rule, locked }: CustomEventCardProps) 
 
   const handleDelete = async () => {
     try {
-      await deleteCustomEventRule(leagueHash, rule.eventName);
+      await deleteLeagueEventRule(leagueHash, rule.eventName);
       setIsEditing(false);
       alert(`Custom event ${rule.eventName} deleted.`);
     } catch (error) {
@@ -97,7 +97,7 @@ export default function CustomEventCard({ rule, locked }: CustomEventCardProps) 
                     Edit the event details or delete the event.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <CustomEventFields predictionDefault={rule.eventType === 'Prediction'} />
+                <LeagueEventFields predictionDefault={rule.eventType === 'Prediction'} />
                 <AlertDialogFooter className='grid grid-cols-2 gap-2'>
                   <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
                   <AlertDialogAction asChild>

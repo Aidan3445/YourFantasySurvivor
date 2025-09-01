@@ -13,21 +13,21 @@ import { useState } from 'react';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { deleteCustomEvent, updateCustomEvent } from '~/services/leagues/settings/leagueActions';
+import { deleteLeagueEvent, updateLeagueEvent } from '~/services/leagues/settings/leagueActions';
 import { useLeague } from '~/hooks/useLeague';
 import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 
-interface EditCustomEventProps {
+interface EditLeagueEventProps {
   episodeNumber: number;
-  customEvent: LeagueEvent;
+  leagueEvent: LeagueEvent;
 }
 
-export default function EditCustomEvent({ episodeNumber, customEvent }: EditCustomEventProps) {
+export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeagueEventProps) {
   const { league, leagueData, refresh } = useLeague();
   const reactForm = useForm<LeagueEventInsert>({
     defaultValues: {
       episodeId: leagueData.episodes.toReversed()[episodeNumber - 1]?.episodeId,
-      ...customEvent,
+      ...leagueEvent,
     },
     resolver: zodResolver(LeagueEventInsertZod)
   });
@@ -40,7 +40,7 @@ export default function EditCustomEvent({ episodeNumber, customEvent }: EditCust
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateCustomEvent(league.leagueHash, customEvent.eventId, data);
+      await updateLeagueEvent(league.leagueHash, leagueEvent.eventId, data);
       alert('Event updated successfully');
       await refresh();
     } catch (e) {
@@ -51,7 +51,7 @@ export default function EditCustomEvent({ episodeNumber, customEvent }: EditCust
 
   const handleDelete = async () => {
     try {
-      await deleteCustomEvent(league.leagueHash, customEvent.eventId);
+      await deleteLeagueEvent(league.leagueHash, leagueEvent.eventId);
       alert('Event deleted successfully');
       await refresh();
     } catch (e) {
@@ -70,7 +70,7 @@ export default function EditCustomEvent({ episodeNumber, customEvent }: EditCust
         </AlertDialogTrigger>
         <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max'>
           <AlertDialogHeader>
-            <AlertDialogTitle>Edit {customEvent.eventName}</AlertDialogTitle>
+            <AlertDialogTitle>Edit {leagueEvent.eventName}</AlertDialogTitle>
             <AlertDialogDescription hidden>Edit the event details</AlertDialogDescription>
           </AlertDialogHeader>
           <form

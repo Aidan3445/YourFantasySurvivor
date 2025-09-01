@@ -7,10 +7,10 @@ import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
 import ChangeSurvivor from '~/components/leagues/hub/picks/changeSurvivor/view';
 import CreateBaseEvent from '~/components/leagues/actions/events/base/create';
-import CustomEvents from '~/components/leagues/customization/events/custom/view';
+import LeagueEvents from '~/components/leagues/customization/events/custom/view';
 import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
 import LeagueScoring from '~/components/leagues/customization/events/base/view';
-import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
+import CreateLeagueEvent from '~/components/leagues/actions/events/custom/create';
 import Predictions from '~/components/leagues/hub/picks/predictions/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
@@ -59,7 +59,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           </TabsContent>
           */}
           <TabsContent value='events'>
-            <CreateCustomEvent />
+            <CreateLeagueEvent />
           </TabsContent>
           <TabsContent value='Base'>
             <CreateBaseEvent />
@@ -76,7 +76,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </h2>
               <SetSurvivalCap />
               <LeagueScoring />
-              <CustomEvents />
+              <LeagueEvents />
               <ShauhinMode />
             </section>
           </TabsContent>
