@@ -3,8 +3,9 @@ import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'dri
 
 import { createTable } from '~/server/db/schema/createTable';
 import { leaguesSchema } from '~/server/db/schema/leagues';
-import { keywords, label, notes, reference, timing } from '~/server/db/schema/shared';
-import { EventTypes } from '~/types/events';
+import { label, notes, reference, timing } from '~/server/db/schema/shared';
+import { EventTypes } from '~/lib/events';
+
 
 export const eventType = pgEnum('event_type', EventTypes);
 export const customEventRuleSchema = createTable(
