@@ -1,13 +1,12 @@
 import 'server-only';
 
 import { auth as clerkAuth } from '@clerk/nextjs/server';
-import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
-import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
+import { and, eq } from 'drizzle-orm';
+import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
+import { leagueSchema } from '~/server/db/schema/leagues';
 import { systemSchema } from '~/server/db/schema/system';
-import { type LeagueHash } from '~/types/deprecated/leagues';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { type LeagueMemberAuth } from '~/types/api';
 
 /**
   * Auth wrapper that utilizes session claims for merging dev and prod users
@@ -23,43 +22,33 @@ export async function auth() {
 
 /**
   * Authenticate the user within a league
-  * @param leagueHash - the hash of the league
+  * @param hash - the hash of the league
   * @returns the user id and league id if the user is a member of the league
   * OR just the user id if the user is not a member of the league
   * OR an empty object if the user is not authenticated
+  * @returnObj `LeagueMemberAuth`
   */
-export async function leagueMemberAuth(leagueHash: LeagueHash) {
+export async function leagueMemberAuth(hash: string) {
   const { userId } = await auth();
-  if (!userId) return { userId, memberId: null, role: null };
+  if (!userId) return { userId, memberId: null, role: null } as LeagueMemberAuth;
 
   // Ensure the user is a member of the league
   const member = await db
     .select({
-      memberId: leagueMembersSchema.memberId,
-      role: leagueMembersSchema.role,
-      member: leagueMembersSchema,
-      league: leaguesSchema,
-      seasonName: seasonsSchema.seasonName,
-      draftDate: leagueSettingsSchema.draftDate,
+      memberId: leagueMemberSchema.memberId,
+      role: leagueMemberSchema.role,
     })
-    .from(leagueMembersSchema)
-    .innerJoin(leaguesSchema, and(
-      eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId),
-      eq(leaguesSchema.leagueHash, leagueHash)))
-    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
-    .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
-    .where(and(
-      eq(leagueMembersSchema.userId, userId),
-    )).then((members) => members[0]);
+    .from(leagueMemberSchema)
+    .innerJoin(leagueSchema, and(
+      eq(leagueMemberSchema.leagueId, leagueSchema.leagueId),
+      eq(leagueSchema.hash, hash)))
+    .where(eq(leagueMemberSchema.userId, userId))
+    .then((members) => members[0]);
 
   return {
     userId,
-    memberId: member?.memberId ?? null,
-    role: member?.role ?? null,
-    member: member?.member ?? null,
-    league: member ? { ...member.league, draftDate: new Date(`${member.draftDate} Z`) } : null,
-    seasonName: member?.seasonName ?? null,
-  };
+    ...member,
+  } as LeagueMemberAuth;
 }
 
 /**

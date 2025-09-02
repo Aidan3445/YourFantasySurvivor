@@ -1,6 +1,6 @@
 export type Season = {
   seasonId: number;
-  seasonName: string;
+  name: string;
   premiereDate: Date;
   finaleDate: Date | null;
 }

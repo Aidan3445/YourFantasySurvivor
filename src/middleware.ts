@@ -3,9 +3,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '~/server/db';
-import { leaguesSchema } from '~/server/db/schema/leagues';
+import { leagueSchema } from '~/server/db/schema/leagues';
 import { and, count, eq } from 'drizzle-orm';
-import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
+import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 
 
 /* Routing Logic
@@ -73,9 +73,9 @@ async function leaguesRoute(req: NextRequest, userId: string) {
   if (leaguesMatcher(req)) {
     const hasLeagues = await db
       .select({ count: count() })
-      .from(leaguesSchema)
-      .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.leagueId, leaguesSchema.leagueId))
-      .where(eq(leagueMembersSchema.userId, userId))
+      .from(leagueSchema)
+      .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.leagueId, leagueSchema.leagueId))
+      .where(eq(leagueMemberSchema.userId, userId))
       .then((result) => (result[0]?.count ?? 0) > 0);
 
     const expectedRoute = hasLeagues ? '/leagues' : '/';
@@ -101,12 +101,12 @@ async function leagueRoute(req: NextRequest, userId: string) {
     const currentRoute = pathname.split('/')[3];
 
     const leagueStatus = await db
-      .select({ leagueStatus: leaguesSchema.leagueStatus })
-      .from(leaguesSchema)
-      .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.leagueId, leaguesSchema.leagueId))
+      .select({ leagueStatus: leagueSchema.status })
+      .from(leagueSchema)
+      .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.leagueId, leagueSchema.leagueId))
       .where(and(
-        eq(leaguesSchema.leagueHash, leagueHash),
-        eq(leagueMembersSchema.userId, userId)))
+        eq(leagueSchema.hash, leagueHash),
+        eq(leagueMemberSchema.userId, userId)))
       .then((leagues) => leagues[0]?.leagueStatus);
     if (!leagueStatus) {
       return NextResponse.redirect(new URL('/leagues', req.url));
