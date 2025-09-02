@@ -10,7 +10,7 @@ import { seasonsSchema } from '~/server/db/schema/seasons';
    * @param hash The hash of the league
    * @returns the league
    * @throws an error if the user is not authenticated
-  * @returnObj `League | undefined`
+   * @returnObj `League | undefined`
    */
 export default async function getLeague(hash: string) {
   return db
@@ -26,4 +26,3 @@ export default async function getLeague(hash: string) {
     .where(eq(leagueSchema.hash, hash))
     .then((leagues) => leagues[0]);
 }
-

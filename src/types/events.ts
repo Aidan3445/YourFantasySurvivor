@@ -12,7 +12,6 @@ export type EventReference = {
 export type Event = {
   eventSource: EventSource;
   eventType: EventType;
-  sourceId: number; // either the seasonId or leagueId depending on eventSource
   episodeNumber: number;
   eventId: number;
   eventName: string;
@@ -34,3 +33,14 @@ export type Elimination = {
 };
 
 export type PredictionTiming = (typeof PredictionTimings)[number];
+
+export type Prediction = {
+  eventSource: EventSource;
+  episodeNumber: number;
+  predictionMakerId: number;
+  eventId: number;
+  referenceId: number;
+  referenceType: ReferenceType;
+  bet: number;
+  hit: boolean | null;
+};

@@ -42,7 +42,6 @@ export default async function getBaseEvents(seasonId: number) {
       events[row.baseEventId] ??= {
         eventSource: 'Base',
         eventType: 'Direct',
-        sourceId: seasonId,
         episodeNumber: row.episodeNumber,
         eventId: row.baseEventId,
         eventName: row.eventName,
