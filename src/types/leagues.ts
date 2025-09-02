@@ -10,4 +10,9 @@ export type League = {
   season: string;
 };
 
-
+export type LeagueSettings = {
+  leagueId: number;
+  draftDate: Date | null;
+  survivalCap: number;
+  preserverStreak: boolean;
+};
