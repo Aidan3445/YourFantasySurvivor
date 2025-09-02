@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const castaways = await getCastaways(seasonId);
-    return NextResponse.json(castaways, { status: 200 });
+    return NextResponse.json({ castaways }, { status: 200 });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });

@@ -7,8 +7,8 @@ export async function GET(req: NextRequest) {
 
 
   try {
-    const data = getSeasonsData(includeInactive);
-    return NextResponse.json(data, { status: 200 });
+    const seasonsData = getSeasonsData(includeInactive);
+    return NextResponse.json({ seasonsData }, { status: 200 });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });

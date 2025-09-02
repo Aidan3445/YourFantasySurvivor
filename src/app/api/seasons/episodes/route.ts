@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const episodes = await getEpisodes(seasonId, mostRecentOnly);
-    return NextResponse.json(episodes, { status: 200 });
+    return NextResponse.json({ episodes }, { status: 200 });
   } catch (e) {
     console.error(e);
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });
