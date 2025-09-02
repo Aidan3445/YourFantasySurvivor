@@ -15,9 +15,9 @@ import type { EpisodeNumber } from '~/types/episodes';
 import {
   type BaseEvent, type BaseEventName, type LeagueDirectEvent, type LeagueEventName, type CustomPredictionEvent
 } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
+import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
 import { type CastawayName } from '~/types/castaways';
-import { type TribeName } from '~/types/tribes';
+import { type TribeName } from '~/types/deprecated/tribes';
 import EpisodeEventsTableBody from '~/components/leagues/hub/activity/timeline/table/body';
 
 

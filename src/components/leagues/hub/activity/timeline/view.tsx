@@ -3,9 +3,9 @@
 
 import { useState } from 'react';
 import { type BaseEventName, type LeagueEventName } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
+import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
 import { type CastawayName } from '~/types/castaways';
-import { type TribeName } from '~/types/tribes';
+import { type TribeName } from '~/types/deprecated/tribes';
 import TimelineFilters from '~/components/leagues/hub/activity/timeline/filters';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
 

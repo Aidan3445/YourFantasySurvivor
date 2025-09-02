@@ -2,10 +2,10 @@ import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
 import { leaguesSchema } from '~/server/db/schema/leagues';
-import { episodesSchema } from '~/server/db/schema/episodes';
-import { castawaysSchema } from '~/server/db/schema/castaways';
+import { episodeSchema } from '~/server/db/schema/episodes';
+import { castawaySchema } from '~/server/db/schema/castaways';
 import { boolean, index, integer, pgEnum, primaryKey, serial, unique, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
-import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '~/types/leagueMembers';
+import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '~/types/deprecated/leagueMembers';
 
 export const leagueMemberRole = pgEnum('league_member_role', LeagueMemberRoleOptions);
 
@@ -33,10 +33,10 @@ export const selectionUpdatesSchema = createTable(
       .references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' })
       .notNull(),
     episodeId: integer('episode_id')
-      .references(() => episodesSchema.episodeId, { onDelete: 'cascade' })
+      .references(() => episodeSchema.episodeId, { onDelete: 'cascade' })
       .notNull(),
     castawayId: integer('castaway_id')
-      .references(() => castawaysSchema.castawayId, { onDelete: 'cascade' })
+      .references(() => castawaySchema.castawayId, { onDelete: 'cascade' })
       .notNull(),
     draft: boolean('draft').notNull().default(false),
   },

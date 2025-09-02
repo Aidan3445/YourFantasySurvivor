@@ -1,4 +1,4 @@
-import { leaguesService as QUERIES } from '~/services/leagues';
+import { leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import LeagueEvents from '~/components/leagues/customization/events/custom/view';
 import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
 import MemberEditForm from '~/components/leagues/customization/member/view';

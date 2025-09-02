@@ -6,15 +6,15 @@ import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues'
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { auth, leagueMemberAuth } from '~/lib/auth';
-import { baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema } from '~/server/db/schema/baseEvents';
+import { baseEventPredictionRulesSchema, baseEventPredictionSchema, baseEventReferenceSchema, baseEventRulesSchema, baseEventSchema, shauhinModeSettingsSchema } from '~/server/db/schema/baseEvents';
 import { leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema } from '~/server/db/schema/leagueEvents';
-import { episodesSchema } from '~/server/db/schema/episodes';
-import { castawaysSchema } from '~/server/db/schema/castaways';
-import type { LeagueStatus, LeagueHash, LeagueName } from '~/types/leagues';
-import type { SeasonName } from '~/types/seasons';
+import { episodeSchema } from '~/server/db/schema/episodes';
+import { castawaySchema } from '~/server/db/schema/castaways';
+import type { LeagueStatus, LeagueHash, LeagueName } from '~/types/deprecated/leagues';
+import type { SeasonName } from '~/types/deprecated/seasons';
 import type { CastawayDraftInfo, CastawayName } from '~/types/castaways';
-import { tribesSchema } from '~/server/db/schema/tribes';
-import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/types/leagueMembers';
+import { tribeSchema } from '~/server/db/schema/tribes';
+import type { LeagueMemberDisplayName, LeagueMemberColor } from '~/types/deprecated/leagueMembers';
 import {
   type EventPrediction, type LeagueDirectEvent, type ReferenceType, type CustomPredictionEvent,
   type BaseEventRule, type LeagueEventId, type LeagueEventName,
@@ -26,8 +26,8 @@ import {
   ScoringBaseEventNames,
   type LeaguePredictionDraft,
 } from '~/types/events';
-import { seasonsService as SEASON_QUERIES } from '~/services/seasons';
-import type { Tribe, TribeName } from '~/types/tribes';
+import { seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasonsService';
+import type { Tribe, TribeName } from '~/types/deprecated/tribes';
 import type { EpisodeAirStatus, EpisodeNumber } from '~/types/episodes';
 import { compileScores } from '~/lib/scores';
 import { sysService as SYS_QUERIES } from '~/services/sys/query';
@@ -156,26 +156,26 @@ export const leaguesService = {
         leagueHash: leaguesSchema.leagueHash,
         leagueStatus: leaguesSchema.leagueStatus,
         season: seasonsSchema.seasonName,
-        castaway: castawaysSchema.fullName,
-        out: baseEventsSchema.eventName,
+        castaway: castawaySchema.fullName,
+        out: baseEventSchema.eventName,
         memberId: leagueMembersSchema.displayName,
       })
       .from(leagueMembersSchema)
       .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
       .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
-      .leftJoin(castawaysSchema, eq(castawaysSchema.castawayId,
+      .leftJoin(castawaySchema, eq(castawaySchema.castawayId,
         db.select({ castawayId: selectionUpdatesSchema.castawayId })
           .from(selectionUpdatesSchema)
           .where(eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId))
           .orderBy(desc(selectionUpdatesSchema.episodeId))
           .limit(1)))
-      .leftJoin(baseEventsSchema, and(
-        inArray(baseEventsSchema.eventName, ['elim', 'noVoteExit']),
-        inArray(baseEventsSchema.baseEventId,
+      .leftJoin(baseEventSchema, and(
+        inArray(baseEventSchema.eventName, ['elim', 'noVoteExit']),
+        inArray(baseEventSchema.baseEventId,
           db.select({ baseEventId: baseEventReferenceSchema.baseEventId })
             .from(baseEventReferenceSchema)
             .where(and(
-              eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+              eq(baseEventReferenceSchema.referenceId, castawaySchema.castawayId),
               eq(baseEventReferenceSchema.referenceType, 'Castaway'))))))
       .where(eq(leagueMembersSchema.userId, userId))
       .orderBy(desc(seasonsSchema.premiereDate))
@@ -314,43 +314,43 @@ export const leaguesService = {
 
     const tribeUpdateEventSchema = aliasedTable(baseEventReferenceSchema, 'tribeUpdate');
     const eliminationEventReferenceSchema = aliasedTable(baseEventReferenceSchema, 'elimination_ref');
-    const eliminationEventSchema = aliasedTable(baseEventsSchema, 'elimination');
+    const eliminationEventSchema = aliasedTable(baseEventSchema, 'elimination');
 
     const castawaysPromise = db
       .select({
-        castawayId: castawaysSchema.castawayId,
-        fullName: castawaysSchema.fullName,
-        age: castawaysSchema.age,
-        residence: castawaysSchema.residence,
-        occupation: castawaysSchema.occupation,
-        imageUrl: castawaysSchema.imageUrl,
+        castawayId: castawaySchema.castawayId,
+        fullName: castawaySchema.fullName,
+        age: castawaySchema.age,
+        residence: castawaySchema.residence,
+        occupation: castawaySchema.occupation,
+        imageUrl: castawaySchema.imageUrl,
         tribe: {
-          tribeId: tribesSchema.tribeId,
-          tribeName: tribesSchema.tribeName,
-          tribeColor: tribesSchema.tribeColor,
+          tribeId: tribeSchema.tribeId,
+          tribeName: tribeSchema.tribeName,
+          tribeColor: tribeSchema.tribeColor,
           seasonName: seasonsSchema.seasonName,
         },
         pickedBy: leagueMembersSchema.displayName,
         eliminatedEpisode: eliminationEventSchema.episodeId,
       })
-      .from(castawaysSchema)
-      .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, castawaysSchema.seasonId))
+      .from(castawaySchema)
+      .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, castawaySchema.seasonId))
       .innerJoin(leaguesSchema, and(
         eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId),
         eq(leaguesSchema.leagueHash, leagueHash)))
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
       // Joining tribe assignments
       .innerJoin(baseEventReferenceSchema, and(
-        eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+        eq(baseEventReferenceSchema.referenceId, castawaySchema.castawayId),
         eq(baseEventReferenceSchema.referenceType, 'Castaway')))
-      .innerJoin(baseEventsSchema, and(
-        eq(baseEventsSchema.baseEventId, baseEventReferenceSchema.baseEventId),
-        eq(baseEventsSchema.eventName, 'tribeUpdate'),
-        arrayContained(baseEventsSchema.keywords, ['Initial Tribes'])))
+      .innerJoin(baseEventSchema, and(
+        eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
+        eq(baseEventSchema.eventName, 'tribeUpdate'),
+        arrayContained(baseEventSchema.keywords, ['Initial Tribes'])))
       .innerJoin(tribeUpdateEventSchema, and(
-        eq(tribeUpdateEventSchema.baseEventId, baseEventsSchema.baseEventId),
+        eq(tribeUpdateEventSchema.baseEventId, baseEventSchema.baseEventId),
         eq(tribeUpdateEventSchema.referenceType, 'Tribe')))
-      .innerJoin(tribesSchema, eq(tribesSchema.tribeId, tribeUpdateEventSchema.referenceId))
+      .innerJoin(tribeSchema, eq(tribeSchema.tribeId, tribeUpdateEventSchema.referenceId))
       // Joining elimination if it exists
       .leftJoin(eliminationEventSchema, and(
         inArray(eliminationEventSchema.eventName, ['elim', 'noVoteExit']),
@@ -358,12 +358,12 @@ export const leaguesService = {
           db.select({ baseEventId: eliminationEventReferenceSchema.baseEventId })
             .from(eliminationEventReferenceSchema)
             .where(and(
-              eq(eliminationEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+              eq(eliminationEventReferenceSchema.referenceId, castawaySchema.castawayId),
               eq(eliminationEventReferenceSchema.referenceType, 'Castaway')))
         )))
       // Joining draft picks if they exist
       .leftJoin(selectionUpdatesSchema, and(
-        eq(selectionUpdatesSchema.castawayId, castawaysSchema.castawayId),
+        eq(selectionUpdatesSchema.castawayId, castawaySchema.castawayId),
         eq(selectionUpdatesSchema.draft, true),
         inArray(selectionUpdatesSchema.memberId, db.select({ memberId: leagueMembersSchema.memberId })
           .from(leagueMembersSchema)
@@ -376,7 +376,7 @@ export const leaguesService = {
         memberId: leagueMembersSchema.memberId,
         displayName: leagueMembersSchema.displayName,
         color: leagueMembersSchema.color,
-        draftPick: castawaysSchema.fullName,
+        draftPick: castawaySchema.fullName,
       })
       .from(leagueMembersSchema)
       .innerJoin(leaguesSchema, and(
@@ -386,7 +386,7 @@ export const leaguesService = {
       .leftJoin(selectionUpdatesSchema, and(
         eq(selectionUpdatesSchema.memberId, leagueMembersSchema.memberId),
         eq(selectionUpdatesSchema.draft, true)))
-      .leftJoin(castawaysSchema, eq(castawaysSchema.castawayId, selectionUpdatesSchema.castawayId));
+      .leftJoin(castawaySchema, eq(castawaySchema.castawayId, selectionUpdatesSchema.castawayId));
 
     const draftOrderPromise = db
       .select({
@@ -419,57 +419,6 @@ export const leaguesService = {
   },
 
   /**
-    * Get the next episode to air for the league's season
-    * @param leagueHash - the hash of the league
-    * @param count - the number of episodes to get, default 1
-    * @returns the episodes starting from the next episode to air 
-    * sorted by air date in descending order
-    * @throws an error if the season does not exist
-    */
-  getEpisodes: async function(leagueHash: LeagueHash, count = 1) {
-    const { memberId, league } = await leagueMemberAuth(leagueHash);
-    // If the user is not a member of the league, throw an error
-    if (!memberId || !league) {
-      throw new Error('User not a member of the league');
-    }
-
-    return await db
-      .select({
-        episodeId: episodesSchema.episodeId,
-        episodeNumber: episodesSchema.episodeNumber,
-        episodeTitle: episodesSchema.title,
-        episodeAirDate: episodesSchema.airDate,
-        episodeRuntime: episodesSchema.runtime,
-        isMerge: episodesSchema.isMerge,
-        isFinale: episodesSchema.isFinale,
-      })
-      .from(episodesSchema)
-      .innerJoin(seasonsSchema, and(
-        eq(seasonsSchema.seasonId, episodesSchema.seasonId),
-        eq(seasonsSchema.seasonId, league.leagueSeason)))
-      .orderBy(asc(episodesSchema.airDate))
-      .then((res) => {
-        return res.slice(0, count)
-          .map((episode) => {
-            const airDate = new Date(`${episode.episodeAirDate} Z`);
-            const airStatus: EpisodeAirStatus = airDate > new Date() ? 'Upcoming' :
-              airDate.getTime() + episode.episodeRuntime * 60 * 1000 > new Date().getTime() ?
-                'Airing' : 'Aired';
-
-            return {
-              episodeId: episode.episodeId,
-              episodeNumber: episode.episodeNumber,
-              episodeTitle: episode.episodeTitle,
-              episodeAirDate: new Date(`${episode.episodeAirDate} Z`),
-              airStatus: airStatus,
-              isMerge: episode.isMerge,
-              isFinale: episode.isFinale,
-            };
-          });
-      });
-  },
-
-  /**
    * Get the base predictions for a league
    * @param leagueHash - the hash of the league
    * @returns the base predictions for the league
@@ -486,35 +435,35 @@ export const leaguesService = {
 
     const basePredictions = await db
       .select({
-        eventName: baseEventPredictionsSchema.baseEventName,
-        eventId: baseEventsSchema.baseEventId,
-        episodeNumber: episodesSchema.episodeNumber,
+        eventName: baseEventPredictionSchema.baseEventName,
+        eventId: baseEventSchema.baseEventId,
+        episodeNumber: episodeSchema.episodeNumber,
         predictionMaker: leagueMembersSchema.displayName,
-        referenceType: baseEventPredictionsSchema.referenceType,
-        referenceId: baseEventPredictionsSchema.referenceId,
-        bet: baseEventPredictionsSchema.bet,
+        referenceType: baseEventPredictionSchema.referenceType,
+        referenceId: baseEventPredictionSchema.referenceId,
+        bet: baseEventPredictionSchema.bet,
         resultReferenceType: baseEventReferenceSchema.referenceType,
         resultReferenceId: baseEventReferenceSchema.referenceId,
-        castaway: castawaysSchema.fullName,
-        tribe: tribesSchema.tribeName,
+        castaway: castawaySchema.fullName,
+        tribe: tribeSchema.tribeName,
       })
-      .from(baseEventPredictionsSchema)
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId))
-      .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId))
+      .from(baseEventPredictionSchema)
+      .innerJoin(episodeSchema, eq(episodeSchema.episodeId, baseEventPredictionSchema.episodeId))
+      .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, baseEventPredictionSchema.memberId))
       // result
-      .leftJoin(baseEventsSchema, and(
+      .leftJoin(baseEventSchema, and(
         eq(
-          sql`cast(${baseEventsSchema.eventName} as varchar)`,
-          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`),
-        eq(baseEventsSchema.episodeId, episodesSchema.episodeId)))
-      .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventsSchema.baseEventId))
+          sql`cast(${baseEventSchema.eventName} as varchar)`,
+          sql`cast(${baseEventPredictionSchema.baseEventName} as varchar)`),
+        eq(baseEventSchema.episodeId, episodeSchema.episodeId)))
+      .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventSchema.baseEventId))
       // references
-      .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, baseEventPredictionsSchema.referenceId),
-        eq(baseEventPredictionsSchema.referenceType, 'Castaway')))
-      .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, baseEventPredictionsSchema.referenceId),
-        eq(baseEventPredictionsSchema.referenceType, 'Tribe')))
+      .leftJoin(castawaySchema, and(
+        eq(castawaySchema.castawayId, baseEventPredictionSchema.referenceId),
+        eq(baseEventPredictionSchema.referenceType, 'Castaway')))
+      .leftJoin(tribeSchema, and(
+        eq(tribeSchema.tribeId, baseEventPredictionSchema.referenceId),
+        eq(baseEventPredictionSchema.referenceType, 'Tribe')))
       .where(eq(leagueMembersSchema.leagueId, league.leagueId))
       .then((rows) => rows.reduce((acc, row) => {
         acc[row.episodeNumber] ??= [];
@@ -575,14 +524,14 @@ export const leaguesService = {
     const directEventsPromise = db
       .select({
         leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId,
-        episodeNumber: episodesSchema.episodeNumber,
+        episodeNumber: episodeSchema.episodeNumber,
         eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
         points: leagueEventsRulesSchema.points,
         referenceType: leagueEventsSchema.referenceType,
         referenceId: leagueEventsSchema.referenceId,
-        castaway: castawaysSchema.fullName,
-        tribe: tribesSchema.tribeName,
+        castaway: castawaySchema.fullName,
+        tribe: tribeSchema.tribeName,
         notes: leagueEventsSchema.notes,
       })
       .from(leagueEventsSchema)
@@ -590,13 +539,13 @@ export const leaguesService = {
         eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
         eq(leagueEventsRulesSchema.leagueId, league.leagueId),
         eq(leagueEventsRulesSchema.eventType, 'Direct')))
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
+      .innerJoin(episodeSchema, eq(episodeSchema.episodeId, leagueEventsSchema.episodeId))
       // references
-      .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, leagueEventsSchema.referenceId),
+      .leftJoin(castawaySchema, and(
+        eq(castawaySchema.castawayId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Castaway')))
-      .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
+      .leftJoin(tribeSchema, and(
+        eq(tribeSchema.tribeId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Tribe')))
       .then((events) => events.reduce((acc, event) => {
         acc[event.episodeNumber] ??= {
@@ -627,8 +576,8 @@ export const leaguesService = {
       }, {} as Record<EpisodeNumber, Record<ReferenceType, LeagueDirectEvent[]>>));
 
 
-    const predictionCastaway = aliasedTable(castawaysSchema, 'predictionCastaway');
-    const predictionTribe = aliasedTable(tribesSchema, 'predictionTribe');
+    const predictionCastaway = aliasedTable(castawaySchema, 'predictionCastaway');
+    const predictionTribe = aliasedTable(tribeSchema, 'predictionTribe');
 
     const predictionsPromise = db
       .select({
@@ -636,7 +585,7 @@ export const leaguesService = {
         eventId: leagueEventsSchema.leagueEventId,
         eventName: leagueEventsRulesSchema.eventName,
         points: leagueEventsRulesSchema.points,
-        episodeNumber: episodesSchema.episodeNumber,
+        episodeNumber: episodeSchema.episodeNumber,
         predictionMaker: leagueMembersSchema.displayName,
         referenceType: leagueEventPredictionsSchema.referenceType,
         referenceId: leagueEventPredictionsSchema.referenceId,
@@ -644,8 +593,8 @@ export const leaguesService = {
         predictionTribe: predictionTribe.tribeName,
         resultReferenceType: leagueEventsSchema.referenceType,
         resultReferenceId: leagueEventsSchema.referenceId,
-        resultCastaway: castawaysSchema.fullName,
-        resultTribe: tribesSchema.tribeName,
+        resultCastaway: castawaySchema.fullName,
+        resultTribe: tribeSchema.tribeName,
         notes: leagueEventsSchema.notes,
       })
       .from(leagueEventsSchema)
@@ -653,7 +602,7 @@ export const leaguesService = {
         eq(leagueEventsRulesSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
         eq(leagueEventsRulesSchema.leagueId, league.leagueId),
         eq(leagueEventsRulesSchema.eventType, 'Prediction')))
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
+      .innerJoin(episodeSchema, eq(episodeSchema.episodeId, leagueEventsSchema.episodeId))
       // prediction
       .innerJoin(leagueEventPredictionsSchema, and(
         eq(leagueEventPredictionsSchema.leagueEventRuleId, leagueEventsSchema.leagueEventRuleId),
@@ -675,11 +624,11 @@ export const leaguesService = {
         eq(predictionTribe.tribeId, leagueEventPredictionsSchema.referenceId),
         eq(leagueEventPredictionsSchema.referenceType, 'Tribe')))
       // result
-      .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, leagueEventsSchema.referenceId),
+      .leftJoin(castawaySchema, and(
+        eq(castawaySchema.castawayId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Castaway')))
-      .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
+      .leftJoin(tribeSchema, and(
+        eq(tribeSchema.tribeId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Tribe')))
       .then((rows) => rows.reduce((acc, row) => {
         acc[row.episodeNumber] ??= [];
@@ -739,20 +688,20 @@ export const leaguesService = {
   getSelectionTimeline: async function(leagueHash: LeagueHash) {
     const selectionUpdates = await db
       .select({
-        episodeNumber: episodesSchema.episodeNumber,
+        episodeNumber: episodeSchema.episodeNumber,
         leagueMember: leagueMembersSchema.displayName,
         color: leagueMembersSchema.color,
-        castaway: castawaysSchema.fullName,
+        castaway: castawaySchema.fullName,
         draft: selectionUpdatesSchema.draft,
       })
       .from(selectionUpdatesSchema)
       .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, selectionUpdatesSchema.memberId))
-      .innerJoin(castawaysSchema, eq(castawaysSchema.castawayId, selectionUpdatesSchema.castawayId))
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId))
+      .innerJoin(castawaySchema, eq(castawaySchema.castawayId, selectionUpdatesSchema.castawayId))
+      .innerJoin(episodeSchema, eq(episodeSchema.episodeId, selectionUpdatesSchema.episodeId))
       .innerJoin(leaguesSchema, and(
         eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId),
         eq(leaguesSchema.leagueHash, leagueHash)))
-      .orderBy(asc(episodesSchema.episodeNumber));
+      .orderBy(asc(episodeSchema.episodeNumber));
 
     /** memberCastaways holds an array of castaways selected by each member each episode */
     const memberCastaways = selectionUpdates.reduce((acc, row) => {
@@ -940,21 +889,21 @@ export const leaguesService = {
 
     const basePredictionsPromise = db
       .select({
-        eventName: baseEventPredictionsSchema.baseEventName,
-        episodeNumber: episodesSchema.episodeNumber,
+        eventName: baseEventPredictionSchema.baseEventName,
+        episodeNumber: episodeSchema.episodeNumber,
         predictionMade: {
-          referenceType: baseEventPredictionsSchema.referenceType,
-          referenceId: baseEventPredictionsSchema.referenceId,
-          bet: baseEventPredictionsSchema.bet,
+          referenceType: baseEventPredictionSchema.referenceType,
+          referenceId: baseEventPredictionSchema.referenceId,
+          bet: baseEventPredictionSchema.bet,
         }
       })
-      .from(baseEventPredictionsSchema)
+      .from(baseEventPredictionSchema)
       .innerJoin(leagueMembersSchema, and(
-        eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId),
+        eq(leagueMembersSchema.memberId, baseEventPredictionSchema.memberId),
         eq(leagueMembersSchema.memberId, memberId)))
-      .innerJoin(episodesSchema, and(
-        eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId),
-        eq(episodesSchema.episodeId, nextEpisode.episodeId)));
+      .innerJoin(episodeSchema, and(
+        eq(episodeSchema.episodeId, baseEventPredictionSchema.episodeId),
+        eq(episodeSchema.episodeId, nextEpisode.episodeId)));
 
     const customPredictionsPromise = db
       .select({
@@ -1032,9 +981,9 @@ export const leaguesService = {
       throw new Error('User not a member of the league');
     }
 
-    const castawayPrediction = aliasedTable(castawaysSchema, 'castawayPrediction');
-    const tribePrediction = aliasedTable(tribesSchema, 'tribePrediction');
-    const episodesPrediction = aliasedTable(episodesSchema, 'episodesPrediction');
+    const castawayPrediction = aliasedTable(castawaySchema, 'castawayPrediction');
+    const tribePrediction = aliasedTable(tribeSchema, 'tribePrediction');
+    const episodesPrediction = aliasedTable(episodeSchema, 'episodesPrediction');
 
     const leaguePredictions = db
       .select({
@@ -1052,10 +1001,10 @@ export const leaguesService = {
           referenceId: leagueEventPredictionsSchema.referenceId,
         },
         result: {
-          episodeNumber: episodesSchema.episodeNumber,
-          castaway: castawaysSchema.fullName,
-          castawayShort: castawaysSchema.shortName,
-          tribe: tribesSchema.tribeName,
+          episodeNumber: episodeSchema.episodeNumber,
+          castaway: castawaySchema.fullName,
+          castawayShort: castawaySchema.shortName,
+          tribe: tribeSchema.tribeName,
           referenceType: leagueEventsSchema.referenceType,
           referenceId: leagueEventsSchema.referenceId,
         }
@@ -1084,12 +1033,12 @@ export const leaguesService = {
           // note manual predictions should not be possible but just in case
           arrayOverlaps(leagueEventsRulesSchema.timing, PredictionTimingOptions
             .filter(timing => !timing.includes('Weekly'))))))
-      .leftJoin(episodesSchema, eq(episodesSchema.episodeId, leagueEventsSchema.episodeId))
-      .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, leagueEventsSchema.referenceId),
+      .leftJoin(episodeSchema, eq(episodeSchema.episodeId, leagueEventsSchema.episodeId))
+      .leftJoin(castawaySchema, and(
+        eq(castawaySchema.castawayId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Castaway')))
-      .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, leagueEventsSchema.referenceId),
+      .leftJoin(tribeSchema, and(
+        eq(tribeSchema.tribeId, leagueEventsSchema.referenceId),
         eq(leagueEventsSchema.referenceType, 'Tribe')))
       .where(and(
         eq(leagueEventPredictionsSchema.memberId, otherMemberId ?? memberId),
@@ -1156,50 +1105,50 @@ export const leaguesService = {
     const basePredictionsData = await db
       .select({
         leagueMember: leagueMembersSchema.displayName,
-        eventName: baseEventPredictionsSchema.baseEventName,
-        episodeNumber: episodesSchema.episodeNumber,
+        eventName: baseEventPredictionSchema.baseEventName,
+        episodeNumber: episodeSchema.episodeNumber,
         prediction: {
           castaway: castawayPrediction.fullName,
           castawayShort: castawayPrediction.shortName,
           tribe: tribePrediction.tribeName,
-          referenceType: baseEventPredictionsSchema.referenceType,
-          referenceId: baseEventPredictionsSchema.referenceId,
-          bet: baseEventPredictionsSchema.bet,
+          referenceType: baseEventPredictionSchema.referenceType,
+          referenceId: baseEventPredictionSchema.referenceId,
+          bet: baseEventPredictionSchema.bet,
         },
         result: {
-          castaway: castawaysSchema.fullName,
-          castawayShort: castawaysSchema.shortName,
-          tribe: tribesSchema.tribeName,
+          castaway: castawaySchema.fullName,
+          castawayShort: castawaySchema.shortName,
+          tribe: tribeSchema.tribeName,
           referenceType: baseEventReferenceSchema.referenceType,
           referenceId: baseEventReferenceSchema.referenceId,
         }
       })
-      .from(baseEventPredictionsSchema)
+      .from(baseEventPredictionSchema)
       .innerJoin(leagueMembersSchema, and(
-        eq(leagueMembersSchema.memberId, baseEventPredictionsSchema.memberId),
+        eq(leagueMembersSchema.memberId, baseEventPredictionSchema.memberId),
         eq(leagueMembersSchema.leagueId, league.leagueId)))
-      .innerJoin(episodesSchema, eq(episodesSchema.episodeId, baseEventPredictionsSchema.episodeId))
+      .innerJoin(episodeSchema, eq(episodeSchema.episodeId, baseEventPredictionSchema.episodeId))
       .leftJoin(castawayPrediction, and(
-        eq(castawayPrediction.castawayId, baseEventPredictionsSchema.referenceId),
-        eq(baseEventPredictionsSchema.referenceType, 'Castaway')))
+        eq(castawayPrediction.castawayId, baseEventPredictionSchema.referenceId),
+        eq(baseEventPredictionSchema.referenceType, 'Castaway')))
       .leftJoin(tribePrediction, and(
-        eq(tribePrediction.tribeId, baseEventPredictionsSchema.referenceId),
-        eq(baseEventPredictionsSchema.referenceType, 'Tribe')))
-      .leftJoin(baseEventsSchema, and(
+        eq(tribePrediction.tribeId, baseEventPredictionSchema.referenceId),
+        eq(baseEventPredictionSchema.referenceType, 'Tribe')))
+      .leftJoin(baseEventSchema, and(
         eq(
-          sql`cast(${baseEventsSchema.eventName} as varchar)`,
-          sql`cast(${baseEventPredictionsSchema.baseEventName} as varchar)`),
-        eq(baseEventsSchema.episodeId, episodesSchema.episodeId)))
-      .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventsSchema.baseEventId))
-      .leftJoin(castawaysSchema, and(
-        eq(castawaysSchema.castawayId, baseEventReferenceSchema.referenceId),
+          sql`cast(${baseEventSchema.eventName} as varchar)`,
+          sql`cast(${baseEventPredictionSchema.baseEventName} as varchar)`),
+        eq(baseEventSchema.episodeId, episodeSchema.episodeId)))
+      .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventSchema.baseEventId))
+      .leftJoin(castawaySchema, and(
+        eq(castawaySchema.castawayId, baseEventReferenceSchema.referenceId),
         eq(baseEventReferenceSchema.referenceType, 'Castaway')))
-      .leftJoin(tribesSchema, and(
-        eq(tribesSchema.tribeId, baseEventReferenceSchema.referenceId),
+      .leftJoin(tribeSchema, and(
+        eq(tribeSchema.tribeId, baseEventReferenceSchema.referenceId),
         eq(baseEventReferenceSchema.referenceType, 'Tribe')))
       .where(and(
-        eq(baseEventPredictionsSchema.memberId, otherMemberId ?? memberId),
-        sql`(${episodesSchema.airDate} < ${new Date().toUTCString()})`))
+        eq(baseEventPredictionSchema.memberId, otherMemberId ?? memberId),
+        sql`(${episodeSchema.airDate} < ${new Date().toUTCString()})`))
       .then((predictions) => predictions.reduce((acc, prediction) => {
         acc[prediction.episodeNumber] ??= [];
         let predictionIndex = acc[prediction.episodeNumber]!.findIndex((p) =>

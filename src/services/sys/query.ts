@@ -3,9 +3,9 @@ import 'server-only';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { type CastawayDetails, type NewCastaway } from '~/types/castaways';
-import type { NewTribe, TribeColor, TribeName } from '~/types/tribes';
+import type { NewTribe, TribeColor, TribeName } from '~/types/deprecated/tribes';
 import { db } from '~/server/db';
-import { castawaysSchema } from '~/server/db/schema/castaways';
+import { castawaySchema } from '~/server/db/schema/castaways';
 import { isNull } from 'drizzle-orm';
 
 export const sysService = {
@@ -115,8 +115,8 @@ export const sysService = {
   fetchAdditions: async function(): Promise<CastawayDetails[]> {
     return db
       .select()
-      .from(castawaysSchema)
-      .where(isNull(castawaysSchema.seasonId))
+      .from(castawaySchema)
+      .where(isNull(castawaySchema.seasonId))
       .then((castaways) => {
         return castaways.map((castaway) => ({
           ...castaway,

@@ -7,8 +7,8 @@ import { useDraft } from '~/hooks/useDraft';
 import { useIsMobile } from '~/hooks/useMobile';
 import { cn } from '~/lib/utils';
 import { type CastawayDraftInfo } from '~/types/castaways';
-import { type LeagueHash } from '~/types/leagues';
-import { type TribeName } from '~/types/tribes';
+import { type LeagueHash } from '~/types/deprecated/leagues';
+import { type TribeName } from '~/types/deprecated/tribes';
 import ColorRow from '~/components/shared/colorRow';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 

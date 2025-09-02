@@ -5,9 +5,9 @@ import { useLeague } from '~/hooks/useLeague';
 import {
   BaseEventFullName, type LeagueEventId, type LeagueEventName, type ReferenceType, type ScoringBaseEventName
 } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
+import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
 import { type CastawayName } from '~/types/castaways';
-import { type TribeName } from '~/types/tribes';
+import { type TribeName } from '~/types/deprecated/tribes';
 import { type EpisodeEventsProps } from '~/components/leagues/hub/activity/timeline/table/view';
 import BaseEventRow from '~/components/leagues/hub/activity/timeline/table/row/base';
 import LeagueEventRow from '~/components/leagues/hub/activity/timeline/table/row/custom';

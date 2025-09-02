@@ -6,7 +6,7 @@ import { leagueMemberAuth } from '~/lib/auth';
 import { Button } from '~/components/common/button';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { leaguesService as QUERIES } from '~/services/leagues';
+import { leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import { metadata } from '~/app/layout';
 
 interface JoinPageProps extends LeaguePageProps {

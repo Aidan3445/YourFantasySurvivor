@@ -10,7 +10,7 @@ import type { EpisodeNumber } from '~/types/episodes';
 import {
   type BaseEvent, BaseEventFullName, baseEventLabelPrefixes, baseEventLabels, type BaseEventRule
 } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
+import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
 import EditBaseEvent from '~/components/leagues/actions/events/base/edit';
 import ColorRow from '~/components/shared/colorRow';
 import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';

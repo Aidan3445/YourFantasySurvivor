@@ -4,7 +4,7 @@ import { createTable } from '~/server/db/schema/createTable';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { integer, serial, varchar } from 'drizzle-orm/pg-core';
 
-export const tribesSchema = createTable(
+export const tribeSchema = createTable(
   'tribe',
   {
     tribeId: serial('tribe_id').notNull().primaryKey(),

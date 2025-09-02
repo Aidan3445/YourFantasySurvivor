@@ -1,23 +1,22 @@
 import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
-import { boolean, index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, pgEnum, serial, unique } from 'drizzle-orm/pg-core';
 import { leaguesSchema } from '~/server/db/schema/leagues';
-import { AllBaseEventNames, ScoringBaseEventNames, ShauhinModeTimings } from '~/types/events';
-import { episodesSchema } from '~/server/db/schema/episodes';
+import { AllBaseEventNames, ScoringBaseEventNames, ShauhinModeTimings } from '~/types/deprecated/events';
+import { episodeSchema } from '~/server/db/schema/episodes';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { keywords, notes, reference, timing } from '~/server/db/schema/sharedEvents';
+import { label, notes, reference, timing } from '~/server/db/schema/shared';
 
 export const eventName = pgEnum('event_name', AllBaseEventNames);
 export const scoringEventName = pgEnum('scoring_event_name', ScoringBaseEventNames);
-export const baseEventsSchema = createTable(
+export const baseEventSchema = createTable(
   'event_base',
   {
     baseEventId: serial('event_base_id').notNull().primaryKey(),
-    episodeId: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
+    episodeId: integer('episode_id').references(() => episodeSchema.episodeId, { onDelete: 'cascade' }).notNull(),
     eventName: eventName('name').notNull(),
-    keywords: keywords('keywords'),
-    label: varchar('label', { length: 64 }).notNull().default(''),
+    label: label('label'),
     notes: notes('notes'),
   },
   (table) => [
@@ -30,7 +29,7 @@ export const baseEventReferenceSchema = createTable(
   'event_base_reference',
   {
     baseEventReferenceId: serial('event_base_reference_id').notNull().primaryKey(),
-    baseEventId: integer('event_id').references(() => baseEventsSchema.baseEventId, { onDelete: 'cascade' }).notNull(),
+    baseEventId: integer('event_id').references(() => baseEventSchema.baseEventId, { onDelete: 'cascade' }).notNull(),
     referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
   },
@@ -118,12 +117,12 @@ export const baseEventPredictionRulesSchema = createTable(
   }
 );
 
-export const baseEventPredictionsSchema = createTable(
+export const baseEventPredictionSchema = createTable(
   'event_base_prediction',
   {
     baseEventPredictionId: serial('event_base_prediction_id').notNull().primaryKey(),
     baseEventName: scoringEventName('event_name').notNull(),
-    episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }).notNull(),
     memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
     referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),

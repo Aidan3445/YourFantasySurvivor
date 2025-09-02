@@ -1,6 +1,6 @@
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { type leaguesService as QUERIES } from '~/services/leagues';
+import { type leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import { defaultShauhinModeSettings, type ShauhinModeSettings } from '~/types/events';
 import useSWR, { type Fetcher } from 'swr';
 import { type SWRKey } from '~/lib/utils';

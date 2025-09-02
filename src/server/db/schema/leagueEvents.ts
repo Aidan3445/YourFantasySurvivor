@@ -5,9 +5,9 @@ import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'dri
 import { leaguesSchema } from '~/server/db/schema/leagues';
 import { LeagueEventTypeOptions } from '~/types/events';
 import { sql } from 'drizzle-orm';
-import { episodesSchema } from '~/server/db/schema/episodes';
+import { episodeSchema } from '~/server/db/schema/episodes';
 import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { notes, reference, timing } from '~/server/db/schema/sharedEvents';
+import { notes, reference, timing } from '~/server/db/schema/shared';
 
 export const leagueEventType = pgEnum('event_type', LeagueEventTypeOptions);
 
@@ -33,7 +33,7 @@ export const leagueEventPredictionsSchema = createTable(
   'event_league_prediction',
   {
     leagueEventRuleId: integer('league_event_rule_id').notNull().references(() => leagueEventsRulesSchema.leagueEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
     memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }),
     referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
@@ -51,7 +51,7 @@ export const leagueEventsSchema = createTable(
   {
     leagueEventId: serial('league_event_id').notNull().primaryKey(),
     leagueEventRuleId: integer('league_event_rule_id').notNull().references(() => leagueEventsRulesSchema.leagueEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
     referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
     notes: notes('notes'),

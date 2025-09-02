@@ -16,7 +16,7 @@ import { Input } from '~/components/common/input';
 import { useEventOptions } from '~/hooks/useEventOptions';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { deleteBaseEvent, updateBaseEvent } from '~/services/leagues/events/baseActions';
+import { deleteBaseEvent, updateBaseEvent } from '~/services/deprecated/baseActions';
 import { useLeague } from '~/hooks/useLeague';
 
 interface EditBaseEventProps {

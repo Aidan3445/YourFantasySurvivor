@@ -3,10 +3,10 @@
 import { redirect, useParams } from 'next/navigation';
 import { type NonUndefined } from 'react-hook-form';
 import useSWR, { type Fetcher } from 'swr';
-import { type leaguesService as QUERIES } from '~/services/leagues';
+import { type leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import { type SWRKey } from '~/lib/utils';
 import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/types/events';
-import { type LeagueHash } from '~/types/leagues';
+import { type LeagueHash } from '~/types/deprecated/leagues';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagueLiveData>>>;

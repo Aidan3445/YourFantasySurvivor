@@ -7,11 +7,11 @@ import { useLeague } from '~/hooks/useLeague';
 import { cn } from '~/lib/utils';
 import type { EpisodeNumber } from '~/types/episodes';
 import { BaseEventFullName, type BaseEventName, type LeagueEventName, type ReferenceType } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
+import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
 import ColorRow from '~/components/shared/colorRow';
 import EditLeagueEvent from '~/components/leagues/actions/events/custom/edit';
 import { type CastawayName } from '~/types/castaways';
-import { type TribeName } from '~/types/tribes';
+import { type TribeName } from '~/types/deprecated/tribes';
 import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
 

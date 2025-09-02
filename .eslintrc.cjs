@@ -65,7 +65,7 @@ const config =
       'warn',
       {
         prefer: 'type-imports',
-        fixStyle: 'inline-type-imports'
+        fixStyle: 'separate-type-imports'
       }
     ],
     '@typescript-eslint/no-unused-vars': [

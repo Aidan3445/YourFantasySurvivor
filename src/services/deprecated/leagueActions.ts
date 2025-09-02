@@ -1,10 +1,10 @@
 'use server';
 
-import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/types/leagues';
+import { type LeagueHash, type LeagueName, type LeagueSettingsUpdate } from '~/types/deprecated/leagues';
 import { db } from '~/server/db';
 import {
-  baseEventPredictionRulesSchema, baseEventPredictionsSchema, baseEventReferenceSchema,
-  baseEventRulesSchema, baseEventsSchema, shauhinModeSettingsSchema
+  baseEventPredictionRulesSchema, baseEventPredictionSchema, baseEventReferenceSchema,
+  baseEventRulesSchema, baseEventSchema, shauhinModeSettingsSchema
 } from '~/server/db/schema/baseEvents';
 import {
   type ReferenceType, type BaseEventRule, type LeagueEventRule, type LeagueEventInsert,
@@ -16,16 +16,16 @@ import { auth, leagueMemberAuth } from '~/lib/auth';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';
 import {
   type LeagueMember, type LeagueMemberId, type NewLeagueMember
-} from '~/types/leagueMembers';
+} from '~/types/deprecated/leagueMembers';
 import { seasonsSchema } from '~/server/db/schema/seasons';
-import { episodesSchema } from '~/server/db/schema/episodes';
+import { episodeSchema } from '~/server/db/schema/episodes';
 import {
   leagueEventPredictionsSchema, leagueEventsRulesSchema, leagueEventsSchema
 } from '~/server/db/schema/leagueEvents';
 import { type CastawayId } from '~/types/castaways';
-import { castawaysSchema } from '~/server/db/schema/castaways';
-import { type TribeId } from '~/types/tribes';
-import { leaguesService as QUERIES } from '~/services/leagues';
+import { castawaySchema } from '~/server/db/schema/castaways';
+import { type TribeId } from '~/types/deprecated/tribes';
+import { leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 import { basePredictionRulesObjectToSchema } from '~/lib/utils';
 
@@ -198,12 +198,12 @@ export async function updateLeagueSettings(
   // so doing some extra work technically by fetching 
   // the episode but it allows for a more dynamic solution 
   const res = await db
-    .select({ premiereDate: seasonsSchema.premiereDate, episode2Date: episodesSchema.airDate })
+    .select({ premiereDate: seasonsSchema.premiereDate, episode2Date: episodeSchema.airDate })
     .from(seasonsSchema)
     .innerJoin(leaguesSchema, eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId))
-    .leftJoin(episodesSchema, and(
-      eq(episodesSchema.seasonId, seasonsSchema.seasonId),
-      eq(episodesSchema.episodeNumber, 2)))
+    .leftJoin(episodeSchema, and(
+      eq(episodeSchema.seasonId, seasonsSchema.seasonId),
+      eq(episodeSchema.episodeNumber, 2)))
     .where(eq(leaguesSchema.leagueHash, leagueHash))
     .then((res) => res[0]);
   if (!res) throw new Error('Season not found');
@@ -523,19 +523,19 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
 
   // castaways that are not eliminated
   const survivingCastawaysPromise = db
-    .select({ castawayId: castawaysSchema.castawayId })
-    .from(castawaysSchema)
-    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, castawaysSchema.seasonId))
+    .select({ castawayId: castawaySchema.castawayId })
+    .from(castawaySchema)
+    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, castawaySchema.seasonId))
     .innerJoin(leaguesSchema, and(
       eq(leaguesSchema.leagueSeason, seasonsSchema.seasonId),
       eq(leaguesSchema.leagueHash, leagueHash)))
     // still in the game
     .leftJoin(baseEventReferenceSchema, and(
-      eq(baseEventReferenceSchema.referenceId, castawaysSchema.castawayId),
+      eq(baseEventReferenceSchema.referenceId, castawaySchema.castawayId),
       eq(baseEventReferenceSchema.referenceType, 'Castaway')))
-    .leftJoin(baseEventsSchema, and(
-      eq(baseEventsSchema.baseEventId, baseEventReferenceSchema.baseEventId),
-      notInArray(baseEventsSchema.eventName, ['elim', 'noVoteExit'])))
+    .leftJoin(baseEventSchema, and(
+      eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
+      notInArray(baseEventSchema.eventName, ['elim', 'noVoteExit'])))
     .then((res) => res.map(({ castawayId }) => castawayId));
 
   // member selection history for the league
@@ -547,9 +547,9 @@ export async function chooseCastaway(leagueHash: LeagueHash, castawayId: Castawa
     .from(selectionUpdatesSchema)
     .innerJoin(leagueMembersSchema, eq(leagueMembersSchema.memberId, selectionUpdatesSchema.memberId))
     .innerJoin(leaguesSchema, eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId))
-    .innerJoin(episodesSchema, eq(episodesSchema.episodeId, selectionUpdatesSchema.episodeId))
+    .innerJoin(episodeSchema, eq(episodeSchema.episodeId, selectionUpdatesSchema.episodeId))
     .where(eq(leaguesSchema.leagueHash, leagueHash))
-    .orderBy(asc(episodesSchema.episodeNumber))
+    .orderBy(asc(episodeSchema.episodeNumber))
     .then((res) => Object.values(res.reduce((acc, { castawayId, memberId }) => {
       acc[memberId] = castawayId;
       return acc;
@@ -689,7 +689,7 @@ export async function makePrediction(
       });
   } else {
     await db
-      .insert(baseEventPredictionsSchema)
+      .insert(baseEventPredictionSchema)
       .values({
         baseEventName: rule.eventName as ScoringBaseEventName,
         episodeId,
@@ -700,9 +700,9 @@ export async function makePrediction(
       })
       .onConflictDoUpdate({
         target: [
-          baseEventPredictionsSchema.baseEventName,
-          baseEventPredictionsSchema.episodeId,
-          baseEventPredictionsSchema.memberId,
+          baseEventPredictionSchema.baseEventName,
+          baseEventPredictionSchema.episodeId,
+          baseEventPredictionSchema.memberId,
         ],
         set: { referenceType, referenceId, bet: betAmount ? betAmount : null },
       });

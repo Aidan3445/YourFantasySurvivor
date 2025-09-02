@@ -1,12 +1,12 @@
 'use client';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
-import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/types/leagues';
+import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/types/deprecated/leagues';
 import { useLeague } from '~/hooks/useLeague';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { Button } from '~/components/common/button';
-import { updateAdmins, updateLeagueSettings } from '~/services/leagues/settings/leagueActions';
+import { updateAdmins, updateLeagueSettings } from '~/services/deprecated/leagueActions';
 import { Input } from '~/components/common/input';
 import LeagueAdminsField from '~/components/leagues/customization/settings/league/admin';
 

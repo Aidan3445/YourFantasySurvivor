@@ -2,7 +2,7 @@
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Input } from '~/components/common/input';
-import { type LeagueMemberColor } from '~/types/leagueMembers';
+import { type LeagueMemberColor } from '~/types/deprecated/leagueMembers';
 import Swatch, { type SwatchRectRenderProps } from '@uiw/react-color-swatch';
 import { type HsvaColor, getContrastingColor, hexToHsva, hexToRgba, hsvaToHex, rgbaToHex } from '@uiw/color-convert';
 import { twentyColors } from '~/lib/colors';

@@ -1,4 +1,4 @@
-import { seasonsService as SEASON_QUERIES } from '~/services/seasons';
+import { seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasonsService';
 import { compileScores } from '~/lib/scores';
 import { defaultBaseRules } from '~/types/events';
 import { type CastawayName } from '~/types/castaways';

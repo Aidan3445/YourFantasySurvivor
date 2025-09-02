@@ -1,11 +1,11 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
+import { type seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasons';
 import { type CastawayDetails } from '~/types/castaways';
 import { type EpisodeNumber } from '~/types/episodes';
 import { type BasePredictionRules, defaultPredictionRules, type PredictionEventTiming, ScoringBaseEventNames } from '~/types/events';
-import { type LeagueHash } from '~/types/leagues';
-import { type TribeName } from '~/types/tribes';
+import { type LeagueHash } from '~/types/deprecated/leagues';
+import { type TribeName } from '~/types/deprecated/tribes';
 import { type baseEventPredictionRulesSchema } from '~/server/db/schema/baseEvents';
 
 export function cn(...inputs: ClassValue[]) {
@@ -32,7 +32,7 @@ export function findTribeCastaways(
   for (let i = 2; i <= episodeNumber; i++) {
     eliminations[i - 1]?.forEach((castaway) => onTribe.delete(castaway));
     if (!tribeUpdates[i]) continue;
-    Object.entries(tribeUpdates[i]!).forEach(([tribeUpdateName, update]) => {
+    Object.entries(tribeUpdates[i]).forEach(([tribeUpdateName, update]) => {
       if (tribeUpdateName === tribeName) {
         update.castaways.forEach((castaway) => onTribe.add(castaway));
       } else {

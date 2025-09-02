@@ -6,7 +6,7 @@ import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
 import UserProvider from '~/context/yfsUserContext';
-import { leaguesService as QUERIES } from '~/services/leagues';
+import { leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import { type Metadata } from 'next';
 
 const inter = Inter({

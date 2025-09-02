@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
-import { leaguesService as QUERIES } from '~/services/leagues';
+import { leaguesService as QUERIES } from '~/services/deprecated/leagues';
 
 export async function GET(_: NextRequest, { params }: LeaguePageProps) {
   const { leagueHash } = await params;

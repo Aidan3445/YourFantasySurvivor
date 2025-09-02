@@ -1,6 +1,6 @@
 'use client';
 
-import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
+import { type seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasonsService';
 import {
   Table, TableCaption, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';

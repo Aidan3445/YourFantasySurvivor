@@ -1,7 +1,7 @@
 import { defaultBaseRules, defaultPredictionRules } from '~/types/events';
 import { findTribeCastaways } from '~/lib/utils';
-import { type leaguesService as LEAGUE_QUERIES } from '~/services/leagues';
-import { type seasonsService as SEASON_QUERIES } from '~/services/seasons';
+import { type leaguesService as LEAGUE_QUERIES } from '~/services/deprecated/leagues';
+import { type seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasonsService';
 import { type ScoringBaseEventName, ScoringBaseEventNames, type BaseEventRule, type ReferenceType, type BasePredictionRules } from '~/types/events';
 import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
 import { type LeagueSurvivalCap } from '~/types/leagues';

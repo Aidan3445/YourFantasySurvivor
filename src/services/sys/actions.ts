@@ -4,13 +4,13 @@ import { eq } from 'drizzle-orm';
 import { systemAdminAuth } from '~/lib/auth';
 import { db } from '~/server/db';
 import { type NewCastaway } from '~/types/castaways';
-import { type NewSeason } from '~/types/seasons';
-import { type NewTribe } from '~/types/tribes';
-import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
-import { castawaysSchema } from '~/server/db/schema/castaways';
-import { episodesSchema } from '~/server/db/schema/episodes';
+import { type NewSeason } from '~/types/deprecated/seasons';
+import { type NewTribe } from '~/types/deprecated/tribes';
+import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
+import { castawaySchema } from '~/server/db/schema/castaways';
+import { episodeSchema } from '~/server/db/schema/episodes';
 import { seasonsSchema } from '~/server/db/schema/seasons';
-import { tribesSchema } from '~/server/db/schema/tribes';
+import { tribeSchema } from '~/server/db/schema/tribes';
 
 /**
   * Import contestants from fandom
@@ -42,19 +42,19 @@ export async function importContestants(
 
       // Insert castaways
       const insertedCastaways = await trx
-        .insert(castawaysSchema)
+        .insert(castawaySchema)
         .values(castaways.map((castaway) => ({ ...castaway, seasonId })))
-        .returning({ castawayId: castawaysSchema.castawayId, fullName: castawaysSchema.fullName });
+        .returning({ castawayId: castawaySchema.castawayId, fullName: castawaySchema.fullName });
 
       // Insert tribes
       const insertedTribes = await trx
-        .insert(tribesSchema)
+        .insert(tribeSchema)
         .values(tribes.map((tribe) => ({ ...tribe, seasonId })))
-        .returning({ tribeId: tribesSchema.tribeId, tribeName: tribesSchema.tribeName });
+        .returning({ tribeId: tribeSchema.tribeId, tribeName: tribeSchema.tribeName });
 
       // Insert first episode
       const episodeId = await trx
-        .insert(episodesSchema)
+        .insert(episodeSchema)
         .values({
           episodeNumber: 1,
           title: season.premiereTitle,
@@ -62,19 +62,19 @@ export async function importContestants(
           runtime: 120,
           seasonId,
         })
-        .returning({ episodeId: episodesSchema.episodeId })
+        .returning({ episodeId: episodeSchema.episodeId })
         .then((episodes) => episodes[0]!.episodeId);
 
       // Assign castaways to tribes
       for (const tribe of insertedTribes) {
         const tribeUpdateId = await trx
-          .insert(baseEventsSchema)
+          .insert(baseEventSchema)
           .values({
             episodeId,
             eventName: 'tribeUpdate',
             keywords: ['Initial Tribes'],
           })
-          .returning({ eventId: baseEventsSchema.baseEventId })
+          .returning({ eventId: baseEventSchema.baseEventId })
           .then((events) => events[0]!.eventId);
 
         await trx
@@ -131,7 +131,7 @@ export async function importEpisode(
   if (!seasonId) throw new Error('Season not found');
 
   await db
-    .insert(episodesSchema)
+    .insert(episodeSchema)
     .values({
       episodeNumber: episode.episodeNumber,
       title: episode.episodeTitle.replaceAll('"', ''),

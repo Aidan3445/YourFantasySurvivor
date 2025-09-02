@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '~/server/db';
-import { baseEventReferenceSchema, baseEventsSchema } from '~/server/db/schema/baseEvents';
+import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { type BaseEventInsert } from '~/types/events';
 import { eq } from 'drizzle-orm';
 import { systemAdminAuth } from '~/lib/auth';
@@ -21,14 +21,14 @@ export async function createBaseEvent(baseEvent: BaseEventInsert) {
     try {
       // insert the base event
       const baseEventId = await db
-        .insert(baseEventsSchema)
+        .insert(baseEventSchema)
         .values({
           episodeId: baseEvent.episodeId,
           eventName: baseEvent.eventName,
           label: baseEvent.label,
           notes: baseEvent.notes,
         })
-        .returning({ baseEventId: baseEventsSchema.baseEventId })
+        .returning({ baseEventId: baseEventSchema.baseEventId })
         .then((result) => result[0]?.baseEventId);
       if (!baseEventId) throw new Error('Failed to create base event');
 
@@ -77,14 +77,14 @@ export async function updateBaseEvent(baseEventId: number, baseEvent: BaseEventI
     try {
       // update the base event
       await db
-        .update(baseEventsSchema)
+        .update(baseEventSchema)
         .set({
           episodeId: baseEvent.episodeId,
           eventName: baseEvent.eventName,
           label: baseEvent.label,
           notes: baseEvent.notes,
         })
-        .where(eq(baseEventsSchema.baseEventId, baseEventId));
+        .where(eq(baseEventSchema.baseEventId, baseEventId));
 
       // delete existing references
       const oldRefs = await db
@@ -127,7 +127,7 @@ export async function deleteBaseEvent(baseEventId: number) {
   // unlike update and insert, cascade delete will take care of deleting
   // the references as well, nice!
   await db
-    .delete(baseEventsSchema)
-    .where(eq(baseEventsSchema.baseEventId, baseEventId));
+    .delete(baseEventSchema)
+    .where(eq(baseEventSchema.baseEventId, baseEventId));
 }
 

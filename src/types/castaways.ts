@@ -1,44 +1,11 @@
-import { type EpisodeId } from '~/types/episodes';
-import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
-import { type Tribe, type TribeEp, type TribeName } from '~/types/tribes';
-
-export type CastawayId = number;
-export type CastawayName = string;
-export type CastawayAge = number;
-export type CastawayHometown = string;
-export type CastawayResidence = string;
-export type CastawayOccupation = string;
-
-export interface CastawayDetails {
-  castawayId: CastawayId;
-  fullName: CastawayName;
-  shortName: CastawayName;
-  startingTribe: TribeEp;
-  tribes: TribeEp[];
-  imageUrl: CastawayImage;
-  eliminatedEpisode: number | null;
-}
-
-export type CastawayImage = string;
-
-export interface NewCastaway {
-  fullName: CastawayName;
-  shortName: CastawayName;
-  age: CastawayAge;
-  residence: CastawayResidence;
-  occupation: CastawayOccupation;
-  imageUrl: CastawayImage;
-  tribe: TribeName;
-}
-
-export interface CastawayDraftInfo {
-  castawayId: CastawayId;
-  fullName: CastawayName;
-  age: CastawayAge;
-  residence: CastawayResidence;
-  occupation: CastawayOccupation;
-  imageUrl: CastawayImage;
-  tribe: Tribe;
-  pickedBy: LeagueMemberDisplayName | null;
-  eliminatedEpisode: EpisodeId | null;
-}
+export type Castaway = {
+  castawayId: number;
+  fullName: string;
+  shortName: string;
+  age: number;
+  hometown: string;
+  residence: string;
+  occupation: string;
+  imageUrl: string;
+  seasonId: number | null;
+};

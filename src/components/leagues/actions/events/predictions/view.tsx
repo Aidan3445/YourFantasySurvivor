@@ -3,7 +3,7 @@ import {
   type BasePredictionDraft, type LeaguePredictionDraft,
 } from '~/types/events';
 import type { CastawayDetails, CastawayDraftInfo } from '~/types/castaways';
-import type { Tribe } from '~/types/tribes';
+import type { Tribe } from '~/types/deprecated/tribes';
 import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 
 export interface MakePredictionsProps {

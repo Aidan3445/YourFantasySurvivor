@@ -2,7 +2,7 @@ import 'server-only';
 
 import { and, count, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
-import { type LeagueHash, type LeagueStatus } from '~/types/leagues';
+import { type LeagueHash, type LeagueStatus } from '~/types/deprecated/leagues';
 import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
 import { seasonsSchema } from '~/server/db/schema/seasons';
 import { leagueMembersSchema, selectionUpdatesSchema } from '~/server/db/schema/leagueMembers';

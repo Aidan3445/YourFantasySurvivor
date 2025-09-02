@@ -2,8 +2,8 @@
 
 import { type ReactNode, createContext, useState } from 'react';
 import { type NonUndefined } from 'react-hook-form';
-import { type leaguesService as QUERIES } from '~/services/leagues';
-import { type LeagueHash } from '~/types/leagues';
+import { type leaguesService as QUERIES } from '~/services/deprecated/leagues';
+import { type LeagueHash } from '~/types/deprecated/leagues';
 
 export type LeaguesList = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagues>>>;
 export type LeagueInfo = LeaguesList[number];

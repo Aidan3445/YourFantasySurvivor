@@ -3,10 +3,10 @@ import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'dri
 
 import { createTable } from '~/server/db/schema/createTable';
 import { leaguesSchema } from '~/server/db/schema/leagues';
-import { CustomEventTypes } from '~/types/sharedEvents';
-import { keywords, notes, reference, timing } from '~/server/db/schema/sharedEvents';
+import { keywords, label, notes, reference, timing } from '~/server/db/schema/shared';
+import { EventTypes } from '~/types/events';
 
-export const eventType = pgEnum('event_type', CustomEventTypes);
+export const eventType = pgEnum('event_type', EventTypes);
 export const customEventRuleSchema = createTable(
   'event_custom_rule',
   {
@@ -31,7 +31,7 @@ export const customEventSchema = createTable(
     customEventId: serial('custom_event_id').notNull().primaryKey(),
     episodeId: integer('episode_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
     customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
-    keywords: keywords('keywords'),
+    label: label('label'),
     notes: notes('notes'),
   },
   (table) => [

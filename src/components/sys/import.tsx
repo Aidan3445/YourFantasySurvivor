@@ -11,7 +11,7 @@ import { Input } from '~/components/common/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '~/components/common/form';
 import { DateTimePicker } from '~/components/common/dateTimePicker';
 import { type NewCastaway } from '~/types/castaways';
-import { type NewTribe } from '~/types/tribes';
+import { type NewTribe } from '~/types/deprecated/tribes';
 import { Circle } from 'lucide-react';
 
 const formSchema = z.object({

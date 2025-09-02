@@ -1,5 +1,5 @@
 import { type ShauhinModeSettings } from '~/types/events';
-import { type leaguesService as QUERIES } from '~/services/leagues';
+import { type leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { Flame } from 'lucide-react';

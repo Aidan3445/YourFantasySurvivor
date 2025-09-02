@@ -2,7 +2,7 @@
 
 import { Settings, X } from 'lucide-react';
 import { z } from 'zod';
-import { type LeagueSettingsUpdate } from '~/types/leagues';
+import { type LeagueSettingsUpdate } from '~/types/deprecated/leagues';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
@@ -11,7 +11,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
-import { updateLeagueSettings } from '~/services/leagues/settings/leagueActions';
+import { updateLeagueSettings } from '~/services/deprecated/leagueActions';
 import { useLeague } from '~/hooks/useLeague';
 import { useState } from 'react';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';

@@ -7,7 +7,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
-import { updateBaseEventRules } from '~/services/leagues/settings/leagueActions';
+import { updateBaseEventRules } from '~/services/deprecated/leagueActions';
 import { useEffect, useState } from 'react';
 import { Lock, LockOpen } from 'lucide-react';
 import ChallengeScoreSettings from '~/components/leagues/customization/events/base/challenges';

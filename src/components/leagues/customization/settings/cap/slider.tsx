@@ -1,5 +1,5 @@
 import { Slider } from '~/components/common/slider';
-import { MAX_SURVIVAL_CAP } from '~/types/leagues';
+import { MAX_SURVIVAL_CAP } from '~/types/deprecated/leagues';
 
 interface SurvivalCapSliderProps {
   value: number;

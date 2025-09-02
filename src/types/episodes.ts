@@ -1,14 +1,15 @@
-export type EpisodeId = number;
-export type EpisodeNumber = number;
-export type EpisodeTitle = string;
-export type EpisodeAirStatus = 'Aired' | 'Upcoming' | 'Airing';
+import { type AirStatuses } from '~/lib/episodes';
+
+export type AirStatus = (typeof AirStatuses)[number];
 
 export type Episode = {
-  episodeId: EpisodeId;
-  episodeNumber: EpisodeNumber;
-  episodeTitle: EpisodeTitle;
-  episodeAirDate: Date;
-  airStatus: EpisodeAirStatus;
+  seasonId: number;
+  episodeId: number;
+  episodeNumber: number;
+  title: string;
+  airDate: Date;
+  runtime: number;
+  airStatus: AirStatus;
   isMerge: boolean;
   isFinale: boolean;
 };

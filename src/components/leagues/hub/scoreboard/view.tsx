@@ -7,7 +7,7 @@ import { useLeague } from '~/hooks/useLeague';
 import { Flame } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import { type LeagueHash } from '~/types/leagues';
+import { type LeagueHash } from '~/types/deprecated/leagues';
 import MemberRow from '~/components/leagues/hub/scoreboard/row';
 import ScoreboardHelp from '~/components/leagues/hub/scoreboard/help';
 
