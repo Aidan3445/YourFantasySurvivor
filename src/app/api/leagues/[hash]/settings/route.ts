@@ -3,7 +3,7 @@ import 'server-only';
 import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
 import { withLeagueAuth } from '~/lib/api-middleware';
-import getLeagueSettings from '~/services/leagues/query/leagueSettings';
+import getLeagueSettings from '~/services/leagues/query/settings';
 
 export async function GET(request: NextRequest, context: LeagueRouteParams) {
   return withLeagueAuth(async (_, context, __) => {
