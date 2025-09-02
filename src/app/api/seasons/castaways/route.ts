@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import getCastaways from '~/services/seasons/castaways';
+import getCastaways from '~/services/seasons/query/castaways';
 
 export async function GET(req: NextRequest) {
   const seasonIdParam = req.nextUrl.searchParams.get('seasonId');

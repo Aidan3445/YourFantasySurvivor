@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import getSeasonsData from '~/services/seasons/seasonsData';
+import getSeasonsData from '~/services/seasons/query/seasonsData';
 
 export async function GET(req: NextRequest) {
   const includeInactiveParam = req.nextUrl.searchParams.get('includeInactive');

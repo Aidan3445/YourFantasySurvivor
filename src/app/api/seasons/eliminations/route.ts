@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import getEliminations from '~/services/seasons/eliminations';
+import getEliminations from '~/services/seasons/query/eliminations';
 
 export async function GET(req: NextRequest) {
   const seasonIdParam = req.nextUrl.searchParams.get('seasonId');

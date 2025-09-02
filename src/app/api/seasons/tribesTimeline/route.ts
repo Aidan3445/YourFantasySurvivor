@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import getTribesTimeline from '~/services/seasons/tribesTimeline';
+import getTribesTimeline from '~/services/seasons/query/tribesTimeline';
 
 export async function GET(req: NextRequest) {
   const seasonIdParam = req.nextUrl.searchParams.get('seasonId');

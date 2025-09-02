@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import getBaseEvents from '~/services/seasons/baseEvents';
+import getBaseEvents from '~/services/seasons/query/baseEvents';
 
 export async function GET(req: NextRequest) {
   const seasonIdParam = req.nextUrl.searchParams.get('seasonId');

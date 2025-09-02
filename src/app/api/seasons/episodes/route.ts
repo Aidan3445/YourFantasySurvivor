@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import getEpisodes from '~/services/seasons/episodes';
+import getEpisodes from '~/services/seasons/query/episodes';
 
 export async function GET(req: NextRequest) {
   const seasonIdParam = req.nextUrl.searchParams.get('seasonId');
