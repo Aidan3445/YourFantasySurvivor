@@ -2,7 +2,7 @@ import 'server-only';
 import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
 
 import { createTable } from '~/server/db/schema/createTable';
-import { leaguesSchema } from '~/server/db/schema/leagues';
+import { leagueSchema } from '~/server/db/schema/leagues';
 import { label, notes, reference, timing } from '~/server/db/schema/shared';
 import { EventTypes } from '~/lib/events';
 
@@ -12,7 +12,7 @@ export const customEventRuleSchema = createTable(
   'event_custom_rule',
   {
     customEventRuleId: serial('custom_event_rule_id').notNull().primaryKey(),
-    leagueId: integer('league_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
+    leagueId: integer('league_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
     eventName: varchar('event_name', { length: 64 }).notNull(),
     description: varchar('event_desc', { length: 256 }).notNull(),
     points: integer('event_points').notNull(),
@@ -30,7 +30,7 @@ export const customEventSchema = createTable(
   'event_custom',
   {
     customEventId: serial('custom_event_id').notNull().primaryKey(),
-    episodeId: integer('episode_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
     customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
     label: label('label'),
     notes: notes('notes'),
@@ -60,8 +60,8 @@ export const customEventPredictionSchema = createTable(
   'event_custom_prediction',
   {
     customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
-    memberId: integer('member_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
+    memberId: integer('member_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
     refernceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
   },

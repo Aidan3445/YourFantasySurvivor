@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
-import { leaguesSchema } from '~/server/db/schema/leagues';
+import { leagueSchema } from '~/server/db/schema/leagues';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { castawaySchema } from '~/server/db/schema/castaways';
 import { boolean, index, integer, pgEnum, primaryKey, serial, unique, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
@@ -9,20 +9,22 @@ import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoleOptions } from '~/types/deprec
 
 export const leagueMemberRole = pgEnum('league_member_role', LeagueMemberRoleOptions);
 
-export const leagueMembersSchema = createTable(
+export const leagueMemberSchema = createTable(
   'league_member',
   {
     memberId: serial('league_member_id').notNull().primaryKey(),
-    leagueId: integer('league_id').references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }).notNull(),
+    leagueId: integer('league_id').references(() => leagueSchema.leagueId, { onDelete: 'cascade' }).notNull(),
     userId: varchar('user_id', { length: 64 }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
     displayName: varchar('display_name', { length: DISPLAY_NAME_MAX_LENGTH }).notNull(),
     role: leagueMemberRole('role').notNull().default('Member'),
+    draftOrder: integer('draft_order'),
   },
   (table) => [
     uniqueIndex('league_user_idx').on(table.leagueId, table.userId),
     unique('league_displayName_unq').on(table.leagueId, table.displayName),
     unique('league_color_unq').on(table.leagueId, table.color),
+    unique('league_draftOrder_unq').on(table.leagueId, table.draftOrder),
   ]
 );
 
@@ -30,7 +32,7 @@ export const selectionUpdatesSchema = createTable(
   'selection_update',
   {
     memberId: integer('member_id')
-      .references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' })
+      .references(() => leagueMemberSchema.memberId, { onDelete: 'cascade' })
       .notNull(),
     episodeId: integer('episode_id')
       .references(() => episodeSchema.episodeId, { onDelete: 'cascade' })

@@ -2,10 +2,10 @@ import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
 import { boolean, index, integer, pgEnum, serial, unique } from 'drizzle-orm/pg-core';
-import { leaguesSchema } from '~/server/db/schema/leagues';
+import { leagueSchema } from '~/server/db/schema/leagues';
 import { AllBaseEventNames, ScoringBaseEventNames, ShauhinModeTimings } from '~/types/deprecated/events';
 import { episodeSchema } from '~/server/db/schema/episodes';
-import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
+import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { label, notes, reference, timing } from '~/server/db/schema/shared';
 
 export const eventName = pgEnum('event_name', AllBaseEventNames);
@@ -44,7 +44,7 @@ export const baseEventRulesSchema = createTable(
   'event_base_rule',
   {
     leagueId: integer('league_id')
-      .references(() => leaguesSchema.leagueId, { onDelete: 'cascade' })
+      .references(() => leagueSchema.leagueId, { onDelete: 'cascade' })
       .primaryKey(),
     advFound: integer('adv_found').notNull(),
     advPlay: integer('adv_play').notNull(),
@@ -65,7 +65,7 @@ export const baseEventPredictionRulesSchema = createTable(
   'event_base_prediction_rule',
   {
     leagueId: integer('league_id')
-      .references(() => leaguesSchema.leagueId, { onDelete: 'cascade' })
+      .references(() => leagueSchema.leagueId, { onDelete: 'cascade' })
       .primaryKey(),
     advFoundPrediction: boolean('adv_found_prediction'),
     advFoundPredictionPoints: integer('adv_found_prediction_points'),
@@ -123,7 +123,7 @@ export const baseEventPredictionSchema = createTable(
     baseEventPredictionId: serial('event_base_prediction_id').notNull().primaryKey(),
     baseEventName: scoringEventName('event_name').notNull(),
     episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-    memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
+    memberId: integer('member_id').notNull().references(() => leagueMemberSchema.memberId, { onDelete: 'cascade' }).notNull(),
     referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
     bet: integer('bet')
@@ -141,7 +141,7 @@ export const shauhinModeSettingsSchema = createTable(
   'event_shauhin_mode_settings',
   {
     leagueId: integer('league_id')
-      .references(() => leaguesSchema.leagueId, { onDelete: 'cascade' })
+      .references(() => leagueSchema.leagueId, { onDelete: 'cascade' })
       .primaryKey(),
     enabled: boolean('enabled').notNull(),
     maxBet: integer('max_bet').notNull(),
