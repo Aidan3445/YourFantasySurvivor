@@ -15,3 +15,10 @@ export type LeagueMemberStatus = {
   currentCastaway: string | null;
   isEliminated: boolean;
 };
+
+export type SelectionUpdate = {
+  episodeNumber: number;
+  memberId: number;
+  castawayId: number;
+  draft: boolean;
+};
