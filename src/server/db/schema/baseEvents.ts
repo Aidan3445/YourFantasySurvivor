@@ -146,8 +146,8 @@ export const shauhinModeSettingsSchema = createTable(
     enabled: boolean('enabled').notNull(),
     maxBet: integer('max_bet').notNull(),
     maxBetsPerWeek: integer('max_bets_per_week').notNull(),
-    startWeek: shauhinModeStart('start_week').notNull(),
-    customStartWeek: integer('custom_start_week').notNull(),
+    startWeek: shauhinModeStart('start_week'),
+    customStartWeek: integer('custom_start_week'),
     enabledBets: scoringEventName('enabled_bets').array().notNull(),
     noEventIsMiss: boolean('no_event_is_miss').notNull()
   }

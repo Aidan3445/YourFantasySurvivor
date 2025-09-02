@@ -43,3 +43,5 @@ export default async function getUserLeagues() {
     .orderBy(desc(seasonsSchema.premiereDate))
     .then((rows) => rows as { league: League, member: LeagueMember }[]);
 }
+
+

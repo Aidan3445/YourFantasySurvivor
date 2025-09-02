@@ -9,3 +9,9 @@ export type LeagueMember = {
   role: LeagueMemberRole;
   draftOrder: number;
 };
+
+export type LeagueMemberStatus = {
+  currentCastawayId: number | null;
+  currentCastaway: string | null;
+  isEliminated: boolean;
+};

@@ -28,7 +28,7 @@ export const leagueMemberSchema = createTable(
   ]
 );
 
-export const selectionUpdatesSchema = createTable(
+export const selectionUpdateSchema = createTable(
   'selection_update',
   {
     memberId: integer('member_id')
@@ -47,5 +47,5 @@ export const selectionUpdatesSchema = createTable(
     index('member_idx').on(table.memberId),
   ]
 );
-export type SelectionUpdate = typeof selectionUpdatesSchema.$inferSelect;
+export type SelectionUpdate = typeof selectionUpdateSchema.$inferSelect;
 
