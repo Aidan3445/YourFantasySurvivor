@@ -1,4 +1,4 @@
-import type { EventSources, EventTypes, ReferenceTypes, BaseEventNames, ScoringBaseEventNames, EliminationEventNames } from '~/lib/events';
+import type { EventSources, EventTypes, ReferenceTypes, BaseEventNames, ScoringBaseEventNames, EliminationEventNames, PredictionTimings } from '~/lib/events';
 
 export type EventSource = (typeof EventSources)[number];
 export type EventType = (typeof EventTypes)[number];
@@ -32,3 +32,5 @@ export type Elimination = {
   eventId: number;
   castawayId: number;
 };
+
+export type PredictionTiming = (typeof PredictionTimings)[number];

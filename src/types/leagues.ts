@@ -1,4 +1,5 @@
-import type { LeagueStatuses } from '~/lib/leagues';
+import type { LeagueStatuses, ShauhinModeTimings } from '~/lib/leagues';
+import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 
 export type LeagueStatus = (typeof LeagueStatuses)[number];
 
@@ -16,3 +17,92 @@ export type LeagueSettings = {
   survivalCap: number;
   preserverStreak: boolean;
 };
+
+export type BaseEventRules = Record<ScoringBaseEventName, number>;
+
+export type BaseEventPredictionRulesSchema = {
+  advFoundPrediction: boolean | null,
+  advFoundPredictionPoints: number | null,
+  advFoundPredictionTiming: PredictionTiming[] | null,
+
+  advPlayPrediction: boolean | null,
+  advPlayPredictionPoints: number | null,
+  advPlayPredictionTiming: PredictionTiming[] | null,
+
+  badAdvPlayPrediction: boolean | null,
+  badAdvPlayPredictionPoints: number | null,
+  badAdvPlayPredictionTiming: PredictionTiming[] | null,
+
+  advElimPrediction: boolean | null,
+  advElimPredictionPoints: number | null,
+  advElimPredictionTiming: PredictionTiming[] | null,
+
+  spokeEpTitlePrediction: boolean | null,
+  spokeEpTitlePredictionPoints: number | null,
+  spokeEpTitlePredictionTiming: PredictionTiming[] | null,
+
+  tribe1stPrediction: boolean | null,
+  tribe1stPredictionPoints: number | null,
+  tribe1stPredictionTiming: PredictionTiming[] | null,
+
+  tribe2ndPrediction: boolean | null,
+  tribe2ndPredictionPoints: number | null,
+  tribe2ndPredictionTiming: PredictionTiming[] | null,
+
+  indivWinPrediction: boolean | null,
+  indivWinPredictionPoints: number | null,
+  indivWinPredictionTiming: PredictionTiming[] | null,
+
+  indivRewardPrediction: boolean | null,
+  indivRewardPredictionPoints: number | null,
+  indivRewardPredictionTiming: PredictionTiming[] | null,
+
+  finalistsPrediction: boolean | null,
+  finalistsPredictionPoints: number | null,
+  finalistsPredictionTiming: PredictionTiming[] | null,
+
+  fireWinPrediction: boolean | null,
+  fireWinPredictionPoints: number | null,
+  fireWinPredictionTiming: PredictionTiming[] | null,
+
+  soleSurvivorPrediction: boolean | null,
+  soleSurvivorPredictionPoints: number | null,
+  soleSurvivorPredictionTiming: PredictionTiming[] | null,
+}
+
+export type BaseEventPredictionSetting = {
+  enabled: boolean;
+  points: number;
+  timing: PredictionTiming[];
+};
+export type BaseEventPredictionRules = Record<ScoringBaseEventName, BaseEventPredictionSetting>;
+
+export type ShauhinModeTiming = (typeof ShauhinModeTimings)[number];
+export type ShauhinModeSettings = {
+  enabled: boolean;
+  maxBet: number;
+  maxBetsPerWeek: number;
+  startWeek: ShauhinModeTiming;
+  customStartWeek: number | null;
+  enabledBets: ScoringBaseEventName[];
+  noEventIsMiss: boolean;
+};
+
+export type CustomEventRule = {
+  eventName: string;
+  description: string;
+  points: number;
+  eventType: EventType;
+  referenceTypes: ReferenceType[];
+  timing: PredictionTiming[];
+};
+
+export type LeagueRules = {
+  base: BaseEventRules | null;
+  basePrediction: BaseEventPredictionRules | null;
+  shauhinMode: ShauhinModeSettings | null;
+  custom: CustomEventRule[];
+};
+
+
+
