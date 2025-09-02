@@ -4,10 +4,9 @@ import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 
-
 /**
   * Get the league name
-  * @param hash - the hash of the league
+  * @param hash The hash of the league
   * @returns the league name
   * @returnObj `leagueName | undefined`
   */

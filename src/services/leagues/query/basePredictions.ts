@@ -10,15 +10,15 @@ import { type Prediction } from '~/types/events';
 
 /**
  * Get the base predictions for a league
- * @param hash - the hash of the league
+ * @param hash hash of the league
  * @returns the base predictions for the league
  * @returnObj `Prediction[]`
  */
 export default async function getBasePredictions(hash: string) {
   return await db.select({
+    eventId: baseEventSchema.baseEventId,
     episodeNumber: episodeSchema.episodeNumber,
     predictionMakerId: baseEventPredictionSchema.memberId,
-    eventId: baseEventSchema.baseEventId,
     referenceId: baseEventPredictionSchema.referenceId,
     referenceType: baseEventPredictionSchema.referenceType,
     bet: baseEventPredictionSchema.bet,
@@ -40,6 +40,7 @@ export default async function getBasePredictions(hash: string) {
       eq(baseEventSchema.episodeId, episodeSchema.episodeId)))
     .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventSchema.baseEventId))
     .where(eq(leagueSchema.hash, hash))
+    .orderBy(episodeSchema.episodeNumber)
     .then((predictions) => predictions.map(p => ({
       ...p,
       eventSource: 'Base'
