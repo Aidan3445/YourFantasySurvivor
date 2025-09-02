@@ -17,13 +17,13 @@ type SeasonsDataQuery = {
 
 /**
   * Fetches seasons data from the API.
-  * @param {boolean} activeOnly - If true, fetches only active seasons.
+  * @param {boolean} includeInactive - Whether to include inactive seasons.
   */
-export default function useSeasonsData(activeOnly: boolean) {
+export default function useSeasonsData(includeInactive: boolean) {
   return useQuery<SeasonsDataQuery>({
-    queryKey: ['seasons', 'baseEvents', activeOnly],
+    queryKey: ['seasons', 'baseEvents', includeInactive],
     queryFn: async () => {
-      const res = await fetch('/api/seasons/seasonsData');
+      const res = await fetch(`/api/seasons/seasonsData?includeInactive=${includeInactive}`);
       if (!res.ok) {
         throw new Error('Failed to fetch season data');
       }

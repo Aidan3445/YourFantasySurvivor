@@ -11,7 +11,7 @@ import getEpisodes from '~/services/seasons/episodes';
 
 /**
   * Get the season data for either all or active seasons
-  * @param activeOnly Whether to get only active seasons or all seasons
+  * @param includeInactive Whether to include inactive seasons or not
   * @returns The season data
   * @returObj `castaways: Castaway[];
   *  season: Season
@@ -21,8 +21,8 @@ import getEpisodes from '~/services/seasons/episodes';
   *  tribesTimeline: Record<episodeNumber, Record<tribeId, castawayId[]>>
   *  eliminations: Record<episodeNumber, Elimination[]>`
   */
-export default async function getSeasonsData(activeOnly: boolean) {
-  const seasons = activeOnly ? await getCurrentSeasons() : await getAllSeasons();
+export default async function getSeasonsData(includeInactive: boolean) {
+  const seasons = includeInactive ? await getAllSeasons() : await getCurrentSeasons();
   if (seasons.length === 0) return [];
 
   const seasonsData = await Promise.all(seasons.map(async (season) => {
