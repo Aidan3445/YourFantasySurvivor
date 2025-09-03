@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
     if (message === 'User not authorized') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    console.error('Failed to create base event', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
@@ -56,6 +57,7 @@ export async function PUT(request: NextRequest) {
     if (message === 'User not authorized') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    console.error('Failed to update base event', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
@@ -73,6 +75,7 @@ export async function DELETE(request: NextRequest) {
     if (message === 'User not authorized') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    console.error('Failed to delete base event', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
