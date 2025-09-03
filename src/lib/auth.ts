@@ -6,7 +6,7 @@ import { and, eq } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { systemSchema } from '~/server/db/schema/system';
-import { type LeagueMemberAuth } from '~/types/api';
+import { type VerifiedLeagueMemberAuth, type LeagueMemberAuth } from '~/types/api';
 
 /**
   * Auth wrapper that utilizes session claims for merging dev and prod users
@@ -30,13 +30,15 @@ export async function auth() {
   */
 export async function leagueMemberAuth(hash: string) {
   const { userId } = await auth();
-  if (!userId) return { userId, memberId: null, role: null } as LeagueMemberAuth;
+  const noAuth: LeagueMemberAuth = { userId, memberId: null, role: null, leagueId: null };
+  if (!userId) return noAuth;
 
   // Ensure the user is a member of the league
   const member = await db
     .select({
       memberId: leagueMemberSchema.memberId,
       role: leagueMemberSchema.role,
+      leagueId: leagueMemberSchema.leagueId,
     })
     .from(leagueMemberSchema)
     .innerJoin(leagueSchema, and(
@@ -44,6 +46,8 @@ export async function leagueMemberAuth(hash: string) {
       eq(leagueSchema.hash, hash)))
     .where(eq(leagueMemberSchema.userId, userId))
     .then((members) => members[0]);
+
+  if (!member) return noAuth;
 
   return {
     userId,
@@ -87,13 +91,14 @@ export function requireAuth<TArgs extends unknown[], TReturn>(
   * Wrapper for server actions with league member authentication
   */
 export function requireLeagueMemberAuth<TArgs extends unknown[], TReturn>(
-  handler: (auth: LeagueMemberAuth, hash: string, ...args: TArgs) => TReturn
+  handler: (auth: VerifiedLeagueMemberAuth, ...args: TArgs) => TReturn
 ): (hash: string, ...args: TArgs) => Promise<TReturn> {
   return async (hash: string, ...args: TArgs) => {
     const auth = await leagueMemberAuth(hash);
     if (!auth.userId) throw new Error('User not authenticated');
     if (!auth.memberId) throw new Error('Not a league member');
-    return handler(auth, hash, ...args);
+    const verifiedAuth = auth as VerifiedLeagueMemberAuth;
+    return handler(verifiedAuth, ...args);
   };
 }
 

@@ -20,7 +20,6 @@ import { EliminationEventNames } from '~/lib/events';
  */
 export default async function chooseCastawayLogic(
   auth: VerifiedLeagueMemberAuth,
-  leagueHash: string,
   castawayId: number,
   isDraft: boolean
 ) {
@@ -28,12 +27,11 @@ export default async function chooseCastawayLogic(
     // Get league and validate
     const league = await trx
       .select({
-        leagueId: leagueSchema.leagueId,
         status: leagueSchema.status,
         seasonId: leagueSchema.season,
       })
       .from(leagueSchema)
-      .where(eq(leagueSchema.hash, leagueHash))
+      .where(eq(leagueSchema.leagueId, auth.leagueId))
       .then(res => res[0]);
 
     if (!league) throw new Error('League not found');
@@ -67,7 +65,7 @@ export default async function chooseCastawayLogic(
         .from(selectionUpdateSchema)
         .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId))
         .where(and(
-          eq(leagueMemberSchema.leagueId, league.leagueId),
+          eq(leagueMemberSchema.leagueId, auth.leagueId),
           eq(selectionUpdateSchema.draft, true)
         ))
         .then(res => res[0]?.count ?? 0);
@@ -102,7 +100,7 @@ export default async function chooseCastawayLogic(
       const totalMembers = await trx
         .select({ count: count() })
         .from(leagueMemberSchema)
-        .where(eq(leagueMemberSchema.leagueId, league.leagueId))
+        .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
         .then(res => res[0]?.count ?? 0);
 
       const totalPicks = await trx
@@ -110,7 +108,7 @@ export default async function chooseCastawayLogic(
         .from(selectionUpdateSchema)
         .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId))
         .where(and(
-          eq(leagueMemberSchema.leagueId, league.leagueId),
+          eq(leagueMemberSchema.leagueId, auth.leagueId),
           eq(selectionUpdateSchema.draft, true)
         ))
         .then(res => res[0]?.count ?? 0);
@@ -119,7 +117,7 @@ export default async function chooseCastawayLogic(
         await trx
           .update(leagueSchema)
           .set({ status: 'Active' })
-          .where(eq(leagueSchema.hash, leagueHash));
+          .where(eq(leagueSchema.leagueId, auth.leagueId));
 
         return { success: true, draftComplete: true };
       }

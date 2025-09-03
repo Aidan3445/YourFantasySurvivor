@@ -1,5 +1,8 @@
 import z from 'zod';
-import { type EventSources, type EventTypes, ReferenceTypes, BaseEventNames, type ScoringBaseEventNames, type EliminationEventNames, type PredictionTimings } from '~/lib/events';
+import {
+  type EventSources, type PredictionTimings, ReferenceTypes, BaseEventNames,
+  type ScoringBaseEventNames, type EliminationEventNames, type EventTypes
+} from '~/lib/events';
 
 export type EventSource = (typeof EventSources)[number];
 export type EventType = (typeof EventTypes)[number];

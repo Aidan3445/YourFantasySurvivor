@@ -28,6 +28,7 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
     if (message.includes('User not') || message.includes('Not a league member')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    console.error('Failed to choose castaway', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

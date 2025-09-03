@@ -1,3 +1,5 @@
+import z from 'zod';
+import { EventTypes, PredictionTimings, ReferenceTypes } from '~/lib/events';
 import type { LeagueStatuses, ShauhinModeTimings } from '~/lib/leagues';
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 
@@ -89,6 +91,7 @@ export type ShauhinModeSettings = {
 };
 
 export type CustomEventRule = {
+  customEventRuleId: number;
   eventName: string;
   description: string;
   points: number;
@@ -104,5 +107,13 @@ export type LeagueRules = {
   custom: CustomEventRule[];
 };
 
-
+export const CustomEventRuleInsertZod = z.object({
+  eventName: z.string().max(64),
+  description: z.string().max(256),
+  points: z.number().int().min(-100).max(100),
+  eventType: z.enum(EventTypes),
+  referenceTypes: z.enum(ReferenceTypes).array().min(1),
+  timing: z.enum(PredictionTimings).array(),
+});
+export type CustomEventRuleInsert = z.infer<typeof CustomEventRuleInsertZod>;
 
