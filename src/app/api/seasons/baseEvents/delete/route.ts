@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireSystemAdminAuth } from '~/lib/auth';
-import { deleteBaseEventLogic } from '~/services/seasons/mutation/deleteBaseEvent';
+import deleteBaseEventLogic from '~/services/seasons/mutation/deleteBaseEvent';
 
 export async function POST(request: NextRequest) {
   try {

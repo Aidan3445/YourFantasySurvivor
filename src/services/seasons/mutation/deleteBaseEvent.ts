@@ -11,7 +11,7 @@ import { baseEventSchema } from '~/server/db/schema/baseEvents';
   * @returns the success status of the delete
   * @returnObj `{ success }`
   */
-export async function deleteBaseEventLogic(baseEventId: number) {
+export default async function deleteBaseEventLogic(baseEventId: number) {
   // Cascade delete handles references automatically
   const result = await db
     .delete(baseEventSchema)

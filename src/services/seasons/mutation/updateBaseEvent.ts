@@ -13,7 +13,7 @@ import { type BaseEventInsert } from '~/types/events';
   * @returns the success status of the update
   * @returnObj `{ success }`
   */
-export async function updateBaseEventLogic(baseEventId: number, baseEvent: BaseEventInsert) {
+export default async function updateBaseEventLogic(baseEventId: number, baseEvent: BaseEventInsert) {
   // create a transaction to ensure both the base event and references are updated
   return await db.transaction(async (trx) => {
     // Update the base event
