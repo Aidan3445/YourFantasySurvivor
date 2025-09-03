@@ -2,7 +2,6 @@
 
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
-import { systemAdminAuth } from '~/lib/auth';
 import { type BaseEventInsert } from '~/types/events';
 
 /**
