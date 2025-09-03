@@ -10,6 +10,11 @@ export type LeagueMember = {
   draftOrder: number;
 };
 
+export type NewLeagueMember = {
+  displayName: string;
+  color: string;
+};
+
 export type LeagueMemberStatus = {
   currentCastawayId: number | null;
   currentCastaway: string | null;

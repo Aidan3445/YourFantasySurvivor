@@ -3,7 +3,7 @@ import 'server-only';
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { seasonSchema } from '~/server/db/schema/seasons';
 
 /**
    * Get a league by its hash
@@ -19,10 +19,10 @@ export default async function getLeague(hash: string) {
       hash: leagueSchema.hash,
       name: leagueSchema.name,
       status: leagueSchema.status,
-      season: seasonsSchema.name
+      season: seasonSchema.name
     })
     .from(leagueSchema)
-    .innerJoin(seasonsSchema, eq(leagueSchema.season, seasonsSchema.seasonId))
+    .innerJoin(seasonSchema, eq(leagueSchema.season, seasonSchema.seasonId))
     .where(eq(leagueSchema.hash, hash))
     .then((leagues) => leagues[0]);
 }

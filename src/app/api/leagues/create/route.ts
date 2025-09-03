@@ -12,13 +12,13 @@ export async function POST(request: NextRequest) {
       draftDate?: Date;
     };
 
-    const result = await requireAuth(createNewLeagueLogic)(
+    const { newLeagueHash } = await requireAuth(createNewLeagueLogic)(
       body.leagueName,
       body.newMember,
       body.draftDate
     );
 
-    return NextResponse.json(result, { status: 200 });
+    return NextResponse.json({ newLeagueHash }, { status: 200 });
   } catch (error) {
     let message: string;
     if (error instanceof Error) message = error.message;

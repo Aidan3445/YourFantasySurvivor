@@ -2,7 +2,7 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { and, asc, gte, isNull, lte, or } from 'drizzle-orm';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { seasonSchema } from '~/server/db/schema/seasons';
 import { type Season } from '~/types/seasons';
 
 /**
@@ -15,15 +15,15 @@ export default async function getCurrentSeasons() {
 
   return db
     .select()
-    .from(seasonsSchema)
+    .from(seasonSchema)
     .where(and(
-      lte(seasonsSchema.premiereDate, now),
+      lte(seasonSchema.premiereDate, now),
       or(
-        isNull(seasonsSchema.finaleDate),
-        gte(seasonsSchema.finaleDate, now)
+        isNull(seasonSchema.finaleDate),
+        gte(seasonSchema.finaleDate, now)
       )
     ))
-    .orderBy(asc(seasonsSchema.premiereDate))
+    .orderBy(asc(seasonSchema.premiereDate))
     .then(rows => rows.map(row => ({
       ...row,
       premiereDate: new Date(`${row.premiereDate} Z`),

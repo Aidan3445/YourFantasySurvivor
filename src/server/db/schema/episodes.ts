@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { seasonSchema } from '~/server/db/schema/seasons';
 import { boolean, integer, serial, smallint, timestamp, unique, varchar } from 'drizzle-orm/pg-core';
 
 export const episodeSchema = createTable(
@@ -14,7 +14,7 @@ export const episodeSchema = createTable(
     runtime: smallint('runtime').default(90).notNull(),
     isMerge: boolean('merge').default(false).notNull(),
     isFinale: boolean('finale').default(false).notNull(),
-    seasonId: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
+    seasonId: integer('season_id').references(() => seasonSchema.seasonId, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
     unique().on(table.seasonId, table.episodeNumber),

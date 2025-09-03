@@ -5,10 +5,8 @@ import { desc } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSettingsSchema } from '~/server/db/schema/leagues';
-import { seasonsSchema } from '~/server/db/schema/seasons';
-import { type LeagueName } from '~/types/deprecated/leagues';
-import { type NewLeagueMember } from '~/types/deprecated/leagueMembers';
-import { type League } from '~/types/leagues';
+import { seasonSchema } from '~/server/db/schema/seasons';
+import { type NewLeagueMember } from '~/types/leagueMembers';
 
 /**
  * Create a new league
@@ -19,25 +17,25 @@ import { type League } from '~/types/leagues';
  * @throws an error if the league cannot be inserted
  * @throws an error if the league settings cannot be inserted
  * @throws an error if the user cannot be added as a member
- * @returns the league info of the league created
- * @returnObj `League`
+ * @returns the league hash of the league created
+ * @returnObj `{ newLeagueHash }`
  */
 export default async function createNewLeagueLogic(
   userId: string,
-  leagueName: LeagueName,
+  leagueName: string,
   newMember: NewLeagueMember,
   draftDate?: Date
 ) {
   // Create the league in a transaction
   return await db.transaction(async (trx) => {
     // Get the current season
-    const { seasonId, name } = await trx
+    const { seasonId } = await trx
       .select({
-        seasonId: seasonsSchema.seasonId,
-        name: seasonsSchema.name,
+        seasonId: seasonSchema.seasonId,
+        name: seasonSchema.name,
       })
-      .from(seasonsSchema)
-      .orderBy(desc(seasonsSchema.premiereDate))
+      .from(seasonSchema)
+      .orderBy(desc(seasonSchema.premiereDate))
       .then((res) => ({ ...res[0] }));
     if (!seasonId) throw new Error('Season not found');
 
@@ -54,7 +52,7 @@ export default async function createNewLeagueLogic(
 
     // Safe to assume the league was inserted if we got this far
     // Get the league id and hash
-    const { leagueId, hash, status } = insertedLeague;
+    const { leagueId, hash } = insertedLeague;
 
     // Insert the owner as a member
     const memberId = await trx
@@ -69,12 +67,6 @@ export default async function createNewLeagueLogic(
       .insert(leagueSettingsSchema)
       .values({ leagueId, draftDate: draftDate?.toUTCString() });
 
-    return {
-      leagueId,
-      name: leagueName,
-      hash,
-      status,
-      season: name!,
-    } as League;
+    return { newLeagueHash: hash };
   });
 }

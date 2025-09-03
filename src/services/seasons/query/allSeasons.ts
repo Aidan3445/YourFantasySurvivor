@@ -2,7 +2,7 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { asc } from 'drizzle-orm';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { seasonSchema } from '~/server/db/schema/seasons';
 import { type Season } from '~/types/seasons';
 
 /**
@@ -13,8 +13,8 @@ import { type Season } from '~/types/seasons';
 export default async function getAllSeasons() {
   return db
     .select()
-    .from(seasonsSchema)
-    .orderBy(asc(seasonsSchema.premiereDate))
+    .from(seasonSchema)
+    .orderBy(asc(seasonSchema.premiereDate))
     .then(rows => rows.map(row => ({
       ...row,
       premiereDate: new Date(`${row.premiereDate} Z`),

@@ -3,7 +3,7 @@ import 'server-only';
 import { createTable } from '~/server/db/schema/createTable';
 import { serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 
-export const seasonsSchema = createTable(
+export const seasonSchema = createTable(
   'season',
   {
     seasonId: serial('season_id').notNull().primaryKey(),

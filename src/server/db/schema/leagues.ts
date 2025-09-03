@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { seasonSchema } from '~/server/db/schema/seasons';
 import { boolean, integer, pgEnum, serial, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { nanoid } from 'nanoid';
 import { DEFAULT_SURVIVAL_CAP, LeagueStatusOptions } from '~/types/deprecated/leagues';
@@ -15,7 +15,7 @@ export const leagueSchema = createTable(
     hash: varchar('league_hash', { length: 16 }).notNull().$defaultFn(() => nanoid(16)),
     name: varchar('league_name', { length: 64 }).notNull(),
     status: leagueStatus('league_status').notNull().default('Predraft'),
-    season: integer('season_id').references(() => seasonsSchema.seasonId, { onDelete: 'cascade' }).notNull(),
+    season: integer('season_id').references(() => seasonSchema.seasonId, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
     uniqueIndex('league_hash_idx').on(table.hash),

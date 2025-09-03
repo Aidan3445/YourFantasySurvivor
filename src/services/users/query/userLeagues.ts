@@ -3,7 +3,7 @@ import 'server-only';
 import { db } from '~/server/db';
 import { desc, eq } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { seasonSchema } from '~/server/db/schema/seasons';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { auth } from '~/lib/auth';
 import { type League } from '~/types/leagues';
@@ -26,7 +26,7 @@ export default async function getUserLeagues() {
         name: leagueSchema.name,
         hash: leagueSchema.hash,
         status: leagueSchema.status,
-        season: seasonsSchema.name,
+        season: seasonSchema.name,
       },
       member: {
         memberId: leagueMemberSchema.memberId,
@@ -38,9 +38,9 @@ export default async function getUserLeagues() {
     })
     .from(leagueMemberSchema)
     .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
-    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leagueSchema.season))
+    .innerJoin(seasonSchema, eq(seasonSchema.seasonId, leagueSchema.season))
     .where(eq(leagueMemberSchema.userId, userId))
-    .orderBy(desc(seasonsSchema.premiereDate))
+    .orderBy(desc(seasonSchema.premiereDate))
     .then((rows) => rows as { league: League, member: LeagueMember }[]);
 }
 
