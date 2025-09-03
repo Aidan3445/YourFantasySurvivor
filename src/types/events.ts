@@ -1,4 +1,5 @@
-import type { EventSources, EventTypes, ReferenceTypes, BaseEventNames, ScoringBaseEventNames, EliminationEventNames, PredictionTimings } from '~/lib/events';
+import z from 'zod';
+import { type EventSources, type EventTypes, ReferenceTypes, BaseEventNames, type ScoringBaseEventNames, type EliminationEventNames, type PredictionTimings } from '~/lib/events';
 
 export type EventSource = (typeof EventSources)[number];
 export type EventType = (typeof EventTypes)[number];
@@ -44,3 +45,14 @@ export type Prediction = {
   bet: number;
   hit: boolean | null;
 };
+
+export const BaseEventInsertZod = z.object({
+  episodeId: z.number().int().min(0),
+  eventName: z.enum(BaseEventNames),
+  label: z.string().max(64).nullable().optional(),
+  notes: z.string().array().max(10).nullable().optional(),
+  referenceType: z.enum(ReferenceTypes),
+  references: z.number().array().min(1),
+  updateTribe: z.number().int().min(0).optional(),
+});
+export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;

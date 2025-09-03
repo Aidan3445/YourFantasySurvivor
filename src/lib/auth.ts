@@ -69,3 +69,30 @@ export async function systemAdminAuth() {
 
   return { userId: isAdmin ? userId : null };
 }
+
+/**
+  * Wrapper for server actions with league member authentication
+  */
+export function requireLeagueMemberAuth<TArgs extends unknown[], TReturn>(
+  handler: (auth: LeagueMemberAuth, hash: string, ...args: TArgs) => TReturn
+): (hash: string, ...args: TArgs) => Promise<TReturn> {
+  return async (hash: string, ...args: TArgs) => {
+    const auth = await leagueMemberAuth(hash);
+    if (!auth.userId) throw new Error('User not authenticated');
+    if (!auth.memberId) throw new Error('Not a league member');
+    return handler(auth, hash, ...args);
+  };
+}
+
+/**
+  * Wrapper for server actions with system admin authentication
+  */
+export function requireSystemAdminAuth<TArgs extends unknown[], TReturn>(
+  handler: (...args: TArgs) => TReturn
+): (...args: TArgs) => Promise<TReturn> {
+  return async (...args: TArgs) => {
+    const { userId } = await systemAdminAuth();
+    if (!userId) throw new Error('User not authorized');
+    return handler(...args);
+  };
+}

@@ -7,59 +7,6 @@ import { eq } from 'drizzle-orm';
 import { systemAdminAuth } from '~/lib/auth';
 
 /**
-  * Create a new base event for the season
-  * @param baseEvent event to create
-  * @throws if the user is not a system admin
-  * @throws if the event cannot be created
-  */
-export async function createBaseEvent(baseEvent: BaseEventInsert) {
-  const { userId } = await systemAdminAuth();
-  if (!userId) throw new Error('User not authorized');
-
-  // create transaction for the event and reference insertions
-  await db.transaction(async (trx) => {
-    try {
-      // insert the base event
-      const baseEventId = await db
-        .insert(baseEventSchema)
-        .values({
-          episodeId: baseEvent.episodeId,
-          eventName: baseEvent.eventName,
-          label: baseEvent.label,
-          notes: baseEvent.notes,
-        })
-        .returning({ baseEventId: baseEventSchema.baseEventId })
-        .then((result) => result[0]?.baseEventId);
-      if (!baseEventId) throw new Error('Failed to create base event');
-
-      const eventRefs = baseEvent.references.map((referenceId) => ({
-        baseEventId,
-        referenceType: baseEvent.referenceType,
-        referenceId: referenceId,
-      }));
-
-      if (baseEvent.updateTribe) {
-        eventRefs.push({
-          baseEventId,
-          referenceType: 'Tribe',
-          referenceId: baseEvent.updateTribe,
-        });
-      }
-
-      // insert the base event references
-      await db
-        .insert(baseEventReferenceSchema)
-        .values(eventRefs);
-    }
-    catch (e) {
-      console.error('Failed to create base event', e);
-      trx.rollback();
-      throw new Error('Failed to create base event');
-    }
-  });
-}
-
-/**
   * Update a base event for the season
   * @param baseEventId id of the event to update
   * @param baseEvent updated event
