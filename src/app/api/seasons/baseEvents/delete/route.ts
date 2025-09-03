@@ -1,15 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireSystemAdminAuth } from '~/lib/auth';
-import { updateBaseEventLogic } from '~/services/seasons/mutation/updateBaseEvent';
-import { type BaseEventInsert } from '~/types/events';
+import { deleteBaseEventLogic } from '~/services/seasons/mutation/deleteBaseEvent';
 
 export async function POST(request: NextRequest) {
   try {
-    const { baseEventId, baseEvent } = await request.json() as {
-      baseEventId: number,
-      baseEvent: BaseEventInsert
-    };
-    const { success } = await requireSystemAdminAuth(updateBaseEventLogic)(baseEventId, baseEvent);
+    const { baseEventId } = await request.json() as { baseEventId: number };
+    const { success } = await requireSystemAdminAuth(deleteBaseEventLogic)(baseEventId);
     return NextResponse.json({ success }, { status: 200 });
   } catch (error) {
     let message: string;

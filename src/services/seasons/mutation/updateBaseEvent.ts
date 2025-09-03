@@ -10,6 +10,7 @@ import { type BaseEventInsert } from '~/types/events';
   * @param baseEventId id of the event to update
   * @param baseEvent updated event
   * @throws if the event cannot be updated
+  * @returns the success status of the update
   * @returnObj `{ success }`
   */
 export async function updateBaseEventLogic(baseEventId: number, baseEvent: BaseEventInsert) {
