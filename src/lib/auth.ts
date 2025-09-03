@@ -71,6 +71,19 @@ export async function systemAdminAuth() {
 }
 
 /**
+ * Wrapper for server actions with general user authentication
+ */
+export function requireAuth<TArgs extends unknown[], TReturn>(
+  handler: (userId: string, ...args: TArgs) => TReturn
+): (...args: TArgs) => Promise<TReturn> {
+  return async (...args: TArgs) => {
+    const { userId } = await auth();
+    if (!userId) throw new Error('User not authenticated');
+    return handler(userId, ...args);
+  };
+}
+
+/**
   * Wrapper for server actions with league member authentication
   */
 export function requireLeagueMemberAuth<TArgs extends unknown[], TReturn>(
