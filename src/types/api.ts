@@ -9,3 +9,9 @@ export type LeagueMemberAuth = {
   memberId: number | null;
   role: LeagueMemberRole | null;
 }
+
+export type VerifiedLeagueMemberAuth = {
+  userId: string;
+  memberId: number;
+  role: LeagueMemberRole;
+}

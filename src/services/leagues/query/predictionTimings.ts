@@ -50,7 +50,7 @@ export default async function getPredictionTimings(hash: string) {
   * nextEpisode: Episode | null
   * mergeEpisode: Episode | null`
   */
-async function getSeasonEpisodes(seasonId: number) {
+export async function getSeasonEpisodes(seasonId: number) {
   // Get current episode status
   const now = new Date();
   const currentEpisodeReq = db

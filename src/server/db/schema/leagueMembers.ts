@@ -18,7 +18,7 @@ export const leagueMemberSchema = createTable(
     displayName: varchar('display_name', { length: DISPLAY_NAME_MAX_LENGTH }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
     role: leagueMemberRole('role').notNull().default('Member'),
-    draftOrder: integer('draft_order'),
+    draftOrder: integer('draft_order').notNull(),
   },
   (table) => [
     uniqueIndex('league_user_idx').on(table.leagueId, table.userId),
