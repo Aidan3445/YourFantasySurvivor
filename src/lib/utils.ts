@@ -1,12 +1,9 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { type seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasons';
-import { type CastawayDetails } from '~/types/castaways';
-import { type EpisodeNumber } from '~/types/episodes';
-import { type BasePredictionRules, defaultPredictionRules, type PredictionEventTiming, ScoringBaseEventNames } from '~/types/events';
-import { type LeagueHash } from '~/types/deprecated/leagues';
-import { type TribeName } from '~/types/deprecated/tribes';
 import { type baseEventPredictionRulesSchema } from '~/server/db/schema/baseEvents';
+import { type BaseEventPredictionRules, type BaseEventPredictionRulesSchema } from '~/types/leagues';
+import { defaultPredictionRules, ScoringBaseEventNames } from '~/lib/events';
+import { type PredictionTiming } from '~/types/events';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -80,12 +77,10 @@ export function isPredictionCorrect(
   return false;
 }
 
-type BaseEventPredictionSchema = typeof baseEventPredictionRulesSchema.$inferSelect;
-
 export function basePredictionRulesSchemaToObject(
-  schema: BaseEventPredictionSchema | null
-): BasePredictionRules {
-  const rules: BasePredictionRules = defaultPredictionRules;
+  schema: BaseEventPredictionRulesSchema | null
+): BaseEventPredictionRules {
+  const rules: BaseEventPredictionRules = defaultPredictionRules;
 
   // If no schema is provided, return the default rules 
   // (all disabled with default points and timing values ready)
@@ -94,15 +89,15 @@ export function basePredictionRulesSchemaToObject(
   for (const eventName of ScoringBaseEventNames) {
     // Construct keys for the event based on the event name
     // Lots of TypeScript magic here but it should be safe
-    const enabledKey = `${eventName}Prediction` as keyof BaseEventPredictionSchema;
-    const pointsKey = `${eventName}PredictionPoints` as keyof BaseEventPredictionSchema;
-    const timingKey = `${eventName}PredictionTiming` as keyof BaseEventPredictionSchema;
+    const enabledKey = `${eventName}Prediction` as keyof BaseEventPredictionRulesSchema;
+    const pointsKey = `${eventName}PredictionPoints` as keyof BaseEventPredictionRulesSchema;
+    const timingKey = `${eventName}PredictionTiming` as keyof BaseEventPredictionRulesSchema;
 
     if (schema[enabledKey]) {
       rules[eventName] = {
         enabled: schema[enabledKey] as boolean,
         points: (schema[pointsKey] ?? 0) as number,
-        timing: (schema[timingKey] ?? []) as PredictionEventTiming[],
+        timing: (schema[timingKey] ?? []) as PredictionTiming[],
       };
 
     } else {
@@ -114,23 +109,23 @@ export function basePredictionRulesSchemaToObject(
 }
 
 export function basePredictionRulesObjectToSchema(
-  rules: BasePredictionRules
-): BaseEventPredictionSchema {
-  const schema: Record<string, boolean | number | PredictionEventTiming[]> = {};
+  rules: BaseEventPredictionRules
+) {
+  const schema: Record<string, boolean | number | PredictionTiming[]> = {};
 
   for (const eventName of ScoringBaseEventNames) {
     const rule = rules[eventName];
 
-    const enabledKey = `${eventName}Prediction` as keyof BaseEventPredictionSchema;
-    const pointsKey = `${eventName}PredictionPoints` as keyof BaseEventPredictionSchema;
-    const timingKey = `${eventName}PredictionTiming` as keyof BaseEventPredictionSchema;
+    const enabledKey = `${eventName}Prediction` as keyof BaseEventPredictionRulesSchema;
+    const pointsKey = `${eventName}PredictionPoints` as keyof BaseEventPredictionRulesSchema;
+    const timingKey = `${eventName}PredictionTiming` as keyof BaseEventPredictionRulesSchema;
 
     schema[enabledKey] = rule.enabled;
     schema[pointsKey] = rule.points;
     schema[timingKey] = rule.timing;
   }
 
-  return schema as BaseEventPredictionSchema;
+  return schema as BaseEventPredictionRulesSchema;
 }
 
 export function castawaysByTribe(options: CastawayDetails[]): Record<string, CastawayDetails[]> {
