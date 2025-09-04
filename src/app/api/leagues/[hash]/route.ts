@@ -38,7 +38,7 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
       if (e instanceof Error) message = e.message;
       else message = String(e);
 
-      if (message.includes('User not') || message.includes('Not a league member')) {
+      if (message.includes('User not') || message.includes('Not a league member') || message.includes('Forbidden')) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
 
