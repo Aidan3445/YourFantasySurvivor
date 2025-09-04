@@ -10,7 +10,7 @@ export type LeagueMember = {
   draftOrder: number;
 };
 
-export type NewLeagueMember = {
+export type LeagueMemberInsert = {
   displayName: string;
   color: string;
 };
