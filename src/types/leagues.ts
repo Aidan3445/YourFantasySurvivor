@@ -20,6 +20,13 @@ export type LeagueSettings = {
   preserverStreak: boolean;
 };
 
+export interface LeagueSettingsUpdate {
+  name?: string;
+  draftDate?: Date | null;
+  survivalCap?: number;
+  preserveStreak?: boolean;
+}
+
 export type BaseEventRules = Record<ScoringBaseEventName, number>;
 
 export type BaseEventPredictionRulesSchema = {
