@@ -31,6 +31,6 @@ export default async function createNewLeague(
     if (message.includes('User not authenticated')) throw e;
 
     console.error('Failed to create league', e);
-    throw new Error('An error occurred while creating the league. Please try again.');
+    throw new Error('An error occurred while creating the league.');
   }
 }

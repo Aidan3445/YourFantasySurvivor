@@ -6,11 +6,11 @@ import { type LeagueHash } from '~/types/deprecated/leagues';
 
 /**
  * Save a chat message to the database
- * @param leagueHash - the hash of the league
- * @param message - the message object with serial, text, and timestamp
- * @returns the serial of the message
- * @throws an error if the user is not authorized
+ * @param auth The authenticated league member
+ * @param message The message object with serial, text, and timestamp
  * @throws an error if the message cannot be saved
+ * @returns Success status of the save
+ * @returnObj `{ success }`
  */
 export default async function saveChatMessage(
   leagueHash: LeagueHash,

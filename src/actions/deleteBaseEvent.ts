@@ -21,7 +21,7 @@ export default async function deleteBaseEvent(baseEventId: number) {
     if (message.includes('User not authorized')) throw e;
 
     console.error('Failed to create base event', e);
-    throw new Error('Failed to create base event. Please try again.');
+    throw new Error('Failed to create base event.');
   }
 }
 

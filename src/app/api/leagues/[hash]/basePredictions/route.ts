@@ -12,7 +12,7 @@ export async function GET(_: NextRequest, context: LeagueRouteParams) {
       return NextResponse.json({ basePredictions }, { status: 200 });
     } catch (e) {
       console.error(e);
-      return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to fetch base predictions' }, { status: 500 });
     }
   })(context);
 }

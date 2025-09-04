@@ -25,7 +25,7 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
     } catch (e) {
       console.error('Failed to save chat message', e);
       return NextResponse.json(
-        { error: 'An error occurred while saving the chat message. Please try again.' },
+        { error: 'An error occurred while saving the chat message.' },
         { status: 500 }
       );
     }

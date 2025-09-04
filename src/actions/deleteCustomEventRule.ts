@@ -27,6 +27,6 @@ export default async function deleteCustomEventRule(
     if (message.includes('User not') || message.includes('Not a league member')) throw e;
 
     console.error('Failed to delete league event rule', e);
-    throw new Error('An error occurred while deleting the league event rule. Please try again.');
+    throw new Error('An error occurred while deleting the league event rule.');
   }
 }

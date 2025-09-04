@@ -25,6 +25,6 @@ export default async function createCustomEvent(
     if (message.includes('User not') || message.includes('Not a league member')) throw e;
 
     console.error('Failed to create league event', e);
-    throw new Error('An error occurred while creating the league event. Please try again.');
+    throw new Error('An error occurred while creating the league event.');
   }
 }

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const eliminations = await getEliminations(seasonId);
     return NextResponse.json({ eliminations }, { status: 200 });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    console.error('Failed to get eliminations', e);
+    return NextResponse.json({ error: 'An error occurred while fetching eliminations.' }, { status: 500 });
   }
 }

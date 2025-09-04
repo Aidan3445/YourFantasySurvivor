@@ -25,6 +25,6 @@ export default async function chooseCastaway(
     if (message.includes('User not') || message.includes('Not a league member')) throw e;
 
     console.error('Failed to choose castaway', e);
-    throw new Error('An error occurred while choosing the castaway. Please try again.');
+    throw new Error('An error occurred while choosing the castaway.');
   }
 }

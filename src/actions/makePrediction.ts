@@ -26,6 +26,6 @@ export default async function makePrediction(
     if (message.includes('User not') || message.includes('Not a league member')) throw e;
 
     console.error('Failed to make prediction', e);
-    throw new Error('An error occurred while making the prediction. Please try again.');
+    throw new Error('An error occurred while making the prediction.');
   }
 }

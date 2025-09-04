@@ -29,6 +29,6 @@ export default async function updateCustomEventRule(
     if (message.includes('User not') || message.includes('Not a league member')) throw e;
 
     console.error('Failed to update league event rule', e);
-    throw new Error('An error occurred while updating the league event rule. Please try again.');
+    throw new Error('An error occurred while updating the league event rule.');
   }
 }

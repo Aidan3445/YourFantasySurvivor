@@ -26,6 +26,6 @@ export default async function deleteCustomEvent(
     if (message.includes('User not authenticated') || message.includes('Not a league member')) throw e;
 
     console.error('Failed to delete league event', e);
-    throw new Error('An error occurred while deleting the league event. Please try again.');
+    throw new Error('An error occurred while deleting the league event.');
   }
 }

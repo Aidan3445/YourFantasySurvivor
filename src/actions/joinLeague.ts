@@ -28,6 +28,6 @@ export default async function joinLeague(leagueHash: LeagueHash, newMember: NewL
     if (message.includes('User not authenticated')) throw e;
 
     console.error('Failed to join league', e);
-    throw new Error('An error occurred while joining the league. Please try again.');
+    throw new Error('An error occurred while joining the league.');
   }
 }

@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const seasons = includeInactive ? await getAllSeasons() : await getCurrentSeasons();
     return NextResponse.json({ seasons }, { status: 200 });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    console.error('Failed to get seasons', e);
+    return NextResponse.json({ error: 'An error occurred while fetching seasons.' }, { status: 500 });
   }
 }

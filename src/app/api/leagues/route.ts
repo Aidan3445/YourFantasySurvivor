@@ -6,7 +6,7 @@ export async function GET(_: NextRequest) {
     const leagues = await getUserLeagues();
     return NextResponse.json({ leagues }, { status: 200 });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    console.error('Failed to get user leagues', e);
+    return NextResponse.json({ error: 'An error occurred while fetching leagues.' }, { status: 500 });
   }
 }

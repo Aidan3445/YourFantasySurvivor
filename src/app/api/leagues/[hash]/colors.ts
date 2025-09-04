@@ -10,6 +10,6 @@ export async function GET(_: NextRequest, { params }: LeagueRouteParams) {
     return NextResponse.json({ usedColors }, { status: 200 });
   } catch (e) {
     console.error(e);
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch used colors' }, { status: 500 });
   }
 }

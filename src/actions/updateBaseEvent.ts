@@ -23,7 +23,7 @@ export default async function updateBaseEvent(baseEventId: number, baseEvent: Ba
     if (message.includes('User not authorized')) throw e;
 
     console.error('Failed to create base event', e);
-    throw new Error('Failed to create base event. Please try again.');
+    throw new Error('Failed to create base event.');
   }
 }
 

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const tribesTimeline = await getTribesTimeline(seasonId);
     return NextResponse.json({ tribesTimeline }, { status: 200 });
   } catch (e) {
-    console.error(e);
-    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
+    console.error('Failed to get tribes timeline', e);
+    return NextResponse.json({ error: 'An error occurred while fetching tribes timeline.' }, { status: 500 });
   }
 }
