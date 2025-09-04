@@ -59,3 +59,14 @@ export const BaseEventInsertZod = z.object({
   updateTribe: z.number().int().min(0).optional(),
 });
 export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
+
+export const CustomEventInsertZod = z.object({
+  episodeId: z.number().int().min(0),
+  customEventRuleId: z.number().int().min(0),
+  label: z.string().max(64).nullable().optional(),
+  notes: z.string().array().max(10).nullable().optional(),
+  referenceType: z.enum(ReferenceTypes),
+  references: z.number().array().min(1),
+});
+export type CustomEventInsert = z.infer<typeof CustomEventInsertZod>;
+

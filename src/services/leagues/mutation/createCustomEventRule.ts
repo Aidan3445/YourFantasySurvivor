@@ -4,7 +4,7 @@ import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
 import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
 import { leagueSchema } from '~/server/db/schema/leagues';
-import { type CustomEventRuleInsert } from '~/types/events';
+import { type CustomEventRuleInsert } from '~/types/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
@@ -35,9 +35,14 @@ export default async function createLeagueEventRuleLogic(
     if (league.leagueStatus === 'Inactive')
       throw new Error('League rules cannot be created while the league is inactive');
 
-    return await trx
+    const newRule = await trx
       .insert(leagueEventsRulesSchema)
       .values({ ...rule, leagueId: auth.leagueId })
-      .returning({ newRuleId: leagueEventsRulesSchema.leagueEventRuleId });
+      .returning({ newRuleId: leagueEventsRulesSchema.leagueEventRuleId })
+      .then((res) => res[0]);
+
+    if (!newRule) throw new Error('Failed to create rule');
+
+    return { newRuleId: newRule.newRuleId };
   });
 }

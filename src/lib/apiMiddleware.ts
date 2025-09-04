@@ -1,29 +1,48 @@
 import 'server-only';
 
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { leagueMemberAuth } from '~/lib/auth';
-import type { LeagueMemberAuth, LeagueRouteParams } from '~/types/api';
+import type { LeagueRouteParams, VerifiedLeagueMemberAuth } from '~/types/api';
+import { type LeagueMemberRole } from '~/types/leagueMembers';
 
-export function withLeagueAuth(
-  handler: (
-    request: NextRequest,
-    context: LeagueRouteParams,
-    auth: LeagueMemberAuth
-  ) => Promise<NextResponse>
-) {
-  return async (request: NextRequest, context: LeagueRouteParams) => {
-    const { hash } = await context.params;
+function withLeagueAuth(minimumPermissions: LeagueMemberRole) {
+  return function(handler: (auth: VerifiedLeagueMemberAuth) => Promise<NextResponse>) {
+    return async (context: LeagueRouteParams) => {
+      const { hash } = await context.params;
 
-    const auth = await leagueMemberAuth(hash);
+      const auth = await leagueMemberAuth(hash);
 
-    if (!auth.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+      if (!auth.userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
 
-    if (!auth.memberId) {
-      return NextResponse.json({ error: 'Not a league member' }, { status: 403 });
-    }
+      if (!auth.memberId) {
+        return NextResponse.json({ error: 'Not a league member' }, { status: 403 });
+      }
 
-    return handler(request, context, auth);
+      switch (minimumPermissions) {
+        case 'Owner':
+          if (auth.role !== 'Owner') {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+          }
+          break;
+        case 'Admin':
+          if (auth.role === 'Member') {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+          }
+          break;
+        default:
+          // No additional checks for 'Member' role
+          break;
+      }
+
+      const verifiedAuth = auth as VerifiedLeagueMemberAuth;
+
+      return handler(verifiedAuth);
+    };
   };
 }
+
+export const withLeagueMemberAuth = withLeagueAuth('Member');
+export const withLeagueAdminAuth = withLeagueAuth('Admin');
+export const withLeagueOwnerAuth = withLeagueAuth('Owner');

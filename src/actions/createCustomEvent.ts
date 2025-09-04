@@ -1,23 +1,22 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
-import createLeagueEventLogic from '~/services/leagues/mutation/createLeagueEvent';
-import { type LeagueHash } from '~/types/deprecated/leagues';
-import { type LeagueEventInsert } from '~/types/events';
+import { requireLeagueAdminAuth } from '~/lib/auth';
+import createCustomEventLogic from '~/services/leagues/mutation/createCustomEvent';
+import { type CustomEventInsert } from '~/types/events';
 
 /**
  * Create a new custom/league event for the season
  * @param leagueHash - hash of the league to create the event for
- * @param leagueEvent - event to create
+ * @param customEvent - event to create
  * @throws if the user is not a system admin
  * @throws if the event cannot be created
  */
-export default async function createLeagueEvent(
-  leagueHash: LeagueHash,
-  leagueEvent: LeagueEventInsert
+export default async function createCustomEvent(
+  leagueHash: string,
+  customEvent: CustomEventInsert
 ) {
   try {
-    return await requireLeagueMemberAuth(createLeagueEventLogic)(leagueHash, leagueEvent);
+    return await requireLeagueAdminAuth(createCustomEventLogic)(leagueHash, customEvent);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

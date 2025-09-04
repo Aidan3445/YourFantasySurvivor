@@ -2,18 +2,17 @@ import 'server-only';
 
 import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
-import { withLeagueAuth } from '~/lib/apiMiddleware';
+import { withLeagueMemberAuth } from '~/lib/apiMiddleware';
 import getBasePredictions from '~/services/leagues/query/basePredictions';
 
-export async function GET(request: NextRequest, context: LeagueRouteParams) {
-  return withLeagueAuth(async (_, context, __) => {
-    const { hash } = await context.params;
+export async function GET(_: NextRequest, context: LeagueRouteParams) {
+  return withLeagueMemberAuth(async (auth) => {
     try {
-      const basePredictions = await getBasePredictions(hash);
+      const basePredictions = await getBasePredictions(auth);
       return NextResponse.json({ basePredictions }, { status: 200 });
     } catch (e) {
       console.error(e);
       return NextResponse.json({ error: (e as Error).message }, { status: 500 });
     }
-  })(request, context);
+  })(context);
 }

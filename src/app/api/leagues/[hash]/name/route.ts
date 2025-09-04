@@ -2,10 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import getLeagueName from '~/services/leagues/query/name';
 import type { LeagueRouteParams } from '~/types/api';
 
-export async function GET(
-  _: NextRequest,
-  { params }: LeagueRouteParams
-) {
+export async function GET(_: NextRequest, { params }: LeagueRouteParams) {
   const { hash } = await params;
 
   try {

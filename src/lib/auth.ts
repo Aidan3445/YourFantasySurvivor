@@ -7,6 +7,7 @@ import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { systemSchema } from '~/server/db/schema/system';
 import { type VerifiedLeagueMemberAuth, type LeagueMemberAuth } from '~/types/api';
+import { type LeagueMemberRole } from '~/types/leagueMembers';
 
 /**
   * Auth wrapper that utilizes session claims for merging dev and prod users
@@ -87,20 +88,47 @@ export function requireAuth<TArgs extends unknown[], TReturn>(
   };
 }
 
+function requireLeagueAuthGenerator(minimunPermissions: LeagueMemberRole) {
+  return <TArgs extends unknown[], TReturn>(
+    handler: (auth: VerifiedLeagueMemberAuth, ...args: TArgs) => TReturn
+  ): (hash: string, ...args: TArgs) => Promise<TReturn> => {
+    return async (hash: string, ...args: TArgs) => {
+      const auth = await leagueMemberAuth(hash);
+      if (!auth.userId) throw new Error('User not authenticated');
+      if (!auth.memberId) throw new Error('Not a league member');
+
+      switch (minimunPermissions) {
+        case 'Owner':
+          if (auth.role !== 'Owner') throw new Error('User not authorized');
+          break;
+        case 'Admin':
+          if (auth.role === 'Member') throw new Error('User not authorized');
+          break;
+        default:
+          // No additional checks for 'Member' role
+          break;
+      }
+
+      const verifiedAuth = auth as VerifiedLeagueMemberAuth;
+      return handler(verifiedAuth, ...args);
+    };
+  };
+}
+
 /**
   * Wrapper for server actions with league member authentication
   */
-export function requireLeagueMemberAuth<TArgs extends unknown[], TReturn>(
-  handler: (auth: VerifiedLeagueMemberAuth, ...args: TArgs) => TReturn
-): (hash: string, ...args: TArgs) => Promise<TReturn> {
-  return async (hash: string, ...args: TArgs) => {
-    const auth = await leagueMemberAuth(hash);
-    if (!auth.userId) throw new Error('User not authenticated');
-    if (!auth.memberId) throw new Error('Not a league member');
-    const verifiedAuth = auth as VerifiedLeagueMemberAuth;
-    return handler(verifiedAuth, ...args);
-  };
-}
+export const requireLeagueMemberAuth = requireLeagueAuthGenerator('Member');
+
+/**
+  * Wrapper for server actions with league admin authentication
+  */
+export const requireLeagueAdminAuth = requireLeagueAuthGenerator('Admin');
+
+/**
+  * Wrapper for server actions with league owner authentication
+  */
+export const requireLeagueOwnerAuth = requireLeagueAuthGenerator('Owner');
 
 /**
   * Wrapper for server actions with system admin authentication

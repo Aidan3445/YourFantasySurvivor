@@ -1,14 +1,14 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
+import { requireLeagueAdminAuth } from '~/lib/auth';
 import updateCustomEventRuleLogic from '~/services/leagues/mutation/updateCustomEventRule';
 import { type CustomEventRuleInsert } from '~/types/leagues';
 
 /**
  * Update a league event rule
- * @param auth - the authenticated league member
- * @param leagueHash - the hash of the league
- * @param rule - the rule to update
+ * @param auth The authenticated league member
+ * @param leagueHash The hash of the league
+ * @param rule The rule to update
  * @throws an error if the user is not authorized
  * @throws an error if the rule cannot be updated
  * @returns Success status of the update
@@ -20,7 +20,7 @@ export default async function updateCustomEventRule(
   ruleId: number,
 ) {
   try {
-    return await requireLeagueMemberAuth(updateCustomEventRuleLogic)(leagueHash, rule, ruleId);
+    return await requireLeagueAdminAuth(updateCustomEventRuleLogic)(leagueHash, rule, ruleId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

@@ -21,7 +21,6 @@ import { EliminationEventNames } from '~/lib/events';
 export default async function chooseCastawayLogic(
   auth: VerifiedLeagueMemberAuth,
   castawayId: number,
-  isDraft: boolean
 ) {
   return await db.transaction(async (trx) => {
     // Get league and validate
@@ -59,6 +58,7 @@ export default async function chooseCastawayLogic(
     if (isEliminated) throw new Error('Castaway has been eliminated');
 
     // Verify draft order if drafting
+    const isDraft = league.status === 'Draft';
     if (isDraft) {
       const pickCount = await trx
         .select({ count: count() })

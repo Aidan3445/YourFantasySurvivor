@@ -2,21 +2,21 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
-import { leagueSchema } from '~/server/db/schema/leagues';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { type SelectionUpdate } from '~/types/leagueMembers';
+import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
   * Get the selection timeline for a league
-  * @param hash The hash of the league
+  * @param auth The authenticated league member
   * @returns castawayMembers and memberCastaways
   * - castawayMembers holds an array of which members selected each castaway each episode
   * - memberCastaways holds an array of castaways selected by each member each episode
   * @returnObj `memberCastaways: Record<memberId, castawayId[]>
   * castawayMembers: Record<castawayId, memberId[]>`
   */
-export default async function getSelectionTimeline(hash: string) {
+export default async function getSelectionTimeline(auth: VerifiedLeagueMemberAuth) {
   const selectionUpdates = await db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
@@ -26,10 +26,9 @@ export default async function getSelectionTimeline(hash: string) {
     })
     .from(selectionUpdateSchema)
     .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId))
-    .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
     .innerJoin(episodeSchema, eq(episodeSchema.episodeId, selectionUpdateSchema.episodeId))
     .orderBy(episodeSchema.episodeNumber)
-    .where(eq(leagueSchema.hash, hash)) as SelectionUpdate[];
+    .where(eq(leagueMemberSchema.leagueId, auth.leagueId)) as SelectionUpdate[];
 
   return processSelectionTimeline(selectionUpdates);
 }

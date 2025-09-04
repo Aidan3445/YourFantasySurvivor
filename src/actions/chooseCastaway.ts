@@ -14,10 +14,9 @@ import chooseCastawayLogic from '~/services/leagues/mutation/chooseCastaway';
 export default async function chooseCastaway(
   leagueHash: string,
   castawayId: number,
-  isDraft: boolean
 ) {
   try {
-    return await requireLeagueMemberAuth(chooseCastawayLogic)(leagueHash, castawayId, isDraft);
+    return await requireLeagueMemberAuth(chooseCastawayLogic)(leagueHash, castawayId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

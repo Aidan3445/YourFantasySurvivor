@@ -1,6 +1,6 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
+import { requireLeagueAdminAuth } from '~/lib/auth';
 import deleteCustomEventRuleLogic from '~/services/leagues/mutation/deleteCustomEventRule';
 
 /**
@@ -18,7 +18,7 @@ export default async function deleteCustomEventRule(
   eventId: number
 ) {
   try {
-    return await requireLeagueMemberAuth(deleteCustomEventRuleLogic)(leagueHash, eventId);
+    return await requireLeagueAdminAuth(deleteCustomEventRuleLogic)(leagueHash, eventId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;
