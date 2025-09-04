@@ -10,7 +10,6 @@ import { customEventRuleSchema, customEventSchema } from '~/server/db/schema/cus
 /**
  * Create a new custom/league event for the season
  * @param auth The authenticated league member
- * @param leagueHash Hash of the league to create the event for
  * @param customEvent Event to create
  * @throws if the event cannot be created
  * @returns the id of the created event

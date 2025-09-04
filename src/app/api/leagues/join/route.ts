@@ -1,13 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '~/lib/auth';
 import joinLeagueLogic from '~/services/leagues/mutation/joinLeague';
-import { type NewLeagueMember } from '~/types/leagueMembers';
+import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as {
       leagueHash: string;
-      newMember: NewLeagueMember;
+      newMember: LeagueMemberInsert;
     };
 
     const result = await requireAuth(joinLeagueLogic)(

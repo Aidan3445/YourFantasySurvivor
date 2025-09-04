@@ -2,22 +2,24 @@
 
 import { requireAuth } from '~/lib/auth';
 import joinLeagueLogic from '~/services/leagues/mutation/joinLeague';
-import { type LeagueHash } from '~/types/deprecated/leagues';
 import { type NewLeagueMember } from '~/types/deprecated/leagueMembers';
 
 /**
- * Join a league
- * @param userId The user joining the league
- * @param hash The hash of the league
- * @param newMember The new member to add
- * @throws an error if the league cannot be found
- * @throws an error if the user is already a member of the league
- * @throws an error if the user cannot be added as a member
- * @throws an error if the league is not in the predraft status
- * @returns an object indicating success
- * @returnObj `{ success: true }`
- */
-export default async function joinLeague(leagueHash: LeagueHash, newMember: NewLeagueMember) {
+  * Join a league
+  * @param hash The hash of the league
+  * @param newMember The new member to add
+  * @throws an error if the league cannot be found
+  * @throws an error if the user is already a member of the league
+  * @throws an error if the user cannot be added as a member
+  * @throws an error if the league is not in the predraft status
+  * @throws an error if the user is not authenticated
+  * @returns an object indicating success
+  * @returnObj `{ success: true }`
+  */
+export default async function joinLeague(
+  leagueHash: string,
+  newMember: NewLeagueMember
+) {
   try {
     return await requireAuth(joinLeagueLogic)(leagueHash, newMember);
   } catch (e) {

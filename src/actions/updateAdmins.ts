@@ -5,13 +5,13 @@ import updateAdminsLogic from '~/services/leagues/mutation/updateAdmins';
 import { type LeagueHash } from '~/types/deprecated/leagues';
 
 /**
- * Update league admin list
- * @param auth The authenticated league member
- * @param admins The new list of admins
- * @throws an error if the admins cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update league admin list
+  * @param leagueHash Hash of the league to update the admins for
+  * @param admins The new list of admins
+  * @throws an error if the admins cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateAdmins(leagueHash: LeagueHash, admins: number[]) {
   try {
     return await requireLeagueMemberAuth(updateAdminsLogic)(leagueHash, admins);

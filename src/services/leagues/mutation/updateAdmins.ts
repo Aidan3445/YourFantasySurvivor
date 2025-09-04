@@ -6,13 +6,13 @@ import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
- * Update league admin list
- * @param auth The authenticated league member
- * @param admins The new list of admins
- * @throws an error if the admins cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update league admin list
+  * @param auth The authenticated league member
+  * @param admins The new list of admins
+  * @throws an error if the admins cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateAdminsLogic(
   auth: VerifiedLeagueMemberAuth,
   admins: number[]

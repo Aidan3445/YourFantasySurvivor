@@ -6,24 +6,24 @@ import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
-import { type NewLeagueMember } from '~/types/leagueMembers';
+import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 /**
- * Join a league
- * @param userId The user joining the league
- * @param hash The hash of the league
- * @param newMember The new member to add
- * @throws an error if the league cannot be found
- * @throws an error if the user is already a member of the league
- * @throws an error if the user cannot be added as a member
- * @throws an error if the league is not in the predraft status
- * @returns an object indicating success
- * @returnObj `{ success: true }`
- */
+  * Join a league
+  * @param userId The user joining the league
+  * @param hash The hash of the league
+  * @param newMember The new member to add
+  * @throws an error if the league cannot be found
+  * @throws an error if the user is already a member of the league
+  * @throws an error if the user cannot be added as a member
+  * @throws an error if the league is not in the predraft status
+  * @returns an object indicating success
+  * @returnObj `{ success: true }`
+  */
 export default async function joinLeagueLogic(
   userId: string,
   hash: string,
-  newMember: NewLeagueMember
+  newMember: LeagueMemberInsert
 ) {
   // Transaction to join the league
   return await db.transaction(async (trx) => {

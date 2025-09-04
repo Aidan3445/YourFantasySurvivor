@@ -7,13 +7,13 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueSettingsUpdate } from '~/types/leagues';
 
 /**
- * Update the league settings
- * @param auth The authenticated league member
- * @param update The settings to update
- * @throws an error if the draft timing cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update the league settings
+  * @param auth The authenticated league member
+  * @param update The settings to update
+  * @throws an error if the draft timing cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateLeagueSettingsLogic(
   auth: VerifiedLeagueMemberAuth,
   update: LeagueSettingsUpdate

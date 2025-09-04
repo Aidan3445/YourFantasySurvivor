@@ -5,13 +5,13 @@ import updateMemberDetailsLogic from '~/services/leagues/mutation/updateMemberDe
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 /**
- * Update league member details
- * @param leagueHash The hash of the league
- * @param member The member to update
- * @throws an error if the member cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update league member details
+  * @param leagueHash The hash of the league
+  * @param member The member to update
+  * @throws an error if the member cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateMemberDetails(
   leagueHash: string,
   member: LeagueMemberInsert

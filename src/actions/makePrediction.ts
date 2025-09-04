@@ -5,13 +5,13 @@ import makePredictionLogic from '~/services/leagues/mutation/makePrediction';
 import { type PredictionInsert } from '~/types/events';
 
 /**
- * Make a league event prediction or update an existing prediction if it exists
- * @param auth The authenticated league member
- * @param prediction The prediction to make
- * @throws an error if the prediction cannot be made
- * @returns Success status of the prediction
- * @returnObj `{ success }`
- */
+  * Make a league event prediction or update an existing prediction if it exists
+  * @param leagueHash Hash of the league to make the prediction for
+  * @param prediction The prediction to make
+  * @throws an error if the prediction cannot be made
+  * @returns Success status of the prediction
+  * @returnObj `{ success }`
+  */
 export default async function makePrediction(
   leagueHash: string,
   prediction: PredictionInsert

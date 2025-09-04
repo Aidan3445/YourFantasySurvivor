@@ -4,14 +4,14 @@ import { requireLeagueAdminAuth } from '~/lib/auth';
 import deleteCustomEventLogic from '~/services/leagues/mutation/deleteCustomEvent';
 
 /**
- * Delete a base event for the season
- * @param auth The authenticated league member
- * @param customEventId Event ID to delete
- * @throws if the user is not an admin or owner of the league
- * @throws if the event cannot be deleted
- * @returns success status
- * @retunObj `{ success: boolean }`
- */
+  * Delete a base event for the season
+  * @param leagueHash Hash of the league to delete the event from
+  * @param customEventId Event ID to delete
+  * @throws if the user is not an admin or owner of the league
+  * @throws if the event cannot be deleted
+  * @returns success status
+  * @retunObj `{ success: boolean }`
+  */
 export default async function deleteCustomEvent(
   leagueHash: string,
   customEventId: number

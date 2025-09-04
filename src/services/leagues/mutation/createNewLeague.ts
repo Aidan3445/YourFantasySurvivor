@@ -6,7 +6,7 @@ import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
-import { type NewLeagueMember } from '~/types/leagueMembers';
+import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 /**
  * Create a new league
@@ -23,7 +23,7 @@ import { type NewLeagueMember } from '~/types/leagueMembers';
 export default async function createNewLeagueLogic(
   userId: string,
   leagueName: string,
-  newMember: NewLeagueMember,
+  newMember: LeagueMemberInsert,
   draftDate?: Date
 ) {
   // Create the league in a transaction

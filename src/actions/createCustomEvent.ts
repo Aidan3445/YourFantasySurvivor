@@ -5,12 +5,14 @@ import createCustomEventLogic from '~/services/leagues/mutation/createCustomEven
 import { type CustomEventInsert } from '~/types/events';
 
 /**
- * Create a new custom/league event for the season
- * @param leagueHash - hash of the league to create the event for
- * @param customEvent - event to create
- * @throws if the user is not a system admin
- * @throws if the event cannot be created
- */
+  * Create a new custom/league event for the season
+  * @param leagueHash Hash of the league to create the event for
+  * @param customEvent Event to create
+  * @throws if the event cannot be created
+  * @throws if the user is not an admin or owner of the league
+  * @returns the id of the created event
+  * @returnObj `{ newEventId }`
+  */
 export default async function createCustomEvent(
   leagueHash: string,
   customEvent: CustomEventInsert

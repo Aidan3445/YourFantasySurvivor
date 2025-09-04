@@ -9,13 +9,13 @@ import { baseEventPredictionSchema } from '~/server/db/schema/baseEvents';
 import { customEventPredictionSchema } from '~/server/db/schema/customEvents';
 
 /**
- * Make a league event prediction or update an existing prediction if it exists
- * @param auth The authenticated league member
- * @param prediction The prediction to make
- * @throws an error if the prediction cannot be made
- * @returns Success status of the prediction and if it was created or updated
- * @returnObj `{ success, wasUpdate }`
- */
+  * Make a league event prediction or update an existing prediction if it exists
+  * @param auth The authenticated league member
+  * @param prediction The prediction to make
+  * @throws an error if the prediction cannot be made
+  * @returns Success status of the prediction and if it was created or updated
+  * @returnObj `{ success, wasUpdate }`
+  */
 export default async function makePredictionLogic(
   auth: VerifiedLeagueMemberAuth,
   prediction: PredictionInsert

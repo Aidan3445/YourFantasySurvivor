@@ -8,14 +8,14 @@ import { type CustomEventRuleInsert } from '~/types/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
- * Update a league event rule
- * @param auth The authenticated league member
- * @param rule The rule to update
- * @throws an error if the user is not authorized
- * @throws an error if the rule cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update a league event rule
+  * @param auth The authenticated league member
+  * @param rule The rule to update
+  * @throws an error if the user is not authorized
+  * @throws an error if the rule cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateCustomEventRuleLogic(
   auth: VerifiedLeagueMemberAuth,
   rule: CustomEventRuleInsert,

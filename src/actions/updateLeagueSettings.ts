@@ -5,13 +5,13 @@ import updateLeagueSettingsLogic from '~/services/leagues/mutation/updateLeagueS
 import { type LeagueSettingsUpdate } from '~/types/leagues';
 
 /**
- * Update the league settings
- * @param auth The authenticated league member
- * @param update The settings to update
- * @throws an error if the draft timing cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update the league settings
+  * @param leagueHash The hash of the league
+  * @param update The settings to update
+  * @throws an error if the draft timing cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateLeagueSettings(
   leagueHash: string,
   update: LeagueSettingsUpdate

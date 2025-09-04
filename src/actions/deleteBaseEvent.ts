@@ -7,6 +7,7 @@ import deleteBaseEventLogic from '~/services/seasons/mutation/deleteBaseEvent';
   * Delete a base event for the season
   * @param baseEventId id of the event to delete
   * @throws if the event cannot be deleted
+  * @throws if the user is not a system admin
   * @returns the success status of the delete
   * @returnObj `{ success }`
   */

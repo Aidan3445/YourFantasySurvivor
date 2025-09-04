@@ -7,15 +7,14 @@ import { leagueSchema } from '~/server/db/schema/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
- * Delete a league event rule
- * @param auth The authenticated league member
- * @param leagueHash The hash of the league
- * @param eventName The event name of the rule to delete
- * @throws an error if the user is not authorized
- * @throws an error if the rule cannot be deleted
- * @returns Success status of the deletion
- * @returnObj `{ success }`
- */
+  * Delete a league event rule
+  * @param auth The authenticated league member
+  * @param ruleId The ID of the rule to delete
+  * @throws an error if the user is not authorized
+  * @throws an error if the rule cannot be deleted
+  * @returns Success status of the deletion
+  * @returnObj `{ success }`
+  */
 export default async function deleteLeagueEventRuleLogic(
   auth: VerifiedLeagueMemberAuth,
   ruleId: number,

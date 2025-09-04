@@ -5,13 +5,13 @@ import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
- * Save a chat message to the database
- * @param auth The authenticated league member
- * @param message The message object with serial, text, and timestamp
- * @throws an error if the message cannot be saved
- * @returns Success status of the save
- * @returnObj `{ success }`
- */
+  * Save a chat message to the database
+  * @param auth The authenticated league member
+  * @param message The message object with serial, text, and timestamp
+  * @throws an error if the message cannot be saved
+  * @returns Success status of the save
+  * @returnObj `{ success }`
+  */
 export default async function saveChatMessageLogic(
   auth: VerifiedLeagueMemberAuth,
   message: { serial: string, text: string, timestamp: string }

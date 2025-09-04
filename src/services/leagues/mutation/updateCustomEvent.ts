@@ -8,15 +8,15 @@ import { type CustomEventInsert } from '~/types/events';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
- * Update a base event for the season
- * @param auth The authenticated league member
- * @param customEventId ID of the event to update
- * @param customEvent Event to update
- * @throws if the user is not a system admin
- * @throws if the event cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update a base event for the season
+  * @param auth The authenticated league member
+  * @param customEventId ID of the event to update
+  * @param customEvent Event to update
+  * @throws if the user is not a system admin
+  * @throws if the event cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateCustomEventLogic(
   auth: VerifiedLeagueMemberAuth,
   customEventId: number,

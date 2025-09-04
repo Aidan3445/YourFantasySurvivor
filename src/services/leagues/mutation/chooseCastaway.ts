@@ -10,14 +10,13 @@ import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
 import { EliminationEventNames } from '~/lib/events';
 
 /**
- * Choose a castaway, either in the draft or as a selection update
- * @param leagueHash The hash of the league
- * @param castawayId The id of the castaway
- * @param isDraft Whether the castaway is being chosen in the draft
- * @throws an error if the castaway cannot be chosen
- * @returns an object indicating success and if the draft is complete
- * @returnObj `{ success, draftComplete? }`
- */
+  * Choose a castaway, either in the draft or as a selection update
+  * @param auth The authenticated league member
+  * @param castawayId The id of the castaway
+  * @throws an error if the castaway cannot be chosen
+  * @returns an object indicating success and if the draft is complete
+  * @returnObj `{ success, draftComplete? }`
+  */
 export default async function chooseCastawayLogic(
   auth: VerifiedLeagueMemberAuth,
   castawayId: number,

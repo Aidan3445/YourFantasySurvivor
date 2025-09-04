@@ -9,13 +9,13 @@ import { type BaseEventInsert } from '~/types/events';
   * @param baseEvent event to create
   * @throws if the event cannot be created
   * @returns the id of the created base event
-  * @returnObj `newEventId`
+  * @returnObj `{ newEventId }`
   */
 export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
   // create transaction for the event and reference insertions
   return await db.transaction(async (trx) => {
     // insert the base event
-    const baseEventId = await trx
+    const newEventId = await trx
       .insert(baseEventSchema)
       .values({
         episodeId: baseEvent.episodeId,
@@ -26,17 +26,17 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
       .returning({ baseEventId: baseEventSchema.baseEventId })
       .then((result) => result[0]?.baseEventId);
 
-    if (!baseEventId) throw new Error('Failed to create base event');
+    if (!newEventId) throw new Error('Failed to create base event');
 
     const eventRefs = baseEvent.references.map((referenceId) => ({
-      baseEventId,
+      baseEventId: newEventId,
       referenceType: baseEvent.referenceType,
       referenceId: referenceId,
     }));
 
     if (baseEvent.updateTribe && baseEvent.eventName === 'tribeUpdate') {
       eventRefs.push({
-        baseEventId,
+        baseEventId: newEventId,
         referenceType: 'Tribe',
         referenceId: baseEvent.updateTribe,
       });
@@ -47,6 +47,6 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
       .insert(baseEventReferenceSchema)
       .values(eventRefs);
 
-    return baseEventId;
+    return { newEventId };
   });
 }

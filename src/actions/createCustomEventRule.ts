@@ -5,13 +5,13 @@ import createCustomEventRuleLogic from '~/services/leagues/mutation/createCustom
 import { type CustomEventRuleInsert } from '~/types/leagues';
 
 /**
- * Create a new league event rule
- * @param leagueId The ID of the league to create the rule for
- * @param rule The rule to create
- * @throws an error if the rule cannot be created
- * @returns The ID of the created rule
- * @returnObj `{ newRuleId }`
- */
+  * Create a new league event rule
+  * @param leagueHash Hash of the league to create the rule for
+  * @param rule The rule to create
+  * @throws an error if the rule cannot be created
+  * @returns The ID of the created rule
+  * @returnObj `{ newRuleId }`
+  */
 export default async function createCustomEventRule(
   leagueHash: string,
   rule: CustomEventRuleInsert

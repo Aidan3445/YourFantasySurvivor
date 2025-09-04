@@ -2,23 +2,23 @@
 
 import { requireAuth } from '~/lib/auth';
 import createNewLeagueLogic from '~/services/leagues/mutation/createNewLeague';
-import { type NewLeagueMember } from '~/types/leagueMembers';
+import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 /**
- * Create a new league
- * @param userId The user creating the league
- * @param leagueName The league to create
- * @param newMember The new member to add
- * @param draftDate The draft date for the league
- * @throws an error if the league cannot be inserted
- * @throws an error if the league settings cannot be inserted
- * @throws an error if the user cannot be added as a member
- * @returns the league info of the league created
- * @returnObj `{ newLeagueHash }`
- */
+  * Create a new league
+  * @param leagueName The league to create
+  * @param newMember The new member to add
+  * @param draftDate The draft date for the league
+  * @throws an error if the league cannot be inserted
+  * @throws an error if the league settings cannot be inserted
+  * @throws an error if the user cannot be added as a member
+  * @throws an error if the user is not authenticated
+  * @returns the league info of the league created
+  * @returnObj `{ newLeagueHash }`
+  */
 export default async function createNewLeague(
   leagueName: string,
-  newMember: NewLeagueMember,
+  newMember: LeagueMemberInsert,
   draftDate?: Date
 ) {
   try {

@@ -7,13 +7,13 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 /**
- * Update league member details
- * @param auth The authenticated league member
- * @param member The member to update
- * @throws an error if the member cannot be updated
- * @returns Success status of the update
- * @returnObj `{ success }`
- */
+  * Update league member details
+  * @param auth The authenticated league member
+  * @param member The member to update
+  * @throws an error if the member cannot be updated
+  * @returns Success status of the update
+  * @returnObj `{ success }`
+  */
 export default async function updateMemberDetailsLogic(
   auth: VerifiedLeagueMemberAuth,
   member: LeagueMemberInsert

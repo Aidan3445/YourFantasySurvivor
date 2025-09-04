@@ -5,13 +5,13 @@ import updateCustomEventLogic from '~/services/leagues/mutation/updateCustomEven
 import { type CustomEventInsert } from '~/types/events';
 
 /**
- * Update a base event for the season
- * @param leagueHash Hash of the league to update the event for
- * @param customEventId ID of the event to update
- * @param customEvent Event to update
- * @throws if the user is not a system admin
- * @throws if the event cannot be updated
- */
+  * Update a base event for the season
+  * @param leagueHash Hash of the league to update the event for
+  * @param customEventId ID of the event to update
+  * @param customEvent Event to update
+  * @throws if the user is not a system admin
+  * @throws if the event cannot be updated
+  */
 export default async function updateCustomEvent(
   leagueHash: string,
   customEventId: number,
