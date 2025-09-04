@@ -14,6 +14,23 @@ export type Episode = {
   isFinale: boolean;
 };
 
+export type EpisodeInsert = {
+  episodeNumber: number;
+  title: string;
+  airDate: Date;
+  isMerge?: boolean;
+  isFinale?: boolean;
+}
+
+export type EpisodeUpdate = {
+  episodeId: number;
+  title?: string;
+  airDate?: Date;
+  runtime?: number;
+  isMerge?: boolean;
+  isFinale?: boolean;
+}
+
 export type KeyEpisodes = {
   previousEpisode: Episode | null;
   nextEpisode: Episode | null;

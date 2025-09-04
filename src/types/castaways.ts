@@ -9,3 +9,13 @@ export type Castaway = {
   imageUrl: string;
   seasonId: number | null;
 };
+
+export type CastawayInsert = {
+  fullName: string;
+  shortName: string;
+  age: number;
+  residence: string;
+  occupation: string;
+  imageUrl: string;
+  tribe: string;
+}

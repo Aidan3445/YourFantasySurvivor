@@ -3,12 +3,13 @@ import 'server-only';
 import { createTable } from '~/server/db/schema/createTable';
 import { boolean, index, integer, pgEnum, serial, unique } from 'drizzle-orm/pg-core';
 import { leagueSchema } from '~/server/db/schema/leagues';
-import { AllBaseEventNames, ScoringBaseEventNames, ShauhinModeTimings } from '~/types/deprecated/events';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { label, notes, reference, timing } from '~/server/db/schema/shared';
+import { BaseEventNames, ScoringBaseEventNames } from '~/lib/events';
+import { ShauhinModeTimings } from '~/lib/leagues';
 
-export const eventName = pgEnum('event_name', AllBaseEventNames);
+export const eventName = pgEnum('event_name', BaseEventNames);
 export const scoringEventName = pgEnum('scoring_event_name', ScoringBaseEventNames);
 export const baseEventSchema = createTable(
   'event_base',

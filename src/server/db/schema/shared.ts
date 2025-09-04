@@ -1,10 +1,9 @@
 import { pgEnum, varchar } from 'drizzle-orm/pg-core';
-import { ReferenceTypes } from '~/lib/events';
-import { TimingOptions } from '~/types/deprecated/sharedEvents';
+import { PredictionTimings, ReferenceTypes } from '~/lib/events';
 
 export const reference = pgEnum('event_reference', ReferenceTypes);
 
-export const timing = pgEnum('event_timing', TimingOptions);
+export const timing = pgEnum('event_timing', PredictionTimings);
 
 export const label = (name: string) => varchar(name, { length: 64 });
 

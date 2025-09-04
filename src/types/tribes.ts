@@ -4,3 +4,8 @@ export type Tribe = {
   tribeColor: string;
   seasonId: number | null;
 };
+
+export type TribeInsert = {
+  tribeName: string;
+  tribeColor: string;
+};
