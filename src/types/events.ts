@@ -1,7 +1,7 @@
 import z from 'zod';
 import {
-  type EventSources, type PredictionTimings, ReferenceTypes, BaseEventNames,
-  type ScoringBaseEventNames, type EliminationEventNames, type EventTypes
+  type PredictionTimings, ReferenceTypes, BaseEventNames,
+  type ScoringBaseEventNames, type EliminationEventNames, EventSources, type EventTypes
 } from '~/lib/events';
 
 export type EventSource = (typeof EventSources)[number];
@@ -42,10 +42,10 @@ export type Prediction = {
   eventSource: EventSource;
   episodeNumber: number;
   predictionMakerId: number;
-  eventId: number;
+  eventName: string;
   referenceId: number;
   referenceType: ReferenceType;
-  bet: number;
+  bet: number | null;
   hit: boolean | null;
 };
 
@@ -69,4 +69,14 @@ export const CustomEventInsertZod = z.object({
   references: z.number().array().min(1),
 });
 export type CustomEventInsert = z.infer<typeof CustomEventInsertZod>;
+
+export const PredictionInsertZod = z.object({
+  eventSource: z.enum(EventSources),
+  episodeId: z.number().int().min(0),
+  referenceId: z.number().int().min(0),
+  referenceType: z.enum(ReferenceTypes),
+  eventName: z.string().max(64),
+  bet: z.number().int().min(0).nullable(),
+});
+export type PredictionInsert = z.infer<typeof PredictionInsertZod>;
 

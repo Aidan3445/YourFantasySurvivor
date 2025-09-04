@@ -34,7 +34,7 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
       referenceId: referenceId,
     }));
 
-    if (baseEvent.updateTribe) {
+    if (baseEvent.updateTribe && baseEvent.eventName === 'tribeUpdate') {
       eventRefs.push({
         baseEventId,
         referenceType: 'Tribe',

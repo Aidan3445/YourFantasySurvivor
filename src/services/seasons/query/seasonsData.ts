@@ -31,7 +31,7 @@ export default async function getSeasonsData(includeInactive: boolean) {
       getCastaways(season.seasonId),
       getTribes(season.seasonId),
       getBaseEvents(season.seasonId),
-      getEpisodes(season.seasonId, false),
+      getEpisodes(season.seasonId),
       getTribesTimeline(season.seasonId),
       getEliminations(season.seasonId),
     ]);

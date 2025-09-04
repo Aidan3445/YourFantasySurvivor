@@ -1,5 +1,5 @@
 import 'server-only';
-import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
+import { index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 
 import { createTable } from '~/server/db/schema/createTable';
 import { leagueSchema } from '~/server/db/schema/leagues';
@@ -59,17 +59,19 @@ export const customEventReferenceSchema = createTable(
 export const customEventPredictionSchema = createTable(
   'event_custom_prediction',
   {
+    customEventPredictionId: serial('custom_event_prediction_id').notNull().primaryKey(),
     customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
     episodeId: integer('episode_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
     memberId: integer('member_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
-    refernceType: reference('reference_type').notNull(),
+    referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
+    bet: integer('bet')
   },
   (table) => [
-    primaryKey({ columns: [table.customEventRuleId, table.episodeId, table.memberId] }),
-    index().on(table.customEventRuleId),
     index().on(table.episodeId),
     index().on(table.memberId),
+    index().on(table.customEventRuleId),
+    unique().on(table.customEventRuleId, table.episodeId, table.memberId)
   ]
 );
 

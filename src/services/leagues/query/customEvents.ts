@@ -73,17 +73,18 @@ export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
   * @returns the custom league events
   * @returnObj `Prediction[]`
   */
-export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
+export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth): Promise<Prediction[]> {
   return db
     .select({
-      eventId: customEventSchema.customEventRuleId,
       episodeNumber: episodeSchema.episodeNumber,
       predictionMakerId: customEventPredictionSchema.memberId,
+      eventName: customEventRuleSchema.eventName,
       referenceId: customEventPredictionSchema.referenceId,
-      referenceType: customEventPredictionSchema.refernceType,
+      referenceType: customEventPredictionSchema.referenceType,
+      bet: customEventPredictionSchema.bet,
       hit: sql<boolean>`
         CASE WHEN ${customEventReferenceSchema} = ${customEventPredictionSchema.referenceId}
-        AND ${customEventReferenceSchema} = ${customEventPredictionSchema.refernceType}
+        AND ${customEventReferenceSchema} = ${customEventPredictionSchema.referenceType}
         THEN true ELSE false END
       `.as('hit'),
     })

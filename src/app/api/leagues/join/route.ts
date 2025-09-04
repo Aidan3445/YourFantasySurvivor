@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       body.newMember
     );
 
-    return NextResponse.json(result, { status: 200 });
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
     let message: string;
     if (error instanceof Error) message = error.message;

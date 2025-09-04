@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       body.draftDate
     );
 
-    return NextResponse.json({ newLeagueHash }, { status: 200 });
+    return NextResponse.json({ newLeagueHash }, { status: 201 });
   } catch (error) {
     let message: string;
     if (error instanceof Error) message = error.message;

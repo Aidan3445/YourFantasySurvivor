@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
   try {
     const baseEvent = await request.json() as BaseEventInsert;
     const newEventId = await requireSystemAdminAuth(createBaseEventLogic)(baseEvent);
-    return NextResponse.json({ newEventId }, { status: 200 });
+    return NextResponse.json({ newEventId }, { status: 201 });
   } catch (error) {
     let message: string;
     if (error instanceof Error) message = error.message;

@@ -16,9 +16,9 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
  */
 export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth) {
   return await db.select({
-    eventId: baseEventSchema.baseEventId,
     episodeNumber: episodeSchema.episodeNumber,
     predictionMakerId: baseEventPredictionSchema.memberId,
+    eventName: baseEventPredictionSchema.baseEventName,
     referenceId: baseEventPredictionSchema.referenceId,
     referenceType: baseEventPredictionSchema.referenceType,
     bet: baseEventPredictionSchema.bet,

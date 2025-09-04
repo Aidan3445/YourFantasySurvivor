@@ -6,7 +6,7 @@ import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
-import { getSeasonEpisodes } from '~/services/leagues/query/predictionTimings';
+import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
 import { EliminationEventNames } from '~/lib/events';
 
 /**
@@ -37,7 +37,7 @@ export default async function chooseCastawayLogic(
     if (league.status === 'Inactive') throw new Error('League is inactive');
 
     // Get next episode
-    const { nextEpisode } = await getSeasonEpisodes(league.seasonId);
+    const { nextEpisode } = await getKeyEpisodes(league.seasonId);
     if (!nextEpisode) throw new Error('No upcoming episode found');
 
     // Check if castaway is eliminated

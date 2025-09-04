@@ -13,3 +13,9 @@ export type Episode = {
   isMerge: boolean;
   isFinale: boolean;
 };
+
+export type KeyEpisodes = {
+  previousEpisode: Episode | null;
+  nextEpisode: Episode | null;
+  mergeEpisode: Episode | null;
+};
