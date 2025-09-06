@@ -5,6 +5,7 @@ import { db } from '~/server/db';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type TribeInsert } from '~/types/tribes';
 import { tribeSchema } from '~/server/db/schema/tribes';
+import { revalidateTag } from 'next/cache';
 
 /**
   * Create a new tribe
@@ -39,6 +40,9 @@ export async function createTribeLogic(
       .returning({ tribeId: tribeSchema.tribeId })
       .then((res) => res[0]?.tribeId);
     if (!newTribeId) throw new Error('Failed to create tribe');
+
+    // Invalidate caches
+    revalidateTag(`tribes-${season.seasonId}`);
 
     return { newTribeId };
   });

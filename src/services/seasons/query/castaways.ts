@@ -4,14 +4,26 @@ import { db } from '~/server/db';
 import { asc, eq, isNull, or } from 'drizzle-orm';
 import { castawaySchema } from '~/server/db/schema/castaways';
 import { type Castaway } from '~/types/castaways';
+import { unstable_cache } from 'next/cache';
 
 /**
-  * Get the castaways for the season
+  * Get the castaways for the season and caches the result
   * @param seasonId The season to get castaways from
   * @returns The castaways for the season
   * @returnObj `Castaway[]`
   */
 export default async function getCastaways(seasonId: number) {
+  return unstable_cache(
+    async (sid: number) => fetchCastaways(sid),
+    ['season-castaways'],
+    {
+      revalidate: 3600,
+      tags: [`castaways-${seasonId}`, 'castaways']
+    }
+  )(seasonId);
+}
+
+async function fetchCastaways(seasonId: number) {
   return db
     .select()
     .from(castawaySchema)

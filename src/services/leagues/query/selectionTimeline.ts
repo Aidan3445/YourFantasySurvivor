@@ -6,6 +6,7 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { type SelectionUpdate } from '~/types/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
+import { SelectionTimelines } from '~/types/leagues';
 
 /**
   * Get the selection timeline for a league
@@ -13,8 +14,8 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
   * @returns castawayMembers and memberCastaways
   * - castawayMembers holds an array of which members selected each castaway each episode
   * - memberCastaways holds an array of castaways selected by each member each episode
-  * @returnObj `memberCastaways: Record<memberId, castawayId[]>
-  * castawayMembers: Record<castawayId, memberId[]>`
+  * @returnObj `memberCastaways: SelectionTimeline
+  * castawayMembers: SelectionTimeline`
   */
 export default async function getSelectionTimeline(auth: VerifiedLeagueMemberAuth) {
   const selectionUpdates = await db
@@ -89,7 +90,7 @@ function processSelectionTimeline(selectionUpdates: SelectionUpdate[]) {
     }
     return { memberCastaways, castawayMembers };
   }, {
-    memberCastaways: {} as Record<number, (number | null)[]>,
-    castawayMembers: {} as Record<number, (number | null)[]>,
-  });
+    memberCastaways: {},
+    castawayMembers: {}
+  } as SelectionTimelines
 }

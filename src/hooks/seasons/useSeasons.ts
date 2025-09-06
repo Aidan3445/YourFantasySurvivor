@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { type Season } from '~/types/seasons';
 
 /**
- * Fetches seasons data from the API.
- * @param {boolean} includeInactive - Whether to include inactive seasons.
- */
-export default function useSeasons(includeInactive: boolean) {
+  * Fetches seasons data from the API.
+  * @param {boolean} includeInactive Whether to include inactive seasons.
+  * @returnObj `Season[]`
+  */
+export function useSeasons(includeInactive: boolean) {
   return useQuery<Season[]>({
     queryKey: ['seasons', includeInactive],
     queryFn: async () => {
@@ -17,8 +18,6 @@ export default function useSeasons(includeInactive: boolean) {
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
     enabled: true
   });
 }

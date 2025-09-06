@@ -4,7 +4,7 @@ import { db } from '~/server/db';
 import { and, eq, sql } from 'drizzle-orm';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { customEventPredictionSchema, customEventReferenceSchema, customEventRuleSchema, customEventSchema } from '~/server/db/schema/customEvents';
-import { type EventWithReferences, type Prediction } from '~/types/events';
+import { type Events, type CustomEvents, type Predictions } from '~/types/events';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
@@ -12,26 +12,26 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
   * Get custom events and predictions for a league
   * @param auth The authenticated league member
   * @returns the custom league events and predictions
-  * @returnObj `events: Record<episodeNumber, Record<eventId, EventWithReferences>>
-  * predictions: Prediction[]`
+  * @returnObj `CustomEvents`
   */
 export default async function getCustomEventsAndPredictions(auth: VerifiedLeagueMemberAuth) {
   const eventsReq = getCustomEvents(auth);
   const predictionsReq = getCustomPredictions(auth);
   const [events, predictions] = await Promise.all([eventsReq, predictionsReq]);
-  return { events, predictions };
+  return { events, predictions } as CustomEvents;
 }
 
 /**
   * Get the custom events for a league
   * @param auth The authenticated league member
   * @returns the custom league events
-  * @returnObj `Record<episodeNumber, Record<eventId, EventWithReferences>>`
+  * @returnObj `Events`
   */
 export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
   return db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
+      episodeId: episodeSchema.episodeId,
       customEventRuleId: customEventSchema.customEventRuleId,
       eventName: customEventRuleSchema.eventName,
       eventType: customEventRuleSchema.eventType,
@@ -52,7 +52,9 @@ export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
       events[row.customEventRuleId] ??= {
         eventSource: 'Custom',
         eventType: row.eventType,
+        customEventRuleId: row.customEventRuleId,
         episodeNumber: row.episodeNumber,
+        episodeId: row.episodeId,
         eventId: row.customEventRuleId,
         eventName: row.eventName,
         label: row.label,
@@ -64,16 +66,16 @@ export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
         id: row.referenceId
       });
       return acc;
-    }, {} as Record<number, Record<number, EventWithReferences>>));
+    }, {} as Events));
 }
 
 /**
   * Get the custom events for a league
   * @param auth The authenticated league member
   * @returns the custom league events
-  * @returnObj `Prediction[]`
+  * @returnObj `Predictions`
   */
-export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth): Promise<Prediction[]> {
+export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
   return db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
@@ -101,10 +103,14 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth): Prom
     .leftJoin(customEventReferenceSchema, eq(customEventReferenceSchema.customEventId, customEventSchema.customEventId))
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
     .orderBy(episodeSchema.episodeNumber)
-    .then(predictions => predictions.map(p => ({
-      ...p,
-      eventSource: 'Custom'
-    } as Prediction)));
+    .then((rows) => rows.reduce((acc, row) => {
+      acc[row.episodeNumber] ??= {};
+      const predictions = acc[row.episodeNumber]!;
+      predictions[row.eventName] ??= [];
+      predictions[row.eventName]!.push({
+        eventSource: 'Base',
+        ...row,
+      });
+      return acc;
+    }, {} as Predictions));
 }
-
-

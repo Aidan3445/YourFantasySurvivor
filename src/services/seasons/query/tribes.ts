@@ -1,19 +1,31 @@
-import { asc, eq, isNull, or } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
+import { asc, eq, isNull, or } from 'drizzle-orm';
+import { unstable_cache } from 'next/cache';
 import { tribeSchema } from '~/server/db/schema/tribes';
 import { type Tribe } from '~/types/tribes';
 
 
 /**
-* Get all tribes for a season
+* Get all tribes for a season and caches the result
 * @param seasonId The season to get tribes from
 * @returns The tribes for the season
 * @throws if the season does not exist
 * @returnObj `Tribe[]`
 */
 export default async function getTribes(seasonId: number) {
+  return unstable_cache(
+    async (sid: number) => fetchTribes(sid),
+    ['season-tribes'],
+    {
+      revalidate: 3600,
+      tags: [`tribes-${seasonId}`, 'tribes']
+    }
+  )(seasonId);
+}
+
+async function fetchTribes(seasonId: number) {
   return db
     .select()
     .from(tribeSchema)

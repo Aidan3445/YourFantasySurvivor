@@ -2,8 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useLeague } from '~/hooks/useLeague';
-import { AllBaseEventNames, type BaseEventInsert, baseEventLabelPrefixes, baseEventLabels, BaseEventInsertZod } from '~/types/events';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { MultiSelect } from '~/components/common/multiSelect';
@@ -11,18 +9,26 @@ import { useMemo, useState } from 'react';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { createBaseEvent } from '~/services/deprecated/baseActions';
-import { useEventOptions } from '~/hooks/useEventOptions';
 import { Circle } from 'lucide-react';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { BaseEventInsertZod, type EventWithReferences, type BaseEventInsert } from '~/types/events';
+import { useEpisodes } from '~/hooks/seasons/useEpisodes';
+import { baseEventLabelPrefixes, baseEventLabels, BaseEventNames } from '~/lib/events';
+import createBaseEvent from '~/actions/createBaseEvent';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
 
 export default function CreateBaseEvent() {
-  const { leagueData, refresh } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: episodes } = useEpisodes(league?.leagueId);
+
   const reactForm = useForm<BaseEventInsert>({
     defaultValues: {
-      episodeId: leagueData.episodes.find(episode => episode.airStatus === 'Airing')?.episodeId ??
-        leagueData.episodes.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
-        leagueData.episodes[0]?.episodeId,
+      episodeId: episodes?.find(episode => episode.airStatus === 'Airing')?.episodeId ??
+        episodes?.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
+        episodes?.[0]?.episodeId,
       notes: null,
     },
     resolver: zodResolver(BaseEventInsertZod),
@@ -32,12 +38,12 @@ export default function CreateBaseEvent() {
   const selectedReferenceIds = reactForm.watch('references');
   const selectedEvent = reactForm.watch('eventName');
   const selectedEpisodeId = reactForm.watch('episodeId');
-  const selectedEpisode = useMemo(() => leagueData.episodes
-    .find(episode =>
-      episode.episodeId === Number(selectedEpisodeId))?.episodeNumber ?? 1,
-    [leagueData.episodes, selectedEpisodeId]);
+  const selectedEpisode = useMemo(() => episodes?.find(episode =>
+    episode.episodeId === Number(selectedEpisodeId))?.episodeNumber ?? 1,
+    [episodes, selectedEpisodeId]);
 
-  const { castawayOptions, tribeOptions } = useEventOptions(selectedEpisode);
+  const { tribeOptions, castawayOptions } = useEventOptions(league?.seasonId, selectedEpisode ?? 1);
+
   const [eventSubtype, setEventSubtype] = useState('');
 
   const labelHelper = (subtype: string) => {
@@ -45,6 +51,28 @@ export default function CreateBaseEvent() {
     if (subtype === 'Custom') return '';
     reactForm.setValue('label', `${baseEventLabelPrefixes[selectedEvent]} ${subtype}`);
   };
+
+  const mockEvent = useMemo(() => {
+    if (!selectedEvent) return null;
+    return {
+      eventSource: 'Base',
+      eventType: 'Direct',
+      eventName: selectedEvent,
+      label: reactForm.getValues('label') ?? `${baseEventLabelPrefixes[selectedEvent]} ${baseEventLabels[selectedEvent]?.[0] ?? selectedEvent}`,
+      episodeNumber: selectedEpisode,
+      references: (selectedReferenceIds ?? []).map(id => ({
+        type: selectedReferenceType,
+        id,
+      })),
+      notes: reactForm.getValues('notes') ?? null,
+    } as EventWithReferences;
+  }, [
+    reactForm,
+    selectedEpisode,
+    selectedEvent,
+    selectedReferenceIds,
+    selectedReferenceType
+  ]);
 
   const [eventClearer, setEventClearer] = useState(0);
 
@@ -58,7 +86,7 @@ export default function CreateBaseEvent() {
       await createBaseEvent(data);
       alert('Base event created successfully');
       reactForm.reset();
-      await refresh();
+      await queryClient.invalidateQueries({ queryKey: ['baseEvents'] });
     } catch (e) {
       alert('Failed to create base event');
       console.error('Failed to create base event', e);
@@ -91,9 +119,9 @@ export default function CreateBaseEvent() {
                           <SelectValue placeholder='Select Episode' />
                         </SelectTrigger>
                         <SelectContent>
-                          {leagueData.episodes.map(episode => (
+                          {episodes?.map(episode => (
                             <SelectItem key={episode.episodeId} value={`${episode.episodeId}`}>
-                              {episode.episodeNumber}: {episode.episodeTitle} - {episode.episodeAirDate.toLocaleDateString()}
+                              {episode.episodeNumber}: {episode.title} - {episode.airDate.toLocaleDateString()}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -122,7 +150,7 @@ export default function CreateBaseEvent() {
                             <SelectValue placeholder='Select Event' />
                           </SelectTrigger>
                           <SelectContent>
-                            {AllBaseEventNames.map(eventName => (
+                            {BaseEventNames.map(eventName => (
                               <SelectItem key={eventName} value={eventName}>
                                 {eventName}
                               </SelectItem>
@@ -222,13 +250,13 @@ export default function CreateBaseEvent() {
                             <SelectValue placeholder='Select Tribe' />
                           </SelectTrigger>
                           <SelectContent>
-                            {leagueData.tribes.map(tribe => (
+                            {tribeOptions.map(tribe => (
                               <SelectItem
                                 className='place-items-center'
-                                key={tribe.tribeId}
-                                value={`${tribe.tribeId}`}>
-                                {tribe.tribeName}
-                                <Circle className='inline-block ml-2' fill={tribe.tribeColor} />
+                                key={tribe.value}
+                                value={`${tribe.value}`}>
+                                {tribe.label}
+                                <Circle className='inline-block ml-2' fill={tribe.color} />
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -261,24 +289,7 @@ export default function CreateBaseEvent() {
             </form>
             <EpisodeEvents
               episodeNumber={selectedEpisode}
-              mockBases={selectedEvent ? [{
-                eventName: selectedEvent,
-                label: reactForm.watch('label'),
-                notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
-                castaways: selectedReferenceType === 'Castaway' ?
-                  selectedReferenceIds?.map(castawayId =>
-                    castawayOptions.find(castaway => castaway.value === castawayId)?.label)
-                    .filter((castaway): castaway is string => castaway !== undefined) :
-                  selectedReferenceIds?.map(tribeId =>
-                    tribeOptions.find(tribe => tribe.value === tribeId)?.castaways).flat()
-                    .filter((castaway): castaway is string => castaway !== undefined),
-                tribes: selectedReferenceType === 'Tribe' ?
-                  selectedReferenceIds?.map(tribeId =>
-                    tribeOptions.find(tribe => tribe.value === tribeId)?.label)
-                    .filter((tribe): tribe is string => tribe !== undefined) : [] as string[],
-                referenceType: selectedReferenceType,
-                references: selectedReferenceIds,
-              }] : undefined}
+              mockEvents={mockEvent ? [mockEvent] : []}
               edit
               filters={{
                 castaway: [],

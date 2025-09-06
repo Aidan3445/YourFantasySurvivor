@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
+import { type League } from '~/types/leagues';
 
 /**
    * Get a league by its hash
@@ -20,10 +21,11 @@ export default async function getLeague(auth: VerifiedLeagueMemberAuth) {
       hash: leagueSchema.hash,
       name: leagueSchema.name,
       status: leagueSchema.status,
-      season: seasonSchema.name
+      season: seasonSchema.name,
+      seasonId: seasonSchema.seasonId,
     })
     .from(leagueSchema)
     .innerJoin(seasonSchema, eq(leagueSchema.season, seasonSchema.seasonId))
     .where(eq(leagueSchema.leagueId, auth.leagueId))
-    .then((leagues) => leagues[0]);
+    .then((leagues) => leagues[0] as League | undefined);
 }

@@ -17,7 +17,7 @@ export default async function getEpisodes(seasonId: number) {
     async (seasonId: number) => fetchEpisodes(seasonId),
     ['season-episodes'],
     {
-      revalidate: 60,
+      revalidate: 3600,
       tags: [`episodes-${seasonId}`, 'episodes']
     }
   )(seasonId);

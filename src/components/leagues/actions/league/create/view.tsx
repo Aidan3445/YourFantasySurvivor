@@ -4,21 +4,21 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form } from '~/components/common/form';
-import { LeagueNameZod } from '~/types/deprecated/leagues';
+import { LeagueNameZod } from '~/types/leagues';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '~/components/common/carousel';
 import { Button } from '~/components/common/button';
 import { Progress } from '~/components/common/progress';
-import { useCarouselProgress } from '~/hooks/useCarouselProgress';
-import { createNewLeague } from '~/services/deprecated/leagueActions';
+import { useCarouselProgress } from '~/hooks/ui/useCarouselProgress';
+import createNewLeague from '~/actions/createNewLeague';
 import { useRouter } from 'next/navigation';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
-import { ColorZod, DisplayNameZod } from '~/types/deprecated/leagueMembers';
 import { useEffect } from 'react';
-import { useYfsUser } from '~/hooks/useYfsUser';
+import { useYfsUser } from '~/hooks/deprecated/useYfsUser';
 import { useUser } from '@clerk/nextjs';
 import NextButton from '~/components/leagues/actions/league/create/next';
 import LeagueNameField from '~/components/leagues/actions/league/create/name';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
+import { ColorZod, DisplayNameZod } from '~/types/leagueMembers';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
@@ -60,14 +60,13 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
         {
           displayName: data.displayName,
           color: data.color,
-          role: 'Owner'
         },
         data.draftDate
       );
       addLeague(leagueInfo);
       alert(`League created called ${data.leagueName}`);
       onSubmit?.();
-      router.push(`/leagues/${leagueInfo.leagueHash}/predraft`);
+      router.push(`/leagues/${leagueInfo.newLeagueHash}/predraft`);
     } catch (error) {
       console.error(error);
       alert('Failed to create league');

@@ -9,6 +9,7 @@ import { tribeSchema } from '~/server/db/schema/tribes';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import getEpisodes from '~/services/seasons/query/episodes';
+import { revalidateTag } from 'next/cache';
 
 /**
   * Create a new castaway
@@ -110,6 +111,9 @@ export async function createCastawayLogic(
         referenceType: 'Castaway',
         referenceId: newCastawayId,
       });
+
+    // Invalidate caches
+    revalidateTag(`castaways-${seasonId}`);
 
     return { newCastawayId };
   });

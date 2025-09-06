@@ -10,6 +10,13 @@ export type Castaway = {
   seasonId: number | null;
 };
 
+export type CastawayWithTribe = Castaway & {
+  tribe: {
+    name: string;
+    color: string;
+  } | null;
+};
+
 export type CastawayInsert = {
   fullName: string;
   shortName: string;

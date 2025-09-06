@@ -1,5 +1,5 @@
 import { type EpisodeNumber } from '~/types/episodes';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { useMemo } from 'react';
 import { type TribeId, type TribeName } from '~/types/deprecated/tribes';
 

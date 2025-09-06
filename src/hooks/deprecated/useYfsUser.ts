@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { YfsUserContext } from '~/context/yfsUserContext';
+import { YfsUserContext } from '~/context/deprecated/yfsUserContext';
 
 export function useYfsUser() {
   const context = useContext(YfsUserContext);

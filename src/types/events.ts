@@ -3,6 +3,9 @@ import {
   type PredictionTimings, ReferenceTypes, BaseEventNames,
   type ScoringBaseEventNames, type EliminationEventNames, EventSources, type EventTypes
 } from '~/lib/events';
+import { type Tribe } from '~/types/tribes';
+import { type CastawayWithTribe } from '~/types/castaways';
+import { type LeagueMember } from '~/types/leagueMembers';
 
 export type EventSource = (typeof EventSources)[number];
 export type EventType = (typeof EventTypes)[number];
@@ -21,10 +24,23 @@ export type Event = {
   eventName: string;
   label: string | null;
   notes: string[] | null;
+  episodeId: number;
+  customEventRuleId?: number;
 };
 
 export type EventWithReferences = Event & {
   references: EventReference[];
+};
+
+export type EnrichedEvent = EventWithReferences & {
+  points: number | null;
+  referenceMap: {
+    tribe: Tribe | null;
+    pairs: {
+      castaway: CastawayWithTribe;
+      member: LeagueMember | null;
+    }[];
+  }[];
 };
 
 export type ScoringBaseEventName = typeof ScoringBaseEventNames[number];
@@ -41,12 +57,26 @@ export type PredictionTiming = (typeof PredictionTimings)[number];
 export type Prediction = {
   eventSource: EventSource;
   episodeNumber: number;
-  predictionMakerId: number;
   eventName: string;
+  predictionMakerId: number;
   referenceId: number;
   referenceType: ReferenceType;
   bet: number | null;
   hit: boolean | null;
+};
+
+/**
+  * Record<episodeNumber, Record<eventId, EventWithReferences>>
+  */
+export type Events = Record<number, Record<number, EventWithReferences>>;
+/**
+  * Record<episodeNumber, Record<eventName, Prediction[]>>
+  */
+export type Predictions = Record<number, Record<string, Prediction[]>>;
+
+export type CustomEvents = {
+  events: Events;
+  predictions: Predictions;
 };
 
 export const BaseEventInsertZod = z.object({

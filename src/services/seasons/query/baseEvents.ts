@@ -6,18 +6,19 @@ import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/ba
 import { castawaySchema } from '~/server/db/schema/castaways';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { tribeSchema } from '~/server/db/schema/tribes';
-import type { EventWithReferences } from '~/types/events';
+import type { Events } from '~/types/events';
 
 /**
   * Get the base events for a season
   * @param seasonId The season to get scores for
   * @returns The base events for the season organized by episode 
-  * @returnObj `Record<episodeNumber, Record<eventId, EventWithReferences>>`
+  * @returnObj `Events`
   */
 export default async function getBaseEvents(seasonId: number) {
   return db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
+      episodeId: episodeSchema.episodeId,
       baseEventId: baseEventSchema.baseEventId,
       eventName: baseEventSchema.eventName,
       label: baseEventSchema.label,
@@ -43,6 +44,7 @@ export default async function getBaseEvents(seasonId: number) {
         eventSource: 'Base',
         eventType: 'Direct',
         episodeNumber: row.episodeNumber,
+        episodeId: row.episodeId,
         eventId: row.baseEventId,
         eventName: row.eventName,
         label: row.label,
@@ -54,5 +56,5 @@ export default async function getBaseEvents(seasonId: number) {
         id: row.referenceId,
       });
       return acc;
-    }, {} as Record<number, Record<number, EventWithReferences>>));
+    }, {} as Events));
 }

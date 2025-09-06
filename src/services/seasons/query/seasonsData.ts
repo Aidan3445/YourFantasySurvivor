@@ -8,6 +8,7 @@ import getBaseEvents from '~/services/seasons/query/baseEvents';
 import getEliminations from '~/services/seasons/query/eliminations';
 import getTribesTimeline from '~/services/seasons/query/tribesTimeline';
 import getEpisodes from '~/services/seasons/query/episodes';
+import { type SeasonsDataQuery } from '~/types/seasons';
 
 /**
   * Get the season data for either all or active seasons
@@ -44,6 +45,6 @@ export default async function getSeasonsData(includeInactive: boolean) {
       episodes,
       tribesTimeline,
       eliminations,
-    };
+    } as SeasonsDataQuery;
   }));
 }

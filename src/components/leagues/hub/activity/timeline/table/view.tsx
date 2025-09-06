@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 'use client';
 
+import { useMemo } from 'react';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import {
   Table,
@@ -10,67 +10,109 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/common/table';
-import { useLeague } from '~/hooks/useLeague';
-import type { EpisodeNumber } from '~/types/episodes';
-import {
-  type BaseEvent, type BaseEventName, type LeagueDirectEvent, type LeagueEventName, type CustomPredictionEvent
-} from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
-import { type CastawayName } from '~/types/castaways';
-import { type TribeName } from '~/types/deprecated/tribes';
 import EpisodeEventsTableBody from '~/components/leagues/hub/activity/timeline/table/body';
+import { useBasePredictions } from '~/hooks/leagues/useBasePredictions';
+import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useSelectionTimeline } from '~/hooks/leagues/useSelectionTimeline';
+import { useBaseEvents } from '~/hooks/seasons/useBaseEvents';
+import { useEpisodes } from '~/hooks/seasons/useEpisodes';
+import { type EventWithReferences } from '~/types/events';
 
 
 export interface EpisodeEventsProps {
-  episodeNumber: EpisodeNumber;
-  mockBases?: Omit<BaseEvent, 'baseEventId'>[];
-  mockPredictions?: Omit<CustomPredictionEvent, 'eventId'>[];
-  mockDirects?: Omit<LeagueDirectEvent, 'eventId'>[];
+  episodeNumber: number;
+  mockEvents?: EventWithReferences[];
   edit?: boolean;
   labelRow?: boolean;
   filters: {
-    castaway: CastawayName[];
-    tribe: TribeName[];
-    member: LeagueMemberDisplayName[];
-    event: (BaseEventName | LeagueEventName)[];
+    castaway: number[];
+    tribe: number[];
+    member: number[];
+    event: number[];
   };
 }
 
 export default function EpisodeEvents({
   episodeNumber,
-  mockBases,
-  mockPredictions,
-  mockDirects,
+  mockEvents,
   edit,
   filters }: EpisodeEventsProps) {
-  const {
-    leagueData: {
-      leagueEvents,
-      baseEvents,
-      basePredictions,
-      episodes
-    }
-  } = useLeague();
+  const { data: league } = useLeague();
+  const { data: selectionTimeline } = useSelectionTimeline();
+  const { data: customEvents } = useCustomEvents();
+  const { data: basePredictions } = useBasePredictions();
+  const { data: baseEvents } = useBaseEvents(league?.seasonId);
+  const { data: episodes } = useEpisodes(league?.seasonId);
 
-  if (episodeNumber === 5) {
-    console.log({ baseEvents, basePredictions, leagueEvents, mockBases, mockPredictions, mockDirects });
-  }
+  const combinedEvents = useMemo(() => [
+    ...(baseEvents?.[episodeNumber] ? Object.values(baseEvents[episodeNumber]) : []),
+    ...(customEvents?.events?.[episodeNumber] ? Object.values(customEvents.events[episodeNumber]) : []),
+  ], [baseEvents, customEvents, episodeNumber]);
 
-  const noTribes = episodeNumber !== -1 && (
-    !(
-      baseEvents[episodeNumber] &&
-      Object.values(baseEvents[episodeNumber]).some((event) => event.tribes.length > 0)
-    ) &&
-    !mockBases?.some((event) => event.tribes.length > 0) &&
-    !(
-      basePredictions[episodeNumber] &&
-      Object.values(basePredictions[episodeNumber]).some((event) => event.reference.referenceType === 'Tribe' && event.eventId !== null)
-    ) &&
-    ![...leagueEvents.predictionEvents[episodeNumber] ?? [], ...mockPredictions ?? []]
-      ?.some((event) => event.reference.referenceType === 'Tribe') &&
-    ![...leagueEvents.directEvents[episodeNumber]?.Tribe ?? [], ...mockDirects ?? []]
-      ?.some((event) => event.referenceType === 'Tribe'));
+  const filteredEvents = useMemo(() => {
+    return combinedEvents.filter((event) => {
+      const eventMembers = event.references
+        .map((ref) => ref.type === 'Castaway'
+          ? selectionTimeline?.castawayMembers?.[ref.id]?.[episodeNumber] ?? []
+          : [])
+        .flat();
 
+      const castawayMatch = filters.castaway.length === 0 || event.references.some((ref) =>
+        ref.type === 'Castaway' && filters.castaway.includes(ref.id));
+      const tribeMatch = filters.tribe.length === 0 || event.references.some((ref) =>
+        ref.type === 'Tribe' && filters.tribe.includes(ref.id));
+      const memberMatch = filters.member.length === 0 || eventMembers.some((ref) =>
+        filters.member.includes(ref));
+      const eventMatch = filters.event.length === 0 || filters.event.includes(event.eventId);
+
+      return castawayMatch && tribeMatch && memberMatch && eventMatch;
+    });
+  }, [
+    combinedEvents,
+    episodeNumber,
+    filters.castaway,
+    filters.event,
+    filters.member,
+    filters.tribe,
+    selectionTimeline?.castawayMembers
+  ]);
+
+  const combinedPredictions = useMemo(() => [
+    ...(basePredictions?.[episodeNumber] ? Object.values(basePredictions[episodeNumber]).flat() : []),
+    ...(customEvents?.predictions?.[episodeNumber] ? Object.values(customEvents.predictions[episodeNumber]).flat() : []),
+  ].filter((prediction) => combinedEvents.some((event) => event.eventName === prediction.eventName)),
+    [basePredictions, customEvents, episodeNumber, combinedEvents]);
+
+  const filteredPredictions = useMemo(() => {
+    return combinedPredictions.filter((prediction) => {
+      const castawayMatch = filters.castaway.length === 0 || (
+        prediction.referenceType === 'Castaway' && filters.castaway.includes(prediction.referenceId)
+      );
+      const tribeMatch = filters.tribe.length === 0 || (
+        prediction.referenceType === 'Tribe' && filters.tribe.includes(prediction.referenceId)
+      );
+      const memberMatch = filters.member.length === 0 ||
+        filters.member.includes(prediction.predictionMakerId);
+      const eventMatch = filters.event.length === 0 || combinedEvents.some((event) =>
+        event.eventName === prediction.eventName && filters.event.includes(event.eventId));
+
+      return castawayMatch && tribeMatch && memberMatch && eventMatch;
+    });
+  }, [combinedEvents,
+    combinedPredictions,
+    filters.castaway,
+    filters.event,
+    filters.member,
+    filters.tribe
+  ]);
+
+  const noTribes = useMemo(() =>
+    episodeNumber !== -1 && (
+      !combinedEvents.some((event) => event.references.some((ref) => ref.type === 'Tribe'))
+      && !combinedPredictions.some((prediction) => prediction.referenceType === 'Tribe')
+      && !mockEvents?.some((event) => event.references.some((ref) => ref.type === 'Tribe'))
+    ), [combinedEvents, combinedPredictions, episodeNumber, mockEvents]);
 
   return (
     <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-var(--sidebar-width)-3rem)] lg:w-full bg-card rounded-lg gap-0'>
@@ -90,15 +132,16 @@ export default function EpisodeEvents({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {episodes.filter((episode) =>
+          {episodes?.filter((episode) =>
             episodeNumber === -1 || episode.episodeNumber === episodeNumber)
             .map((episode) => (
               <EpisodeEventsTableBody
                 key={episode.episodeNumber}
+                seasonId={episode.seasonId}
                 episodeNumber={episode.episodeNumber}
-                mockBases={mockBases}
-                mockPredictions={mockPredictions}
-                mockDirects={mockDirects}
+                mockEvents={mockEvents}
+                filteredEvents={filteredEvents}
+                filteredPredictions={filteredPredictions}
                 edit={edit}
                 filters={filters}
                 labelRow={episodeNumber === -1} />

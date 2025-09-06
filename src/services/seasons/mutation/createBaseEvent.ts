@@ -1,5 +1,7 @@
 'use server';
 
+import { revalidateTag } from 'next/cache';
+import { EliminationEventNames } from '~/lib/events';
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { type BaseEventInsert } from '~/types/events';
@@ -46,6 +48,11 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
     await trx
       .insert(baseEventReferenceSchema)
       .values(eventRefs);
+
+    if ([...EliminationEventNames, 'tribeUpdate'].includes(baseEvent.eventName)) {
+      // Invalidate cache
+      revalidateTag('tribe-members');
+    }
 
     return { newEventId };
   });

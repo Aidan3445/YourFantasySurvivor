@@ -4,6 +4,8 @@ import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { type BaseEventInsert } from '~/types/events';
+import { EliminationEventNames } from '~/lib/events';
+import { revalidateTag } from 'next/cache';
 
 /**
   * Update a base event for the season
@@ -17,7 +19,7 @@ export default async function updateBaseEventLogic(baseEventId: number, baseEven
   // create a transaction to ensure both the base event and references are updated
   return await db.transaction(async (trx) => {
     // Update the base event
-    await trx
+    const event = await trx
       .update(baseEventSchema)
       .set({
         episodeId: baseEvent.episodeId,
@@ -25,7 +27,8 @@ export default async function updateBaseEventLogic(baseEventId: number, baseEven
         label: baseEvent.label,
         notes: baseEvent.notes,
       })
-      .where(eq(baseEventSchema.baseEventId, baseEventId));
+      .where(eq(baseEventSchema.baseEventId, baseEventId))
+      .returning({ eventName: baseEventSchema.eventName });
 
     // Clear and rebuild references (simpler and safer)
     await trx
@@ -48,6 +51,11 @@ export default async function updateBaseEventLogic(baseEventId: number, baseEven
 
     if (eventRefs.length > 0) {
       await trx.insert(baseEventReferenceSchema).values(eventRefs);
+    }
+
+    if (['tribeUpdate', ...EliminationEventNames].includes(event[0]!.eventName)) {
+      // Invalidate cache
+      revalidateTag('tribe-members');
     }
 
     return { success: true };

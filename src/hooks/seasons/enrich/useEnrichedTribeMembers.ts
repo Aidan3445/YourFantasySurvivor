@@ -1,0 +1,39 @@
+import { useMemo } from 'react';
+import { useCastaways } from '~/hooks/seasons/useCastaways';
+import { useTribeMembers } from '~/hooks/seasons/useTribeMembers';
+import { useTribes } from '~/hooks/seasons/useTribes';
+import { type Castaway } from '~/types/castaways';
+import { type Tribe } from '~/types/tribes';
+
+/**
+  * Custom hook to get enriched tribe members data.
+  * Combines tribe members with their respective tribe and castaway details.
+  * @param {number} seasonId The season ID to get tribe members for.
+  * @param {number} episode The episode number to get tribe members for.
+  * @returnObj `Record<tribeId, { tribe: Tribe; members: Castaway[] }>`
+  */
+export function useEnrichedTribeMembers(seasonId?: number, episode?: number) {
+  const { data: tribeMembers } = useTribeMembers(seasonId, episode);
+  const { data: tribes } = useTribes(seasonId);
+  const { data: castaways } = useCastaways(seasonId);
+
+  return useMemo(() => {
+    if (!tribeMembers || !tribes || !castaways) return {};
+
+    // Return structure with full tribe and castaway objects
+    return Object.entries(tribeMembers).reduce((acc, [tribeId, memberIds]) => {
+      const tribe = tribes.find(t => t.tribeId === parseInt(tribeId));
+      if (!tribe) return acc;
+
+      const members = memberIds.map(id => castaways.find(c => c.castawayId === id));
+
+      return {
+        ...acc,
+        [tribeId]: {
+          tribe,
+          members: members.filter(Boolean),
+        }
+      };
+    }, {} as Record<number, { tribe: Tribe; members: Castaway[] }>);
+  }, [tribeMembers, tribes, castaways]);
+}

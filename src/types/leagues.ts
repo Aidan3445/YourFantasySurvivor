@@ -1,6 +1,6 @@
 import z from 'zod';
 import { EventTypes, PredictionTimings, ReferenceTypes } from '~/lib/events';
-import type { LeagueStatuses, ShauhinModeTimings } from '~/lib/leagues';
+import { LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, type LeagueStatuses, type ShauhinModeTimings } from '~/lib/leagues';
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 
 export type LeagueStatus = (typeof LeagueStatuses)[number];
@@ -11,7 +11,12 @@ export type League = {
   hash: string;
   status: LeagueStatus;
   season: string;
+  seasonId: number;
 };
+
+export const LeagueNameZod = z.string()
+  .min(LEAGUE_NAME_MIN_LENGTH, { message: `League name must be between ${LEAGUE_NAME_MIN_LENGTH} and ${LEAGUE_NAME_MAX_LENGTH} characters` })
+  .max(LEAGUE_NAME_MAX_LENGTH, { message: `League name must be between ${LEAGUE_NAME_MIN_LENGTH} and ${LEAGUE_NAME_MAX_LENGTH} characters` });
 
 export type LeagueSettings = {
   leagueId: number;
@@ -124,3 +129,8 @@ export const CustomEventRuleInsertZod = z.object({
 });
 export type CustomEventRuleInsert = z.infer<typeof CustomEventRuleInsertZod>;
 
+export type SelectionTimeline = Record<number, (number | null)[]>;
+export type SelectionTimelines = {
+  memberCastaways: SelectionTimeline,
+  castawayMembers: SelectionTimeline
+};
