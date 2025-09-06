@@ -2,7 +2,6 @@
 
 import { Settings, X } from 'lucide-react';
 import { z } from 'zod';
-import { type LeagueSettingsUpdate } from '~/types/deprecated/leagues';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
@@ -11,10 +10,13 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
-import { updateLeagueSettings } from '~/services/deprecated/leagueActions';
-import { useLeague } from '~/hooks/useLeague';
 import { useState } from 'react';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
+import { type LeagueSettingsUpdate } from '~/types/leagues';
+import updateLeagueSettings from '~/actions/updateLeagueSettings';
+import { useQueryClient } from '@tanstack/react-query';
 
 const formSchema = z.object({
   draftDate: z.date().nullable(),
@@ -25,24 +27,18 @@ interface SetDraftDateProps {
 }
 
 export default function SetDraftDate({ overrideLeagueHash }: SetDraftDateProps) {
-  const {
-    league: {
-      leagueHash,
-      settings: {
-        draftDate
-      }
-    },
-    refresh
-  } = useLeague({ overrideLeagueHash });
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague(overrideLeagueHash);
+  const { data: leagueSettings } = useLeagueSettings(overrideLeagueHash);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      draftDate: draftDate!,
+      draftDate: leagueSettings?.draftDate
     },
   });
 
-  if (!leagueHash) return null;
+  if (!league) return null;
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     const leagueUpdate: LeagueSettingsUpdate = {
@@ -50,9 +46,8 @@ export default function SetDraftDate({ overrideLeagueHash }: SetDraftDateProps) 
     };
 
     try {
-      await updateLeagueSettings(leagueHash, leagueUpdate);
-      console.log('Draft timing updated:', data.draftDate);
-      await refresh();
+      await updateLeagueSettings(league.hash, leagueUpdate);
+      await queryClient.invalidateQueries({ queryKey: ['settings', league.hash] });
       alert(`Draft timing updated: ${data.draftDate?.toLocaleString() ?? 'Manual Draft'}`);
       setDialogOpen(false);
     } catch (error) {
