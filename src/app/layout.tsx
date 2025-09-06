@@ -5,8 +5,6 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
-import UserProvider from '~/context/yfsUserContext';
-import { leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import { type Metadata } from 'next';
 
 const inter = Inter({
@@ -26,8 +24,6 @@ interface RootLayoutProps {
 
 
 export default async function RootLayout({ children }: RootLayoutProps) {
-  const leagues = await QUERIES.getLeagues();
-
   return (
     <StrictMode>
       <ClerkProvider
@@ -37,18 +33,16 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             colorBackground: '#EED9BF',
           }
         }}>
-        <UserProvider leagues={leagues}>
-          <html lang='en'>
-            <body className={`font-sans ${inter.variable}`}>
-              <SidebarProvider defaultOpen>
-                <Nav />
-                <div className='w-full'>
-                  {children}
-                </div>
-              </SidebarProvider>
-            </body>
-          </html>
-        </UserProvider>
+        <html lang='en'>
+          <body className={`font-sans ${inter.variable}`}>
+            <SidebarProvider defaultOpen>
+              <Nav />
+              <div className='w-full'>
+                {children}
+              </div>
+            </SidebarProvider>
+          </body>
+        </html>
       </ClerkProvider>
     </StrictMode>
   );
