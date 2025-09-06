@@ -4,11 +4,12 @@ import { type LeagueSettings } from '~/types/leagues';
 
 /**
   * Fetches league settings for a league based on the league hash from the URL parameters.
+  * @param overrideHash Optional hash to override URL parameter.
   * @returnObj `LeagueRule[]`
   */
-export function useLeagueSettings() {
+export function useLeagueSettings(overrideHash?: string) {
   const params = useParams();
-  const hash = params.hash as string;
+  const hash = overrideHash ?? params.hash as string;
 
   return useQuery<LeagueSettings>({
     queryKey: ['settings', hash],

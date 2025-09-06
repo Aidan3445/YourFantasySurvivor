@@ -6,12 +6,13 @@ import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/ba
 import { castawaySchema } from '~/server/db/schema/castaways';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { tribeSchema } from '~/server/db/schema/tribes';
+import { type TribesTimeline } from '~/types/tribes';
 
 /**
   * Get the members of each tribe for each episode in a season
   * @param seasonId The season to get scores for
   * @returns The members of each tribe for each episode
-  * @returnObj `Record<episodeNumber, Record<tribeId, castawayId[]>>`
+  * @returnObj `TribesTimeline`
   */
 export default async function getTribesTimeline(seasonId: number) {
   const tribeReference = aliasedTable(baseEventReferenceSchema, 'tribeReference');
@@ -43,5 +44,5 @@ export default async function getTribesTimeline(seasonId: number) {
       updates[row.tribeId] ??= [];
       updates[row.tribeId]!.push(row.castawayId);
       return acc;
-    }, {} as Record<number, Record<number, number[]>>));
+    }, {} as TribesTimeline));
 }

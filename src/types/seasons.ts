@@ -1,6 +1,6 @@
 import { type Castaway } from '~/types/castaways';
-import { type Tribe } from '~/types/tribes';
-import type { Elimination, EventWithReferences } from '~/types/events';
+import { type TribesTimeline, type Tribe } from '~/types/tribes';
+import { type Eliminations, type Events } from '~/types/events';
 import { type Episode } from '~/types/episodes';
 
 export type Season = {
@@ -14,8 +14,8 @@ export type SeasonsDataQuery = {
   season: Season;
   castaways: Castaway[];
   tribes: Tribe[];
-  baseEvents: Record<number, Record<number, EventWithReferences>>;
+  baseEvents: Events;
   episodes: Episode[];
-  tribesTimeline: Record<number, Record<number, number[]>>;
-  eliminations: Record<number, Elimination[]>;
+  tribesTimeline: TribesTimeline;
+  eliminations: Eliminations;
 }

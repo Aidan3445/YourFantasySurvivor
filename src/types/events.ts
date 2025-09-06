@@ -52,6 +52,8 @@ export type Elimination = {
   castawayId: number;
 };
 
+export type Eliminations = Elimination[][]
+
 export type PredictionTiming = (typeof PredictionTimings)[number];
 
 export type Prediction = {
@@ -131,3 +133,7 @@ export const PredictionInsertZod = z.object({
 });
 export type PredictionInsert = z.infer<typeof PredictionInsertZod>;
 
+/**
+  * Record<ReferenceType | 'Member', Record<referneceId, runningScores[]>>
+  */
+export type Scores = Record<ReferenceType | 'Member', Record<number, number[]>>;

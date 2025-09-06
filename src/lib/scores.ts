@@ -1,50 +1,62 @@
-import { defaultBaseRules, defaultPredictionRules } from '~/types/events';
+import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/lib/leagues';
 import { findTribeCastaways } from '~/lib/utils';
-import { type leaguesService as LEAGUE_QUERIES } from '~/services/deprecated/leagues';
-import { type seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasonsService';
-import { type ScoringBaseEventName, ScoringBaseEventNames, type BaseEventRule, type ReferenceType, type BasePredictionRules } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/leagueMembers';
-import { type LeagueSurvivalCap } from '~/types/leagues';
+import { type Predictions, type Eliminations, type Events, type CustomEvents, type ReferenceType, type Scores, type ScoringBaseEventName, type Prediction } from '~/types/events';
+import { type SelectionTimelines, type LeagueRules } from '~/types/leagues';
+import { type TribesTimeline } from '~/types/tribes';
+import { ScoringBaseEventNames } from '~/lib/events';
 
 /**
-* Compile the scores for a league 
-* @param baseEvents The base events for the season
-* @param tribesTimeline The tribe updates for the season
-* @param eliminations The eliminations for the season
-* @param leagueEvents The league events
-* @param baseEventRules The league's base event scoring
-* @param selectionTimeline The selection timeline for the league
-* @param survivalCap The survival cap for the league
-* @returns The scores for the league as running totals
-*/
+  * Compile the scores for a league 
+  * @param baseEvents The base events for the season
+  * @param tribesTimeline The tribe updates for the season
+  * @param eliminations The eliminations for the season
+  * @param customEvents The league events
+  * @param baseEventRules The league's base event scoring
+  * @param selectionTimelines The selection timelines for the league
+  * @param survivalCap The survival cap for the league
+  * @returns The scores for the league as running totals
+  * @returnObj `Scores`
+  */
 export function compileScores(
-  baseEvents: Awaited<ReturnType<typeof SEASON_QUERIES.getBaseEvents>>,
-  baseEventRules: BaseEventRule = defaultBaseRules,
-  tribesTimeline: Awaited<ReturnType<typeof SEASON_QUERIES.getTribesTimeline>>,
-  eliminations: Awaited<ReturnType<typeof SEASON_QUERIES.getEliminations>>,
+  baseEvents: Events,
+  eliminations: Eliminations,
+  tribesTimeline: TribesTimeline,
 
-  basePredictions: Awaited<ReturnType<typeof LEAGUE_QUERIES.getBasePredictions>> = {},
-  basePredictionRules: BasePredictionRules = defaultPredictionRules,
-  leagueEvents: Awaited<ReturnType<typeof LEAGUE_QUERIES.getLeagueEvents>> = { directEvents: {}, predictionEvents: {} },
-  selectionTimeline: Awaited<ReturnType<typeof LEAGUE_QUERIES.getSelectionTimeline>> = { castawayMembers: {}, memberCastaways: {} },
-  survivalCap: LeagueSurvivalCap = 0,
+  selectionTimelines: SelectionTimelines = { castawayMembers: {}, memberCastaways: {} },
+  customEvents: CustomEvents = { events: [], predictions: [] },
+  basePredictions: Predictions = {},
+  rules: LeagueRules | null = null,
+  survivalCap = 0,
   preserveStreak = false
 ) {
-  const scores: Record<ReferenceType | 'Member', Record<LeagueMemberDisplayName, number[]>> = {
+  const scores: Scores = {
     Castaway: {},
     Tribe: {},
     Member: {},
   };
+
+  const baseEventRules = rules?.base ?? defaultBaseRules;
+  const basePredictionRules = rules?.basePrediction ?? defaultPredictionRules;
+  const shauhinModeRules = rules?.shauhinMode ?? defaultShauhinModeSettings;
+  const customEventRules = rules?.custom ?? [];
 
   // score base events
   Object.entries(baseEvents).forEach(([episodeNumber, events]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(events).forEach((event) => {
       const baseEvent = event.eventName as ScoringBaseEventName;
-      event.tribes.forEach((tribe) => {
+      const { eventTribes, eventCastaways } = event.references.reduce((acc, ref) => {
+        if (ref.type === 'Tribe') acc.eventTribes.add(ref.id);
+        if (ref.type === 'Castaway') acc.eventCastaways.add(ref.id);
+        return acc;
+      }, { eventTribes: new Set<number>(), eventCastaways: new Set<number>() });
+
+      const shauhinModeActive = shauhinModeRules.enabled && shauhinModeRules.enabledBets.includes(baseEvent);
+
+      eventTribes.forEach((tribe) => {
         // add castaways to be scored
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
-          if (!event.castaways.includes(castaway)) event.castaways.push(castaway);
+          if (!eventCastaways.has(castaway)) eventCastaways.add(castaway);
         });
         // here we want to align the castaways for non scoring events so we
         // push this check inside, later we skip iteration entirely for castaways
@@ -56,27 +68,30 @@ export function compileScores(
         const points = baseEventRules[baseEvent];
         scores.Tribe[tribe][episodeNum] += points;
         // check predictions
-        basePredictions[episodeNum]?.filter((p) =>
-          p.reference.referenceType === 'Tribe' && p.eventName === event.eventName)
+        Object.entries(basePredictions[episodeNum] ?? {})
+          .reduce((acc, [eventName, preds]) => {
+            if (eventName === event.eventName) acc.push(...preds);
+            return acc;
+          }, [] as Prediction[])
           .forEach((prediction) => {
             // initialize member score if it doesn't exist
-            scores.Member[prediction.predictionMaker] ??= [];
-            scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
+            scores.Member[prediction.predictionMakerId] ??= [];
+            scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
 
-            if (prediction.reference.referenceType === tribe) {
+            if (prediction.referenceType === 'Tribe' && prediction.referenceId === tribe) {
               // add points to member score
-              scores.Member[prediction.predictionMaker]![episodeNum]!
+              scores.Member[prediction.predictionMakerId]![episodeNum]!
                 += basePredictionRules[baseEvent].points
-                + (prediction.bet ?? 0);
-            } else {
+                + (shauhinModeActive && prediction.bet ? prediction.bet : 0);
+            } else if (shauhinModeActive && prediction.bet) {
               // subtract bet for incorrect tribe prediction
-              scores.Member[prediction.predictionMaker]![episodeNum]! -= prediction.bet ?? 0;
+              scores.Member[prediction.predictionMakerId]![episodeNum]! -= prediction.bet;
             }
           });
       });
 
       if (!ScoringBaseEventNames.includes(event.eventName as ScoringBaseEventName)) return;
-      event.castaways.forEach((castaway) => {
+      eventCastaways.forEach((castaway) => {
         // initialize castaway score if it doesn't exist
         scores.Castaway[castaway] ??= [];
         scores.Castaway[castaway][episodeNum] ??= 0;
@@ -85,86 +100,97 @@ export function compileScores(
         scores.Castaway[castaway][episodeNum] += points;
         // score the member who has this castaway selected at this episode
         const cmIndex = Math.min(episodeNum,
-          (selectionTimeline.castawayMembers[castaway]?.length ?? 0) - 1);
-        const leagueMember = selectionTimeline.castawayMembers[castaway]?.[cmIndex];
+          (selectionTimelines.castawayMembers[castaway]?.length ?? 0) - 1);
+        const leagueMember = selectionTimelines.castawayMembers[castaway]?.[cmIndex];
         // if the castaway was not selected at this episode, don't score the member
         if (!leagueMember) return;
         scores.Member[leagueMember] ??= [];
         scores.Member[leagueMember][episodeNum] ??= 0;
         scores.Member[leagueMember][episodeNum] += points;
         // check predictions
-        basePredictions[episodeNum]?.filter((p) =>
-          p.reference.referenceType === 'Castaway' && p.eventName === event.eventName)
+        Object.entries(basePredictions[episodeNum] ?? {})
+          .reduce((acc, [eventName, preds]) => {
+            if (eventName === event.eventName) acc.push(...preds);
+            return acc;
+          }, [] as Prediction[])
           .forEach((prediction) => {
             // initialize member score if it doesn't exist
-            scores.Member[prediction.predictionMaker] ??= [];
-            scores.Member[prediction.predictionMaker]![episodeNum] ??= 0;
+            scores.Member[prediction.predictionMakerId] ??= [];
+            scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
 
-            if (prediction.reference.referenceType === castaway) {
+            if (prediction.referenceType === 'Castaway' && prediction.referenceId === castaway) {
               // add points to member score
-              scores.Member[prediction.predictionMaker]![episodeNum]! +=
-                basePredictionRules[event.eventName as ScoringBaseEventName].points
+              scores.Member[prediction.predictionMakerId]![episodeNum]!
+                += basePredictionRules[baseEvent].points
                 + (prediction.bet ?? 0);
             } else {
-              // subtract bet for incorrect castaway prediction
-              scores.Member[prediction.predictionMaker]![episodeNum]! -= prediction.bet ?? 0;
+              // subtract bet for incorrect tribe prediction
+              scores.Member[prediction.predictionMakerId]![episodeNum]! -= prediction.bet ?? 0;
             }
           });
+
       });
     });
   });
 
   /* score league events */
   // direct events
-  Object.entries(leagueEvents.directEvents).forEach(([episodeNumber, refEvents]) => {
+  Object.entries(customEvents.events).forEach(([episodeNumber, refEvents]) => {
     const episodeNum = parseInt(episodeNumber);
-    Object.values(refEvents).forEach((events) => {
-      events.forEach((event) => {
+    Object.values(refEvents).forEach((event) => {
+      const points = customEventRules.find((r) => r.eventName === event.eventName)?.points;
+      if (!points) return;
+
+      event.references.forEach((reference) => {
         // initialize member score if it doesn't exist
-        scores[event.referenceType][event.referenceName] ??= [];
-        scores[event.referenceType][event.referenceName]![episodeNum] ??= 0;
-        scores[event.referenceType][event.referenceName]![episodeNum]! += event.points;
+        scores[reference.type][reference.id] ??= [];
+        scores[reference.type][reference.id]![episodeNum] ??= 0;
+        scores[reference.type][reference.id]![episodeNum]! += points;
         // score castaways if this is a tribe event
-        if (event.referenceType === 'Tribe') {
-          findTribeCastaways(tribesTimeline, eliminations, event.referenceName, episodeNum).forEach((castaway) => {
+        if (reference.type === 'Tribe') {
+          findTribeCastaways(tribesTimeline, eliminations, reference.id, episodeNum).forEach((castaway) => {
             scores.Tribe[castaway] ??= [];
             scores.Tribe[castaway][episodeNum] ??= 0;
-            scores.Tribe[castaway][episodeNum] += event.points;
+            scores.Tribe[castaway][episodeNum] += points;
             // score the member who has this castaway selected at this episode
             const cmIndex = Math.min(episodeNum - 1,
-              (selectionTimeline.castawayMembers[castaway]?.length ?? 0) - 1);
-            const leagueMember = selectionTimeline.castawayMembers[castaway]?.[cmIndex];
+              (selectionTimelines.castawayMembers[castaway]?.length ?? 0) - 1);
+            const leagueMember = selectionTimelines.castawayMembers[castaway]?.[cmIndex];
             // if the castaway was not selected at this episode, don't score the member
             if (!leagueMember) return;
             scores.Member[leagueMember] ??= [];
             scores.Member[leagueMember][episodeNum] ??= 0;
-            scores.Member[leagueMember][episodeNum] += event.points;
+            scores.Member[leagueMember][episodeNum] += points;
           });
         }
         // score members if this is a castaway event
-        if (event.referenceType === 'Castaway') {
+        if (reference.type === 'Castaway') {
           const cmIndex = Math.min(episodeNum - 1,
-            (selectionTimeline.castawayMembers[event.referenceName]?.length ?? 0) - 1);
-          const leagueMember = selectionTimeline.castawayMembers[event.referenceName]?.[cmIndex];
+            (selectionTimelines.castawayMembers[reference.id]?.length ?? 0) - 1);
+          const leagueMember = selectionTimelines.castawayMembers[reference.id]?.[cmIndex];
           // if the castaway was not selected at this episode, don't score the member
           if (!leagueMember) return;
           scores.Member[leagueMember] ??= [];
           scores.Member[leagueMember][episodeNum] ??= 0;
-          scores.Member[leagueMember][episodeNum] += event.points;
+          scores.Member[leagueMember][episodeNum] += points;
         }
       });
     });
   });
 
   // prediction events
-  Object.entries(leagueEvents.predictionEvents).forEach(([episodeNumber, events]) => {
+  Object.entries(customEvents.predictions).forEach(([episodeNumber, predictionsMap]) => {
     const episodeNum = parseInt(episodeNumber);
-    Object.values(events).forEach((event) => {
-      if (!event.hit) return;
+
+    Object.values(predictionsMap).flat().forEach((prediction) => {
+      const points = customEventRules.find((r) => r.eventName === prediction.eventName)?.points;
+      if (!points) return;
+
+      if (!prediction.hit) return;
       // prediction events just earn points for the member who made the prediction
-      scores.Member[event.predictionMaker] ??= [];
-      scores.Member[event.predictionMaker]![episodeNum] ??= 0;
-      scores.Member[event.predictionMaker]![episodeNum]! += event.points;
+      scores.Member[prediction.predictionMakerId] ??= [];
+      scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
+      scores.Member[prediction.predictionMakerId]![episodeNum]! += points;
     });
   });
 
@@ -172,13 +198,14 @@ export function compileScores(
   // after each episode the castaway survives, they earn a bonus point
   // then they earn two points for the next episode, then three, etc.
   // the bonus is capped at the survival cap set by the league
-  const currentStreaks: Record<LeagueMemberDisplayName, number> = {};
-  Object.entries(selectionTimeline.memberCastaways).forEach(([member, castaways]) => {
+  const currentStreaks: Record<number, number> = {};
+  Object.entries(selectionTimelines.memberCastaways).forEach(([memberId, castaways]) => {
+    const mid = parseInt(memberId, 10);
     // get the episode of the first pick, this will be the same for all members for now
     // but doing it this way allows for the possibility of members joining late
     const firstPickEpisode = castaways.findIndex((c) => c);
     // ensure at least zero entry exists for the member
-    scores.Member[member] ??= [0];
+    scores.Member[mid] ??= [0];
     // iterate to add the streak bonus
     let streak = 0;
 
@@ -190,7 +217,7 @@ export function compileScores(
       // if the castaway selected has been eliminated set the streak to 0
       // note this has the side effect of ensuring that streaks end when
       // a member is out of castaways to select
-      if (eliminated.includes(castaways[mcIndex] ?? '') ||
+      if (eliminated.some((e) => e.castawayId === castaways[mcIndex]) ||
         (!preserveStreak && castaways[episodeNumber - 1] &&
           castaways[episodeNumber - 1] !== castaways[mcIndex])) {
         streak = 0;
@@ -199,12 +226,12 @@ export function compileScores(
       // increment the streak and add the bonus to the member's score
       streak++;
       const bonus = Math.min(streak, survivalCap);
-      scores.Member[member] ??= [];
-      scores.Member[member][episodeNumber] ??= 0;
-      scores.Member[member][episodeNumber]! += bonus;
+      scores.Member[mid] ??= [];
+      scores.Member[mid][episodeNumber] ??= 0;
+      scores.Member[mid][episodeNumber]! += bonus;
     }
 
-    currentStreaks[member] = streak;
+    currentStreaks[mid] = streak;
   });
 
   // fill in missing episodes and convert to running totals

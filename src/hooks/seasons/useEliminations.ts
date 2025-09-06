@@ -1,13 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { type Elimination } from '~/types/events';
+import { type Eliminations } from '~/types/events';
 
 /**
   * Fetches eliminations data from the API.
   * @param {number} seasonId The season ID to get eliminations for.
-  * @returnObj `Record<episodeNumber, Elimination[]>`
+  * @returnObj `Eliminations`
   */
 export function useEliminations(seasonId: number) {
-  return useQuery<Record<number, Elimination[]>>({
+  return useQuery<Eliminations>({
     queryKey: ['eliminations', seasonId],
     queryFn: async () => {
       const res = await fetch(`/api/seasons/eliminations?seasonId=${seasonId}`);

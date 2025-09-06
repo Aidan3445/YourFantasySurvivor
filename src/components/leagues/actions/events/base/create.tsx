@@ -22,7 +22,7 @@ import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
 export default function CreateBaseEvent() {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
-  const { data: episodes } = useEpisodes(league?.leagueId);
+  const { data: episodes } = useEpisodes(league?.leagueId ?? null);
 
   const reactForm = useForm<BaseEventInsert>({
     defaultValues: {

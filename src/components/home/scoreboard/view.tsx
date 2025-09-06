@@ -1,12 +1,10 @@
-import { seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasonsService';
 import { compileScores } from '~/lib/scores';
-import { defaultBaseRules } from '~/types/events';
-import { type CastawayName } from '~/types/castaways';
 import { newtwentyColors } from '~/lib/colors';
 import ScoreboardTable from '~/components/home/scoreboard/table';
+import getSeasonsData from '~/services/seasons/query/seasonsData';
 
 export async function CastawayScoreboard() {
-  const scoreData = await SEASON_QUERIES.getSeasonScoreData();
+  const scoreData = await getSeasonsData(false);
 
   if (scoreData.length === 0) {
     return (
@@ -21,20 +19,19 @@ export async function CastawayScoreboard() {
   const scoresBySeason = scoreData.map((data) => {
     const { Castaway: castawayScores } = compileScores(
       data.baseEvents,
-      defaultBaseRules,
-      data.tribesTimeline,
       data.eliminations,
+      data.tribesTimeline
     ).scores;
 
     const sortedCastaways = Object.entries(castawayScores)
       .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
 
-    const castawayColors: Record<CastawayName, string> =
+    const castawayColors: Record<string, string> =
       scoreData[0]!.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
         .reduce((acc, { fullName }, index) => {
           acc[fullName] = newtwentyColors[index % newtwentyColors.length]!;
           return acc;
-        }, {} as Record<CastawayName, string>);
+        }, {} as Record<string, string>);
 
     const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
 

@@ -6,13 +6,13 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { castawaySchema } from '~/server/db/schema/castaways';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { EliminationEventNames } from '~/lib/events';
-import { type Elimination } from '~/types/events';
+import { type Eliminations } from '~/types/events';
 
 /**
   * Get the castaways eliminated in each episode of a season
   * @param seasonId The season to get eliminations for
   * @returns The castaways eliminated in each episode
-  * @returnObj `Record<episodeNumber, Elimination[]>`
+  * @returnObj `Eliminations`
   */
 export default async function getEliminations(seasonId: number) {
   const now = new Date().toISOString();
@@ -44,5 +44,5 @@ export default async function getEliminations(seasonId: number) {
         });
       }
       return acc;
-    }, {} as Record<number, Elimination[]>));
+    }, [] as Eliminations));
 }

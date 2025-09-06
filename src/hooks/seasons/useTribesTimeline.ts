@@ -1,12 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
+import { type TribesTimeline } from '~/types/tribes';
 
 /**
   * Fetches tribes timeline data from the API.
   * @param {number} seasonId The season ID to get tribes timeline for.
-  * @returnObj `Record<episodeNumber, Record<tribeId, castawayId[]>>`
+  * @returnObj `TribesTimeline`
   */
 export function useTribesTimeline(seasonId: number | null) {
-  return useQuery<Record<number, Record<number, number[]>>>({
+  return useQuery<TribesTimeline>({
     queryKey: ['tribesTimeline', seasonId],
     queryFn: async () => {
       if (!seasonId) throw new Error('Season ID is required to fetch tribes timeline');

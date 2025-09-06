@@ -4,7 +4,7 @@ import ColorRow from '~/components/shared/colorRow';
 import { MoveRight, Circle, Flame, History, CircleHelp } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
-import { useIsMobile } from '~/hooks/useMobile';
+import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Separator } from '~/components/common/separator';
 
 
