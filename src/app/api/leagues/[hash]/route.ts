@@ -14,7 +14,7 @@ export async function GET(_: NextRequest, context: LeagueRouteParams) {
       if (!league) {
         return NextResponse.json({ error: 'League not found' }, { status: 404 });
       }
-      return NextResponse.json({ league }, { status: 200 });
+      return NextResponse.json(league, { status: 200 });
     } catch (e) {
       console.error(e);
       return NextResponse.json({ error: 'An error occurred while fetching the league.' }, { status: 500 });

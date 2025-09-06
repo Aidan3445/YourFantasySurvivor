@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const episodes = await getEpisodes(seasonId);
-    return NextResponse.json({ episodes }, { status: 200 });
+    return NextResponse.json(episodes, { status: 200 });
   } catch (e) {
     console.error('Failed to get episodes', e);
     return NextResponse.json({ error: 'An error occurred while fetching episodes.' }, { status: 500 });
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
       const newEpisodes = await Promise.all(
         body.episodes.map(async (episode) => await createEpisodeLogic(body.seasonName, episode)
           .then(({ newEpisodeId }) => newEpisodeId)));
-      return NextResponse.json({ newEpisodes }, { status: 201 });
+      return NextResponse.json(newEpisodes, { status: 201 });
     } catch (error) {
       console.error('Failed to create episodes', error);
       return NextResponse.json({ error: 'An error occurred while creating the episodes.' }, { status: 500 });

@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const seasons = includeInactive ? await getAllSeasons() : await getCurrentSeasons();
-    return NextResponse.json({ seasons }, { status: 200 });
+    return NextResponse.json(seasons, { status: 200 });
   } catch (e) {
     console.error('Failed to get seasons', e);
     return NextResponse.json({ error: 'An error occurred while fetching seasons.' }, { status: 500 });

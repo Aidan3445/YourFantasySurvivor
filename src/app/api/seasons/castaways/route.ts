@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const castaways = await getCastaways(seasonId);
-    return NextResponse.json({ castaways }, { status: 200 });
+    return NextResponse.json(castaways, { status: 200 });
   } catch (e) {
     console.error('Failed to get castaways', e);
     return NextResponse.json({ error: 'An error occurred while fetching castaways.' }, { status: 500 });
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       const newCastaways = await Promise.all(
         body.castaways.map(async (castaway) => await createCastawayLogic(body.seasonName, castaway)
           .then(({ newCastawayId }) => newCastawayId)));
-      return NextResponse.json({ newCastaways }, { status: 201 });
+      return NextResponse.json(newCastaways, { status: 201 });
     } catch (error) {
       console.error('Failed to create castaways', error);
       return NextResponse.json({ error: 'An error occurred while creating the castaways.' }, { status: 500 });

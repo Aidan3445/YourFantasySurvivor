@@ -12,7 +12,7 @@ export async function GET(_: NextRequest, context: LeagueRouteParams) {
       if (!leagueRules) {
         return NextResponse.json({ error: 'League not found' }, { status: 404 });
       }
-      return NextResponse.json({ leagueRules }, { status: 200 });
+      return NextResponse.json(leagueRules, { status: 200 });
     } catch (e) {
       console.error(e);
       return NextResponse.json({ error: 'Failed to fetch league rules' }, { status: 500 });

@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const eliminations = await getEliminations(seasonId);
-    return NextResponse.json({ eliminations }, { status: 200 });
+    return NextResponse.json(eliminations, { status: 200 });
   } catch (e) {
     console.error('Failed to get eliminations', e);
     return NextResponse.json({ error: 'An error occurred while fetching eliminations.' }, { status: 500 });

@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const baseEvents = await getBaseEvents(seasonId);
-    return NextResponse.json({ baseEvents }, { status: 200 });
+    return NextResponse.json(baseEvents, { status: 200 });
   } catch (e) {
     console.error('Failed to get base events', e);
     return NextResponse.json({ error: 'An error occurred while fetching base events.' }, { status: 500 });

@@ -12,8 +12,8 @@ import getCustomEventsAndPredictions from '~/services/leagues/query/customEvents
 export async function GET(_: NextRequest, context: LeagueRouteParams) {
   return withLeagueMemberAuth(async (auth) => {
     try {
-      const { events, predictions } = await getCustomEventsAndPredictions(auth);
-      return NextResponse.json({ events, predictions }, { status: 200 });
+      const customEvents = await getCustomEventsAndPredictions(auth);
+      return NextResponse.json(customEvents, { status: 200 });
     } catch (e) {
       console.error('Failed to fetch custom events and predictions', e);
       return NextResponse.json({ error: (e as Error).message }, { status: 500 });
