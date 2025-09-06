@@ -1,21 +1,16 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 'use client';
 
 import { useState } from 'react';
-import { type BaseEventName, type LeagueEventName } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
-import { type CastawayName } from '~/types/castaways';
-import { type TribeName } from '~/types/deprecated/tribes';
 import TimelineFilters from '~/components/leagues/hub/activity/timeline/filters';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
 
 // TODO: add survivor streak to timeline
 
 export default function Timeline() {
-  const [filterCastaway, setFilterCastaway] = useState<CastawayName[]>([]);
-  const [filterTribe, setFilterTribe] = useState<TribeName[]>([]);
-  const [filterMember, setFilterMember] = useState<LeagueMemberDisplayName[]>([]);
-  const [filterEvent, setFilterEvent] = useState<(BaseEventName | LeagueEventName)[]>([]);
+  const [filterCastaway, setFilterCastaway] = useState<number[]>([]);
+  const [filterTribe, setFilterTribe] = useState<number[]>([]);
+  const [filterMember, setFilterMember] = useState<number[]>([]);
+  const [filterEvent, setFilterEvent] = useState<string[]>([]);
 
   const [selectedEpisode, setSelectedEpisode] = useState<number>();
 

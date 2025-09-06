@@ -1,31 +1,32 @@
-/* eslint-disable @typescript-eslint/no-redundant-type-constituents */
 'use client';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { Select } from '@radix-ui/react-select';
 import { SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
-import { useIsMobile } from '~/hooks/useMobile';
+import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Label } from '~/components/common/label';
 import { MultiSelect } from '~/components/common/multiSelect';
-import { BaseEventFullName, type BaseEventName, type LeagueEventName, } from '~/types/events';
-import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
-import { type CastawayName } from '~/types/castaways';
-import { type TribeName } from '~/types/deprecated/tribes';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/leagues/useLeague';
 import { useEffect } from 'react';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
+import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useCastaways } from '~/hooks/seasons/useCastaways';
+import { useTribes } from '~/hooks/seasons/useTribes';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import { useEpisodes } from '~/hooks/seasons/useEpisodes';
+import { BaseEventFullName } from '~/lib/events';
 
 
 export interface TimelineFiltersProps {
-  setFilterCastaway: (castaways: CastawayName[]) => void;
-  setFilterTribe: (tribes: TribeName[]) => void;
-  setFilterMember: (members: LeagueMemberDisplayName[]) => void;
-  setFilterEvent: (events: (BaseEventName | LeagueEventName)[]) => void;
-  setSelectedEpisode: (episodeNumber?: number) => void;
-  filterCastaway: CastawayName[];
-  filterTribe: TribeName[];
-  filterMember: LeagueMemberDisplayName[];
-  filterEvent: (BaseEventName | LeagueEventName)[];
+  setFilterCastaway: (castaway: number[]) => void;
+  setFilterTribe: (tribe: number[]) => void;
+  setFilterMember: (member: number[]) => void;
+  setFilterEvent: (event: string[]) => void;
+  setSelectedEpisode: (episode?: number) => void;
+  filterCastaway: number[];
+  filterTribe: number[];
+  filterMember: number[];
+  filterEvent: string[];
   selectedEpisode?: number;
 }
 
@@ -41,28 +42,21 @@ export default function TimelineFilters({
   filterEvent,
   selectedEpisode
 }: TimelineFiltersProps) {
-  const {
-    leagueData: {
-      episodes,
-      castaways,
-      tribes,
-    },
-    league: {
-      members: {
-        list: members
-      },
-      leagueEventRules
-    }
-  } = useLeague();
   const isMobile = useIsMobile();
+  const { data: league } = useLeague();
+  const { data: leagueRules } = useLeagueRules();
+  const { data: castaways } = useCastaways(league?.seasonId ?? null);
+  const { data: tribes } = useTribes(league?.seasonId ?? null);
+  const { data: members } = useLeagueMembers();
+  const { data: episodes } = useEpisodes(league?.seasonId ?? null);
 
   useEffect(() => {
-    if (selectedEpisode) return;
+    if (selectedEpisode ?? !episodes) return;
 
-    const latestEpisode = episodes.find((episode) =>
-      episode.airStatus === 'Airing') ??
+    const latestEpisode = episodes.find((episode) => episode.airStatus === 'Airing') ??
       episodes.findLast((episode) => episode.airStatus === 'Aired') ??
       episodes[0];
+
     setSelectedEpisode(latestEpisode?.episodeNumber);
   }, [episodes, selectedEpisode, setSelectedEpisode]);
 
@@ -83,13 +77,13 @@ export default function TimelineFilters({
                 <SelectItem value='-1'>
                   All Episodes
                 </SelectItem>
-                {episodes.toReversed()
+                {episodes?.toReversed()
                   .map((episode) => (
                     <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
-                      {`${episode.episodeNumber}:`} {episode.episodeTitle}
+                      {`${episode.episodeNumber}:`} {episode.title}
                       <div className='inline ml-1'>
                         <AirStatus
-                          airDate={episode.episodeAirDate}
+                          airDate={episode.airDate}
                           airStatus={episode.airStatus}
                           showTime={false}
                           showDate={!isMobile} />
@@ -104,51 +98,54 @@ export default function TimelineFilters({
           </span>
         </span>
         <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center gap-4 px-2'>
-          <div className='w-min flex flex-col items-center'>
-            <Label className='text-sm font-semibold text-muted-foreground'>
-              Castaway Filter
-            </Label>
-            <MultiSelect
-              options={castaways.map((castaway) => ({
-                value: castaway.fullName,
-                label: castaway.fullName
-              }))}
-              value={filterCastaway}
-              onValueChange={(value) => setFilterCastaway(value as CastawayName[])}
-              modalPopover
-              placeholder='All Castaways'
-            />
-          </div>
-          <div className='w-min flex flex-col items-center'>
-            <Label className='text-sm font-semibold text-muted-foreground'>
-              Tribe Filter
-            </Label>
-            <MultiSelect
-              options={tribes.map((tribe) => ({
-                value: tribe.tribeName,
-                label: tribe.tribeName
-              }))}
-              value={filterTribe}
-              onValueChange={(value) => setFilterTribe(value as TribeName[])}
-              modalPopover
-              placeholder='All Tribes'
-            />
-          </div>
-          <div className='w-min flex flex-col items-center'>
-            <Label className='text-sm font-semibold text-muted-foreground'>
-              Member Filter
-            </Label>
-            <MultiSelect
-              options={members.map((member) => ({
-                value: member.displayName,
-                label: member.displayName
-              }))}
-              value={filterMember}
-              onValueChange={(value) => setFilterMember(value as LeagueMemberDisplayName[])}
-              modalPopover
-              placeholder='All Members'
-            />
-          </div>
+          {castaways &&
+            <div className='w-min flex flex-col items-center'>
+              <Label className='text-sm font-semibold text-muted-foreground'>
+                Castaway Filter
+              </Label>
+              <MultiSelect
+                options={castaways.map((castaway) => ({
+                  value: castaway.castawayId,
+                  label: castaway.fullName
+                }))}
+                value={filterCastaway as unknown as string[]}
+                onValueChange={(value) => setFilterCastaway(value as number[])}
+                modalPopover
+                placeholder='All Castaways'
+              />
+            </div>}
+          {tribes &&
+            <div className='w-min flex flex-col items-center'>
+              <Label className='text-sm font-semibold text-muted-foreground'>
+                Tribe Filter
+              </Label>
+              <MultiSelect
+                options={tribes.map((tribe) => ({
+                  value: tribe.tribeId,
+                  label: tribe.tribeName
+                }))}
+                value={filterTribe as unknown as string[]}
+                onValueChange={(value) => setFilterTribe(value as number[])}
+                modalPopover
+                placeholder='All Tribes'
+              />
+            </div>}
+          {members &&
+            <div className='w-min flex flex-col items-center'>
+              <Label className='text-sm font-semibold text-muted-foreground'>
+                Member Filter
+              </Label>
+              <MultiSelect
+                options={members.map((member) => ({
+                  value: member.memberId,
+                  label: member.displayName
+                }))}
+                value={filterMember as unknown as string[]}
+                onValueChange={(value) => setFilterMember(value as number[])}
+                modalPopover
+                placeholder='All Members'
+              />
+            </div>}
           <div className='w-min flex flex-col items-center'>
             <Label className='text-sm font-semibold text-muted-foreground'>
               Event Filter
@@ -162,15 +159,14 @@ export default function TimelineFilters({
                     label: eventFullName
                   })),
                 { label: 'Custom Events', value: null },
-                ...Object.values(leagueEventRules)
+                ...Object.values(leagueRules?.custom ?? [])
                   .map((event) => ({
                     value: event.eventName,
                     label: event.eventName
                   }))
               ]}
               value={filterEvent}
-              onValueChange={(value) =>
-                setFilterEvent(value as (BaseEventName | LeagueEventName)[])}
+              onValueChange={(value) => setFilterEvent(value as string[])}
               modalPopover
               placeholder='All Events'
             />

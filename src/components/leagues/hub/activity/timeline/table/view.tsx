@@ -6,6 +6,7 @@ import {
   Table,
   TableBody,
   TableCaption,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -24,12 +25,11 @@ export interface EpisodeEventsProps {
   episodeNumber: number;
   mockEvents?: EventWithReferences[];
   edit?: boolean;
-  labelRow?: boolean;
   filters: {
     castaway: number[];
     tribe: number[];
     member: number[];
-    event: number[];
+    event: string[];
   };
 }
 
@@ -42,16 +42,51 @@ export default function EpisodeEvents({
   const { data: selectionTimeline } = useSelectionTimeline();
   const { data: customEvents } = useCustomEvents();
   const { data: basePredictions } = useBasePredictions();
-  const { data: baseEvents } = useBaseEvents(league?.seasonId);
-  const { data: episodes } = useEpisodes(league?.seasonId);
+  const { data: baseEvents } = useBaseEvents(league?.seasonId ?? null);
+  const { data: episodes } = useEpisodes(league?.seasonId ?? null);
 
   const combinedEvents = useMemo(() => [
     ...(baseEvents?.[episodeNumber] ? Object.values(baseEvents[episodeNumber]) : []),
     ...(customEvents?.events?.[episodeNumber] ? Object.values(customEvents.events[episodeNumber]) : []),
   ], [baseEvents, customEvents, episodeNumber]);
 
+  const combinedPredictions = useMemo(() => [
+    ...(basePredictions?.[episodeNumber] ? Object.values(basePredictions[episodeNumber]).flat() : []),
+    ...(customEvents?.predictions?.[episodeNumber] ? Object.values(customEvents.predictions[episodeNumber]).flat() : []),
+  ].filter((prediction) => combinedEvents.some((event) => event.eventName === prediction.eventName)),
+    [basePredictions, customEvents, episodeNumber, combinedEvents]);
+
+  // filter predictions first because they may require an event that gets filtered out
+  const filteredPredictions = useMemo(() => {
+    return combinedPredictions.filter((prediction) => {
+      const castawayMatch = filters.castaway.length === 0 || (
+        prediction.referenceType === 'Castaway' && filters.castaway.includes(prediction.referenceId)
+      );
+      const tribeMatch = filters.tribe.length === 0 || (
+        prediction.referenceType === 'Tribe' && filters.tribe.includes(prediction.referenceId)
+      );
+      const memberMatch = filters.member.length === 0 ||
+        filters.member.includes(prediction.predictionMakerId);
+      const eventMatch = filters.event.length === 0 || combinedEvents.some((event) =>
+        event.eventName === prediction.eventName && filters.event.includes(event.eventName));
+
+      return castawayMatch && tribeMatch && memberMatch && eventMatch;
+    });
+  }, [combinedEvents,
+    combinedPredictions,
+    filters.castaway,
+    filters.event,
+    filters.member,
+    filters.tribe
+  ]);
+
   const filteredEvents = useMemo(() => {
     return combinedEvents.filter((event) => {
+      // before we check anything else, see if the event is referenced by a prediction
+      if (filteredPredictions.some((prediction) => prediction.eventName === event.eventName)) {
+        return true;
+      }
+
       const eventMembers = event.references
         .map((ref) => ref.type === 'Castaway'
           ? selectionTimeline?.castawayMembers?.[ref.id]?.[episodeNumber] ?? []
@@ -64,47 +99,19 @@ export default function EpisodeEvents({
         ref.type === 'Tribe' && filters.tribe.includes(ref.id));
       const memberMatch = filters.member.length === 0 || eventMembers.some((ref) =>
         filters.member.includes(ref));
-      const eventMatch = filters.event.length === 0 || filters.event.includes(event.eventId);
+      const eventMatch = filters.event.length === 0 || filters.event.includes(event.eventName);
 
       return castawayMatch && tribeMatch && memberMatch && eventMatch;
     });
   }, [
     combinedEvents,
     episodeNumber,
+    filteredPredictions,
     filters.castaway,
     filters.event,
     filters.member,
     filters.tribe,
     selectionTimeline?.castawayMembers
-  ]);
-
-  const combinedPredictions = useMemo(() => [
-    ...(basePredictions?.[episodeNumber] ? Object.values(basePredictions[episodeNumber]).flat() : []),
-    ...(customEvents?.predictions?.[episodeNumber] ? Object.values(customEvents.predictions[episodeNumber]).flat() : []),
-  ].filter((prediction) => combinedEvents.some((event) => event.eventName === prediction.eventName)),
-    [basePredictions, customEvents, episodeNumber, combinedEvents]);
-
-  const filteredPredictions = useMemo(() => {
-    return combinedPredictions.filter((prediction) => {
-      const castawayMatch = filters.castaway.length === 0 || (
-        prediction.referenceType === 'Castaway' && filters.castaway.includes(prediction.referenceId)
-      );
-      const tribeMatch = filters.tribe.length === 0 || (
-        prediction.referenceType === 'Tribe' && filters.tribe.includes(prediction.referenceId)
-      );
-      const memberMatch = filters.member.length === 0 ||
-        filters.member.includes(prediction.predictionMakerId);
-      const eventMatch = filters.event.length === 0 || combinedEvents.some((event) =>
-        event.eventName === prediction.eventName && filters.event.includes(event.eventId));
-
-      return castawayMatch && tribeMatch && memberMatch && eventMatch;
-    });
-  }, [combinedEvents,
-    combinedPredictions,
-    filters.castaway,
-    filters.event,
-    filters.member,
-    filters.tribe
   ]);
 
   const noTribes = useMemo(() =>
@@ -135,18 +142,25 @@ export default function EpisodeEvents({
           {episodes?.filter((episode) =>
             episodeNumber === -1 || episode.episodeNumber === episodeNumber)
             .map((episode) => (
-              <EpisodeEventsTableBody
-                key={episode.episodeNumber}
-                seasonId={episode.seasonId}
-                episodeNumber={episode.episodeNumber}
-                mockEvents={mockEvents}
-                filteredEvents={filteredEvents}
-                filteredPredictions={filteredPredictions}
-                edit={edit}
-                filters={filters}
-                labelRow={episodeNumber === -1} />
+              <>
+                {episodeNumber === -1 &&
+                  <TableRow className='bg-secondary/50 hover:bg-secondary/25'>
+                    <TableCell colSpan={7} className='text-center font-bold text-secondary-foreground'>
+                      Episode {episodeNumber}
+                    </TableCell>
+                  </TableRow>}
+                <EpisodeEventsTableBody
+                  key={episode.episodeNumber}
+                  seasonId={episode.seasonId}
+                  episodeNumber={episode.episodeNumber}
+                  mockEvents={mockEvents}
+                  filteredEvents={filteredEvents}
+                  filteredPredictions={filteredPredictions}
+                  edit={edit}
+                  filters={filters} />
+              </>
             ))}
-        </TableBody>
+        </TableBody >
       </Table>
       <ScrollBar hidden orientation='horizontal' />
     </ScrollArea>

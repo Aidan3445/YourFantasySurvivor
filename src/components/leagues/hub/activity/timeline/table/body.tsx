@@ -5,6 +5,8 @@ import { type EpisodeEventsProps } from '~/components/leagues/hub/activity/timel
 import { type EnrichedEvent, type EventWithReferences, type Prediction } from '~/types/events';
 import { useEnrichEvents } from '~/hooks/seasons/enrich/useEnrichEvents';
 import EventRow from '~/components/leagues/hub/activity/timeline/table/row';
+import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPredictions';
+import PredictionRow from '~/components/leagues/hub/activity/timeline/table/row/predictionRow';
 
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
@@ -13,7 +15,6 @@ interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
 }
 
 export default function EpisodeEventsTableBody({
-  labelRow,
   seasonId,
   episodeNumber,
   mockEvents,
@@ -23,7 +24,9 @@ export default function EpisodeEventsTableBody({
   filters
 }: EpisodeEventsTableBodyProps) {
   const enrichedEvents = useEnrichEvents(seasonId, filteredEvents);
-  const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents);
+  const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents ?? null);
+  const enrichedPredictions = useEnrichPredictions(seasonId, enrichedEvents, filteredPredictions);
+  const enrichedMockPredictions = useEnrichPredictions(seasonId, enrichedMockEvents, filteredPredictions);
 
   const { baseEvents, customEvents } = enrichedEvents.reduce((acc, event) => {
     if (event.eventSource === 'Base') {
@@ -34,14 +37,14 @@ export default function EpisodeEventsTableBody({
     return acc;
   }, { baseEvents: [] as EnrichedEvent[], customEvents: [] as EnrichedEvent[] });
 
-  if (!filteredEvents.length && !filteredPredictions.length && !mockEvents) {
+  if (!enrichedEvents.length && !enrichedPredictions.length && !mockEvents) {
     const hasFilters =
       filters.member.length > 0 ||
       filters.castaway.length > 0 ||
       filters.event.length > 0 ||
       filters.tribe.length > 0;
 
-    return labelRow ? null : (
+    return (
       <TableRow className='bg-card'>
         <TableCell colSpan={7} className='text-center text-muted-foreground'>
           No events for episode {episodeNumber} {hasFilters ? 'with the selected filters' : ''}
@@ -52,18 +55,8 @@ export default function EpisodeEventsTableBody({
 
   return (
     <>
-      {labelRow && // TODO: wrap in accordion
-        <TableRow className='bg-secondary/50 hover:bg-secondary/25'>
-          <TableCell colSpan={7} className='text-center font-bold text-secondary-foreground'>
-            Episode {episodeNumber}
-          </TableCell>
-        </TableRow>}
       {enrichedMockEvents.map((mock, index) =>
-        <EventRow
-          key={index}
-          className='bg-yellow-500'
-          event={mock}
-          edit={false} />
+        <EventRow key={index} className='bg-yellow-500' event={mock} edit={false} />
       )}
       {baseEvents.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200 text-xs text-muted-foreground'>
@@ -90,10 +83,7 @@ export default function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {baseEvents.map((event, index) => (
-        <EventRow
-          key={index}
-          event={event}
-          edit={edit} />
+        <EventRow key={index} event={event} edit={edit} />
       ))}
       {customEvents.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
@@ -102,33 +92,20 @@ export default function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {customEvents.map((event, index) => (
-        <EventRow
-          key={index}
-          event={event}
-          edit={edit} />
+        <EventRow key={index} event={event} edit={edit} />
       ))}
-      {/* Predictions 
-      {combinedPredictions?.length > 0 &&
+      {enrichedPredictions.length + enrichedMockPredictions.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
           <TableCell colSpan={7} className='text-xs text-muted-foreground'>
             Predictions
           </TableCell>
         </TableRow>}
-      {combinedPredictions?.map((event, index) => (
-        <LeagueEventRow
-          key={index}
-          eventId={event.eventId}
-          eventName={event.eventName}
-          points={event.points}
-          references={event.references}
-          predictionMakers={event.predictionMakers}
-          misses={event.misses}
-          defaultOpenMisses={filters.member.length > 0}
-          notes={event.notes}
-          episodeNumber={episodeNumber}
-          edit={edit} />
-      ))}
-      */}
+      {enrichedMockPredictions.map((mock, index) =>
+        <PredictionRow key={index} className='bg-yellow-500' prediction={mock} editCol={edit} />
+      )}
+      {enrichedPredictions.map((prediction, index) =>
+        <PredictionRow key={index} prediction={prediction} editCol={edit} />
+      )}
     </>
   );
 }

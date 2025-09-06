@@ -1,24 +1,23 @@
 import { Flame } from 'lucide-react';
 import { TableCell } from '~/components/common/table';
 import { cn } from '~/lib/utils';
-import { type EnrichedEvent } from '~/types/events';
 
 interface PointsCellProps {
-  event: EnrichedEvent;
+  points: number | null;
 }
 
-export default function PointsCell({ event }: PointsCellProps) {
-  if (!event.points) return (
+export default function PointsCell({ points }: PointsCellProps) {
+  if (!points) return (
     <TableCell className='text-xs text-muted-foreground text-center'>N/A</TableCell>
   );
 
   return (
     <TableCell className={cn('text-sm text-center',
-      event.points > 0 ? 'text-green-600' : 'text-destructive')}>
-      {event.points > 0 ? `+${event.points}` : event.points}
+      points > 0 ? 'text-green-600' : 'text-destructive')}>
+      {points > 0 ? `+${points}` : points}
       <Flame className={cn(
         'inline align-top w-4 h-min',
-        event.points > 0 ? 'stroke-green-600' : 'stroke-destructive')} />
+        points > 0 ? 'stroke-green-600' : 'stroke-destructive')} />
     </TableCell>
   );
 }

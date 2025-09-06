@@ -6,10 +6,9 @@ import ColorRow from '~/components/shared/colorRow';
 import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
 import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 import { type EnrichedEvent, type BaseEventName } from '~/types/events';
-import { BaseEventFullName } from '~/lib/events';
+import { BaseEventFullName, baseEventLabelPrefixes } from '~/lib/events';
 import { useMemo } from 'react';
 import EditEvent from '~/components/leagues/actions/events/edit';
-import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 
 interface EventRowProps {
   className?: string;
@@ -20,7 +19,15 @@ interface EventRowProps {
 export default function EventRow({ className, event, edit }: EventRowProps) {
   const isBaseEvent = useMemo(() => event.eventSource === 'Base', [event.eventSource]);
 
-  const label = useEventLabel(event.eventName, isBaseEvent, event.label);
+  const label = useMemo(() => {
+    const trimmed = event.label?.trim();
+    if (trimmed) return trimmed;
+
+    if (isBaseEvent) {
+      return `${baseEventLabelPrefixes[event.eventName as BaseEventName]} ${event.eventName}`;
+    }
+    return event.eventName;
+  }, [event.eventName, event.label, isBaseEvent]);
 
   return (
     <TableRow className={className}>
@@ -49,7 +56,7 @@ export default function EventRow({ className, event, edit }: EventRowProps) {
             </ColorRow>
           ))}
         </div>
-      </TableCell>
+      </TableCell >
       <TableCell className='text-right'>
         <div className={cn(
           'text-xs flex flex-col h-full gap-0.5 items-end',
