@@ -6,7 +6,7 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { type SelectionUpdate } from '~/types/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
-import { SelectionTimelines } from '~/types/leagues';
+import { type SelectionTimelines } from '~/types/leagues';
 
 /**
   * Get the selection timeline for a league
@@ -93,4 +93,5 @@ function processSelectionTimeline(selectionUpdates: SelectionUpdate[]) {
     memberCastaways: {},
     castawayMembers: {}
   } as SelectionTimelines
+  );
 }

@@ -6,7 +6,7 @@ import { type Tribe } from '~/types/tribes';
   * @param {number} seasonId The season ID to get tribes for.
   * @returnObj `Tribe[]`
   */
-export function useTribes(seasonId?: number) {
+export function useTribes(seasonId: number | null) {
   return useQuery<Tribe[]>({
     queryKey: ['tribes', seasonId],
     queryFn: async () => {

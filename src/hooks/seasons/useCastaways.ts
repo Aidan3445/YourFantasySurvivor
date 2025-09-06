@@ -6,7 +6,7 @@ import { type Castaway } from '~/types/castaways';
   * @param {number} seasonId The season ID to get castaways for.
   * @returnObj `Castaway[]`
   */
-export function useCastaways(seasonId?: number) {
+export function useCastaways(seasonId: number | null) {
   return useQuery<Castaway[]>({
     queryKey: ['castaways', seasonId],
     queryFn: async () => {

@@ -6,7 +6,7 @@ import { type Episode } from '~/types/episodes';
   * @param seasonId The ID of the season to fetch episodes for.
   * @returnObj `Episode[]`
   */
-export function useEpisodes(seasonId?: number) {
+export function useEpisodes(seasonId: number | null) {
   return useQuery<Episode[]>({
     queryKey: ['episodes', seasonId],
     queryFn: async () => {

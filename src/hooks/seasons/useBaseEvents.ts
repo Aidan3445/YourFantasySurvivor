@@ -6,7 +6,7 @@ import { type Events } from '~/types/events';
   * @param {number} seasonId The season ID to get base events for.
   * @returnObj `Events`
   */
-export function useBaseEvents(seasonId?: number) {
+export function useBaseEvents(seasonId: number | null) {
   return useQuery<Events>({
     queryKey: ['baseEvents', seasonId],
     queryFn: async () => {

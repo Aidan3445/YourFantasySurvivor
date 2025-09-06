@@ -5,11 +5,12 @@ import { type League } from '~/types/leagues';
 /**
   * Fetches league data based on the league hash from the URL parameters.
   * Adjusts stale time and refetch intervals based on the league status.
+  * @param overrideHash Optional hash to override URL parameter.
   * @returnObj `League`
   */
-export function useLeague() {
+export function useLeague(overrideHash?: string) {
   const params = useParams();
-  const hash = params.hash as string;
+  const hash = overrideHash ?? params.hash as string;
 
   return useQuery<League>({
     queryKey: ['league', hash],

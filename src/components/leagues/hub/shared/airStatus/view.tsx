@@ -1,9 +1,9 @@
 import { cn } from '~/lib/utils';
-import { type EpisodeAirStatus } from '~/types/episodes';
+import { type AirStatus as EpAirStatus } from '~/types/episodes';
 
 type AirStatusProps = {
   airDate: Date;
-  airStatus: EpisodeAirStatus;
+  airStatus: EpAirStatus;
   showDate?: boolean;
   showTime?: boolean;
 };

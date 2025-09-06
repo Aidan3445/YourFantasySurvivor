@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
   * @param {number} seasonId The season ID to get tribes timeline for.
   * @returnObj `Record<episodeNumber, Record<tribeId, castawayId[]>>`
   */
-export function useTribesTimeline(seasonId?: number) {
+export function useTribesTimeline(seasonId: number | null) {
   return useQuery<Record<number, Record<number, number[]>>>({
     queryKey: ['tribesTimeline', seasonId],
     queryFn: async () => {

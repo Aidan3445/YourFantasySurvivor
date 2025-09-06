@@ -18,8 +18,8 @@ import { type CastawayWithTribe } from '~/types/castaways';
   * @param {EventWithReferences[]} events The list of events to enrich.
   */
 export function useEnrichEvents(
-  seasonId?: number,
-  events?: EventWithReferences[]
+  seasonId: number | null,
+  events: EventWithReferences[] | null
 ) {
   const { data: selectionTimeline } = useSelectionTimeline();
   const { data: rules } = useLeagueRules();

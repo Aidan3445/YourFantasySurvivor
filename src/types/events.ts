@@ -65,10 +65,31 @@ export type Prediction = {
   hit: boolean | null;
 };
 
+export type EnrichedPrediction = {
+  event: EnrichedEvent;
+  points: number;
+  hits: {
+    member: LeagueMember
+    hit: boolean;
+    bet: number | null;
+  }[];
+  misses: {
+    member: LeagueMember
+    reference: {
+      type: ReferenceType;
+      name: string;
+      color: string;
+    } | null;
+    hit: boolean;
+    bet: number | null;
+  }[];
+};
+
 /**
   * Record<episodeNumber, Record<eventId, EventWithReferences>>
   */
 export type Events = Record<number, Record<number, EventWithReferences>>;
+
 /**
   * Record<episodeNumber, Record<eventName, Prediction[]>>
   */
