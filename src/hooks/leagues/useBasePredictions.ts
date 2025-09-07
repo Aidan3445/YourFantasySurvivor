@@ -4,11 +4,12 @@ import { type Predictions } from '~/types/events';
 
 /**
   * Fetches base event predictions for a league based on the league hash from the URL parameters.
+  * @param {string} overrideHash Optional hash to override the URL parameter.
   * @returnObj `Prediction[]`
   */
-export function useBasePredictions() {
+export function useBasePredictions(overrideHash?: string) {
   const params = useParams();
-  const hash = params.hash as string;
+  const hash = overrideHash ?? params.hash as string;
 
   return useQuery<Predictions>({
     queryKey: ['basePredictions', hash],

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
@@ -20,7 +20,10 @@ export default async function getLeague(auth: VerifiedLeagueMemberAuth) {
       displayName: leagueMemberSchema.displayName,
       color: leagueMemberSchema.color,
       role: leagueMemberSchema.role,
-      draftOrder: leagueMemberSchema.draftOrder
+      draftOrder: leagueMemberSchema.draftOrder,
+      loggedIn: sql<boolean>`CASE WHEN 
+        ${leagueMemberSchema.memberId} = ${auth.memberId}
+        THEN true ELSE false END`.as('loggedIn'),
     })
     .from(leagueMemberSchema)
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))

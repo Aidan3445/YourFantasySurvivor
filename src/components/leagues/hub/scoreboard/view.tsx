@@ -3,28 +3,27 @@
 import {
   Table, TableBody, TableCaption, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
-import { useLeague } from '~/hooks/useLeague';
 import { Flame } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import { type LeagueHash } from '~/types/deprecated/leagues';
 import MemberRow from '~/components/leagues/hub/scoreboard/row';
 import ScoreboardHelp from '~/components/leagues/hub/scoreboard/help';
+import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 interface ScoreboardProps {
-  overrideLeagueHash?: LeagueHash;
+  overrideHash?: string;
   maxRows?: number;
 }
 
-export default function Scoreboard({ overrideLeagueHash, maxRows }: ScoreboardProps = {}) {
-  const { leagueData, league } = useLeague({ overrideLeagueHash });
-  const sortedMemberScores = Object.entries(leagueData.scores.Member)
-    .sort(([_, scoresA], [__, scoresB]) =>
-      (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0));
-
-  const loggedInIndex = sortedMemberScores.findIndex(([member]) =>
-    member === league.members.loggedIn?.displayName
-  );
+export default function Scoreboard({ overrideHash, maxRows }: ScoreboardProps = {}) {
+  const {
+    sortedMemberScores,
+    loggedInIndex,
+    leagueSettings,
+    selectionTimeline,
+    castaways,
+    currentStreaks
+  } = useLeagueData(overrideHash);
 
   return (
     <ScrollArea className='bg-card rounded-lg gap-0'>
@@ -41,31 +40,33 @@ export default function Scoreboard({ overrideLeagueHash, maxRows }: ScoreboardPr
             <TableHead className='text-center'>Member</TableHead>
             <TableHead className='text-center w-0 relative pr-8'>
               Survivor
-              <ScoreboardHelp hasSurvivalCap={league.settings.survivalCap > 0} />
+              <ScoreboardHelp hasSurvivalCap={leagueSettings?.survivalCap !== undefined} />
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedMemberScores.map(([member, scores], index) => {
+          {sortedMemberScores.map(({ member, scores }, index) => {
             if (maxRows && index !== loggedInIndex && (
               loggedInIndex >= maxRows ? index >= maxRows - 1 : index >= maxRows
             )) return null;
 
-            const color = league.members.list
-              .find((m) => m.displayName === member)?.color ?? '#ffffff';
-            const survivorName = leagueData.selectionTimeline.memberCastaways[member]?.slice()
-              .pop() ?? 'None';
-            const survivor = leagueData.castaways.find((c) => c.fullName === survivorName)!;
+            const castawayId = selectionTimeline?.memberCastaways?.[member.memberId]?.slice()
+              .pop();
+            const castaway = castawayId !== undefined ?
+              (castaways?.find((c) => c.castawayId === castawayId)) : undefined;
+            const selectionList = selectionTimeline?.memberCastaways?.[member.memberId]?.map(
+              (id) => castaways?.find((c) => c.castawayId === id) ?? null) ?? [];
 
             return (
               <MemberRow
                 key={index}
                 place={index + 1}
                 member={member}
+                currentStreak={currentStreaks?.[member.memberId] ?? 0}
+                selectionList={selectionList}
                 points={scores.slice().pop() ?? 0}
-                survivor={survivor}
-                color={color}
-                overrideLeagueHash={overrideLeagueHash}
+                castaway={castaway}
+                color={member.color}
                 doubleBelow={maxRows ? loggedInIndex > maxRows && index >= (maxRows - 2) : false}
               />
             );

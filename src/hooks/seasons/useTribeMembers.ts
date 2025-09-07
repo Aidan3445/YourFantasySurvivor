@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
   * @param {number} episodeNumber The episode number to get tribe members for.
   * @returnObj `Record<tribeId, castawayId[]>`
   */
-export function useTribeMembers(seasonId?: number, episodeNumber?: number) {
+export function useTribeMembers(seasonId: number | null, episodeNumber: number | null) {
   return useQuery<Record<number, number[]>>({
     queryKey: ['tribeMembers', seasonId],
     queryFn: async () => {

@@ -4,7 +4,7 @@ import {
   type ScoringBaseEventNames, type EliminationEventNames, EventSources, type EventTypes
 } from '~/lib/events';
 import { type Tribe } from '~/types/tribes';
-import { type CastawayWithTribe } from '~/types/castaways';
+import { type EnrichedCastaway } from '~/types/castaways';
 import { type LeagueMember } from '~/types/leagueMembers';
 
 export type EventSource = (typeof EventSources)[number];
@@ -37,7 +37,7 @@ export type EnrichedEvent = EventWithReferences & {
   referenceMap: {
     tribe: Tribe | null;
     pairs: {
-      castaway: CastawayWithTribe;
+      castaway: EnrichedCastaway;
       member: LeagueMember | null;
     }[];
   }[];
@@ -137,3 +137,7 @@ export type PredictionInsert = z.infer<typeof PredictionInsertZod>;
   * Record<ReferenceType | 'Member', Record<referneceId, runningScores[]>>
   */
 export type Scores = Record<ReferenceType | 'Member', Record<number, number[]>>;
+/**
+  * Record<memberId, streakCount>
+  */
+export type Streaks = Record<number, number>;

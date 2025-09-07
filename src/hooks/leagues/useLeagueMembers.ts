@@ -4,12 +4,12 @@ import { type LeagueMember } from '~/types/leagueMembers';
 
 /**
   * Fetches league members data from the API.
+  * @param {string} overrideHash Optional hash to override the URL parameter.
   * @returnObj `LeagueMember[]`
   */
-export function useLeagueMembers() {
+export function useLeagueMembers(overrideHash?: string) {
   const params = useParams();
-  const hash = params.hash as string;
-
+  const hash = overrideHash ?? params?.leagueHash;
 
   return useQuery<LeagueMember[]>({
     queryKey: ['leagueMembers', hash],

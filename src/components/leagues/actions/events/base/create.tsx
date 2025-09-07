@@ -42,7 +42,7 @@ export default function CreateBaseEvent() {
     episode.episodeId === Number(selectedEpisodeId))?.episodeNumber ?? 1,
     [episodes, selectedEpisodeId]);
 
-  const { tribeOptions, castawayOptions } = useEventOptions(league?.seasonId, selectedEpisode ?? 1);
+  const { tribeOptions, castawayOptions } = useEventOptions(league?.seasonId ?? null, selectedEpisode ?? 1);
 
   const [eventSubtype, setEventSubtype] = useState('');
 

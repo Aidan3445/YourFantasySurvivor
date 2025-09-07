@@ -6,7 +6,7 @@ import { useEnrichedTribeMembers } from '~/hooks/seasons/enrich/useEnrichedTribe
   * @param {number} seasonId The season ID to get options for.
   * @param {number} selectedEpisode The episode number to get options for.
   */
-export function useEventOptions(seasonId?: number, selectedEpisode?: number) {
+export function useEventOptions(seasonId: number | null, selectedEpisode: number | null) {
   const tribeMembers = useEnrichedTribeMembers(seasonId, selectedEpisode);
   const tribeOptions = useMemo(() =>
     Object.values(tribeMembers ?? {}).map(({ tribe }) => ({

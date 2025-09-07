@@ -4,11 +4,12 @@ import { type CustomEvents } from '~/types/events';
 
 /**
   * Fetches custom events and predictions for a league based on the league hash from the URL parameters.
+  * @param {string} overrideHash Optional hash to override the URL parameter.
   * @returnObj `CustomEvents`
   */
-export function useCustomEvents() {
+export function useCustomEvents(overrideHash?: string) {
   const params = useParams();
-  const hash = params.hash as string;
+  const hash = overrideHash ?? params.hash as string;
 
   return useQuery<CustomEvents>({
     queryKey: ['customEvents', hash],

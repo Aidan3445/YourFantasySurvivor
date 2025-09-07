@@ -5,7 +5,7 @@ import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { defaultBaseRules } from '~/lib/leagues';
-import { type CastawayWithTribe } from '~/types/castaways';
+import { type EnrichedCastaway } from '~/types/castaways';
 import { type EnrichedPrediction, type EnrichedEvent, type Prediction, type ScoringBaseEventName } from '~/types/events';
 
 /**
@@ -111,7 +111,7 @@ export function useEnrichPredictions(
             return acc;
           }
 
-          const castawayWithTribe: CastawayWithTribe = {
+          const castawayWithTribe: EnrichedCastaway = {
             ...castaway,
             tribe
           };

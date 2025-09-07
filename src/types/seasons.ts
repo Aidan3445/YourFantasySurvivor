@@ -1,4 +1,4 @@
-import { type Castaway } from '~/types/castaways';
+import { type EnrichedCastaway } from '~/types/castaways';
 import { type TribesTimeline, type Tribe } from '~/types/tribes';
 import { type Eliminations, type Events } from '~/types/events';
 import { type Episode } from '~/types/episodes';
@@ -12,10 +12,11 @@ export type Season = {
 
 export type SeasonsDataQuery = {
   season: Season;
-  castaways: Castaway[];
+  castaways: EnrichedCastaway[];
   tribes: Tribe[];
   baseEvents: Events;
   episodes: Episode[];
   tribesTimeline: TribesTimeline;
   eliminations: Eliminations;
 }
+

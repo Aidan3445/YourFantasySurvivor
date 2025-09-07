@@ -39,7 +39,7 @@ export default function EditEvent({ event }: EditEventProps) {
     resolver: zodResolver(z.union([BaseEventInsertZod, CustomEventInsertZod]))
   });
   const selectedReferenceType = reactForm.watch('referenceType');
-  const { castawayOptions, tribeOptions } = useEventOptions(league?.seasonId, event.episodeNumber);
+  const { castawayOptions, tribeOptions } = useEventOptions(league?.seasonId ?? null, event.episodeNumber);
   const [eventClearer, setEventClearer] = useState(0);
 
   const clearReferences = () => {

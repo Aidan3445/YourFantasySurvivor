@@ -8,7 +8,7 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { defaultBaseRules } from '~/lib/leagues';
 import { type Tribe } from '~/types/tribes';
-import { type CastawayWithTribe } from '~/types/castaways';
+import { type EnrichedCastaway } from '~/types/castaways';
 
 /**
   * Custom hook to get enriched data for a list of events.
@@ -80,7 +80,7 @@ export function useEnrichEvents(
             return null;
           }
 
-          const castawayWithTribe: CastawayWithTribe = {
+          const castawayWithTribe: EnrichedCastaway = {
             ...castaway,
             tribe: tribe
               ? { name: tribe.tribeName, color: tribe.tribeColor }

@@ -9,19 +9,13 @@ import getEliminations from '~/services/seasons/query/eliminations';
 import getTribesTimeline from '~/services/seasons/query/tribesTimeline';
 import getEpisodes from '~/services/seasons/query/episodes';
 import { type SeasonsDataQuery } from '~/types/seasons';
+import { type EnrichedCastaway } from '~/types/castaways';
 
 /**
   * Get the season data for either all or active seasons
   * @param includeInactive Whether to include inactive seasons or not
   * @returns The season data
-  * @returObj `castaways: Castaway[];
-  *  season: Season
-  *  castaways: Castaway[]
-  *  tribes: Tribe[]
-  *  baseEvents: Record<episodeNumber, Record<eventId, EventWithReferences>>
-  *  episodes: Episode[]
-  *  tribesTimeline: Record<episodeNumber, Record<tribeId, castawayId[]>>
-  *  eliminations: Record<episodeNumber, Elimination[]>`
+  * @returObj `SeasonsDataQuery[]`
   */
 export default async function getSeasonsData(includeInactive: boolean) {
   const seasons = includeInactive ? await getAllSeasons() : await getCurrentSeasons();
@@ -37,9 +31,30 @@ export default async function getSeasonsData(includeInactive: boolean) {
       getEliminations(season.seasonId),
     ]);
 
+    const enrichedCastaways: EnrichedCastaway[] = castaways.map(castaway => {
+      const startTribeIds = Object.entries(tribesTimeline[1] ?? {})
+        .find(([_, castawayIds]) => castawayIds.includes(castaway.castawayId));
+
+      if (!startTribeIds) return { ...castaway, tribe: null, eliminatedEpisode: null };
+
+      const tribeId = Number(startTribeIds[0]);
+      const tribeMatch = tribes.find(t => t.tribeId === tribeId) ?? null;
+      const tribe = tribeMatch ? { name: tribeMatch.tribeName, color: tribeMatch.tribeColor } : null;
+
+      const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
+        episodeElims.some(elim => elim.castawayId === castaway.castawayId)
+      );
+
+      return {
+        ...castaway,
+        tribe,
+        eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex + 1 : null
+      };
+    });
+
     return {
       season,
-      castaways,
+      castaways: enrichedCastaways,
       tribes,
       baseEvents,
       episodes,

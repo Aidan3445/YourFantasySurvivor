@@ -9,6 +9,7 @@ export type LeagueMember = {
   color: string;
   role: LeagueMemberRole;
   draftOrder: number;
+  loggedIn: boolean;
 };
 
 export type LeagueMemberInsert = {

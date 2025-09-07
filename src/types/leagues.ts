@@ -22,7 +22,7 @@ export type LeagueSettings = {
   leagueId: number;
   draftDate: Date | null;
   survivalCap: number;
-  preserverStreak: boolean;
+  preserveStreak: boolean;
 };
 
 export interface LeagueSettingsUpdate {

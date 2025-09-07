@@ -1,6 +1,6 @@
 import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/lib/leagues';
 import { findTribeCastaways } from '~/lib/utils';
-import { type Predictions, type Eliminations, type Events, type CustomEvents, type ReferenceType, type Scores, type ScoringBaseEventName, type Prediction } from '~/types/events';
+import { type Predictions, type Eliminations, type Events, type CustomEvents, type ReferenceType, type Scores, type ScoringBaseEventName, type Prediction, type Streaks } from '~/types/events';
 import { type SelectionTimelines, type LeagueRules } from '~/types/leagues';
 import { type TribesTimeline } from '~/types/tribes';
 import { ScoringBaseEventNames } from '~/lib/events';
@@ -198,7 +198,7 @@ export function compileScores(
   // after each episode the castaway survives, they earn a bonus point
   // then they earn two points for the next episode, then three, etc.
   // the bonus is capped at the survival cap set by the league
-  const currentStreaks: Record<number, number> = {};
+  const currentStreaks: Streaks = {};
   Object.entries(selectionTimelines.memberCastaways).forEach(([memberId, castaways]) => {
     const mid = parseInt(memberId, 10);
     // get the episode of the first pick, this will be the same for all members for now
