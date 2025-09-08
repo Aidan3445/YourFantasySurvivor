@@ -2,42 +2,43 @@
 
 import { Button } from '~/components/common/button';
 import SetDraftDate from '~/components/leagues/customization/settings/draft/view';
-import { useLeague } from '~/hooks/useLeague';
 import { useRouter } from 'next/navigation';
 import Clock from '~/components/leagues/predraft/countdown/clock';
 import StartDraft from '~/components/leagues/predraft/countdown/start';
+import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface DraftCountdownProps {
-  overrideLeagueHash?: string;
+  overrideHash?: string;
 }
 
-export function DraftCountdown({ overrideLeagueHash }: DraftCountdownProps) {
-  const {
-    league: {
-      leagueHash,
-      leagueStatus,
-      members: { loggedIn, list },
-      settings: { draftDate }
-    },
-    refresh
-  } = useLeague({ overrideLeagueHash });
+export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague(overrideHash);
+  const { data: leagueSettings } = useLeagueSettings(overrideHash);
+  const { data: leagueMembers } = useLeagueMembers(overrideHash);
+
   const router = useRouter();
 
 
-  const editable =
-    (loggedIn && loggedIn.role === 'Owner') &&
-    (!draftDate || Date.now() < draftDate.getTime());
+  const editable = (leagueMembers?.loggedIn && leagueMembers.loggedIn.role === 'Owner') && leagueSettings &&
+    (leagueSettings.draftDate === null || Date.now() < leagueSettings.draftDate.getTime());
 
   const onDraftJoin = async () => {
-    if (leagueStatus === 'Predraft') {
-      const res = await fetch(`/api/leagues/${leagueHash}/draft/start`, { method: 'POST' });
+    if (!league) return;
+
+    if (league.status === 'Predraft') {
+      const res = await fetch(`/api/leagues/${league.hash}/draft/start`, { method: 'POST' });
       if (res.status !== 200) {
         alert(`Failed to join draft: ${res.statusText}`);
         return;
       }
-      await refresh();
+      await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
+      await queryClient.invalidateQueries({ queryKey: ['leagueSettings', league.hash] });
     }
-    router.push(`/leagues/${leagueHash}/draft`);
+    router.push(`/leagues/${league.hash}/draft`);
   };
 
   return (
@@ -46,21 +47,21 @@ export function DraftCountdown({ overrideLeagueHash }: DraftCountdownProps) {
         <div className='flex flex-wrap gap-x-2 items-baseline'>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>
           <p className='text-sm text-muted-foreground'>
-            {draftDate
-              ? (draftDate.getTime() > Date.now()
-                ? `Starts at: ${draftDate.toLocaleString()}`
+            {leagueSettings?.draftDate
+              ? (leagueSettings.draftDate.getTime() > Date.now()
+                ? `Starts at: ${leagueSettings.draftDate.toLocaleString()}`
                 : 'Draft is live')
               : 'Draft set to manual start by commissioner'}
           </p>
         </div>
         <div className='flex gap-2 ml-auto'>
-          {editable && list.length > 1 && leagueStatus === 'Predraft' &&
+          {editable && leagueMembers && leagueMembers.members.length > 1 && league?.status === 'Predraft' &&
             <StartDraft startDraft={onDraftJoin} />}
-          {editable && <SetDraftDate overrideLeagueHash={overrideLeagueHash} />}
+          {editable && <SetDraftDate overrideLeagueHash={overrideHash} />}
         </div>
       </span>
       <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow-sm shadow-black'>
-        <Clock endDate={draftDate} replacedBy={
+        <Clock endDate={leagueSettings?.draftDate ?? null} replacedBy={
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'
             variant='positive'
