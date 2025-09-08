@@ -1,27 +1,46 @@
 'use client';
 
-import { type seasonsService as SEASON_QUERIES } from '~/services/deprecated/seasonsService';
 import {
   Table, TableCaption, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { type CastawayName } from '~/types/castaways';
 import { Fragment, useState } from 'react';
 import ScorboardBody from '~/components/home/scoreboard/body';
 import SelectSeason from '~/components/home/scoreboard/selectSeason';
+import { type SeasonsDataQuery } from '~/types/seasons';
+import { compileScores } from '~/lib/scores';
+import { newtwentyColors } from '~/lib/colors';
 
 export interface ScoreboardTableProps {
-  scoresBySeason: {
-    sortedCastaways: [CastawayName, number[]][];
-    castawayColors: Record<CastawayName, string>;
-    castawaySplitIndex: number;
-    data: Awaited<ReturnType<typeof SEASON_QUERIES.getSeasonScoreData>>[0];
-  }[];
+  scoreData: SeasonsDataQuery[];
 }
 
-export default function ScoreboardTable({ scoresBySeason }: ScoreboardTableProps) {
+export default function ScoreboardTable({ scoreData }: ScoreboardTableProps) {
+  const scoresBySeason = scoreData.map((data) => {
+    const { Castaway: castawayScores } = compileScores(
+      data.baseEvents,
+      data.eliminations,
+      data.tribesTimeline
+    ).scores;
+
+    const sortedCastaways = Object.entries(castawayScores)
+      .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0))
+      .map(([castawayId, scores]) => [Number(castawayId), scores] as [number, number[]]);
+
+    const castawayColors: Record<string, string> =
+      scoreData[0]!.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
+        .reduce((acc, { castawayId }, index) => {
+          acc[castawayId] = newtwentyColors[index % newtwentyColors.length]!;
+          return acc;
+        }, {} as Record<string, string>);
+
+    const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
+
+    return { sortedCastaways, castawayColors, castawaySplitIndex, data };
+  });
+
   const [selectedSeason, setSelectedSeason] = useState(scoresBySeason[0]);
 
   if (!selectedSeason) return <div className='text-center py-6'>No seasons available.</div>;
@@ -53,7 +72,7 @@ export default function ScoreboardTable({ scoresBySeason }: ScoreboardTableProps
                     <SelectSeason
                       seasons={scoresBySeason.map(s => ({
                         value: String(s.data.season.seasonId),
-                        label: s.data.season.seasonName,
+                        label: s.data.season.name,
                       }))}
                       value={String(selectedSeason.data.season.seasonId)}
                       setValue={selectSeason}

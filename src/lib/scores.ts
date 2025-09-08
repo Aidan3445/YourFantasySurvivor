@@ -217,7 +217,7 @@ export function compileScores(
       // if the castaway selected has been eliminated set the streak to 0
       // note this has the side effect of ensuring that streaks end when
       // a member is out of castaways to select
-      if (eliminated.some((e) => e.castawayId === castaways[mcIndex]) ||
+      if (eliminated.some((e) => e?.castawayId === castaways[mcIndex]) ||
         (!preserveStreak && castaways[episodeNumber - 1] &&
           castaways[episodeNumber - 1] !== castaways[mcIndex])) {
         streak = 0;

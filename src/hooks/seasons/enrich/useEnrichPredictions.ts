@@ -7,6 +7,7 @@ import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { defaultBaseRules } from '~/lib/leagues';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type EnrichedPrediction, type EnrichedEvent, type Prediction, type ScoringBaseEventName } from '~/types/events';
+import { useEliminations } from '~/hooks/seasons/useEliminations';
 
 /**
   * Custom hook to get enriched data for a list of predictions.
@@ -25,10 +26,11 @@ export function useEnrichPredictions(
   const { data: tribes } = useTribes(seasonId);
   const { data: castaways } = useCastaways(seasonId);
   const { data: leagueMembers } = useLeagueMembers();
+  const { data: eliminations } = useEliminations(seasonId);
 
   const enrichedPredictions = useMemo(() => {
     if (!seasonId || !events || !predictions || !tribesTimeline ||
-      !castaways || !tribes || !leagueMembers || !rules) {
+      !eliminations || !castaways || !tribes || !leagueMembers || !rules) {
       return [];
     }
 
@@ -59,7 +61,7 @@ export function useEnrichPredictions(
         acc[prediction.eventName] = existingPrediction;
       }
 
-      const member = leagueMembers.find(m => m.memberId === prediction.predictionMakerId);
+      const member = leagueMembers.members.find(m => m.memberId === prediction.predictionMakerId);
       if (!member) {
         return acc; // skip if member not found
       }
@@ -111,9 +113,14 @@ export function useEnrichPredictions(
             return acc;
           }
 
+          const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
+            episodeElims.some(elim => elim.castawayId === castaway.castawayId)
+          );
+
           const castawayWithTribe: EnrichedCastaway = {
             ...castaway,
-            tribe
+            tribe,
+            eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex + 1 : null
           };
           existingPrediction.misses.push({
             ...entry,
@@ -144,7 +151,7 @@ export function useEnrichPredictions(
     }, {} as Record<string, EnrichedPrediction>);
   }, [
     castaways, events, leagueMembers, predictions,
-    rules, seasonId, tribes, tribesTimeline
+    rules, seasonId, tribes, tribesTimeline, eliminations
   ]);
 
   return Object.values(enrichedPredictions);

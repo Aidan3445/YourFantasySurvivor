@@ -35,3 +35,9 @@ export type SelectionUpdate = {
   castawayId: number;
   draft: boolean;
 };
+
+export type CurrentSelection = {
+  castawayId: number;
+  fullName: string;
+  isEliminated: boolean;
+};

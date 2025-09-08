@@ -6,6 +6,7 @@ import { type ReactNode, StrictMode } from 'react';
 import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
 import { type Metadata } from 'next';
+import QueryClientContextProvider from '~/context/reactQueryContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,27 +24,30 @@ interface RootLayoutProps {
 }
 
 
+
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <StrictMode>
-      <ClerkProvider
-        appearance={{
-          variables: {
-            colorPrimary: '#B09472',
-            colorBackground: '#EED9BF',
-          }
-        }}>
-        <html lang='en'>
-          <body className={`font-sans ${inter.variable}`}>
-            <SidebarProvider defaultOpen>
-              <Nav />
-              <div className='w-full'>
-                {children}
-              </div>
-            </SidebarProvider>
-          </body>
-        </html>
-      </ClerkProvider>
+      <QueryClientContextProvider>
+        <ClerkProvider
+          appearance={{
+            variables: {
+              colorPrimary: '#B09472',
+              colorBackground: '#EED9BF',
+            }
+          }}>
+          <html lang='en'>
+            <body className={`font-sans ${inter.variable}`}>
+              <SidebarProvider defaultOpen>
+                <Nav />
+                <div className='w-full'>
+                  {children}
+                </div>
+              </SidebarProvider>
+            </body>
+          </html>
+        </ClerkProvider>
+      </QueryClientContextProvider>
     </StrictMode>
   );
 }

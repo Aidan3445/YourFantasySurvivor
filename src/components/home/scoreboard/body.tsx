@@ -1,45 +1,70 @@
 import { TableBody, TableRow } from '~/components/common/table';
-import { type CastawayDetails } from '~/types/castaways';
 import CastawayEntry from '~/components/home/scoreboard/entry';
+import { type SeasonsDataQuery } from '~/types/seasons';
+import { type Tribe } from '~/types/tribes';
 
 export interface BodyProps {
-  sortedCastaways: [string, number[]][];
+  sortedCastaways: [number, number[]][];
   castawayColors: Record<string, string>;
   castawaySplitIndex: number;
-  data: {
-    castaways: CastawayDetails[];
-    season: {
-      seasonId: number;
-    };
-  };
+  data: SeasonsDataQuery;
 }
 
 export default function ScorboardBody({
   sortedCastaways, castawayColors, castawaySplitIndex, data
 }: BodyProps) {
+  const getTribeTimeline = (castawayId: number) => {
+    return Object.entries(data.tribesTimeline)
+      .map(([episode, tribeUpdates]) => {
+        const update = Object.entries(tribeUpdates)
+          .find(([_, castawayIds]) => castawayIds.includes(castawayId));
+        if (update) {
+          const tribe = data.tribes.find(t => t.tribeId === Number(update[0]));
+          return { episode: Number(episode), tribe: tribe };
+        }
+        return null;
+      })
+      .filter((entry): entry is { episode: number; tribe: Tribe; } => entry !== null)
+      .sort((a, b) => a.episode - b.episode);
+  };
+
   return (
     <TableBody>
-      {sortedCastaways.slice(0, castawaySplitIndex).map(([castawayName, scores], index) => {
+      {sortedCastaways.slice(0, castawaySplitIndex).map(([castawayId, scores], index) => {
         const totalPoints = scores.slice().pop() ?? 0;
-        const color = castawayColors[castawayName] ?? '#ffffff';
-        const castaway = data.castaways.find(c => c.fullName === castawayName);
+        const color = castawayColors[castawayId] ?? '#ffffff';
+        const castaway = data.castaways.find(c => c.castawayId === Number(castawayId));
+        const tribeTimeline = getTribeTimeline(castawayId);
 
-        const [secondCastawayName, secondScores] = sortedCastaways[index + castawaySplitIndex] ?? [];
+        // Find the corresponding castaway and scores for the second column
+        const [secondCastawayId, secondScores] = sortedCastaways[index + castawaySplitIndex] ?? [];
+        let secondCastaway;
+        let secondTotalPoints;
+        let secondColor;
+        let secondTribeTimeline;
+        if (secondCastawayId && secondScores) {
+          secondCastaway = secondCastawayId ? data.castaways.find(c => c.castawayId === Number(secondCastawayId)) : undefined;
+          secondTotalPoints = secondScores?.slice().pop() ?? 0;
+          secondColor = secondCastawayId ? (castawayColors[secondCastawayId] ?? '#ffffff') : '';
+          secondTribeTimeline = secondCastawayId ? getTribeTimeline(secondCastawayId) : [];
+        }
 
         return (
-          <TableRow key={`${castawayName}-${secondCastawayName ?? 'empty'}`}>
+          <TableRow key={`${castawayId}-${secondCastawayId ?? 'empty'}`}>
             <CastawayEntry
               place={index + 1}
               castaway={castaway}
               points={totalPoints}
               color={color}
+              tribeTimeline={tribeTimeline}
             />
-            {secondCastawayName && secondScores && (
+            {secondCastawayId && secondScores && (
               <CastawayEntry
                 place={index + 1 + castawaySplitIndex}
-                castaway={data.castaways.find(c => c.fullName === secondCastawayName)}
-                points={secondScores.slice().pop() ?? 0}
-                color={castawayColors[secondCastawayName] ?? '#ffffff'}
+                castaway={secondCastaway}
+                points={secondTotalPoints}
+                color={secondColor}
+                tribeTimeline={secondTribeTimeline}
               />
             )}
           </TableRow>

@@ -47,7 +47,7 @@ export default function TimelineFilters({
   const { data: leagueRules } = useLeagueRules();
   const { data: castaways } = useCastaways(league?.seasonId ?? null);
   const { data: tribes } = useTribes(league?.seasonId ?? null);
-  const { data: members } = useLeagueMembers();
+  const { data: leagueMembers } = useLeagueMembers();
   const { data: episodes } = useEpisodes(league?.seasonId ?? null);
 
   useEffect(() => {
@@ -130,13 +130,13 @@ export default function TimelineFilters({
                 placeholder='All Tribes'
               />
             </div>}
-          {members &&
+          {leagueMembers &&
             <div className='w-min flex flex-col items-center'>
               <Label className='text-sm font-semibold text-muted-foreground'>
                 Member Filter
               </Label>
               <MultiSelect
-                options={members.map((member) => ({
+                options={leagueMembers.members.map((member) => ({
                   value: member.memberId,
                   label: member.displayName
                 }))}

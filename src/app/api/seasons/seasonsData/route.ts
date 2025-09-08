@@ -5,9 +5,8 @@ export async function GET(req: NextRequest) {
   const includeInactiveParam = req.nextUrl.searchParams.get('includeInactive');
   const includeInactive = includeInactiveParam === 'true';
 
-
   try {
-    const seasonsData = getSeasonsData(includeInactive);
+    const seasonsData = await getSeasonsData(includeInactive);
     return NextResponse.json(seasonsData, { status: 200 });
   } catch (e) {
     console.error('Failed to get seasons data', e);

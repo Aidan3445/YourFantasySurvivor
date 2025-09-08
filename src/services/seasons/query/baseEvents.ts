@@ -38,7 +38,7 @@ export default async function getBaseEvents(seasonId: number) {
     .where(eq(episodeSchema.seasonId, seasonId))
     .orderBy(episodeSchema.episodeNumber)
     .then(rows => rows.reduce((acc, row) => {
-      acc[row.episodeNumber] ??= [];
+      acc[row.episodeNumber] ??= {};
       const events = acc[row.episodeNumber]!;
       events[row.baseEventId] ??= {
         eventSource: 'Base',

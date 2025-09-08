@@ -20,9 +20,7 @@ export default async function getCurrentSeasons() {
       lte(seasonSchema.premiereDate, now),
       or(
         isNull(seasonSchema.finaleDate),
-        gte(seasonSchema.finaleDate, now)
-      )
-    ))
+        gte(seasonSchema.finaleDate, now))))
     .orderBy(asc(seasonSchema.premiereDate))
     .then(rows => rows.map(row => ({
       ...row,

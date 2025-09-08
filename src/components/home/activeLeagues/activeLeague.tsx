@@ -17,7 +17,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         href={`/leagues/${league.hash}`}
         className='block'>
         <div className='px-2 py-1 rounded-lg border hover:bg-accent/50 transition-colors flex items-center justify-between mb-2'>
-          <h4 className='font-semibold mr-auto'>{league.hash}</h4>
+          <h4 className='font-semibold mr-auto'>{league.name}</h4>
           <Badge variant='secondary'>{league.season}</Badge>
           <Eye className='ml-2' />
         </div>

@@ -42,7 +42,7 @@ export default async function getSeasonsData(includeInactive: boolean) {
       const tribe = tribeMatch ? { name: tribeMatch.tribeName, color: tribeMatch.tribeColor } : null;
 
       const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
-        episodeElims.some(elim => elim.castawayId === castaway.castawayId)
+        episodeElims?.some(elim => elim.castawayId === castaway.castawayId)
       );
 
       return {

@@ -6,10 +6,12 @@ import { type Eliminations } from '~/types/events';
   * @param {number} seasonId The season ID to get eliminations for.
   * @returnObj `Eliminations`
   */
-export function useEliminations(seasonId: number) {
+export function useEliminations(seasonId: number | null) {
   return useQuery<Eliminations>({
     queryKey: ['eliminations', seasonId],
     queryFn: async () => {
+      if (!seasonId) throw new Error('Season ID is required');
+
       const res = await fetch(`/api/seasons/eliminations?seasonId=${seasonId}`);
       if (!res.ok) {
         throw new Error('Failed to fetch eliminations data');

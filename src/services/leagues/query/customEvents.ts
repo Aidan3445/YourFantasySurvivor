@@ -85,8 +85,8 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       referenceType: customEventPredictionSchema.referenceType,
       bet: customEventPredictionSchema.bet,
       hit: sql<boolean>`
-        CASE WHEN ${customEventReferenceSchema} = ${customEventPredictionSchema.referenceId}
-        AND ${customEventReferenceSchema} = ${customEventPredictionSchema.referenceType}
+        CASE WHEN ${customEventReferenceSchema.referenceId} = ${customEventPredictionSchema.referenceId}
+        AND ${customEventReferenceSchema.referenceType} = ${customEventPredictionSchema.referenceType}
         THEN true ELSE false END
       `.as('hit'),
     })

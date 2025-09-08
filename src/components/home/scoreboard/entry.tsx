@@ -3,19 +3,21 @@ import {
 } from '~/components/common/table';
 
 import { Circle, FlameKindling } from 'lucide-react';
-import { type CastawayDetails } from '~/types/castaways';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import ColorRow from '~/components/shared/colorRow';
+import { type EnrichedCastaway } from '~/types/castaways';
+import { type Tribe } from '~/types/tribes';
 
 interface CastawayRowProps {
   place: number;
-  castaway?: CastawayDetails;
-  points: number;
-  color: string;
+  castaway?: EnrichedCastaway;
+  points?: number;
+  color?: string;
+  tribeTimeline?: { episode: number; tribe: Tribe; }[];
 }
 
-export default function CastawayEntry({ place, castaway, points, color }: CastawayRowProps) {
+export default function CastawayEntry({ place, castaway, points, color, tribeTimeline }: CastawayRowProps) {
   return (
     <>
       <TableCell className='px-1'>
@@ -31,7 +33,7 @@ export default function CastawayEntry({ place, castaway, points, color }: Castaw
       <TableCell className='text-nowrap px-1'>
         <ColorRow
           className='justify-center gap-0'
-          color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.startingTribe.tribeColor ?? color}>
+          color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color ?? color}>
           {castaway?.fullName ?? 'Jeff Probst'}
           {castaway?.eliminatedEpisode && (
             <Popover>
@@ -48,14 +50,14 @@ export default function CastawayEntry({ place, castaway, points, color }: Castaw
             </Popover>
           )}
           <div className='ml-auto flex gap-0.5'>
-            {castaway && castaway.tribes.length > 1 && castaway.tribes.map((tribe) => (
-              <Popover key={`${tribe.tribeName}-${tribe.episode}`}>
+            {tribeTimeline?.map(({ episode, tribe }) => (
+              <Popover key={`${tribe.tribeName}-${episode}`}>
                 <PopoverTrigger>
                   <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='end'>
                   <PopoverArrow />
-                  {tribe.tribeName} - Episode {tribe.episode}
+                  {tribe.tribeName} - Episode {episode}
                 </PopoverContent>
               </Popover>
             ))}

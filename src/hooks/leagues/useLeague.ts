@@ -4,7 +4,7 @@ import { type League } from '~/types/leagues';
 
 /**
   * Fetches league data based on the league hash from the URL parameters.
-  * Adjusts stale time and refetch intervals based on the league status.
+  * Adjusts stale time and fetch intervals based on the league status.
   * @param overrideHash Optional hash to override URL parameter.
   * @returnObj `League`
   */

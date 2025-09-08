@@ -27,7 +27,6 @@ export function useLeagueData(overrideHash?: string) {
     seasonsData?.find((s) => s.season.seasonId === league?.seasonId),
     [seasonsData, league]);
 
-
   const scoreData = useMemo(() => {
     if (!league || !leagueMembers || !seasonData || !selectionTimeline || !basePredictions || !leagueRules || !leagueSettings) {
       return {
@@ -54,7 +53,7 @@ export function useLeagueData(overrideHash?: string) {
       .sort(([_, scoresA], [__, scoresB]) =>
         (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0))
       .map(([member, memberScores]) => ({
-        member: leagueMembers.find((m) => m.memberId === Number(member))!,
+        member: leagueMembers.members.find((m) => m.memberId === Number(member))!,
         scores: memberScores,
         currentStreak: currentStreaks[Number(member)] ?? 0,
       }))

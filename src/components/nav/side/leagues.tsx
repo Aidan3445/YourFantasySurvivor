@@ -57,7 +57,7 @@ export default function SideNavLeagues() {
                   className={league.hash === leagueHash ? 'font-semibold' : ''}
                   key={league.hash}
                   href={`/leagues/${league.hash}`}
-                  label={league.hash} />
+                  label={league.name} />
               ))}
             <Separator />
             {(leaguesData && (leaguesData.length > 5 || leaguesData.some(({ league }) => league.status === 'Inactive'))) && (

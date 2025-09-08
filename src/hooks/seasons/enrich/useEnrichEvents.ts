@@ -9,6 +9,7 @@ import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { defaultBaseRules } from '~/lib/leagues';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
+import { useEliminations } from '~/hooks/seasons/useEliminations';
 
 /**
   * Custom hook to get enriched data for a list of events.
@@ -27,11 +28,12 @@ export function useEnrichEvents(
   const { data: tribes } = useTribes(seasonId);
   const { data: castaways } = useCastaways(seasonId);
   const { data: leagueMembers } = useLeagueMembers();
+  const { data: eliminations } = useEliminations(seasonId);
 
   return useMemo(() => {
     if (
-      !events || !tribesTimeline || !selectionTimeline ||
-      !tribes || !castaways || !leagueMembers || !rules) {
+      !events || !tribesTimeline || !selectionTimeline || !tribes ||
+      !eliminations || !castaways || !leagueMembers || !rules) {
       return [];
     }
 
@@ -79,12 +81,15 @@ export function useEnrichEvents(
             console.warn(`Castaway with ID ${castawayId} not found for event ID ${event.eventId}`);
             return null;
           }
-
+          const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
+            episodeElims.some(elim => elim.castawayId === castaway.castawayId)
+          );
           const castawayWithTribe: EnrichedCastaway = {
             ...castaway,
             tribe: tribe
               ? { name: tribe.tribeName, color: tribe.tribeColor }
-              : null
+              : null,
+            eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex + 1 : null
           };
 
           if (tribe === null) {
@@ -92,7 +97,7 @@ export function useEnrichEvents(
           }
 
           const member = memberId
-            ? leagueMembers.find(m => m.memberId === memberId) ?? null
+            ? leagueMembers.members.find(m => m.memberId === memberId) ?? null
             : null;
           return { castaway: castawayWithTribe, member };
         });
@@ -137,5 +142,14 @@ export function useEnrichEvents(
         referenceMap,
       } as EnrichedEvent;
     });
-  }, [castaways, events, leagueMembers, rules, selectionTimeline, tribes, tribesTimeline]);
+  }, [
+    castaways,
+    eliminations,
+    events,
+    leagueMembers,
+    rules,
+    selectionTimeline,
+    tribes,
+    tribesTimeline
+  ]);
 }
