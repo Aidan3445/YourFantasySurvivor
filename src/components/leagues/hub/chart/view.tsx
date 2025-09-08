@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { useMemo } from 'react';
 import CustomTooltip from '~/components/leagues/hub/chart/tooltip';
 import { formatData } from '~/components/leagues/hub/chart/utils';

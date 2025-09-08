@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { useDraft } from '~/hooks/useDraft';
-import { useLeague } from '~/hooks/useLeague';
-import { type LeagueHash } from '~/types/deprecated/leagues';
+import { useDraft } from '~/hooks/deprecated/useDraft';
+import { useLeague } from '~/hooks/deprecated/useLeague';
+import { type Hash } from '~/types/deprecated/leagues';
 import { getContrastingColor } from '@uiw/color-convert';
 import ChooseCastaway from '~/components/leagues/draft/chooseCastaway';
 import ColorRow from '~/components/shared/colorRow';
@@ -15,11 +15,11 @@ import MakePredictions from '~/components/leagues/actions/events/predictions/vie
 import { useRouter } from 'next/navigation';
 
 interface DraftTrackerProps {
-  leagueHash: LeagueHash;
+  hash: Hash;
 }
 
-export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
-  const { draft } = useDraft(leagueHash);
+export default function DraftTracker({ hash }: DraftTrackerProps) {
+  const { draft } = useDraft(hash);
   const {
     league: {
       leagueStatus,
@@ -64,9 +64,9 @@ export default function DraftTracker({ leagueHash }: DraftTrackerProps) {
 
   useEffect(() => {
     if (onTheClockIndex === -1 || leagueStatus !== 'Draft') {
-      router.push(`/leagues/${leagueHash}`);
+      router.push(`/leagues/${hash}`);
     }
-  }, [onTheClockIndex, leagueStatus, router, leagueHash]);
+  }, [onTheClockIndex, leagueStatus, router, hash]);
 
   return (
     <section className='w-full space-y-4 overflow-x-hidden p-4'>

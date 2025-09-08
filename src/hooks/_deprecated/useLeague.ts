@@ -6,7 +6,7 @@ import useSWR, { type Fetcher } from 'swr';
 import { type leaguesService as QUERIES } from '~/services/deprecated/leagues';
 import { type SWRKey } from '~/lib/utils';
 import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/types/events';
-import { type LeagueHash } from '~/types/deprecated/leagues';
+import { type Hash } from '~/types/deprecated/leagues';
 
 export type League = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeague>>>;
 export type LeagueData = NonUndefined<Awaited<ReturnType<typeof QUERIES.getLeagueLiveData>>>;
@@ -17,19 +17,19 @@ type Response = {
   episodeAiring: boolean
 };
 
-const leagueFetcher: Fetcher<Response, SWRKey> = ({ leagueHash }) =>
-  fetch(`/api/leagues/${leagueHash}`)
+const leagueFetcher: Fetcher<Response, SWRKey> = ({ hash }) =>
+  fetch(`/api/leagues/${hash}`)
     .then((res) => res.json());
 
 interface UseLeagueProps {
-  overrideLeagueHash?: LeagueHash;
+  overrideHash?: Hash;
 }
 
-export function useLeague({ overrideLeagueHash }: UseLeagueProps = {}) {
-  const { leagueHash: paramHash } = useParams();
-  const leagueHash = overrideLeagueHash ?? paramHash;
+export function useLeague({ overrideHash }: UseLeagueProps = {}) {
+  const { hash: paramHash } = useParams();
+  const hash = overrideHash ?? paramHash;
 
-  const { data, mutate } = useSWR<Response>({ leagueHash, key: 'league' }, leagueFetcher,
+  const { data, mutate } = useSWR<Response>({ hash, key: 'league' }, leagueFetcher,
     {
       refreshInterval: (data) => {
         // no refresh if league is inactive or no data
@@ -72,7 +72,7 @@ export function useLeague({ overrideLeagueHash }: UseLeagueProps = {}) {
 }
 
 export const nonLeague: League = {
-  leagueHash: '',
+  hash: '',
   leagueName: '',
   leagueStatus: 'Inactive',
   leagueEventRules: [],

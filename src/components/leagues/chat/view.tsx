@@ -8,14 +8,14 @@ import ChatRoom, { type ChatRoomProps } from '~/components/leagues/chat/room';
 
 export default function LeagueChat({ chatHistory, messageEnd }: ChatRoomProps) {
   const params = useParams();
-  const leagueHash = params.leagueHash as string;
+  const hash = params.hash as string;
 
-  const realtimeClient = new Realtime({ authUrl: `/api/leagues/${leagueHash}/chat` });
+  const realtimeClient = new Realtime({ authUrl: `/api/leagues/${hash}/chat` });
   const chatClient = new ChatClient(realtimeClient);
 
   return (
     <ChatClientProvider client={chatClient}>
-      <ChatRoomProvider name={leagueHash}>
+      <ChatRoomProvider name={hash}>
         <ChatRoom chatHistory={chatHistory} messageEnd={messageEnd} />
       </ChatRoomProvider>
     </ChatClientProvider>

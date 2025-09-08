@@ -1,6 +1,6 @@
 'use client';
 
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
@@ -9,7 +9,7 @@ import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { cn } from '~/lib/utils';
 import { GripVertical, Lock, LockOpen, Shuffle } from 'lucide-react';
 import SortableItem from '~/components/common/sortableItem';
-import { handleDragEnd } from '~/hooks/useSortableItem';
+import { handleDragEnd } from '~/hooks/ui/useSortableItem';
 import { updateDraftOrder } from '~/services/deprecated/leagueActions';
 import { Button } from '~/components/common/button';
 import { useRouter } from 'next/navigation';
@@ -25,7 +25,7 @@ interface DraftOrderProps {
 export default function DraftOrder({ className }: DraftOrderProps) {
   const {
     league: {
-      leagueHash,
+      hash,
       members,
       leagueStatus,
       settings: {
@@ -49,8 +49,8 @@ export default function DraftOrder({ className }: DraftOrderProps) {
   const [order, setOrder] = useState(dbOrder);
 
   useEffect(() => {
-    if (leagueStatus !== 'Predraft' && leagueHash) router.push(`/leagues/${leagueHash}/draft`);
-  }, [leagueStatus, router, leagueHash]);
+    if (leagueStatus !== 'Predraft' && hash) router.push(`/leagues/${hash}/draft`);
+  }, [leagueStatus, router, hash]);
 
   useEffect(() => {
     setOrder(dbOrder);
@@ -82,7 +82,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
 
   const handleSubmit = async () => {
     try {
-      await updateDraftOrder(leagueHash, order.map((member) => member.memberId));
+      await updateDraftOrder(hash, order.map((member) => member.memberId));
       await refresh();
       alert('Draft order saved');
       setLocked(true);

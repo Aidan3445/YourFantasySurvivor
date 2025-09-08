@@ -6,7 +6,7 @@ import { type Message } from 'node_modules/@ably/chat/dist/core/message';
 import { Input } from '~/components/common/input';
 import { Button } from '~/components/common/button';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { type Headers } from '@ably/chat';
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
@@ -21,7 +21,7 @@ export interface ChatRoomProps {
 }
 
 export default function ChatRoom({ chatHistory, messageEnd }: ChatRoomProps) {
-  const { league: { members, leagueHash } } = useLeague();
+  const { league: { members, hash } } = useLeague();
   const loggedInUser = members?.loggedIn;
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -64,7 +64,7 @@ export default function ChatRoom({ chatHistory, messageEnd }: ChatRoomProps) {
 
 
       await saveChatMessage(
-        leagueHash,
+        hash,
         {
           serial: message.serial,
           text: message.text,

@@ -17,11 +17,11 @@ import { type NewLeagueMember } from '~/types/deprecated/leagueMembers';
   * @returnObj `{ success: true }`
   */
 export default async function joinLeague(
-  leagueHash: string,
+  hash: string,
   newMember: NewLeagueMember
 ) {
   try {
-    return await requireAuth(joinLeagueLogic)(leagueHash, newMember);
+    return await requireAuth(joinLeagueLogic)(hash, newMember);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

@@ -10,7 +10,7 @@ import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 
 /* Routing Logic
  
-    {Home OR Leagues}                  {Leagues/:leagueHash/:route*}                      
+    {Home OR Leagues}                  {Leagues/:hash/:route*}                      
            |                                        |
       Logged in?                               Logged in?
        /     \                                   /     \                               
@@ -31,8 +31,8 @@ export const config = {
   matcher: [
     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     '/(api|trpc)(.*)',
-    '/leagues/:leagueHash/:path*',
-    '/api/leagues/:leagueHash/:path*',
+    '/leagues/:hash/:path*',
+    '/api/leagues/:hash/:path*',
   ],
 };
 
@@ -92,12 +92,12 @@ async function leaguesRoute(req: NextRequest, userId: string) {
 }
 
 // League Route matcher
-const leagueRouteMatcher = createRouteMatcher(['/leagues/:leagueHash/:path*']);
+const leagueRouteMatcher = createRouteMatcher(['/leagues/:hash/:path*']);
 async function leagueRoute(req: NextRequest, userId: string) {
   if (leagueRouteMatcher(req)) {
     const url = req.nextUrl;
     const pathname = url.pathname;
-    const leagueHash = pathname.split('/')[2]!;
+    const hash = pathname.split('/')[2]!;
     const currentRoute = pathname.split('/')[3];
 
     const leagueStatus = await db
@@ -105,7 +105,7 @@ async function leagueRoute(req: NextRequest, userId: string) {
       .from(leagueSchema)
       .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.leagueId, leagueSchema.leagueId))
       .where(and(
-        eq(leagueSchema.hash, leagueHash),
+        eq(leagueSchema.hash, hash),
         eq(leagueMemberSchema.userId, userId)))
       .then((leagues) => leagues[0]?.leagueStatus);
     if (!leagueStatus) {
@@ -123,7 +123,7 @@ async function leagueRoute(req: NextRequest, userId: string) {
 
     // Redirect if on the wrong route
     if (currentRoute !== expectedRoute) {
-      return NextResponse.redirect(new URL(`/leagues/${leagueHash}/${expectedRoute ?? ''}`, req.url));
+      return NextResponse.redirect(new URL(`/leagues/${hash}/${expectedRoute ?? ''}`, req.url));
     }
 
     return NextResponse.next();

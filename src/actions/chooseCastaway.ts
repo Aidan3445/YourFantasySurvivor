@@ -5,7 +5,7 @@ import chooseCastawayLogic from '~/services/leagues/mutation/chooseCastaway';
 
 /**
   * Choose a castaway, either in the draft or as a selection update
-  * @param leagueHash The hash of the league
+  * @param hash The hash of the league
   * @param castawayId The id of the castaway
   * @param isDraft Whether the castaway is being chosen in the draft
   * @throws an error if the castaway cannot be chosen
@@ -14,11 +14,11 @@ import chooseCastawayLogic from '~/services/leagues/mutation/chooseCastaway';
   * @returnObj `{ success, draftComplete? }`
   */
 export default async function chooseCastaway(
-  leagueHash: string,
+  hash: string,
   castawayId: number,
 ) {
   try {
-    return await requireLeagueMemberAuth(chooseCastawayLogic)(leagueHash, castawayId);
+    return await requireLeagueMemberAuth(chooseCastawayLogic)(hash, castawayId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

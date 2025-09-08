@@ -6,7 +6,7 @@ import { type ShauhinModeSettings } from '~/types/leagues';
 
 /**
   * Update the Shauhin Mode settings for a league
-  * @param leagueHash The hash of the league
+  * @param hash The hash of the league
   * @param shauhinMode The new Shauhin Mode settings
   * @throws an error if the Shauhin Mode settings cannot be updated
   * @throws an error if the league is inactive
@@ -14,11 +14,11 @@ import { type ShauhinModeSettings } from '~/types/leagues';
   * @returnObj `{ success }`
   */
 export default async function updateShauhinMode(
-  leagueHash: string,
+  hash: string,
   shauhinMode: ShauhinModeSettings,
 ) {
   try {
-    return await requireLeagueMemberAuth(updateShauhinModeLogic)(leagueHash, shauhinMode);
+    return await requireLeagueMemberAuth(updateShauhinModeLogic)(hash, shauhinMode);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

@@ -6,18 +6,18 @@ import { type PredictionInsert } from '~/types/events';
 
 /**
   * Make a league event prediction or update an existing prediction if it exists
-  * @param leagueHash Hash of the league to make the prediction for
+  * @param hash Hash of the league to make the prediction for
   * @param prediction The prediction to make
   * @throws an error if the prediction cannot be made
   * @returns Success status of the prediction
   * @returnObj `{ success }`
   */
 export default async function makePrediction(
-  leagueHash: string,
+  hash: string,
   prediction: PredictionInsert
 ) {
   try {
-    return await requireLeagueMemberAuth(makePredictionLogic)(leagueHash, prediction);
+    return await requireLeagueMemberAuth(makePredictionLogic)(hash, prediction);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

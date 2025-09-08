@@ -10,11 +10,11 @@ import {
 } from '~/components/common/alertDialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useState } from 'react';
-import { useEventOptions } from '~/hooks/useEventOptions';
+import { useEventOptions } from '~/hooks/deprecated/useEventOptions';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
 import { deleteLeagueEvent, updateLeagueEvent } from '~/services/deprecated/leagueActions';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { type LeagueEvent, type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 
 interface EditLeagueEventProps {
@@ -40,7 +40,7 @@ export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeag
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateLeagueEvent(league.leagueHash, leagueEvent.eventId, data);
+      await updateLeagueEvent(league.hash, leagueEvent.eventId, data);
       alert('Event updated successfully');
       await refresh();
     } catch (e) {
@@ -51,7 +51,7 @@ export default function EditLeagueEvent({ episodeNumber, leagueEvent }: EditLeag
 
   const handleDelete = async () => {
     try {
-      await deleteLeagueEvent(league.leagueHash, leagueEvent.eventId);
+      await deleteLeagueEvent(league.hash, leagueEvent.eventId);
       alert('Event deleted successfully');
       await refresh();
     } catch (e) {

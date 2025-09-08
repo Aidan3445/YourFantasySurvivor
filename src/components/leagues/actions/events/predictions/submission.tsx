@@ -10,7 +10,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import { makePrediction } from '~/services/deprecated/leagueActions';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useMemo } from 'react';
@@ -56,7 +56,7 @@ export default function SubmissionCard({ prediction, options }: SubmissionCardPr
       if (!selectedType) throw new Error('Invalid reference type');
 
       await makePrediction(
-        league.leagueHash,
+        league.hash,
         prediction,
         selectedType,
         data.referenceId,

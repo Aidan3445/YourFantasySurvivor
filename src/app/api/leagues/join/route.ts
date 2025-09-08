@@ -6,12 +6,12 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json() as {
-      leagueHash: string;
+      hash: string;
       newMember: LeagueMemberInsert;
     };
 
     const result = await requireAuth(joinLeagueLogic)(
-      body.leagueHash,
+      body.hash,
       body.newMember
     );
 

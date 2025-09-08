@@ -3,7 +3,7 @@
 import { z } from 'zod';
 import { BaseEventRuleZod, BasePredictionRulesZod, defaultBaseRules, defaultPredictionRules } from '~/types/events';
 import { useForm } from 'react-hook-form';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
@@ -22,7 +22,7 @@ const formSchema = z.object({
 export default function LeagueScoring() {
   const {
     league: {
-      leagueHash,
+      hash,
       baseEventRules,
       basePredictionRules,
       members: {
@@ -50,7 +50,7 @@ export default function LeagueScoring() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateBaseEventRules(leagueHash, data.baseEventRules, data.basePredictionRules);
+      await updateBaseEventRules(hash, data.baseEventRules, data.basePredictionRules);
       await refresh();
       setLocked(true);
       alert('Base event rules updated.');

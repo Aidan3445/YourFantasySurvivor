@@ -18,7 +18,7 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
  * @throws an error if the league settings cannot be inserted
  * @throws an error if the user cannot be added as a member
  * @returns the league hash of the league created
- * @returnObj `{ newLeagueHash }`
+ * @returnObj `{ newHash }`
  */
 export default async function createNewLeagueLogic(
   userId: string,
@@ -67,6 +67,6 @@ export default async function createNewLeagueLogic(
       .insert(leagueSettingsSchema)
       .values({ leagueId, draftDate: draftDate?.toUTCString() });
 
-    return { newLeagueHash: hash };
+    return { newHash: hash };
   });
 }

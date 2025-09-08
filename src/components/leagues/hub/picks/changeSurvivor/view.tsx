@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem } from '~/components/common/form';
 import { Button } from '~/components/common/button';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
@@ -37,7 +37,7 @@ export default function ChangeSurvivor() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await chooseCastaway(league.leagueHash, data.castawayId, false);
+      await chooseCastaway(league.hash, data.castawayId, false);
       await refresh();
       reactForm.reset();
       setSelected('');

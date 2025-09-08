@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { type LeagueEventRule, LeagueEventRuleZod, defaultLeagueEventRule } from '~/types/events';
 
 import { Button } from '~/components/common/button';
@@ -20,7 +20,7 @@ import LeagueEventCard from '~/components/leagues/customization/events/custom/ca
 export default function LeagueEvents() {
   const {
     league: {
-      leagueHash,
+      hash,
       leagueEventRules,
       members: {
         loggedIn
@@ -43,7 +43,7 @@ export default function LeagueEvents() {
     };
 
     try {
-      await createLeagueEventRule(leagueHash, newRule);
+      await createLeagueEventRule(hash, newRule);
       await refresh();
       alert(`Custom event ${newRule.eventName} created.`);
       reactForm.reset();

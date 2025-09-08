@@ -53,15 +53,15 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const { newLeagueHash } = await createNewLeague(
+      const { newHash } = await createNewLeague(
         data.leagueName,
         { displayName: data.displayName, color: data.color },
         data.draftDate);
-      if (!newLeagueHash) throw new Error('Failed to create league');
+      if (!newHash) throw new Error('Failed to create league');
 
       alert(`League created called ${data.leagueName}`);
       onSubmit?.();
-      router.push(`/leagues/${newLeagueHash}/predraft`);
+      router.push(`/leagues/${newHash}/predraft`);
     } catch (error) {
       console.error(error);
       alert('Failed to create league');

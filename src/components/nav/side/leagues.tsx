@@ -13,7 +13,7 @@ import { useLeagues } from '~/hooks/user/useLeagues';
 export default function SideNavLeagues() {
   const { data: leaguesData } = useLeagues();
   const [open, setOpen] = useState('');
-  const { leagueHash } = useParams();
+  const { hash } = useParams();
 
   useEffect(() => {
     if (leaguesData && leaguesData.length > 0) {
@@ -54,7 +54,7 @@ export default function SideNavLeagues() {
               .slice(0, 5)
               .map(({ league }) => (
                 <SideNavLink
-                  className={league.hash === leagueHash ? 'font-semibold' : ''}
+                  className={league.hash === hash ? 'font-semibold' : ''}
                   key={league.hash}
                   href={`/leagues/${league.hash}`}
                   label={league.name} />

@@ -23,13 +23,13 @@ const formSchema = z.object({
 });
 
 interface SetDraftDateProps {
-  overrideLeagueHash?: string;
+  overrideHash?: string;
 }
 
-export default function SetDraftDate({ overrideLeagueHash }: SetDraftDateProps) {
+export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
   const queryClient = useQueryClient();
-  const { data: league } = useLeague(overrideLeagueHash);
-  const { data: leagueSettings } = useLeagueSettings(overrideLeagueHash);
+  const { data: league } = useLeague(overrideHash);
+  const { data: leagueSettings } = useLeagueSettings(overrideHash);
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const reactForm = useForm<z.infer<typeof formSchema>>({

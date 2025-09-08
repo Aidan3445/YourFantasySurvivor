@@ -8,7 +8,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } fr
 import { Switch } from '~/components/common/switch';
 import { Button } from '~/components/common/button';
 import { updateLeagueSettings } from '~/services/deprecated/leagueActions';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { Flame, Lock, LockOpen } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
@@ -28,7 +28,7 @@ export default function SetSurvivalCap() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateLeagueSettings(league.leagueHash, data);
+      await updateLeagueSettings(league.hash, data);
       alert('Survival cap updated successfully');
       setLocked(true);
       reactForm.reset(data);

@@ -3,21 +3,21 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
-import { useDraft } from '~/hooks/useDraft';
-import { useIsMobile } from '~/hooks/useMobile';
+import { useDraft } from '~/hooks/deprecated/useDraft';
+import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn } from '~/lib/utils';
 import { type CastawayDraftInfo } from '~/types/castaways';
-import { type LeagueHash } from '~/types/deprecated/leagues';
+import { type Hash } from '~/types/deprecated/leagues';
 import { type TribeName } from '~/types/deprecated/tribes';
 import ColorRow from '~/components/shared/colorRow';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 interface CastawayCardsProps {
-  leagueHash: LeagueHash;
+  hash: Hash;
 }
 
-export default function DraftCastaways({ leagueHash }: CastawayCardsProps) {
-  const { draft } = useDraft(leagueHash);
+export default function DraftCastaways({ hash }: CastawayCardsProps) {
+  const { draft } = useDraft(hash);
   const isMobile = useIsMobile();
 
   const castaways = draft?.castaways ?? [];

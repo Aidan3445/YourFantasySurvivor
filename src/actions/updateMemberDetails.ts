@@ -6,18 +6,18 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 /**
   * Update league member details
-  * @param leagueHash The hash of the league
+  * @param hash The hash of the league
   * @param member The member to update
   * @throws an error if the member cannot be updated
   * @returns Success status of the update
   * @returnObj `{ success }`
   */
 export default async function updateMemberDetails(
-  leagueHash: string,
+  hash: string,
   member: LeagueMemberInsert
 ) {
   try {
-    return await requireLeagueMemberAuth(updateMemberDetailsLogic)(leagueHash, member);
+    return await requireLeagueMemberAuth(updateMemberDetailsLogic)(hash, member);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

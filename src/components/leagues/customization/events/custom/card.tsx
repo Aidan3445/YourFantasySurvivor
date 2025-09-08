@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { type LeagueEventRule, LeagueEventRuleZod } from '~/types/events';
 
 import { Button } from '~/components/common/button';
@@ -25,7 +25,7 @@ interface LeagueEventCardProps {
 export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) {
   const {
     league: {
-      leagueHash,
+      hash,
       members: {
         loggedIn
       }
@@ -41,7 +41,7 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await updateLeagueEventRule(leagueHash, data);
+      await updateLeagueEventRule(hash, data);
       await refresh();
       alert(`Custom event ${data.eventName} updated.`);
     } catch (error) {
@@ -52,7 +52,7 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
 
   const handleDelete = async () => {
     try {
-      await deleteLeagueEventRule(leagueHash, rule.eventName);
+      await deleteLeagueEventRule(hash, rule.eventName);
       setIsEditing(false);
       alert(`Custom event ${rule.eventName} deleted.`);
     } catch (error) {

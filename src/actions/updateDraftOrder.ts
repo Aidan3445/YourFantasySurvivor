@@ -2,19 +2,19 @@
 
 import { requireLeagueMemberAuth } from '~/lib/auth';
 import updateDraftOrderLogic from '~/services/leagues/mutation/updateDraftOrder';
-import { type LeagueHash } from '~/types/deprecated/leagues';
+import { type Hash } from '~/types/deprecated/leagues';
 
 /**
   * Update the draft order for a league
-  * @param leagueHash Hash of the league to update the draft order for
+  * @param hash Hash of the league to update the draft order for
   * @param draftOrder The new draft order
   * @throws an error if the draft order cannot be updated
   * @returns Success status of the update
   * @returnObj `{ success }`
   */
-export default async function updateDraftOrder(leagueHash: LeagueHash, draftOrder: number[]) {
+export default async function updateDraftOrder(hash: Hash, draftOrder: number[]) {
   try {
-    return await requireLeagueMemberAuth(updateDraftOrderLogic)(leagueHash, draftOrder);
+    return await requireLeagueMemberAuth(updateDraftOrderLogic)(hash, draftOrder);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

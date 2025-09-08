@@ -64,9 +64,15 @@ export default async function getUserLeagues() {
             eq(baseEventReferenceSchema.referenceType, 'Castaway'))))))
     .where(eq(leagueMemberSchema.userId, userId))
     .orderBy(desc(seasonSchema.premiereDate))
-    .then((rows) => rows as {
-      league: League,
-      member: LeagueMember,
-      currentSelection: CurrentSelection
-    }[]);
+    .then((rows) => rows
+      .map((row) => {
+        if (row.currentSelection?.castawayId === null) {
+          row.currentSelection = null;
+        }
+        return row;
+      }) as {
+        league: League,
+        member: LeagueMember,
+        currentSelection: CurrentSelection
+      }[]);
 }

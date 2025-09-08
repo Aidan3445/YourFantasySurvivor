@@ -11,15 +11,15 @@ type Response = {
   betRules: ShauhinModeSettings;
 };
 
-const predictionsFetcher: Fetcher<Response, SWRKey> = async ({ leagueHash }) =>
-  fetch(`/api/leagues/${leagueHash}/predictions`)
+const predictionsFetcher: Fetcher<Response, SWRKey> = async ({ hash }) =>
+  fetch(`/api/leagues/${hash}/predictions`)
     .then((res) => res.json());
 
 export function usePredictions() {
-  const { leagueHash } = useParams();
+  const { hash } = useParams();
   const [error, setError] = useState<string | null>(null);
 
-  const { data, mutate } = useSWR<Response>({ leagueHash, key: 'predictions' }, predictionsFetcher, {
+  const { data, mutate } = useSWR<Response>({ hash, key: 'predictions' }, predictionsFetcher, {
     refreshInterval: 60000,
     refreshWhenHidden: false,
     refreshWhenOffline: false,

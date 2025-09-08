@@ -12,14 +12,14 @@ export async function POST(request: NextRequest) {
     };
 
     try {
-      const { newLeagueHash } = await createNewLeagueLogic(
+      const { newHash } = await createNewLeagueLogic(
         userId,
         body.leagueName,
         body.newMember,
         body.draftDate
       );
 
-      return NextResponse.json({ newLeagueHash }, { status: 201 });
+      return NextResponse.json({ newHash }, { status: 201 });
     } catch (error) {
       console.error('Failed to create new league', error);
       return NextResponse.json({ error: 'An error occurred while creating the league.' }, { status: 500 });

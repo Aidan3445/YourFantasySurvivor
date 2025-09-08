@@ -7,7 +7,7 @@ import { Form, FormLabel } from '~/components/common/form';
 import { ColorZod, DisplayNameZod, type LeagueMember } from '~/types/deprecated/leagueMembers';
 import { updateMemberDetails } from '~/services/deprecated/leagueActions';
 import { useEffect } from 'react';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
 import { Button } from '~/components/common/button';
 import { cn } from '~/lib/utils';
@@ -27,7 +27,7 @@ interface MemberEditFormProps {
 export default function MemberEditForm({ className }: MemberEditFormProps) {
   const {
     league: {
-      leagueHash,
+      hash,
       members: {
         loggedIn,
         list: memberColors
@@ -58,7 +58,7 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
         color: data.color,
       };
 
-      await updateMemberDetails(leagueHash, member);
+      await updateMemberDetails(hash, member);
       await refresh();
       alert('Successfully updated member details');
     } catch (error) {

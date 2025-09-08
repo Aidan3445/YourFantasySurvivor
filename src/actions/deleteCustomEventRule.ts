@@ -5,7 +5,7 @@ import deleteCustomEventRuleLogic from '~/services/leagues/mutation/deleteCustom
 
 /**
   * Delete a league event rule
-  * @param leagueHash The hash of the league
+  * @param hash The hash of the league
   * @param eventName The event name of the rule to delete
   * @throws an error if the user is not authorized
   * @throws an error if the rule cannot be deleted
@@ -13,11 +13,11 @@ import deleteCustomEventRuleLogic from '~/services/leagues/mutation/deleteCustom
   * @returnObj `{ success }`
   */
 export default async function deleteCustomEventRule(
-  leagueHash: string,
+  hash: string,
   eventId: number
 ) {
   try {
-    return await requireLeagueAdminAuth(deleteCustomEventRuleLogic)(leagueHash, eventId);
+    return await requireLeagueAdminAuth(deleteCustomEventRuleLogic)(hash, eventId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

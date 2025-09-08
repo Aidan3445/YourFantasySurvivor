@@ -4,7 +4,7 @@ import Timeline from '~/components/leagues/hub/activity/timeline/view';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
-import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
+import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
 import ChangeSurvivor from '~/components/leagues/hub/picks/changeSurvivor/view';
 import CreateBaseEvent from '~/components/leagues/actions/events/base/create';
 import LeagueEvents from '~/components/leagues/customization/events/custom/view';
@@ -19,10 +19,10 @@ import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
-  const { leagueHash } = await params;
-  const { role } = await leagueMemberAuth(leagueHash);
+  const { hash } = await params;
+  const { role } = await leagueMemberAuth(hash);
   const { userId } = await systemAdminAuth();
-  //const chatHistory = await QUERIES.getChatHistory(leagueHash);
+  //const chatHistory = await QUERIES.getChatHistory(hash);
 
   return (
     <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>

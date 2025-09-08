@@ -10,12 +10,12 @@ import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import LeagueChatCard from '~/components/leagues/chat/card';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
-import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
+import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
-  const { leagueHash } = await params;
-  const chatHistory = await QUERIES.getChatHistory(leagueHash);
+  const { hash } = await params;
+  const chatHistory = await QUERIES.getChatHistory(hash);
 
   return (
     <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>

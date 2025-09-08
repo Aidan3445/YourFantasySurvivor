@@ -1,5 +1,5 @@
 import DraftCastaways from '~/components/leagues/draft/draftCastaways';
-import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
+import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
 import DraftTracker from '~/components/leagues/draft/draftTracker';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
@@ -9,8 +9,8 @@ import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 /*
 export default async function DraftPage({ params }: LeaguePageProps) {
-  const { leagueHash } = await params;
-  const chatHistory = await QUERIES.getChatHistory(leagueHash);
+  const { hash } = await params;
+  const chatHistory = await QUERIES.getChatHistory(hash);
 
   return (
     <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>
@@ -25,10 +25,10 @@ export default async function DraftPage({ params }: LeaguePageProps) {
         </TabsList>
         <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-visible @container/tabs-content'>
           <TabsContent value='draft' className='mt-0'>
-            <DraftTracker leagueHash={leagueHash} />
+            <DraftTracker hash={hash} />
           </TabsContent>
           <TabsContent value='castaways' className='m-4'>
-            <DraftCastaways leagueHash={leagueHash} />
+            <DraftCastaways hash={hash} />
           </TabsContent>
           <TabsContent value='chat' className='m-2 mt-0'>
             <LeagueChatCard className='w-full px-2 h-[calc(100svh-8.5rem)]' chatHistory={chatHistory} defaultOpen />
@@ -43,8 +43,8 @@ export default async function DraftPage({ params }: LeaguePageProps) {
 */
 
 export default async function DraftPage({ params }: LeaguePageProps) {
-  const { leagueHash } = await params;
-  // const chatHistory = await QUERIES.getChatHistory(leagueHash);
+  const { hash } = await params;
+  // const chatHistory = await QUERIES.getChatHistory(hash);
 
   return (
     <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>
@@ -63,10 +63,10 @@ export default async function DraftPage({ params }: LeaguePageProps) {
         </TabsList>
         <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-visible @container/tabs-content'>
           <TabsContent value='draft' className='mt-0'>
-            <DraftTracker leagueHash={leagueHash} />
+            <DraftTracker hash={hash} />
           </TabsContent>
           <TabsContent value='castaways' className='m-4'>
-            <DraftCastaways leagueHash={leagueHash} />
+            <DraftCastaways hash={hash} />
           </TabsContent>
           {/* 
             <TabsContent value='chat' className='m-2 mt-0'>

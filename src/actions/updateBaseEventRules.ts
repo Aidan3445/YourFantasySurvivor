@@ -6,7 +6,7 @@ import { type BaseEventPredictionRules, type BaseEventRules } from '~/types/leag
 
 /**
   * Update the base event rules for a league
-  * @param leagueHash The hash of the league
+  * @param hash The hash of the league
   * @param baseRules The new base event rules
   * @param predictionRules The new prediction rules
   * @throws an error if the rules cannot be updated
@@ -14,12 +14,12 @@ import { type BaseEventPredictionRules, type BaseEventRules } from '~/types/leag
   * @returnObj `{ success }`
   */
 export default async function updateBaseEventRules(
-  leagueHash: string,
+  hash: string,
   baseRules: BaseEventRules,
   predictionRules: BaseEventPredictionRules
 ) {
   try {
-    return await requireLeagueMemberAuth(updateBaseEventRulesLogic)(leagueHash, baseRules, predictionRules);
+    return await requireLeagueMemberAuth(updateBaseEventRulesLogic)(hash, baseRules, predictionRules);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

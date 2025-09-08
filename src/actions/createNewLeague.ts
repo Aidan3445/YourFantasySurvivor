@@ -14,7 +14,7 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
   * @throws an error if the user cannot be added as a member
   * @throws an error if the user is not authenticated
   * @returns the league info of the league created
-  * @returnObj `{ newLeagueHash }`
+  * @returnObj `{ newHash }`
   */
 export default async function createNewLeague(
   leagueName: string,

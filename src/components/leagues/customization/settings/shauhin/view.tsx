@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { useEffect, useState } from 'react';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Lock, LockOpen } from 'lucide-react';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { cn } from '~/lib/utils';
 import { updateShauhinMode } from '~/services/deprecated/leagueActions';
 
@@ -23,7 +23,7 @@ export default function ShauhinMode() {
       members: {
         loggedIn
       },
-      leagueHash,
+      hash,
       shauhinModeSettings,
       basePredictionRules
     },
@@ -49,7 +49,7 @@ export default function ShauhinMode() {
     try {
       ShauhinModeSettingsZod.parse(data); // Validate data before sending
 
-      await updateShauhinMode(leagueHash, data);
+      await updateShauhinMode(hash, data);
       await refresh();
       setLocked(true);
       alert('Shauhin Mode settings saved successfully!');

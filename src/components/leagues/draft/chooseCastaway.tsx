@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem } from '~/components/common/form';
 import { Button } from '~/components/common/button';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { type CastawayDraftInfo } from '~/types/castaways';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import { chooseCastaway } from '~/services/deprecated/leagueActions';
@@ -24,7 +24,7 @@ const formSchema = z.object({
 export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProps) {
   const {
     league: {
-      leagueHash,
+      hash,
       members
     },
     refresh
@@ -37,7 +37,7 @@ export default function ChooseCastaway({ castaways, onDeck }: ChooseCastawayProp
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await chooseCastaway(leagueHash, data.castawayId, true);
+      await chooseCastaway(hash, data.castawayId, true);
       await refresh();
       alert('Castaway chosen successfully');
     } catch (error) {

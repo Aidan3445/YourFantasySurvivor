@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 import { Textarea } from '~/components/common/textarea';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
 import { Button } from '~/components/common/button';
-import { useEventOptions } from '~/hooks/useEventOptions';
+import { useEventOptions } from '~/hooks/deprecated/useEventOptions';
 import { createLeagueEvent } from '~/services/deprecated/leagueActions';
 
 export default function CreateLeagueEvent() {
@@ -47,7 +47,7 @@ export default function CreateLeagueEvent() {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      await createLeagueEvent(league.leagueHash, data);
+      await createLeagueEvent(league.hash, data);
       alert('Base event created successfully');
       reactForm.reset();
       await refresh();

@@ -9,7 +9,7 @@ import { type LeagueMember } from '~/types/leagueMembers';
   */
 export function useLeagueMembers(overrideHash?: string) {
   const params = useParams();
-  const hash = overrideHash ?? params?.leagueHash as string;
+  const hash = overrideHash ?? params?.hash as string;
 
   return useQuery<{ loggedIn?: LeagueMember; members: LeagueMember[] }>({
     queryKey: ['leagueMembers', hash],

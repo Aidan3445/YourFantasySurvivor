@@ -6,7 +6,7 @@ import { type CustomEventInsert } from '~/types/events';
 
 /**
   * Create a new custom/league event for the season
-  * @param leagueHash Hash of the league to create the event for
+  * @param hash Hash of the league to create the event for
   * @param customEvent Event to create
   * @throws if the event cannot be created
   * @throws if the user is not an admin or owner of the league
@@ -14,11 +14,11 @@ import { type CustomEventInsert } from '~/types/events';
   * @returnObj `{ newEventId }`
   */
 export default async function createCustomEvent(
-  leagueHash: string,
+  hash: string,
   customEvent: CustomEventInsert
 ) {
   try {
-    return await requireLeagueAdminAuth(createCustomEventLogic)(leagueHash, customEvent);
+    return await requireLeagueAdminAuth(createCustomEventLogic)(hash, customEvent);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

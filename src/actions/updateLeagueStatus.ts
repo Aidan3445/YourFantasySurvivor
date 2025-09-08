@@ -11,10 +11,10 @@ import updateLeagueStatusLogic from '~/services/leagues/mutation/updateLeagueSta
   * @returnObj `{ success }`
   */
 export default async function updateLeagueStatus(
-  leagueHash: string,
+  hash: string,
 ) {
   try {
-    return await requireLeagueMemberAuth(updateLeagueStatusLogic)(leagueHash);
+    return await requireLeagueMemberAuth(updateLeagueStatusLogic)(hash);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

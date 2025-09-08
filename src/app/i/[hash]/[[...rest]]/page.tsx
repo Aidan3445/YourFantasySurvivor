@@ -1,5 +1,5 @@
 import JoinLeagueForm from '~/components/leagues/actions/league/join/form';
-import { type LeaguePageProps } from '~/app/leagues/[leagueHash]/layout';
+import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
 import { SignIn, SignUp } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import { leagueMemberAuth } from '~/lib/auth';
@@ -17,8 +17,8 @@ export async function generateMetadata(
   { params }: JoinPageProps,
 ): Promise<Metadata> {
   // read route params
-  const { leagueHash } = await params;
-  const leagueName = await QUERIES.getLeagueName(leagueHash) ?? 'Your Fantasy Survivor';
+  const { hash } = await params;
+  const leagueName = await QUERIES.getLeagueName(hash) ?? 'Your Fantasy Survivor';
 
 
   return {
@@ -32,22 +32,22 @@ export async function generateMetadata(
 }
 
 export default async function LeagueJoinPage({ searchParams, params }: JoinPageProps) {
-  const [{ leagueHash }, query] = await Promise.all([params, searchParams]);
-  const { userId, memberId, league } = await leagueMemberAuth(leagueHash);
+  const [{ hash }, query] = await Promise.all([params, searchParams]);
+  const { userId, memberId, league } = await leagueMemberAuth(hash);
 
   if (!userId) {
     return (
       <main className='w-full flex justify-center mt-2'>
         {query?.signUp ?
-          <SignUp forceRedirectUrl={`/i/${leagueHash}`} signInUrl={`/i/${leagueHash}`} /> :
-          <SignIn forceRedirectUrl={`/i/${leagueHash}`} signUpUrl={`/i/${leagueHash}?signUp=true`} />
+          <SignUp forceRedirectUrl={`/i/${hash}`} signInUrl={`/i/${hash}`} /> :
+          <SignIn forceRedirectUrl={`/i/${hash}`} signUpUrl={`/i/${hash}?signUp=true`} />
         }
       </main>
     );
   }
 
   if (memberId) {
-    redirect(`/leagues/${leagueHash}`);
+    redirect(`/leagues/${hash}`);
   }
 
   if (league && league.leagueStatus !== 'Predraft') {
@@ -65,7 +65,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
   return (
     <main className='w-full place-items-center mt-4'>
       <h1 className='text-3xl'>Join the League</h1>
-      <JoinLeagueForm leagueHash={leagueHash} />
+      <JoinLeagueForm hash={hash} />
     </main>
   );
 }

@@ -6,18 +6,18 @@ import { type LeagueSettingsUpdate } from '~/types/leagues';
 
 /**
   * Update the league settings
-  * @param leagueHash The hash of the league
+  * @param hash The hash of the league
   * @param update The settings to update
   * @throws an error if the draft timing cannot be updated
   * @returns Success status of the update
   * @returnObj `{ success }`
   */
 export default async function updateLeagueSettings(
-  leagueHash: string,
+  hash: string,
   update: LeagueSettingsUpdate
 ) {
   try {
-    return await requireLeagueMemberAuth(updateLeagueSettingsLogic)(leagueHash, update);
+    return await requireLeagueMemberAuth(updateLeagueSettingsLogic)(hash, update);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

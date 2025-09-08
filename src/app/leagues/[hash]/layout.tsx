@@ -5,7 +5,7 @@ import { leagueMemberAuth } from '~/lib/auth';
 
 export interface LeaguePageProps {
   params: Promise<{
-    leagueHash: string;
+    hash: string;
   }>;
 }
 
@@ -14,14 +14,14 @@ export interface LeagueLayoutProps extends LeaguePageProps {
 }
 
 export default async function LeagueLayout({ children, params }: LeagueLayoutProps) {
-  const { leagueHash } = await params;
-  const { memberId } = await leagueMemberAuth(leagueHash);
+  const { hash } = await params;
+  const { memberId } = await leagueMemberAuth(hash);
 
   if (!memberId) {
     return (
       <main className='w-full place-items-center flex flex-col justify-center h-screen gap-4'>
         <h1 className='text-3xl'>Sign in to view the League</h1>
-        <SignIn routing='hash' forceRedirectUrl={`/leagues/${leagueHash}`} />
+        <SignIn routing='hash' forceRedirectUrl={`/leagues/${hash}`} />
       </main>
     );
   }

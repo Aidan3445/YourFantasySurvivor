@@ -2,7 +2,7 @@
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/types/deprecated/leagues';
-import { useLeague } from '~/hooks/useLeague';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { Button } from '~/components/common/button';
@@ -20,7 +20,7 @@ const formSchema = z.object({
 export function LeagueSettings() {
   const {
     league: {
-      leagueHash,
+      hash,
       leagueName,
       settings: {
         draftDate,
@@ -56,8 +56,8 @@ export function LeagueSettings() {
 
     try {
       await Promise.all([
-        updateLeagueSettings(leagueHash, leagueUpdate),
-        updateAdmins(leagueHash, data.admins),
+        updateLeagueSettings(hash, leagueUpdate),
+        updateAdmins(hash, data.admins),
       ]);
       await refresh();
       alert(`League settings updated for ${data.leagueName}`);

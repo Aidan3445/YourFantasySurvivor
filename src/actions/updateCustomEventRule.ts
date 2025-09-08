@@ -6,7 +6,7 @@ import { type CustomEventRuleInsert } from '~/types/leagues';
 
 /**
   * Update a league event rule
-  * @param leagueHash The hash of the league
+  * @param hash The hash of the league
   * @param rule The rule to update
   * @throws an error if the user is not authorized
   * @throws an error if the rule cannot be updated
@@ -14,12 +14,12 @@ import { type CustomEventRuleInsert } from '~/types/leagues';
   * @returnObj `{ success }`
   */
 export default async function updateCustomEventRule(
-  leagueHash: string,
+  hash: string,
   rule: CustomEventRuleInsert,
   ruleId: number,
 ) {
   try {
-    return await requireLeagueAdminAuth(updateCustomEventRuleLogic)(leagueHash, rule, ruleId);
+    return await requireLeagueAdminAuth(updateCustomEventRuleLogic)(hash, rule, ruleId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

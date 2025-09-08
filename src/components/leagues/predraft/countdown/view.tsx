@@ -57,7 +57,7 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
         <div className='flex gap-2 ml-auto'>
           {editable && leagueMembers && leagueMembers.members.length > 1 && league?.status === 'Predraft' &&
             <StartDraft startDraft={onDraftJoin} />}
-          {editable && <SetDraftDate overrideLeagueHash={overrideHash} />}
+          {editable && <SetDraftDate overrideHash={overrideHash} />}
         </div>
       </span>
       <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow-sm shadow-black'>

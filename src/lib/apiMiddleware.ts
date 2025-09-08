@@ -29,20 +29,20 @@ function withLeagueAuth(minimumPermissions: LeagueMemberRole) {
       }
 
       if (!auth.memberId) {
-        console.log('Not a league member', { userId: auth.userId, leagueHash: hash });
+        console.log('Not a league member', { userId: auth.userId, hash: hash });
         return NextResponse.json({ error: 'Not a league member' }, { status: 403 });
       }
 
       switch (minimumPermissions) {
         case 'Owner':
           if (auth.role !== 'Owner') {
-            console.log('Not the league owner', { userId: auth.userId, leagueHash: hash, role: auth.role });
+            console.log('Not the league owner', { userId: auth.userId, hash: hash, role: auth.role });
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
           }
           break;
         case 'Admin':
           if (auth.role === 'Member') {
-            console.log('Not a league admin', { userId: auth.userId, leagueHash: hash, role: auth.role });
+            console.log('Not a league admin', { userId: auth.userId, hash: hash, role: auth.role });
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
           }
           break;

@@ -1,7 +1,7 @@
 'use client';
 
-import { usePredictions } from '~/hooks/usePredictions';
-import { useLeague } from '~/hooks/useLeague';
+import { usePredictions } from '~/hooks/deprecated/usePredictions';
+import { useLeague } from '~/hooks/deprecated/useLeague';
 import PredictionHistory from '~/components/leagues/hub/activity/predictionHistory/view';
 import MakePredictions from '~/components/leagues/hub/picks/predictions/makePredictions';
 

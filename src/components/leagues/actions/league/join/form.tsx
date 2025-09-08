@@ -10,7 +10,7 @@ import { joinLeague } from '~/services/deprecated/leagueActions';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
-import { useYfsUser } from '~/hooks/useYfsUser';
+import { useYfsUser } from '~/hooks/deprecated/useYfsUser';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
 
 const formSchema = z.object({
@@ -27,10 +27,10 @@ const defaultValues = {
 };
 
 interface JoinLeagueFormProps {
-  leagueHash: string;
+  hash: string;
 }
 
-export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
+export default function JoinLeagueForm({ hash }: JoinLeagueFormProps) {
   const router = useRouter();
   const { user } = useUser();
   const [memberColors, setMemberColors] = useState<LeagueMemberColor[]>([]);
@@ -47,7 +47,7 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
 
   useEffect(() => {
     async function fetchMemberColors() {
-      await fetch(`/api/leagues/${leagueHash}/join`)
+      await fetch(`/api/leagues/${hash}/join`)
         .then(res => res.json())
         .then(({ memberColors }: { memberColors: LeagueMemberColor[] }) => {
           setMemberColors(memberColors);
@@ -55,7 +55,7 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
     }
 
     void fetchMemberColors();
-  }, [leagueHash, setMemberColors]);
+  }, [hash, setMemberColors]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
@@ -65,10 +65,10 @@ export default function JoinLeagueForm({ leagueHash }: JoinLeagueFormProps) {
         role: 'Member',
       };
 
-      const leagueInfo = await joinLeague(leagueHash, member);
+      const leagueInfo = await joinLeague(hash, member);
       addLeague(leagueInfo);
       alert('Successfully joined league');
-      router.push(`/leagues/${leagueHash}`);
+      router.push(`/leagues/${hash}`);
     } catch (error) {
       console.error(error);
       alert('Failed to join league');

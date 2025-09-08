@@ -2,22 +2,22 @@
 
 import { requireLeagueMemberAuth } from '~/lib/auth';
 import saveChatMessageLogic from '~/services/leagues/mutation/saveChatMessage';
-import { type LeagueHash } from '~/types/deprecated/leagues';
+import { type Hash } from '~/types/deprecated/leagues';
 
 /**
   * Save a chat message to the database
-  * @param leagueHash Hash of the league to save the message for
+  * @param hash Hash of the league to save the message for
   * @param message The message object with serial, text, and timestamp
   * @throws an error if the message cannot be saved
   * @returns Success status of the save
   * @returnObj `{ success }`
   */
 export default async function saveChatMessage(
-  leagueHash: LeagueHash,
+  hash: Hash,
   message: { serial: string, text: string, timestamp: string }
 ) {
   try {
-    return await requireLeagueMemberAuth(saveChatMessageLogic)(leagueHash, message);
+    return await requireLeagueMemberAuth(saveChatMessageLogic)(hash, message);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;
