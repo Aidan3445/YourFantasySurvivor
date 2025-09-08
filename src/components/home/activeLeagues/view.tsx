@@ -4,27 +4,26 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/common/card';
 import { Button } from '~/components/common/button';
 import { Trophy } from 'lucide-react';
-import { useYfsUser } from '~/hooks/useYfsUser';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/common/carousel';
 import { cn } from '~/lib/utils';
 import Autoplay from 'embla-carousel-autoplay';
 import NoActiveLeagues from '~/components/home/activeLeagues/noActiveLeagues';
 import ActiveLeague from '~/components/home/activeLeagues/activeLeague';
+import { useLeagues } from '~/hooks/user/useLeagues';
 
 export function ActiveLeagues() {
-  const { leagues } = useYfsUser();
+  const { data: leagues } = useLeagues();
 
-  const topLeagues = leagues
-    .filter(league => league.leagueStatus !== 'Inactive')
+  const topLeagues = leagues?.filter(({ league }) => league.status !== 'Inactive')
     .sort((a, b) => {
       const statusOrder = { Draft: 0, Predraft: 1, Active: 2, Inactive: 3 };
-      if (a.leagueStatus !== b.leagueStatus) {
-        return statusOrder[a.leagueStatus] - statusOrder[b.leagueStatus];
+      if (a.league.status !== b.league.status) {
+        return statusOrder[a.league.status] - statusOrder[b.league.status];
       }
-      return b.season.localeCompare(a.season);
+      return b.league.season.localeCompare(a.league.season);
     });
 
-  if (topLeagues.length === 0) {
+  if (!topLeagues || topLeagues.length === 0) {
     return <NoActiveLeagues />;
   }
 
@@ -56,8 +55,8 @@ export function ActiveLeagues() {
             </Button>
           </CardHeader>
           <CarouselContent>
-            {topLeagues.map((league) => (
-              <CarouselItem key={league.leagueHash}>
+            {topLeagues.map(({ league }) => (
+              <CarouselItem key={league.hash}>
                 <ActiveLeague league={league} />
               </CarouselItem>
             ))}
