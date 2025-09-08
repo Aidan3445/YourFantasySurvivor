@@ -13,7 +13,6 @@ import createNewLeague from '~/actions/createNewLeague';
 import { useRouter } from 'next/navigation';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
 import { useEffect } from 'react';
-import { useYfsUser } from '~/hooks/deprecated/useYfsUser';
 import { useUser } from '@clerk/nextjs';
 import NextButton from '~/components/leagues/actions/league/create/next';
 import LeagueNameField from '~/components/leagues/actions/league/create/name';
@@ -47,7 +46,6 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
     },
     resolver: zodResolver(formSchema)
   });
-  const { addLeague } = useYfsUser();
 
   useEffect(() => {
     reactForm.setValue('displayName', user?.username ?? '');
@@ -55,18 +53,15 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const leagueInfo = await createNewLeague(
+      const { newLeagueHash } = await createNewLeague(
         data.leagueName,
-        {
-          displayName: data.displayName,
-          color: data.color,
-        },
-        data.draftDate
-      );
-      addLeague(leagueInfo);
+        { displayName: data.displayName, color: data.color },
+        data.draftDate);
+      if (!newLeagueHash) throw new Error('Failed to create league');
+
       alert(`League created called ${data.leagueName}`);
       onSubmit?.();
-      router.push(`/leagues/${leagueInfo.newLeagueHash}/predraft`);
+      router.push(`/leagues/${newLeagueHash}/predraft`);
     } catch (error) {
       console.error(error);
       alert('Failed to create league');
