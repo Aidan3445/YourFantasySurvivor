@@ -3,23 +3,23 @@
 import { SidebarMenuButton, SidebarMenuSub } from '~/components/common/sidebar';
 import { ListPlus, Trophy } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
-import { useYfsUser } from '~/hooks/useYfsUser';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import { Separator } from '~/components/common/separator';
 import SideNavLink from '~/components/nav/side/link';
+import { useLeagues } from '~/hooks/user/useLeagues';
 
 export default function SideNavLeagues() {
-  const { leagues } = useYfsUser();
+  const { data: leaguesData } = useLeagues();
   const [open, setOpen] = useState('');
   const { leagueHash } = useParams();
 
   useEffect(() => {
-    if (leagues.length > 0) {
+    if (leaguesData && leaguesData.length > 0) {
       setOpen('leagues');
     }
-  }, [leagues, setOpen]);
+  }, [leaguesData, setOpen]);
 
   const toggleOpen = () => {
     if (open === 'leagues') {
@@ -29,7 +29,7 @@ export default function SideNavLeagues() {
     }
   };
 
-  if (leagues.length === 0) {
+  if (leaguesData?.length === 0) {
     return <SideNavLink href='/leagues' icon={<Trophy />} label='Leagues' />;
   }
 
@@ -50,18 +50,17 @@ export default function SideNavLeagues() {
         </SidebarMenuButton>
         <AccordionContent className='pb-1'>
           <SidebarMenuSub>
-            {leagues
-              .filter(league => league.leagueStatus !== 'Inactive')
+            {leaguesData?.filter(({ league }) => league.status !== 'Inactive')
               .slice(0, 5)
-              .map(league => (
+              .map(({ league }) => (
                 <SideNavLink
-                  className={league.leagueHash === leagueHash ? 'font-semibold' : ''}
-                  key={league.leagueHash}
-                  href={`/leagues/${league.leagueHash}`}
-                  label={league.leagueName} />
+                  className={league.hash === leagueHash ? 'font-semibold' : ''}
+                  key={league.hash}
+                  href={`/leagues/${league.hash}`}
+                  label={league.hash} />
               ))}
             <Separator />
-            {(leagues.length > 5 || leagues.some(league => league.leagueStatus === 'Inactive')) && (
+            {(leaguesData && (leaguesData.length > 5 || leaguesData.some(({ league }) => league.status === 'Inactive'))) && (
               <SideNavLink
                 className='text-nowrap'
                 href='/leagues'
