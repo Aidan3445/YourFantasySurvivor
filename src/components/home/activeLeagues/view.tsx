@@ -27,7 +27,6 @@ export function ActiveLeagues() {
     return <NoActiveLeagues />;
   }
 
-
   return (
     <Card className='h-full'>
       <CardContent className='px-0 overflow-y-auto'>
@@ -37,7 +36,7 @@ export function ActiveLeagues() {
             watchDrag: topLeagues.length > 1,
             ignoreKeys: topLeagues.length > 1
           }}
-          plugins={[Autoplay({ delay: 8000, stopOnInteraction: true })]}
+          plugins={[Autoplay({ delay: 8000, stopOnMouseEnter: true })]}
         >
           <CardHeader className='grid grid-cols-[min-content_1fr_auto_1fr_min-content] items-center px-4 mb-4'>
             <div className='w-full invisible' />

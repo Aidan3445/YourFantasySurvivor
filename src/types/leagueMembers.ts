@@ -40,4 +40,4 @@ export type CurrentSelection = {
   castawayId: number;
   fullName: string;
   isEliminated: boolean;
-};
+} | null;
