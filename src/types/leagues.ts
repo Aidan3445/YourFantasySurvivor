@@ -17,6 +17,13 @@ export type League = {
   seasonId: number;
 };
 
+export type PublicLeague = {
+  name: string;
+  status: LeagueStatus;
+  season: string;
+  usedColors: string[];
+};
+
 export const LeagueNameZod = z.string()
   .min(LEAGUE_NAME_MIN_LENGTH, { message: `League name must be between ${LEAGUE_NAME_MIN_LENGTH} and ${LEAGUE_NAME_MAX_LENGTH} characters` })
   .max(LEAGUE_NAME_MAX_LENGTH, { message: `League name must be between ${LEAGUE_NAME_MIN_LENGTH} and ${LEAGUE_NAME_MAX_LENGTH} characters` });

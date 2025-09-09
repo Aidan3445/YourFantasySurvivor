@@ -50,7 +50,7 @@ export default function CastawayEntry({ place, castaway, points, color, tribeTim
             </Popover>
           )}
           <div className='ml-auto flex gap-0.5'>
-            {tribeTimeline?.map(({ episode, tribe }) => (
+            {tribeTimeline && (tribeTimeline.length > 1 || castaway?.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
               <Popover key={`${tribe.tribeName}-${episode}`}>
                 <PopoverTrigger>
                   <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />

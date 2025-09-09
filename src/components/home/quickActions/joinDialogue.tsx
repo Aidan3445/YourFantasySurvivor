@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '~/components/common/button';
 import { Input } from '~/components/common/input';
 import { Label } from '~/components/common/label';
@@ -12,6 +12,16 @@ export default function JoinLeagueDialog() {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState('');
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
+
+  useEffect(() => {
+    // if the join code is in the URL, cut out everything but the code
+    // http://localhost:1234/i/-rfJ3Ju9uNAsPBOy --> -rfJ3Ju9uNAsPBOy
+    const urlMaybe = joinCode;
+    const match = urlMaybe.match(/\/i\/([a-zA-Z0-9-_]+)/);
+    if (match) {
+      setJoinCode(match[1] ?? joinCode);
+    }
+  }, [joinCode]);
 
   const handleJoinLeague = () => {
     if (joinCode.trim()) {

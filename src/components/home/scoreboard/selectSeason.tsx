@@ -22,9 +22,10 @@ interface ComboboxProps {
   seasons: { value: string; label: string }[];
   value: string;
   setValue: (value: string) => void;
+  someHidden?: boolean;
 }
 
-export default function SelectSeason({ seasons, value, setValue }: ComboboxProps) {
+export default function SelectSeason({ seasons, value, setValue, someHidden }: ComboboxProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -37,7 +38,7 @@ export default function SelectSeason({ seasons, value, setValue }: ComboboxProps
         <Command>
           <CommandInput placeholder='Search seasons...' />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No seasons found.</CommandEmpty>
             <CommandGroup>
               {seasons.map((seasons) => (
                 <CommandItem
@@ -58,7 +59,7 @@ export default function SelectSeason({ seasons, value, setValue }: ComboboxProps
               ))}
               <CommandItem onSelect={() => router.push('/playground')}>
                 <span className='mx-auto text-xs py-0.5'>
-                  View All Seasons
+                  {someHidden ? 'See all seasons' : 'Try scoring playground'}
                 </span>
               </CommandItem>
             </CommandGroup>

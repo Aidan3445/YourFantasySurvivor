@@ -35,12 +35,15 @@ export default async function updateDraftOrderLogic(
 
     // Match member IDs to their new draft order for update
     const orderCase = sql`
-    CASE ${leagueMemberSchema.memberId}
-    ${draftOrder.map((memberId, index) =>
-      sql`WHEN ${memberId} THEN ${index + 1}`
-    ).reduce((a, b) => sql`${a} ${b}`)}
-    END
-  `;
+  CASE ${leagueMemberSchema.memberId}
+  ${sql.join(
+      draftOrder.map((memberId, index) =>
+        sql`WHEN ${memberId} THEN ${index + 1}::smallint`
+      ),
+      sql` `
+    )}
+  END
+`;
 
     const updated = await trx
       .update(leagueMemberSchema)

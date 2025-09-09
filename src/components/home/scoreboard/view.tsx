@@ -2,7 +2,7 @@ import ScoreboardTable from '~/components/home/scoreboard/table';
 import getSeasonsData from '~/services/seasons/query/seasonsData';
 
 export async function CastawayScoreboard() {
-  const scoreData = await getSeasonsData(false);
+  const scoreData = await getSeasonsData(true);
 
   if (scoreData.length === 0) {
     return (
@@ -14,8 +14,12 @@ export async function CastawayScoreboard() {
     );
   }
 
+  const mostRecent6 = scoreData
+    .filter(s => s.tribes.length > 0)
+    .toSorted((a, b) => b.season.premiereDate.getTime() - a.season.premiereDate.getTime());
+
   return (
-    <ScoreboardTable scoreData={scoreData} />
+    <ScoreboardTable scoreData={mostRecent6} someHidden={scoreData.length > 6} />
   );
 }
 

@@ -2,24 +2,15 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
-import { ColorZod, DisplayNameZod, type LeagueMemberColor, type NewLeagueMember } from '~/types/deprecated/leagueMembers';
-import { joinLeague } from '~/services/deprecated/leagueActions';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
-import { useYfsUser } from '~/hooks/deprecated/useYfsUser';
+import { useEffect } from 'react';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
-
-const formSchema = z.object({
-  displayName: DisplayNameZod,
-  color: ColorZod,
-}).transform(data => ({
-  ...data,
-  displayName: data.displayName.trim(),
-}));
+import { type LeagueMemberInsert, LeagueMemberInsertZod } from '~/types/leagueMembers';
+import joinLeague from '~/actions/joinLeague';
+import { useQueryClient } from '@tanstack/react-query';
 
 const defaultValues = {
   displayName: '',
@@ -28,45 +19,32 @@ const defaultValues = {
 
 interface JoinLeagueFormProps {
   hash: string;
+  colors: string[];
 }
 
-export default function JoinLeagueForm({ hash }: JoinLeagueFormProps) {
-  const router = useRouter();
+export default function JoinLeagueForm({ hash, colors }: JoinLeagueFormProps) {
+  const queryClient = useQueryClient();
   const { user } = useUser();
-  const [memberColors, setMemberColors] = useState<LeagueMemberColor[]>([]);
+  const router = useRouter();
 
-  const reactForm = useForm<z.infer<typeof formSchema>>({
+  const reactForm = useForm<LeagueMemberInsert>({
     defaultValues,
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(LeagueMemberInsertZod),
   });
-  const { addLeague } = useYfsUser();
 
   useEffect(() => {
     reactForm.setValue('displayName', user?.username ?? '');
   }, [user, reactForm]);
 
-  useEffect(() => {
-    async function fetchMemberColors() {
-      await fetch(`/api/leagues/${hash}/join`)
-        .then(res => res.json())
-        .then(({ memberColors }: { memberColors: LeagueMemberColor[] }) => {
-          setMemberColors(memberColors);
-        });
-    }
-
-    void fetchMemberColors();
-  }, [hash, setMemberColors]);
-
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const member: NewLeagueMember = {
+      const member: LeagueMemberInsert = {
         displayName: data.displayName,
         color: data.color,
-        role: 'Member',
       };
 
-      const leagueInfo = await joinLeague(hash, member);
-      addLeague(leagueInfo);
+      await joinLeague(hash, member);
+      await queryClient.invalidateQueries({ queryKey: ['leagues'] });
       alert('Successfully joined league');
       router.push(`/leagues/${hash}`);
     } catch (error) {
@@ -77,8 +55,8 @@ export default function JoinLeagueForm({ hash }: JoinLeagueFormProps) {
 
   return (
     <Form {...reactForm}>
-      <form className=' flex flex-col p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
-        <LeagueMemberFields memberColors={memberColors} />
+      <form className='p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+        <LeagueMemberFields memberColors={colors} />
         <Button
           className='w-full'
           type='submit'

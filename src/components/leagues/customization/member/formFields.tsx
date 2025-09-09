@@ -33,16 +33,15 @@ export default function LeagueMemberFields({ memberColors = [] }: LeagueMemberFi
   };
 
   return (
-    <section className='mx-2 flex flex-wrap gap-4 justify-center w-full'>
+    <section className='flex flex-wrap gap-4 justify-center w-full'>
       <FormField
         name='displayName'
         render={({ field }) => (
           <FormItem className='w-full'>
             <FormDescription className='mt-2 text-sm text-left'>
-              Choose your name and color for this league. This is the name that will be at the top
+              Choose your name and color for this league. This is the what will be at the top
               of the leaderboard when you destroy the competition.
               <br />
-              You can update this at any time, both must be unique within the league.
             </FormDescription>
             <FormLabel className='text-lg'>Display Name</FormLabel>
             <FormControl>
@@ -64,7 +63,6 @@ export default function LeagueMemberFields({ memberColors = [] }: LeagueMemberFi
             <FormControl>
               <div className='flex justify-center'>
                 <Swatch
-                  className='pb-4'
                   onChange={(color) => ensureNewColor(color, field.onChange)}
                   colors={availableColors}
                   color={field.value as string}
@@ -91,6 +89,11 @@ export default function LeagueMemberFields({ memberColors = [] }: LeagueMemberFi
           </FormItem>
         )
         } />
+      <i className='text-xs text-muted-foreground w-full text-center mb-2'>
+        {'Don\'t worry you can always change your name and color later!'}
+        <br />
+        Colors that are greyed out are already taken by another member.
+      </i>
     </section >
   );
 }

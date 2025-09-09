@@ -6,7 +6,7 @@ import {
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import ScorboardBody from '~/components/home/scoreboard/body';
 import SelectSeason from '~/components/home/scoreboard/selectSeason';
 import { type SeasonsDataQuery } from '~/types/seasons';
@@ -15,10 +15,11 @@ import { newtwentyColors } from '~/lib/colors';
 
 export interface ScoreboardTableProps {
   scoreData: SeasonsDataQuery[];
+  someHidden?: boolean;
 }
 
-export default function ScoreboardTable({ scoreData }: ScoreboardTableProps) {
-  const scoresBySeason = scoreData.map((data) => {
+export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTableProps) {
+  const scoresBySeason = useMemo(() => scoreData.map((data) => {
     const { Castaway: castawayScores } = compileScores(
       data.baseEvents,
       data.eliminations,
@@ -30,7 +31,7 @@ export default function ScoreboardTable({ scoreData }: ScoreboardTableProps) {
       .map(([castawayId, scores]) => [Number(castawayId), scores] as [number, number[]]);
 
     const castawayColors: Record<string, string> =
-      scoreData[0]!.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
+      data.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
         .reduce((acc, { castawayId }, index) => {
           acc[castawayId] = newtwentyColors[index % newtwentyColors.length]!;
           return acc;
@@ -39,14 +40,14 @@ export default function ScoreboardTable({ scoreData }: ScoreboardTableProps) {
     const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
 
     return { sortedCastaways, castawayColors, castawaySplitIndex, data };
-  });
+  }), [scoreData]);
 
   const [selectedSeason, setSelectedSeason] = useState(scoresBySeason[0]);
 
   if (!selectedSeason) return <div className='text-center py-6'>No seasons available.</div>;
 
-  const selectSeason = (seasonId: string) => {
-    const season = scoresBySeason.find(s => s.data.season.seasonId === +seasonId);
+  const selectSeason = (seasonName: string) => {
+    const season = scoresBySeason.find(s => s.data.season.name === seasonName);
     if (season) {
       setSelectedSeason(season);
     }
@@ -71,12 +72,12 @@ export default function ScoreboardTable({ scoreData }: ScoreboardTableProps) {
                   {a === 1 && (
                     <SelectSeason
                       seasons={scoresBySeason.map(s => ({
-                        value: String(s.data.season.seasonId),
+                        value: s.data.season.name,
                         label: s.data.season.name,
                       }))}
-                      value={String(selectedSeason.data.season.seasonId)}
+                      value={selectedSeason.data.season.name}
                       setValue={selectSeason}
-                    />
+                      someHidden={someHidden} />
                   )}
                 </TableHead>
               </Fragment>
