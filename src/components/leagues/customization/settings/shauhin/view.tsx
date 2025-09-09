@@ -2,9 +2,8 @@
 
 import { useForm } from 'react-hook-form';
 import ColorRow from '~/components/shared/colorRow';
-import { type z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
-import { BaseEventFullName, type ScoringBaseEventName, defaultShauhinModeSettings, ShauhinModeSettingsZod, ShauhinModeTimings } from '~/types/events';
+import { type ScoringBaseEventName } from '~/types/events';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '~/components/common/button';
 import { Switch } from '~/components/common/switch';
@@ -13,44 +12,52 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { useEffect, useState } from 'react';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Lock, LockOpen } from 'lucide-react';
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import { cn } from '~/lib/utils';
-import { updateShauhinMode } from '~/services/deprecated/leagueActions';
+import { type ShauhinModeSettings, ShauhinModeSettingsZod } from '~/types/leagues';
+import { ABS_MAX_EVENT_POINTS, defaultShauhinModeSettings, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings } from '~/lib/leagues';
+import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import updateShauhinMode from '~/actions/updateShauhinMode';
+import { BaseEventFullName } from '~/lib/events';
 
 export default function ShauhinMode() {
-  const {
-    league: {
-      members: {
-        loggedIn
-      },
-      hash,
-      shauhinModeSettings,
-      basePredictionRules
-    },
-    refresh
-  } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: rules } = useLeagueRules();
+  const { data: leagueMembers } = useLeagueMembers();
 
-  const reactForm = useForm<z.infer<typeof ShauhinModeSettingsZod>>({
-    defaultValues: shauhinModeSettings ?? defaultShauhinModeSettings,
+  const reactForm = useForm<ShauhinModeSettings>({
+    defaultValues: rules?.shauhinMode ?? defaultShauhinModeSettings,
     resolver: zodResolver(ShauhinModeSettingsZod),
   });
   const [locked, setLocked] = useState(true);
 
-
   useEffect(() => {
-    const settings = shauhinModeSettings ?? defaultShauhinModeSettings;
+    const defaults = defaultShauhinModeSettings;
+
+    if (rules && !rules.shauhinMode) {
+      // ensure that default shauhin mode settings are valid with current rules
+      defaults.enabledBets = defaults.enabledBets.filter((bet) =>
+        rules.basePrediction?.[bet]?.enabled);
+    }
+
+    const settings = rules?.shauhinMode ?? defaultShauhinModeSettings;
     //settings.enabledBets = settings.enabledBets.filter((bet) =>
     //basePredictionRules[bet as ScoringBaseEventName]?.enabled);
 
     reactForm.reset(settings);
-  }, [shauhinModeSettings, /*basePredictionRules,*/ reactForm]);
+  }, [rules?.shauhinMode, reactForm, rules]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league) return;
+
     try {
       ShauhinModeSettingsZod.parse(data); // Validate data before sending
 
-      await updateShauhinMode(hash, data);
-      await refresh();
+      await updateShauhinMode(league.hash, data);
+      await queryClient.invalidateQueries({ queryKey: ['rules', league.hash] });
       setLocked(true);
       alert('Shauhin Mode settings saved successfully!');
     } catch (error) {
@@ -59,7 +66,7 @@ export default function ShauhinMode() {
     }
   });
 
-  const disabled = loggedIn?.role !== 'Owner';
+  const disabled = !!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner';
 
   return (
     <article className='p-2 bg-card rounded-xl w-full relative'>
@@ -154,14 +161,18 @@ export default function ShauhinMode() {
                                       <FormControl>
                                         <Input
                                           type='number'
-                                          min={ShauhinModeSettingsZod.shape.customStartWeek.minValue ?? undefined}
-                                          max={ShauhinModeSettingsZod.shape.customStartWeek.maxValue ?? undefined}
+                                          min={2}
                                           placeholder='Enable after episode...'
                                           {...customField}
                                           onChange={(e) => customField.onChange(+e.target.value)}
                                           onFocus={(e) => e.target.select()}
                                           value={Math.max(2, customField.value as number || 2)} />
                                       </FormControl>
+                                      {customField.value > 14 && (
+                                        <p className='text-xs text-destructive mt-1'>
+                                          Warning: Most seasons do not have this many weeks!
+                                        </p>
+                                      )}
                                     </FormItem>
                                   )} />
                               )}
@@ -198,8 +209,8 @@ export default function ShauhinMode() {
                                 type='number'
                                 placeholder='Max Bet'
                                 className='input'
-                                min={ShauhinModeSettingsZod.shape.maxBet.minValue ?? undefined}
-                                max={ShauhinModeSettingsZod.shape.maxBet.maxValue ?? undefined}
+                                min={0}
+                                max={ABS_MAX_EVENT_POINTS}
                                 {...field}
                                 onChange={(e) => field.onChange(+e.target.value)}
                                 onFocus={(e) => e.target.select()}
@@ -231,8 +242,8 @@ export default function ShauhinMode() {
                                 type='number'
                                 placeholder='Max Bets Per Week'
                                 className='input'
-                                min={ShauhinModeSettingsZod.shape.maxBet.minValue ?? undefined}
-                                max={ShauhinModeSettingsZod.shape.maxBet.maxValue ?? undefined}
+                                min={0}
+                                max={SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK}
                                 {...field}
                                 onChange={(e) => field.onChange(+e.target.value)}
                                 onFocus={(e) => e.target.select()}
@@ -272,7 +283,7 @@ export default function ShauhinMode() {
                           <FormLabel className='text-sm ml-4'>Enabled Bets</FormLabel>
                           <FormControl>
                             <MultiSelect
-                              options={Object.entries(basePredictionRules)
+                              options={Object.entries(rules?.basePrediction ?? {})
                                 .filter(([_, setting]) => setting.enabled)
                                 .map(([eventName]) => ({
                                   value: eventName as ScoringBaseEventName,

@@ -1,13 +1,13 @@
 'use client';
 
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
-import { LeagueEventTypeOptions, PredictionTimingOptions, ReferenceOptions } from '~/types/events';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { type ReactNode, useState } from 'react';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
+import { EventTypes, PredictionTimings, ReferenceTypes } from '~/lib/events';
 
 interface LeagueEventFieldsProps {
   predictionDefault?: boolean;
@@ -66,7 +66,7 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
             <FormLabel>Reference Type</FormLabel>
             <FormControl>
               <MultiSelect
-                options={ReferenceOptions
+                options={ReferenceTypes
                   .map((option) => ({ label: option, value: option }))}
                 onValueChange={field.onChange}
                 defaultValue={field.value as string[]}
@@ -114,7 +114,7 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
                     <SelectValue placeholder='Select event type' />
                   </SelectTrigger>
                   <SelectContent>
-                    {LeagueEventTypeOptions.map((type) => (
+                    {EventTypes.map((type) => (
                       <SelectItem key={type} value={type}>
                         {type}
                       </SelectItem>
@@ -140,7 +140,7 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
               </FormLabel>
               <FormControl>
                 <MultiSelect
-                  options={PredictionTimingOptions
+                  options={PredictionTimings
                     .map((option) => ({ label: option, value: option }))}
                   onValueChange={field.onChange}
                   defaultValue={field.value as string[]}

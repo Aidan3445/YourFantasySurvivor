@@ -3,7 +3,8 @@ import { FormControl, FormField, FormItem, FormLabel } from '~/components/common
 import { Input } from '~/components/common/input';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Switch } from '~/components/common/switch';
-import { PredictionTimingOptions, type ScoringBaseEventName } from '~/types/events';
+import { PredictionTimings } from '~/lib/events';
+import { type ScoringBaseEventName } from '~/types/events';
 
 export interface BaseEventSettingsProps {
   disabled?: boolean;
@@ -62,12 +63,12 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
               render={({ field: timingField }) => (
                 <FormItem>
                   {disabled &&
-                    <i className='text-muted-foreground'>- {(timingField.value as string[]).join(', ')}</i>
+                    <div className='italic -mt-2 ml-4 text-muted-foreground text-xs'>{(timingField.value as string[]).join(', ')}</div>
                   }
                   {!disabled &&
                     <FormControl className='animate-scale-in-fast mb-2'>
                       <MultiSelect
-                        options={PredictionTimingOptions
+                        options={PredictionTimings
                           .map((option) => ({ label: option, value: option }))}
                         onValueChange={timingField.onChange}
                         defaultValue={timingField.value as string[]}

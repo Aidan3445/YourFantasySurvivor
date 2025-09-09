@@ -4,7 +4,7 @@ import { createTable } from '~/server/db/schema/createTable';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { castawaySchema } from '~/server/db/schema/castaways';
-import { boolean, index, integer, pgEnum, primaryKey, serial, unique, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, pgEnum, primaryKey, serial, smallint, unique, uniqueIndex, varchar } from 'drizzle-orm/pg-core';
 import { DISPLAY_NAME_MAX_LENGTH, LeagueMemberRoles } from '~/lib/leagues';
 
 export const leagueMemberRole = pgEnum('league_member_role', LeagueMemberRoles);
@@ -18,7 +18,7 @@ export const leagueMemberSchema = createTable(
     displayName: varchar('display_name', { length: DISPLAY_NAME_MAX_LENGTH }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
     role: leagueMemberRole('role').notNull().default('Member'),
-    draftOrder: integer('draft_order').notNull(),
+    draftOrder: smallint('draft_order').notNull(),
   },
   (table) => [
     uniqueIndex('league_user_idx').on(table.leagueId, table.userId),

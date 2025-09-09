@@ -9,6 +9,7 @@ import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useQueryClient } from '@tanstack/react-query';
+import { useMemo } from 'react';
 
 interface DraftCountdownProps {
   overrideHash?: string;
@@ -22,9 +23,10 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
 
   const router = useRouter();
 
-
-  const editable = (leagueMembers?.loggedIn && leagueMembers.loggedIn.role === 'Owner') && leagueSettings &&
-    (leagueSettings.draftDate === null || Date.now() < leagueSettings.draftDate.getTime());
+  const editable = useMemo(() =>
+    (leagueMembers?.loggedIn && leagueMembers.loggedIn.role === 'Owner') && leagueSettings &&
+    (leagueSettings.draftDate === null || Date.now() < leagueSettings.draftDate.getTime()),
+    [leagueMembers, leagueSettings]);
 
   const onDraftJoin = async () => {
     if (!league) return;
@@ -36,7 +38,7 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
         return;
       }
       await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
-      await queryClient.invalidateQueries({ queryKey: ['leagueSettings', league.hash] });
+      await queryClient.invalidateQueries({ queryKey: ['settings', league.hash] });
     }
     router.push(`/leagues/${league.hash}/draft`);
   };

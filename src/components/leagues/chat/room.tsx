@@ -1,8 +1,10 @@
 'use client';
 
+import { type Message } from 'node_modules/@ably/chat/dist/core/message';
+import { type ReactNode } from 'react';
+/*
 import { useState, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { useMessages } from '@ably/chat/react';
-import { type Message } from 'node_modules/@ably/chat/dist/core/message';
 import { Input } from '~/components/common/input';
 import { Button } from '~/components/common/button';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
@@ -12,6 +14,7 @@ import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { UserCog2, Crown } from 'lucide-react';
 import { saveChatMessage } from '~/services/deprecated/leagueActions';
+*/
 
 export interface ChatRoomProps {
   chatHistory?: Message[];
@@ -20,6 +23,11 @@ export interface ChatRoomProps {
   messageEnd?: ReactNode;
 }
 
+export default function ChatRoom(_: ChatRoomProps) {
+  return null;
+}
+
+/*
 export default function ChatRoom({ chatHistory, messageEnd }: ChatRoomProps) {
   const { league: { members, hash } } = useLeague();
   const loggedInUser = members?.loggedIn;
@@ -135,3 +143,4 @@ export default function ChatRoom({ chatHistory, messageEnd }: ChatRoomProps) {
     </>
   );
 }
+*/

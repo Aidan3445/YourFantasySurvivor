@@ -2,64 +2,45 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form, FormLabel } from '~/components/common/form';
-import { ColorZod, DisplayNameZod, type LeagueMember } from '~/types/deprecated/leagueMembers';
-import { updateMemberDetails } from '~/services/deprecated/leagueActions';
 import { useEffect } from 'react';
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import LeagueMemberFields from '~/components/leagues/customization/member/formFields';
 import { Button } from '~/components/common/button';
 import { cn } from '~/lib/utils';
-
-const formSchema = z.object({
-  displayName: DisplayNameZod,
-  color: ColorZod,
-}).transform(data => ({
-  ...data,
-  displayName: data.displayName.trim(),
-}));
+import { type LeagueMemberInsert, LeagueMemberInsertZod } from '~/types/leagueMembers';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import updateMemberDetails from '~/actions/updateMemberDetails';
 
 interface MemberEditFormProps {
   className?: string;
 }
 
 export default function MemberEditForm({ className }: MemberEditFormProps) {
-  const {
-    league: {
-      hash,
-      members: {
-        loggedIn,
-        list: memberColors
-      }
-    },
-    refresh
-  } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: leagueMembers } = useLeagueMembers();
 
-  const reactForm = useForm<z.infer<typeof formSchema>>({
+  const reactForm = useForm<LeagueMemberInsert>({
     defaultValues: {
-      displayName: loggedIn?.displayName ?? '',
-      color: loggedIn?.color ?? '',
+      displayName: leagueMembers?.loggedIn?.displayName ?? '',
+      color: leagueMembers?.loggedIn?.color ?? '',
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(LeagueMemberInsertZod),
   });
 
   useEffect(() => {
-    reactForm.setValue('displayName', loggedIn?.displayName ?? '');
-  }, [loggedIn, reactForm]);
+    reactForm.setValue('displayName', leagueMembers?.loggedIn?.displayName ?? '');
+    reactForm.setValue('color', leagueMembers?.loggedIn?.color ?? '');
+  }, [leagueMembers?.loggedIn, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league || !leagueMembers?.loggedIn) return;
+
     try {
-      if (!loggedIn) return;
-
-      const member: LeagueMember = {
-        ...loggedIn,
-        displayName: data.displayName,
-        color: data.color,
-      };
-
-      await updateMemberDetails(hash, member);
-      await refresh();
+      await updateMemberDetails(league.hash, data);
+      await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
       alert('Successfully updated member details');
     } catch (error) {
       console.error(error);
@@ -74,10 +55,7 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
         className
       )} action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit Member Details</FormLabel>
-        <LeagueMemberFields
-          memberColors={memberColors
-            .filter((m) => m.memberId !== loggedIn?.memberId)
-            .map((m) => m.color)} />
+        <LeagueMemberFields memberColors={leagueMembers?.members.map(m => m.color) ?? []} />
         <Button
           disabled={!reactForm.formState.isDirty}
           type='submit'

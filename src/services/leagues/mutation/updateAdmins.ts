@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from '~/server/db';
-import { and, eq, inArray, notInArray } from 'drizzle-orm';
+import { and, eq, inArray, not, notInArray } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
@@ -27,12 +27,14 @@ export default async function updateAdminsLogic(
         eq(leagueMemberSchema.leagueId, auth.leagueId),
         notInArray(leagueMemberSchema.memberId, admins),
         eq(leagueMemberSchema.role, 'Admin')));
-    // Promote the new admins - also 're-promotes' existing admins
+    // Promote the new admins
     const newAdmins = await trx
       .update(leagueMemberSchema)
       .set({ role: 'Admin' })
       .where(and(
         eq(leagueMemberSchema.leagueId, auth.leagueId),
+        not(eq(leagueMemberSchema.role, 'Owner')),
+        not(eq(leagueMemberSchema.role, 'Admin')),
         inArray(leagueMemberSchema.memberId, admins)))
       .returning({ memberId: leagueMemberSchema.memberId });
 

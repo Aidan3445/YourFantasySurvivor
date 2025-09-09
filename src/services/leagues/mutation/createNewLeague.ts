@@ -57,7 +57,7 @@ export default async function createNewLeagueLogic(
     // Insert the owner as a member
     const memberId = await trx
       .insert(leagueMemberSchema)
-      .values({ leagueId, userId: userId, ...newMember, draftOrder: 0 })
+      .values({ leagueId, userId: userId, ...newMember, role: 'Owner', draftOrder: 0 })
       .returning({ memberId: leagueMemberSchema.memberId })
       .then((res) => res[0]?.memberId);
     if (!memberId) throw new Error('Failed to add user as a member');

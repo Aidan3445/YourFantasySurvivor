@@ -2,8 +2,8 @@ import { Flame } from 'lucide-react';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Input } from '~/components/common/input';
 import { cn } from '~/lib/utils';
-import { BaseEventDescriptions, BaseEventFullName } from '~/types/events';
 import { type BaseEventSettingsProps, BasePredictionFormField } from '~/components/leagues/customization/events/base/predictions';
+import { BaseEventDescriptions, BaseEventFullName } from '~/lib/events';
 
 export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (

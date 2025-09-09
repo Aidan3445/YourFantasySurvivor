@@ -1,9 +1,10 @@
 import { type BaseEventPredictionRules, type BaseEventPredictionRulesSchema } from '~/types/leagues';
-import { defaultPredictionRules, ScoringBaseEventNames } from '~/lib/events';
 import { type Eliminations, type PredictionTiming } from '~/types/events';
 import { type TribesTimeline } from '~/types/tribes';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { defaultBasePredictionRules } from '~/lib/leagues';
+import { ScoringBaseEventNames } from '~/lib/events';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -43,7 +44,7 @@ export function findTribeCastaways(
 export function basePredictionRulesSchemaToObject(
   schema: BaseEventPredictionRulesSchema | null
 ): BaseEventPredictionRules {
-  const rules: BaseEventPredictionRules = defaultPredictionRules;
+  const rules = defaultBasePredictionRules;
 
   // If no schema is provided, return the default rules 
   // (all disabled with default points and timing values ready)

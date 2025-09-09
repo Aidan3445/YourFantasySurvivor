@@ -2,7 +2,7 @@
 
 import { requireAuth } from '~/lib/auth';
 import joinLeagueLogic from '~/services/leagues/mutation/joinLeague';
-import { type NewLeagueMember } from '~/types/deprecated/leagueMembers';
+import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 /**
   * Join a league
@@ -18,7 +18,7 @@ import { type NewLeagueMember } from '~/types/deprecated/leagueMembers';
   */
 export default async function joinLeague(
   hash: string,
-  newMember: NewLeagueMember
+  newMember: LeagueMemberInsert
 ) {
   try {
     return await requireAuth(joinLeagueLogic)(hash, newMember);

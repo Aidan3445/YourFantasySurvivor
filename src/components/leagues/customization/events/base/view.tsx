@@ -1,57 +1,58 @@
 'use client';
 
 import { z } from 'zod';
-import { BaseEventRuleZod, BasePredictionRulesZod, defaultBaseRules, defaultPredictionRules } from '~/types/events';
 import { useForm } from 'react-hook-form';
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
-import { updateBaseEventRules } from '~/services/deprecated/leagueActions';
 import { useEffect, useState } from 'react';
 import { Lock, LockOpen } from 'lucide-react';
 import ChallengeScoreSettings from '~/components/leagues/customization/events/base/challenges';
 import AdvantageScoreSettings from '~/components/leagues/customization/events/base/advantages';
 import OtherScoreSettings from '~/components/leagues/customization/events/base/other';
+import { BaseEventRulesZod, BasePredictionRulesZod } from '~/types/leagues';
+import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { defaultBaseRules, defaultBasePredictionRules } from '~/lib/leagues';
+import updateBaseEventRules from '~/actions/updateBaseEventRules';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 
 const formSchema = z.object({
-  baseEventRules: BaseEventRuleZod,
+  baseEventRules: BaseEventRulesZod,
   basePredictionRules: BasePredictionRulesZod
 });
 
 export default function LeagueScoring() {
-  const {
-    league: {
-      hash,
-      baseEventRules,
-      basePredictionRules,
-      members: {
-        loggedIn
-      }
-    },
-    refresh,
-  } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: leagueMembers } = useLeagueMembers();
+  const { data: rules, refetch } = useLeagueRules();
+
   const reactForm = useForm<z.infer<typeof formSchema>>({
     defaultValues: {
-      baseEventRules: baseEventRules ?? defaultBaseRules,
-      basePredictionRules: basePredictionRules ?? defaultPredictionRules
+      baseEventRules: rules?.base ?? defaultBaseRules,
+      basePredictionRules: rules?.basePrediction ?? defaultBasePredictionRules
     },
     resolver: zodResolver(formSchema)
   });
   const [locked, setLocked] = useState(true);
 
   useEffect(() => {
-    reactForm.setValue('baseEventRules', baseEventRules ?? defaultBaseRules);
-  }, [baseEventRules, reactForm]);
+    reactForm.setValue('baseEventRules', rules?.base ?? defaultBaseRules);
+  }, [rules?.base, reactForm]);
 
   useEffect(() => {
-    reactForm.setValue('basePredictionRules', basePredictionRules ?? defaultPredictionRules);
-  }, [basePredictionRules, reactForm]);
+    reactForm.setValue('basePredictionRules', rules?.basePrediction ?? defaultBasePredictionRules);
+  }, [rules?.basePrediction, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league) return;
+
     try {
-      await updateBaseEventRules(hash, data.baseEventRules, data.basePredictionRules);
-      await refresh();
+      await updateBaseEventRules(league.hash, data.baseEventRules, data.basePredictionRules);
+      await queryClient.invalidateQueries({ queryKey: ['rules', league.hash] });
+      await refetch();
       setLocked(true);
       alert('Base event rules updated.');
     } catch (error) {
@@ -60,7 +61,7 @@ export default function LeagueScoring() {
     }
   });
 
-  const disabled = loggedIn?.role !== 'Owner';
+  const disabled = !!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner';
 
   return (
     <article className='p-2 bg-card rounded-xl w-full relative'>

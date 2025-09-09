@@ -1,5 +1,6 @@
+import { Infinity } from 'lucide-react';
 import { Slider } from '~/components/common/slider';
-import { MAX_SURVIVAL_CAP } from '~/types/deprecated/leagues';
+import { MAX_SURVIVAL_CAP } from '~/lib/leagues';
 
 interface SurvivalCapSliderProps {
   value: number;
@@ -22,7 +23,7 @@ export default function SurvivalCapSlider({ value, onChange, disabled }: Surviva
           {value === 0 ? 'Off' : value === MAX_SURVIVAL_CAP ? 'Unlimited' : value}
         </div>
       </Slider>
-      {MAX_SURVIVAL_CAP}
+      <Infinity />
     </span>
   );
 }

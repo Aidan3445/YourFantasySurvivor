@@ -2,9 +2,9 @@
 
 import { db } from '~/server/db';
 import { and, eq } from 'drizzle-orm';
-import { leagueEventsRulesSchema } from '~/server/db/schema/leagueEvents';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
+import { customEventRuleSchema } from '~/server/db/schema/customEvents';
 
 /**
   * Delete a league event rule
@@ -15,7 +15,7 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
   * @returns Success status of the deletion
   * @returnObj `{ success }`
   */
-export default async function deleteLeagueEventRuleLogic(
+export default async function deleteCustomEventRuleLogic(
   auth: VerifiedLeagueMemberAuth,
   ruleId: number,
 ) {
@@ -36,11 +36,11 @@ export default async function deleteLeagueEventRuleLogic(
       throw new Error('League rules cannot be deleted while the league is inactive');
 
     const deleted = await trx
-      .delete(leagueEventsRulesSchema)
+      .delete(customEventRuleSchema)
       .where(and(
-        eq(leagueEventsRulesSchema.leagueId, league.leagueId),
-        eq(leagueEventsRulesSchema.leagueEventRuleId, ruleId)))
-      .returning({ leagueEventRuleId: leagueEventsRulesSchema.leagueEventRuleId })
+        eq(customEventRuleSchema.leagueId, league.leagueId),
+        eq(customEventRuleSchema.customEventRuleId, ruleId)))
+      .returning({ id: customEventRuleSchema.customEventRuleId })
       .then(res => res[0]);
     if (!deleted) throw new Error('Rule not found');
 

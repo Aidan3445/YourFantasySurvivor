@@ -1,73 +1,61 @@
 'use client';
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
-import { type LeagueSettingsUpdate, SurvivalCapZod } from '~/types/deprecated/leagues';
-import { useLeague } from '~/hooks/deprecated/useLeague';
-import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { Button } from '~/components/common/button';
-import { updateAdmins, updateLeagueSettings } from '~/services/deprecated/leagueActions';
 import { Input } from '~/components/common/input';
 import LeagueAdminsField from '~/components/leagues/customization/settings/league/admin';
-
-const formSchema = z.object({
-  leagueName: z.string(),
-  survivalCap: SurvivalCapZod,
-  draftDate: z.date().optional(),
-  admins: z.array(z.number())
-});
+import { LeagueDetailsUpdateZod, type LeagueSettingsUpdate } from '~/types/leagues';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useMemo } from 'react';
+import updateLeagueSettings from '~/actions/updateLeagueSettings';
+import updateAdmins from '~/actions/updateAdmins';
 
 export function LeagueSettings() {
-  const {
-    league: {
-      hash,
-      leagueName,
-      settings: {
-        draftDate,
-      },
-      members: {
-        loggedIn,
-        list,
-      },
-    },
-    refresh
-  } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: leagueMembers } = useLeagueMembers();
 
-  const membersList = list.map(member => ({
-    value: member.memberId,
-    label: member.displayName,
-    role: member.role,
-  }))
-    .filter(member => member.value !== loggedIn?.memberId);
+  const membersList = useMemo(() =>
+    leagueMembers?.members
+      .map(member => ({
+        value: member.memberId,
+        label: member.displayName,
+        role: member.role,
+      }))
+      .filter(member =>
+        member.value !== leagueMembers.loggedIn?.memberId && member.role !== 'Owner') ?? [],
+    [leagueMembers]);
 
-  const reactForm = useForm<z.infer<typeof formSchema>>({
+  const reactForm = useForm<LeagueSettingsUpdate>({
     defaultValues: {
-      leagueName,
-      draftDate: draftDate ?? new Date(),
-      admins: membersList.filter(member => member.role === 'Admin').map(member => member.value),
+      name: league?.name ?? '',
+      admins: membersList.filter(m => m.role === 'Admin').map(m => m.value) ?? [],
     },
+    resolver: zodResolver(LeagueDetailsUpdateZod)
   });
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    const leagueUpdate: LeagueSettingsUpdate = {
-      leagueName: data.leagueName,
-      draftDate: data.draftDate,
-    };
+    if (!league) return;
 
     try {
       await Promise.all([
-        updateLeagueSettings(hash, leagueUpdate),
-        updateAdmins(hash, data.admins),
+        updateLeagueSettings(league.hash, data),
+        data.admins ? updateAdmins(league.hash, data.admins) : Promise.resolve(),
       ]);
-      await refresh();
-      alert(`League settings updated for ${data.leagueName}`);
+      await queryClient.invalidateQueries({ queryKey: ['settings', league.hash] });
+      await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
+      alert(`League settings updated for ${data.name}`);
     } catch (error) {
       console.error(error);
       alert('Failed to update league some or all settings');
     }
   });
 
-  const editable = loggedIn?.role === 'Owner';
+  const editable = !!leagueMembers && leagueMembers.loggedIn?.role === 'Owner';
 
   if (!editable) return null;
 

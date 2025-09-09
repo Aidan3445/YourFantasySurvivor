@@ -3,11 +3,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
-import { useLeague } from '~/hooks/deprecated/useLeague';
-import { type LeagueEventRule, LeagueEventRuleZod, defaultLeagueEventRule } from '~/types/events';
-
+import { useLeague } from '~/hooks/leagues/useLeague';
 import { Button } from '~/components/common/button';
-import { createLeagueEventRule } from '~/services/deprecated/leagueActions';
 import { Lock, LockOpen } from 'lucide-react';
 import {
   AlertDialog, AlertDialogCancel, AlertDialogContent,
@@ -16,36 +13,33 @@ import {
 import { useState } from 'react';
 import LeagueEventFields from '~/components/leagues/customization/events/custom/fields';
 import LeagueEventCard from '~/components/leagues/customization/events/custom/card';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import { type CustomEventRuleInsert, CustomEventRuleInsertZod } from '~/types/leagues';
+import { defaultNewCustomRule } from '~/lib/leagues';
+import createCustomEventRule from '~/actions/createCustomEventRule';
+import { useLeagueRules } from '~/hooks/leagues/useRules';
 
 export default function LeagueEvents() {
-  const {
-    league: {
-      hash,
-      leagueEventRules,
-      members: {
-        loggedIn
-      }
-    },
-    refresh
-  } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: rules } = useLeagueRules();
+  const { data: leagueMembers } = useLeagueMembers();
 
-  const reactForm = useForm<LeagueEventRule>({
-    defaultValues: defaultLeagueEventRule,
-    resolver: zodResolver(LeagueEventRuleZod),
+  const reactForm = useForm<CustomEventRuleInsert>({
+    defaultValues: defaultNewCustomRule,
+    resolver: zodResolver(CustomEventRuleInsertZod)
   });
   const [locked, setLocked] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    const newRule: LeagueEventRule = {
-      ...data,
-      timing: data.eventType === 'Prediction' ? data.timing : [],
-    };
+    if (!league) return;
 
     try {
-      await createLeagueEventRule(hash, newRule);
-      await refresh();
-      alert(`Custom event ${newRule.eventName} created.`);
+      await createCustomEventRule(league.hash, data);
+      await queryClient.invalidateQueries({ queryKey: ['rules', league.hash] });
+      alert(`Custom event ${data.eventName} created.`);
       reactForm.reset();
       setModalOpen(false);
     } catch (error) {
@@ -54,7 +48,7 @@ export default function LeagueEvents() {
     }
   });
 
-  const disabled = loggedIn?.role !== 'Owner';
+  const disabled = !!leagueMembers?.loggedIn && leagueMembers.loggedIn.role !== 'Owner';
 
   return (
     <article className='bg-card p-2 rounded-xl w-full relative space-y-2'>
@@ -115,16 +109,17 @@ export default function LeagueEvents() {
           </Form>
         </AlertDialog>}
       {
-        leagueEventRules.length === 0 &&
-        <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
-          No custom events have been created yet.
-        </h3>
+        rules?.custom?.length ?
+          <article className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
+            {rules?.custom.map((rule, index) => (
+              <LeagueEventCard key={index} rule={rule} locked={disabled || locked} />
+            ))}
+          </article>
+          :
+          <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
+            No custom events have been created yet.
+          </h3>
       }
-      <article className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-        {leagueEventRules.map((rule, index) => (
-          <LeagueEventCard key={index} rule={rule} locked={disabled || locked} />
-        ))}
-      </article>
     </article >
   );
 }

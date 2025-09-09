@@ -1,6 +1,5 @@
 'use client';
 
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core';
@@ -10,10 +9,14 @@ import { cn } from '~/lib/utils';
 import { GripVertical, Lock, LockOpen, Shuffle } from 'lucide-react';
 import SortableItem from '~/components/common/sortableItem';
 import { handleDragEnd } from '~/hooks/ui/useSortableItem';
-import { updateDraftOrder } from '~/services/deprecated/leagueActions';
 import { Button } from '~/components/common/button';
 import { useRouter } from 'next/navigation';
 import ColorRow from '~/components/shared/colorRow';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
+import updateDraftOrder from '~/actions/updateDraftOrder';
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -23,42 +26,34 @@ interface DraftOrderProps {
 }
 
 export default function DraftOrder({ className }: DraftOrderProps) {
-  const {
-    league: {
-      hash,
-      members,
-      leagueStatus,
-      settings: {
-        draftOrder,
-        draftDate
-      }
-    },
-    refresh
-  } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: leagueMembers } = useLeagueMembers();
+  const { data: settings } = useLeagueSettings();
+
   const router = useRouter();
   const sensors = useSensors(useSensor(PointerSensor));
   const [locked, setLocked] = useState(true);
 
-  const dbOrder = useMemo(() => draftOrder.map((memberId) => {
-    const member = members.list.find((m) => m.memberId === memberId);
-    return member;
-  }).filter((member) => !!member)
-    .map((member) => ({ ...member, id: member.memberId })),
-    [members, draftOrder]);
-
+  const dbOrder = useMemo(() => leagueMembers?.members.map(m => ({ ...m, id: m.memberId })) ?? [], [leagueMembers?.members]);
   const [order, setOrder] = useState(dbOrder);
 
   useEffect(() => {
-    if (leagueStatus !== 'Predraft' && hash) router.push(`/leagues/${hash}/draft`);
-  }, [leagueStatus, router, hash]);
+    if (league?.status !== 'Predraft' && league?.hash) router.push(`/leagues/${league.hash}/draft`);
+  }, [league, router]);
 
   useEffect(() => {
-    setOrder(dbOrder);
-  }, [dbOrder, setOrder]);
+    if (!leagueMembers?.members) return;
+
+    setOrder(leagueMembers.members.map(m => ({ ...m, id: m.memberId })));
+  }, [leagueMembers?.members]);
 
   const orderChanged = useMemo(() => {
-    return order.some((member, index) => member.memberId !== draftOrder[index]);
-  }, [order, draftOrder]);
+    if (!leagueMembers?.members || !order) return false;
+    return leagueMembers.members.some((member, index) => member.memberId !== order[index]?.memberId);
+  }, [leagueMembers?.members, order]);
+
+  if (!leagueMembers) return null;
 
   const shuffleOrderWithAnimation = () => {
     // shuffle order by swapping items one by one
@@ -77,13 +72,15 @@ export default function DraftOrder({ className }: DraftOrderProps) {
   };
 
   const orderLocked = locked ||
-    leagueStatus !== 'Predraft' ||
-    (!!draftDate && Date.now() > draftDate.getTime());
+    league?.status !== 'Predraft' ||
+    (!!settings?.draftDate && Date.now() > settings.draftDate.getTime());
 
   const handleSubmit = async () => {
+    if (!league || !orderChanged || !leagueMembers) return;
+
     try {
-      await updateDraftOrder(hash, order.map((member) => member.memberId));
-      await refresh();
+      await updateDraftOrder(league?.hash, order.map((member) => member.memberId));
+      await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
       alert('Draft order saved');
       setLocked(true);
     } catch (error) {
@@ -94,7 +91,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
 
   return (
     <article className={cn('flex flex-col w-full p-2 bg-card rounded-xl relative', className)}>
-      {members.loggedIn?.role === 'Owner' && (orderLocked ?
+      {leagueMembers.loggedIn?.role === 'Owner' && (orderLocked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => setLocked(false)} /> :
@@ -138,7 +135,7 @@ export default function DraftOrder({ className }: DraftOrderProps) {
                   disabled={orderLocked}>
                   <ColorRow
                     color={member.color}
-                    loggedIn={members.loggedIn?.memberId === member.memberId}>
+                    loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}>
                     <h3 className='text-lg' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
                     <h2 className='text-3xl font-semibold' style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h2>
                     {!orderLocked &&

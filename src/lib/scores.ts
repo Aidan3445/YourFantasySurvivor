@@ -1,4 +1,4 @@
-import { defaultBaseRules, defaultPredictionRules, defaultShauhinModeSettings } from '~/lib/leagues';
+import { defaultBaseRules, defaultBasePredictionRules, defaultShauhinModeSettings } from '~/lib/leagues';
 import { findTribeCastaways } from '~/lib/utils';
 import { type Predictions, type Eliminations, type Events, type CustomEvents, type ReferenceType, type Scores, type ScoringBaseEventName, type Prediction, type Streaks } from '~/types/events';
 import { type SelectionTimelines, type LeagueRules } from '~/types/leagues';
@@ -36,7 +36,7 @@ export function compileScores(
   };
 
   const baseEventRules = rules?.base ?? defaultBaseRules;
-  const basePredictionRules = rules?.basePrediction ?? defaultPredictionRules;
+  const basePredictionRules = rules?.basePrediction ?? defaultBasePredictionRules;
   const shauhinModeRules = rules?.shauhinMode ?? defaultShauhinModeSettings;
   const customEventRules = rules?.custom ?? [];
 

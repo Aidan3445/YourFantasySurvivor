@@ -22,6 +22,13 @@ export const DisplayNameZod = z.string()
   .max(DISPLAY_NAME_MAX_LENGTH, { message: `Display name must be between ${DISPLAY_NAME_MIN_LENGTH} and ${DISPLAY_NAME_MAX_LENGTH} characters` });
 export const ColorZod = z.string().regex(/^#[0-9a-f]{6}$/i);
 
+export const LeagueMemberInsertZod = z.object({
+  displayName: DisplayNameZod,
+  color: ColorZod,
+}).transform(data => ({
+  ...data,
+  displayName: data.displayName.trim(),
+}));
 
 export type LeagueMemberStatus = {
   currentCastawayId: number | null;

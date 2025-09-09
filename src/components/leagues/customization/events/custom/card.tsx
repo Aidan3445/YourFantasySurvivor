@@ -3,11 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
-import { useLeague } from '~/hooks/deprecated/useLeague';
-import { type LeagueEventRule, LeagueEventRuleZod } from '~/types/events';
-
 import { Button } from '~/components/common/button';
-import { deleteLeagueEventRule, updateLeagueEventRule } from '~/services/deprecated/leagueActions';
 import { Flame, Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -16,33 +12,36 @@ import {
 import { useState } from 'react';
 import { cn } from '~/lib/utils';
 import LeagueEventFields from '~/components/leagues/customization/events/custom/fields';
+import { type CustomEventRuleInsert, CustomEventRuleInsertZod, type CustomEventRule } from '~/types/leagues';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import updateCustomEventRule from '~/actions/updateCustomEventRule';
+import deleteCustomEventRule from '~/actions/deleteCustomEventRule';
 
 interface LeagueEventCardProps {
-  rule: LeagueEventRule;
+  rule: CustomEventRule;
   locked?: boolean;
 }
 
 export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) {
-  const {
-    league: {
-      hash,
-      members: {
-        loggedIn
-      }
-    },
-    refresh
-  } = useLeague();
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: leagueMembers } = useLeagueMembers();
+
   const [isEditing, setIsEditing] = useState(false);
 
-  const reactForm = useForm<LeagueEventRule>({
+  const reactForm = useForm<CustomEventRuleInsert>({
     defaultValues: rule,
-    resolver: zodResolver(LeagueEventRuleZod),
+    resolver: zodResolver(CustomEventRuleInsertZod),
   });
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league) return;
+
     try {
-      await updateLeagueEventRule(hash, data);
-      await refresh();
+      await updateCustomEventRule(league.hash, data, rule.customEventRuleId);
+      await queryClient.invalidateQueries({ queryKey: ['rules', league.hash] });
       alert(`Custom event ${data.eventName} updated.`);
     } catch (error) {
       console.error(error);
@@ -51,8 +50,10 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
   });
 
   const handleDelete = async () => {
+    if (!league) return;
     try {
-      await deleteLeagueEventRule(hash, rule.eventName);
+      await deleteCustomEventRule(league.hash, rule.customEventRuleId);
+      await queryClient.invalidateQueries({ queryKey: ['rules', league.hash] });
       setIsEditing(false);
       alert(`Custom event ${rule.eventName} deleted.`);
     } catch (error) {
@@ -78,7 +79,7 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
       {rule.eventType === 'Prediction' &&
         <p className='text-xs italic mb-1'>Predictions: {rule.timing.join(', ')}</p>}
       <p className='text-sm'>{rule.description}</p>
-      {loggedIn && loggedIn.role === 'Owner' && !locked &&
+      {leagueMembers?.loggedIn && leagueMembers.loggedIn.role === 'Owner' && !locked &&
         <Form {...reactForm}>
           <form action={() => handleSubmit()}>
             <AlertDialog open={isEditing} onOpenChange={setIsEditing}>

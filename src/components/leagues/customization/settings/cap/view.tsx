@@ -1,38 +1,54 @@
 'use client';
 
-import { DEFAULT_SURVIVAL_CAP, MAX_SURVIVAL_CAP, SurvivalCapZod } from '~/types/deprecated/leagues';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { type z } from 'zod';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '~/components/common/form';
 import { Switch } from '~/components/common/switch';
 import { Button } from '~/components/common/button';
-import { updateLeagueSettings } from '~/services/deprecated/leagueActions';
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import { Flame, Lock, LockOpen } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '~/lib/utils';
 import SurvivalCapSlider from '~/components/leagues/customization/settings/cap/slider';
+import { type LeagueSurvivalUpdate, LeagueSurvivalUpdateZod } from '~/types/leagues';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
+import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
+import { DEFAULT_SURVIVAL_CAP, MAX_SURVIVAL_CAP } from '~/lib/leagues';
+import updateLeagueSettings from '~/actions/updateLeagueSettings';
 
 
 export default function SetSurvivalCap() {
-  const { league, refresh } = useLeague();
-  const reactForm = useForm<z.infer<typeof SurvivalCapZod>>({
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: leagueMembers } = useLeagueMembers();
+  const { data: settings } = useLeagueSettings();
+
+  const reactForm = useForm<LeagueSurvivalUpdate>({
     defaultValues: {
-      survivalCap: league.settings.survivalCap ?? DEFAULT_SURVIVAL_CAP,
-      preserveStreak: league.settings.preserveStreak ?? true
+      survivalCap: settings?.survivalCap ?? DEFAULT_SURVIVAL_CAP,
+      preserveStreak: settings?.preserveStreak ?? true
     },
-    resolver: zodResolver(SurvivalCapZod)
+    resolver: zodResolver(LeagueSurvivalUpdateZod)
   });
   const [locked, setLocked] = useState(true);
 
+  useEffect(() => {
+    if (!settings) return;
+
+    reactForm.setValue('survivalCap', settings.survivalCap);
+    reactForm.setValue('preserveStreak', settings.preserveStreak);
+  }, [settings, reactForm]);
+
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league) return;
+
     try {
       await updateLeagueSettings(league.hash, data);
       alert('Survival cap updated successfully');
       setLocked(true);
       reactForm.reset(data);
-      await refresh();
+      await queryClient.invalidateQueries({ queryKey: ['settings', league.hash] });
     } catch (error) {
       alert('Failed to update survival cap');
     }
@@ -40,7 +56,7 @@ export default function SetSurvivalCap() {
 
   return (
     <article className='p-2 bg-card rounded-xl w-full relative'>
-      {league.members.loggedIn?.role === 'Owner' && (locked ?
+      {leagueMembers?.loggedIn && leagueMembers.loggedIn.role === 'Owner' && (locked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => setLocked(false)} /> :

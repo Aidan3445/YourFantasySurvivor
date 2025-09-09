@@ -1,4 +1,4 @@
-import { type ShauhinModeSettings, type BaseEventPredictionRules, type BaseEventRules } from '~/types/leagues';
+import { type BaseEventPredictionRules, type BaseEventRules, type ShauhinModeSettings, type CustomEventRuleInsert } from '~/types/leagues';
 
 export const LeagueStatuses = ['Predraft', 'Draft', 'Active', 'Inactive'] as const;
 export const LeagueMemberRoles = ['Owner', 'Admin', 'Member'] as const;
@@ -7,8 +7,11 @@ export const ShauhinModeTimings = ['Premiere', 'After Merge', 'Before Finale', '
 export const LEAGUE_NAME_MIN_LENGTH = 3;
 export const LEAGUE_NAME_MAX_LENGTH = 64;
 export const DEFAULT_SURVIVAL_CAP = 5;
+export const MAX_SURVIVAL_CAP = 15;
 export const DISPLAY_NAME_MIN_LENGTH = 2;
 export const DISPLAY_NAME_MAX_LENGTH = 32;
+export const ABS_MAX_EVENT_POINTS = 100;
+export const SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK = 10;
 
 export const defaultBaseRules: BaseEventRules = {
   advFound: 5,
@@ -25,7 +28,16 @@ export const defaultBaseRules: BaseEventRules = {
   soleSurvivor: 10,
 };
 
-export const defaultPredictionRules: BaseEventPredictionRules = {
+export const defaultNewCustomRule: CustomEventRuleInsert = {
+  eventName: '',
+  description: '',
+  points: 5,
+  eventType: 'Direct',
+  referenceTypes: ['Castaway'],
+  timing: [],
+};
+
+export const defaultBasePredictionRules: BaseEventPredictionRules = {
   advFound: {
     enabled: false,
     points: 5,
@@ -87,10 +99,9 @@ export const defaultPredictionRules: BaseEventPredictionRules = {
     timing: ['Draft', 'After Merge', 'Before Finale']
   }
 };
-
 export const defaultShauhinModeSettings: ShauhinModeSettings = {
-  enabled: true,
-  maxBet: 100,
+  enabled: false,
+  maxBet: ABS_MAX_EVENT_POINTS,
   maxBetsPerWeek: 5,
   startWeek: 'After Merge',
   customStartWeek: 8,

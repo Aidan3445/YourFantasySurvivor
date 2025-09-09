@@ -18,14 +18,15 @@ export default async function updateLeagueSettingsLogic(
   auth: VerifiedLeagueMemberAuth,
   update: LeagueSettingsUpdate
 ) {
-  const { name, survivalCap, draftDate } = update;
+  const { name, draftDate } = update;
+  console.log('Updating league settings', update);
 
   // Transaction to update the league settings
   return await db.transaction(async (trx) => {
     await trx
       .update(leagueSettingsSchema)
       // we need the date === null because we want to allow setting it to null
-      .set({ survivalCap, draftDate: draftDate === null ? null : draftDate?.toUTCString() })
+      .set({ ...update, draftDate: draftDate === null ? null : draftDate?.toUTCString() })
       .from(leagueSchema)
       .where(eq(leagueSettingsSchema.leagueId, auth.leagueId));
 

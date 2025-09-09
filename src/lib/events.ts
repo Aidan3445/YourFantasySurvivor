@@ -1,5 +1,4 @@
 import { type ScoringBaseEventName, type BaseEventName, type ReferenceType } from '~/types/events';
-import { type BaseEventPredictionRules } from '~/types/leagues';
 
 export const EventSources = ['Base', 'Custom'] as const;
 export const EventTypes = ['Direct', 'Prediction'] as const;
@@ -40,69 +39,6 @@ export const PredictionTimings = [
   'Draft', 'Weekly', 'After Merge', 'Before Finale',
   'Weekly (Premerge only)', 'Weekly (Postmerge only)'
 ] as const;
-
-export const defaultPredictionRules: BaseEventPredictionRules = {
-  advFound: {
-    enabled: false,
-    points: 5,
-    timing: ['Draft']
-  },
-  advPlay: {
-    enabled: false,
-    points: 3,
-    timing: ['Weekly']
-  },
-  badAdvPlay: {
-    enabled: false,
-    points: 3,
-    timing: ['Weekly']
-  },
-  advElim: {
-    enabled: false,
-    points: 3,
-    timing: ['Weekly']
-  },
-  spokeEpTitle: {
-    enabled: false,
-    points: 2,
-    timing: ['Weekly']
-  },
-  tribe1st: {
-    enabled: false,
-    points: 5,
-    timing: ['Weekly (Premerge only)']
-  },
-  tribe2nd: {
-    enabled: false,
-    points: 3,
-    timing: ['Weekly (Premerge only)']
-  },
-  indivWin: {
-    enabled: false,
-    points: 10,
-    timing: ['Weekly (Postmerge only)']
-  },
-  indivReward: {
-    enabled: false,
-    points: 5,
-    timing: ['Weekly (Postmerge only)']
-  },
-  finalists: {
-    enabled: false,
-    points: 3,
-    timing: ['Draft', 'After Merge', 'Before Finale'],
-  },
-  fireWin: {
-    enabled: false,
-    points: 7,
-    timing: ['Before Finale']
-  },
-  soleSurvivor: {
-    enabled: false,
-    points: 10,
-    timing: ['Draft', 'After Merge', 'Before Finale']
-  }
-};
 
 export const baseEventLabelPrefixes: Record<BaseEventName, string> = {
   advFound: 'Found',

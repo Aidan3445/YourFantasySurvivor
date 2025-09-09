@@ -11,6 +11,10 @@ export default function Clock({ endDate, replacedBy }: ClockProps) {
   const [timer, setTimer] = useState<number | null>(null);
 
   useEffect(() => {
+    if (!endDate && timer !== null) {
+      setTimer(null);
+      return;
+    }
     if (!endDate || (timer !== null && timer <= 0)) return;
     if (timer === null) setTimer(endDate.getTime() - Date.now());
 
