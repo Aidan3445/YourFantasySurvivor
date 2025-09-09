@@ -12,7 +12,6 @@ export async function GET(_: NextRequest, context: LeagueRouteParams) {
       if (!leagueRules) {
         return NextResponse.json({ error: 'League not found' }, { status: 404 });
       }
-      console.log(leagueRules);
       return NextResponse.json(leagueRules, { status: 200 });
     } catch (e) {
       console.error(e);
