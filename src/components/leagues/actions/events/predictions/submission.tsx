@@ -5,17 +5,18 @@ import { cn } from '~/lib/utils';
 import { Button } from '~/components/common/button';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '~/components/common/form';
 import { HelpCircle } from 'lucide-react';
-import { type ReferenceType, type ScoringBaseEventName, type LeaguePredictionDraft } from '~/types/events';
+import { type ReferenceType, type MakePrediction } from '~/types/events';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
-import { makePrediction } from '~/services/deprecated/leagueActions';
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useMemo } from 'react';
 import { Input } from '~/components/common/input';
 import ColorRow from '~/components/shared/colorRow';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useQueryClient } from '@tanstack/react-query';
+import makePrediction from '~/actions/makePrediction';
 
 const formSchema = z.object({
   referenceId: z.coerce.number(),
@@ -23,22 +24,24 @@ const formSchema = z.object({
 });
 
 interface SubmissionCardProps {
-  prediction: LeaguePredictionDraft;
+  prediction: MakePrediction;
   options: Record<ReferenceType, Record<string, { id: number, color: string, tribeName?: string }>>;
+  maxBet?: number;
 }
 
-export default function SubmissionCard({ prediction, options }: SubmissionCardProps) {
-  const { league, refresh } = useLeague();
+export default function SubmissionCard({ prediction, options, maxBet }: SubmissionCardProps) {
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
 
   const schema = useMemo(() => {
     return formSchema.extend({
       bet: z.coerce.number()
         .min(0, 'Bet must be a positive number')
-        .max(league.shauhinModeSettings?.maxBet ?? 1000, 'Bet exceeds maximum allowed')
+        .max(maxBet ?? 1000, 'Bet exceeds maximum allowed')
         .default(0)
         .optional(),
     });
-  }, [league.shauhinModeSettings?.maxBet]);
+  }, [maxBet]);
 
   const reactForm = useForm<z.infer<typeof schema>>({
     defaultValues: {
@@ -49,30 +52,31 @@ export default function SubmissionCard({ prediction, options }: SubmissionCardPr
   });
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league) return;
+
     try {
       const selectedType = Object.keys(options).find((type) =>
         Object.values(options[type as ReferenceType]).some(({ id }) =>
           id === data.referenceId)) as ReferenceType | undefined;
       if (!selectedType) throw new Error('Invalid reference type');
 
-      await makePrediction(
-        league.hash,
-        prediction,
-        selectedType,
-        data.referenceId,
-        data.bet
-      );
-      await refresh();
+      await makePrediction(league?.hash, {
+        eventSource: prediction.eventSource,
+        eventName: prediction.eventName,
+        referenceType: selectedType,
+        referenceId: data.referenceId,
+        bet: data.bet ?? null,
+      });
+      await queryClient.invalidateQueries({ queryKey: ['basePredictions', league?.hash] });
+      await queryClient.invalidateQueries({ queryKey: ['customEvents', league?.hash] });
+      reactForm.reset(data);
+
       alert('Prediction submitted');
     } catch (error) {
       console.error(error);
       alert('Failed to submit prediction');
     }
   });
-
-  const shauhinEnabled = league.shauhinModeSettings?.enabled &&
-    league.shauhinModeSettings.enabledBets
-      .includes(prediction.eventName as ScoringBaseEventName);
 
   return (
     <Form {...reactForm}>
@@ -81,7 +85,7 @@ export default function SubmissionCard({ prediction, options }: SubmissionCardPr
           <FormField
             name='referenceId'
             render={({ field }) => (
-              <FormItem className={shauhinEnabled ? 'lg:col-span-3' : 'lg:col-span-4'}>
+              <FormItem className={prediction.shauhinEnabled ? 'lg:col-span-3' : 'lg:col-span-4'}>
                 <FormLabel className='sr-only'>Prediction</FormLabel>
                 <FormControl>
                   <Select
@@ -126,7 +130,7 @@ export default function SubmissionCard({ prediction, options }: SubmissionCardPr
                 </FormControl>
               </FormItem>
             )} />
-          {shauhinEnabled && (
+          {prediction.shauhinEnabled && (
             <FormField
               name='bet'
               render={({ field: betField }) => (
@@ -150,7 +154,7 @@ export default function SubmissionCard({ prediction, options }: SubmissionCardPr
                       <p className='text-sm'>
                         If your prediction is correct, you will earn the bet amount in points.
                         Miss it, and you lose the bet amount.<br />
-                        Bets are limited to a maximum of {league.shauhinModeSettings?.maxBet ?? 1000} points.<br />
+                        Bets are limited to a maximum of {maxBet ?? 1000} points.<br />
                         <br />
                         <b>Note:</b> Bets are only available for certain predictions as defined in the league settings.
                         <br /><br />
@@ -163,7 +167,7 @@ export default function SubmissionCard({ prediction, options }: SubmissionCardPr
               } />
           )}
           <Button
-            className={cn(shauhinEnabled ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
+            className={cn(prediction.shauhinEnabled ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
             disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
             type='submit'>
             {prediction.predictionMade ?? reactForm.formState.isSubmitSuccessful

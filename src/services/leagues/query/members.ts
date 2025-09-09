@@ -27,5 +27,6 @@ export default async function getLeague(auth: VerifiedLeagueMemberAuth) {
     })
     .from(leagueMemberSchema)
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
+    .orderBy(leagueMemberSchema.draftOrder)
     .then((members) => members as LeagueMember[]);
 }

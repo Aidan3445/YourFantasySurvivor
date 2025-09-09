@@ -1,0 +1,30 @@
+import { useQuery } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
+import { type PredictionTiming } from '~/types/events';
+
+/**
+  * Fetches prediction timing currently active for a league based on the league hash from the URL parameters.
+  * @param {string} overrideHash Optional hash to override the URL parameter.
+  * @returnObj `PredictionTiming[]`
+  */
+export function usePredictionTiming(overrideHash?: string) {
+  const params = useParams();
+  const hash = overrideHash ?? params.hash as string;
+
+  return useQuery<PredictionTiming[]>({
+    queryKey: ['rules', hash],
+    queryFn: async () => {
+      if (!hash) throw new Error('League hash is required');
+
+      const response = await fetch(`/api/leagues/${hash}/predictionTiming`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch league');
+      }
+      return response.json();
+    },
+    enabled: !!hash,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchInterval: 10 * 60 * 1000, // 10 minutes
+  });
+}
+

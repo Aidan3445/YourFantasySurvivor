@@ -16,4 +16,5 @@ export type VerifiedLeagueMemberAuth = {
   memberId: number;
   role: LeagueMemberRole;
   leagueId: number;
+  seasonId: number;
 }

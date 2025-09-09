@@ -2,7 +2,6 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
-import { type Hash } from '~/types/deprecated/leagues';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';
 
 type Message = typeof leagueChatSchema.$inferSelect
@@ -13,7 +12,7 @@ type Message = typeof leagueChatSchema.$inferSelect
     * @return the chat history for the league
     * @throws an error if the user is not a member of the league
     */
-export default async function getChatHistory(hash: Hash) {
+export default async function getChatHistory(hash: number) {
   const messageData = await db
     .select()
     .from(leagueChatSchema)

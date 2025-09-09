@@ -7,7 +7,6 @@ import chooseCastawayLogic from '~/services/leagues/mutation/chooseCastaway';
   * Choose a castaway, either in the draft or as a selection update
   * @param hash The hash of the league
   * @param castawayId The id of the castaway
-  * @param isDraft Whether the castaway is being chosen in the draft
   * @throws an error if the castaway cannot be chosen
   * @throws an error if the user is not in the league
   * @returns an object indicating success and if the draft is complete

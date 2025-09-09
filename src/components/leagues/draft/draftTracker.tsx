@@ -1,9 +1,5 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useDraft } from '~/hooks/deprecated/useDraft';
-import { useLeague } from '~/hooks/deprecated/useLeague';
-import { type Hash } from '~/types/deprecated/leagues';
 import { getContrastingColor } from '@uiw/color-convert';
 import ChooseCastaway from '~/components/leagues/draft/chooseCastaway';
 import ColorRow from '~/components/shared/colorRow';
@@ -12,74 +8,40 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/common/alertDialog';
 import MakePredictions from '~/components/leagues/actions/events/predictions/view';
-import { useRouter } from 'next/navigation';
+import { useLeagueDraft } from '~/hooks/leagues/useDraft';
 
 interface DraftTrackerProps {
-  hash: Hash;
+  hash: string;
 }
 
 export default function DraftTracker({ hash }: DraftTrackerProps) {
-  const { draft } = useDraft(hash);
   const {
-    league: {
-      leagueStatus,
-      members: {
-        loggedIn
-      },
-      settings: {
-        survivalCap
-      }
-    }
-  } = useLeague();
-  const router = useRouter();
-
-  const { onTheClock, onDeck, onTheClockIndex } = useMemo(() => {
-    const onTheClockIndex = draft?.picks.findIndex((pick) => !pick?.draftPick);
-
-    const onTheClockDisplayName = draft.picks[onTheClockIndex]?.displayName;
-    const onDeckDisplayName = draft.picks[onTheClockIndex + 1]?.displayName;
-
-    return {
-      onTheClock: {
-        ...draft.picks[onTheClockIndex],
-        loggedIn: !!onTheClockDisplayName && onTheClockDisplayName === loggedIn?.displayName,
-      },
-      onDeck: {
-        ...draft.picks[onTheClockIndex + 1],
-        loggedIn: !!onDeckDisplayName && onDeckDisplayName === loggedIn?.displayName,
-      },
-      onTheClockIndex
-    };
-  }, [draft, loggedIn]);
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [closedDialog, setClosedDialog] = useState(false);
-
-  useEffect(() => {
-    if (onTheClock?.loggedIn) {
-      setDialogOpen(true);
-    }
-  }, [onTheClock, setDialogOpen]);
-
-
-  useEffect(() => {
-    if (onTheClockIndex === -1 || leagueStatus !== 'Draft') {
-      router.push(`/leagues/${hash}`);
-    }
-  }, [onTheClockIndex, leagueStatus, router, hash]);
+    draftDetails,
+    membersWithPicks,
+    onTheClock,
+    onDeck,
+    leagueMembers,
+    rules,
+    predictionRuleCount,
+    settings,
+    basePredictions,
+    customPredictions,
+    dialogOpen,
+    setDialogOpen,
+  } = useLeagueDraft(hash);
 
   return (
     <section className='w-full space-y-4 overflow-x-hidden p-4'>
       <article className='flex flex-col w-full p-2 bg-card rounded-lg'>
         <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
         <div className='grid grid-cols-1 gap-2'>
-          {draft?.picks.map((pick, index) => (
+          {leagueMembers?.members.map((pick, index) => (
             <ColorRow
               key={pick.memberId}
               className={onTheClock.memberId === pick.memberId ?
                 'animate-pulse' : ''}
               color={pick.color}
-              loggedIn={loggedIn?.displayName === pick.displayName}>
+              loggedIn={leagueMembers.loggedIn?.displayName === pick.displayName}>
               <h3
                 className='text-lg'
                 style={{ color: getContrastingColor(pick.color) }}>
@@ -97,11 +59,11 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
                   Picking...
                 </h3>
               )}
-              {pick.draftPick && (
+              {membersWithPicks?.find(m => m.member.memberId === pick.memberId) && (
                 <h3
                   className='ml-auto text-lg text-wrap'
                   style={{ color: getContrastingColor(pick.color) }}>
-                  {pick.draftPick}
+                  {membersWithPicks.find(m => m.member.memberId === pick.memberId)?.castawayFullName}
                 </h3>
               )}
             </ColorRow>
@@ -109,12 +71,15 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
         </div>
       </article>
       {(onDeck.loggedIn || onTheClock.loggedIn) &&
-        <ChooseCastaway castaways={draft.castaways} onDeck={onDeck.loggedIn} />}
+        <ChooseCastaway draftDetails={draftDetails} onDeck={onDeck.loggedIn} />}
       <MakePredictions
-        customPredictions={draft.predictions}
-        castaways={draft.castaways}
-        tribes={draft.tribes} />
-      <AlertDialog open={dialogOpen && !closedDialog} onOpenChange={setDialogOpen}>
+        rules={rules}
+        predictionRuleCount={predictionRuleCount}
+        predictionsMade={[...(basePredictions ?? []), ...(customPredictions ?? [])]}
+        castaways={Object.values(draftDetails ?? {})
+          .flatMap(({ castaways }) => castaways.map(c => c.castaway))}
+        tribes={Object.values(draftDetails ?? {}).map(({ tribe }) => tribe)} />
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
@@ -125,13 +90,13 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
               <br />
               Additionally you will earn points for each successive episode they
               survive (i.e one point for the first episode, two for the second, etc.)
-              {survivalCap ? ` up to a maximum of ${survivalCap} points.` : '.'}
+              {settings?.survivalCap ? ` up to a maximum of ${settings.survivalCap} points.` : '.'}
               <br />
               When they are voted out you will select from the remaining castaways.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction className='w-full' onClick={() => setClosedDialog(true)}>
+            <AlertDialogAction className='w-full'>
               {'I\'m ready!'}
             </AlertDialogAction>
           </AlertDialogFooter>

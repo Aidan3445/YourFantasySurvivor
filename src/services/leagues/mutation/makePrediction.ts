@@ -7,6 +7,7 @@ import getPredictionTimings from '~/services/leagues/query/predictionTimings';
 import getLeagueRules from '~/services/leagues/query/rules';
 import { baseEventPredictionSchema } from '~/server/db/schema/baseEvents';
 import { customEventPredictionSchema } from '~/server/db/schema/customEvents';
+import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
 
 /**
   * Make a league event prediction or update an existing prediction if it exists
@@ -22,9 +23,11 @@ export default async function makePredictionLogic(
 ) {
   // Insert or update the prediction
   return db.transaction(async (trx) => {
+    const keyEpisodes = await getKeyEpisodes(auth.seasonId);
     const predictionTimings = await getPredictionTimings(auth);
 
-    if (predictionTimings.length === 0) throw new Error('Predictions cannot be made at this time');
+    if (predictionTimings.length === 0 || !keyEpisodes.nextEpisode)
+      throw new Error('Predictions cannot be made at this time');
 
     const rules = await getLeagueRules(auth);
 
@@ -43,6 +46,7 @@ export default async function makePredictionLogic(
           .insert(baseEventPredictionSchema)
           .values({
             ...prediction,
+            episodeId: keyEpisodes.nextEpisode.episodeId,
             baseEventName: eventName,
             memberId: auth.memberId
           })
@@ -81,6 +85,7 @@ export default async function makePredictionLogic(
           .insert(customEventPredictionSchema)
           .values({
             ...prediction,
+            episodeId: keyEpisodes.nextEpisode.episodeId,
             customEventRuleId: rule.customEventRuleId,
             memberId: auth.memberId
           })

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { type Eliminations } from '~/types/events';
+import { type Elimination, type Eliminations } from '~/types/events';
 
 /**
   * Fetches eliminations data from the API.
@@ -16,7 +16,11 @@ export function useEliminations(seasonId: number | null) {
       if (!res.ok) {
         throw new Error('Failed to fetch eliminations data');
       }
-      return res.json();
+      const data = await res.json() as (Elimination[] | null)[];
+      return data.map((elimination) => {
+        if (elimination === null) return [];
+        return elimination;
+      });
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

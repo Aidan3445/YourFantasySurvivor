@@ -17,7 +17,7 @@ export function useEventOptions(seasonId: number | null, selectedEpisode: number
     [tribeMembers]
   );
   const castawayOptions = useMemo(() =>
-    Object.values(tribeMembers ?? {}).flatMap(({ members }) =>
+    Object.values(tribeMembers ?? {}).flatMap(({ castaways: members }) =>
       members.map(member => ({
         value: member.castawayId,
         label: member.fullName,

@@ -84,6 +84,9 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       referenceId: customEventPredictionSchema.referenceId,
       referenceType: customEventPredictionSchema.referenceType,
       bet: customEventPredictionSchema.bet,
+      pending: sql<boolean>`
+        CASE WHEN ${customEventSchema.customEventId} IS NULL THEN true ELSE false END
+      `.as('pending'),
       hit: sql<boolean>`
         CASE WHEN ${customEventReferenceSchema.referenceId} = ${customEventPredictionSchema.referenceId}
         AND ${customEventReferenceSchema.referenceType} = ${customEventPredictionSchema.referenceType}
@@ -93,13 +96,13 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
     .from(customEventPredictionSchema)
     .innerJoin(episodeSchema, eq(episodeSchema.episodeId, customEventPredictionSchema.episodeId))
     .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, customEventPredictionSchema.memberId))
+    .innerJoin(customEventRuleSchema, and(
+      eq(customEventRuleSchema.customEventRuleId, customEventPredictionSchema.customEventRuleId),
+      eq(customEventRuleSchema.eventType, 'Prediction')))
     // result
-    .innerJoin(customEventSchema, and(
+    .leftJoin(customEventSchema, and(
       eq(customEventSchema.customEventRuleId, customEventPredictionSchema.customEventRuleId),
       eq(customEventSchema.episodeId, episodeSchema.episodeId)))
-    .innerJoin(customEventRuleSchema, and(
-      eq(customEventRuleSchema.customEventRuleId, customEventSchema.customEventRuleId),
-      eq(customEventRuleSchema.eventType, 'Prediction')))
     .leftJoin(customEventReferenceSchema, eq(customEventReferenceSchema.customEventId, customEventSchema.customEventId))
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
     .orderBy(episodeSchema.episodeNumber)

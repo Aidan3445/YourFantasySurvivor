@@ -2,6 +2,9 @@ import z from 'zod';
 import { EventTypes, PredictionTimings, ReferenceTypes } from '~/lib/events';
 import { LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, type LeagueStatuses, type ShauhinModeTimings } from '~/lib/leagues';
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
+import { type Tribe } from '~/types/tribes';
+import { type EnrichedCastaway } from '~/types/castaways';
+import { type LeagueMember } from '~/types/leagueMembers';
 
 export type LeagueStatus = (typeof LeagueStatuses)[number];
 
@@ -130,7 +133,27 @@ export const CustomEventRuleInsertZod = z.object({
 export type CustomEventRuleInsert = z.infer<typeof CustomEventRuleInsertZod>;
 
 export type SelectionTimeline = Record<number, (number | null)[]>;
+/**
+  * Selection timelines for both member->castaway and castaway->member selections.
+  * The keys are member IDs or castaway IDs, and the values are arrays of selected IDs with index
+  * representing the episode number.
+  * ---
+  * For example:
+  * [memberCastaways][[memberId]][[3]] gives the [castawayId] selected by [memberId] in episode [3].
+  * [castawayMembers][[castawayId]][[5]] gives the [memberId] who selected [castawayId] in episode [5].
+  * ---
+  * If a castaway is available (not selected) in an episode, the value is [null].
+  * When a member has no selection in an episode, the value is [null].
+  */
 export type SelectionTimelines = {
   memberCastaways: SelectionTimeline,
   castawayMembers: SelectionTimeline
 };
+
+export type DraftDetails = Record<number, {
+  tribe: Tribe;
+  castaways: {
+    castaway: EnrichedCastaway;
+    member: LeagueMember | null;
+  }[];
+}> 

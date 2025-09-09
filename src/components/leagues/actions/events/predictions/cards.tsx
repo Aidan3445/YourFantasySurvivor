@@ -1,49 +1,59 @@
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import {
-  type ReferenceType, defaultPredictionRules,
-  BaseEventDescriptions, type ScoringBaseEventName, BasePredictionReferenceTypes,
-  type LeaguePredictionDraft, BaseEventFullName
-} from '~/types/events';
-import type { CastawayDetails, CastawayDraftInfo } from '~/types/castaways';
 import { CoverCarousel } from '~/components/common/carousel';
-import { type MakePredictionsProps } from '~/components/leagues/actions/events/predictions/view';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
 import SubmissionCard from '~/components/leagues/actions/events/predictions/submission';
+import { BaseEventDescriptions, BaseEventFullName, BasePredictionReferenceTypes } from '~/lib/events';
+import { type MakePredictionsProps } from '~/components/leagues/actions/events/predictions/view';
+import { type ScoringBaseEventName, type ReferenceType, type MakePrediction } from '~/types/events';
+import { useCallback, useMemo } from 'react';
 
 export default function PredictionCards({
-  basePredictionRules = defaultPredictionRules,
-  basePredictions = [],
-  customPredictions = [],
+  rules,
+  predictionRuleCount,
+  predictionsMade,
   castaways,
   tribes,
   className
 }: MakePredictionsProps) {
-  const enabledBasePredictions = Object.entries(basePredictionRules)
-    .filter(([_, rule]) => rule.enabled)
-    .map(([baseEventName, rule]) => {
-      const eventName = baseEventName as ScoringBaseEventName;
-      const fullName = BaseEventFullName[baseEventName as ScoringBaseEventName] ?? baseEventName;
-      const prediction: LeaguePredictionDraft = {
-        eventName: eventName,
-        label: fullName,
-        description: `${BaseEventDescriptions.prediction[eventName]} \
+
+  const enabledBasePredictions = useMemo(() =>
+    Object.entries(rules?.basePrediction ?? {})
+      .filter(([_, rule]) => rule.enabled)
+      .map(([baseEventName, rule]) => {
+        const eventName = baseEventName as ScoringBaseEventName;
+        const fullName = BaseEventFullName[baseEventName as ScoringBaseEventName] ?? baseEventName;
+        const prediction: MakePrediction = {
+          eventSource: 'Base' as const,
+          eventName: eventName,
+          label: fullName,
+          description: `${BaseEventDescriptions.prediction[eventName]} \
             ${BaseEventDescriptions.italics[eventName] ?? ''}`,
+          points: rule.points,
+          referenceTypes: BasePredictionReferenceTypes[eventName],
+          timing: rule.timing,
+          predictionMade: predictionsMade.find((pred) =>
+            pred.eventName === eventName) ?? null,
+          shauhinEnabled: rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.includes(eventName)
+        };
+        return prediction;
+      }), [rules, predictionsMade]);
+
+  const customPredictions: MakePrediction[] = useMemo(() =>
+    rules?.custom
+      .map((rule) => ({
+        eventSource: 'Custom' as const,
+        eventName: rule.eventName,
+        label: rule.eventName,
+        description: rule.description,
         points: rule.points,
-        eventType: 'Prediction',
-        referenceTypes: BasePredictionReferenceTypes[eventName],
+        referenceTypes: rule.referenceTypes,
         timing: rule.timing,
-        predictionMade: basePredictions.find((pred) =>
-          pred.eventName === eventName)?.predictionMade ?? null,
-      };
+        predictionMade: predictionsMade.find((pred) =>
+          pred.eventName === rule.eventName) ?? null,
+      })) ?? [], [rules, predictionsMade]);
 
-      return prediction;
-    });
-
-  const predictionRuleCount = enabledBasePredictions.length + customPredictions.length;
-  if (predictionRuleCount === 0) return null;
-
-  const getOptions = (referenceTypes: ReferenceType[]) => {
+  const getOptions = useCallback((referenceTypes: ReferenceType[]) => {
     const options: Record<ReferenceType, Record<string, {
       id: number,
       color: string,
@@ -56,12 +66,11 @@ export default function PredictionCards({
     if (referenceTypes.length === 0 || referenceTypes.includes('Castaway')) {
       castaways.forEach((castaway) => {
         if (castaway.eliminatedEpisode) return;
-        const tribe = (castaway as CastawayDraftInfo).tribe ??
-          (castaway as CastawayDetails).tribes.slice(-1)[0];
+        const tribe = castaway.tribe;
         options.Castaway[castaway.fullName] = {
           id: castaway.castawayId,
-          color: tribe.tribeColor,
-          tribeName: tribe.tribeName
+          color: tribe?.color ?? '#AAAAAA',
+          tribeName: tribe?.name ?? 'No Tribe'
         };
       });
     }
@@ -74,16 +83,17 @@ export default function PredictionCards({
       });
     }
     return options;
-  };
+  }, [castaways, tribes]);
 
+  if (predictionRuleCount === 0) return null;
   if (predictionRuleCount === 1) {
-    const prediction = (customPredictions[0] ?? enabledBasePredictions[0])!;
+    const prediction = enabledBasePredictions[0] ?? customPredictions[0]!;
     return (
       <article
         className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg min-w-96', className)}>
         <span className='flex gap-1 items-start self-center px-1'>
           <h3 className='text-lg font-semibold text-card-foreground'>
-            {prediction.label ?? prediction.eventName}
+            {prediction.label}
           </h3>
           -
           <div className='inline-flex mt-1'>
@@ -92,7 +102,11 @@ export default function PredictionCards({
           </div>
         </span>
         <p className='text-sm'>{prediction.description}</p>
-        <SubmissionCard prediction={prediction} options={getOptions(prediction.referenceTypes)} />
+        <SubmissionCard
+          prediction={prediction}
+          options={getOptions(prediction.referenceTypes)}
+          maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined}
+        />
       </article>
     );
   }
@@ -115,7 +129,9 @@ export default function PredictionCards({
     footer: (
       <SubmissionCard
         prediction={prediction}
-        options={getOptions(prediction.referenceTypes)} />
+        options={getOptions(prediction.referenceTypes)}
+        maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined}
+      />
     ),
   }));
 
@@ -139,7 +155,8 @@ export default function PredictionCards({
     footer: (
       <SubmissionCard
         prediction={prediction}
-        options={getOptions(prediction.referenceTypes)} />
+        options={getOptions(prediction.referenceTypes)}
+        maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
     ),
   }));
 

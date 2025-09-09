@@ -3,31 +3,19 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
-import { useDraft } from '~/hooks/deprecated/useDraft';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn } from '~/lib/utils';
-import { type CastawayDraftInfo } from '~/types/castaways';
-import { type Hash } from '~/types/deprecated/leagues';
-import { type TribeName } from '~/types/deprecated/tribes';
 import ColorRow from '~/components/shared/colorRow';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { useLeagueDraft } from '~/hooks/leagues/useDraft';
 
 interface CastawayCardsProps {
-  hash: Hash;
+  hash: string;
 }
 
 export default function DraftCastaways({ hash }: CastawayCardsProps) {
-  const { draft } = useDraft(hash);
+  const { draftDetails } = useLeagueDraft(hash);
   const isMobile = useIsMobile();
-
-  const castaways = draft?.castaways ?? [];
-
-
-  const castawaysByTribe = castaways?.reduce((acc, castaway) => {
-    acc[castaway.tribe.tribeName] ??= [];
-    acc[castaway.tribe.tribeName]!.push(castaway);
-    return acc;
-  }, {} as Record<TribeName, CastawayDraftInfo[]>);
 
   return (
     <section className='w-full bg-card rounded-lg overflow-x-hidden'>
@@ -37,13 +25,13 @@ export default function DraftCastaways({ hash }: CastawayCardsProps) {
       </span>
       <ScrollArea className='overflow-auto w-[calc(100vw-2rem)] md:w-full'>
         <article className='flex gap-4 p-4 justify-start'>
-          {Object.entries(castawaysByTribe ?? {}).map(([tribeName, castaways]) => (
+          {Object.values(draftDetails ?? {}).map(({ tribe, castaways }) => (
             <div
-              key={tribeName}
+              key={tribe.tribeId}
               className='flex grow flex-col gap-1 bg-b2 rounded-lg p-2 min-w-56'
-              style={{ border: `5px solid ${castaways[0]?.tribe.tribeColor}` }}>
-              <h2 className='text-lg font-semibold'>{tribeName}</h2>
-              {castaways.map((castaway) => (
+              style={{ border: `5px solid ${tribe.tribeColor}` }}>
+              <h2 className='text-lg font-semibold'>{tribe.tribeName}</h2>
+              {castaways.map(({ castaway, member }) => (
                 <Popover key={castaway.fullName}>
                   <PopoverTrigger className={cn(
                     'relative flex gap-4 items-center bg-accent p-1 rounded-md text-left',
@@ -55,13 +43,13 @@ export default function DraftCastaways({ hash }: CastawayCardsProps) {
                       width={50}
                       height={50}
                       className={cn('rounded-full',
-                        (!!castaway.pickedBy || !!castaway.eliminatedEpisode) && 'grayscale')} />
+                        (!!member || !!castaway.eliminatedEpisode) && 'grayscale')} />
                     <p>{castaway.fullName}</p>
-                    {castaway.pickedBy && (
+                    {member && (
                       <ColorRow
                         className='absolute -right-1 top-1 rotate-30 text-xs leading-tight p-0 px-1 z-50'
-                        color={draft?.picks.find(pick => pick.displayName === castaway.pickedBy)?.color}>
-                        {castaway.pickedBy}
+                        color={member.color}>
+                        {member.displayName}
                       </ColorRow>
                     )}
                   </PopoverTrigger>

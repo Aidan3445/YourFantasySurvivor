@@ -38,12 +38,10 @@ export default async function getLeagueRules(auth: VerifiedLeagueMemberAuth) {
 
   const [base, custom] = await Promise.all([baseReq, customReq]);
 
-  if (!base) return undefined;
-
   return {
-    base: base.base,
-    basePrediction: basePredictionRulesSchemaToObject(base.basePrediction),
-    shauhinMode: base.shauhinMode,
+    base: base?.base ?? null,
+    basePrediction: base ? basePredictionRulesSchemaToObject(base.basePrediction) : null,
+    shauhinMode: base?.shauhinMode ?? null,
     custom
   } as LeagueRules;
 }

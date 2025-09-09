@@ -31,9 +31,9 @@ export function useEnrichedTribeMembers(seasonId: number | null, episode: number
         ...acc,
         [tribeId]: {
           tribe,
-          members: members.filter(Boolean),
+          castaways: members.filter(Boolean),
         }
       };
-    }, {} as Record<number, { tribe: Tribe; members: Castaway[] }>);
+    }, {} as Record<number, { tribe: Tribe; castaways: Castaway[] }>);
   }, [tribeMembers, tribes, castaways]);
 }

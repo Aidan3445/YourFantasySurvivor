@@ -63,6 +63,7 @@ export type Prediction = {
   predictionMakerId: number;
   referenceId: number;
   referenceType: ReferenceType;
+  pending: boolean;
   bet: number | null;
   hit: boolean | null;
 };
@@ -125,13 +126,24 @@ export type CustomEventInsert = z.infer<typeof CustomEventInsertZod>;
 
 export const PredictionInsertZod = z.object({
   eventSource: z.enum(EventSources),
-  episodeId: z.number().int().min(0),
   referenceId: z.number().int().min(0),
   referenceType: z.enum(ReferenceTypes),
   eventName: z.string().max(64),
   bet: z.number().int().min(0).nullable(),
 });
 export type PredictionInsert = z.infer<typeof PredictionInsertZod>;
+
+export type MakePrediction = {
+  eventSource: EventSource;
+  eventName: string;
+  label: string;
+  description: string;
+  points: number;
+  referenceTypes: ReferenceType[];
+  timing: PredictionTiming[];
+  predictionMade: Prediction | null;
+  shauhinEnabled?: boolean;
+}
 
 /**
   * Record<ReferenceType | 'Member', Record<referneceId, runningScores[]>>

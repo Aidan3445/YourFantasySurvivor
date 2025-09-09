@@ -22,6 +22,9 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
     referenceId: baseEventPredictionSchema.referenceId,
     referenceType: baseEventPredictionSchema.referenceType,
     bet: baseEventPredictionSchema.bet,
+    pending: sql<boolean>`
+      CASE WHEN ${baseEventSchema.baseEventId} IS NULL THEN true ELSE false END
+    `.as('pending'),
     hit: sql<boolean>`
       CASE WHEN ${baseEventReferenceSchema.referenceId} = ${baseEventPredictionSchema.referenceId}
       AND ${baseEventReferenceSchema.referenceType} = ${baseEventPredictionSchema.referenceType}
@@ -32,7 +35,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
     .innerJoin(episodeSchema, eq(baseEventPredictionSchema.episodeId, episodeSchema.episodeId))
     .innerJoin(leagueMemberSchema, eq(baseEventPredictionSchema.memberId, leagueMemberSchema.memberId))
     // result
-    .innerJoin(baseEventSchema, and(
+    .leftJoin(baseEventSchema, and(
       eq(
         sql`cast(${baseEventSchema.eventName} as varchar)`,
         sql`cast(${baseEventPredictionSchema.baseEventName} as varchar)`),
