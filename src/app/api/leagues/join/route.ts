@@ -36,13 +36,9 @@ export async function POST(request: NextRequest) {
         newMember: LeagueMemberInsert;
       };
 
-      const result = await joinLeagueLogic(
-        userId,
-        body.hash,
-        body.newMember
-      );
+      const success = await joinLeagueLogic(userId, body.hash, body.newMember);
 
-      return NextResponse.json(result, { status: 201 });
+      return NextResponse.json(success, { status: 201 });
     } catch (error) {
       console.error('Failed to join league', error);
       return NextResponse.json({ error: 'An error occurred while joining the league.' }, { status: 500 });

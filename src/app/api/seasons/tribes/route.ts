@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const tribes = await getTribes(seasonId);
-    return NextResponse.json(tribes, { status: 200 });
+    return NextResponse.json({ tribes }, { status: 200 });
   } catch (e) {
     console.error('Failed to get tribes', e);
     return NextResponse.json({ error: 'An error occurred while fetching tribes.' }, { status: 500 });
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       const newTribes = await Promise.all(
         body.tribes.map(async (tribe) => await createTribeLogic(body.seasonName, tribe)
           .then(({ newTribeId }) => newTribeId)));
-      return NextResponse.json(newTribes, { status: 201 });
+      return NextResponse.json({ newTribes }, { status: 201 });
     } catch (error) {
       console.error('Failed to create tribes', error);
       return NextResponse.json({ error: 'An error occurred while creating the tribes.' }, { status: 500 });

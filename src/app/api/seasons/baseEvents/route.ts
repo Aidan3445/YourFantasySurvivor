@@ -48,8 +48,8 @@ export async function PUT(request: NextRequest) {
       baseEventId: number,
       baseEvent: BaseEventInsert
     };
-    const { success } = await requireSystemAdminAuth(updateBaseEventLogic)(baseEventId, baseEvent);
-    return NextResponse.json({ success }, { status: 200 });
+    const success = await requireSystemAdminAuth(updateBaseEventLogic)(baseEventId, baseEvent);
+    return NextResponse.json(success, { status: 200 });
   } catch (error) {
     let message: string;
     if (error instanceof Error) message = error.message;
@@ -65,8 +65,8 @@ export async function PUT(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const { baseEventId } = await request.json() as { baseEventId: number };
-    const { success } = await requireSystemAdminAuth(deleteBaseEventLogic)(baseEventId);
-    return NextResponse.json({ success }, { status: 200 });
+    const success = await requireSystemAdminAuth(deleteBaseEventLogic)(baseEventId);
+    return NextResponse.json(success, { status: 200 });
   } catch (error) {
     let message: string;
     if (error instanceof Error) message = error.message;

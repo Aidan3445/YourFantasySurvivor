@@ -39,8 +39,8 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await updateCustomEventRuleLogic(auth, body.rule, body.ruleId);
-      return NextResponse.json({ success }, { status: 200 });
+      const success = await updateCustomEventRuleLogic(auth, body.rule, body.ruleId);
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to update custom event rule', e);
       return NextResponse.json({ error: 'Failed to update custom event rule' }, { status: 500 });
@@ -58,8 +58,8 @@ export async function DELETE(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await deleteCustomEventRuleLogic(auth, parseInt(ruleIdParam, 10));
-      return NextResponse.json({ success }, { status: 200 });
+      const success = await deleteCustomEventRuleLogic(auth, parseInt(ruleIdParam, 10));
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to delete custom event rule', e);
       return NextResponse.json({ error: 'Failed to delete custom event rule' }, { status: 500 });

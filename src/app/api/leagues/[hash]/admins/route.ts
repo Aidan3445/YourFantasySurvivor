@@ -16,8 +16,8 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await updateAdminsLogic(auth, body.admins);
-      return NextResponse.json({ success }, { status: 200 });
+      const success = await updateAdminsLogic(auth, body.admins);
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to update admins', e);
       return NextResponse.json(

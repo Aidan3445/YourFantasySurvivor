@@ -20,8 +20,8 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await saveChatMessageLogic(auth, body.message);
-      return NextResponse.json({ success }, { status: 201 });
+      const success = await saveChatMessageLogic(auth, body.message);
+      return NextResponse.json(success, { status: 201 });
     } catch (e) {
       console.error('Failed to save chat message', e);
       return NextResponse.json(

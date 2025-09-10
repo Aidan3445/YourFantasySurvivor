@@ -9,7 +9,7 @@ export async function GET(_: NextRequest, context: LeagueRouteParams) {
   return withLeagueMemberAuth(async (auth) => {
     try {
       const basePredictions = await getBasePredictions(auth);
-      return NextResponse.json({ basePredictions }, { status: 200 });
+      return NextResponse.json(basePredictions, { status: 200 });
     } catch (e) {
       console.error(e);
       return NextResponse.json({ error: 'Failed to fetch base predictions' }, { status: 500 });

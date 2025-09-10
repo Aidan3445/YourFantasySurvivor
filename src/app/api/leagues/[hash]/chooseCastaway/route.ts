@@ -16,8 +16,8 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await chooseCastawayLogic(auth, body.castawayId);
-      return NextResponse.json({ success }, { status: 200 });
+      const success = await chooseCastawayLogic(auth, body.castawayId);
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to choose castaway', e);
       return NextResponse.json({ error: 'Failed to choose castaway' }, { status: 500 });

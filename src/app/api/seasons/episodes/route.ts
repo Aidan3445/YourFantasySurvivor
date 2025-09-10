@@ -54,8 +54,8 @@ export async function PUT(request: NextRequest) {
     }
 
     try {
-      const { success } = await updateEpisodeLogic(body);
-      return NextResponse.json({ success }, { status: 200 });
+      const success = await updateEpisodeLogic(body);
+      return NextResponse.json(success, { status: 200 });
     } catch (error) {
       console.error('Failed to update episode', error);
       return NextResponse.json({ error: 'An error occurred while updating the episode.' }, { status: 500 });

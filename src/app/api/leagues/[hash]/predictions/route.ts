@@ -13,8 +13,8 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
         prediction: PredictionInsert;
       };
 
-      const { success, wasUpdate } = await makePredictionLogic(auth, body.prediction);
-      return NextResponse.json({ success, wasUpdate }, { status: wasUpdate ? 200 : 201 });
+      const status = await makePredictionLogic(auth, body.prediction);
+      return NextResponse.json(status, { status: status.wasUpdate ? 200 : 201 });
     } catch (e) {
       console.error('Failed to make prediction', e);
       return NextResponse.json(

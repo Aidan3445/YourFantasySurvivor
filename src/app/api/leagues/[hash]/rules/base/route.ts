@@ -18,8 +18,8 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const result = await updateBaseEventRulesLogic(auth, body.baseRules, body.predictionRules);
-      return NextResponse.json(result);
+      const success = await updateBaseEventRulesLogic(auth, body.baseRules, body.predictionRules);
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to update base event rules', e);
       return NextResponse.json({ error: 'An error occurred while updating the base event rules.' }, { status: 500 });

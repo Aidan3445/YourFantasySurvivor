@@ -14,7 +14,7 @@ export async function GET(_: NextRequest, context: LeagueRouteParams) {
       if (!leagueMembers) {
         return NextResponse.json({ error: 'League not found' }, { status: 404 });
       }
-      return NextResponse.json(leagueMembers, { status: 200 });
+      return NextResponse.json({ leagueMembers }, { status: 200 });
     } catch (e) {
       console.error('Failed to get league members', e);
       return NextResponse.json({ error: 'An error occurred while fetching league members.' }, { status: 500 });
@@ -33,8 +33,8 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await updateMemberDetailsLogic(auth, body.member);
-      return NextResponse.json({ success }, { status: 200 });
+      const success = await updateMemberDetailsLogic(auth, body.member);
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to update member details', e);
       return NextResponse.json({ error: 'An error occurred while updating the member details.' }, { status: 500 });

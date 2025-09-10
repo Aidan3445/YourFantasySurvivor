@@ -16,8 +16,8 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const result = await updateDraftOrderLogic(auth, body.draftOrder);
-      return NextResponse.json(result);
+      const success = await updateDraftOrderLogic(auth, body.draftOrder);
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to update draft order', e);
       return NextResponse.json({ error: 'An error occurred while updating the draft order.' }, { status: 500 });

@@ -31,8 +31,8 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await updateLeagueSettingsLogic(auth, body);
-      return NextResponse.json({ success }, { status: 200 });
+      const success = await updateLeagueSettingsLogic(auth, body);
+      return NextResponse.json(success, { status: 200 });
     } catch (e) {
       let message: string;
       if (e instanceof Error) message = e.message;
