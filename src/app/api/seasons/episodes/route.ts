@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const episodes = await getEpisodes(seasonId);
-    return NextResponse.json(episodes, { status: 200 });
+    return NextResponse.json({ episodes }, { status: 200 });
   } catch (e) {
     console.error('Failed to get episodes', e);
     return NextResponse.json({ error: 'An error occurred while fetching episodes.' }, { status: 500 });
