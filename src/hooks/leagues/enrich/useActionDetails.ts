@@ -13,42 +13,40 @@ import { useEliminations } from '~/hooks/seasons/useEliminations';
 import { useRouter } from 'next/navigation';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { type DraftDetails } from '~/types/leagues';
-import { useBasePredictions } from '~/hooks/leagues/useBasePredictions';
-import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
+import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
 
 /**
-  * Custom hook to get league draft details.
+  * Custom hook to get league action details
   * @param {string} overrideHash Optional hash to override the URL parameter.
-  * @returnObj `LeagueRule[]`
   */
-export function useLeagueDraft(overrideHash?: string) {
+export function useLeagueActionDetails(overrideHash?: string) {
   const { data: league } = useLeague(overrideHash);
   const { data: rules } = useLeagueRules(overrideHash);
   const { data: settings } = useLeagueSettings(overrideHash);
   const { data: leagueMembers } = useLeagueMembers(overrideHash);
   const { data: selectionTimeline } = useSelectionTimeline(overrideHash);
   const { data: predictionTiming } = usePredictionTiming(overrideHash);
-  const { data: basePredictions } = useBasePredictions(overrideHash);
-  const { data: customEvents } = useCustomEvents(overrideHash);
+  const { customPredictionsMade, basePredictionsMade } = usePredictionsMade(overrideHash);
 
   const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
   const nextEpisode = useMemo(() => keyEpisodes?.nextEpisode?.episodeNumber ?? null, [keyEpisodes]);
   const tribeMembers = useEnrichedTribeMembers(league?.seasonId ?? null, nextEpisode);
   const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
-  const { draftDetails, membersWithPicks } = useMemo(() => {
+  const { actionDetails, membersWithPicks } = useMemo(() => {
     if (!league || !rules || !predictionTiming || !selectionTimeline ||
       !nextEpisode || !tribeMembers || !leagueMembers || !eliminations) return {};
 
     const membersWithPicks: { member: LeagueMember; castawayFullName: string }[] = [];
 
-    const draftDetails: DraftDetails = Object.entries(tribeMembers).reduce((acc, [tribeId, { tribe, castaways }]) => {
+    const actionDetails: DraftDetails = Object.entries(tribeMembers).reduce((acc, [tribeId, { tribe, castaways }]) => {
       const selections = castaways.map(castaway => {
         const selection = selectionTimeline.castawayMembers[castaway.castawayId]?.[nextEpisode];
 
         const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
           episodeElims.some(elim => elim?.castawayId === castaway.castawayId)
         );
+
         const castawayWithTribe: EnrichedCastaway = {
           ...castaway,
           tribe: { name: tribe.tribeName, color: tribe.tribeColor },
@@ -80,7 +78,7 @@ export function useLeagueDraft(overrideHash?: string) {
     }>);
 
     return {
-      draftDetails,
+      actionDetails,
       membersWithPicks
     };
   }, [league, rules, predictionTiming, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminations]);
@@ -135,8 +133,17 @@ export function useLeagueDraft(overrideHash?: string) {
     return enabledBasePredictions + rules.custom.length;
   }, [rules]);
 
+  const predictionsMade = useMemo(() => {
+    if (!nextEpisode) return [];
+    return [
+      ...(basePredictionsMade?.[nextEpisode] ?? []),
+      ...(customPredictionsMade?.[nextEpisode] ?? [])
+    ];
+  }, [nextEpisode, basePredictionsMade, customPredictionsMade]);
+
+
   return {
-    draftDetails,
+    actionDetails,
     membersWithPicks,
     onTheClock,
     onDeck,
@@ -144,8 +151,9 @@ export function useLeagueDraft(overrideHash?: string) {
     rules,
     predictionRuleCount,
     settings,
-    basePredictions: Object.values(basePredictions?.[nextEpisode ?? -1] ?? {}).flat(),
-    customPredictions: Object.values(customEvents?.predictions?.[nextEpisode ?? -1] ?? {}).flat(),
+    predictionsMade,
+    selectionTimeline,
+    keyEpisodes,
     dialogOpen,
     setDialogOpen,
   };

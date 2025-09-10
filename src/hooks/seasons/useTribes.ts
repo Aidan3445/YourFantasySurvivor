@@ -16,7 +16,8 @@ export function useTribes(seasonId: number | null) {
       if (!res.ok) {
         throw new Error('Failed to fetch tribes data');
       }
-      return res.json();
+      const { tribes } = await res.json() as { tribes: Tribe[] };
+      return tribes;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

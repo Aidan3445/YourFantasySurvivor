@@ -20,7 +20,8 @@ export function usePredictionTiming(overrideHash?: string) {
       if (!response.ok) {
         throw new Error('Failed to fetch league');
       }
-      return response.json();
+      const { predictionTiming } = await response.json() as { predictionTiming: PredictionTiming[] };
+      return predictionTiming;
     },
     enabled: !!hash,
     staleTime: 5 * 60 * 1000, // 5 minutes

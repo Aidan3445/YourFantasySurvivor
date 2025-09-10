@@ -14,8 +14,8 @@ export function useSeasonsData(includeInactive: boolean) {
       if (!res.ok) {
         throw new Error('Failed to fetch season data');
       }
-      const data = await res.json() as SeasonsDataQuery[];
-      return data;
+      const { seasonsData } = await res.json() as { seasonsData: SeasonsDataQuery[] };
+      return seasonsData;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

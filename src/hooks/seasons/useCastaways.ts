@@ -16,7 +16,8 @@ export function useCastaways(seasonId: number | null) {
       if (!res.ok) {
         throw new Error('Failed to fetch castaways data');
       }
-      return res.json();
+      const { castaways } = await res.json() as { castaways: Castaway[] };
+      return castaways;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

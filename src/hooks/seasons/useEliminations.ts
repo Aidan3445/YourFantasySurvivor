@@ -16,8 +16,8 @@ export function useEliminations(seasonId: number | null) {
       if (!res.ok) {
         throw new Error('Failed to fetch eliminations data');
       }
-      const data = await res.json() as (Elimination[] | null)[];
-      return data.map((elimination) => {
+      const { eliminations } = await res.json() as { eliminations: (Elimination[] | null)[] };
+      return eliminations.map((elimination) => {
         if (elimination === null) return [];
         return elimination;
       });

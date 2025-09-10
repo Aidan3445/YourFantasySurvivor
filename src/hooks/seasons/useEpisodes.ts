@@ -16,7 +16,8 @@ export function useEpisodes(seasonId: number | null) {
       if (!res.ok) {
         throw new Error('Failed to fetch episode data');
       }
-      return res.json();
+      const { episodes } = await res.json() as { episodes: Episode[] };
+      return episodes;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

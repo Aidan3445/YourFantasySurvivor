@@ -14,7 +14,14 @@ export function useLeagues() {
       if (!response.ok) {
         throw new Error('Failed to fetch league');
       }
-      return response.json();
+      const { leagues } = await response.json() as {
+        leagues: {
+          league: League,
+          member: LeagueMember,
+          castaway: CurrentSelection
+        }[]
+      };
+      return leagues;
     }
   });
 }

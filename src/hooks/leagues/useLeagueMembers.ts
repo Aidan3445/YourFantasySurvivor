@@ -20,9 +20,9 @@ export function useLeagueMembers(overrideHash?: string) {
       if (!res.ok) {
         throw new Error('Failed to fetch leagueMembers data');
       }
-      const data = await res.json() as LeagueMember[];
-      const loggedIn = data.find((member) => member.loggedIn);
-      return { loggedIn, members: data };
+      const { leagueMembers } = await res.json() as { leagueMembers: LeagueMember[] };
+      const loggedIn = leagueMembers.find((member) => member.loggedIn);
+      return { loggedIn, members: leagueMembers };
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours
