@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { and, eq, inArray, sql } from 'drizzle-orm';
@@ -17,6 +17,7 @@ export default async function updateDraftOrderLogic(
   auth: VerifiedLeagueMemberAuth,
   draftOrder: number[]
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Transaction to update the draft order
   return await db.transaction(async (trx) => {
     // Verify all members exist first
@@ -38,7 +39,7 @@ export default async function updateDraftOrderLogic(
   CASE ${leagueMemberSchema.memberId}
   ${sql.join(
       draftOrder.map((memberId, index) =>
-        sql`WHEN ${memberId} THEN ${index + 1}::smallint`
+        sql`WHEN ${memberId} THEN ${index}::smallint`
       ),
       sql` `
     )}

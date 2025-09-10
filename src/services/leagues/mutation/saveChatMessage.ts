@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { leagueChatSchema } from '~/server/db/schema/leagueChat';

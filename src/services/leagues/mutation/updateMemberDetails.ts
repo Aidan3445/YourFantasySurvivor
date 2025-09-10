@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { and, eq, or } from 'drizzle-orm';
@@ -18,6 +18,7 @@ export default async function updateMemberDetailsLogic(
   auth: VerifiedLeagueMemberAuth,
   member: LeagueMemberInsert
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Error can be ignored, the where clause is not understood by the type system
   const update = await db
     .update(leagueMemberSchema)

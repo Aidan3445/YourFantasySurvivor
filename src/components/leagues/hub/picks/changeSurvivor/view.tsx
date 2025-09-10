@@ -5,74 +5,83 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem } from '~/components/common/form';
 import { Button } from '~/components/common/button';
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import {
   AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/common/alertDialog';
-import { chooseCastaway } from '~/services/deprecated/leagueActions';
 import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import ColorRow from '~/components/shared/colorRow';
-import { type LeagueMemberDisplayName } from '~/types/deprecated/leagueMembers';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
+import chooseCastaway from '~/actions/chooseCastaway';
+import { type LeagueMember } from '~/types/leagueMembers';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
 });
 
-export default function ChangeSurvivor() {
-  const { league, leagueData, refresh } = useLeague();
+export default function ChangeCastaway() {
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { actionDetails, keyEpisodes, leagueMembers } = useLeagueActionDetails();
+
   const reactForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
   const [selected, setSelected] = useState('');
 
-  const availableCastaways = leagueData.castaways
-    .filter(castaway => !castaway.eliminatedEpisode && castaway.startingTribe.tribeId > 0)
-    .map(castaway => ({
-      ...castaway,
-      pickedBy: leagueData.selectionTimeline.castawayMembers[castaway.fullName]?.slice(-1)[0]
-    }));
+  const availableCastaways = useMemo(() => Object.values(actionDetails ?? {})
+    .map(({ castaways }) => castaways
+      .map(({ castaway, member }) => ({
+        ...castaway,
+        pickedBy: member ?? null
+      })))
+    .flat(),
+    [actionDetails]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league) return;
+
     try {
-      await chooseCastaway(league.hash, data.castawayId, false);
-      await refresh();
+      await chooseCastaway(league.hash, data.castawayId);
+      await queryClient.invalidateQueries({ queryKey: ['selectionTimeline', league.hash] });
+      await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
       reactForm.reset();
       setSelected('');
-
       alert('Castaway chosen successfully');
     } catch (error) {
       alert('Failed to choose castaway');
     }
   });
 
-  const lastEpisode = useMemo(() => leagueData.episodes.findLast(episode => episode.airStatus === 'Aired'), [leagueData]);
-
   const { pickPriority, elim } = useMemo(() => {
-    return Object.entries(leagueData.selectionTimeline.memberCastaways)
-      .reduce((acc, [member, castaways]) => {
-        const eliminatedEpisode = leagueData.castaways.find(castaway => castaway.fullName === castaways.slice(-1)[0])?.eliminatedEpisode;
-        if (eliminatedEpisode) {
-          acc.elim.push(member);
-          if (eliminatedEpisode === lastEpisode?.episodeNumber) acc.pickPriority.push(member);
+    return availableCastaways
+      .reduce((acc, castaway) => {
+        if (castaway.pickedBy) {
+          acc.elim.push(castaway.pickedBy);
+          if (castaway.eliminatedEpisode === keyEpisodes?.previousEpisode?.episodeNumber) {
+            acc.pickPriority.push(castaway.pickedBy);
+          }
         }
         return acc;
-      }, { pickPriority: [], elim: [] } as { pickPriority: LeagueMemberDisplayName[], elim: LeagueMemberDisplayName[] });
-  }, [leagueData, lastEpisode]);
+      }, { pickPriority: [], elim: [] } as { pickPriority: LeagueMember[], elim: LeagueMember[] });
+  }, [availableCastaways, keyEpisodes]);
+
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [closedDialog, setClosedDialog] = useState(false);
 
   useEffect(() => {
-    if (elim.includes(league.members.loggedIn?.displayName ?? '')) {
+    if (leagueMembers?.loggedIn && elim.some(member => member.memberId === leagueMembers.loggedIn?.memberId)) {
       setDialogOpen(true);
     }
     // check if dialog was closed within the last 10 minutes
     setClosedDialog(localStorage.getItem('closedDialog') ?
       Date.now() - JSON.parse(localStorage.getItem('closedDialog')!) < 1000 * 60 * 10 : false);
-  }, [elim, league.members.loggedIn]);
+  }, [elim, leagueMembers]);
 
   /*
    * This will be put into effect next season in combination with a new waiver system
@@ -82,7 +91,7 @@ export default function ChangeSurvivor() {
   }
   */
 
-  if (league.leagueStatus === 'Inactive') return null;
+  if (league?.status === 'Inactive') return null;
 
   if (availableCastaways.every(castaway => castaway.pickedBy)) {
     return (
@@ -95,21 +104,21 @@ export default function ChangeSurvivor() {
     );
   }
 
-  if (lastEpisode && pickPriority.length > 0 && !dialogOpen) {
+  if (keyEpisodes?.previousEpisode && pickPriority.length > 0 && !dialogOpen) {
     return (
       <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
         <h1 className='text-2xl font-semibold'>Wait to Swap your Survivor Pick</h1>
-        <h3 className='text-lg font-semibold'>Eliminated members have{' '}
-          {Math.floor((1000 * 60 * 60 * 48 - (Date.now() - lastEpisode.episodeAirDate.getTime())) / 1000 / 60 / 60)}
+        <h3 className='text-lg font-semibold'>Recently Eliminated members have{' '}
+          {Math.floor((1000 * 60 * 60 * 48 - (Date.now() - keyEpisodes.previousEpisode.airDate.getTime())) / 1000 / 60 / 60)}
           {' hours left to pick first:'}
         </h3>
         {
           pickPriority.map((member) => (
-            <span key={member} className='flex items-center gap-2'>
+            <span key={member.memberId} className='flex items-center gap-2'>
               <ColorRow
                 className='justify-center leading-tight font-normal'
-                color={league.members.list.find(m => m.displayName === member)?.color}>
-                {member}
+                color={member.color}>
+                {member.displayName}
               </ColorRow>
             </span>
           ))
@@ -146,34 +155,30 @@ export default function ChangeSurvivor() {
                         {availableCastaways.map((castaway) => {
                           return (castaway.pickedBy ?
                             <SelectLabel
-                              key={castaway.fullName}
+                              key={castaway.castawayId}
                               className='cursor-not-allowed'
-                              style={{
-                                backgroundColor:
-                                  league.members.list
-                                    .find(member => member.displayName === castaway.pickedBy)?.color,
-                              }}>
+                              style={{ backgroundColor: castaway.pickedBy.color }}>
                               <span
                                 className='flex items-center gap-1'
-                                style={{
-                                  color: getContrastingColor(league.members.list.find(member =>
-                                    member.displayName === castaway.pickedBy)?.color ?? '#000000')
-                                }}>
-                                {<ColorRow
-                                  className='w-20 px-0 justify-center leading-tight font-normal'
-                                  color={castaway.tribes.slice(-1)[0]?.tribeColor}>
-                                  {castaway.tribes.slice(-1)[0]?.tribeName}
-                                </ColorRow>}
-                                {castaway.fullName} ({castaway.pickedBy})
+                                style={{ color: getContrastingColor(castaway.pickedBy.color) }}>
+                                {castaway.tribe &&
+                                  <ColorRow
+                                    className='w-20 px-0 justify-center leading-tight font-normal'
+                                    color={castaway.tribe.color}>
+                                    {castaway.tribe.name}
+                                  </ColorRow>
+                                }
+                                {castaway.fullName} ({castaway.pickedBy.displayName})
                               </span>
                             </SelectLabel> :
                             <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
                               <span className='flex items-center gap-1'>
-                                {<ColorRow
-                                  className='w-20 px-0 justify-center leading-tight'
-                                  color={castaway.tribes.slice(-1)[0]?.tribeColor}>
-                                  {castaway.tribes.slice(-1)[0]?.tribeName}
-                                </ColorRow>}
+                                {castaway.tribe &&
+                                  <ColorRow
+                                    className='w-20 px-0 justify-center leading-tight'
+                                    color={castaway.tribe.color}>
+                                    {castaway.tribe.name}
+                                  </ColorRow>}
                                 {castaway.fullName}
                               </span>
                             </SelectItem>
@@ -187,7 +192,7 @@ export default function ChangeSurvivor() {
             )} />
           <Button
             className='lg:w-24 w-full'
-            disabled={!formSchema.safeParse(reactForm.watch())?.success || leagueData.episodes.slice(-1)[0]?.airStatus === 'Airing'}
+            disabled={!formSchema.safeParse(reactForm.watch())?.success || reactForm.formState.isSubmitting || keyEpisodes?.previousEpisode?.airStatus === 'Airing'}
             type='submit'>
             Submit
           </Button>

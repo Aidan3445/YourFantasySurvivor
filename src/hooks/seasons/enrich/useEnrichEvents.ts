@@ -10,6 +10,7 @@ import { defaultBaseRules } from '~/lib/leagues';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
+import { findTribeCastaways } from '~/lib/utils';
 
 /**
   * Custom hook to get enriched data for a list of events.
@@ -50,7 +51,7 @@ export function useEnrichEvents(
         let tribe: { name: string; color: string } | null = null;
         const sortedTimeline = Object.entries(tribesTimeline)
           .filter(([epNumStr]) => parseInt(epNumStr) <= event.episodeNumber)
-          .sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+          .toSorted((a, b) => parseInt(b[0]) - parseInt(a[0]));
 
         // find the most recent tribe update for the castaway
         for (const [, tribesInEpisode] of sortedTimeline) {
@@ -73,8 +74,9 @@ export function useEnrichEvents(
 
       const createCastawayMemberPairs = (castawayIds: number[], tribe: Tribe | null) => {
         return castawayIds.map(castawayId => {
+          const selectionLength = selectionTimeline.castawayMembers[castawayId]?.length ?? 0;
           const memberId = selectionTimeline
-            .castawayMembers[castawayId]?.[event.episodeNumber] ?? null;
+            .castawayMembers[castawayId]?.[Math.min(selectionLength - 1, event.episodeNumber)] ?? null;
 
           const castaway = castaways.find(c => c.castawayId === castawayId);
           if (!castaway) {
@@ -116,7 +118,7 @@ export function useEnrichEvents(
 
         return {
           ...event,
-          points: null,
+          points: points,
           referenceMap: [referenceMap],
         } as EnrichedEvent;
       }
@@ -127,8 +129,8 @@ export function useEnrichEvents(
         const castawaySet = new Set<number>();
         eventCastaways.forEach(castawayId => castawaySet.add(castawayId));
 
-        // Add all tribe members from the episode to the set
-        const tribeMembers = tribesTimeline[event.episodeNumber]?.[tribeId] ?? [];
+        const tribeMembers = findTribeCastaways(
+          tribesTimeline, eliminations, tribeId, event.episodeNumber);
         tribeMembers.forEach(castawayId => castawaySet.add(castawayId));
 
         const pairs = createCastawayMemberPairs(Array.from(castawaySet), tribe).filter(Boolean);

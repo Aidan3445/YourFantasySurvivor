@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { desc } from 'drizzle-orm';
@@ -41,7 +41,7 @@ export default async function createNewLeagueLogic(
 
     const insertedLeague = await trx
       .insert(leagueSchema)
-      .values({ name: leagueName, season: seasonId })
+      .values({ name: leagueName, seasonId })
       .returning({
         leagueId: leagueSchema.leagueId,
         hash: leagueSchema.hash,

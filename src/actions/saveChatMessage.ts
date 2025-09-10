@@ -2,7 +2,6 @@
 
 import { requireLeagueMemberAuth } from '~/lib/auth';
 import saveChatMessageLogic from '~/services/leagues/mutation/saveChatMessage';
-import { type Hash } from '~/types/deprecated/leagues';
 
 /**
   * Save a chat message to the database
@@ -13,7 +12,7 @@ import { type Hash } from '~/types/deprecated/leagues';
   * @returnObj `{ success }`
   */
 export default async function saveChatMessage(
-  hash: Hash,
+  hash: string,
   message: { serial: string, text: string, timestamp: string }
 ) {
   try {

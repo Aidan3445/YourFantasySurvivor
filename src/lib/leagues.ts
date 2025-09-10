@@ -2,7 +2,7 @@ import { type BaseEventPredictionRules, type BaseEventRules, type ShauhinModeSet
 
 export const LeagueStatuses = ['Predraft', 'Draft', 'Active', 'Inactive'] as const;
 export const LeagueMemberRoles = ['Owner', 'Admin', 'Member'] as const;
-export const ShauhinModeTimings = ['Premiere', 'After Merge', 'Before Finale', 'Custom'] as const;
+export const ShauhinModeTimings = ['After Premiere', 'After Merge', 'Before Finale', 'Custom'] as const;
 
 export const LEAGUE_NAME_MIN_LENGTH = 3;
 export const LEAGUE_NAME_MAX_LENGTH = 64;

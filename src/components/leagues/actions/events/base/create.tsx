@@ -41,6 +41,8 @@ export default function CreateBaseEvent() {
   const selectedEpisode = useMemo(() => episodes?.find(episode =>
     episode.episodeId === Number(selectedEpisodeId))?.episodeNumber ?? 1,
     [episodes, selectedEpisodeId]);
+  const setLabel = reactForm.watch('label');
+  const setNotes = reactForm.watch('notes');
 
   const { tribeOptions, castawayOptions } = useEventOptions(league?.seasonId ?? null, selectedEpisode ?? 1);
 
@@ -58,20 +60,21 @@ export default function CreateBaseEvent() {
       eventSource: 'Base',
       eventType: 'Direct',
       eventName: selectedEvent,
-      label: reactForm.getValues('label') ?? `${baseEventLabelPrefixes[selectedEvent]} ${baseEventLabels[selectedEvent]?.[0] ?? selectedEvent}`,
+      label: setLabel ?? `${baseEventLabelPrefixes[selectedEvent]} ${baseEventLabels[selectedEvent]?.[0] ?? selectedEvent}`,
       episodeNumber: selectedEpisode,
       references: (selectedReferenceIds ?? []).map(id => ({
         type: selectedReferenceType,
         id,
       })),
-      notes: reactForm.getValues('notes') ?? null,
+      notes: setNotes
     } as EventWithReferences;
   }, [
-    reactForm,
     selectedEpisode,
     selectedEvent,
     selectedReferenceIds,
-    selectedReferenceType
+    selectedReferenceType,
+    setLabel,
+    setNotes,
   ]);
 
   const [eventClearer, setEventClearer] = useState(0);
@@ -143,6 +146,7 @@ export default function CreateBaseEvent() {
                           onValueChange={(value) => {
                             field.onChange(value);
                             reactForm.resetField('label');
+                            reactForm.resetField('referenceType');
                             setEventSubtype('');
                             clearReferences();
                           }}>
@@ -265,21 +269,22 @@ export default function CreateBaseEvent() {
                     </FormItem>
                   )} />
               )}
-              <FormField
-                name='notes'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Notes (line separated)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        className='w-full'
-                        value={(field.value as string[])?.join('\n')}
-                        onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
-                        placeholder='Notes' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+              {selectedReferenceIds?.length &&
+                <FormField
+                  name='notes'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel>Notes (line separated)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className='w-full'
+                          value={(field.value as string[])?.join('\n')}
+                          onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
+                          placeholder='Notes' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />}
               <br />
               <Button
                 disabled={!reactForm.formState.isValid}

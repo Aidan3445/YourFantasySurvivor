@@ -5,9 +5,9 @@ import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
-import ChangeSurvivor from '~/components/leagues/hub/picks/changeSurvivor/view';
+import ChangeCastaway from '~/components/leagues/hub/picks/changeSurvivor/view';
 import CreateBaseEvent from '~/components/leagues/actions/events/base/create';
-import LeagueEvents from '~/components/leagues/customization/events/custom/view';
+import CustomEvents from '~/components/leagues/customization/events/custom/view';
 import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
 import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import CreateLeagueEvent from '~/components/leagues/actions/events/custom/create';
@@ -17,11 +17,18 @@ import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import { leaguesService as QUERIES } from '~/services/leagues';
 import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
+import getLeague from '~/services/leagues/query/legaue';
+import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
-  const { role } = await leagueMemberAuth(hash);
+  const auth = await leagueMemberAuth(hash);
   const { userId } = await systemAdminAuth();
+  let isActive = false;
+  if (auth.memberId) {
+    const league = await getLeague(auth as VerifiedLeagueMemberAuth);
+    isActive = league?.status === 'Active';
+  }
   //const chatHistory = await QUERIES.getChatHistory(hash);
 
   return (
@@ -37,8 +44,8 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           {/*
           <TabsTrigger className='flex-1 lg:hidden' value='chat'>Chat</TabsTrigger>
           */}
-          {role !== 'Member' && <TabsTrigger className='flex-1' value='events'>Commish</TabsTrigger>}
-          {userId && <TabsTrigger className='flex-1' value='Base'>Base</TabsTrigger>}
+          {isActive && auth.role !== 'Member' && <TabsTrigger className='flex-1' value='events'>Commish</TabsTrigger>}
+          {isActive && userId && <TabsTrigger className='flex-1' value='Base'>Base</TabsTrigger>}
           <TabsTrigger className='flex-0 ml-10' value='settings'>Settings</TabsTrigger>
         </TabsList>
         <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-visible @container/tabs-content'>
@@ -48,8 +55,10 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
                 <Scoreboard />
                 <Chart />
               </span>
-              <ChangeSurvivor />
+              <ChangeCastaway />
               <Predictions />
+              {/*
+              */}
               <Timeline />
             </section>
           </TabsContent>
@@ -66,17 +75,19 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           </TabsContent>
           <TabsContent value='settings'>
             <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-14'>
+              {isActive && <>
+                <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
+                  Settings
+                </h2>
+                <MemberEditForm className='flex-1' />
+                <LeagueSettings />
+              </>}
               <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
-                League Settings
-              </h2>
-              <MemberEditForm className='flex-1' />
-              <LeagueSettings />
-              <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
-                Scoring Settings
+                Scoring
               </h2>
               <SetSurvivalCap />
               <LeagueScoring />
-              <LeagueEvents />
+              <CustomEvents />
               <ShauhinMode />
             </section>
           </TabsContent>

@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
@@ -20,6 +20,7 @@ export default async function updateShauhinModeLogic(
   auth: VerifiedLeagueMemberAuth,
   shauhinMode: ShauhinModeSettings,
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Transaction to update the Shauhin Mode settings
   return db.transaction(async (trx) => {
     // Get league information

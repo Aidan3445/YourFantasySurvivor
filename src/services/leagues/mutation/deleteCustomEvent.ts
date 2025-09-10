@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { and, eq, not } from 'drizzle-orm';
@@ -19,6 +19,7 @@ export default async function deleteCustomEventLogic(
   auth: VerifiedLeagueMemberAuth,
   customEventId: number
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   if (auth.role === 'Member') {
     throw new Error('User not authorized to delete league events');
   }

@@ -4,6 +4,7 @@ import { Eye } from 'lucide-react';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DraftCountdown } from '~/components/leagues/predraft/countdown/view';
 import { type League } from '~/types/leagues';
+import DraftOrder from '~/components/leagues/predraft/order/view';
 
 interface ActiveLeagueProps {
   league: League;
@@ -23,8 +24,11 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         </div>
       </Link>
       {league.status === 'Active'
-        ? <Scoreboard overrideHash={league.hash} maxRows={5} />
-        : <DraftCountdown overrideHash={league.hash} />}
+        ? <Scoreboard overrideHash={league.hash} maxRows={5} className='bg-accent' />
+        : <div className='space-y-0'>
+          <DraftCountdown overrideHash={league.hash} />
+          <DraftOrder overrideHash={league.hash} className='bg-accent' />
+        </div>}
     </div>
   );
 }

@@ -47,7 +47,7 @@ export default async function getUserLeagues() {
     })
     .from(leagueMemberSchema)
     .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
-    .innerJoin(seasonSchema, eq(seasonSchema.seasonId, leagueSchema.season))
+    .innerJoin(seasonSchema, eq(seasonSchema.seasonId, leagueSchema.seasonId))
     .leftJoin(castawaySchema, eq(castawaySchema.castawayId,
       db.select({ castawayId: selectionUpdateSchema.castawayId })
         .from(selectionUpdateSchema)

@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { eq, sql } from 'drizzle-orm';
@@ -36,7 +36,7 @@ export default async function joinLeagueLogic(
       })
       .from(leagueSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))
-      .innerJoin(seasonSchema, eq(seasonSchema.seasonId, leagueSchema.season))
+      .innerJoin(seasonSchema, eq(seasonSchema.seasonId, leagueSchema.seasonId))
       .where(eq(leagueSchema.hash, hash))
       .then((leagues) => leagues[0]);
 

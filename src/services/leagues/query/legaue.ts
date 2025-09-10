@@ -25,7 +25,7 @@ export default async function getLeague(auth: VerifiedLeagueMemberAuth) {
       seasonId: seasonSchema.seasonId,
     })
     .from(leagueSchema)
-    .innerJoin(seasonSchema, eq(leagueSchema.season, seasonSchema.seasonId))
+    .innerJoin(seasonSchema, eq(leagueSchema.seasonId, seasonSchema.seasonId))
     .where(eq(leagueSchema.leagueId, auth.leagueId))
     .then((leagues) => leagues[0] as League | undefined);
 }

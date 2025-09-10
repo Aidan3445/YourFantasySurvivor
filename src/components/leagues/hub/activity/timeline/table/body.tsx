@@ -12,6 +12,7 @@ interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
   filteredEvents: EventWithReferences[];
   filteredPredictions: Prediction[];
+  index: number;
 }
 
 export default function EpisodeEventsTableBody({
@@ -21,7 +22,8 @@ export default function EpisodeEventsTableBody({
   filteredEvents,
   filteredPredictions,
   edit,
-  filters
+  filters,
+  index
 }: EpisodeEventsTableBodyProps) {
   const enrichedEvents = useEnrichEvents(seasonId, filteredEvents);
   const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents ?? null);
@@ -58,7 +60,7 @@ export default function EpisodeEventsTableBody({
       {enrichedMockEvents.map((mock, index) =>
         <EventRow key={index} className='bg-yellow-500' event={mock} edit={false} />
       )}
-      {baseEvents.length > 0 &&
+      {index > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200 text-xs text-muted-foreground'>
           {edit && <TableCell className='w-0'>
             Edit

@@ -13,7 +13,7 @@ export default function LeagueAdminsField({ members }: LeagueAdminsFieldProps) {
         <FormItem className='w-full'>
           <FormLabel>Admins</FormLabel>
           <FormDescription>
-            Admins can edit league settings and help score custom events throughout the season.
+            Admins can help score events throughout the season.
           </FormDescription>
           <FormControl>
             <MultiSelect

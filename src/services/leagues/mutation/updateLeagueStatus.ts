@@ -1,10 +1,11 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueStatus } from '~/types/leagues';
+import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
 
 /**
   * Update the league status to the next stage
@@ -16,8 +17,10 @@ import { type LeagueStatus } from '~/types/leagues';
 export default async function updateLeagueStatusLogic(
   auth: VerifiedLeagueMemberAuth,
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Transaction to update the league settings
   return await db.transaction(async (trx) => {
+
     const status = await trx
       .select({ status: leagueSchema.status })
       .from(leagueSchema)
@@ -29,12 +32,14 @@ export default async function updateLeagueStatusLogic(
     }
 
     let newStatus: LeagueStatus;
+    let keyEpisodes;
     switch (status) {
       case 'Predraft':
         newStatus = 'Draft';
         break;
       case 'Draft':
         newStatus = 'Active';
+        keyEpisodes = await getKeyEpisodes(auth.leagueId);
         break;
       case 'Active':
         newStatus = 'Inactive';
@@ -47,7 +52,7 @@ export default async function updateLeagueStatusLogic(
 
     const update = await trx
       .update(leagueSchema)
-      .set({ status: newStatus })
+      .set({ status: newStatus, startWeek: keyEpisodes?.nextEpisode?.episodeNumber ?? null })
       .where(eq(leagueSchema.leagueId, auth.leagueId))
       .returning({ status: leagueSchema.status })
       .then((res) => res[0]);

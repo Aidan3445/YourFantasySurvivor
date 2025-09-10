@@ -1,4 +1,4 @@
-import LeagueEvents from '~/components/leagues/customization/events/custom/view';
+import CustomEvents from '~/components/leagues/customization/events/custom/view';
 import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
 import MemberEditForm from '~/components/leagues/customization/member/view';
 import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
@@ -32,7 +32,7 @@ export default async function LeaguePage() {
               </h2>
               <SetSurvivalCap />
               <LeagueScoring />
-              <LeagueEvents />
+              <CustomEvents />
               <ShauhinMode />
             </div>
           </TabsContent>

@@ -7,14 +7,14 @@ import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn } from '~/lib/utils';
 import ColorRow from '~/components/shared/colorRow';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import { useLeagueDraft } from '~/hooks/leagues/useDraft';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
 
 interface CastawayCardsProps {
   hash: string;
 }
 
 export default function DraftCastaways({ hash }: CastawayCardsProps) {
-  const { draftDetails } = useLeagueDraft(hash);
+  const { actionDetails } = useLeagueActionDetails(hash);
   const isMobile = useIsMobile();
 
   return (
@@ -25,7 +25,7 @@ export default function DraftCastaways({ hash }: CastawayCardsProps) {
       </span>
       <ScrollArea className='overflow-auto w-[calc(100vw-2rem)] md:w-full'>
         <article className='flex gap-4 p-4 justify-start'>
-          {Object.values(draftDetails ?? {}).map(({ tribe, castaways }) => (
+          {Object.values(actionDetails ?? {}).map(({ tribe, castaways }) => (
             <div
               key={tribe.tribeId}
               className='flex grow flex-col gap-1 bg-b2 rounded-lg p-2 min-w-56'

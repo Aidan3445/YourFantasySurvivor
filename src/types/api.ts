@@ -1,4 +1,5 @@
 import { type LeagueMemberRole } from '~/types/leagueMembers';
+import { type LeagueStatus } from '~/types/leagues';
 
 export type LeagueRouteParams = {
   params: Promise<{ hash: string }>
@@ -16,5 +17,6 @@ export type VerifiedLeagueMemberAuth = {
   memberId: number;
   role: LeagueMemberRole;
   leagueId: number;
+  status: LeagueStatus;
   seasonId: number;
 }

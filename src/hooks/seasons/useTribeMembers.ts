@@ -11,7 +11,7 @@ export function useTribeMembers(seasonId: number | null, episodeNumber: number |
     queryKey: ['tribeMembers', seasonId],
     queryFn: async () => {
       if (!seasonId || !episodeNumber) {
-        throw new Error('seasonId and episodeNumber are required');
+        return {};
       }
 
       const res = await fetch(`/api/seasons/tribeMembers?seasonId=${seasonId}&episodeNumber=${episodeNumber}`);

@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { and, eq, inArray, count } from 'drizzle-orm';
@@ -21,12 +21,13 @@ export default async function chooseCastawayLogic(
   auth: VerifiedLeagueMemberAuth,
   castawayId: number,
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   return await db.transaction(async (trx) => {
     // Get league and validate
     const league = await trx
       .select({
         status: leagueSchema.status,
-        seasonId: leagueSchema.season,
+        seasonId: leagueSchema.seasonId,
       })
       .from(leagueSchema)
       .where(eq(leagueSchema.leagueId, auth.leagueId))
@@ -76,6 +77,7 @@ export default async function chooseCastawayLogic(
         .then(res => res[0]?.draftOrder);
 
       if (memberOrder !== pickCount) {
+        console.error('Draft order mismatch', { memberOrder, pickCount });
         throw new Error('Not your turn to draft');
       }
     }

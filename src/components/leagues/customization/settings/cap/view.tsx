@@ -54,9 +54,11 @@ export default function SetSurvivalCap() {
     }
   });
 
+  const disabled = (!!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner') || league?.status === 'Inactive';
+
   return (
     <article className='p-2 bg-card rounded-xl w-full relative'>
-      {leagueMembers?.loggedIn && leagueMembers.loggedIn.role === 'Owner' && (locked ?
+      {!disabled && (locked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => setLocked(false)} /> :

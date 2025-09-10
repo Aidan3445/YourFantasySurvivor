@@ -5,6 +5,8 @@ import { createTable } from '~/server/db/schema/createTable';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { label, notes, reference, timing } from '~/server/db/schema/shared';
 import { EventTypes } from '~/lib/events';
+import { episodeSchema } from '~/server/db/schema/episodes';
+import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 
 
 export const eventType = pgEnum('event_type', EventTypes);
@@ -61,8 +63,8 @@ export const customEventPredictionSchema = createTable(
   {
     customEventPredictionId: serial('custom_event_prediction_id').notNull().primaryKey(),
     customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
-    memberId: integer('member_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
+    memberId: integer('member_id').notNull().references(() => leagueMemberSchema.memberId, { onDelete: 'cascade' }),
     referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
     bet: integer('bet')

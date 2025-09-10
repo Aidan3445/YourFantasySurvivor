@@ -20,7 +20,7 @@ export default async function getPredictionTimings(auth: VerifiedLeagueMemberAut
     .select({
       leagueStatus: leagueSchema.status,
       draftDate: leagueSettingsSchema.draftDate,
-      seasonId: leagueSchema.season
+      seasonId: leagueSchema.seasonId
     })
     .from(leagueSchema)
     .leftJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))

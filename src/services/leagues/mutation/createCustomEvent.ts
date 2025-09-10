@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { and, count, eq } from 'drizzle-orm';
@@ -19,6 +19,7 @@ export default async function createCustomEventLogic(
   auth: VerifiedLeagueMemberAuth,
   customEvent: CustomEventInsert
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Create custom event in transaction
   return db.transaction(async (trx) => {
     // ensure the rule is in the league

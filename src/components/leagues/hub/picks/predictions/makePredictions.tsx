@@ -1,16 +1,14 @@
-import { type ShauhinModeSettings } from '~/types/events';
-import { type leaguesService as QUERIES } from '~/services/deprecated/leagues';
+'use client';
+
 import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { Flame } from 'lucide-react';
 
 interface MakePredictionsProps {
-  predictions: Awaited<ReturnType<typeof QUERIES.getThisWeeksPredictions>>;
-  betRules: ShauhinModeSettings | undefined;
-  myScore: number | undefined;
+  wallet?: number;
 }
 
-export default function MakePredictions({ predictions: weekly, betRules, myScore }: MakePredictionsProps) {
+export default function MakePredictions({ predictions: weekly, betRules, wallet: myScore }: MakePredictionsProps) {
   if (!weekly) return null;
   const {
     basePredictionRules,

@@ -10,7 +10,7 @@ export function useTribesTimeline(seasonId: number | null) {
   return useQuery<TribesTimeline>({
     queryKey: ['tribesTimeline', seasonId],
     queryFn: async () => {
-      if (!seasonId) throw new Error('Season ID is required to fetch tribes timeline');
+      if (!seasonId) return {};
 
       const res = await fetch(`/api/seasons/tribesTimeline?seasonId=${seasonId}`);
       if (!res.ok) {

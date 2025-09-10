@@ -1,24 +1,24 @@
 'use client';
 
-import { usePredictions } from '~/hooks/deprecated/usePredictions';
-import { useLeague } from '~/hooks/deprecated/useLeague';
+import { useMemo } from 'react';
 import PredictionHistory from '~/components/leagues/hub/activity/predictionHistory/view';
 import MakePredictions from '~/components/leagues/hub/picks/predictions/makePredictions';
+import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 export default function Predictions() {
-  const { leagueData, league } = useLeague();
-  const { predictions, history, betRules } = usePredictions();
+  const { scores, leagueMembers } = useLeagueData();
 
-  const displayName = league?.members?.loggedIn?.displayName;
+  const currentBalance = useMemo(() =>
+    leagueMembers?.loggedIn ?
+      scores.Member[leagueMembers.loggedIn.memberId]?.slice().pop() : undefined,
+    [scores, leagueMembers]);
 
-  if (!displayName) return null;
-
-  const myScore = [...leagueData.scores.Member[displayName]!].pop();
+  if (!leagueMembers?.loggedIn) return null;
 
   return (
     <>
-      <MakePredictions predictions={predictions} betRules={betRules} myScore={myScore} />
-      <PredictionHistory history={history} />
+      <MakePredictions wallet={currentBalance} />
+      <PredictionHistory />
     </>
   );
 }

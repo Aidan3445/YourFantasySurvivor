@@ -7,12 +7,12 @@ import { BaseEventDescriptions, BaseEventFullName } from '~/lib/events';
 
 export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <div>
+    <div className='grid grid-rows-subgrid row-span-5'>
       <FormLabel className='text-2xl'>Challenges</FormLabel>
       <FormField
         name='baseEventRules.indivWin'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.indivWin}
               {disabled &&
@@ -47,7 +47,7 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
       <FormField
         name='baseEventRules.indivReward'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.indivReward}
               {disabled &&
@@ -82,7 +82,7 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
       <FormField
         name='baseEventRules.tribe1st'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.tribe1st}
               {disabled &&
@@ -117,7 +117,7 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
       <FormField
         name='baseEventRules.tribe2nd'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.tribe2nd}
               {disabled &&

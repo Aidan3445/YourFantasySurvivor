@@ -70,8 +70,8 @@ export default function EventRow({ className, event, edit }: EventRowProps) {
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5',
           event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.member)) && 'justify-center')}>
-          {event.referenceMap?.flatMap(({ pairs }, index) =>
-            pairs.map(({ member }) =>
+          {event.referenceMap?.map(({ pairs }, index) =>
+            pairs.map(({ castaway, member }) =>
               member ?
                 <ColorRow
                   key={member.memberId}
@@ -79,7 +79,7 @@ export default function EventRow({ className, event, edit }: EventRowProps) {
                   color={member.color}>
                   {member.displayName}
                 </ColorRow> :
-                <ColorRow className='invisible leading-tight px-1 w-min' key={index}>
+                <ColorRow className='invisible leading-tight px-1 w-min' key={`${castaway.castawayId}-${index}`}>
                   None
                 </ColorRow>
             )

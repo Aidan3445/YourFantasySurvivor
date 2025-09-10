@@ -2,41 +2,87 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useLeague } from '~/hooks/deprecated/useLeague';
-import { type LeagueEventInsert, LeagueEventInsertZod } from '~/types/events';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Textarea } from '~/components/common/textarea';
 import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
 import { Button } from '~/components/common/button';
-import { useEventOptions } from '~/hooks/deprecated/useEventOptions';
-import { createLeagueEvent } from '~/services/deprecated/leagueActions';
+import { CustomEventInsertZod, type EventWithReferences, type CustomEventInsert } from '~/types/events';
+import { useQueryClient } from '@tanstack/react-query';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useEpisodes } from '~/hooks/seasons/useEpisodes';
+import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
+import createCustomEvent from '~/actions/createCustomEvent';
+import { Switch } from '~/components/common/switch';
+import { Input } from '~/components/common/input';
+import { MultiSelect } from '~/components/common/multiSelect';
 
 export default function CreateLeagueEvent() {
-  const { leagueData, league, refresh } = useLeague();
-  const reactForm = useForm<LeagueEventInsert>({
+  const queryClient = useQueryClient();
+  const { data: league } = useLeague();
+  const { data: rules } = useLeagueRules();
+  const { data: episodes } = useEpisodes(league?.leagueId ?? null);
+
+  const reactForm = useForm<CustomEventInsert>({
     defaultValues: {
-      episodeId: leagueData.episodes.find(episode => episode.airStatus === 'Airing')?.episodeId ??
-        leagueData.episodes.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
-        leagueData.episodes[0]?.episodeId,
+      episodeId: episodes?.find(episode => episode.airStatus === 'Airing')?.episodeId ??
+        episodes?.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
+        episodes?.[0]?.episodeId,
       notes: null,
     },
-    resolver: zodResolver(LeagueEventInsertZod),
+    resolver: zodResolver(CustomEventInsertZod),
   });
 
   const selectedReferenceType = reactForm.watch('referenceType');
-  const selectedEvent = league.leagueEventRules.find(rule =>
-    rule.leagueEventRuleId === +reactForm.watch('leagueEventRuleId'));
+  const selectedReferenceIds = reactForm.watch('references');
+  const selectedRuleId = reactForm.watch('customEventRuleId');
+  const selectedEvent = useMemo(() =>
+    rules?.custom.find(rule => rule.customEventRuleId === +selectedRuleId),
+    [rules?.custom, selectedRuleId]);
   const selectedEpisodeId = reactForm.watch('episodeId');
-  const selectedEpisode = useMemo(() => leagueData.episodes
-    .find(episode =>
-      episode.episodeId === +selectedEpisodeId)?.episodeNumber ?? 1,
-    [leagueData.episodes, selectedEpisodeId]);
+  const selectedEpisode = useMemo(() => episodes?.find(episode =>
+    episode.episodeId === +selectedEpisodeId)?.episodeNumber ?? 1,
+    [episodes, selectedEpisodeId]);
+  const setLabel = reactForm.watch('label');
+  const setNotes = reactForm.watch('notes');
 
-  const { castawayOptions, tribeOptions } = useEventOptions(selectedEpisode);
+  const { tribeOptions, castawayOptions } = useEventOptions(league?.seasonId ?? null, selectedEpisode ?? 1);
 
-  if (league.leagueEventRules.length === 0) return (
+  const [hasCustomLabel, setHasCustomLabel] = useState(false);
+
+  const mockEvent = useMemo(() => {
+    if (!selectedEvent) return null;
+    return {
+      eventSource: 'Custom',
+      eventType: 'Direct',
+      eventName: selectedEvent.eventName,
+      label: setLabel ?? selectedEvent.eventName,
+      episodeNumber: selectedEpisode,
+      references: (selectedReferenceIds ?? []).map(id => ({
+        type: selectedReferenceType,
+        id: id,
+      })),
+      notes: setNotes
+    } as EventWithReferences;
+  }, [
+    selectedEvent,
+    selectedEpisode,
+    selectedReferenceType,
+    selectedReferenceIds,
+    setLabel,
+    setNotes
+  ]);
+
+  const [eventClearer, setEventClearer] = useState(0);
+
+  const clearReferences = () => {
+    setEventClearer(eventClearer + 1);
+    reactForm.resetField('references');
+  };
+
+  if (!rules?.custom || rules.custom.length === 0) return (
     <div className='px-4 w-full md:pb-14 text-center'>
       <section className='bg-card rounded-xl pb-4 w-full'>
         <h2 className='text-2xl self-center text-muted-foreground'>No Custom Events</h2>
@@ -46,25 +92,17 @@ export default function CreateLeagueEvent() {
   );
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!league) return;
     try {
-      await createLeagueEvent(league.hash, data);
+      await createCustomEvent(league.hash, data);
       alert('Base event created successfully');
       reactForm.reset();
-      await refresh();
+      await queryClient.invalidateQueries({ queryKey: ['customEvents', league.hash] });
     } catch (e) {
       alert('Failed to create base event');
       console.error('Failed to create base event', e);
     }
   });
-
-
-  const correctPredictions: { predictionMaker: string }[] =
-    leagueData.leagueEvents.predictionEvents[selectedEpisode]
-      ?.filter((prediction) => prediction.leagueEventRuleId === +reactForm.watch('leagueEventRuleId') &&
-        prediction.reference.referenceId === +reactForm.watch('referenceId')) ?? [];
-  if (correctPredictions.length === 0) {
-    correctPredictions.push({ predictionMaker: 'No Correct Predictions' });
-  }
 
   return (
     <div className='px-4 w-full md:pb-14'>
@@ -89,9 +127,9 @@ export default function CreateLeagueEvent() {
                           <SelectValue placeholder='Select Episode' />
                         </SelectTrigger>
                         <SelectContent>
-                          {leagueData.episodes.map(episode => (
+                          {episodes?.map(episode => (
                             <SelectItem key={episode.episodeId} value={`${episode.episodeId}`}>
-                              {episode.episodeNumber}: {episode.episodeTitle} - {episode.episodeAirDate.toLocaleDateString()}
+                              {episode.episodeNumber}: {episode.title} - {episode.airDate.toLocaleDateString()}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -111,15 +149,17 @@ export default function CreateLeagueEvent() {
                         value={field.value as string}
                         onValueChange={(value) => {
                           field.onChange(value);
-                          if (selectedEvent?.referenceTypes[0])
-                            reactForm.setValue('referenceType', selectedEvent.referenceTypes[0]);
+                          reactForm.resetField('label');
+                          reactForm.resetField('referenceType');
+                          setHasCustomLabel(false);
+                          clearReferences();
                         }}>
                         <SelectTrigger>
                           <SelectValue placeholder='Select Event' />
                         </SelectTrigger>
                         <SelectContent>
-                          {league.leagueEventRules.map(({ eventName, leagueEventRuleId }) => (
-                            <SelectItem key={eventName} value={leagueEventRuleId.toString()}>
+                          {rules?.custom.map(({ eventName, customEventRuleId }) => (
+                            <SelectItem key={eventName} value={customEventRuleId.toString()}>
                               {eventName}
                             </SelectItem>
                           ))}
@@ -129,6 +169,32 @@ export default function CreateLeagueEvent() {
                     <FormMessage />
                   </FormItem>
                 )} />
+              {selectedEvent &&
+                <Switch
+                  id='custom-label'
+                  checked={hasCustomLabel}
+                  onCheckedChange={(checked) => {
+                    setHasCustomLabel(checked);
+                    if (!checked) reactForm.resetField('label');
+                  }}>
+                  Use Custom Label
+                </Switch>}
+              {selectedEvent && hasCustomLabel &&
+                <FormField
+                  name='label'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel>Custom Label</FormLabel>
+                      <FormControl>
+                        <Input
+                          type='text'
+                          className='w-full'
+                          placeholder='Label'
+                          {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />}
               {selectedEvent && <>
                 <FormLabel>Reference</FormLabel>
                 <FormField
@@ -141,7 +207,7 @@ export default function CreateLeagueEvent() {
                           value={field.value as string}
                           onValueChange={(value) => {
                             field.onChange(value);
-                            reactForm.resetField('referenceId');
+                            clearReferences();
                           }}>
                           <SelectTrigger className='h-full'>
                             <SelectValue placeholder='Select Reference Type' />
@@ -157,49 +223,38 @@ export default function CreateLeagueEvent() {
               </>}
               {selectedReferenceType &&
                 <FormField
-                  name='referenceId'
+                  name='references'
                   render={({ field }) => (
                     <FormItem>
                       <FormControl>
-                        <Select
-                          defaultValue={field.value as string}
-                          value={field.value as string ?? ''}
-                          onValueChange={(value) => field.onChange(value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Select Reference' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {selectedReferenceType === 'Castaway' ?
-                              castawayOptions.map(({ value, label }) => (
-                                <SelectItem key={value} value={`${value}`}>
-                                  {label}
-                                </SelectItem>
-                              )) :
-                              tribeOptions.map(({ value, label }) => (
-                                <SelectItem key={value} value={`${value}`}>
-                                  {label}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
+                        <MultiSelect
+                          options={selectedReferenceType === 'Castaway' ?
+                            castawayOptions : tribeOptions}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value as string[]}
+                          value={field.value as string[]}
+                          modalPopover
+                          clear={eventClearer}
+                          placeholder={`Select ${selectedReferenceType}s`} />
                       </FormControl>
                     </FormItem>
                   )} />}
-              <FormField
-                name='notes'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Notes (line separated)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        className='w-full'
-                        value={(field.value as string[])?.join('\n')}
-                        onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
-                        placeholder='Notes' />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+              {selectedReferenceIds?.length &&
+                <FormField
+                  name='notes'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel>Notes (line separated)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          className='w-full'
+                          value={(field.value as string[])?.join('\n')}
+                          onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
+                          placeholder='Notes' />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />}
               <br />
               <Button
                 disabled={!reactForm.formState.isValid}
@@ -209,33 +264,7 @@ export default function CreateLeagueEvent() {
             </form>
             <EpisodeEvents
               episodeNumber={selectedEpisode}
-              mockDirects={selectedEvent?.eventType === 'Direct' ? [{
-                leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
-                eventName: selectedEvent.eventName,
-                referenceType: selectedReferenceType,
-                points: selectedEvent.points,
-                referenceId: +reactForm.watch('referenceId'),
-                referenceName: selectedReferenceType === 'Castaway' ?
-                  castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
-                  tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
-                notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
-              }] : undefined}
-              mockPredictions={selectedEvent?.eventType === 'Prediction' ?
-                correctPredictions.map(prediction => ({
-                  leagueEventRuleId: +reactForm.watch('leagueEventRuleId'),
-                  eventName: selectedEvent.eventName,
-                  points: selectedEvent.points,
-                  predictionMaker: prediction.predictionMaker,
-                  reference: {
-                    referenceType: selectedReferenceType,
-                    referenceId: +reactForm.watch('referenceId'),
-                    referenceName: selectedReferenceType === 'Castaway' ?
-                      castawayOptions.find(castaway => castaway.value === +reactForm.watch('referenceId'))?.label ?? '' :
-                      tribeOptions.find(tribe => tribe.value === +reactForm.watch('referenceId'))?.label ?? '',
-                  },
-                  hit: true,
-                  notes: reactForm.watch('notes')?.filter(note => note !== '') ?? null,
-                })) : undefined}
+              mockEvents={mockEvent ? [mockEvent] : []}
               edit
               filters={{
                 castaway: [],

@@ -8,7 +8,8 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/common/alertDialog';
 import MakePredictions from '~/components/leagues/actions/events/predictions/view';
-import { useLeagueDraft } from '~/hooks/leagues/useDraft';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
+import { useMemo } from 'react';
 
 interface DraftTrackerProps {
   hash: string;
@@ -16,7 +17,7 @@ interface DraftTrackerProps {
 
 export default function DraftTracker({ hash }: DraftTrackerProps) {
   const {
-    draftDetails,
+    actionDetails,
     membersWithPicks,
     onTheClock,
     onDeck,
@@ -24,11 +25,17 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
     rules,
     predictionRuleCount,
     settings,
-    basePredictions,
-    customPredictions,
+    predictionsMade,
     dialogOpen,
     setDialogOpen,
-  } = useLeagueDraft(hash);
+  } = useLeagueActionDetails(hash);
+
+  const castaways = useMemo(() =>
+    Object.values(actionDetails ?? {})
+      .flatMap(({ castaways }) => castaways.map(c => c.castaway)), [actionDetails]);
+  const tribes = useMemo(() =>
+    Object.values(actionDetails ?? {}).map(({ tribe }) => tribe), [actionDetails]);
+
 
   return (
     <section className='w-full space-y-4 overflow-x-hidden p-4'>
@@ -71,19 +78,18 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
         </div>
       </article>
       {(onDeck.loggedIn || onTheClock.loggedIn) &&
-        <ChooseCastaway draftDetails={draftDetails} onDeck={onDeck.loggedIn} />}
+        <ChooseCastaway draftDetails={actionDetails} onDeck={onDeck.loggedIn} />}
       <MakePredictions
         rules={rules}
         predictionRuleCount={predictionRuleCount}
-        predictionsMade={[...(basePredictions ?? []), ...(customPredictions ?? [])]}
-        castaways={Object.values(draftDetails ?? {})
-          .flatMap(({ castaways }) => castaways.map(c => c.castaway))}
-        tribes={Object.values(draftDetails ?? {}).map(({ tribe }) => tribe)} />
+        predictionsMade={predictionsMade}
+        castaways={castaways}
+        tribes={tribes} />
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {'It\'s your turn to pick!'}
+              {`It's ${onDeck.loggedIn ? 'almost ' : ' '}your turn to pick!`}
             </AlertDialogTitle>
             <AlertDialogDescription className='text-left'>
               This castaway will earn you points based on their performance in the game.

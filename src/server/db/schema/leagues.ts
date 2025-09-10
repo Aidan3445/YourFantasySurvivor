@@ -15,7 +15,8 @@ export const leagueSchema = createTable(
     hash: varchar('league_hash', { length: 16 }).notNull().$defaultFn(() => nanoid(16)),
     name: varchar('league_name', { length: 64 }).notNull(),
     status: leagueStatus('league_status').notNull().default('Predraft'),
-    season: integer('season_id').references(() => seasonSchema.seasonId, { onDelete: 'cascade' }).notNull(),
+    seasonId: integer('season_id').references(() => seasonSchema.seasonId, { onDelete: 'cascade' }).notNull(),
+    startWeek: integer('start_week')
   },
   (table) => [
     uniqueIndex('league_hash_idx').on(table.hash),

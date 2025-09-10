@@ -8,15 +8,28 @@ import { type KeyEpisodes } from '~/types/episodes';
   */
 export function useKeyEpisodes(seasonId: number | null) {
   return useQuery<KeyEpisodes>({
-    queryKey: ['episodes', seasonId],
+    queryKey: ['episodes', seasonId, 'key'],
     queryFn: async () => {
-      if (!seasonId) throw new Error('Season ID is required');
+      if (!seasonId) return {} as KeyEpisodes;
 
       const res = await fetch(`/api/seasons/episodes/key?seasonId=${seasonId}`);
       if (!res.ok) {
         throw new Error('Failed to fetch episode data');
       }
-      return res.json();
+      const keyEpisodes = await res.json() as KeyEpisodes;
+
+      return {
+        mergeEpisode: keyEpisodes.mergeEpisode
+          ? { ...keyEpisodes.mergeEpisode, airDate: new Date(keyEpisodes.mergeEpisode.airDate) }
+          : null,
+        nextEpisode: keyEpisodes.nextEpisode
+          ?
+          { ...keyEpisodes.nextEpisode, airDate: new Date(keyEpisodes.nextEpisode.airDate) }
+          : null,
+        previousEpisode: keyEpisodes.previousEpisode
+          ? { ...keyEpisodes.previousEpisode, airDate: new Date(keyEpisodes.previousEpisode.airDate) }
+          : null,
+      };
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

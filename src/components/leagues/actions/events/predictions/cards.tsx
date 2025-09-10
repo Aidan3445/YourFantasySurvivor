@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
 import { CoverCarousel } from '~/components/common/carousel';
@@ -7,6 +9,7 @@ import { BaseEventDescriptions, BaseEventFullName, BasePredictionReferenceTypes 
 import { type MakePredictionsProps } from '~/components/leagues/actions/events/predictions/view';
 import { type ScoringBaseEventName, type ReferenceType, type MakePrediction } from '~/types/events';
 import { useCallback, useMemo } from 'react';
+import { useShauhinActive } from '~/hooks/leagues/enrich/useShauhinActive';
 
 export default function PredictionCards({
   rules,
@@ -16,6 +19,7 @@ export default function PredictionCards({
   tribes,
   className
 }: MakePredictionsProps) {
+  const shauhinActive = useShauhinActive();
 
   const enabledBasePredictions = useMemo(() =>
     Object.entries(rules?.basePrediction ?? {})
@@ -34,13 +38,17 @@ export default function PredictionCards({
           timing: rule.timing,
           predictionMade: predictionsMade.find((pred) =>
             pred.eventName === eventName) ?? null,
-          shauhinEnabled: rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.includes(eventName)
+          shauhinEnabled: shauhinActive &&
+            rules?.shauhinMode?.enabled &&
+            rules.shauhinMode.enabledBets.includes(eventName)
         };
         return prediction;
-      }), [rules, predictionsMade]);
+      }),
+    [rules, predictionsMade, shauhinActive]);
 
   const customPredictions: MakePrediction[] = useMemo(() =>
     rules?.custom
+      .filter((rule) => rule.eventType === 'Prediction')
       .map((rule) => ({
         eventSource: 'Custom' as const,
         eventName: rule.eventName,

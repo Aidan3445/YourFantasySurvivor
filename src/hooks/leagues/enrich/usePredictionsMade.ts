@@ -17,11 +17,9 @@ export function usePredictionsMade(overrideHash?: string) {
 
   const basePredictionsMade = useMemo(() => {
     if (!basePredictions) return {};
-    console.log('Base predictions:', basePredictions);
     return Object.entries(basePredictions ?? {})
       .reduce((acc, [episodeNumber, predictionMap]) => {
         Object.values(predictionMap).forEach((predictions) => {
-          console.log('Predictions for episode', episodeNumber, predictions);
           const userPreds = predictions?.filter(pred =>
             pred.predictionMakerId === leagueMembers?.loggedIn?.memberId);
           if (userPreds) {

@@ -1,14 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
 import { type SelectionTimelines } from '~/types/leagues';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useMemo } from 'react';
 
 /**
   * Fetches selection timeline data for a league based on the league hash from the URL parameters.
   * @param {string} overrideHash Optional hash to override the URL parameter.
   */
 export function useSelectionTimeline(overrideHash?: string) {
-  const params = useParams();
-  const hash = overrideHash ?? params.hash as string;
+  const { data: league } = useLeague(overrideHash);
+  const hash = useMemo(() => overrideHash ?? league?.hash, [overrideHash, league]);
 
   return useQuery<SelectionTimelines>({
     queryKey: ['selectionTimeline', hash],
@@ -23,7 +24,9 @@ export function useSelectionTimeline(overrideHash?: string) {
     },
     enabled: !!hash,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 10 * 60 * 1000, // 10 minutes
+    refetchInterval: league?.status === 'Draft' ?
+      5 * 1000 : // 5 seconds during draft
+      10 * 60 * 1000, // 10 minutes
   });
 }
 

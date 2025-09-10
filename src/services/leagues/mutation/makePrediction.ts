@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
@@ -21,6 +21,7 @@ export default async function makePredictionLogic(
   auth: VerifiedLeagueMemberAuth,
   prediction: PredictionInsert
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Insert or update the prediction
   return db.transaction(async (trx) => {
     const keyEpisodes = await getKeyEpisodes(auth.seasonId);

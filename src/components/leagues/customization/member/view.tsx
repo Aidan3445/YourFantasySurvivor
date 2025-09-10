@@ -55,7 +55,9 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
         className
       )} action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit Member Details</FormLabel>
-        <LeagueMemberFields memberColors={leagueMembers?.members.map(m => m.color) ?? []} />
+        <LeagueMemberFields
+          memberColors={leagueMembers?.members.map(m => m.color) ?? []}
+          currentColor={leagueMembers?.loggedIn?.color} />
         <Button
           disabled={!reactForm.formState.isDirty}
           type='submit'

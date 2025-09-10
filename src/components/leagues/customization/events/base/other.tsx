@@ -7,13 +7,13 @@ import { BaseEventDescriptions, BaseEventFullName } from '~/lib/events';
 
 export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <div>
+    <div className='grid grid-rows-subgrid row-span-5'>
       <FormLabel className='text-2xl'>Other</FormLabel>
       <div>
         <FormField
           name='baseEventRules.spokeEpTitle'
           render={({ field }) => (
-            <FormItem>
+            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
               <FormLabel className='inline-flex gap-2 items-center'>
                 {BaseEventFullName.spokeEpTitle}
                 {disabled &&
@@ -50,7 +50,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
         <FormField
           name='baseEventRules.finalists'
           render={({ field }) => (
-            <FormItem>
+            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
               <FormLabel className='inline-flex gap-2 items-center'>
                 {BaseEventFullName.finalists}
                 {disabled &&
@@ -87,7 +87,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
         <FormField
           name='baseEventRules.fireWin'
           render={({ field }) => (
-            <FormItem>
+            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
               <FormLabel className='inline-flex gap-2 items-center'>
                 {BaseEventFullName.fireWin}
                 {disabled &&
@@ -124,7 +124,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
         <FormField
           name='baseEventRules.soleSurvivor'
           render={({ field }) => (
-            <FormItem>
+            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
               <FormLabel className='inline-flex gap-2 items-center'>
                 {BaseEventFullName.soleSurvivor}
                 {disabled &&

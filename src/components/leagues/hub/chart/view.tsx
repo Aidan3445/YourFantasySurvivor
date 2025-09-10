@@ -9,34 +9,23 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { useLeague } from '~/hooks/deprecated/useLeague';
 import { useMemo } from 'react';
 import CustomTooltip from '~/components/leagues/hub/chart/tooltip';
 import { formatData } from '~/components/leagues/hub/chart/utils';
+import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 export default function Chart() {
-  const {
-    leagueData: {
-      scores: {
-        Member: memberScores,
-      }
-    },
-    league: {
-      members: {
-        list: members,
-      }
-    }
-  } = useLeague();
+  const { sortedMemberScores, } = useLeagueData();
 
   const highestScore = useMemo(() => Math.max(
-    ...Object.values(memberScores).map((scores) => scores.slice().pop() ?? 0)
-  ), [memberScores]);
+    ...sortedMemberScores.map(({ scores }) => scores.slice().pop() ?? 0)
+    , 0), [sortedMemberScores]);
 
-  const data = useMemo(() => Object.entries(memberScores).map(([name, scores]) => ({
-    name,
+  const data = useMemo(() => sortedMemberScores.map(({ member, scores }) => ({
+    name: member.displayName,
     episodeScores: scores,
-    color: members.find((member) => member.displayName === name)?.color ?? '#ffffff'
-  })), [memberScores, members]);
+    color: member.color,
+  })), [sortedMemberScores]);
 
   const memberCount = data.length;
 

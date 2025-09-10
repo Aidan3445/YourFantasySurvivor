@@ -66,7 +66,7 @@ export default function ShauhinMode() {
     }
   });
 
-  const disabled = !!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner';
+  const disabled = (!!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner') || league?.status === 'Inactive';
 
   return (
     <article className='p-2 bg-card rounded-xl w-full relative'>

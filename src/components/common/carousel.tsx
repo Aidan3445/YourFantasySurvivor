@@ -284,7 +284,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
   }, [api]);
 
   return (
-    <Carousel className='relative' setApi={setApi} opts={{ containScroll: false }}>
+    <Carousel className='relative' setApi={setApi} opts={{ containScroll: false, duration: 20 }}>
       <CarouselContent
         className='ml-0 -mx-2'>
         {items.map((item, index) => {
@@ -295,25 +295,25 @@ function CoverCarousel({ items }: CoverCarouselProps) {
             <CarouselItem
               key={index}
               className={cn(
-                'z-10 transition-all duration-500 drop-shadow-md bg-secondary rounded-md',
+                'z-10 transition-all duration-400 drop-shadow-md bg-secondary rounded-md',
                 'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
                 'basis-[90%] lg:basis-1/2',
                 {
                   'pointer-events-none': offset !== 0,
 
-                  'scale-50 translate-y-2 -z-10 blur-[1px] duration-[400ms]': absOffset === 1,
+                  'scale-50 translate-y-2 -z-10 blur-[1px] duration-300': absOffset === 1,
                   'translate-x-1/3': offset === -1,
                   '-translate-x-1/3': offset === 1,
 
-                  'scale-[25%] translate-y-4 -z-20 blur-[2px] duration-300': absOffset === 2,
+                  'scale-[25%] translate-y-4 -z-20 blur-[2px] duration-200': absOffset === 2,
                   'translate-x-full': offset === -2,
                   '-translate-x-full': offset === 2,
 
-                  'scale-[12.5%] translate-y-6 -z-30 blur-[3px] duration-200': absOffset === 3,
+                  'scale-[12.5%] translate-y-6 -z-30 blur-[3px] duration-100': absOffset === 3,
                   'translate-x-[185%]': offset <= -3,
                   '-translate-x-[185%]': offset >= 3,
 
-                  'scale-0 duration-100': absOffset > 3,
+                  'scale-0 duration-50': absOffset > 3,
                 }
               )}>
               <Table className='table-fixed'>
@@ -412,4 +412,5 @@ export {
   CarouselNext,
   CoverCarousel,
   CarouselProgress,
+  useCarousel,
 };

@@ -10,7 +10,7 @@ export function useCastaways(seasonId: number | null) {
   return useQuery<Castaway[]>({
     queryKey: ['castaways', seasonId],
     queryFn: async () => {
-      if (!seasonId) throw new Error('Season ID is required');
+      if (!seasonId) return [];
 
       const res = await fetch(`/api/seasons/castaways?seasonId=${seasonId}`);
       if (!res.ok) {

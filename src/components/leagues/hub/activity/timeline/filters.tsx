@@ -77,19 +77,18 @@ export default function TimelineFilters({
                 <SelectItem value='-1'>
                   All Episodes
                 </SelectItem>
-                {episodes?.toReversed()
-                  .map((episode) => (
-                    <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
-                      {`${episode.episodeNumber}:`} {episode.title}
-                      <div className='inline ml-1'>
-                        <AirStatus
-                          airDate={episode.airDate}
-                          airStatus={episode.airStatus}
-                          showTime={false}
-                          showDate={!isMobile} />
-                      </div>
-                    </SelectItem>
-                  ))}
+                {episodes?.map((episode) => (
+                  <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
+                    {`${episode.episodeNumber}:`} {episode.title}
+                    <div className='inline ml-1'>
+                      <AirStatus
+                        airDate={episode.airDate}
+                        airStatus={episode.airStatus}
+                        showTime={false}
+                        showDate={!isMobile} />
+                    </div>
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             <AccordionTrigger className='w-full'>

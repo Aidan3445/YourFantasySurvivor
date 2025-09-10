@@ -22,14 +22,15 @@ const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
 
 interface DraftOrderProps {
+  overrideHash?: string;
   className?: string;
 }
 
-export default function DraftOrder({ className }: DraftOrderProps) {
+export default function DraftOrder({ overrideHash, className }: DraftOrderProps) {
   const queryClient = useQueryClient();
-  const { data: league } = useLeague();
-  const { data: leagueMembers } = useLeagueMembers();
-  const { data: settings } = useLeagueSettings();
+  const { data: league } = useLeague(overrideHash);
+  const { data: leagueMembers } = useLeagueMembers(overrideHash);
+  const { data: settings } = useLeagueSettings(overrideHash);
 
   const router = useRouter();
   const sensors = useSensors(useSensor(PointerSensor));

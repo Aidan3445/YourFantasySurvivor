@@ -32,7 +32,7 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
     if (!league) return;
 
     if (league.status === 'Predraft') {
-      const res = await fetch(`/api/leagues/${league.hash}/draft/start`, { method: 'POST' });
+      const res = await fetch(`/api/leagues/${league.hash}/status`, { method: 'PUT' });
       if (res.status !== 200) {
         alert(`Failed to join draft: ${res.statusText}`);
         return;
@@ -62,7 +62,7 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
           {editable && <SetDraftDate overrideHash={overrideHash} />}
         </div>
       </span>
-      <span className='bg-primary rounded-2xl p-2 mt-4 text-primary-foreground text-2xl shadow-sm shadow-black'>
+      <span className='bg-primary rounded-2xl p-2 mt-2 text-primary-foreground text-2xl shadow-sm shadow-black'>
         <Clock endDate={leagueSettings?.draftDate ?? null} replacedBy={
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'

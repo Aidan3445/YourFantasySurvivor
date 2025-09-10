@@ -10,14 +10,14 @@ export function useEpisodes(seasonId: number | null) {
   return useQuery<Episode[]>({
     queryKey: ['episodes', seasonId],
     queryFn: async () => {
-      if (!seasonId) throw new Error('Season ID is required');
+      if (!seasonId) return [];
 
       const res = await fetch(`/api/seasons/episodes?seasonId=${seasonId}`);
       if (!res.ok) {
         throw new Error('Failed to fetch episode data');
       }
       const { episodes } = await res.json() as { episodes: Episode[] };
-      return episodes;
+      return episodes.map(ep => ({ ...ep, airDate: new Date(ep.airDate) }));
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

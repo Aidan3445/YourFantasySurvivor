@@ -15,6 +15,7 @@ export type League = {
   status: LeagueStatus;
   season: string;
   seasonId: number;
+  startWeek: number | null;
 };
 
 export type PublicLeague = {
@@ -44,7 +45,7 @@ export type LeagueSettingsUpdate = {
 }
 
 export const LeagueDetailsUpdateZod = z.object({
-  leagueName: LeagueNameZod,
+  name: LeagueNameZod,
   admins: z.array(z.number()),
 });
 export type LeagueDetailsUpdate = z.infer<typeof LeagueDetailsUpdateZod>;
@@ -164,11 +165,11 @@ export const ShauhinModeSettingsZod = z.object({
     .min(1, { message: 'Max bets per week must be at least 1' })
     .max(SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, { message: `Max bets per week cannot exceed ${SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK}` }),
   startWeek: z.enum(ShauhinModeTimings),
-  customStartWeek: z.coerce.number().int().min(1).nullable(),
+  customStartWeek: z.coerce.number().int().min(3).nullable(),
   enabledBets: z.array(z.enum(ScoringBaseEventNames)).min(1, { message: 'At least one bet type must be enabled' }),
   noEventIsMiss: z.boolean(),
-}).refine(data => data.startWeek !== 'Custom' || (data.customStartWeek !== null && data.customStartWeek >= 2), {
-  message: 'Custom start week must be set and at least 2 when start week is Custom'
+}).refine(data => data.startWeek !== 'Custom' || (data.customStartWeek !== null && data.customStartWeek >= 3), {
+  message: 'Custom start week must be set and at least 3 when start week is Custom'
 });
 
 export type CustomEventRule = {

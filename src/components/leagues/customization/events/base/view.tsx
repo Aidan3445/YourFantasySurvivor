@@ -61,7 +61,7 @@ export default function LeagueScoring() {
     }
   });
 
-  const disabled = !!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner';
+  const disabled = (!!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner') || league?.status === 'Inactive';
 
   return (
     <article className='p-2 bg-card rounded-xl w-full relative'>
@@ -98,13 +98,13 @@ export default function LeagueScoring() {
       </div>
       <Form {...reactForm}>
         <form action={() => handleSubmit()}>
-          <span className='grid lg:grid-cols-3 gap-4 '>
+          <span className='grid lg:grid-cols-3 gap-x-4 gap-y-2'>
             <ChallengeScoreSettings disabled={disabled || locked} />
             <AdvantageScoreSettings disabled={disabled || locked} />
             <OtherScoreSettings disabled={disabled || locked} />
           </span>
           {!(disabled || locked) && (
-            <span className='w-fit ml-auto grid grid-cols-2 gap-2'>
+            <span className='w-fit ml-auto grid grid-cols-2 gap-2 mt-4'>
               <Button
                 type='button'
                 variant='destructive'

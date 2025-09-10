@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { and, eq, inArray, not, notInArray } from 'drizzle-orm';
@@ -17,16 +17,19 @@ export default async function updateAdminsLogic(
   auth: VerifiedLeagueMemberAuth,
   admins: number[]
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Create transaction
   return await db.transaction(async (trx) => {
     // Demote the old admins not in the list
-    await trx
+    const removedAdmins = await trx
       .update(leagueMemberSchema)
       .set({ role: 'Member' })
       .where(and(
         eq(leagueMemberSchema.leagueId, auth.leagueId),
         notInArray(leagueMemberSchema.memberId, admins),
-        eq(leagueMemberSchema.role, 'Admin')));
+        eq(leagueMemberSchema.role, 'Admin')))
+      .returning({ memberId: leagueMemberSchema.memberId });
+
     // Promote the new admins
     const newAdmins = await trx
       .update(leagueMemberSchema)
@@ -39,7 +42,8 @@ export default async function updateAdminsLogic(
       .returning({ memberId: leagueMemberSchema.memberId });
 
     // Validate the number of admins
-    if (newAdmins.length !== admins.length) {
+    if (removedAdmins.some(r => admins.includes(r.memberId)) &&
+      newAdmins.some(n => !admins.includes(n.memberId))) {
       throw new Error('Failed to update admins');
     }
 

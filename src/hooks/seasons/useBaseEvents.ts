@@ -10,7 +10,7 @@ export function useBaseEvents(seasonId: number | null) {
   return useQuery<Events>({
     queryKey: ['baseEvents', seasonId],
     queryFn: async () => {
-      if (!seasonId) throw new Error('Season ID is required');
+      if (!seasonId) return {};
 
       const res = await fetch(`/api/seasons/baseEvents?seasonId=${seasonId}`);
       if (!res.ok) {

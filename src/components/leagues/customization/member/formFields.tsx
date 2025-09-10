@@ -11,17 +11,18 @@ import { useMemo } from 'react';
 
 interface LeagueMemberFieldsProps {
   memberColors?: string[];
+  currentColor?: string;
 }
 
-export default function LeagueMemberFields({ memberColors = [] }: LeagueMemberFieldsProps) {
+export default function LeagueMemberFields({ memberColors = [], currentColor }: LeagueMemberFieldsProps) {
   const availableColors = useMemo(() => twentyColors.map((color) => {
-    if (memberColors.some((memberColor) => memberColor === color)) {
+    if (color !== currentColor && memberColors.some((memberColor) => memberColor === color)) {
       const rgb = hexToRgba(color);
       const avg = Math.round((rgb.r + rgb.g + rgb.b) / 3);
       return rgbaToHex({ r: avg, g: avg, b: avg, a: 1 });
     }
     return color;
-  }), [memberColors]);
+  }), [memberColors, currentColor]);
 
   const ensureNewColor = (color: HsvaColor, setColor?: (value: string) => void) => {
     if (color.s === 0) {

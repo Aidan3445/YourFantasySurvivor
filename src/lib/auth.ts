@@ -40,7 +40,8 @@ export async function leagueMemberAuth(hash: string) {
       memberId: leagueMemberSchema.memberId,
       role: leagueMemberSchema.role,
       leagueId: leagueMemberSchema.leagueId,
-      seasonId: leagueSchema.season,
+      status: leagueSchema.status,
+      seasonId: leagueSchema.seasonId,
     })
     .from(leagueMemberSchema)
     .innerJoin(leagueSchema, and(

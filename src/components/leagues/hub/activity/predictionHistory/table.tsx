@@ -1,16 +1,49 @@
+'use client';
+
 import { Flame } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
+import { useLeague } from '~/hooks/leagues/useLeague';
+import { useCastaways } from '~/hooks/seasons/useCastaways';
+import { useTribes } from '~/hooks/seasons/useTribes';
+import { useIsMobile } from '~/hooks/ui/useMobile';
+import { BaseEventFullName } from '~/lib/events';
 import { cn } from '~/lib/utils';
-import { BaseEventFullName, type BaseEventName, type Prediction } from '~/types/events';
+import { type PredictionWithEvent, type BaseEventName, type EventReference } from '~/types/events';
 
 interface PredictionTableProps {
-  predictions: Prediction[];
+  predictions: PredictionWithEvent[];
 }
 
 export default function PredctionTable({ predictions }: PredictionTableProps) {
-  const hasBets = predictions.some((pred) => pred.prediction.bet && pred.prediction.bet > 0);
+  const { data: league } = useLeague();
+  const { data: castaways } = useCastaways(league?.seasonId ?? null);
+  const { data: tribes } = useTribes(league?.seasonId ?? null);
+  const isMobile = useIsMobile();
+  const hasBets = useMemo(() => predictions.some((pred) => pred.bet && pred.bet > 0), [predictions]);
+
+  const findReferenceNames = useCallback((references?: EventReference[]) => {
+    if (!castaways || !tribes || !references) return [{ short: 'TBD', full: 'TBD' }];
+    const refs = references.map((ref) => {
+      if (ref.type === 'Castaway') {
+        const castaway = castaways.find((c) => c.castawayId === ref.id);
+        return castaway ? {
+          short: castaway.shortName,
+          full: castaway.fullName,
+        } : null;
+      } else if (ref.type === 'Tribe') {
+        const tribe = tribes.find((t) => t.tribeId === ref.id);
+        return tribe ? {
+          short: tribe.tribeName,
+          full: tribe.tribeName,
+        } : null;
+      }
+      return null;
+    }).filter(Boolean) as { short: string; full: string }[];
+    return refs.length > 0 ? refs : [{ short: 'TBD', full: 'TBD' }];
+  }, [castaways, tribes]);
 
   return (
     <Table className='transform-gpu will-change-transform'>
@@ -26,16 +59,12 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
       </TableHeader>
       <TableBody>
         {predictions.sort((a) => a.timing.some((t) => t.startsWith('Weekly')) ? 1 : -1)
-          .map((pred) => {
-            const hit = pred.results.some((res) =>
-              res.referenceId === pred.prediction.referenceId &&
-              res.referenceType === pred.prediction.referenceType);
+          .map((pred, index) => {
             return (
-              <TableRow key={pred.leagueEventRuleId ?? pred.eventName} className='bg-b3'>
+              <TableRow key={index} className='bg-b3'>
                 <TableCell>
                   <div className='flex flex-col text-nowrap'>
-                    {BaseEventFullName[pred.eventName as BaseEventName] ??
-                      pred.eventName}
+                    {BaseEventFullName[pred.eventName as BaseEventName] ?? pred.eventName}
                     <span className='text-xs italic'>
                       {pred.timing.join(' - ')}
                     </span>
@@ -43,13 +72,13 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                 </TableCell>
                 <TableCell className='text-nowrap'>
                   <span className={cn('text-sm text-center',
-                    hit ?
+                    pred.hit ?
                       pred.points > 0 ? 'text-green-800' : 'text-red-800' :
                       'text-muted-foreground')}>
-                    {pred.points > 0 && hit ? `+${pred.points}` : pred.points}
+                    {pred.points > 0 && pred.hit ? `+${pred.points}` : pred.points}
                     <Flame className={cn(
                       'inline align-top w-4 h-min',
-                      hit ?
+                      pred.hit ?
                         pred.points > 0 ? 'stroke-green-800' : 'stroke-red-800' :
                         'stroke-muted-foreground'
                     )} />
@@ -58,39 +87,30 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                 {
                   hasBets &&
                   <TableCell className='text-nowrap'>
-                    {pred.prediction.bet && pred.prediction.bet > 0 ? (
-                      hit ? (
+                    {pred.bet && pred.bet > 0 ? (
+                      pred.hit ? (
                         <span className='text-sm text-center text-green-800'>
-                          +{pred.prediction.bet}
+                          +{pred.bet}
                           <Flame className='inline align-top w-4 h-min stroke-green-800' />
                         </span>
                       ) : (
                         <span className='text-sm text-center text-red-800'>
-                          -{pred.prediction.bet}
+                          -{pred.bet}
                           <Flame className='inline align-top w-4 h-min stroke-red-800' />
                         </span>
                       )
-                    ) : <span className='text-sm text-center text-muted-foreground'>-</span>
-                    }
+                    ) : <span className='text-sm text-center text-muted-foreground'>-</span>}
                   </TableCell>
                 }
                 <TableCell>
-                  <div className='md:hidden'>{pred.prediction.castawayShort ?? pred.prediction.tribe}</div>
-                  <div className='hidden md:block'>{pred.prediction.castaway ?? pred.prediction.tribe}</div>
+                  {findReferenceNames([{ type: pred.referenceType, id: pred.referenceId }])
+                    .map((res) => isMobile ? res.short : res.full)
+                    .join(', ')}
                 </TableCell>
                 <TableCell>
-                  <div className='md:hidden'>
-                    {pred.results.map((res) => res.castawayShort ?? res.tribe)
-                      .join(', ') ||
-                      <div className='text-muted-foreground'>TBD</div>
-                    }
-                  </div>
-                  <div className='hidden md:block'>
-                    {pred.results.map((res) => res.castaway ?? res.tribe)
-                      .join(', ') ||
-                      <div className='text-muted-foreground'>TBD</div>
-                    }
-                  </div>
+                  {findReferenceNames(pred.event?.references)
+                    .map((res) => isMobile ? res.short : res.full)
+                    .join(', ')}
                 </TableCell>
               </TableRow >
             );

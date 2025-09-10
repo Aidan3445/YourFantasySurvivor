@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { and, eq } from 'drizzle-orm';
@@ -19,6 +19,7 @@ export default async function deleteCustomEventRuleLogic(
   auth: VerifiedLeagueMemberAuth,
   ruleId: number,
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Transaction to delete the rule
   return await db.transaction(async (trx) => {
     // Get league information

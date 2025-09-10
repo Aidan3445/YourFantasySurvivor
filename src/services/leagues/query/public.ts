@@ -22,7 +22,7 @@ export default async function getPublicLeague(hash: string) {
       season: seasonSchema.name,
     })
     .from(leagueSchema)
-    .innerJoin(seasonSchema, eq(leagueSchema.season, seasonSchema.seasonId))
+    .innerJoin(seasonSchema, eq(leagueSchema.seasonId, seasonSchema.seasonId))
     .where(eq(leagueSchema.hash, hash));
 
   const [colors, league] = await Promise.all([colorsReq, leagueReq]);

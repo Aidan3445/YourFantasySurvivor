@@ -19,7 +19,7 @@ export type EventReference = {
 export type Event = {
   eventSource: EventSource;
   eventType: EventType;
-  episodeNumber: number;
+  episodeNumber: number; // episode that the event occurred in
   eventId: number;
   eventName: string;
   label: string | null;
@@ -57,8 +57,9 @@ export type Eliminations = Elimination[][]
 export type PredictionTiming = (typeof PredictionTimings)[number];
 
 export type Prediction = {
+  predictionId: number;
   eventSource: EventSource;
-  episodeNumber: number;
+  episodeNumber: number; // episode that the prediction was made in
   eventName: string;
   predictionMakerId: number;
   referenceId: number;
@@ -66,6 +67,12 @@ export type Prediction = {
   pending: boolean;
   bet: number | null;
   hit: boolean | null;
+};
+
+export type PredictionWithEvent = Prediction & {
+  points: number;
+  event: EventWithReferences | undefined;
+  timing: PredictionTiming[];
 };
 
 export type EnrichedPrediction = {

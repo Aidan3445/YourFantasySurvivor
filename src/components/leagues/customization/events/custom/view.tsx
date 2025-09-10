@@ -20,7 +20,7 @@ import { defaultNewCustomRule } from '~/lib/leagues';
 import createCustomEventRule from '~/actions/createCustomEventRule';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 
-export default function LeagueEvents() {
+export default function CustomEvents() {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
   const { data: rules } = useLeagueRules();
@@ -48,7 +48,7 @@ export default function LeagueEvents() {
     }
   });
 
-  const disabled = !!leagueMembers?.loggedIn && leagueMembers.loggedIn.role !== 'Owner';
+  const disabled = (!!leagueMembers?.loggedIn && leagueMembers.loggedIn.role !== 'Owner') || league?.status === 'Inactive';
 
   return (
     <article className='bg-card p-2 rounded-xl w-full relative space-y-2'>

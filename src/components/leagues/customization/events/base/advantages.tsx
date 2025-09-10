@@ -7,12 +7,12 @@ import { BaseEventDescriptions, BaseEventFullName } from '~/lib/events';
 
 export default function AdvantageScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <div>
+    <div className='grid grid-rows-subgrid row-span-5'>
       <FormLabel className='text-2xl'>Advantages</FormLabel>
       <FormField
         name='baseEventRules.advFound'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.advFound}
               {disabled &&
@@ -47,7 +47,7 @@ export default function AdvantageScoreSettings({ disabled }: BaseEventSettingsPr
       <FormField
         name='baseEventRules.advPlay'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.advPlay}
               {disabled &&
@@ -82,7 +82,7 @@ export default function AdvantageScoreSettings({ disabled }: BaseEventSettingsPr
       <FormField
         name='baseEventRules.badAdvPlay'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.badAdvPlay}
               {disabled &&
@@ -118,7 +118,7 @@ export default function AdvantageScoreSettings({ disabled }: BaseEventSettingsPr
       <FormField
         name='baseEventRules.advElim'
         render={({ field }) => (
-          <FormItem>
+          <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
             <FormLabel className='inline-flex gap-2 items-center'>
               {BaseEventFullName.advElim}
               {disabled &&

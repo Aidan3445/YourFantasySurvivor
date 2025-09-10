@@ -22,7 +22,7 @@ export default function CreateLeagueModal({ children, className }: CreateLeagueM
       <AlertDialogTrigger className={className} asChild>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className='sm:w-160 w-96 flex flex-col'>
+      <AlertDialogContent className='sm:w-160 w-96 flex flex-col animate-scale-in-fast'>
         <AlertDialogHeader>
           <AlertDialogTitle className='text-2xl'>Create a New League</AlertDialogTitle>
           <AlertDialogDescription className='sr-only'>

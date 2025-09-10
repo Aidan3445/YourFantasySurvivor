@@ -13,9 +13,10 @@ import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 interface ScoreboardProps {
   overrideHash?: string;
   maxRows?: number;
+  className?: string;
 }
 
-export default function Scoreboard({ overrideHash, maxRows }: ScoreboardProps = {}) {
+export default function Scoreboard({ overrideHash, maxRows, className }: ScoreboardProps = {}) {
   const {
     sortedMemberScores,
     loggedInIndex,
@@ -26,7 +27,7 @@ export default function Scoreboard({ overrideHash, maxRows }: ScoreboardProps = 
   } = useLeagueData(overrideHash);
 
   return (
-    <ScrollArea className='bg-card rounded-lg gap-0'>
+    <ScrollArea className={cn('bg-card rounded-lg gap-0', className)}>
       <Table>
         <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
         <TableHeader>

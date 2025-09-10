@@ -13,7 +13,7 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
    * @throws an error if the user is not authenticated
    * @returnObj `LeagueMember[]`
    */
-export default async function getLeague(auth: VerifiedLeagueMemberAuth) {
+export default async function getLeagueMembers(auth: VerifiedLeagueMemberAuth) {
   return db
     .select({
       memberId: leagueMemberSchema.memberId,

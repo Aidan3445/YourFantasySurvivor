@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
 import updateAdmins from '~/actions/updateAdmins';
 
@@ -38,6 +38,13 @@ export function LeagueSettings() {
     resolver: zodResolver(LeagueDetailsUpdateZod)
   });
 
+  useEffect(() => {
+    if (league) reactForm.setValue('name', league.name);
+    if (membersList.length > 0) reactForm.setValue('admins',
+      membersList.filter(m => m.role === 'Admin').map(m => m.value) ?? []
+    );
+  }, [league, membersList, reactForm]);
+
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     if (!league) return;
 
@@ -46,6 +53,7 @@ export function LeagueSettings() {
         updateLeagueSettings(league.hash, data),
         data.admins ? updateAdmins(league.hash, data.admins) : Promise.resolve(),
       ]);
+      await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['settings', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
       alert(`League settings updated for ${data.name}`);
@@ -55,7 +63,7 @@ export function LeagueSettings() {
     }
   });
 
-  const editable = !!leagueMembers && leagueMembers.loggedIn?.role === 'Owner';
+  const editable = (!!leagueMembers && leagueMembers.loggedIn?.role === 'Owner') && league?.status !== 'Inactive';
 
   if (!editable) return null;
 
@@ -64,7 +72,7 @@ export function LeagueSettings() {
       <form className='lg:flex-1 w-full lg:w-min flex flex-col p-2 gap-2 bg-card rounded-xl items-center' action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit League Details</FormLabel>
         <FormField
-          name='leagueName'
+          name='name'
           render={({ field }) => (
             <FormItem className='w-full'>
               <FormLabel className='text-lg'>League Name</FormLabel>
@@ -82,10 +90,9 @@ export function LeagueSettings() {
           )} />
         {editable && <>
           <LeagueAdminsField members={membersList} />
-          <Button
-            className='mt-auto'
-            disabled={!reactForm.formState.isDirty}
-            type='submit'>Save</Button>
+          <Button className='mt-auto' disabled={!reactForm.formState.isDirty} type='submit'>
+            Save
+          </Button>
         </>}
       </form>
     </Form>

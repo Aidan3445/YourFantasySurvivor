@@ -11,12 +11,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Input } from '~/components/common/input';
 import ColorRow from '~/components/shared/colorRow';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useQueryClient } from '@tanstack/react-query';
 import makePrediction from '~/actions/makePrediction';
+import { useCarousel } from '~/components/common/carousel';
 
 const formSchema = z.object({
   referenceId: z.coerce.number(),
@@ -32,6 +33,7 @@ interface SubmissionCardProps {
 export default function SubmissionCard({ prediction, options, maxBet }: SubmissionCardProps) {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
+  const { canScrollNext, scrollNext } = useCarousel();
 
   const schema = useMemo(() => {
     return formSchema.extend({
@@ -50,6 +52,14 @@ export default function SubmissionCard({ prediction, options, maxBet }: Submissi
     },
     resolver: zodResolver(schema),
   });
+
+  useEffect(() => {
+    if (!prediction?.predictionMade) return;
+    reactForm.reset({
+      referenceId: prediction.predictionMade?.referenceId,
+      bet: prediction.predictionMade?.bet ?? undefined,
+    });
+  }, [prediction?.predictionMade, reactForm, prediction]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     if (!league) return;
@@ -72,9 +82,12 @@ export default function SubmissionCard({ prediction, options, maxBet }: Submissi
       reactForm.reset(data);
 
       alert('Prediction submitted');
+
+      if (canScrollNext) scrollNext();
     } catch (error) {
       console.error(error);
       alert('Failed to submit prediction');
+      reactForm.setError('root', { message: (error as Error).message });
     }
   });
 
@@ -90,7 +103,9 @@ export default function SubmissionCard({ prediction, options, maxBet }: Submissi
                 <FormControl>
                   <Select
                     onValueChange={field.onChange}
-                    value={`${field.value ?? ''}`}>
+                    value={field.value ?
+                      String(field.value) :
+                      prediction.predictionMade ? String(prediction.predictionMade.referenceId) : undefined}>
                     <SelectTrigger className=''>
                       <SelectValue placeholder='Select prediction' />
                     </SelectTrigger>
@@ -140,6 +155,9 @@ export default function SubmissionCard({ prediction, options, maxBet }: Submissi
                     <Input
                       type='number'
                       placeholder='Enter bet'
+                      min={0}
+                      max={maxBet ?? 1000}
+                      step={1}
                       {...betField}
                       value={betField.value as string ?? ''}
                     />
@@ -170,7 +188,7 @@ export default function SubmissionCard({ prediction, options, maxBet }: Submissi
             className={cn(prediction.shauhinEnabled ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
             disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
             type='submit'>
-            {prediction.predictionMade ?? reactForm.formState.isSubmitSuccessful
+            {prediction.predictionMade && !reactForm.formState.errors.root
               ? 'Update' : 'Submit'}
           </Button>
         </span >

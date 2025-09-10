@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
@@ -18,8 +18,9 @@ export default async function updateLeagueSettingsLogic(
   auth: VerifiedLeagueMemberAuth,
   update: LeagueSettingsUpdate
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
+
   const { name, draftDate } = update;
-  console.log('Updating league settings', update);
 
   // Transaction to update the league settings
   return await db.transaction(async (trx) => {

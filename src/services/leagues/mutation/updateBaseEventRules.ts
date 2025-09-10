@@ -1,4 +1,4 @@
-'use server';
+import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
@@ -24,6 +24,7 @@ export default async function updateBaseEventRulesLogic(
   baseRules: BaseEventRules,
   predictionRules: BaseEventPredictionRules,
 ) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
   return await db.transaction(async (trx) => {
     // Get league information
     const league = await trx

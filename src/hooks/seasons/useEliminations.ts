@@ -10,7 +10,7 @@ export function useEliminations(seasonId: number | null) {
   return useQuery<Eliminations>({
     queryKey: ['eliminations', seasonId],
     queryFn: async () => {
-      if (!seasonId) throw new Error('Season ID is required');
+      if (!seasonId) return [];
 
       const res = await fetch(`/api/seasons/eliminations?seasonId=${seasonId}`);
       if (!res.ok) {
