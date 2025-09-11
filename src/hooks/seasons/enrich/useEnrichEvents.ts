@@ -102,7 +102,7 @@ export function useEnrichEvents(
             ? leagueMembers.members.find(m => m.memberId === memberId) ?? null
             : null;
           return { castaway: castawayWithTribe, member };
-        });
+        }).filter(Boolean) as EnrichedEvent['referenceMap'][number]['pairs'];
       };
 
       const { eventTribes, eventCastaways } = event.references.reduce((acc, ref) => {
@@ -111,32 +111,26 @@ export function useEnrichEvents(
         return acc;
       }, { eventTribes: [] as number[], eventCastaways: [] as number[] });
 
-
-      if (eventTribes.length === 0) {
-        const pairs = createCastawayMemberPairs(eventCastaways, null).filter(Boolean);
-        const referenceMap = { tribe: null, pairs };
-
-        return {
-          ...event,
-          points: points,
-          referenceMap: [referenceMap],
-        } as EnrichedEvent;
-      }
-
       const referenceMap = eventTribes.map(tribeId => {
         const tribe = tribes.find(t => t.tribeId === tribeId)!;
 
         const castawaySet = new Set<number>();
-        eventCastaways.forEach(castawayId => castawaySet.add(castawayId));
-
         const tribeMembers = findTribeCastaways(
           tribesTimeline, eliminations, tribeId, event.episodeNumber);
         tribeMembers.forEach(castawayId => castawaySet.add(castawayId));
 
         const pairs = createCastawayMemberPairs(Array.from(castawaySet), tribe).filter(Boolean);
 
-        return { tribe, pairs };
+        return { tribe, pairs } as EnrichedEvent['referenceMap'][number];
       });
+
+      const looseCastaways = eventCastaways.filter(castawayId => referenceMap
+        .every(tm => !tm.pairs.some(p => p?.castaway.castawayId === castawayId)));
+
+      if (looseCastaways.length > 0) {
+        const pairs = createCastawayMemberPairs(looseCastaways, null).filter(Boolean);
+        referenceMap.push({ tribe: null, pairs });
+      }
 
       return {
         ...event,

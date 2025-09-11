@@ -58,7 +58,7 @@ export default function EpisodeEventsTableBody({
   return (
     <>
       {enrichedMockEvents.map((mock, index) =>
-        <EventRow key={index} className='bg-yellow-500' event={mock} edit={false} />
+        <EventRow key={index} className='bg-yellow-500' event={mock} editCol={edit} isMock />
       )}
       {index > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200 text-xs text-muted-foreground'>
@@ -85,7 +85,7 @@ export default function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {baseEvents.map((event, index) => (
-        <EventRow key={index} event={event} edit={edit} />
+        <EventRow key={index} event={event} editCol={edit} />
       ))}
       {customEvents.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
@@ -94,7 +94,7 @@ export default function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {customEvents.map((event, index) => (
-        <EventRow key={index} event={event} edit={edit} />
+        <EventRow key={index} event={event} editCol={edit} />
       ))}
       {enrichedPredictions.length + enrichedMockPredictions.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>

@@ -5,16 +5,15 @@ import { Pencil, X } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { useState } from 'react';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { BaseEventInsertZod, CustomEventInsertZod, type BaseEventInsert, type CustomEventInsert, type EnrichedEvent } from '~/types/events';
+import { BaseEventInsertZod, CustomEventInsertZod, type EventReference, type BaseEventInsert, type CustomEventInsert, type EnrichedEvent } from '~/types/events';
 import z from 'zod';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
@@ -34,18 +33,24 @@ export default function EditEvent({ event }: EditEventProps) {
   const reactForm = useForm<BaseEventInsert | CustomEventInsert>({
     defaultValues: {
       ...event,
-      references: event.references.map((ref) => ref.id),
+      references: event.references
     },
     resolver: zodResolver(z.union([BaseEventInsertZod, CustomEventInsertZod]))
   });
-  const selectedReferenceType = reactForm.watch('referenceType');
-  const { castawayOptions, tribeOptions } = useEventOptions(league?.seasonId ?? null, event.episodeNumber);
+  const {
+    combinedReferenceOptions,
+    handleCombinedReferenceSelection,
+    getDefaultStringValues
+  } = useEventOptions(league?.seasonId ?? null, event.episodeNumber);
   const [eventClearer, setEventClearer] = useState(0);
 
   const clearReferences = () => {
     setEventClearer(eventClearer + 1);
     reactForm.resetField('references');
   };
+
+  const [modalsOpen, setModalsOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     // determine if base or custom event
@@ -61,6 +66,8 @@ export default function EditEvent({ event }: EditEventProps) {
         await queryClient.invalidateQueries({ queryKey: ['customEvents', league?.hash] });
       }
 
+      clearReferences();
+      setModalsOpen(false);
       alert('Event updated successfully');
     } catch (e) {
       alert('Failed to update event');
@@ -81,6 +88,9 @@ export default function EditEvent({ event }: EditEventProps) {
         await deleteCustomEvent(league?.hash, event.eventId);
         await queryClient.invalidateQueries({ queryKey: ['customEvents', league?.hash] });
       }
+      clearReferences();
+      setModalsOpen(false);
+      setDeleteModalOpen(false);
 
       alert('Event deleted successfully');
     } catch (e) {
@@ -88,8 +98,6 @@ export default function EditEvent({ event }: EditEventProps) {
       console.error('Failed to delete event', e);
     }
   };
-
-  const [modalsOpen, setModalsOpen] = useState(false);
 
   return (
     <Form {...reactForm}>
@@ -104,9 +112,7 @@ export default function EditEvent({ event }: EditEventProps) {
             </AlertDialogTitle>
             <AlertDialogDescription hidden>Edit the event details</AlertDialogDescription>
           </AlertDialogHeader>
-          <form
-            className='flex flex-col gap-1 px-2 w-full'
-            action={() => handleSubmit()}>
+          <form className='flex flex-col gap-1 px-2 w-full' action={() => handleSubmit()}>
             <FormField
               name='label'
               render={({ field }) => (
@@ -123,42 +129,18 @@ export default function EditEvent({ event }: EditEventProps) {
               )} />
             <FormLabel>Reference</FormLabel>
             <FormField
-              name='referenceType'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <Select
-                      defaultValue={field.value as string}
-                      value={field.value as string}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        clearReferences();
-                      }}>
-                      <SelectTrigger className='h-full'>
-                        <SelectValue placeholder='Select Reference Type' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='Castaway'>Castaway</SelectItem>
-                        <SelectItem value='Tribe'>Tribe</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )} />
-            <FormField
               name='references'
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
                     <MultiSelect
-                      options={selectedReferenceType === 'Castaway' ?
-                        castawayOptions : tribeOptions}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value as string[]}
-                      value={field.value as string[]}
+                      options={combinedReferenceOptions}
+                      onValueChange={(value) =>
+                        reactForm.setValue('references', handleCombinedReferenceSelection(value))}
+                      defaultValue={getDefaultStringValues(field.value as EventReference[])}
                       modalPopover
                       clear={eventClearer}
-                      placeholder={`Select ${selectedReferenceType}s`} />
+                      placeholder={'Select References'} />
                   </FormControl>
                 </FormItem>
               )} />
@@ -186,11 +168,11 @@ export default function EditEvent({ event }: EditEventProps) {
                 <AlertDialogCancel variant='secondary'>
                   Cancel
                 </AlertDialogCancel>
-                <AlertDialogAction asChild>
-                  <Button type='submit'>Save</Button>
-                </AlertDialogAction>
+                <Button type='submit'>
+                  Save
+                </Button>
               </span>
-              <AlertDialog>
+              <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
                 <AlertDialogTrigger asChild>
                   <Button variant='destructive'>Delete Event</Button>
                 </AlertDialogTrigger>
@@ -208,15 +190,9 @@ export default function EditEvent({ event }: EditEventProps) {
                       Cancel
                     </AlertDialogCancel>
                     <form action={() => handleDelete()}>
-                      <AlertDialogAction
-                        variant='destructive'
-                        asChild>
-                        <Button
-                          type='submit'
-                          onClick={() => setModalsOpen(false)}>
-                          Delete
-                        </Button>
-                      </AlertDialogAction>
+                      <Button variant='destructive' type='submit'>
+                        Delete
+                      </Button>
                     </form>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -225,7 +201,7 @@ export default function EditEvent({ event }: EditEventProps) {
           </form>
         </AlertDialogContent>
       </AlertDialog >
-    </Form>
+    </Form >
   );
 }
 

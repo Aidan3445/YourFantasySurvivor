@@ -6,7 +6,7 @@ import ColorRow from '~/components/shared/colorRow';
 import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
 import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 import { type EnrichedEvent, type BaseEventName } from '~/types/events';
-import { BaseEventFullName, baseEventLabelPrefixes } from '~/lib/events';
+import { BaseEventFullName, BaseEventLabelPrefixes } from '~/lib/events';
 import { useMemo } from 'react';
 import EditEvent from '~/components/leagues/actions/events/edit';
 
@@ -24,7 +24,7 @@ export default function EventRow({ className, event, edit }: EventRowProps) {
     if (trimmed) return trimmed;
 
     if (isBaseEvent) {
-      return `${baseEventLabelPrefixes[event.eventName as BaseEventName]} ${event.eventName}`;
+      return `${BaseEventLabelPrefixes[event.eventName as BaseEventName]} ${event.eventName}`;
     }
     return event.eventName;
   }, [event.eventName, event.label, isBaseEvent]);

@@ -40,7 +40,7 @@ export const PredictionTimings = [
   'Weekly (Premerge only)', 'Weekly (Postmerge only)'
 ] as const;
 
-export const baseEventLabelPrefixes: Record<BaseEventName, string> = {
+export const BaseEventLabelPrefixes: Record<BaseEventName, string> = {
   advFound: 'Found',
   advPlay: 'Correctly played',
   badAdvPlay: 'Incorrectly played',
@@ -59,11 +59,10 @@ export const baseEventLabelPrefixes: Record<BaseEventName, string> = {
   otherNotes: ''
 } as const;
 
-
 const advList = ['Advantage', 'Idol', 'Beware Advantage', 'Extra Vote', 'Block a Vote', 'Steal a Vote',
   'Safety Without Power', 'Idol Nullifier', 'Challenge Advantage', 'Knowledge is Power'] as const;
 
-export const baseEventLabels: Record<BaseEventName, readonly [string, ...string[]]> = {
+export const BaseEventLabels: Record<BaseEventName, readonly [string, ...string[]]> = {
   advFound: advList,
   advPlay: [...advList, 'Shot in the Dark'],
   badAdvPlay: [...advList, 'Shot in the Dark'],

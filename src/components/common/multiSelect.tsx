@@ -68,6 +68,8 @@ interface MultiSelectProps
     value: string | number | null;
     /** Optional icon component to display alongside the option. */
     icon?: React.ComponentType<{ className?: string }>;
+    /** Optional color for a badge next to the label */
+    color?: string;
   }[];
 
   /**
@@ -356,7 +358,16 @@ export const MultiSelect = React.forwardRef<
                       {option.icon && (
                         <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
                       )}
-                      <span>{option.label}</span>
+                      <span className='flex w-full justify-between'>
+                        {option.label}
+                        {option.color && !isLabel &&
+                          <Badge
+                            style={{ backgroundColor: option.color }}
+                            className='ml-2 text-xs px-1 py-0.5 rounded-lg'>
+                            &nbsp;
+                          </Badge>
+                        }
+                      </span>
                     </CommandItem>
                   );
                 })}

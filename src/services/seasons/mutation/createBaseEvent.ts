@@ -30,19 +30,11 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
 
     if (!newEventId) throw new Error('Failed to create base event');
 
-    const eventRefs = baseEvent.references.map((referenceId) => ({
+    const eventRefs = baseEvent.references.map((reference) => ({
       baseEventId: newEventId,
-      referenceType: baseEvent.referenceType,
-      referenceId: referenceId,
+      referenceType: reference.type,
+      referenceId: reference.id,
     }));
-
-    if (baseEvent.updateTribe && baseEvent.eventName === 'tribeUpdate') {
-      eventRefs.push({
-        baseEventId: newEventId,
-        referenceType: 'Tribe',
-        referenceId: baseEvent.updateTribe,
-      });
-    }
 
     // insert the base event references
     await trx

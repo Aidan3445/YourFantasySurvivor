@@ -10,7 +10,7 @@ import CreateBaseEvent from '~/components/leagues/actions/events/base/create';
 import CustomEvents from '~/components/leagues/customization/events/custom/view';
 import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
 import LeagueScoring from '~/components/leagues/customization/events/base/view';
-import CreateLeagueEvent from '~/components/leagues/actions/events/custom/create';
+import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
 import Predictions from '~/components/leagues/hub/picks/predictions/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 //import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
@@ -57,8 +57,6 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </span>
               <ChangeCastaway />
               <Predictions />
-              {/*
-              */}
               <Timeline />
             </section>
           </TabsContent>
@@ -68,7 +66,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           </TabsContent>
           */}
           <TabsContent value='events'>
-            <CreateLeagueEvent />
+            <CreateCustomEvent />
           </TabsContent>
           <TabsContent value='Base'>
             <CreateBaseEvent />

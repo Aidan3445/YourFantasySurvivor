@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { baseEventLabelPrefixes } from '~/lib/events';
+import { BaseEventFullName, BaseEventLabelPrefixes } from '~/lib/events';
 import { type BaseEventName } from '~/types/events';
 
 export function useEventLabel(eventName: string, isBaseEvent: boolean, eventLabel: string | null) {
@@ -8,8 +8,9 @@ export function useEventLabel(eventName: string, isBaseEvent: boolean, eventLabe
     if (trimmed) return trimmed;
 
     if (isBaseEvent) {
-      return `${baseEventLabelPrefixes[eventName as BaseEventName]} ${eventName}`;
+      return `${BaseEventLabelPrefixes[eventName as BaseEventName]} ${BaseEventFullName[eventName as BaseEventName]}`;
     }
+
     return eventName;
   }, [eventName, eventLabel, isBaseEvent]);
 }

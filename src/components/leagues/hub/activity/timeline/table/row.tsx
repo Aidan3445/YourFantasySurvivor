@@ -14,20 +14,23 @@ import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 interface EventRowProps {
   className?: string;
   event: EnrichedEvent;
-  edit?: boolean;
+  editCol?: boolean;
+  isMock?: boolean;
 }
 
-export default function EventRow({ className, event, edit }: EventRowProps) {
+export default function EventRow({ className, event, editCol: edit, isMock }: EventRowProps) {
   const isBaseEvent = useMemo(() => event.eventSource === 'Base', [event.eventSource]);
 
   const label = useEventLabel(event.eventName, isBaseEvent, event.label);
 
   return (
     <TableRow className={className}>
-      {edit ?
-        <TableCell className='w-0'>
-          <EditEvent event={event} />
-        </TableCell> :
+      {edit ? (
+        isMock ?
+          <TableCell className='w-0' /> :
+          <TableCell className='w-0'>
+            <EditEvent event={event} />
+          </TableCell>) :
         null}
       <TableCell className='text-nowrap'>
         {isBaseEvent &&

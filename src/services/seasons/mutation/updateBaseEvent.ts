@@ -35,19 +35,11 @@ export default async function updateBaseEventLogic(baseEventId: number, baseEven
       .delete(baseEventReferenceSchema)
       .where(eq(baseEventReferenceSchema.baseEventId, baseEventId));
 
-    const eventRefs = baseEvent.references.map((referenceId) => ({
+    const eventRefs = baseEvent.references.map((reference) => ({
       baseEventId,
-      referenceType: baseEvent.referenceType,
-      referenceId,
+      referenceType: reference.type,
+      referenceId: reference.id,
     }));
-
-    if (baseEvent.updateTribe) {
-      eventRefs.push({
-        baseEventId,
-        referenceType: 'Tribe' as const,
-        referenceId: baseEvent.updateTribe,
-      });
-    }
 
     if (eventRefs.length > 0) {
       await trx.insert(baseEventReferenceSchema).values(eventRefs);

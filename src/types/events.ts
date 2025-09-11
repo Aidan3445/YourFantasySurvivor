@@ -115,10 +115,19 @@ export const BaseEventInsertZod = z.object({
   eventName: z.enum(BaseEventNames),
   label: z.string().max(64).nullable().optional(),
   notes: z.string().array().max(10).nullable().optional(),
-  referenceType: z.enum(ReferenceTypes),
-  references: z.number().array().min(1),
-  updateTribe: z.number().int().min(0).optional(),
-});
+  references: z.object({
+    type: z.enum(ReferenceTypes),
+    id: z.number().int().min(0),
+  }).array().min(1)
+}).refine((data) => {
+  // If eventName is 'tribeUpdate', we need at least one tribe and at least one castaway
+  if (data.eventName === 'tribeUpdate') {
+    const hasTribe = data.references.some((ref) => ref.type === 'Tribe');
+    const hasCastaway = data.references.some((ref) => ref.type === 'Castaway');
+    return hasTribe && hasCastaway;
+  }
+  return true;
+}, { message: 'Tribe Update events must reference at least one tribe and one castaway' });
 export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
 
 export const CustomEventInsertZod = z.object({
@@ -126,8 +135,10 @@ export const CustomEventInsertZod = z.object({
   customEventRuleId: z.number().int().min(0),
   label: z.string().max(64).nullable().optional(),
   notes: z.string().array().max(10).nullable().optional(),
-  referenceType: z.enum(ReferenceTypes),
-  references: z.number().array().min(1),
+  references: z.object({
+    type: z.enum(ReferenceTypes),
+    id: z.number().int().min(0),
+  }).array().min(1)
 });
 export type CustomEventInsert = z.infer<typeof CustomEventInsertZod>;
 
