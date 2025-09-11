@@ -36,12 +36,14 @@ export default function CreateCustomEvent() {
 
   const selectedReferences = reactForm.watch('references');
   const selectedRuleId = reactForm.watch('customEventRuleId');
-  const selectedEvent = useMemo(() =>
-    rules?.custom.find(rule => rule.customEventRuleId === Number(selectedRuleId)),
-    [rules?.custom, selectedRuleId]);
+  const selectedEvent = useMemo(() => {
+    const rule = rules?.custom.find(rule => rule.customEventRuleId === Number(selectedRuleId));
+    if (rule) reactForm.setValue('label', rule.eventName);
+    return rule;
+  }, [reactForm, rules?.custom, selectedRuleId]);
   const selectedEpisodeId = reactForm.watch('episodeId');
   const selectedEpisode = useMemo(() => episodes?.find(episode =>
-    episode.episodeId === Number(selectedEpisodeId))?.episodeNumber ?? 1,
+    episode.episodeId === Number(selectedEpisodeId))?.episodeNumber,
     [episodes, selectedEpisodeId]);
   const setLabel = reactForm.watch('label');
   const setNotes = reactForm.watch('notes');
@@ -113,10 +115,9 @@ export default function CreateCustomEvent() {
                 name='episodeId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Episode</FormLabel>
+                    <FormLabel className='ml-2'>Episode</FormLabel>
                     <FormControl>
                       <Select
-                        defaultValue={field.value as string}
                         value={field.value as string}
                         onValueChange={(value) => {
                           field.onChange(Number(value));
@@ -137,19 +138,18 @@ export default function CreateCustomEvent() {
                     <FormMessage />
                   </FormItem>
                 )} />
-              <FormLabel>Event</FormLabel>
               <span className='flex gap-4'>
                 <FormField
                   name='customEventRuleId'
                   render={({ field }) => (
                     <FormItem className='w-full'>
+                      <FormLabel className='ml-2'>Event</FormLabel>
                       <FormControl>
                         <Select
-                          defaultValue={field.value as string}
+                          disabled={!selectedEpisode}
                           value={field.value as string}
                           onValueChange={(value) => {
                             field.onChange(Number(value));
-                            reactForm.setValue('label', '');
                             clearReferences();
                           }}>
                           <SelectTrigger>
@@ -175,54 +175,59 @@ export default function CreateCustomEvent() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                {selectedEvent &&
-                  <FormField
-                    name='label'
-                    render={({ field }) => (
-                      <FormItem className='w-full'>
-                        <FormControl>
-                          <Input
-                            defaultValue={field.value as string ?? ''}
-                            type='text'
-                            placeholder='Label'
-                            {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />}
-                {selectedEvent &&
-                  <FormField
-                    name='references'
-                    render={() => (
-                      <FormItem className='w-full'>
-                        <FormControl>
-                          <MultiSelect
-                            options={combinedReferenceOptions}
-                            onValueChange={(value) =>
-                              reactForm.setValue('references', handleCombinedReferenceSelection(value))}
-                            modalPopover
-                            clear={eventClearer}
-                            placeholder={'Select References'} />
-                        </FormControl>
-                      </FormItem>
-                    )} />}
+                <FormField
+                  name='label'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel className='ml-2'>Label</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={!selectedEvent}
+                          type='text'
+                          placeholder='Label'
+                          {...field}
+                          value={field.value as string ?? ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
               </span>
-              {selectedReferences && selectedReferences.length > 0 &&
+              <span className='flex gap-2'>
+                <FormField
+                  name='references'
+                  render={() => (
+                    <FormItem className='w-full'>
+                      <FormLabel className='ml-2'>References</FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          className='h-full rounded-xl items-start pt-1'
+                          disabled={!selectedEvent}
+                          options={combinedReferenceOptions}
+                          onValueChange={(value) =>
+                            reactForm.setValue('references', handleCombinedReferenceSelection(value))}
+                          modalPopover
+                          clear={eventClearer}
+                          placeholder={'Select References'} />
+                      </FormControl>
+                    </FormItem>
+                  )} />
                 <FormField
                   name='notes'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel>Notes (line separated)</FormLabel>
+                      <FormLabel className='ml-2'>Notes (line separated)</FormLabel>
                       <FormControl>
                         <Textarea
-                          className='w-full'
+                          disabled={!selectedReferences || selectedReferences.length === 0}
+                          className='w-full h-full'
                           value={(field.value as string[])?.join('\n')}
                           onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
                           placeholder='Notes' />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )} />}
+                  )} />
+              </span>
               <br />
               <Button
                 disabled={!reactForm.formState.isValid}
@@ -231,7 +236,7 @@ export default function CreateCustomEvent() {
               </Button>
             </form>
             <EpisodeEvents
-              episodeNumber={selectedEpisode}
+              episodeNumber={selectedEpisode ?? 1}
               mockEvents={mockEvent ? [mockEvent] : []}
               edit
               filters={{

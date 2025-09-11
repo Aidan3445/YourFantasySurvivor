@@ -17,6 +17,7 @@ import { BaseEventLabelPrefixes, BaseEventLabels, BaseEventNames } from '~/lib/e
 import createBaseEvent from '~/actions/createBaseEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
+import { cn } from '~/lib/utils';
 
 export default function CreateBaseEvent() {
   const queryClient = useQueryClient();
@@ -37,7 +38,7 @@ export default function CreateBaseEvent() {
   const selectedEvent = reactForm.watch('eventName');
   const selectedEpisodeId = reactForm.watch('episodeId');
   const selectedEpisode = useMemo(() => episodes?.find(episode =>
-    episode.episodeId === Number(selectedEpisodeId))?.episodeNumber ?? 1,
+    episode.episodeId === Number(selectedEpisodeId))?.episodeNumber,
     [episodes, selectedEpisodeId]);
   const setLabel = reactForm.watch('label');
   const setNotes = reactForm.watch('notes');
@@ -108,10 +109,9 @@ export default function CreateBaseEvent() {
                 name='episodeId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Episode</FormLabel>
+                    <FormLabel className='ml-2'>Episode</FormLabel>
                     <FormControl>
                       <Select
-                        defaultValue={field.value as string}
                         value={field.value as string}
                         onValueChange={(value) => {
                           field.onChange(Number(value));
@@ -132,15 +132,15 @@ export default function CreateBaseEvent() {
                     <FormMessage />
                   </FormItem>
                 )} />
-              <FormLabel>Event</FormLabel>
               <span className='flex gap-2'>
                 <FormField
                   name='eventName'
                   render={({ field }) => (
                     <FormItem className='w-full'>
+                      <FormLabel className='ml-2'>Event</FormLabel>
                       <FormControl>
                         <Select
-                          defaultValue={field.value as string}
+                          disabled={!selectedEpisode}
                           value={field.value as string}
                           onValueChange={(value) => {
                             field.onChange(value);
@@ -163,8 +163,10 @@ export default function CreateBaseEvent() {
                       <FormMessage />
                     </FormItem>
                   )} />
-                {selectedEvent &&
+                <div className='w-full'>
+                  <FormLabel className='ml-2'>Type</FormLabel>
                   <Select
+                    disabled={!selectedEvent}
                     value={eventSubtype}
                     onValueChange={labelHelper}>
                     <SelectTrigger>
@@ -178,54 +180,62 @@ export default function CreateBaseEvent() {
                       ))}
                       <SelectItem value='Custom'>Custom</SelectItem>
                     </SelectContent>
-                  </Select>}
-                {eventSubtype &&
-                  <FormField
-                    name='label'
-                    render={({ field }) => (
-                      <FormItem className='w-full'>
-                        <FormControl>
-                          <Input
-                            type='text'
-                            placeholder='Label'
-                            {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )} />}
-                {eventSubtype &&
-                  <FormField
-                    name='references'
-                    render={() => (
-                      <FormItem>
-                        <FormControl>
-                          <MultiSelect
-                            options={combinedReferenceOptions}
-                            onValueChange={(value) =>
-                              reactForm.setValue('references', handleCombinedReferenceSelection(value))}
-                            modalPopover
-                            clear={eventClearer}
-                            placeholder={'Select References'} />
-                        </FormControl>
-                      </FormItem>
-                    )} />}
+                  </Select>
+                </div>
+                <FormField
+                  name='label'
+                  render={({ field }) => (
+                    <FormItem className='w-full'>
+                      <FormLabel className='ml-2'>Label</FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={eventSubtype === ''}
+                          type='text'
+                          placeholder='Label'
+                          {...field}
+                          value={field.value as string ?? ''} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
               </span>
-              {selectedReferences && selectedReferences.length > 0 &&
+              <span className='flex gap-2'>
+                <FormField
+                  name='references'
+                  render={() => (
+                    <FormItem className={cn('w-full', eventSubtype === '' && '!pointer-events-none !cursor-not-allowed')}>
+                      <FormLabel className='ml-2'>References</FormLabel>
+                      <FormControl>
+                        <MultiSelect
+                          className='h-full rounded-xl items-start pt-1'
+                          maxCount={7}
+                          disabled={eventSubtype === ''}
+                          options={combinedReferenceOptions}
+                          onValueChange={(value) =>
+                            reactForm.setValue('references', handleCombinedReferenceSelection(value))}
+                          modalPopover
+                          clear={eventClearer}
+                          placeholder={'Select References'} />
+                      </FormControl>
+                    </FormItem>
+                  )} />
                 <FormField
                   name='notes'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel>Notes (line separated)</FormLabel>
+                      <FormLabel className='ml-2'>Notes (line separated)</FormLabel>
                       <FormControl>
                         <Textarea
-                          className='w-full'
+                          disabled={!selectedReferences || selectedReferences.length === 0}
+                          className='w-full h-full'
                           value={(field.value as string[])?.join('\n')}
                           onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
                           placeholder='Notes' />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )} />}
+                  )} />
+              </span>
               <br />
               <Button
                 disabled={!reactForm.formState.isValid}
@@ -234,7 +244,7 @@ export default function CreateBaseEvent() {
               </Button>
             </form>
             <EpisodeEvents
-              episodeNumber={selectedEpisode}
+              episodeNumber={selectedEpisode ?? 1}
               mockEvents={mockEvent ? [mockEvent] : []}
               edit
               filters={{
@@ -246,7 +256,7 @@ export default function CreateBaseEvent() {
             />
           </span>
         </Form>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 }
