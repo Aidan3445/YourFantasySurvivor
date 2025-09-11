@@ -32,7 +32,7 @@ export const customEventSchema = createTable(
   'event_custom',
   {
     customEventId: serial('custom_event_id').notNull().primaryKey(),
-    episodeId: integer('episode_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
     customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
     label: label('label'),
     notes: notes('notes'),
