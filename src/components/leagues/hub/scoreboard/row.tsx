@@ -28,9 +28,18 @@ interface MemberRowProps {
   doubleBelow?: boolean;
 }
 
-export default function MemberRow({ place, member, currentStreak, selectionList, points, castaway, color, doubleBelow }: MemberRowProps) {
+export default function MemberRow({
+  place,
+  member,
+  currentStreak,
+  selectionList,
+  points, castaway,
+  color,
+  doubleBelow,
+  overrideHash
+}: MemberRowProps) {
   const { data: tribesTimeline } = useTribesTimeline(castaway?.seasonId ?? null);
-  const { data: leagueSettings } = useLeagueSettings();
+  const { data: leagueSettings } = useLeagueSettings(overrideHash);
   const isMobile = useIsMobile();
 
   const condensedTimeline = useMemo(() => (selectionList ?? [])
@@ -161,12 +170,13 @@ export default function MemberRow({ place, member, currentStreak, selectionList,
                       ? 'black'
                       : getContrastingColor(castaway?.tribe?.color ?? '#AAAAAA')
                   }}>
-                    {Math.min(currentStreak ?? Infinity, leagueSettings.survivalCap) ||
-                      <Skull
+                    {castaway?.eliminatedEpisode
+                      ? <Skull
                         size={16}
                         color={castaway?.eliminatedEpisode
                           ? 'black'
-                          : getContrastingColor(castaway?.tribe?.color ?? '#AAAAAA')} />}
+                          : getContrastingColor(castaway?.tribe?.color ?? '#AAAAAA')} />
+                      : Math.min(currentStreak ?? Infinity, leagueSettings.survivalCap)}
                   </div>
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='end'>

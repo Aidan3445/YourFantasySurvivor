@@ -17,7 +17,7 @@ import { type Eliminations } from '~/types/events';
 export default async function getEliminations(seasonId: number) {
   const now = new Date().toISOString();
 
-  return db
+  const x = await db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
       eventId: baseEventSchema.baseEventId,
@@ -45,4 +45,7 @@ export default async function getEliminations(seasonId: number) {
       }
       return acc;
     }, [] as Eliminations));
+
+  console.log('elims', seasonId, x);
+  return x;
 }

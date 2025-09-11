@@ -60,7 +60,7 @@ export default function ChangeCastaway() {
   const { pickPriority, elim } = useMemo(() => {
     return availableCastaways
       .reduce((acc, castaway) => {
-        if (castaway.pickedBy) {
+        if (castaway.pickedBy && castaway.eliminatedEpisode) {
           acc.elim.push(castaway.pickedBy);
           if (castaway.eliminatedEpisode === keyEpisodes?.previousEpisode?.episodeNumber) {
             acc.pickPriority.push(castaway.pickedBy);

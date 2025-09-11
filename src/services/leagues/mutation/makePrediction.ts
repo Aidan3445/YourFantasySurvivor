@@ -40,7 +40,6 @@ export default async function makePredictionLogic(
         const rule = rules.basePrediction?.[eventName];
         if (!rule?.enabled) throw new Error(`Predictions for ${prediction.eventName} are not enabled`);
         if (!predictionTimings.some(t => rule.timing.includes(t))) {
-          console.log({ predictionTimings, ruleTiming: rule.timing });
           throw new Error(`Predictions for ${prediction.eventName} cannot be made at this time`);
         }
         // Upsert the prediction

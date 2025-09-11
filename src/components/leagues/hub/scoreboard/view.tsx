@@ -69,7 +69,7 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
                 castaway={castaway}
                 color={member.color}
                 doubleBelow={maxRows ? loggedInIndex > maxRows && index >= (maxRows - 2) : false}
-              />
+                overrideHash={overrideHash} />
             );
           })}
         </TableBody>

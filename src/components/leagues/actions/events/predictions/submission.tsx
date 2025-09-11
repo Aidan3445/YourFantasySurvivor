@@ -56,7 +56,6 @@ export default function SubmissionCard({ prediction, options, maxBet }: Submissi
 
   useEffect(() => {
     if (!prediction?.predictionMade) return;
-    console.log('Resetting form with prediction made:', prediction.predictionMade);
     reactForm.reset({
       referenceId: prediction.predictionMade?.referenceId,
       bet: prediction.predictionMade?.bet ?? undefined,
