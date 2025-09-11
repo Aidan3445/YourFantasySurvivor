@@ -20,6 +20,7 @@ export default async function getPredictionTimings(auth: VerifiedLeagueMemberAut
     .select({
       leagueStatus: leagueSchema.status,
       draftDate: leagueSettingsSchema.draftDate,
+      startWeek: leagueSchema.startWeek,
       seasonId: leagueSchema.seasonId
     })
     .from(leagueSchema)
@@ -36,7 +37,7 @@ export default async function getPredictionTimings(auth: VerifiedLeagueMemberAut
   return getActiveTimings({
     keyEpisodes,
     leagueStatus: league.leagueStatus,
-    draftDate: league.draftDate ? new Date(`${league.draftDate} Z`) : null,
+    startWeek: league.startWeek,
   });
 
 }
@@ -44,11 +45,11 @@ export default async function getPredictionTimings(auth: VerifiedLeagueMemberAut
 function getActiveTimings({
   keyEpisodes,
   leagueStatus,
-  draftDate,
+  startWeek,
 }: {
   keyEpisodes: KeyEpisodes
   leagueStatus: LeagueStatus,
-  draftDate: Date | null,
+  startWeek: number | null,
 }) {
   const { previousEpisode, nextEpisode, mergeEpisode } = keyEpisodes;
 
@@ -57,7 +58,7 @@ function getActiveTimings({
   // - if the league is in draft status
   // - if there are no previous episodes
   // - if the draft date is after the last aired episode
-  if (leagueStatus === 'Draft' || !previousEpisode || (draftDate && draftDate > previousEpisode.airDate)) {
+  if (leagueStatus === 'Draft' || !previousEpisode || startWeek === nextEpisode?.episodeNumber) {
     timings.push('Draft');
   }
 

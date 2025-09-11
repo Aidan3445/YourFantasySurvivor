@@ -17,6 +17,7 @@ export default function PredictionCards({
   predictionsMade,
   castaways,
   tribes,
+  wallet,
   className
 }: MakePredictionsProps) {
   const shauhinActive = useShauhinActive();
@@ -113,8 +114,8 @@ export default function PredictionCards({
         <SubmissionCard
           prediction={prediction}
           options={getOptions(prediction.referenceTypes)}
-          maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined}
-        />
+          wallet={wallet}
+          maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
       </article>
     );
   }
@@ -138,8 +139,8 @@ export default function PredictionCards({
       <SubmissionCard
         prediction={prediction}
         options={getOptions(prediction.referenceTypes)}
-        maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined}
-      />
+        wallet={wallet}
+        maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
     ),
   }));
 
@@ -164,6 +165,7 @@ export default function PredictionCards({
       <SubmissionCard
         prediction={prediction}
         options={getOptions(prediction.referenceTypes)}
+        wallet={wallet}
         maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
     ),
   }));

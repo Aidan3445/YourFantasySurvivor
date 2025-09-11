@@ -295,6 +295,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
             <CarouselItem
               key={index}
               className={cn(
+                'will-change-transform transform-gpu',
                 'z-10 transition-all duration-400 drop-shadow-md bg-secondary rounded-md',
                 'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
                 'basis-[90%] lg:basis-1/2',
@@ -368,7 +369,7 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                   item.footer && (
                     <TableFooter className='border-none'>
                       <TableRow className='bg-b2 hover:bg-b2 border-none'>
-                        <TableCell colSpan={3} className='p-0'>
+                        <TableCell colSpan={3} className='p-0 will-change-transform transform-gpu'>
                           {item.footer}
                         </TableCell>
                       </TableRow>

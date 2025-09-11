@@ -10,6 +10,7 @@ export interface MakePredictionsProps {
   predictionsMade: Prediction[];
   castaways: EnrichedCastaway[];
   tribes: Tribe[];
+  wallet?: number;
   className?: string;
 }
 
