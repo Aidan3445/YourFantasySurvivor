@@ -138,66 +138,75 @@ export default function CreateCustomEvent() {
                   </FormItem>
                 )} />
               <FormLabel>Event</FormLabel>
-              <FormField
-                name='customEventRuleId'
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormControl>
-                      <Select
-                        defaultValue={field.value as string}
-                        value={field.value as string}
-                        onValueChange={(value) => {
-                          field.onChange(Number(value));
-                          reactForm.resetField('label');
-                          clearReferences();
-                        }}>
-                        <SelectTrigger>
-                          <SelectValue placeholder='Select Event'>
-                            {rules?.custom.find(rule => rule.customEventRuleId === Number(field.value))?.eventName ?? 'Select Event'}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          {rules?.custom.map(({ eventName, customEventRuleId }) => (
-                            <SelectItem key={customEventRuleId} value={customEventRuleId.toString()}>
-                              {eventName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-              {selectedEvent &&
+              <span className='flex gap-4'>
                 <FormField
-                  name='label'
+                  name='customEventRuleId'
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className='w-full'>
                       <FormControl>
-                        <Input
-                          type='text'
-                          placeholder='Label'
-                          {...field} />
+                        <Select
+                          defaultValue={field.value as string}
+                          value={field.value as string}
+                          onValueChange={(value) => {
+                            field.onChange(Number(value));
+                            reactForm.setValue('label', '');
+                            clearReferences();
+                          }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select Event'>
+                              {
+                                (() => {
+                                  const rule = rules?.custom.find(rule => rule.customEventRuleId === Number(field.value));
+                                  if (rule) return `${rule.eventName} (${rule.eventType})`;
+                                  return 'Select Event';
+                                })()
+                              }
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {rules?.custom.map(({ eventName, customEventRuleId, eventType }) => (
+                              <SelectItem key={customEventRuleId} value={customEventRuleId.toString()}>
+                                {eventName} ({eventType})
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
-                  )} />}
-              {selectedEvent &&
-                <FormField
-                  name='references'
-                  render={() => (
-                    <FormItem>
-                      <FormControl>
-                        <MultiSelect
-                          options={combinedReferenceOptions}
-                          onValueChange={(value) =>
-                            reactForm.setValue('references', handleCombinedReferenceSelection(value))}
-                          modalPopover
-                          clear={eventClearer}
-                          placeholder={'Select References'} />
-                      </FormControl>
-                    </FormItem>
-                  )} />}
+                  )} />
+                {selectedEvent &&
+                  <FormField
+                    name='label'
+                    render={({ field }) => (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <Input
+                            defaultValue={field.value as string ?? ''}
+                            type='text'
+                            placeholder='Label'
+                            {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />}
+                {selectedEvent &&
+                  <FormField
+                    name='references'
+                    render={() => (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <MultiSelect
+                            options={combinedReferenceOptions}
+                            onValueChange={(value) =>
+                              reactForm.setValue('references', handleCombinedReferenceSelection(value))}
+                            modalPopover
+                            clear={eventClearer}
+                            placeholder={'Select References'} />
+                        </FormControl>
+                      </FormItem>
+                    )} />}
+              </span>
               {selectedReferences && selectedReferences.length > 0 &&
                 <FormField
                   name='notes'

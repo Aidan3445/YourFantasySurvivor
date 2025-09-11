@@ -5,7 +5,7 @@ import { and, count, eq } from 'drizzle-orm';
 import { type CustomEventInsert } from '~/types/events';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { leagueSchema } from '~/server/db/schema/leagues';
-import { customEventRuleSchema, customEventSchema } from '~/server/db/schema/customEvents';
+import { customEventReferenceSchema, customEventRuleSchema, customEventSchema } from '~/server/db/schema/customEvents';
 
 /**
  * Create a new custom/league event for the season
@@ -41,6 +41,17 @@ export default async function createCustomEventLogic(
       .returning({ customEventId: customEventSchema.customEventId })
       .then((result) => result[0]?.customEventId);
     if (!newEventId) throw new Error('Failed to create league event');
+
+    const eventRefs = customEvent.references.map((reference) => ({
+      customEventId: newEventId,
+      referenceType: reference.type,
+      referenceId: reference.id,
+    }));
+
+    // insert the references
+    await trx
+      .insert(customEventReferenceSchema)
+      .values(eventRefs);
 
     return { newEventId };
   });

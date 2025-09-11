@@ -179,37 +179,37 @@ export default function CreateBaseEvent() {
                       <SelectItem value='Custom'>Custom</SelectItem>
                     </SelectContent>
                   </Select>}
+                {eventSubtype &&
+                  <FormField
+                    name='label'
+                    render={({ field }) => (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <Input
+                            type='text'
+                            placeholder='Label'
+                            {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />}
+                {eventSubtype &&
+                  <FormField
+                    name='references'
+                    render={() => (
+                      <FormItem>
+                        <FormControl>
+                          <MultiSelect
+                            options={combinedReferenceOptions}
+                            onValueChange={(value) =>
+                              reactForm.setValue('references', handleCombinedReferenceSelection(value))}
+                            modalPopover
+                            clear={eventClearer}
+                            placeholder={'Select References'} />
+                        </FormControl>
+                      </FormItem>
+                    )} />}
               </span>
-              {eventSubtype &&
-                <FormField
-                  name='label'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Input
-                          type='text'
-                          placeholder='Label'
-                          {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />}
-              {eventSubtype &&
-                <FormField
-                  name='references'
-                  render={() => (
-                    <FormItem>
-                      <FormControl>
-                        <MultiSelect
-                          options={combinedReferenceOptions}
-                          onValueChange={(value) =>
-                            reactForm.setValue('references', handleCombinedReferenceSelection(value))}
-                          modalPopover
-                          clear={eventClearer}
-                          placeholder={'Select References'} />
-                      </FormControl>
-                    </FormItem>
-                  )} />}
               {selectedReferences && selectedReferences.length > 0 &&
                 <FormField
                   name='notes'
