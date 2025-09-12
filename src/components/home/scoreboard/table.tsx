@@ -90,7 +90,7 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
               </Fragment>
             )) : (
               <TableHead className='text-center' colSpan={2}>
-                Castaway
+                {selectedSeason?.data.season.name} Castaways
                 <SelectSeason
                   seasons={scoresBySeason.map(s => ({
                     value: s.data.season.name,
