@@ -18,6 +18,7 @@ export type EpisodeInsert = {
   episodeNumber: number;
   title: string;
   airDate: Date;
+  runtime?: number;
   isMerge?: boolean;
   isFinale?: boolean;
 }

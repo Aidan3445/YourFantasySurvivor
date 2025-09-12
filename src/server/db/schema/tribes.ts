@@ -2,7 +2,7 @@ import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
 import { seasonSchema } from '~/server/db/schema/seasons';
-import { integer, serial, varchar } from 'drizzle-orm/pg-core';
+import { integer, serial, unique, varchar } from 'drizzle-orm/pg-core';
 
 export const tribeSchema = createTable(
   'tribe',
@@ -12,6 +12,9 @@ export const tribeSchema = createTable(
     tribeColor: varchar('color', { length: 7 }).notNull(),
     // null seasonId for production or anything else to be shared across seasons
     seasonId: integer('season_id').references(() => seasonSchema.seasonId, { onDelete: 'cascade' })
-  }
+  },
+  (table) => ([
+    unique().on(table.tribeName, table.seasonId)
+  ])
 );
 

@@ -31,8 +31,8 @@ export async function createEpisodeLogic(
     if (!season) throw new Error('Season not found');
 
     // Guess the runtime
-    let runtime;
-    if (episode.episodeNumber === 1 || episode.isFinale) {
+    let runtime = episode.runtime;
+    if (!runtime && (episode.episodeNumber === 1 || episode.isFinale)) {
       runtime = 120;
     }
 
@@ -45,9 +45,32 @@ export async function createEpisodeLogic(
         seasonId: season.seasonId,
         runtime
       })
+      .onConflictDoUpdate({
+        target: [episodeSchema.episodeNumber, episodeSchema.seasonId],
+        set: {
+          ...episode,
+          airDate: episode.airDate.toUTCString(),
+        }
+      })
       .returning({ episodeId: episodeSchema.episodeId })
       .then((res) => res[0]?.episodeId);
     if (!newEpisodeId) throw new Error('Failed to create episode');
+
+    if (episode.episodeNumber === 1) {
+      // Update the premiere date of the season
+      await trx
+        .update(seasonSchema)
+        .set({ premiereDate: episode.airDate.toUTCString() })
+        .where(eq(seasonSchema.seasonId, season.seasonId));
+    }
+
+    if (episode.isFinale) {
+      // Update the finale date of the season
+      await trx
+        .update(seasonSchema)
+        .set({ finaleDate: episode.airDate.toUTCString() })
+        .where(eq(seasonSchema.seasonId, season.seasonId));
+    }
 
     // Invalidate cache for the season's episodes
     revalidateTag(`episodes-${season.seasonId}`);

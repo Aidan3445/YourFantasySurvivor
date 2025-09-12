@@ -38,6 +38,12 @@ export async function createTribeLogic(
         seasonId: season.seasonId,
       })
       .returning({ tribeId: tribeSchema.tribeId })
+      .onConflictDoUpdate({
+        target: [tribeSchema.tribeName, tribeSchema.seasonId],
+        set: {
+          ...tribe
+        }
+      })
       .then((res) => res[0]?.tribeId);
     if (!newTribeId) throw new Error('Failed to create tribe');
 

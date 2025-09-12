@@ -57,6 +57,12 @@ export async function createCastawayLogic(
         ...castaway,
         seasonId,
       })
+      .onConflictDoUpdate({
+        target: [castawaySchema.fullName, castawaySchema.seasonId],
+        set: {
+          ...castaway
+        }
+      })
       .returning({ castawayId: castawaySchema.castawayId })
       .then((res) => res[0]?.castawayId);
     if (!newCastawayId) throw new Error('Failed to create castaway');
@@ -97,7 +103,8 @@ export async function createCastawayLogic(
           baseEventId: tribeUpdateId,
           referenceType: 'Tribe',
           referenceId: tribeId,
-        });
+        })
+        .onConflictDoNothing();
     } else {
       tribeUpdateId = existingTribeUpdate[0]?.baseEventId;
     }
@@ -110,7 +117,8 @@ export async function createCastawayLogic(
         baseEventId: tribeUpdateId,
         referenceType: 'Castaway',
         referenceId: newCastawayId,
-      });
+      })
+      .onConflictDoNothing();
 
     // Invalidate caches
     revalidateTag(`castaways-${seasonId}`);

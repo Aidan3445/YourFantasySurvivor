@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '~/components/common/button';
-import { importContestants, importEpisode } from '~/services/sys/actions';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,9 +9,12 @@ import Image from 'next/image';
 import { Input } from '~/components/common/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '~/components/common/form';
 import { DateTimePicker } from '~/components/common/dateTimePicker';
-import { type NewCastaway } from '~/types/castaways';
-import { type NewTribe } from '~/types/deprecated/tribes';
 import { Circle } from 'lucide-react';
+import { type CastawayInsert } from '~/types/castaways';
+import { type TribeInsert } from '~/types/tribes';
+import createEpisode from '~/actions/sys/createEpisode';
+import createTribe from '~/actions/sys/createTribe';
+import createCastaway from '~/actions/sys/createCastaway';
 
 const formSchema = z.object({
   seasonName: z.string(),
@@ -27,8 +29,8 @@ export default function Import() {
     resolver: zodResolver(formSchema),
   });
 
-  const [castaways, setCastaways] = useState<NewCastaway[]>([]);
-  const [tribes, setTribes] = useState<NewTribe[]>([]);
+  const [castaways, setCastaways] = useState<CastawayInsert[]>([]);
+  const [tribes, setTribes] = useState<TribeInsert[]>([]);
   const [premiere, setPremiere] = useState<{ episodeNumber: number, episodeTitle: string, episodeAirDate: string }>();
   const [episodes, setEpisodes] = useState<{ episodeNumber: number, episodeTitle: string, episodeAirDate: string }[]>([]);
 
@@ -37,8 +39,8 @@ export default function Import() {
       method: 'GET',
     })
       .then(res => res.json())) as {
-        castaways: NewCastaway[],
-        tribes: NewTribe[],
+        castaways: CastawayInsert[],
+        tribes: TribeInsert[],
         episodes: { episodeNumber: number, episodeTitle: string, episodeAirDate: string }[],
         premiere?: { episodeNumber: number, episodeTitle: string, episodeAirDate: string },
       };
@@ -60,7 +62,9 @@ export default function Import() {
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     if (!reactForm.watch('premiereDate') || !premiere) return;
     try {
-      await importContestants({ ...data, premiereTitle: premiere?.episodeTitle }, castaways, tribes);
+      await Promise.all(tribes.map(tribe => createTribe(data.seasonName, tribe)));
+      await Promise.all(castaways.map(castaway => createCastaway(data.seasonName, castaway)));
+
       alert('Contestants imported successfully');
     } catch (error) {
       console.error('Error importing contestants', error);
@@ -148,10 +152,14 @@ interface ImportEpisodeProps {
 function ImportEpisode({ seasonName: seasonId, episodeNumber, episodeTitle, episodeAirDate }: ImportEpisodeProps) {
   const handleSubmit = async () => {
     try {
-      await importEpisode(seasonId, {
+      await createEpisode(seasonId, {
         episodeNumber,
-        episodeTitle,
-        episodeAirDate: new Date(episodeAirDate).toUTCString()
+        title: episodeTitle.replaceAll('"', ''),
+        airDate: new Date(episodeAirDate),
+        isMerge: isMerge,
+        isFinale,
+        runtime,
+
       });
       alert('Episode imported successfully');
     } catch (error) {
@@ -160,12 +168,38 @@ function ImportEpisode({ seasonName: seasonId, episodeNumber, episodeTitle, epis
     }
   };
 
+  const [isMerge, setIsMerge] = useState(false);
+  const [isFinale, setIsFinale] = useState(false);
+  const [runtime, setRuntime] = useState(0);
+
   return (
     <div className='items-center bg-card rounded-lg p-4'>
       <h2 className='font-bold'>Episode {episodeNumber}</h2>
       <p>{episodeTitle}</p>
       <p>{new Date(episodeAirDate).toLocaleString()}</p>
       <form action={() => handleSubmit()}>
+        <label className='inline-flex items-center space-x-2'>
+          <input
+            type='checkbox'
+            checked={isMerge}
+            onChange={() => setIsMerge(!isMerge)} />
+          <span>Is Merge</span>
+        </label>
+        <label className='inline-flex items-center space-x-2 ml-4'>
+          <input
+            type='checkbox'
+            checked={isFinale}
+            onChange={() => setIsFinale(!isFinale)} />
+          <span>Is Finale</span>
+        </label>
+        <label className='inline-flex items-center space-x-2 ml-4'>
+          <span>Runtime (minutes):</span>
+          <input
+            type='number'
+            value={runtime}
+            onChange={(e) => setRuntime(parseInt(e.target.value, 10))}
+            className='w-16 text-right rounded-md border border-input bg-transparent px-2 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50' />
+        </label>
         <Button type='submit'>Import Episode</Button>
       </form>
     </div>
