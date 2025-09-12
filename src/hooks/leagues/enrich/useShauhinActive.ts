@@ -19,8 +19,7 @@ export function useShauhinActive(overrideHash?: string) {
     const prevEpisodeNumber = keyEpisodes.previousEpisode.episodeNumber;
     const mergeEpisodeNumber = keyEpisodes.mergeEpisode?.episodeNumber ?? null;
 
-    if (league.status === 'Draft' || !league.startWeek ||
-      league.startWeek > prevEpisodeNumber) return false;
+    if (league.status === 'Draft') return false;
 
     const setting = rules.shauhinMode.startWeek;
     switch (setting) {

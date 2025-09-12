@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { type DraftDetails } from '~/types/leagues';
 import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
+import { type ScoringBaseEventName } from '~/types/events';
 
 /**
   * Custom hook to get league action details
@@ -34,7 +35,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
   const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
   const { actionDetails, membersWithPicks } = useMemo(() => {
-    if (!league || !rules || !predictionTiming || !selectionTimeline ||
+    if (!league || !rules || !selectionTimeline ||
       !nextEpisode || !tribeMembers || !leagueMembers || !eliminations) return {};
 
     const membersWithPicks: { member: LeagueMember; castawayFullName: string }[] = [];
@@ -81,7 +82,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
       actionDetails,
       membersWithPicks
     };
-  }, [league, rules, predictionTiming, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminations]);
+  }, [league, rules, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminations]);
 
 
   const router = useRouter();
@@ -141,6 +142,33 @@ export function useLeagueActionDetails(overrideHash?: string) {
     ];
   }, [nextEpisode, basePredictionsMade, customPredictionsMade]);
 
+  const rulesBasedOnTiming = useMemo(() => {
+    if (!rules || !predictionTiming) return rules;
+
+    const filteredCustom = rules.custom
+      .filter(rule => rule.eventType === 'Direct' ||
+        rule.timing.some(t => predictionTiming.includes(t)));
+
+    if (rules.basePrediction) {
+      const filteredBase = { ...rules.basePrediction };
+      Object.entries(filteredBase).forEach(([eventName, rule]) => {
+        if (rule.enabled && !rule.timing.some(t => predictionTiming.includes(t))) {
+          filteredBase[eventName as ScoringBaseEventName].enabled = false;
+        }
+      });
+
+      return {
+        ...rules,
+        custom: filteredCustom,
+        basePrediction: filteredBase
+      };
+    }
+
+    return {
+      ...rules,
+      custom: filteredCustom,
+    };
+  }, [rules, predictionTiming]);
 
   return {
     actionDetails,
@@ -148,7 +176,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
     onTheClock,
     onDeck,
     leagueMembers,
-    rules,
+    rules: rulesBasedOnTiming,
     predictionRuleCount,
     settings,
     predictionsMade,

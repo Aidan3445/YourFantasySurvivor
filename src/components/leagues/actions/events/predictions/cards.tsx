@@ -8,7 +8,7 @@ import SubmissionCard from '~/components/leagues/actions/events/predictions/subm
 import { BaseEventDescriptions, BaseEventFullName, BasePredictionReferenceTypes } from '~/lib/events';
 import { type MakePredictionsProps } from '~/components/leagues/actions/events/predictions/view';
 import { type ScoringBaseEventName, type ReferenceType, type MakePrediction } from '~/types/events';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useShauhinActive } from '~/hooks/leagues/enrich/useShauhinActive';
 
 export default function PredictionCards({
@@ -18,6 +18,8 @@ export default function PredictionCards({
   castaways,
   tribes,
   wallet,
+  totalBet,
+  setBetTotal,
   className
 }: MakePredictionsProps) {
   const shauhinActive = useShauhinActive();
@@ -94,6 +96,16 @@ export default function PredictionCards({
     return options;
   }, [castaways, tribes]);
 
+  const [formBetValues, setFormBetValues] = useState<Record<string, number>>({});
+  const updateFormBetValue = useCallback((eventName: string, bet: number) => {
+    setFormBetValues((prev) => ({ ...prev, [eventName]: bet }));
+  }, []);
+
+  useEffect(() => {
+    const totalBet = Object.values(formBetValues).reduce((sum, val) => sum + val, 0);
+    setBetTotal(totalBet);
+  }, [formBetValues, setBetTotal]);
+
   if (predictionRuleCount === 0) return null;
   if (predictionRuleCount === 1) {
     const prediction = enabledBasePredictions[0] ?? customPredictions[0]!;
@@ -115,6 +127,8 @@ export default function PredictionCards({
           prediction={prediction}
           options={getOptions(prediction.referenceTypes)}
           wallet={wallet}
+          updateBetTotal={updateFormBetValue}
+          totalBet={totalBet}
           maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
       </article>
     );
@@ -140,6 +154,8 @@ export default function PredictionCards({
         prediction={prediction}
         options={getOptions(prediction.referenceTypes)}
         wallet={wallet}
+        updateBetTotal={updateFormBetValue}
+        totalBet={totalBet}
         maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
     ),
   }));
@@ -166,6 +182,8 @@ export default function PredictionCards({
         prediction={prediction}
         options={getOptions(prediction.referenceTypes)}
         wallet={wallet}
+        updateBetTotal={updateFormBetValue}
+        totalBet={totalBet}
         maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
     ),
   }));

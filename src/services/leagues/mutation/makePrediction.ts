@@ -8,6 +8,12 @@ import getLeagueRules from '~/services/leagues/query/rules';
 import { baseEventPredictionSchema } from '~/server/db/schema/baseEvents';
 import { customEventPredictionSchema } from '~/server/db/schema/customEvents';
 import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
+import { getSeasonData } from '~/services/seasons/query/seasonsData';
+import getSelectionTimeline from '~/services/leagues/query/selectionTimeline';
+import getCustomEventsAndPredictions from '~/services/leagues/query/customEvents';
+import getBasePredictions from '~/services/leagues/query/basePredictions';
+import getLeagueSettings from '~/services/leagues/query/settings';
+import { compileScores } from '~/lib/scores';
 
 /**
   * Make a league event prediction or update an existing prediction if it exists
@@ -22,13 +28,20 @@ export default async function makePredictionLogic(
   prediction: PredictionInsert
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
+
+
   // Insert or update the prediction
   return db.transaction(async (trx) => {
     const keyEpisodes = await getKeyEpisodes(auth.seasonId);
     const predictionTimings = await getPredictionTimings(auth);
-
     if (predictionTimings.length === 0 || !keyEpisodes.nextEpisode)
       throw new Error('Predictions cannot be made at this time');
+
+    // Check the member's current score to ensure they have enough points to make the bet
+    const currentScore = await getMemberBetBalance(auth, keyEpisodes.nextEpisode.episodeNumber);
+    if ((prediction.bet ?? 0) > currentScore) {
+      throw new Error('Insufficient points to make this prediction');
+    }
 
     const rules = await getLeagueRules(auth);
 
@@ -117,4 +130,56 @@ export default async function makePredictionLogic(
         throw new Error('Invalid event source');
     }
   });
+}
+
+/**
+  * Helper to get the current score of the member to ensure betting limits are not exceeded
+  * @param auth The authenticated league member
+  * @param nextEpisodeNumber The episode number of the next episode
+  * @returns the current score of the member
+  * @returnObj `score`
+  */
+async function getMemberBetBalance(auth: VerifiedLeagueMemberAuth, nextEpisodeNumber: number) {
+  const seasonData = await getSeasonData(auth.seasonId);
+  const selectionTimeline = await getSelectionTimeline(auth);
+  const customEvents = await getCustomEventsAndPredictions(auth);
+  const basePredictions = await getBasePredictions(auth);
+  const leagueRules = await getLeagueRules(auth);
+  const leagueSettings = await getLeagueSettings(auth);
+
+  if (!seasonData) throw new Error('Season data not found');
+  if (!leagueRules) throw new Error('League rules not found');
+  if (!leagueSettings) throw new Error('League settings not found');
+  if (!selectionTimeline) throw new Error('Selection timeline not found');
+  if (!basePredictions) throw new Error('Base predictions not found');
+  if (!customEvents) throw new Error('Custom events not found');
+
+  const { scores } = compileScores(
+    seasonData.baseEvents,
+    seasonData.eliminations,
+    seasonData.tribesTimeline,
+    seasonData.keyEpisodes,
+    selectionTimeline,
+    customEvents,
+    basePredictions,
+    leagueRules,
+    leagueSettings.survivalCap,
+    leagueSettings.preserveStreak,
+  );
+
+  const score = scores.Member[auth.memberId]?.slice().pop() ?? 0;
+
+  const basePredictionsMade = Object.values(basePredictions[nextEpisodeNumber] ?? {})
+    .map((predictions) => {
+      return predictions?.filter(pred => !!pred.bet && pred.predictionMakerId === auth.memberId);
+    }).flat() ?? [];
+  const customPredictionsMade = Object.values(customEvents.predictions[nextEpisodeNumber] ?? {})
+    .map((preds) => {
+      return preds?.filter(pred => !!pred.bet && pred.predictionMakerId === auth.memberId);
+    }).flat() ?? [];
+
+  const totalBetsMade = [...basePredictionsMade, ...customPredictionsMade]
+    .reduce((acc, pred) => acc + (pred.bet ?? 0), 0);
+
+  return score - totalBetsMade;
 }

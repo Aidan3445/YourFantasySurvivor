@@ -16,12 +16,16 @@ export default async function makePrediction(
   hash: string,
   prediction: PredictionInsert
 ) {
+
   try {
-    return await requireLeagueMemberAuth(makePredictionLogic)(hash, prediction);
+    return { ...await requireLeagueMemberAuth(makePredictionLogic)(hash, prediction), reason: '' };
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;
     else message = String(e);
+
+    if (message.includes('Insufficient'))
+      return { success: false, wasUpdate: false, reason: 'Insufficient points to make this bet.\nYou may have unsubmitted bet changes that are locking your points.' };
 
     if (message.includes('User not') || message.includes('Not a league member')) throw e;
 

@@ -11,6 +11,8 @@ export interface MakePredictionsProps {
   castaways: EnrichedCastaway[];
   tribes: Tribe[];
   wallet?: number;
+  totalBet: number;
+  setBetTotal: (betTotal: number) => void;
   className?: string;
 }
 

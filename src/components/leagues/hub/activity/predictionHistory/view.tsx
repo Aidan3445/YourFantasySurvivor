@@ -8,10 +8,12 @@ import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { useBaseEvents } from '~/hooks/seasons/useBaseEvents';
+import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
 import { type ScoringBaseEventName, type PredictionWithEvent } from '~/types/events';
 
 export default function PredictionHistory() {
   const { data: league } = useLeague();
+  const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
   const { data: rules } = useLeagueRules();
   const { basePredictionsMade, customPredictionsMade } = usePredictionsMade();
   const { data: customEvents } = useCustomEvents();
@@ -19,12 +21,17 @@ export default function PredictionHistory() {
 
   const predictionsWithEvents = useMemo(() => {
     const predictions: Record<number, PredictionWithEvent[]> = {};
+    if (!keyEpisodes?.previousEpisode) return predictions;
+
     if (baseEvents) {
       // note we have two different episode numbers available to us here:
       // * prediction.eventNumber is the episode when the prediction was made
       // * event.episodeNumber is the episode when the event occurs (if there is one)
       // for weekly events these are the same, but for sole survivor they may differ
       Object.entries(basePredictionsMade).forEach(([episodeNumber, predictionMap]) => {
+        const episodeNum = Number(episodeNumber);
+        if (episodeNum > keyEpisodes.previousEpisode!.episodeNumber) return;
+
         const predsWithEvents = predictionMap.map(pred => {
           const rule = rules?.basePrediction?.[pred.eventName as ScoringBaseEventName];
           return {
@@ -37,8 +44,8 @@ export default function PredictionHistory() {
           };
         });
         if (predsWithEvents.length === 0) return;
-        predictions[Number(episodeNumber)] ??= [];
-        predictions[Number(episodeNumber)]!.push(...predsWithEvents);
+        predictions[episodeNum] ??= [];
+        predictions[episodeNum].push(...predsWithEvents);
       });
     }
 
@@ -46,6 +53,9 @@ export default function PredictionHistory() {
     if (!customEvents?.events) return predictions;
 
     Object.entries(customPredictionsMade).forEach(([episodeNumber, preds]) => {
+      const episodeNum = Number(episodeNumber);
+      if (episodeNum > keyEpisodes.previousEpisode!.episodeNumber) return;
+
       const predsWithEvents = preds.map(pred => {
         const rule = rules?.custom.find(rule => rule.eventName === pred.eventName);
         return {
@@ -58,12 +68,20 @@ export default function PredictionHistory() {
         };
       });
       if (predsWithEvents.length === 0) return;
-      predictions[Number(episodeNumber)] ??= [];
-      predictions[Number(episodeNumber)]!.push(...predsWithEvents);
+      predictions[episodeNum] ??= [];
+      predictions[episodeNum].push(...predsWithEvents);
     });
 
     return predictions;
-  }, [basePredictionsMade, baseEvents, customPredictionsMade, customEvents?.events, rules]);
+  }, [
+    keyEpisodes?.previousEpisode,
+    baseEvents,
+    customEvents?.events,
+    customPredictionsMade,
+    basePredictionsMade,
+    rules?.basePrediction,
+    rules?.custom
+  ]);
 
   const stats = Object.values(predictionsWithEvents).reduce((acc, pred) => {
     pred.forEach(p => {

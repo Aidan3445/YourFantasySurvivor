@@ -4,18 +4,13 @@ import PredictionCards from '~/components/leagues/actions/events/predictions/car
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { Flame } from 'lucide-react';
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
+import { cn } from '~/lib/utils';
 
-interface MakePredictionsProps {
-  wallet?: number;
-}
-
-export default function MakePredictions({ wallet }: MakePredictionsProps) {
+export default function MakePredictions() {
+  const { scores, leagueMembers } = useLeagueData();
   const { actionDetails, predictionRuleCount, keyEpisodes, predictionsMade, rules } = useLeagueActionDetails();
-
-
-  const betTotal = useMemo(() => predictionsMade.reduce((acc, pred) =>
-    acc + (pred?.bet ?? 0), 0), [predictionsMade]);
 
   const castaways = useMemo(() =>
     Object.values(actionDetails ?? {})
@@ -23,16 +18,30 @@ export default function MakePredictions({ wallet }: MakePredictionsProps) {
   const tribes = useMemo(() =>
     Object.values(actionDetails ?? {}).map(({ tribe }) => tribe), [actionDetails]);
 
-  const balance = useMemo(() => (wallet ?? 0) - betTotal, [wallet, betTotal]);
+  const [formBetTotal, setFormBetTotal] = useState(0);
+  const submittedBetTotal = useMemo(() => predictionsMade
+    .reduce((total, p) => total + (p.bet ?? 0), 0), [predictionsMade]);
+  const balance = useMemo(() =>
+    scores?.Member[leagueMembers?.loggedIn?.memberId ?? -1]?.slice().pop() ?? 0,
+    [scores, leagueMembers?.loggedIn]);
 
   if (predictionRuleCount === 0 || !keyEpisodes?.nextEpisode) return null;
 
   return (
     <div className='text-center bg-card rounded-lg w-full relative overflow-clip'>
       {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
-        <div className='absolute top-2 right-4 text-sm italic text-muted-foreground'>
-          Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
-        </div >
+        <div className='absolute top-2 right-4 text-sm italic text-muted-foreground text-right'>
+          Bet Balance: {balance - submittedBetTotal}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
+          {formBetTotal !== submittedBetTotal && <>
+            <br />
+            <span className={cn('text-xs rounded-sm text-muted-foreground p-0.5 bg-amber-400', {
+              'bg-red-400': balance - formBetTotal < 0,
+              'bg-green-400': formBetTotal < submittedBetTotal
+            })}>
+              Pending Balance: {balance - formBetTotal}<Flame className='inline mb-1 w-4 h-min stroke-muted-foreground' />
+            </span>
+          </>}
+        </div>
       }
       {
         keyEpisodes.nextEpisode.airStatus === 'Airing' ?
@@ -54,7 +63,10 @@ export default function MakePredictions({ wallet }: MakePredictionsProps) {
             rules={rules}
             predictionsMade={predictionsMade}
             castaways={castaways}
-            tribes={tribes} />
+            tribes={tribes}
+            wallet={balance}
+            totalBet={formBetTotal}
+            setBetTotal={setFormBetTotal} />
         )
       }
     </div >

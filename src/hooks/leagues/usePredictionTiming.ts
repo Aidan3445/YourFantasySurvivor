@@ -12,15 +12,16 @@ export function usePredictionTiming(overrideHash?: string) {
   const hash = overrideHash ?? params.hash as string;
 
   return useQuery<PredictionTiming[]>({
-    queryKey: ['rules', hash],
+    queryKey: ['predictionTiming', hash],
     queryFn: async () => {
-      if (!hash) throw new Error('League hash is required');
+      if (!hash) return [];
 
       const response = await fetch(`/api/leagues/${hash}/predictionTiming`);
       if (!response.ok) {
-        throw new Error('Failed to fetch league');
+        return [];
       }
       const { predictionTiming } = await response.json() as { predictionTiming: PredictionTiming[] };
+      console.log('Fetched prediction timing:', predictionTiming);
       return predictionTiming;
     },
     enabled: !!hash,

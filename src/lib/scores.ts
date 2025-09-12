@@ -133,7 +133,7 @@ export function compileScores(
               console.log('new total:', String(scores.Member[prediction.predictionMakerId]![episodeNum]));
             }
           }
-        } else if (shauhinModeActive && prediction.bet) {
+        } else if (shauhinModeActive && !prediction.pending && prediction.bet) {
           // if the prediction was wrong but shauhin mode is active, subtract the bet
           scores.Member[prediction.predictionMakerId] ??= [];
           scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;

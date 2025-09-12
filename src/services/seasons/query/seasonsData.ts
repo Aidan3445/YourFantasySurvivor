@@ -23,15 +23,15 @@ export default async function getSeasonsData(includeInactive: boolean) {
   if (seasons.length === 0) return [];
 
   return Promise.all(seasons.map(async (season) => {
-    const [castaways, tribes, baseEvents, episodes, tribesTimeline, eliminations, keyEpisodes] = await Promise.all([
-      getCastaways(season.seasonId),
-      getTribes(season.seasonId),
-      getBaseEvents(season.seasonId),
-      getEpisodes(season.seasonId),
-      getTribesTimeline(season.seasonId),
-      getEliminations(season.seasonId),
-      getKeyEpisodes(season.seasonId)
-    ]);
+    const {
+      castaways,
+      tribes,
+      baseEvents,
+      episodes,
+      tribesTimeline,
+      eliminations,
+      keyEpisodes
+    } = await getSeasonData(season.seasonId);
 
     const enrichedCastaways: EnrichedCastaway[] = castaways.map(castaway => {
       const startTribeIds = Object.entries(tribesTimeline[1] ?? {})
@@ -65,4 +65,34 @@ export default async function getSeasonsData(includeInactive: boolean) {
       keyEpisodes
     } as SeasonsDataQuery;
   }));
+}
+
+/**
+  * Get the necessary season data for a single season
+  * @param seasonId The season ID to get the data for
+  * @returns The season data
+  * @returObj `SeasonsDataQuery | null`
+  */
+export async function getSeasonData(seasonId: number) {
+  const [
+    castaways, tribes, baseEvents, episodes,
+    tribesTimeline, eliminations, keyEpisodes
+  ] = await Promise.all([
+    getCastaways(seasonId),
+    getTribes(seasonId),
+    getBaseEvents(seasonId),
+    getEpisodes(seasonId),
+    getTribesTimeline(seasonId),
+    getEliminations(seasonId),
+    getKeyEpisodes(seasonId)
+  ]);
+  return {
+    castaways,
+    tribes,
+    baseEvents,
+    episodes,
+    tribesTimeline,
+    eliminations,
+    keyEpisodes
+  } as SeasonsDataQuery;
 }
