@@ -89,7 +89,8 @@ export default function CreateBaseEvent() {
         episodeId: data.episodeId,
         notes: null,
       });
-      await queryClient.invalidateQueries({ queryKey: ['baseEvents'] });
+      await queryClient.invalidateQueries({ queryKey: ['baseEvents', league?.seasonId] });
+      await queryClient.invalidateQueries({ queryKey: ['seasons', league?.seasonId] });
     } catch (e) {
       alert('Failed to create base event');
       console.error('Failed to create base event', e);

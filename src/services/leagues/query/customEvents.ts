@@ -1,10 +1,10 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, arrayOverlaps, eq, or, sql } from 'drizzle-orm';
+import { aliasedTable, and, arrayOverlaps, eq, gte, or, sql } from 'drizzle-orm';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { customEventPredictionSchema, customEventReferenceSchema, customEventRuleSchema, customEventSchema } from '~/server/db/schema/customEvents';
-import { type Events, type CustomEvents, type Predictions } from '~/types/events';
+import { type Events, type CustomEvents, type Predictions, type ReferenceType } from '~/types/events';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { PredictionTimings } from '~/lib/events';
@@ -48,7 +48,7 @@ export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
     .where(eq(customEventRuleSchema.leagueId, auth.leagueId))
     .orderBy(episodeSchema.episodeNumber)
     .then(rows => rows.reduce((acc, row) => {
-      acc[row.episodeNumber] ??= [];
+      acc[row.episodeNumber] ??= {};
       const events = acc[row.episodeNumber]!;
       events[row.customEventRuleId] ??= {
         eventSource: 'Custom',
@@ -70,6 +70,8 @@ export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
     }, {} as Events));
 }
 
+const eventEpisodeAlias = aliasedTable(episodeSchema, 'eventEpisode');
+
 /**
   * Get the custom events for a league
   * @param auth The authenticated league member
@@ -86,9 +88,7 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       referenceId: customEventPredictionSchema.referenceId,
       referenceType: customEventPredictionSchema.referenceType,
       bet: customEventPredictionSchema.bet,
-      pending: sql<boolean>`
-        CASE WHEN ${customEventSchema.customEventId} IS NULL THEN true ELSE false END
-      `.as('pending'),
+      pending: customEventSchema.customEventId,
       hit: sql<boolean>`
         CASE WHEN ${customEventReferenceSchema.referenceId} = ${customEventPredictionSchema.referenceId}
         AND ${customEventReferenceSchema.referenceType} = ${customEventPredictionSchema.referenceType}
@@ -112,11 +112,28 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
             PredictionTimings.filter(timing => timing.includes('Weekly')))),
         // if the event is not weekly, the episode doesn't matter
         arrayOverlaps(customEventRuleSchema.timing,
-          PredictionTimings.filter(timing => !timing.includes('Weekly'))))))
+          PredictionTimings.filter(timing => !timing.includes('Weekly'))))
+    ))
+    // ensure event episode is same or after prediction episode
+    .leftJoin(eventEpisodeAlias, and(
+      eq(eventEpisodeAlias.episodeId, customEventSchema.episodeId),
+      eq(eventEpisodeAlias.seasonId, episodeSchema.seasonId),
+      gte(eventEpisodeAlias.episodeNumber, episodeSchema.episodeNumber)))
+    // reference match
     .leftJoin(customEventReferenceSchema, eq(customEventReferenceSchema.customEventId, customEventSchema.customEventId))
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
     .orderBy(episodeSchema.episodeNumber)
-    .then((rows) => rows.reduce((acc, row) => {
+    .then((rows: {
+      predictionId: number;
+      episodeNumber: number;
+      predictionMakerId: number;
+      eventName: string;
+      referenceId: number;
+      referenceType: ReferenceType;
+      bet: number | null;
+      pending: number | null;
+      hit: boolean;
+    }[]) => rows.reduce((acc, row) => {
       acc[row.episodeNumber] ??= {};
       const predictions = acc[row.episodeNumber]!;
 

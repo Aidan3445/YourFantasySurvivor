@@ -16,7 +16,7 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 export function useLeagueData(overrideHash?: string) {
   const { data: league } = useLeague(overrideHash);
   const { data: leagueMembers } = useLeagueMembers(overrideHash);
-  const { data: seasonsData } = useSeasonsData(false);
+  const { data: seasonsData } = useSeasonsData(true, league?.seasonId);
   const { data: selectionTimeline } = useSelectionTimeline(overrideHash);
   const { data: customEvents } = useCustomEvents(overrideHash);
   const { data: basePredictions } = useBasePredictions(overrideHash);

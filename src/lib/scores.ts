@@ -98,14 +98,8 @@ export function compileScores(
         scores.Member[leagueMember] ??= [];
         scores.Member[leagueMember][episodeNum] ??= 0;
         scores.Member[leagueMember][episodeNum] += points;
-        if (leagueMember === 311) {
-          console.log('Scored member for castaway event:', event.eventName, { episodeNum, castaway, leagueMember, points });
-          console.log('new total:', String(scores.Member[leagueMember][episodeNum]));
-        }
       });
     });
-
-    console.log('Scores after episode', episodeNum, JSON.parse(JSON.stringify(scores)));
   });
 
 
@@ -131,28 +125,16 @@ export function compileScores(
           scores.Member[prediction.predictionMakerId] ??= [];
           scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
           scores.Member[prediction.predictionMakerId]![episodeNum]! += points;
-          if (prediction.predictionMakerId === 311) {
-            console.log('Scored member for base prediction:', prediction.eventName, { episodeNum, leagueMember: prediction.predictionMakerId, points });
-            console.log('new total:', String(scores.Member[prediction.predictionMakerId]![episodeNum]));
-          }
           if (shauhinModeActive && prediction.bet) {
             scores.Member[prediction.predictionMakerId] ??= [];
             scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
             scores.Member[prediction.predictionMakerId]![episodeNum]! += prediction.bet;
-            if (prediction.predictionMakerId === 311) {
-              console.log('Scored member for shauhin mode bet:', prediction.eventName, { episodeNum, leagueMember: prediction.predictionMakerId, points: prediction.bet });
-              console.log('new total:', String(scores.Member[prediction.predictionMakerId]![episodeNum]));
-            }
           }
         } else if (shauhinModeActive && !prediction.pending && prediction.bet) {
           // if the prediction was wrong but shauhin mode is active, subtract the bet
           scores.Member[prediction.predictionMakerId] ??= [];
           scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
           scores.Member[prediction.predictionMakerId]![episodeNum]! -= prediction.bet;
-          if (prediction.predictionMakerId === 311) {
-            console.log('Subtracted member for shauhin mode missed bet:', prediction.eventName, { episodeNum, leagueMember: prediction.predictionMakerId, points: -prediction.bet });
-            console.log('new total:', String(scores.Member[prediction.predictionMakerId]![episodeNum]));
-          }
         }
       });
     });
@@ -162,6 +144,9 @@ export function compileScores(
   Object.entries(customEvents.events).forEach(([episodeNumber, refEvents]) => {
     const episodeNum = parseInt(episodeNumber);
     Object.values(refEvents).forEach((event) => {
+      // skip prediction events here, they are handled below
+      if (event.eventType === 'Prediction') return;
+
       const points = customEventRules.find((r) => r.eventName === event.eventName)?.points;
       if (!points) return;
 
@@ -270,8 +255,6 @@ export function compileScores(
       }
     }
   }
-
-  console.log('Compiled scores:', { scores, currentStreaks }, '\n\n\n\n\n\n');
 
   return { scores, currentStreaks };
 }

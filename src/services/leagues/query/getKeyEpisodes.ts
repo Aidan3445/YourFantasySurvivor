@@ -17,7 +17,9 @@ export default async function getKeyEpisodes(seasonId: number) {
   return episodes.reduce((acc, episode) => {
     if (episode.airStatus === 'Aired') {
       acc.previousEpisode = episode;
-    } else if (episode.airStatus === 'Upcoming' && !acc.nextEpisode) {
+    }
+
+    if (episode.airStatus === 'Upcoming' && !acc.nextEpisode) {
       acc.nextEpisode = episode;
     } else if (episode.isMerge) {
       acc.mergeEpisode = episode;

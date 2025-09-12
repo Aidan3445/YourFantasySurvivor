@@ -34,14 +34,22 @@ export default function PredictionHistory() {
 
         const predsWithEvents = predictionMap.map(pred => {
           const rule = rules?.basePrediction?.[pred.eventName as ScoringBaseEventName];
-          return {
+          const t = {
             ...pred,
             points: rule?.points ?? 0,
-            event: Object.values(baseEvents[Number(episodeNumber)] ?? {})
-              .find((event) => event.eventName === pred.eventName),
+            event: Object.values(baseEvents ?? {})
+              .map(epEvents => Object.values(epEvents)
+                .find(event => event.eventId === pred.pending))
+              .find(e => e !== undefined),
             timing: rule?.timing ?? []
-
           };
+
+          if (pred.pending === 564) {
+            console.log({ pred, t, rule, baseEvents });
+          }
+
+          return t;
+
         });
         if (predsWithEvents.length === 0) return;
         predictions[episodeNum] ??= [];
@@ -58,14 +66,21 @@ export default function PredictionHistory() {
 
       const predsWithEvents = preds.map(pred => {
         const rule = rules?.custom.find(rule => rule.eventName === pred.eventName);
-        return {
+        const t = {
           ...pred,
           points: rule?.points ?? 0,
-          event: Object.entries(customEvents.events)
-            .find(([_, events]) => Object.values(events)
-              .find(e => e.eventName === pred.eventName))?.[1]?.[1],
+          event: Object.values(customEvents.events ?? {})
+            .map(epEvents => Object.values(epEvents)
+              .find(event => event.eventId === pred.pending))
+            .find(e => e !== undefined),
           timing: rule?.timing ?? []
         };
+
+        if (pred.pending === 564) {
+          console.log({ pred, t, rule, customEvents });
+        }
+
+        return t;
       });
       if (predsWithEvents.length === 0) return;
       predictions[episodeNum] ??= [];
@@ -76,12 +91,14 @@ export default function PredictionHistory() {
   }, [
     keyEpisodes?.previousEpisode,
     baseEvents,
-    customEvents?.events,
+    customEvents,
     customPredictionsMade,
     basePredictionsMade,
     rules?.basePrediction,
     rules?.custom
   ]);
+
+  console.log({ predictionsWithEvents });
 
   const stats = Object.values(predictionsWithEvents).reduce((acc, pred) => {
     pred.forEach(p => {
@@ -142,10 +159,7 @@ export default function PredictionHistory() {
       </span>
       <CoverCarousel items={Object.entries(predictionsWithEvents).toReversed().map(([episode, preds]) => ({
         header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
-        content: (<PredctionTable predictions={(() => {
-          console.log('episode', episode, preds);
-          return preds;
-        })()} />)
+        content: (<PredctionTable predictions={preds} />)
       }))} />
     </div>
   );

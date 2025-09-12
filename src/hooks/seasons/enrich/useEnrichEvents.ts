@@ -136,8 +136,8 @@ export function useEnrichEvents(
         ...event,
         points: points,
         referenceMap,
-      } as EnrichedEvent;
-    });
+      };
+    }).filter(Boolean) as EnrichedEvent[];
   }, [
     castaways,
     eliminations,

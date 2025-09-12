@@ -59,6 +59,7 @@ export default function EditEvent({ event }: EditEventProps) {
       if (isBaseEvent) {
         await updateBaseEvent(event.eventId, data as BaseEventInsert);
         await queryClient.invalidateQueries({ queryKey: ['baseEvents', league?.seasonId] });
+        await queryClient.invalidateQueries({ queryKey: ['seasons', league?.seasonId] });
       } else {
         if (!event.customEventRuleId) throw new Error('Missing customEventRuleId for custom event');
         if (!league?.hash) throw new Error('Missing league hash');
@@ -82,6 +83,7 @@ export default function EditEvent({ event }: EditEventProps) {
       if (isBaseEvent) {
         await deleteBaseEvent(event.eventId);
         await queryClient.invalidateQueries({ queryKey: ['baseEvents', league?.seasonId] });
+        await queryClient.invalidateQueries({ queryKey: ['seasons', league?.seasonId] });
       } else {
         if (!event.customEventRuleId) throw new Error('Missing customEventRuleId for custom event');
         if (!league?.hash) throw new Error('Missing league hash');

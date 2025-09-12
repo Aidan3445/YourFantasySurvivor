@@ -33,7 +33,7 @@ export default function EpisodeEventsTableBody({
   const { baseEvents, customEvents } = enrichedEvents.reduce((acc, event) => {
     if (event.eventSource === 'Base') {
       acc.baseEvents.push(event);
-    } else {
+    } else if (event.eventType === 'Direct') {
       acc.customEvents.push(event);
     }
     return acc;

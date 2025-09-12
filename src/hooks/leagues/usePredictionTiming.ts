@@ -21,7 +21,6 @@ export function usePredictionTiming(overrideHash?: string) {
         return [];
       }
       const { predictionTiming } = await response.json() as { predictionTiming: PredictionTiming[] };
-      console.log('Fetched prediction timing:', predictionTiming);
       return predictionTiming;
     },
     enabled: !!hash,
