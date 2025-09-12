@@ -13,9 +13,16 @@ import {
   PopoverTrigger,
 } from '~/components/common/popover';
 
-export function DateTimePicker() {
+interface DateTimePickerProps {
+  value?: Date;
+  onChange?: (date: Date) => void;
+  rangeStart?: Date;
+  rangeEnd?: Date;
+}
+
+export function DateTimePicker({ value, onChange, rangeStart, rangeEnd }: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [date, setDate] = React.useState<Date | undefined>(value);
 
   return (
     <div className='flex gap-4'>
@@ -41,7 +48,17 @@ export function DateTimePicker() {
               captionLayout='dropdown'
               onSelect={(date) => {
                 setDate(date);
+                if (date && onChange) onChange(date);
                 setOpen(false);
+              }}
+              disabled={(checkDate) => {
+                if (rangeStart && checkDate < rangeStart) {
+                  return true;
+                }
+                if (rangeEnd && checkDate > rangeEnd) {
+                  return true;
+                }
+                return false;
               }}
             />
           </PopoverContent>
@@ -55,8 +72,17 @@ export function DateTimePicker() {
           type='time'
           id='time-picker'
           step='1'
-          defaultValue='10:30:00'
-          className='bg-background appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+          value={date ? date.toTimeString().split(' ')[0] : ''}
+          className='bg-background appearance-none rounded-md [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+          onChange={(e) => {
+            if (date) {
+              const [hours, minutes, seconds] = e.target.value.split(':').map(Number);
+              const newDate = new Date(date);
+              newDate.setHours(hours!, minutes, seconds);
+              setDate(newDate);
+              if (onChange) onChange(newDate);
+            }
+          }}
         />
       </div>
     </div>

@@ -10,7 +10,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
@@ -37,6 +37,14 @@ export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
       draftDate: leagueSettings?.draftDate
     },
   });
+
+  useEffect(() => {
+    if (leagueSettings) {
+      reactForm.reset({
+        draftDate: leagueSettings.draftDate
+      });
+    }
+  }, [leagueSettings, reactForm]);
 
   if (!league) return null;
 
@@ -68,7 +76,7 @@ export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Edit Draft Type and Date</AlertDialogTitle>
             <AlertDialogDescription>
-              You have the choice to draft before or after the first episode of the season.
+              You can draft before the season starts or set a data after the premiere.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <form className='flex flex-col gap-2 justify-between h-full' action={() => handleSubmit()}>
@@ -85,7 +93,10 @@ export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
               <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
                 <X stroke='white' />
               </AlertDialogCancel>
-              <Button type='submit'>Save</Button>
+              <Button type='submit'>Save
+
+                Draft as {reactForm.watch('draftDate') ? ` ${reactForm.getValues('draftDate')?.toLocaleString()}` : ' Manually'}
+              </Button>
             </AlertDialogFooter>
           </form>
         </AlertDialogContent>

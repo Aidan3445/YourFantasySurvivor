@@ -1,4 +1,4 @@
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { FormControl, FormDescription, FormField, FormItem, FormMessage } from '~/components/common/form';
 import { DateTimePicker } from '~/components/common/dateTimePicker';
 
 interface DraftDateFieldProps {
@@ -10,16 +10,12 @@ export function DraftDateField({ disabled }: DraftDateFieldProps) {
     <FormField
       name='draftDate'
       render={({ field }) => (
-        <FormItem>
-          <FormLabel className='text-lg'>Draft Start Date</FormLabel>
+        <FormItem className={disabled ? 'opacity-50 pointer-events-none' : ''}>
           <FormControl>
-            <span className='flex w-full justify-center'>
+            <span className='flex w-full justify-center mb-4'>
               <DateTimePicker
-                date={field.value as Date}
-                setDate={field.onChange}
-                side='top'
-                disabled={disabled}
-                placeholder='Select draft start date and time'
+                value={field.value ? new Date(field.value as Date) : undefined}
+                onChange={field.onChange}
                 rangeStart={new Date(new Date().setHours(0, 0, 0, 0))} />
             </span>
           </FormControl>
