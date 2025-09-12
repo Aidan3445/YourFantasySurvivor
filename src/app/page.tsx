@@ -21,7 +21,7 @@ export default async function HomePage() {
 
       {/* Logged in users */}
       <SignedIn>
-        <div className='space-y-2'>
+        <div className='space-y-2 mb-8'>
           {/* Welcome back section */}
           <div className='text-center'>
             <h1 className='text-4xl font-bold mb-2'>Welcome back!</h1>

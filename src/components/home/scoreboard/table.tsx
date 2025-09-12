@@ -27,7 +27,6 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
       data.keyEpisodes,
     ).scores;
 
-
     const sortedCastaways = Object.entries(castawayScores)
       .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0))
       .map(([castawayId, scores]) => [Number(castawayId), scores] as [number, number[]]);
@@ -46,6 +45,10 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
 
   const [selectedSeason, setSelectedSeason] = useState(scoresBySeason[0]);
 
+  const allZero = useMemo(() => {
+    return selectedSeason?.sortedCastaways.every(([_, scores]) => scores.every(score => score === 0));
+  }, [selectedSeason]);
+
   if (!selectedSeason) return <div className='text-center py-6'>No seasons available.</div>;
 
   const selectSeason = (seasonName: string) => {
@@ -55,6 +58,8 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
     }
   };
 
+
+
   return (
     <ScrollArea className='bg-card rounded-xl gap-0'>
       <Table>
@@ -62,7 +67,7 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
         <TableHeader>
           <TableRow className={cn(
             'px-4 bg-white hover:bg-white')}>
-            {[0, 1].map((a) => (
+            {!allZero ? [0, 1].map((a) => (
               <Fragment key={a}>
                 <TableHead className='text-center w-0'>Place</TableHead>
                 <TableHead className='text-center w-0 text-nowrap'>
@@ -83,10 +88,23 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
                   )}
                 </TableHead>
               </Fragment>
-            ))}
+            )) : (
+              <TableHead className='text-center' colSpan={2}>
+                Castaway
+                <SelectSeason
+                  seasons={scoresBySeason.map(s => ({
+                    value: s.data.season.name,
+                    label: s.data.season.name,
+                  }))}
+                  value={selectedSeason.data.season.name}
+                  setValue={selectSeason}
+                  someHidden={someHidden} />
+              </TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <ScorboardBody
+          allZero={allZero}
           sortedCastaways={selectedSeason.sortedCastaways}
           castawayColors={selectedSeason.castawayColors}
           castawaySplitIndex={selectedSeason.castawaySplitIndex}

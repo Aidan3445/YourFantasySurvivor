@@ -54,11 +54,22 @@ export function compileScores(
         return acc;
       }, { eventTribes: new Set<number>(), eventCastaways: new Set<number>() });
 
+      // ensure initial tribe assignments
+      if (episodeNum === 1 && event.eventName === 'tribeUpdate') {
+        eventTribes.forEach((tribeId) => {
+          scores.Tribe[tribeId] ??= [];
+        });
+        eventCastaways.forEach((castawayId) => {
+          scores.Castaway[castawayId] ??= [];
+        });
+      }
+
       eventTribes.forEach((tribe) => {
         // add castaways to be scored
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
           if (!eventCastaways.has(castaway)) eventCastaways.add(castaway);
         });
+
         // here we want to align the castaways for non scoring events so we
         // push this check inside, later we skip iteration entirely for castaways
         if (!ScoringBaseEventNames.includes(baseEvent)) return;

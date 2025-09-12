@@ -1,3 +1,5 @@
+'use client';
+
 import { TableBody, TableRow } from '~/components/common/table';
 import CastawayEntry from '~/components/home/scoreboard/entry';
 import { type SeasonsDataQuery } from '~/types/seasons';
@@ -8,10 +10,11 @@ export interface BodyProps {
   castawayColors: Record<string, string>;
   castawaySplitIndex: number;
   data: SeasonsDataQuery;
+  allZero?: boolean;
 }
 
 export default function ScorboardBody({
-  sortedCastaways, castawayColors, castawaySplitIndex, data
+  sortedCastaways, castawayColors, castawaySplitIndex, data, allZero
 }: BodyProps) {
   const getTribeTimeline = (castawayId: number) => {
     return Object.entries(data.tribesTimeline)
@@ -52,6 +55,7 @@ export default function ScorboardBody({
         return (
           <TableRow key={`${castawayId}-${secondCastawayId ?? 'empty'}`}>
             <CastawayEntry
+              allZero={allZero}
               place={index + 1}
               castaway={castaway}
               points={totalPoints}
@@ -60,6 +64,7 @@ export default function ScorboardBody({
             />
             {secondCastawayId && secondScores && (
               <CastawayEntry
+                allZero={allZero}
                 place={index + 1 + castawaySplitIndex}
                 castaway={secondCastaway}
                 points={secondTotalPoints}

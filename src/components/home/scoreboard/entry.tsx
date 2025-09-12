@@ -15,21 +15,26 @@ interface CastawayRowProps {
   points?: number;
   color?: string;
   tribeTimeline?: { episode: number; tribe: Tribe; }[];
+  allZero?: boolean;
 }
 
-export default function CastawayEntry({ place, castaway, points, color, tribeTimeline }: CastawayRowProps) {
+export default function CastawayEntry({ place, castaway, points, color, tribeTimeline, allZero }: CastawayRowProps) {
   return (
     <>
-      <TableCell className='px-1'>
-        <ColorRow color={color} className='justify-center p-0'>
-          {place}
-        </ColorRow>
-      </TableCell>
-      <TableCell className='px-1'>
-        <ColorRow color={color} className='justify-center p-0'>
-          {points}
-        </ColorRow>
-      </TableCell>
+      {!allZero && (
+        <>
+          <TableCell className='px-1'>
+            <ColorRow color={color} className='justify-center p-0'>
+              {place}
+            </ColorRow>
+          </TableCell>
+          <TableCell className='px-1'>
+            <ColorRow color={color} className='justify-center p-0'>
+              {points}
+            </ColorRow>
+          </TableCell>
+        </>
+      )}
       <TableCell className='text-nowrap px-1'>
         <ColorRow
           className='justify-center gap-0'
