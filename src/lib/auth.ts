@@ -1,13 +1,13 @@
 import 'server-only';
 
 import { auth as clerkAuth } from '@clerk/nextjs/server';
-import { and, eq } from 'drizzle-orm';
 import { db } from '~/server/db';
-import { leagueMembersSchema } from '~/server/db/schema/leagueMembers';
-import { leagueSettingsSchema, leaguesSchema } from '~/server/db/schema/leagues';
+import { and, eq } from 'drizzle-orm';
+import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
+import { leagueSchema } from '~/server/db/schema/leagues';
 import { systemSchema } from '~/server/db/schema/system';
-import { type LeagueHash } from '~/server/db/defs/leagues';
-import { seasonsSchema } from '~/server/db/schema/seasons';
+import { type VerifiedLeagueMemberAuth, type LeagueMemberAuth } from '~/types/api';
+import { type LeagueMemberRole } from '~/types/leagueMembers';
 
 /**
   * Auth wrapper that utilizes session claims for merging dev and prod users
@@ -23,43 +23,39 @@ export async function auth() {
 
 /**
   * Authenticate the user within a league
-  * @param leagueHash - the hash of the league
+  * @param hash - the hash of the league
   * @returns the user id and league id if the user is a member of the league
   * OR just the user id if the user is not a member of the league
   * OR an empty object if the user is not authenticated
+  * @returnObj `LeagueMemberAuth`
   */
-export async function leagueMemberAuth(leagueHash: LeagueHash) {
+export async function leagueMemberAuth(hash: string) {
   const { userId } = await auth();
-  if (!userId) return { userId, memberId: null, role: null };
+  const noAuth: LeagueMemberAuth = { userId, memberId: null, role: null, leagueId: null };
+  if (!userId) return noAuth;
 
   // Ensure the user is a member of the league
   const member = await db
     .select({
-      memberId: leagueMembersSchema.memberId,
-      role: leagueMembersSchema.role,
-      member: leagueMembersSchema,
-      league: leaguesSchema,
-      seasonName: seasonsSchema.seasonName,
-      draftDate: leagueSettingsSchema.draftDate,
+      memberId: leagueMemberSchema.memberId,
+      role: leagueMemberSchema.role,
+      leagueId: leagueMemberSchema.leagueId,
+      status: leagueSchema.status,
+      seasonId: leagueSchema.seasonId,
     })
-    .from(leagueMembersSchema)
-    .innerJoin(leaguesSchema, and(
-      eq(leaguesSchema.leagueId, leagueMembersSchema.leagueId),
-      eq(leaguesSchema.leagueHash, leagueHash)))
-    .innerJoin(seasonsSchema, eq(seasonsSchema.seasonId, leaguesSchema.leagueSeason))
-    .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leaguesSchema.leagueId))
-    .where(and(
-      eq(leagueMembersSchema.userId, userId),
-    )).then((members) => members[0]);
+    .from(leagueMemberSchema)
+    .innerJoin(leagueSchema, and(
+      eq(leagueMemberSchema.leagueId, leagueSchema.leagueId),
+      eq(leagueSchema.hash, hash)))
+    .where(eq(leagueMemberSchema.userId, userId))
+    .then((members) => members[0]);
+
+  if (!member) return noAuth;
 
   return {
     userId,
-    memberId: member?.memberId ?? null,
-    role: member?.role ?? null,
-    member: member?.member ?? null,
-    league: member ? { ...member.league, draftDate: new Date(`${member.draftDate} Z`) } : null,
-    seasonName: member?.seasonName ?? null,
-  };
+    ...member,
+  } as LeagueMemberAuth;
 }
 
 /**
@@ -79,4 +75,72 @@ export async function systemAdminAuth() {
     .then((admins) => admins.length > 0);
 
   return { userId: isAdmin ? userId : null };
+}
+
+/**
+ * Wrapper for server actions with general user authentication
+ */
+export function requireAuth<TArgs extends unknown[], TReturn>(
+  handler: (userId: string, ...args: TArgs) => TReturn
+): (...args: TArgs) => Promise<TReturn> {
+  return async (...args: TArgs) => {
+    const { userId } = await auth();
+    if (!userId) throw new Error('User not authenticated');
+    return handler(userId, ...args);
+  };
+}
+
+function requireLeagueAuthGenerator(minimunPermissions: LeagueMemberRole) {
+  return <TArgs extends unknown[], TReturn>(
+    handler: (auth: VerifiedLeagueMemberAuth, ...args: TArgs) => TReturn
+  ): (hash: string, ...args: TArgs) => Promise<TReturn> => {
+    return async (hash: string, ...args: TArgs) => {
+      const auth = await leagueMemberAuth(hash);
+      if (!auth.userId) throw new Error('User not authenticated');
+      if (!auth.memberId) throw new Error('Not a league member');
+
+      switch (minimunPermissions) {
+        case 'Owner':
+          if (auth.role !== 'Owner') throw new Error('User not authorized');
+          break;
+        case 'Admin':
+          if (auth.role === 'Member') throw new Error('User not authorized');
+          break;
+        default:
+          // No additional checks for 'Member' role
+          break;
+      }
+
+      const verifiedAuth = auth as VerifiedLeagueMemberAuth;
+      return handler(verifiedAuth, ...args);
+    };
+  };
+}
+
+/**
+  * Wrapper for server actions with league member authentication
+  */
+export const requireLeagueMemberAuth = requireLeagueAuthGenerator('Member');
+
+/**
+  * Wrapper for server actions with league admin authentication
+  */
+export const requireLeagueAdminAuth = requireLeagueAuthGenerator('Admin');
+
+/**
+  * Wrapper for server actions with league owner authentication
+  */
+export const requireLeagueOwnerAuth = requireLeagueAuthGenerator('Owner');
+
+/**
+  * Wrapper for server actions with system admin authentication
+  */
+export function requireSystemAdminAuth<TArgs extends unknown[], TReturn>(
+  handler: (...args: TArgs) => TReturn
+): (...args: TArgs) => Promise<TReturn> {
+  return async (...args: TArgs) => {
+    const { userId } = await systemAdminAuth();
+    if (!userId) throw new Error('User not authorized');
+    return handler(...args);
+  };
 }

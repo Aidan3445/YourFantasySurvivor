@@ -42,4 +42,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
+# claude
+/.claude
+
 /old
+
+# manually hidden files
+**/*<hide>*

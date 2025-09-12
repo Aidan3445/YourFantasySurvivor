@@ -3,11 +3,10 @@ import '~/styles/globals.css';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
-import { SidebarProvider } from '~/components/ui/sidebar';
+import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
-import UserProvider from '~/context/yfsUserContext';
-import { QUERIES } from './api/leagues/query';
 import { type Metadata } from 'next';
+import QueryClientContextProvider from '~/context/reactQueryContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -25,19 +24,18 @@ interface RootLayoutProps {
 }
 
 
-export default async function RootLayout({ children }: RootLayoutProps) {
-  const leagues = await QUERIES.getLeagues();
 
+export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <StrictMode>
-      <ClerkProvider
-        appearance={{
-          variables: {
-            colorPrimary: '#B09472',
-            colorBackground: '#EED9BF',
-          }
-        }}>
-        <UserProvider leagues={leagues}>
+      <QueryClientContextProvider>
+        <ClerkProvider
+          appearance={{
+            variables: {
+              colorPrimary: '#B09472',
+              colorBackground: '#EED9BF',
+            }
+          }}>
           <html lang='en'>
             <body className={`font-sans ${inter.variable}`}>
               <SidebarProvider defaultOpen>
@@ -48,8 +46,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               </SidebarProvider>
             </body>
           </html>
-        </UserProvider>
-      </ClerkProvider>
+        </ClerkProvider>
+      </QueryClientContextProvider>
     </StrictMode>
   );
 }

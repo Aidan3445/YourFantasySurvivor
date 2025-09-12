@@ -1,8 +1,8 @@
 import { SignedIn, SignedOut } from '@clerk/nextjs';
-import { HeroSection } from '~/components/home/heroSection';
-import { TopLeaguesCard } from '~/components/home/topLeaguesCard';
-import { QuickActions } from '~/components/home/quickActions';
-import { GlobalCastawayScoreboard } from '~/components/home/globalCastawayScoreboard';
+import { HeroSection } from '~/components/home/hero/view';
+import { ActiveLeagues } from '~/components/home/activeLeagues/view';
+import { QuickActions } from '~/components/home/quickActions/view';
+import { CastawayScoreboard } from '~/components/home/scoreboard/view';
 
 export default async function HomePage() {
   return (
@@ -14,14 +14,14 @@ export default async function HomePage() {
 
           {/* Global Castaway Scoreboard */}
           <div className='w-full'>
-            <GlobalCastawayScoreboard />
+            <CastawayScoreboard />
           </div>
         </div>
       </SignedOut>
 
       {/* Logged in users */}
       <SignedIn>
-        <div className='space-y-2'>
+        <div className='space-y-2 mb-8'>
           {/* Welcome back section */}
           <div className='text-center'>
             <h1 className='text-4xl font-bold mb-2'>Welcome back!</h1>
@@ -31,10 +31,10 @@ export default async function HomePage() {
           </div>
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 grid-rows-[1fr]'>
             <div className='lg:col-span-2'>
-              <TopLeaguesCard />
+              <ActiveLeagues />
             </div>
             <div className='lg:col-span-2 lg:row-start-2'>
-              <GlobalCastawayScoreboard />
+              <CastawayScoreboard />
             </div>
             <div className='lg:row-span-2 min-w-96'>
               <QuickActions />
