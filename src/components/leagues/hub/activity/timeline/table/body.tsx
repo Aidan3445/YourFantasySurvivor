@@ -4,9 +4,9 @@ import { TableCell, TableRow } from '~/components/common/table';
 import { type EpisodeEventsProps } from '~/components/leagues/hub/activity/timeline/table/view';
 import { type EnrichedEvent, type EventWithReferences, type Prediction } from '~/types/events';
 import { useEnrichEvents } from '~/hooks/seasons/enrich/useEnrichEvents';
-import EventRow from '~/components/leagues/hub/activity/timeline/table/row';
 import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPredictions';
 import PredictionRow from '~/components/leagues/hub/activity/timeline/table/row/predictionRow';
+import EventRow from '~/components/leagues/hub/activity/timeline/table/row/eventRow';
 
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
