@@ -1,76 +1,282 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tailwindcss';
+@plugin 'tailwind-scrollbar';
 
-/* styles */
-body  {
-    @apply bg-gradient-to-b from-b3 to-b1 min-h-screen bg-fixed overscroll-none;
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --breakpoint-web: 768px;
+
+  --color-b1: #684528;
+  --color-b1-light: #8c6d4d;
+  --color-b2: #b09472;
+  --color-b3: #e5bc8f;
+  --color-b4: #eed9bf;
+  --color-g1: #3d5540;
+  --color-g2: #7d9277;
+  --color-g3: #a9cf9f;
+  --color-error: rgb(248, 113, 113, 0.6);
+
+  --color-sidebar: hsl(var(--sidebar-background));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-primary: hsl(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-ring: hsl(var(--sidebar-ring));
+
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-shimmer1: shimmer1 10s infinite;
+  --animate-shimmer2: shimmer2 10s infinite;
+  --animate-shimmer3: shimmer3 10s infinite;
+  --animate-shimmer-fast: shimmerfast 5s infinite;
+  --animate-scale-in: scale-in 2s ease-out;
+  --animate-scale-in-fast: scale-in 0.1s ease-out;
+  --animate-scale-out: scale-out 2s ease-out;
+  --animate-scale-out-fast: scale-out 0.1s ease-out;
+
+  --transition-delay-400: 400ms;
+
+  --rotate-30: 30deg;
+  --rotate-210: 210deg;
+
+  --drop-shadow-text: 0 1.2px 1.2px rgba(0, 0, 0, 1);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
+  @keyframes shimmer1 {
+    0% {
+      transform: translateX(165%) skewX(-45deg);
+    }
+    12% {
+      transform: translateX(-50%) skewX(-45deg);
+    }
+    75% {
+      transform: translateX(-50%) skewX(-45deg);
+    }
+    100% {
+      transform: translateX(165%) skewX(-45deg);
+    }
+  }
+  @keyframes shimmer2 {
+    0% {
+      transform: translateX(115%) skewX(-45deg);
+    }
+    12% {
+      transform: translateX(-100%) skewX(-45deg);
+    }
+    75% {
+      transform: translateX(-100%) skewX(-45deg);
+    }
+    100% {
+      transform: translateX(115%) skewX(-45deg);
+    }
+  }
+  @keyframes shimmer3 {
+    0% {
+      transform: translateX(57.5%) skewX(-45deg);
+    }
+    12% {
+      transform: translateX(-157.5%) skewX(-45deg);
+    }
+    75% {
+      transform: translateX(-157.5%) skewX(-45deg);
+    }
+    100% {
+      transform: translateX(57.5%) skewX(-45deg);
+    }
+  }
+  @keyframes shimmerfast {
+    0% {
+      transform: translateX(57.5%) skewX(-45deg);
+    }
+    25% {
+      transform: translateX(-157.5%) skewX(-45deg);
+    }
+    50% {
+      transform: translateX(-157.5%) skewX(-45deg);
+    }
+    100% {
+      transform: translateX(57.5%) skewX(-45deg);
+    }
+  }
+  @keyframes scale-in {
+    0% {
+      transform: scale(0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  @keyframes scale-out {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(0);
+    }
+  }
 }
 
-* {
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  @media (width >= --theme(--breakpoint-web)) {
+    max-width: none;
+  }
+  @media (width >= 1400px) {
+    max-width: 1400px;
+  }
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@layer utilities {
+  /* styles */
+  body {
+    @apply bg-linear-to-b from-b3 to-b1 min-h-screen bg-fixed overscroll-none;
+  }
+
+  * {
     @apply text-black;
-}
+  }
 
-/* Main scroll */
-::-webkit-scrollbar {
+  /* Main scroll */
+  ::-webkit-scrollbar {
     @apply w-2 h-2;
-}
+  }
 
-::-webkit-scrollbar-track {
+  ::-webkit-scrollbar-track {
     @apply bg-zinc-700/50;
-}
+  }
 
-::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     @apply bg-zinc-200/70 rounded-md;
-}
+  }
 
-::-webkit-scrollbar-thumb:hover {
+  ::-webkit-scrollbar-thumb:hover {
     @apply bg-zinc-200;
+  }
+
+  /* CLERK */
+  .cl-button {
+    @apply border-0! ring-0!;
+  }
+
+  .cl-userButton-root {
+    @apply w-full;
+  }
+
+  .cl-userButtonBox {
+    @apply flex-row-reverse -ml-1.5;
+  }
+
+  .cl-userButtonAvatarBox {
+    @apply ml-1;
+  }
+
+  .cl-userButtonTrigger {
+    @apply flex justify-start w-full;
+  }
+
+  .cl-userButtonOuterIdentifier {
+    @apply whitespace-nowrap;
+  }
+
+  .cl-modalBackdrop {
+    @apply h-svh;
+  }
+
+  .cl-signUp-start,
+  .cl-signIn-start {
+    @apply pt-0;
+  }
+
+  .cl-card.cl-signIn-start {
+    @apply pt-10;
+  }
+
+  .cl-logoBox {
+    @apply h-44;
+  }
+
+  /* Color Swatch */
+  .w-color-swatch {
+    @apply grid! grid-cols-5;
+  }
+
+  /* Sidebar */
 }
-
-/* CLERK */
- .cl-button {
-  @apply !border-0 !ring-0;
-}
-
-.cl-userButton-root {
-  @apply w-full;
-}
-
-.cl-userButtonBox {
-  @apply flex-row-reverse -ml-1.5;
-} 
-
-.cl-userButtonAvatarBox {
-  @apply ml-1;
-}
-
-.cl-userButtonTrigger {
-  @apply flex justify-start w-full;
-}
-
-.cl-userButtonOuterIdentifier {
-  @apply whitespace-nowrap;
-}
-
-.cl-modalBackdrop {
-  @apply h-svh;
-}
-
-.cl-signUp-start, .cl-signIn-start {
-  @apply pt-0;
-}
-
-.cl-logoBox {
-  @apply h-44;
-}
-
-/* Color Swatch */
-.w-color-swatch {
-  @apply !grid grid-cols-5;
-}
-
-/* Sidebar */
 @layer base { 
   :root {
         --sidebar-background: 112 100% 88%;
@@ -151,38 +357,46 @@ body  {
     }
 }
 
-.shimmer-1, .shimmer-2, .shimmer-3, .shimmer-fast {
+@layer utilities {
+  .shimmer-1,
+  .shimmer-2,
+  .shimmer-3,
+  .shimmer-fast {
     @apply relative overflow-hidden;
-}
+  }
 
-.shimmer-1::before, .shimmer-2::before, .shimmer-3::before, .shimmer-fast::before {
-    content: "";
-    @apply  flex box-border absolute w-[200%] h-full 
-    bg-gradient-to-r from-transparent via-white/50 to-transparent;
-}
+  .shimmer-1::before,
+  .shimmer-2::before,
+  .shimmer-3::before,
+  .shimmer-fast::before {
+    content: '';
+    @apply flex box-border absolute w-[200%] h-full 
+    bg-linear-to-r from-transparent via-white/50 to-transparent;
+  }
 
-.shimmer-1::before{
+  .shimmer-1::before {
     @apply animate-shimmer1;
-}
+  }
 
-.shimmer-2::before {
+  .shimmer-2::before {
     @apply animate-shimmer2;
-}
+  }
 
-.shimmer-3::before {
+  .shimmer-3::before {
     @apply animate-shimmer3;
-}
+  }
 
-.shimmer-fast::before {
-    @apply animate-shimmer-fast
-}
+  .shimmer-fast::before {
+    @apply animate-shimmer-fast;
+  }
 
-/*
+  /*
 
 
 ---break---
 
 */
+}
 
 @layer base {
   * {

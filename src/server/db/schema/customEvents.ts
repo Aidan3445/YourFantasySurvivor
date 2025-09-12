@@ -1,72 +1,79 @@
-/*
 import 'server-only';
+import { index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 
-import { createTable } from './createTable';
-import { castawaysSchema } from './castaways';
-import { tribesSchema } from './tribes';
-import { episodesSchema } from './episodes';
-import { leaguesSchema } from './leagues';
-import { leagueMembersSchema } from './leagueMembers';
-import { integer, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
-import { z } from 'zod';
+import { createTable } from '~/server/db/schema/createTable';
+import { leagueSchema } from '~/server/db/schema/leagues';
+import { label, notes, reference, timing } from '~/server/db/schema/shared';
+import { EventTypes } from '~/lib/events';
+import { episodeSchema } from '~/server/db/schema/episodes';
+import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 
-export const oldRef = pgEnum('event_old_reference', ['castaway', 'tribe', 'member']);
 
-export const customEventRules = createTable(
+export const eventType = pgEnum('event_type', EventTypes);
+export const customEventRuleSchema = createTable(
   'event_custom_rule',
   {
-    id: serial('custom_rule_id').notNull().primaryKey(),
-    league: integer('league_id').references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }).notNull(),
-    eventName: varchar('name', { length: 32 }).notNull(),
-    description: varchar('description', { length: 256 }).notNull(),
-    points: integer('points').notNull(),
-    referenceType: oldRef('reference_type').notNull(),
-  }
+    customEventRuleId: serial('custom_event_rule_id').notNull().primaryKey(),
+    leagueId: integer('league_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
+    eventName: varchar('event_name', { length: 64 }).notNull(),
+    description: varchar('event_desc', { length: 256 }).notNull(),
+    points: integer('event_points').notNull(),
+    eventType: eventType('event_type').notNull(),
+    referenceTypes: reference('reference_types').array().notNull(),
+    timing: timing('event_timing').array().notNull(),
+  },
+  (table) => [
+    unique().on(table.leagueId, table.eventName),
+    index().on(table.leagueId),
+  ]
 );
 
-export const eventName = z.coerce.string()
-  .min(3, { message: 'Name must be between 3 and 16 characters' })
-  .max(32, { message: 'Name must be between 3 and 16 characters' });
-
-export const description = z.coerce.string()
-  .min(3, { message: 'Description must be between 3 and 256 characters, or blank' })
-  .max(256, { message: 'Description must be between 3 and 256 characters, or blank' })
-  .or(z.literal(''));
-
-export const customEvents = createTable(
+export const customEventSchema = createTable(
   'event_custom',
   {
-    id: serial('event_custom_id').notNull().primaryKey(),
-    rule: integer('rule_id').references(() => customEventRules.id, { onDelete: 'cascade' }).notNull(),
-    episode: integer('episode_id').references(() => episodesSchema.episodeId, { onDelete: 'cascade' }).notNull(),
-  }
-);
-export type CustomEvent = typeof customEvents.$inferSelect;
-
-export const customCastaways = createTable(
-  'event_custom_castaway',
-  {
-    id: serial('event_custom_castaway_id').notNull().primaryKey(),
-    event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('castaway_id').references(() => castawaysSchema.castawayId, { onDelete: 'cascade' }).notNull(),
+    customEventId: serial('custom_event_id').notNull().primaryKey(),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
+    customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
+    label: label('label'),
+    notes: notes('notes'),
   },
+  (table) => [
+    index().on(table.episodeId),
+    index().on(table.customEventRuleId),
+  ]
 );
 
-export const customTribes = createTable(
-  'event_custom_tribe',
+export const customEventReferenceSchema = createTable(
+  'event_custom_reference',
   {
-    id: serial('event_custom_tribe_id').notNull().primaryKey(),
-    event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('tribe_id').references(() => tribesSchema.tribeId, { onDelete: 'cascade' }).notNull(),
+    customEventReferenceId: serial('custom_event_reference_id').notNull().primaryKey(),
+    customEventId: integer('custom_event_id').notNull().references(() => customEventSchema.customEventId, { onDelete: 'cascade' }),
+    referenceType: reference('reference_type').notNull(),
+    referenceId: integer('reference_id').notNull(),
   },
+  (table) => [
+    index().on(table.customEventId),
+    index().on(table.referenceId, table.referenceType),
+    unique().on(table.customEventId, table.referenceType, table.referenceId)
+  ]
 );
 
-export const customMembers = createTable(
-  'event_custom_member',
+export const customEventPredictionSchema = createTable(
+  'event_custom_prediction',
   {
-    id: serial('event_custom_member_id').notNull().primaryKey(),
-    event: integer('event_id').references(() => customEvents.id, { onDelete: 'cascade' }).notNull(),
-    reference: integer('member_id').references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }).notNull(),
+    customEventPredictionId: serial('custom_event_prediction_id').notNull().primaryKey(),
+    customEventRuleId: integer('custom_event_rule_id').notNull().references(() => customEventRuleSchema.customEventRuleId, { onDelete: 'cascade' }),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
+    memberId: integer('member_id').notNull().references(() => leagueMemberSchema.memberId, { onDelete: 'cascade' }),
+    referenceType: reference('reference_type').notNull(),
+    referenceId: integer('reference_id').notNull(),
+    bet: integer('bet')
   },
+  (table) => [
+    index().on(table.episodeId),
+    index().on(table.memberId),
+    index().on(table.customEventRuleId),
+    unique().on(table.customEventRuleId, table.episodeId, table.memberId)
+  ]
 );
-//*/
+

@@ -1,0 +1,30 @@
+'use server';
+
+import { requireLeagueMemberAuth } from '~/lib/auth';
+import saveChatMessageLogic from '~/services/leagues/mutation/saveChatMessage';
+
+/**
+  * Save a chat message to the database
+  * @param hash Hash of the league to save the message for
+  * @param message The message object with serial, text, and timestamp
+  * @throws an error if the message cannot be saved
+  * @returns Success status of the save
+  * @returnObj `{ success }`
+  */
+export default async function saveChatMessage(
+  hash: string,
+  message: { serial: string, text: string, timestamp: string }
+) {
+  try {
+    return await requireLeagueMemberAuth(saveChatMessageLogic)(hash, message);
+  } catch (e) {
+    let message: string;
+    if (e instanceof Error) message = e.message;
+    else message = String(e);
+
+    if (message.includes('User not') || message.includes('Not a league member')) throw e;
+
+    console.error('Failed to save chat message', e);
+    throw new Error('An error occurred while saving the chat message. Please try again.');
+  }
+}

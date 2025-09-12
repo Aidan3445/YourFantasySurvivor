@@ -1,29 +1,27 @@
 import 'server-only';
 
-import { createTable } from './createTable';
-import { boolean, index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
-import { leaguesSchema } from './leagues';
-import { LeagueEventTypeOptions, LeaguePredictionTimingOptions } from '~/server/db/defs/events';
+import { createTable } from '~/server/db/schema/createTable';
+import { index, integer, pgEnum, primaryKey, serial, unique, varchar } from 'drizzle-orm/pg-core';
+import { leagueSchema } from '~/server/db/schema/leagues';
 import { sql } from 'drizzle-orm';
-import { leagueEventReference } from './baseEvents';
-import { episodesSchema } from './episodes';
-import { leagueMembersSchema } from './leagueMembers';
+import { episodeSchema } from '~/server/db/schema/episodes';
+import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
+import { notes, reference, timing } from '~/server/db/schema/shared';
+import { EventTypes } from '~/lib/events';
 
-export const leagueEventType = pgEnum('event_league_type', LeagueEventTypeOptions);
-export const leagueEventTiming = pgEnum('event_league_timing', LeaguePredictionTimingOptions);
+export const leagueEventType = pgEnum('event_type', EventTypes);
 
 export const leagueEventsRulesSchema = createTable(
   'event_league_rule',
   {
     leagueEventRuleId: serial('league_event_rule_id').notNull().primaryKey(),
-    leagueId: integer('league_id').notNull().references(() => leaguesSchema.leagueId, { onDelete: 'cascade' }),
+    leagueId: integer('league_id').notNull().references(() => leagueSchema.leagueId, { onDelete: 'cascade' }),
     eventName: varchar('event_name', { length: 32 }).notNull(),
     description: varchar('event_desc', { length: 256 }).notNull(),
     points: integer('event_points').notNull(),
     eventType: leagueEventType('event_type').notNull(),
-    referenceTypes: leagueEventReference('reference_types').array().notNull().default(sql`ARRAY['Castaway', 'Tribe']::event_league_reference[]`),
-    timing: leagueEventTiming('event_timing').array().notNull().default(sql`ARRAY[]::event_league_timing[]`),
-    public: boolean('public').notNull(),
+    referenceTypes: reference('reference_types').array().notNull().default(sql`ARRAY[]::event_reference[]`),
+    timing: timing('event_timing').array().notNull().default(sql`ARRAY[]::event_timing[]`),
   },
   (table) => [
     unique().on(table.leagueId, table.eventName),
@@ -35,9 +33,9 @@ export const leagueEventPredictionsSchema = createTable(
   'event_league_prediction',
   {
     leagueEventRuleId: integer('league_event_rule_id').notNull().references(() => leagueEventsRulesSchema.leagueEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }),
-    memberId: integer('member_id').notNull().references(() => leagueMembersSchema.memberId, { onDelete: 'cascade' }),
-    referenceType: leagueEventReference('reference_type').notNull(),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
+    memberId: integer('member_id').notNull().references(() => leagueMemberSchema.memberId, { onDelete: 'cascade' }),
+    referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
   },
   (table) => [
@@ -53,28 +51,13 @@ export const leagueEventsSchema = createTable(
   {
     leagueEventId: serial('league_event_id').notNull().primaryKey(),
     leagueEventRuleId: integer('league_event_rule_id').notNull().references(() => leagueEventsRulesSchema.leagueEventRuleId, { onDelete: 'cascade' }),
-    episodeId: integer('episode_id').notNull().references(() => episodesSchema.episodeId, { onDelete: 'cascade' }),
-    referenceType: leagueEventReference('reference_type').notNull(),
+    episodeId: integer('episode_id').notNull().references(() => episodeSchema.episodeId, { onDelete: 'cascade' }),
+    referenceType: reference('reference_type').notNull(),
     referenceId: integer('reference_id').notNull(),
-    notes: varchar('notes', { length: 256 }).array(),
+    notes: notes('notes'),
   },
   (table) => [
     index().on(table.leagueEventRuleId),
     index().on(table.episodeId),
-  ]
-);
-
-export const leagueEventReferenceSchema = createTable(
-  'event_league_reference',
-  {
-    leagueEventReferenceId: serial('league_event_reference_id').notNull().primaryKey(),
-    leagueEventId: integer('league_event_id').notNull().references(() => leagueEventsSchema.leagueEventId, { onDelete: 'cascade' }),
-    referenceType: leagueEventReference('reference_type').notNull(),
-    referenceId: integer('reference_id').notNull(),
-  },
-  (table) => [
-    index().on(table.leagueEventId),
-    index().on(table.referenceId),
-    unique().on(table.leagueEventId, table.referenceType, table.referenceId),
   ]
 );

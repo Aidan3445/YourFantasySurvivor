@@ -1,0 +1,50 @@
+import 'server-only';
+
+import { db } from '~/server/db';
+import { and, eq } from 'drizzle-orm';
+import { leagueSchema } from '~/server/db/schema/leagues';
+import { type VerifiedLeagueMemberAuth } from '~/types/api';
+import { customEventRuleSchema } from '~/server/db/schema/customEvents';
+
+/**
+  * Delete a league event rule
+  * @param auth The authenticated league member
+  * @param ruleId The ID of the rule to delete
+  * @throws an error if the user is not authorized
+  * @throws an error if the rule cannot be deleted
+  * @returns Success status of the deletion
+  * @returnObj `{ success }`
+  */
+export default async function deleteCustomEventRuleLogic(
+  auth: VerifiedLeagueMemberAuth,
+  ruleId: number,
+) {
+  if (auth.status === 'Inactive') throw new Error('League is inactive');
+  // Transaction to delete the rule
+  return await db.transaction(async (trx) => {
+    // Get league information
+    const league = await trx
+      .select({
+        leagueId: leagueSchema.leagueId,
+        leagueStatus: leagueSchema.status,
+      })
+      .from(leagueSchema)
+      .where(eq(leagueSchema.leagueId, auth.leagueId))
+      .then((res) => res[0]);
+    if (!league) throw new Error('League not found');
+
+    if (league.leagueStatus === 'Inactive')
+      throw new Error('League rules cannot be deleted while the league is inactive');
+
+    const deleted = await trx
+      .delete(customEventRuleSchema)
+      .where(and(
+        eq(customEventRuleSchema.leagueId, league.leagueId),
+        eq(customEventRuleSchema.customEventRuleId, ruleId)))
+      .returning({ id: customEventRuleSchema.customEventRuleId })
+      .then(res => res[0]);
+    if (!deleted) throw new Error('Rule not found');
+
+    return { success: true };
+  });
+}
