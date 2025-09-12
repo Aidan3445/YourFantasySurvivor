@@ -102,6 +102,8 @@ export default function PredictionCards({
   }, []);
 
   useEffect(() => {
+    if (!setBetTotal) return;
+
     const totalBet = Object.values(formBetValues).reduce((sum, val) => sum + val, 0);
     setBetTotal(totalBet);
   }, [formBetValues, setBetTotal]);

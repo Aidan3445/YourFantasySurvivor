@@ -16,7 +16,7 @@ export default async function getChatHistory(hash: number) {
   const messageData = await db
     .select()
     .from(leagueChatSchema)
-    .where(eq(leagueChatSchema.hash, hash));
+    .where(eq(leagueChatSchema.leagueId, hash));
 
   const messages: Message[] = messageData.map((message) => ({
     ...message,

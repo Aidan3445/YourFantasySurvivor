@@ -76,7 +76,7 @@ export default function Import() {
     <span className='w-full space-y-4'>
       <Form {...reactForm}>
         <form
-          className='flex gap-4 bg-card p-8 rounded-full justify-center'
+          className='flex gap-4 bg-card p-8 rounded-full justify-center items-end'
           action={() => handleSubmit()}>
           <Button type='button' onClick={handleClick}>Fetch Data</Button>
           <FormField
@@ -98,10 +98,7 @@ export default function Import() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <DateTimePicker
-                    date={field.value as Date}
-                    setDate={field.onChange}
-                    side='bottom' />
+                  <DateTimePicker value={field.value as Date} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
