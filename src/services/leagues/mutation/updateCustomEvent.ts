@@ -52,7 +52,10 @@ export default async function updateCustomEventLogic(
     // update the base event
     const update = await trx
       .update(customEventSchema)
-      .set(customEvent)
+      .set({
+        ...customEvent,
+        notes: customEvent.notes?.map(note => note.trim()).filter(note => note.length > 0),
+      })
       .where(eq(customEventSchema.customEventId, customEventId))
       .returning({ customEventId: customEventSchema.customEventId })
       .then(res => res[0]);

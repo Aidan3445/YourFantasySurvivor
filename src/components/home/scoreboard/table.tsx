@@ -23,8 +23,10 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
     const { Castaway: castawayScores } = compileScores(
       data.baseEvents,
       data.eliminations,
-      data.tribesTimeline
+      data.tribesTimeline,
+      data.keyEpisodes,
     ).scores;
+
 
     const sortedCastaways = Object.entries(castawayScores)
       .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0))

@@ -9,7 +9,7 @@ import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsC
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
-import { MoveRight } from 'lucide-react';
+import { Flame, MoveRight } from 'lucide-react';
 import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 
 interface PredictionRowProps {
@@ -71,12 +71,17 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
           prediction.hits.length === 1 && 'justify-center')}>
           {prediction.hits.length > 0 ?
             prediction.hits.map((hit, index) =>
-              <ColorRow
-                key={index}
-                className='leading-tight px-1 w-min'
-                color={hit.member.color}>
-                {hit.member.displayName}
-              </ColorRow>
+              <span key={index} className='flex gap-1 items-center'>
+                <ColorRow
+                  className='leading-tight px-1 w-min'
+                  color={hit.member.color}>
+                  {hit.member.displayName}
+                </ColorRow>
+                {hit.bet && <p className='text-xs text-green-600'>
+                  +{hit.bet}
+                  <Flame className='inline align-top w-3.5 h-min stroke-green-600' />
+                </p>}
+              </span>
             ) : (
               <ColorRow className='invisible leading-tight px-1 w-min'>
                 None
@@ -110,6 +115,10 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                             </ColorRow>
                           </>
                         }
+                        {miss.bet && <p className='text-xs text-red-600'>
+                          -{miss.bet}
+                          <Flame className='inline align-top w-3.5 h-min stroke-red-600' />
+                        </p>}
                       </span>
                     ))}
                   </div>

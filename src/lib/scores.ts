@@ -1,15 +1,17 @@
 import { defaultBaseRules, defaultBasePredictionRules, defaultShauhinModeSettings } from '~/lib/leagues';
 import { findTribeCastaways } from '~/lib/utils';
-import { type Predictions, type Eliminations, type Events, type CustomEvents, type ReferenceType, type Scores, type ScoringBaseEventName, type Prediction, type Streaks } from '~/types/events';
+import { type Predictions, type Eliminations, type Events, type CustomEvents, type ReferenceType, type Scores, type ScoringBaseEventName, type Streaks } from '~/types/events';
 import { type SelectionTimelines, type LeagueRules } from '~/types/leagues';
 import { type TribesTimeline } from '~/types/tribes';
 import { ScoringBaseEventNames } from '~/lib/events';
+import { type KeyEpisodes } from '~/types/episodes';
 
 /**
   * Compile the scores for a league 
   * @param baseEvents The base events for the season
-  * @param tribesTimeline The tribe updates for the season
   * @param eliminations The eliminations for the season
+  * @param tribesTimeline The tribe updates for the season
+  * @param keyEpisodes The key episodes for the season
   * @param customEvents The league events
   * @param baseEventRules The league's base event scoring
   * @param selectionTimelines The selection timelines for the league
@@ -21,6 +23,7 @@ export function compileScores(
   baseEvents: Events,
   eliminations: Eliminations,
   tribesTimeline: TribesTimeline,
+  keyEpisodes: KeyEpisodes,
 
   selectionTimelines: SelectionTimelines = { castawayMembers: {}, memberCastaways: {} },
   customEvents: CustomEvents = { events: [], predictions: [] },
@@ -51,8 +54,6 @@ export function compileScores(
         return acc;
       }, { eventTribes: new Set<number>(), eventCastaways: new Set<number>() });
 
-      const shauhinModeActive = shauhinModeRules.enabled && shauhinModeRules.enabledBets.includes(baseEvent);
-
       eventTribes.forEach((tribe) => {
         // add castaways to be scored
         findTribeCastaways(tribesTimeline, eliminations, tribe, episodeNum).forEach((castaway) => {
@@ -67,27 +68,6 @@ export function compileScores(
         // add points to tribe score
         const points = baseEventRules[baseEvent];
         scores.Tribe[tribe][episodeNum] += points;
-        // check predictions
-        Object.entries(basePredictions[episodeNum] ?? {})
-          .reduce((acc, [eventName, preds]) => {
-            if (eventName === event.eventName) acc.push(...preds);
-            return acc;
-          }, [] as Prediction[])
-          .forEach((prediction) => {
-            // initialize member score if it doesn't exist
-            scores.Member[prediction.predictionMakerId] ??= [];
-            scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
-
-            if (prediction.referenceType === 'Tribe' && prediction.referenceId === tribe) {
-              // add points to member score
-              scores.Member[prediction.predictionMakerId]![episodeNum]!
-                += basePredictionRules[baseEvent].points
-                + (shauhinModeActive && prediction.bet ? prediction.bet : 0);
-            } else if (shauhinModeActive && prediction.bet) {
-              // subtract bet for incorrect tribe prediction
-              scores.Member[prediction.predictionMakerId]![episodeNum]! -= prediction.bet;
-            }
-          });
       });
 
       if (!ScoringBaseEventNames.includes(event.eventName as ScoringBaseEventName)) return;
@@ -107,31 +87,64 @@ export function compileScores(
         scores.Member[leagueMember] ??= [];
         scores.Member[leagueMember][episodeNum] ??= 0;
         scores.Member[leagueMember][episodeNum] += points;
-        // check predictions
-        Object.entries(basePredictions[episodeNum] ?? {})
-          .reduce((acc, [eventName, preds]) => {
-            if (eventName === event.eventName) acc.push(...preds);
-            return acc;
-          }, [] as Prediction[])
-          .forEach((prediction) => {
-            // initialize member score if it doesn't exist
-            scores.Member[prediction.predictionMakerId] ??= [];
-            scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
-
-            if (prediction.referenceType === 'Castaway' && prediction.referenceId === castaway) {
-              // add points to member score
-              scores.Member[prediction.predictionMakerId]![episodeNum]!
-                += basePredictionRules[baseEvent].points
-                + (prediction.bet ?? 0);
-            } else {
-              // subtract bet for incorrect tribe prediction
-              scores.Member[prediction.predictionMakerId]![episodeNum]! -= prediction.bet ?? 0;
-            }
-          });
-
+        if (leagueMember === 311) {
+          console.log('Scored member for castaway event:', event.eventName, { episodeNum, castaway, leagueMember, points });
+          console.log('new total:', String(scores.Member[leagueMember][episodeNum]));
+        }
       });
     });
+
+    console.log('Scores after episode', episodeNum, JSON.parse(JSON.stringify(scores)));
   });
+
+
+  // score base predictions
+  Object.entries(basePredictions ?? {})
+    .forEach(([episodeNumber, predictionsMap]) => {
+      const episodeNum = parseInt(episodeNumber, 10);
+      const shauhinModeActive =
+        shauhinModeRules.enabled &&
+        shauhinModeRules.enabledBets.length > 0 && (
+          (shauhinModeRules.startWeek === 'Custom' && episodeNum >= (shauhinModeRules.customStartWeek ?? Infinity))
+          || (shauhinModeRules.startWeek === 'After Premiere' && episodeNum > 1)
+          || (shauhinModeRules.startWeek === 'After Merge' && episodeNum > (keyEpisodes.mergeEpisode?.episodeNumber ?? Infinity))
+          || (shauhinModeRules.startWeek === 'Before Finale' && !!keyEpisodes.nextEpisode?.isFinale && episodeNum < keyEpisodes.nextEpisode.episodeNumber)
+        );
+
+      Object.values(predictionsMap).flat().forEach((prediction) => {
+        const rule = basePredictionRules[prediction.eventName as ScoringBaseEventName];
+        const points = rule?.points;
+        if (!points || !rule?.enabled) return;
+        if (prediction.hit) {
+          // prediction events just earn points for the member who made the prediction
+          scores.Member[prediction.predictionMakerId] ??= [];
+          scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
+          scores.Member[prediction.predictionMakerId]![episodeNum]! += points;
+          if (prediction.predictionMakerId === 311) {
+            console.log('Scored member for base prediction:', prediction.eventName, { episodeNum, leagueMember: prediction.predictionMakerId, points });
+            console.log('new total:', String(scores.Member[prediction.predictionMakerId]![episodeNum]));
+          }
+          if (shauhinModeActive && prediction.bet) {
+            scores.Member[prediction.predictionMakerId] ??= [];
+            scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
+            scores.Member[prediction.predictionMakerId]![episodeNum]! += prediction.bet;
+            if (prediction.predictionMakerId === 311) {
+              console.log('Scored member for shauhin mode bet:', prediction.eventName, { episodeNum, leagueMember: prediction.predictionMakerId, points: prediction.bet });
+              console.log('new total:', String(scores.Member[prediction.predictionMakerId]![episodeNum]));
+            }
+          }
+        } else if (shauhinModeActive && prediction.bet) {
+          // if the prediction was wrong but shauhin mode is active, subtract the bet
+          scores.Member[prediction.predictionMakerId] ??= [];
+          scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
+          scores.Member[prediction.predictionMakerId]![episodeNum]! -= prediction.bet;
+          if (prediction.predictionMakerId === 311) {
+            console.log('Subtracted member for shauhin mode missed bet:', prediction.eventName, { episodeNum, leagueMember: prediction.predictionMakerId, points: -prediction.bet });
+            console.log('new total:', String(scores.Member[prediction.predictionMakerId]![episodeNum]));
+          }
+        }
+      });
+    });
 
   /* score league events */
   // direct events
@@ -149,11 +162,11 @@ export function compileScores(
         // score castaways if this is a tribe event
         if (reference.type === 'Tribe') {
           findTribeCastaways(tribesTimeline, eliminations, reference.id, episodeNum).forEach((castaway) => {
-            scores.Tribe[castaway] ??= [];
-            scores.Tribe[castaway][episodeNum] ??= 0;
-            scores.Tribe[castaway][episodeNum] += points;
+            scores.Castaway[castaway] ??= [];
+            scores.Castaway[castaway][episodeNum] ??= 0;
+            scores.Castaway[castaway][episodeNum] += points;
             // score the member who has this castaway selected at this episode
-            const cmIndex = Math.min(episodeNum - 1,
+            const cmIndex = Math.min(episodeNum,
               (selectionTimelines.castawayMembers[castaway]?.length ?? 0) - 1);
             const leagueMember = selectionTimelines.castawayMembers[castaway]?.[cmIndex];
             // if the castaway was not selected at this episode, don't score the member
@@ -247,5 +260,10 @@ export function compileScores(
     }
   }
 
+  console.log('Compiled scores:', { scores, currentStreaks }, '\n\n\n\n\n\n');
+
   return { scores, currentStreaks };
 }
+
+
+

@@ -23,7 +23,7 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
         episodeId: baseEvent.episodeId,
         eventName: baseEvent.eventName,
         label: baseEvent.label,
-        notes: baseEvent.notes,
+        notes: baseEvent.notes?.map(note => note.trim()).filter(note => note.length > 0),
       })
       .returning({ baseEventId: baseEventSchema.baseEventId })
       .then((result) => result[0]?.baseEventId);

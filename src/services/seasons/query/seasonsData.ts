@@ -10,6 +10,7 @@ import getTribesTimeline from '~/services/seasons/query/tribesTimeline';
 import getEpisodes from '~/services/seasons/query/episodes';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import { type EnrichedCastaway } from '~/types/castaways';
+import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
 
 /**
   * Get the season data for either all or active seasons
@@ -22,13 +23,14 @@ export default async function getSeasonsData(includeInactive: boolean) {
   if (seasons.length === 0) return [];
 
   return Promise.all(seasons.map(async (season) => {
-    const [castaways, tribes, baseEvents, episodes, tribesTimeline, eliminations] = await Promise.all([
+    const [castaways, tribes, baseEvents, episodes, tribesTimeline, eliminations, keyEpisodes] = await Promise.all([
       getCastaways(season.seasonId),
       getTribes(season.seasonId),
       getBaseEvents(season.seasonId),
       getEpisodes(season.seasonId),
       getTribesTimeline(season.seasonId),
       getEliminations(season.seasonId),
+      getKeyEpisodes(season.seasonId)
     ]);
 
     const enrichedCastaways: EnrichedCastaway[] = castaways.map(castaway => {
@@ -60,6 +62,7 @@ export default async function getSeasonsData(includeInactive: boolean) {
       episodes,
       tribesTimeline,
       eliminations,
+      keyEpisodes
     } as SeasonsDataQuery;
   }));
 }

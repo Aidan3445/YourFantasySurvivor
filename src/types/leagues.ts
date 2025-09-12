@@ -160,9 +160,9 @@ export type ShauhinModeSettings = {
 };
 export const ShauhinModeSettingsZod = z.object({
   enabled: z.boolean(),
-  maxBet: EventPointsZod.refine(val => val > 0, { message: 'Max bet must be greater than 0' }),
+  maxBet: EventPointsZod.refine(val => val >= 0, { message: 'Max bet must be positive or 0 for unlimited.' }),
   maxBetsPerWeek: z.coerce.number().int()
-    .min(1, { message: 'Max bets per week must be at least 1' })
+    .min(0, { message: 'Max bets per week must be at least 1 or 0 for unlimited.' })
     .max(SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, { message: `Max bets per week cannot exceed ${SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK}` }),
   startWeek: z.enum(ShauhinModeTimings),
   customStartWeek: z.coerce.number().int().min(3).nullable(),

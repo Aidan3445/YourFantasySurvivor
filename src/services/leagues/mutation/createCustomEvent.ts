@@ -37,7 +37,10 @@ export default async function createCustomEventLogic(
     // insert the league event
     const newEventId = await trx
       .insert(customEventSchema)
-      .values(customEvent)
+      .values({
+        ...customEvent,
+        notes: customEvent.notes?.map(note => note.trim()).filter(note => note.length > 0),
+      })
       .returning({ customEventId: customEventSchema.customEventId })
       .then((result) => result[0]?.customEventId);
     if (!newEventId) throw new Error('Failed to create league event');

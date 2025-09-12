@@ -41,6 +41,7 @@ export function useLeagueData(overrideHash?: string) {
       seasonData.baseEvents,
       seasonData.eliminations,
       seasonData.tribesTimeline,
+      seasonData.keyEpisodes,
       selectionTimeline,
       customEvents,
       basePredictions,

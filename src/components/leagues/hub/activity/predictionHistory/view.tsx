@@ -23,23 +23,25 @@ export default function PredictionHistory() {
       // note we have two different episode numbers available to us here:
       // * prediction.eventNumber is the episode when the prediction was made
       // * event.episodeNumber is the episode when the event occurs (if there is one)
+      // for weekly events these are the same, but for sole survivor they may differ
       Object.entries(basePredictionsMade).forEach(([episodeNumber, predictionMap]) => {
         const predsWithEvents = predictionMap.map(pred => {
           const rule = rules?.basePrediction?.[pred.eventName as ScoringBaseEventName];
           return {
             ...pred,
             points: rule?.points ?? 0,
-            event: Object.entries(baseEvents)
-              .find(([_, events]) => Object.values(events)
-                .find(e => e.eventName === pred.eventName))?.[1]?.[1],
+            event: Object.values(baseEvents[Number(episodeNumber)] ?? {})
+              .find((event) => event.eventName === pred.eventName),
             timing: rule?.timing ?? []
 
           };
         });
+        if (predsWithEvents.length === 0) return;
         predictions[Number(episodeNumber)] ??= [];
         predictions[Number(episodeNumber)]!.push(...predsWithEvents);
       });
     }
+
 
     if (!customEvents?.events) return predictions;
 
@@ -55,6 +57,7 @@ export default function PredictionHistory() {
           timing: rule?.timing ?? []
         };
       });
+      if (predsWithEvents.length === 0) return;
       predictions[Number(episodeNumber)] ??= [];
       predictions[Number(episodeNumber)]!.push(...predsWithEvents);
     });
@@ -64,6 +67,7 @@ export default function PredictionHistory() {
 
   const stats = Object.values(predictionsWithEvents).reduce((acc, pred) => {
     pred.forEach(p => {
+      acc.count.episodes.add(p.episodeNumber);
       if (p.pending) return acc;
       if (p.hit) {
         acc.count.correct++;
@@ -79,6 +83,7 @@ export default function PredictionHistory() {
     count: {
       correct: 0,
       total: 0,
+      episodes: new Set<number>(),
     },
     points: {
       earned: 0,
@@ -90,19 +95,19 @@ export default function PredictionHistory() {
 
   if (stats.count.total === 0) return null;
 
-  if (stats.count.total === 1) {
+  if (stats.count.episodes.size === 1) {
     const prediction = Object.entries(predictionsWithEvents)[0];
     if (!prediction) return null;
 
     const [episode, preds] = prediction;
     return (
-      <div className='text-center bg-card rounded-lg'>
+      <div className='text-center bg-card rounded-lg w-full place-items-center'>
         <h1 className='text-3xl'>Prediction History</h1>
         <span className='flex justify-center items-center gap-2 text-sm'>
           <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
           <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
         </span>
-        <article className='flex flex-col bg-card rounded-lg my-4 text-center overflow-hidden'>
+        <article className='flex flex-col my-4 text-center overflow-hidden drop-shadow-md bg-secondary rounded-md overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip w-[90%] lg:w-1/2'>
           <h2 className='text-2xl'>{`Episode ${episode}`}</h2>
           <PredctionTable predictions={preds} />
         </article>
@@ -119,7 +124,10 @@ export default function PredictionHistory() {
       </span>
       <CoverCarousel items={Object.entries(predictionsWithEvents).toReversed().map(([episode, preds]) => ({
         header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
-        content: (<PredctionTable predictions={preds} />),
+        content: (<PredctionTable predictions={(() => {
+          console.log('episode', episode, preds);
+          return preds;
+        })()} />)
       }))} />
     </div>
   );

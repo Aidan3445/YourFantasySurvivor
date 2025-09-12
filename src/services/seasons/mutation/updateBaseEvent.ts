@@ -25,7 +25,7 @@ export default async function updateBaseEventLogic(baseEventId: number, baseEven
         episodeId: baseEvent.episodeId,
         eventName: baseEvent.eventName,
         label: baseEvent.label,
-        notes: baseEvent.notes,
+        notes: baseEvent.notes?.map(note => note.trim()).filter(note => note.length > 0),
       })
       .where(eq(baseEventSchema.baseEventId, baseEventId))
       .returning({ eventName: baseEventSchema.eventName });

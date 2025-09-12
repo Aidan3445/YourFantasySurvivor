@@ -4,7 +4,7 @@ import { useTribes } from '~/hooks/seasons/useTribes';
 import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
-import { defaultBaseRules } from '~/lib/leagues';
+import { defaultBasePredictionRules } from '~/lib/leagues';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type EnrichedPrediction, type EnrichedEvent, type Prediction, type ScoringBaseEventName } from '~/types/events';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
@@ -47,10 +47,10 @@ export function useEnrichPredictions(
         }
         let points: number | null = null;
         if (event.eventSource === 'Base') {
-          const baseRules = rules?.base ?? defaultBaseRules;
-          points = baseRules[event.eventName as ScoringBaseEventName] ?? null;
+          const basePredictionRules = rules.basePrediction ?? defaultBasePredictionRules;
+          points = basePredictionRules[prediction.eventName as ScoringBaseEventName]?.points ?? null;
         } else {
-          points = rules?.custom?.find(r => r.eventName === event.eventName)?.points ?? null;
+          points = rules.custom?.find(r => r.eventName === event.eventName)?.points ?? null;
         }
 
         if (points === null) {
