@@ -49,6 +49,7 @@ export default async function updateBaseEventLogic(baseEventId: number, baseEven
       // Invalidate cache
       revalidateTag('tribe-members');
     }
+    revalidateTag('base-events');
 
     return { success: true };
   });

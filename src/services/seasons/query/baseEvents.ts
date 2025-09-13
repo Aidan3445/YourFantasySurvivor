@@ -7,6 +7,7 @@ import { castawaySchema } from '~/server/db/schema/castaways';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { tribeSchema } from '~/server/db/schema/tribes';
 import type { Events } from '~/types/events';
+import { unstable_cache } from 'next/cache';
 
 /**
   * Get the base events for a season
@@ -15,6 +16,17 @@ import type { Events } from '~/types/events';
   * @returnObj `Events`
   */
 export default async function getBaseEvents(seasonId: number) {
+  return unstable_cache(
+    async (seasonId: number) => fetchBaseEvents(seasonId),
+    ['base-events', seasonId.toString()],
+    {
+      revalidate: false,
+      tags: [`base-events-${seasonId}`, 'base-events']
+    }
+  )(seasonId);
+}
+
+async function fetchBaseEvents(seasonId: number) {
   return db
     .select({
       episodeNumber: episodeSchema.episodeNumber,

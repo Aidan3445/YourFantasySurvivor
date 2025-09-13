@@ -122,6 +122,7 @@ export async function createCastawayLogic(
 
     // Invalidate caches
     revalidateTag(`castaways-${seasonId}`);
+    revalidateTag('seasons');
 
     return { newCastawayId };
   });

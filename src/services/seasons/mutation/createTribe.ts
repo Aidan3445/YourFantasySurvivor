@@ -49,6 +49,7 @@ export async function createTribeLogic(
 
     // Invalidate caches
     revalidateTag(`tribes-${season.seasonId}`);
+    revalidateTag('seasons');
 
     return { newTribeId };
   });

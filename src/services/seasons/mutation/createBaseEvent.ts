@@ -44,7 +44,9 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
     if ([...EliminationEventNames, 'tribeUpdate'].includes(baseEvent.eventName)) {
       // Invalidate cache
       revalidateTag('tribe-members');
+      revalidateTag('eliminations');
     }
+    revalidateTag('base-events');
 
     return { newEventId };
   });

@@ -4,6 +4,7 @@ import { db } from '~/server/db';
 import { and, asc, gte, isNull, lte, or } from 'drizzle-orm';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type Season } from '~/types/seasons';
+import { unstable_cache } from 'next/cache';
 
 /**
   * Get the current seasons
@@ -11,6 +12,17 @@ import { type Season } from '~/types/seasons';
   * @returObj `Season[]`
   */
 export default async function getCurrentSeasons() {
+  return unstable_cache(
+    async () => fetchCurrentSeasons(),
+    ['current-seasons'],
+    {
+      revalidate: false,
+      tags: ['seasons', 'current-seasons']
+    }
+  )();
+}
+
+async function fetchCurrentSeasons() {
   const now = new Date().toISOString();
 
   return db

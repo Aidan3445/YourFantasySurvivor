@@ -7,6 +7,7 @@ import { castawaySchema } from '~/server/db/schema/castaways';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { tribeSchema } from '~/server/db/schema/tribes';
 import { type TribesTimeline } from '~/types/tribes';
+import { unstable_cache } from 'next/cache';
 
 /**
   * Get the members of each tribe for each episode in a season
@@ -15,6 +16,24 @@ import { type TribesTimeline } from '~/types/tribes';
   * @returnObj `TribesTimeline`
   */
 export default async function getTribesTimeline(seasonId: number) {
+  return unstable_cache(
+    async (seasonId: number) => fetchTribesTimeline(seasonId),
+    ['tribes-timeline', seasonId.toString()],
+    {
+      revalidate: false,
+      tags: [
+        `tribe-members-${seasonId}`,
+        'tribe-members',
+        `tribes-${seasonId}`,
+        'tribes',
+        `castaways-${seasonId}`,
+        'castaways',
+      ]
+    }
+  )(seasonId);
+}
+
+async function fetchTribesTimeline(seasonId: number) {
   const tribeReference = aliasedTable(baseEventReferenceSchema, 'tribeReference');
   const castawayReference = aliasedTable(baseEventReferenceSchema, 'castawayReference');
 

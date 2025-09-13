@@ -62,6 +62,8 @@ export async function createEpisodeLogic(
         .update(seasonSchema)
         .set({ premiereDate: episode.airDate.toUTCString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
+      // Invalidate seasons
+      revalidateTag('seasons');
     }
 
     if (episode.isFinale) {
@@ -70,6 +72,8 @@ export async function createEpisodeLogic(
         .update(seasonSchema)
         .set({ finaleDate: episode.airDate.toUTCString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
+      // Invalidate seasons
+      revalidateTag('seasons');
     }
 
     // Invalidate cache for the season's episodes

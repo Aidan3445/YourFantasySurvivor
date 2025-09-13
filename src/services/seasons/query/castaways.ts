@@ -15,9 +15,9 @@ import { unstable_cache } from 'next/cache';
 export default async function getCastaways(seasonId: number) {
   return unstable_cache(
     async (sid: number) => fetchCastaways(sid),
-    ['season-castaways'],
+    ['castaways', seasonId.toString()],
     {
-      revalidate: 3600,
+      revalidate: false,
       tags: [`castaways-${seasonId}`, 'castaways']
     }
   )(seasonId);

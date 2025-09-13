@@ -15,9 +15,9 @@ import { unstable_cache } from 'next/cache';
 export default async function getEpisodes(seasonId: number) {
   return unstable_cache(
     async (seasonId: number) => fetchEpisodes(seasonId),
-    ['season-episodes'],
+    ['episodes', seasonId.toString()],
     {
-      revalidate: 3600,
+      revalidate: false,
       tags: [`episodes-${seasonId}`, 'episodes']
     }
   )(seasonId);

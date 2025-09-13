@@ -4,6 +4,7 @@ import { db } from '~/server/db';
 import { asc } from 'drizzle-orm';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type Season } from '~/types/seasons';
+import { unstable_cache } from 'next/cache';
 
 /**
   * Get all seasons
@@ -11,6 +12,17 @@ import { type Season } from '~/types/seasons';
   * @returObj `Season[]`
   */
 export default async function getAllSeasons() {
+  return unstable_cache(
+    async () => fetchAllSeasons(),
+    ['all-seasons'],
+    {
+      revalidate: false,
+      tags: ['seasons', 'all-seasons']
+    }
+  )();
+}
+
+async function fetchAllSeasons() {
   return db
     .select()
     .from(seasonSchema)

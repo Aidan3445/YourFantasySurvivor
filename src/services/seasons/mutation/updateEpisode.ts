@@ -5,6 +5,7 @@ import { db } from '~/server/db';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { type EpisodeUpdate } from '~/types/episodes';
 import { revalidateTag } from 'next/cache';
+import { seasonSchema } from '~/server/db/schema/seasons';
 
 /**
   * Update an episode
@@ -31,6 +32,26 @@ export async function updateEpisodeLogic(
       .then((res) => res[0]);
 
     if (!update) throw new Error('Failed to update episode');
+
+    if (episode.episodeNumber === 1 && episode.airDate) {
+      // Update the premiere date of the season
+      await trx
+        .update(seasonSchema)
+        .set({ premiereDate: episode.airDate.toUTCString() })
+        .where(eq(seasonSchema.seasonId, update.seasonId));
+      // Invalidate seasons
+      revalidateTag('seasons');
+    }
+
+    if (episode.isFinale && episode.airDate) {
+      // Update the finale date of the season
+      await trx
+        .update(seasonSchema)
+        .set({ finaleDate: episode.airDate.toUTCString() })
+        .where(eq(seasonSchema.seasonId, update.seasonId));
+      // Invalidate seasons
+      revalidateTag('seasons');
+    }
 
     // Invalidate cache for the season's episodes
     revalidateTag(`episodes-${update.seasonId}`);

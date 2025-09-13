@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { unstable_cache } from 'next/cache';
 import getTribesTimeline from '~/services/seasons/query/tribesTimeline';
 import getEliminations from '~/services/seasons/query/eliminations';
 
@@ -11,26 +10,7 @@ import getEliminations from '~/services/seasons/query/eliminations';
   * @returns the castaways and tribes that are active for the selected episode
   * @returnsObj `Record<tribeId, castawayId[]>`
   */
-export default async function getTribeMembers(seasonId: number, episodeId: number) {
-  return unstable_cache(
-    async (sid: number, eid: number) => fetchTribeMembers(sid, eid),
-    ['season-episodes'],
-    {
-      revalidate: 3600,
-      tags: [
-        'tribe-members',
-        `episodes-${seasonId}`,
-        'episodes',
-        `castaways-${seasonId}`,
-        'castaways',
-        `tribes-${seasonId}`,
-        'tribes'
-      ]
-    }
-  )(seasonId, episodeId);
-}
-
-async function fetchTribeMembers(seasonId: number, episodeNumber: number) {
+export default async function getTribeMembers(seasonId: number, episodeNumber: number) {
   const tribesTimelineReq = getTribesTimeline(seasonId);
   const eliminationsReq = getEliminations(seasonId);
 

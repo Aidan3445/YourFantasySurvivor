@@ -25,6 +25,7 @@ export type EpisodeInsert = {
 
 export type EpisodeUpdate = {
   episodeId: number;
+  episodeNumber?: number;
   title?: string;
   airDate?: Date;
   runtime?: number;

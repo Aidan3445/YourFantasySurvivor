@@ -17,9 +17,9 @@ import { type Tribe } from '~/types/tribes';
 export default async function getTribes(seasonId: number) {
   return unstable_cache(
     async (sid: number) => fetchTribes(sid),
-    ['season-tribes'],
+    ['tribes', seasonId.toString()],
     {
-      revalidate: 3600,
+      revalidate: false,
       tags: [`tribes-${seasonId}`, 'tribes']
     }
   )(seasonId);
