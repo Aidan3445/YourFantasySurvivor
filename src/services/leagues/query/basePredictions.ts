@@ -39,9 +39,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
     referenceId: baseEventPredictionSchema.referenceId,
     referenceType: baseEventPredictionSchema.referenceType,
     bet: baseEventPredictionSchema.bet,
-    pending: sql<boolean>`
-      CASE WHEN ${baseEventSchema.baseEventId} IS NULL THEN true ELSE false END
-    `.as('pending'),
+    pending: baseEventSchema.baseEventId,
     hit: sql<boolean>`
       CASE WHEN ${baseEventReferenceSchema.referenceId} = ${baseEventPredictionSchema.referenceId}
       AND ${baseEventReferenceSchema.referenceType} = ${baseEventPredictionSchema.referenceType}
