@@ -25,8 +25,20 @@ export default async function getSeasonsData(includeInactive: boolean) {
   const seasons = includeInactive ? await getAllSeasons() : await getCurrentSeasons();
   if (seasons.length === 0) return [];
 
-  return Promise.all(seasons.map(async (season) =>
-    await getSeasonData(season.seasonId, season)));
+  return Promise.all(seasons.map(async (season) => {
+    const datedSeason = {
+      ...season,
+      premiereDate: typeof season.premiereDate === 'string'
+        ? new Date(`${season.premiereDate as string}`)
+        : season.premiereDate,
+      finaleDate: season.finaleDate
+        ? (typeof season.finaleDate === 'string'
+          ? new Date(`${season.finaleDate as string}`)
+          : season.finaleDate)
+        : null
+    } as Season;
+    return await getSeasonData(season.seasonId, datedSeason);
+  }));
 }
 
 /**
@@ -53,7 +65,11 @@ export async function getSeasonData(seasonId: number, season?: Season) {
       .select()
       .from(seasonSchema)
       .where(eq(seasonSchema.seasonId, seasonId))
-      .then(rows => rows[0] ?? null)
+      .then(rows => rows[0] ? {
+        ...rows[0],
+        premiereDate: new Date(`${rows[0].premiereDate} Z`),
+        finaleDate: rows[0].finaleDate ? new Date(`${rows[0].finaleDate} Z`) : null
+      } as Season : null)
   ]);
 
   const enrichedCastaways: EnrichedCastaway[] = castaways.map(castaway => {
