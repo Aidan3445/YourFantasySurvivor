@@ -36,11 +36,9 @@ export default function CreateCustomEvent() {
 
   const selectedReferences = reactForm.watch('references');
   const selectedRuleId = reactForm.watch('customEventRuleId');
-  const selectedEvent = useMemo(() => {
-    const rule = rules?.custom.find(rule => rule.customEventRuleId === Number(selectedRuleId));
-    if (rule) reactForm.setValue('label', rule.eventName);
-    return rule;
-  }, [reactForm, rules?.custom, selectedRuleId]);
+  const selectedEvent = useMemo(() =>
+    rules?.custom.find(rule => rule.customEventRuleId === Number(selectedRuleId)),
+    [rules?.custom, selectedRuleId]);
   const selectedEpisodeId = reactForm.watch('episodeId');
   const selectedEpisode = useMemo(() => episodes?.find(episode =>
     episode.episodeId === Number(selectedEpisodeId))?.episodeNumber,
@@ -179,7 +177,7 @@ export default function CreateCustomEvent() {
                   name='label'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>Label</FormLabel>
+                      <FormLabel className='ml-2'>Label (optional)</FormLabel>
                       <FormControl>
                         <Input
                           disabled={!selectedEvent}
@@ -200,12 +198,13 @@ export default function CreateCustomEvent() {
                       <FormLabel className='ml-2'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
-                          className='h-full rounded-xl items-start pt-1'
+                          className='h-full rounded-xl pt-1'
                           disabled={!selectedEvent}
                           options={combinedReferenceOptions}
                           onValueChange={(value) =>
                             reactForm.setValue('references', handleCombinedReferenceSelection(value))}
                           modalPopover
+                          maxCount={7}
                           clear={eventClearer}
                           placeholder={'Select References'} />
                       </FormControl>
@@ -230,7 +229,7 @@ export default function CreateCustomEvent() {
               </span>
               <br />
               <Button
-                disabled={!reactForm.formState.isValid}
+                disabled={CustomEventInsertZod.safeParse(reactForm.getValues()).success === false}
                 type='submit'>
                 Create
               </Button>
