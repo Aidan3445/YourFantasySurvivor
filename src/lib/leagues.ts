@@ -26,6 +26,7 @@ export const defaultBaseRules: BaseEventRules = {
   finalists: 5,
   fireWin: 5,
   soleSurvivor: 10,
+  elim: 0,
 };
 
 export const defaultNewCustomRule: CustomEventRuleInsert = {
@@ -97,7 +98,12 @@ export const defaultBasePredictionRules: BaseEventPredictionRules = {
     enabled: false,
     points: 10,
     timing: ['Draft', 'After Merge', 'Before Finale']
-  }
+  },
+  elim: {
+    enabled: false,
+    points: 5,
+    timing: ['Weekly']
+  },
 };
 export const defaultShauhinModeSettings: ShauhinModeSettings = {
   enabled: false,

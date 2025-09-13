@@ -18,10 +18,12 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
-                  field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                  field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                  field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
                   <Flame className={cn('inline align-top',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                    field.value === 0 && 'stroke-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>
@@ -36,7 +38,7 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
                     disabled={disabled}
                     {...field} />
                 </FormControl>}
-              <FormDescription className='max-w-72 text-wrap'>
+              <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.indivWin}
               </FormDescription>
             </span>
@@ -53,10 +55,12 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
-                  field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                  field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                  field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
                   <Flame className={cn('inline align-top',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                    field.value === 0 && 'stroke-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>
@@ -71,7 +75,7 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
                     disabled={disabled}
                     {...field} />
                 </FormControl>}
-              <FormDescription className='max-w-72 text-wrap'>
+              <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.indivReward}
               </FormDescription>
             </span>
@@ -88,10 +92,12 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
-                  field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                  field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                  field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
                   <Flame className={cn('inline align-top',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                    field.value === 0 && 'stroke-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>
@@ -106,7 +112,7 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
                     disabled={disabled}
                     {...field} />
                 </FormControl>}
-              <FormDescription className='max-w-72 text-wrap'>
+              <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.tribe1st}
               </FormDescription>
             </span>
@@ -123,10 +129,12 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
               {disabled &&
                 <h2 className={cn(
                   'text-lg font-bold text-card-foreground',
-                  field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                  field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                  field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
                   <Flame className={cn('inline align-top',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                    field.value === 0 && 'stroke-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>
@@ -141,7 +149,7 @@ export default function ChallengeScoreSettings({ disabled }: BaseEventSettingsPr
                     disabled={disabled}
                     {...field} />
                 </FormControl>}
-              <FormDescription className='max-w-72 text-wrap'>
+              <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.tribe2nd} <i className='text-xs text-muted-foreground'>
                   {BaseEventDescriptions.italics.tribe2nd}</i>
               </FormDescription>

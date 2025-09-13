@@ -4,16 +4,16 @@ export const EventSources = ['Base', 'Custom'] as const;
 export const EventTypes = ['Direct', 'Prediction'] as const;
 export const ReferenceTypes = ['Castaway', 'Tribe'] as const;
 
+export const EliminationEventNames = ['elim', 'noVoteExit'] as const;
 export const ScoringBaseEventNames = [
   'advFound', 'advPlay', 'badAdvPlay', 'advElim', 'spokeEpTitle', 'tribe1st',
-  'tribe2nd', 'indivWin', 'indivReward', 'finalists', 'fireWin', 'soleSurvivor'
+  'tribe2nd', 'indivWin', 'indivReward', 'finalists', 'fireWin', 'soleSurvivor',
+  'elim'
 ] as const;
-
-export const EliminationEventNames = ['elim', 'noVoteExit'] as const;
 
 export const BaseEventNames = [
   ...ScoringBaseEventNames,
-  ...EliminationEventNames,
+  'noVoteExit',
   'tribeUpdate', 'otherNotes'] as const;
 
 export const BaseEventFullName: Record<BaseEventName, string> = {
@@ -76,7 +76,7 @@ export const BaseEventLabels: Record<BaseEventName, readonly [string, ...string[
   fireWin: ['Won Fire Making'],
   soleSurvivor: ['Sole Survivor'],
   elim: ['Voted Out', 'Blindside', 'Rock Draw'],
-  noVoteExit: ['Lost Fire Making', 'Quit', 'Medevac', 'Removed'],
+  noVoteExit: ['Med Evacuation', 'Quit', 'Removed'],
   tribeUpdate: ['Starting Tribes', 'Merge Tribe', 'Tribe Swap', 'New Tribes'],
   otherNotes: ['Other Notes']
 } as const;
@@ -98,7 +98,8 @@ export const BaseEventDescriptions: {
     spokeEpTitle: 'Points if your castaway is quoted in the episode title',
     finalists: 'Points if your castaway makes it to the final tribal council',
     fireWin: 'Points if your castaway wins the fire-making challenge',
-    soleSurvivor: 'Points if your castaway wins the season'
+    soleSurvivor: 'Points if your castaway wins the season',
+    elim: 'Points if your castaway is eliminated at tribal council',
   },
   prediction: {
     indivWin: 'Predict which castaway will win an individual immunity challenge',
@@ -112,7 +113,8 @@ export const BaseEventDescriptions: {
     spokeEpTitle: 'Predict which castaway will be quoted in the episode title',
     finalists: 'Predict which castaway will make it to the final tribal council',
     fireWin: 'Predict which castaway will win the fire-making challenge',
-    soleSurvivor: 'Predict which castaway will win the season'
+    soleSurvivor: 'Predict which castaway will win the season',
+    elim: 'Predict which castaway will be voted out at tribal council',
   },
   italics: {
     tribe2nd: '(only applies for challenges with 3+ tribes/teams)',
@@ -134,4 +136,5 @@ export const BasePredictionReferenceTypes: Record<ScoringBaseEventName, Referenc
   finalists: ['Castaway'],
   fireWin: ['Castaway'],
   soleSurvivor: ['Castaway'],
+  elim: ['Castaway'],
 } as const;

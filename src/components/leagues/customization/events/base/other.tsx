@@ -7,7 +7,7 @@ import { BaseEventDescriptions, BaseEventFullName } from '~/lib/events';
 
 export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
   return (
-    <div className='grid grid-rows-subgrid row-span-5'>
+    <div className='grid grid-rows-subgrid row-span-6'>
       <FormLabel className='text-2xl'>Other</FormLabel>
       <div>
         <FormField
@@ -19,10 +19,12 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
-                    field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                    field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                    field.value === 0 && 'text-muted-foreground')}>
                     {field.value}
                     <Flame className={cn('inline align-top',
-                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                      field.value === 0 && 'stroke-muted-foreground'
                     )} />
                   </h2>}
               </FormLabel>
@@ -37,7 +39,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.spokeEpTitle}
                 </FormDescription>
               </span>
@@ -56,10 +58,12 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
-                    field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                    field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                    field.value === 0 && 'text-muted-foreground')}>
                     {field.value}
                     <Flame className={cn('inline align-top',
-                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                      field.value === 0 && 'stroke-muted-foreground'
                     )} />
                   </h2>}
               </FormLabel>
@@ -74,7 +78,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.finalists}
                 </FormDescription>
               </span>
@@ -93,10 +97,12 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
-                    field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                    field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                    field.value === 0 && 'text-muted-foreground')}>
                     {field.value}
                     <Flame className={cn('inline align-top',
-                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                      field.value === 0 && 'stroke-muted-foreground'
                     )} />
                   </h2>}
               </FormLabel>
@@ -111,7 +117,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.fireWin}
                 </FormDescription>
               </span>
@@ -130,10 +136,13 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {disabled &&
                   <h2 className={cn(
                     'text-lg font-bold text-card-foreground',
-                    field.value <= 0 ? 'text-destructive' : 'text-green-600')}>
+                    field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                    field.value === 0 && 'text-muted-foreground'
+                  )}>
                     {field.value}
                     <Flame className={cn('inline align-top',
-                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                      field.value === 0 && 'stroke-muted-foreground'
                     )} />
                   </h2>}
               </FormLabel>
@@ -148,11 +157,50 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.soleSurvivor}
                 </FormDescription>
               </span>
               <BasePredictionFormField eventName={'soleSurvivor'} disabled={disabled} />
+              <FormMessage />
+            </FormItem>
+          )} />
+      </div>
+      <div>
+        <FormField
+          name='baseEventRules.elim'
+          render={({ field }) => (
+            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
+              <FormLabel className='inline-flex gap-2 items-center'>
+                {BaseEventFullName.elim}
+                {disabled &&
+                  <h2 className={cn(
+                    'text-lg font-bold text-card-foreground',
+                    field.value <= 0 ? 'text-destructive' : 'text-green-600',
+                    field.value === 0 && 'text-muted-foreground')}>
+                    {field.value}
+                    <Flame className={cn('inline align-top',
+                      field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
+                      field.value === 0 && 'stroke-muted-foreground'
+                    )} />
+                  </h2>}
+              </FormLabel>
+              <span className='flex gap-4 items-top'>
+                {!disabled &&
+                  <FormControl>
+                    <Input
+                      className='w-24 text-black'
+                      type='number'
+                      step={1}
+                      placeholder='Points'
+                      disabled={disabled}
+                      {...field} />
+                  </FormControl>}
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
+                  {BaseEventDescriptions.main.elim}
+                </FormDescription>
+              </span>
+              <BasePredictionFormField eventName={'elim'} disabled={disabled} />
               <FormMessage />
             </FormItem>
           )} />

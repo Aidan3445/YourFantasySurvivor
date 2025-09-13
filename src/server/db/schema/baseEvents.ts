@@ -59,6 +59,7 @@ export const baseEventRulesSchema = createTable(
     finalists: integer('finalists').notNull(),
     fireWin: integer('fire_win').notNull(),
     soleSurvivor: integer('sole_survivor').notNull(),
+    elim: integer('elim').notNull().default(0)
   }
 );
 
@@ -114,7 +115,11 @@ export const baseEventPredictionRulesSchema = createTable(
 
     soleSurvivorPrediction: boolean('sole_survivor_prediction'),
     soleSurvivorPredictionPoints: integer('sole_survivor_prediction_points'),
-    soleSurvivorPredictionTiming: timing('sole_survivor_prediction_timing').array()
+    soleSurvivorPredictionTiming: timing('sole_survivor_prediction_timing').array(),
+
+    elimPrediction: boolean('elim_prediction'),
+    elimPredictionPoints: integer('elim_prediction_points'),
+    elimPredictionTiming: timing('elim_prediction_timing').array()
   }
 );
 
