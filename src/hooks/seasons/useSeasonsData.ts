@@ -16,7 +16,19 @@ export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
         throw new Error('Failed to fetch season data');
       }
       const { seasonsData } = await res.json() as { seasonsData: SeasonsDataQuery[] };
-      return seasonsData;
+      return seasonsData.map(seasonData => ({
+        ...seasonData,
+        // Convert date strings to Date objects
+        season: {
+          ...seasonData.season,
+          premiereDate: new Date(seasonData.season.premiereDate),
+          finaleDate: seasonData.season.finaleDate ? new Date(seasonData.season.finaleDate) : null,
+        },
+        episodes: seasonData.episodes.map(episode => ({
+          ...episode,
+          airDate: new Date(episode.airDate),
+        })),
+      }));
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours

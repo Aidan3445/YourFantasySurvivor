@@ -4,11 +4,11 @@ import { Input } from '~/components/common/input';
 import { cn } from '~/lib/utils';
 import { type BaseEventSettingsProps, BasePredictionFormField } from '~/components/leagues/customization/events/base/predictions';
 import { BaseEventDescriptions, BaseEventFullName } from '~/lib/events';
+import SettingsWrapper from '~/components/leagues/customization/events/base/settingsWrapper';
 
-export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps) {
+export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEventSettingsProps) {
   return (
-    <div className='grid grid-rows-subgrid row-span-6'>
-      <FormLabel className='text-2xl'>Other</FormLabel>
+    <SettingsWrapper label='Other'>
       <div>
         <FormField
           name='baseEventRules.spokeEpTitle'
@@ -32,7 +32,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black'
+                      className='w-24 text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -43,7 +43,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                   {BaseEventDescriptions.main.spokeEpTitle}
                 </FormDescription>
               </span>
-              <BasePredictionFormField eventName={'spokeEpTitle'} disabled={disabled} />
+              {!hidePredictions && <BasePredictionFormField eventName={'spokeEpTitle'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
           )} />
@@ -71,7 +71,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black'
+                      className='w-24 text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -82,7 +82,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                   {BaseEventDescriptions.main.finalists}
                 </FormDescription>
               </span>
-              <BasePredictionFormField eventName={'finalists'} disabled={disabled} />
+              {!hidePredictions && <BasePredictionFormField eventName={'finalists'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
           )} />
@@ -110,7 +110,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black'
+                      className='w-24 text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -121,7 +121,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                   {BaseEventDescriptions.main.fireWin}
                 </FormDescription>
               </span>
-              <BasePredictionFormField eventName={'fireWin'} disabled={disabled} />
+              {!hidePredictions && <BasePredictionFormField eventName={'fireWin'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
           )} />
@@ -150,7 +150,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black'
+                      className='w-24 text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -161,7 +161,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                   {BaseEventDescriptions.main.soleSurvivor}
                 </FormDescription>
               </span>
-              <BasePredictionFormField eventName={'soleSurvivor'} disabled={disabled} />
+              {!hidePredictions && <BasePredictionFormField eventName={'soleSurvivor'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
           )} />
@@ -189,7 +189,7 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black'
+                      className='w-24 text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -200,11 +200,11 @@ export default function OtherScoreSettings({ disabled }: BaseEventSettingsProps)
                   {BaseEventDescriptions.main.elim}
                 </FormDescription>
               </span>
-              <BasePredictionFormField eventName={'elim'} disabled={disabled} />
+              {!hidePredictions && <BasePredictionFormField eventName={'elim'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
           )} />
       </div>
-    </div>
+    </SettingsWrapper>
   );
 }

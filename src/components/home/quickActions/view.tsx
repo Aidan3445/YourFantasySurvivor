@@ -5,7 +5,7 @@ import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
 
 export function QuickActions() {
   return (
-    <Card className='h-full'>
+    <Card className='h-auto mb-0'>
       <CardHeader>
         <CardTitle className='flex justify-center items-center gap-2'>
           <Zap className='w-5 h-5 text-blue-500' />
@@ -14,7 +14,7 @@ export function QuickActions() {
       </CardHeader>
       <CardContent className='space-y-4'>
         <CreateLeagueForm />
-        <h3 className='text-center text-lg font-semibold text-muted-foreground -mt-4'>OR</h3>
+        <h3 className='text-center text-lg font-semibold text-muted-foreground'>OR</h3>
         <JoinLeagueDialog />
       </CardContent>
     </Card>

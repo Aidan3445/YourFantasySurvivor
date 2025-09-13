@@ -21,15 +21,15 @@ export default async function HomePage() {
 
       {/* Logged in users */}
       <SignedIn>
-        <div className='space-y-2 mb-8'>
-          {/* Welcome back section */}
-          <div className='text-center'>
-            <h1 className='text-4xl font-bold mb-2'>Welcome back!</h1>
+        <div>
+          <div className='text-center lg:hidden'>
+            <h1 className='text-4xl font-bold mb-2'>Welcome to YFS!</h1>
             <p className='text-muted-foreground text-lg'>
               Ready to dominate your fantasy leagues?
             </p>
           </div>
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 grid-rows-[1fr]'>
+          {/* Welcome back section */}
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-3 grid-rows-[1fr]'>
             <div className='lg:col-span-2'>
               <ActiveLeagues />
             </div>
@@ -37,6 +37,12 @@ export default async function HomePage() {
               <CastawayScoreboard />
             </div>
             <div className='lg:row-span-2 min-w-96'>
+              <div className='text-center hidden lg:block'>
+                <h1 className='text-4xl font-bold mb-2'>Welcome to YFS!</h1>
+                <p className='text-muted-foreground text-lg'>
+                  Ready to dominate your fantasy leagues?
+                </p>
+              </div>
               <QuickActions />
             </div>
           </div>

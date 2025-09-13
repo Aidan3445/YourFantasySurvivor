@@ -12,9 +12,10 @@ import { type KeyEpisodes } from '~/types/episodes';
   * @param eliminations The eliminations for the season
   * @param tribesTimeline The tribe updates for the season
   * @param keyEpisodes The key episodes for the season
-  * @param customEvents The league events
-  * @param baseEventRules The league's base event scoring
   * @param selectionTimelines The selection timelines for the league
+  * @param customEvents The league events
+  * @param basePredictions The base predictions for the season
+  * @param rules The league rules
   * @param survivalCap The survival cap for the league
   * @returns The scores for the league as running totals
   * @returnObj `Scores`

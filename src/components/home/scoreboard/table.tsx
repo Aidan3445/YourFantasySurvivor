@@ -6,25 +6,42 @@ import {
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import ScorboardBody from '~/components/home/scoreboard/body';
 import SelectSeason from '~/components/home/scoreboard/selectSeason';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import { compileScores } from '~/lib/scores';
 import { newtwentyColors } from '~/lib/colors';
+import { type BaseEventRules } from '~/types/leagues';
 
 export interface ScoreboardTableProps {
   scoreData: SeasonsDataQuery[];
   someHidden?: boolean;
+  overrideBaseRules?: BaseEventRules;
 }
 
-export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTableProps) {
-  const scoresBySeason = useMemo(() => scoreData.map((data) => {
+export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRules }: ScoreboardTableProps) {
+  const [selectedSeasonIndex, setSelectedSeasonIndex] = useState(0);
+
+  // Calculate scores only for the selected season
+  const selectedSeasonData = useMemo(() => {
+    const data = scoreData[selectedSeasonIndex];
+    if (!data) return null;
+
     const { Castaway: castawayScores } = compileScores(
       data.baseEvents,
       data.eliminations,
       data.tribesTimeline,
       data.keyEpisodes,
+      undefined,
+      undefined,
+      undefined,
+      overrideBaseRules ? {
+        base: overrideBaseRules,
+        basePrediction: null,
+        custom: [],
+        shauhinMode: null
+      } : null
     ).scores;
 
     const sortedCastaways = Object.entries(castawayScores)
@@ -40,33 +57,44 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
 
     const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
 
-    return { sortedCastaways, castawayColors, castawaySplitIndex, data };
-  }), [scoreData]);
+    return {
+      sortedCastaways,
+      castawayColors,
+      castawaySplitIndex,
+      data
+    };
+  }, [scoreData, selectedSeasonIndex, overrideBaseRules]);
 
-  const [selectedSeason, setSelectedSeason] = useState(scoresBySeason[0]);
-
+  // Calculate allZero based on selected season data
   const allZero = useMemo(() => {
-    return selectedSeason?.sortedCastaways.every(([_, scores]) => scores.every(score => score === 0));
-  }, [selectedSeason]);
+    return selectedSeasonData?.sortedCastaways.every(([_, scores]) => scores.every(score => score === 0)) ?? true;
+  }, [selectedSeasonData]);
 
-  if (!selectedSeason) return <div className='text-center py-6'>No seasons available.</div>;
-
-  const selectSeason = (seasonName: string) => {
-    const season = scoresBySeason.find(s => s.data.season.name === seasonName);
-    if (season) {
-      setSelectedSeason(season);
+  // Season selection handler
+  const selectSeason = useCallback((seasonName: string) => {
+    const index = scoreData.findIndex(s => s.season.name === seasonName);
+    if (index !== -1) {
+      setSelectedSeasonIndex(index);
     }
-  };
+  }, [scoreData]);
 
+  // Reset to first season if current selection is invalid
+  useEffect(() => {
+    if (selectedSeasonIndex >= scoreData.length && scoreData.length > 0) {
+      setSelectedSeasonIndex(0);
+    }
+  }, [scoreData, selectedSeasonIndex]);
 
+  if (!selectedSeasonData) {
+    return <div className='text-center py-6'>No seasons available.</div>;
+  }
 
   return (
     <ScrollArea className='bg-card rounded-xl gap-0'>
       <Table>
         <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
         <TableHeader>
-          <TableRow className={cn(
-            'px-4 bg-white hover:bg-white')}>
+          <TableRow className={cn('px-4 bg-white hover:bg-white')}>
             {!allZero ? [0, 1].map((a) => (
               <Fragment key={a}>
                 <TableHead className='text-center w-0'>Place</TableHead>
@@ -78,41 +106,42 @@ export default function ScoreboardTable({ scoreData, someHidden }: ScoreboardTab
                   Castaway
                   {a === 1 && (
                     <SelectSeason
-                      seasons={scoresBySeason.map(s => ({
-                        value: s.data.season.name,
-                        label: s.data.season.name,
+                      seasons={scoreData.map(s => ({
+                        value: s.season.name,
+                        label: s.season.name,
                       }))}
-                      value={selectedSeason.data.season.name}
+                      value={selectedSeasonData.data.season.name}
                       setValue={selectSeason}
-                      someHidden={someHidden} />
+                      someHidden={someHidden}
+                    />
                   )}
                 </TableHead>
               </Fragment>
             )) : (
               <TableHead className='text-center' colSpan={2}>
-                {selectedSeason?.data.season.name} Castaways
+                {selectedSeasonData.data.season.name} Castaways
                 <SelectSeason
-                  seasons={scoresBySeason.map(s => ({
-                    value: s.data.season.name,
-                    label: s.data.season.name,
+                  seasons={scoreData.map(s => ({
+                    value: s.season.name,
+                    label: s.season.name,
                   }))}
-                  value={selectedSeason.data.season.name}
+                  value={selectedSeasonData.data.season.name}
                   setValue={selectSeason}
-                  someHidden={someHidden} />
+                  someHidden={someHidden}
+                />
               </TableHead>
             )}
           </TableRow>
         </TableHeader>
         <ScorboardBody
           allZero={allZero}
-          sortedCastaways={selectedSeason.sortedCastaways}
-          castawayColors={selectedSeason.castawayColors}
-          castawaySplitIndex={selectedSeason.castawaySplitIndex}
-          data={selectedSeason.data}
+          sortedCastaways={selectedSeasonData.sortedCastaways}
+          castawayColors={selectedSeasonData.castawayColors}
+          castawaySplitIndex={selectedSeasonData.castawaySplitIndex}
+          data={selectedSeasonData.data}
         />
       </Table>
       <ScrollBar orientation='horizontal' />
     </ScrollArea>
   );
 }
-

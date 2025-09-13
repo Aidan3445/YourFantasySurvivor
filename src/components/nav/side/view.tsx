@@ -5,6 +5,7 @@ import Image from 'next/image';
 import SideNavFooter from '~/components/nav/side/footer';
 import SideNavLink from '~/components/nav/side/link';
 import SideNavLeagues from '~/components/nav/side/leagues';
+import { Flame } from 'lucide-react';
 
 export default function SideNav() {
   return (
@@ -22,11 +23,11 @@ export default function SideNav() {
                   className='brightness-0' />
               }
               label='Your Fantasy Survivor' />
+            <SideNavLink href='/playground' icon={<Flame />} label='Playground' />
             <SignedIn>
               <SideNavLeagues />
             </SignedIn>
             {/*<SideNavLink href='/seasons' icon={<BookUser />} label='Seasons' />
-            <SideNavLink href='/playground' icon={<Flame />} label='Playground' />
             <SidebarSeparator />*/}
           </SidebarMenu>
           <SideNavFooter />

@@ -1,4 +1,5 @@
 import { Flame } from 'lucide-react';
+import { type ReactNode } from 'react';
 import { FormControl, FormField, FormItem, FormLabel } from '~/components/common/form';
 import { Input } from '~/components/common/input';
 import { MultiSelect } from '~/components/common/multiSelect';
@@ -8,6 +9,8 @@ import { type ScoringBaseEventName } from '~/types/events';
 
 export interface BaseEventSettingsProps {
   disabled?: boolean;
+  hidePredictions?: boolean;
+  children?: ReactNode;
 }
 
 interface BasePredictionFormFieldProps extends BaseEventSettingsProps {
