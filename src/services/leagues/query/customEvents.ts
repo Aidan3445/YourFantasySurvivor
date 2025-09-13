@@ -40,6 +40,7 @@ export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
       referenceType: customEventReferenceSchema.referenceType,
       referenceId: customEventReferenceSchema.referenceId,
       notes: customEventSchema.notes,
+      eventId: customEventSchema.customEventId,
     })
     .from(customEventSchema)
     .innerJoin(customEventRuleSchema, eq(customEventRuleSchema.customEventRuleId, customEventSchema.customEventRuleId))
@@ -56,7 +57,7 @@ export async function getCustomEvents(auth: VerifiedLeagueMemberAuth) {
         customEventRuleId: row.customEventRuleId,
         episodeNumber: row.episodeNumber,
         episodeId: row.episodeId,
-        eventId: row.customEventRuleId,
+        eventId: row.eventId,
         eventName: row.eventName,
         label: row.label,
         notes: row.notes,

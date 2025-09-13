@@ -16,7 +16,6 @@ export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
         throw new Error('Failed to fetch season data');
       }
       const { seasonsData } = await res.json() as { seasonsData: SeasonsDataQuery[] };
-      console.log('Fetched seasons data:', { includeInactive, seasonId, seasonsData });
       return seasonsData;
     },
     staleTime: 1000 * 60 * 5, // 5 minutes

@@ -34,7 +34,7 @@ export default function PredictionHistory() {
 
         const predsWithEvents = predictionMap.map(pred => {
           const rule = rules?.basePrediction?.[pred.eventName as ScoringBaseEventName];
-          const t = {
+          return {
             ...pred,
             points: rule?.points ?? 0,
             event: Object.values(baseEvents ?? {})
@@ -43,13 +43,6 @@ export default function PredictionHistory() {
               .find(e => e !== undefined),
             timing: rule?.timing ?? []
           };
-
-          if (pred.pending === 564) {
-            console.log({ pred, t, rule, baseEvents });
-          }
-
-          return t;
-
         });
         if (predsWithEvents.length === 0) return;
         predictions[episodeNum] ??= [];
@@ -66,7 +59,7 @@ export default function PredictionHistory() {
 
       const predsWithEvents = preds.map(pred => {
         const rule = rules?.custom.find(rule => rule.eventName === pred.eventName);
-        const t = {
+        return {
           ...pred,
           points: rule?.points ?? 0,
           event: Object.values(customEvents.events ?? {})
@@ -75,12 +68,6 @@ export default function PredictionHistory() {
             .find(e => e !== undefined),
           timing: rule?.timing ?? []
         };
-
-        if (pred.pending === 564) {
-          console.log({ pred, t, rule, customEvents });
-        }
-
-        return t;
       });
       if (predsWithEvents.length === 0) return;
       predictions[episodeNum] ??= [];
@@ -97,8 +84,6 @@ export default function PredictionHistory() {
     rules?.basePrediction,
     rules?.custom
   ]);
-
-  console.log({ predictionsWithEvents });
 
   const stats = Object.values(predictionsWithEvents).reduce((acc, pred) => {
     pred.forEach(p => {

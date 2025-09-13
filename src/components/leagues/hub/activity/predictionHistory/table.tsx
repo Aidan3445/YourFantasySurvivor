@@ -7,6 +7,7 @@ import {
 } from '~/components/common/table';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useCastaways } from '~/hooks/seasons/useCastaways';
+import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
 import { useTribes } from '~/hooks/seasons/useTribes';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { BaseEventFullName } from '~/lib/events';
@@ -19,6 +20,7 @@ interface PredictionTableProps {
 
 export default function PredctionTable({ predictions }: PredictionTableProps) {
   const { data: league } = useLeague();
+  const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
   const { data: castaways } = useCastaways(league?.seasonId ?? null);
   const { data: tribes } = useTribes(league?.seasonId ?? null);
   const isMobile = useIsMobile();
@@ -108,9 +110,14 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                     .join(', ')}
                 </TableCell>
                 <TableCell>
-                  {findReferenceNames(pred.event?.references)
-                    .map((res) => isMobile ? res.short : res.full)
-                    .join(', ')}
+                  {pred.timing.every((t) => t.includes('Weekly')) &&
+                    (keyEpisodes?.previousEpisode?.episodeNumber ?? 0) >= pred.episodeNumber &&
+                    !pred.event
+                    ? (<span className='text-muted-foreground'>N/A</span>)
+                    : (findReferenceNames(pred.event?.references)
+                      .map((res) => isMobile ? res.short : res.full)
+                      .join(', ')
+                    )}
                 </TableCell>
               </TableRow >
             );
