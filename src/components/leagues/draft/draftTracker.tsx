@@ -10,6 +10,7 @@ import {
 import MakePredictions from '~/components/leagues/actions/events/predictions/view';
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
 import { useMemo } from 'react';
+import SkipMember from '~/components/leagues/draft/skipMember';
 
 interface DraftTrackerProps {
   hash: string;
@@ -45,7 +46,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
           {leagueMembers?.members.map((pick, index) => (
             <ColorRow
               key={pick.memberId}
-              className={onTheClock.memberId === pick.memberId ?
+              className={onTheClock?.memberId === pick.memberId ?
                 'animate-pulse' : ''}
               color={pick.color}
               loggedIn={leagueMembers.loggedIn?.displayName === pick.displayName}>
@@ -59,12 +60,18 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
                 style={{ color: getContrastingColor(pick.color) }}>
                 {pick.displayName}
               </h2>
-              {onTheClock.memberId === pick.memberId && (
-                <h3
-                  className='ml-auto inline-flex text-lg self-end animate-bounce'
-                  style={{ color: getContrastingColor(pick.color) }}>
-                  Picking...
-                </h3>
+              {onTheClock?.memberId === pick.memberId && (
+                <>
+                  <h3
+                    className='ml-auto inline-flex text-lg self-end animate-bounce'
+                    style={{ color: getContrastingColor(pick.color) }}>
+                    Picking...
+                  </h3>
+                  {leagueMembers.loggedIn?.role !== 'Member' &&
+                    pick.draftOrder < leagueMembers.members.length && (
+                      <SkipMember hash={hash} member={pick} leagueMembers={leagueMembers.members} />
+                    )}
+                </>
               )}
               {membersWithPicks?.find(m => m.member.memberId === pick.memberId) && (
                 <h3
@@ -77,19 +84,19 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
           ))}
         </div>
       </article>
-      {(onDeck.loggedIn || onTheClock.loggedIn) &&
-        <ChooseCastaway draftDetails={actionDetails} onDeck={onDeck.loggedIn} />}
+      {(!!onDeck?.loggedIn || !!onTheClock?.loggedIn) &&
+        <ChooseCastaway draftDetails={actionDetails} onDeck={!!onDeck?.loggedIn} />}
       <MakePredictions
         rules={rules}
         predictionRuleCount={predictionRuleCount}
         predictionsMade={predictionsMade}
         castaways={castaways}
         tribes={tribes} />
-      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <AlertDialog open={dialogOpen ?? false} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {`It's ${onDeck.loggedIn ? 'almost ' : ' '}your turn to pick!`}
+              {`It's ${onDeck?.loggedIn ? 'almost ' : ' '}your turn to pick!`}
             </AlertDialogTitle>
             <AlertDialogDescription className='text-left'>
               This castaway will earn you points based on their performance in the game.

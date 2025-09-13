@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { type League } from '~/types/leagues';
 
@@ -9,6 +9,7 @@ import { type League } from '~/types/leagues';
   * @returnObj `League`
   */
 export function useLeague(overrideHash?: string) {
+  const queryClient = useQueryClient();
   const params = useParams();
   const hash = overrideHash ?? params.hash as string;
 
@@ -31,8 +32,10 @@ export function useLeague(overrideHash?: string) {
       // During critical states, keep data fresher
       switch (data.status) {
         case 'Predraft':
+          void queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
           return 30 * 1000; // 30 seconds - draft could start anytime
         case 'Draft':
+          void queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
           return 10 * 1000; // 10 seconds - need to know when draft completes
         case 'Active':
           return 5 * 60 * 1000; // 5 minutes - status rarely changes

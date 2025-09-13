@@ -1,6 +1,6 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
+import { requireLeagueAdminAuth } from '~/lib/auth';
 import updateDraftOrderLogic from '~/services/leagues/mutation/updateDraftOrder';
 
 /**
@@ -13,7 +13,7 @@ import updateDraftOrderLogic from '~/services/leagues/mutation/updateDraftOrder'
   */
 export default async function updateDraftOrder(hash: string, draftOrder: number[]) {
   try {
-    return await requireLeagueMemberAuth(updateDraftOrderLogic)(hash, draftOrder);
+    return await requireLeagueAdminAuth(updateDraftOrderLogic)(hash, draftOrder);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

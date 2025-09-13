@@ -35,18 +35,20 @@ export default async function updateDraftOrderLogic(
     }
 
     // Match member IDs to their new draft order for update
+    const offset = draftOrder.length + 100;
     const orderCase = sql`
   CASE ${leagueMemberSchema.memberId}
   ${sql.join(
       draftOrder.map((memberId, index) =>
-        sql`WHEN ${memberId} THEN ${index}::smallint`
+        sql`WHEN ${memberId} THEN ${index + offset}::smallint`
       ),
       sql` `
     )}
   END
 `;
 
-    const updated = await trx
+    // first update everyone to a high number to avoid unique constraint issues
+    const updatedHigh = await trx
       .update(leagueMemberSchema)
       .set({ draftOrder: orderCase })
       .where(and(
@@ -55,8 +57,24 @@ export default async function updateDraftOrderLogic(
       ))
       .returning({ memberId: leagueMemberSchema.memberId });
 
-    if (updated.length !== draftOrder.length) {
+    if (updatedHigh.length !== draftOrder.length) {
       throw new Error('Failed to update draft order');
+    }
+
+    // then shift them down to the correct order
+    const updatedFinal = await trx
+      .update(leagueMemberSchema)
+      .set({
+        draftOrder: sql`${leagueMemberSchema.draftOrder} - ${offset}::smallint`
+      })
+      .where(and(
+        eq(leagueMemberSchema.leagueId, auth.leagueId),
+        inArray(leagueMemberSchema.memberId, draftOrder)
+      ))
+      .returning({ memberId: leagueMemberSchema.memberId });
+
+    if (updatedFinal.length !== draftOrder.length) {
+      throw new Error('Failed to finalize draft order update');
     }
 
     return { success: true };

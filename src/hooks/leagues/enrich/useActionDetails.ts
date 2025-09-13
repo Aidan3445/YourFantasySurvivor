@@ -90,6 +90,10 @@ export function useLeagueActionDetails(overrideHash?: string) {
   const [dialogOpen, setDialogOpen] = useState<boolean>();
 
   const { onTheClock, onDeck, onTheClockIndex } = useMemo(() => {
+    if (!leagueMembers || !selectionTimeline) {
+      return { onTheClock: null, onDeck: null, onTheClockIndex: -1 };
+    }
+
     const onTheClockIndex = leagueMembers?.members?.findIndex(member =>
       selectionTimeline?.memberCastaways?.[member.memberId]?.[nextEpisode ?? -1] === undefined
     ) ?? 0;
@@ -111,10 +115,14 @@ export function useLeagueActionDetails(overrideHash?: string) {
   }, [leagueMembers, selectionTimeline, nextEpisode]);
 
   useEffect(() => {
-    if (onTheClock?.loggedIn && dialogOpen === undefined) {
+    if ((!!onTheClock?.loggedIn || !!onDeck?.loggedIn) && dialogOpen === undefined) {
       setDialogOpen(true);
     }
-  }, [dialogOpen, onTheClock, setDialogOpen]);
+  }, [dialogOpen, onTheClock, setDialogOpen, onDeck, leagueMembers, leagueMembers?.loggedIn?.draftOrder]);
+
+  useEffect(() => {
+    setDialogOpen(undefined);
+  }, [leagueMembers?.loggedIn?.draftOrder]);
 
   useEffect(() => {
     const func = async () => {
