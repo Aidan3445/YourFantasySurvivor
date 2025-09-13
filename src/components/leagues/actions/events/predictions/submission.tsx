@@ -119,7 +119,7 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
             <FormField
               name='referenceId'
               render={({ field }) => (
-                <FormItem className={prediction.shauhinEnabled ? 'lg:col-span-3' : 'lg:col-span-4'}>
+                <FormItem className={prediction.shauhinEnabled && !!wallet ? 'lg:col-span-3' : 'lg:col-span-4'}>
                   <FormLabel className='sr-only'>Prediction</FormLabel>
                   <FormControl>
                     <Select
@@ -166,7 +166,7 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
                   </FormControl>
                 </FormItem>
               )} />
-            {prediction.shauhinEnabled && wallet && (
+            {prediction.shauhinEnabled && !!wallet && (
               <FormField
                 name='bet'
                 render={({ field: betField }) => (
@@ -216,7 +216,7 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
                 } />
             )}
             <Button
-              className={cn(prediction.shauhinEnabled ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
+              className={cn(prediction.shauhinEnabled && !!wallet ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
               disabled={
                 !reactForm.formState.isDirty ||
                 reactForm.formState.isSubmitting ||
