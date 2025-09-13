@@ -64,7 +64,7 @@ export type Prediction = {
   predictionMakerId: number;
   referenceId: number;
   referenceType: ReferenceType;
-  pending: number | null; // eventId that the prediction is pending on
+  eventId: number | null; // eventId that the prediction is linked to, if any
   bet: number | null;
   hit: boolean | null;
 };

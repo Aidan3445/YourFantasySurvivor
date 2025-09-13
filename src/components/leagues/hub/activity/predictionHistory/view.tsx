@@ -39,7 +39,7 @@ export default function PredictionHistory() {
             points: rule?.points ?? 0,
             event: Object.values(baseEvents ?? {})
               .map(epEvents => Object.values(epEvents)
-                .find(event => event.eventId === pred.pending))
+                .find(event => event.eventId === pred.eventId))
               .find(e => e !== undefined),
             timing: rule?.timing ?? []
           };
@@ -64,7 +64,7 @@ export default function PredictionHistory() {
           points: rule?.points ?? 0,
           event: Object.values(customEvents.events ?? {})
             .map(epEvents => Object.values(epEvents)
-              .find(event => event.eventId === pred.pending))
+              .find(event => event.eventId === pred.eventId))
             .find(e => e !== undefined),
           timing: rule?.timing ?? []
         };
@@ -88,7 +88,7 @@ export default function PredictionHistory() {
   const stats = Object.values(predictionsWithEvents).reduce((acc, pred) => {
     pred.forEach(p => {
       acc.count.episodes.add(p.episodeNumber);
-      if (p.pending) return acc;
+      if (p.eventId === null) return acc;
       if (p.hit) {
         acc.count.correct++;
         acc.points.earned += p.points;

@@ -220,7 +220,7 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
               disabled={
                 !reactForm.formState.isDirty ||
                 reactForm.formState.isSubmitting ||
-                (wallet ?? 0) - (totalBet ?? 0) < 0
+                (prediction.shauhinEnabled && (wallet ?? 0) - (totalBet ?? 0) < 0)
               }
               type='submit'>
               {prediction.predictionMade && !reactForm.formState.errors.root

@@ -131,7 +131,7 @@ export function compileScores(
             scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
             scores.Member[prediction.predictionMakerId]![episodeNum]! += prediction.bet;
           }
-        } else if (shauhinModeActive && !prediction.pending && prediction.bet) {
+        } else if (shauhinModeActive && prediction.eventId !== null && prediction.bet) {
           // if the prediction was wrong but shauhin mode is active, subtract the bet
           scores.Member[prediction.predictionMakerId] ??= [];
           scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
@@ -256,6 +256,8 @@ export function compileScores(
       }
     }
   }
+
+  console.log({ scores, currentStreaks, baseEvents, basePredictions, customEvents, rules });
 
   return { scores, currentStreaks };
 }

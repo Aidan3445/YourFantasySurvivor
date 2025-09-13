@@ -89,7 +89,7 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       referenceId: customEventPredictionSchema.referenceId,
       referenceType: customEventPredictionSchema.referenceType,
       bet: customEventPredictionSchema.bet,
-      pending: customEventSchema.customEventId,
+      eventId: customEventSchema.customEventId,
       hit: sql<boolean>`
         CASE WHEN ${customEventReferenceSchema.referenceId} = ${customEventPredictionSchema.referenceId}
         AND ${customEventReferenceSchema.referenceType} = ${customEventPredictionSchema.referenceType}
@@ -132,7 +132,7 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       referenceId: number;
       referenceType: ReferenceType;
       bet: number | null;
-      pending: number | null;
+      eventId: number | null;
       hit: boolean;
     }[]) => rows.reduce((acc, row) => {
       acc[row.episodeNumber] ??= {};
