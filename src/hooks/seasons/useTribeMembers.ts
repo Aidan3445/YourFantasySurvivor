@@ -1,4 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { useIsEpisodeAiringForSeason } from '~/hooks/helpers/useIsEpisodeAiring';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 
 /**
   * Fetches tribe members data from the API.
@@ -7,6 +9,9 @@ import { useQuery } from '@tanstack/react-query';
   * @returnObj `Record<tribeId, castawayId[]>`
   */
 export function useTribeMembers(seasonId: number | null, episodeNumber: number | null) {
+  const isEpisodeAiring = useIsEpisodeAiringForSeason(seasonId ?? null);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
+
   return useQuery<Record<number, number[]>>({
     queryKey: ['tribeMembers', seasonId],
     queryFn: async () => {
@@ -20,9 +25,7 @@ export function useTribeMembers(seasonId: number | null, episodeNumber: number |
       }
       return res.json();
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: true,
-    enabled: !!seasonId && !!episodeNumber
+    enabled: !!seasonId && !!episodeNumber,
+    ...refreshConfig,
   });
 }

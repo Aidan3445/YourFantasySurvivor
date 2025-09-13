@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { type Events } from '~/types/events';
+import { useIsEpisodeAiringForSeason } from '~/hooks/helpers/useIsEpisodeAiring';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 
 /**
   * Fetches base events data from the API.
@@ -7,6 +9,9 @@ import { type Events } from '~/types/events';
   * @returnObj `Events`
   */
 export function useBaseEvents(seasonId: number | null) {
+  const isEpisodeAiring = useIsEpisodeAiringForSeason(seasonId);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
+
   return useQuery<Events>({
     queryKey: ['baseEvents', seasonId],
     queryFn: async () => {
@@ -18,10 +23,7 @@ export function useBaseEvents(seasonId: number | null) {
       }
       return res.json();
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    enabled: !!seasonId
+    enabled: !!seasonId,
+    ...refreshConfig,
   });
 }

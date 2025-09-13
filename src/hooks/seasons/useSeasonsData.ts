@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { type SeasonsDataQuery } from '~/types/seasons';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
+import { useIsEpisodeAiringForSeason } from '~/hooks/helpers/useIsEpisodeAiring';
 
 /**
   * Fetches seasons data from the API.
@@ -8,6 +10,9 @@ import { type SeasonsDataQuery } from '~/types/seasons';
   * @returnObj `SeasonsDataQuery`
   */
 export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
+  const isEpisodeAiring = useIsEpisodeAiringForSeason(seasonId ?? null);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
+
   return useQuery<SeasonsDataQuery[]>({
     queryKey: ['seasons', seasonId, includeInactive],
     queryFn: async () => {
@@ -30,17 +35,14 @@ export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
         })),
       }));
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: true,
-    refetchInterval: (query) => {
-      const data = query.state.data;
-      if (!data) return false;
-      const isAnyEpisodeAiring = data.some(seasonData =>
-        seasonData.episodes.some(episode => episode.airStatus === 'Airing')
-      );
-      return isAnyEpisodeAiring ? 1000 * 60 : false; // 1 minute
-    },
-    enabled: true
+    enabled: true,
+    ...(isEpisodeAiring ? refreshConfig : {
+      staleTime: Infinity,
+      gcTime: 24 * 60 * 60 * 1000, // 24 hours
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchInterval: false,
+    })
   });
 }

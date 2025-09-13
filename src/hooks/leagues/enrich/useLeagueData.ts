@@ -25,10 +25,14 @@ export function useLeagueData(overrideHash?: string) {
 
   const seasonData = useMemo(() =>
     seasonsData?.find((s) => s.season.seasonId === league?.seasonId),
-    [seasonsData, league]);
+    [seasonsData, league?.seasonId]
+  );
+
+  const membersArray = useMemo(() => leagueMembers?.members ?? [], [leagueMembers?.members]);
 
   const scoreData = useMemo(() => {
-    if (!league || !leagueMembers || !seasonData || !selectionTimeline || !basePredictions || !leagueRules || !leagueSettings) {
+    if (!league || !membersArray.length || !seasonData || !selectionTimeline ||
+      !basePredictions || !leagueRules || !leagueSettings) {
       return {
         scores: { Castaway: {}, Tribe: {}, Member: {} },
         currentStreaks: {},
@@ -53,12 +57,15 @@ export function useLeagueData(overrideHash?: string) {
     const sortedMemberScores = Object.entries(scores.Member)
       .sort(([_, scoresA], [__, scoresB]) =>
         (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0))
-      .map(([member, memberScores]) => ({
-        member: leagueMembers.members.find((m) => m.memberId === Number(member))!,
-        scores: memberScores,
-        currentStreak: currentStreaks[Number(member)] ?? 0,
-      }))
-      .filter(({ member }) => member !== undefined);
+      .map(([memberId, memberScores]) => {
+        const member = membersArray.find((m) => m.memberId === Number(memberId));
+        return member ? {
+          member,
+          scores: memberScores,
+          currentStreak: currentStreaks[Number(memberId)] ?? 0,
+        } : null;
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
 
     const loggedInIndex = sortedMemberScores.findIndex(({ member }) => member?.loggedIn);
 
@@ -68,18 +75,9 @@ export function useLeagueData(overrideHash?: string) {
       sortedMemberScores,
       loggedInIndex,
     };
-  }, [
-    league,
-    leagueMembers,
-    seasonData,
-    selectionTimeline,
-    customEvents,
-    basePredictions,
-    leagueRules,
-    leagueSettings
-  ]);
+  }, [league, membersArray, seasonData, selectionTimeline, basePredictions, leagueRules, leagueSettings, customEvents]);
 
-  return {
+  return useMemo(() => ({
     ...scoreData,
     ...seasonData,
     league,
@@ -89,7 +87,15 @@ export function useLeagueData(overrideHash?: string) {
     basePredictions,
     leagueRules,
     leagueSettings
-  };
+  }), [
+    scoreData,
+    seasonData,
+    league,
+    leagueMembers,
+    selectionTimeline,
+    customEvents,
+    basePredictions,
+    leagueRules,
+    leagueSettings
+  ]);
 }
-
-

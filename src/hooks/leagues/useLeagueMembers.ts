@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
+import { useIsEpisodeAiring } from '~/hooks/helpers/useIsEpisodeAiring';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 import { type LeagueMember } from '~/types/leagueMembers';
 
 /**
@@ -10,6 +12,9 @@ import { type LeagueMember } from '~/types/leagueMembers';
 export function useLeagueMembers(overrideHash?: string) {
   const params = useParams();
   const hash = overrideHash ?? params?.hash as string;
+
+  const isEpisodeAiring = useIsEpisodeAiring(overrideHash);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
 
   return useQuery<{ loggedIn?: LeagueMember; members: LeagueMember[] }>({
     queryKey: ['leagueMembers', hash],
@@ -24,9 +29,7 @@ export function useLeagueMembers(overrideHash?: string) {
       const loggedIn = leagueMembers.find((member) => member.loggedIn);
       return { loggedIn, members: leagueMembers };
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: true,
-    enabled: !!hash
+    enabled: !!hash,
+    ...refreshConfig,
   });
 }

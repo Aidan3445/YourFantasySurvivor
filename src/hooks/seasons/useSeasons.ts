@@ -3,6 +3,7 @@ import { type Season } from '~/types/seasons';
 
 /**
   * Fetches seasons data from the API.
+  * Optimized for essentially static data that never changes.
   * @param {boolean} includeInactive Whether to include inactive seasons.
   * @returnObj `Season[]`
   */
@@ -17,8 +18,12 @@ export function useSeasons(includeInactive: boolean) {
       const { seasons } = await res.json() as { seasons: Season[] };
       return seasons;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
+    staleTime: Infinity,
+    gcTime: 30 * 24 * 60 * 60 * 1000, // 30 days
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
     enabled: true
   });
 }

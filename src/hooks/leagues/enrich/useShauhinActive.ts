@@ -14,28 +14,38 @@ export function useShauhinActive(overrideHash?: string) {
   const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
 
   const shauhinActive = useMemo(() => {
+    if (!league || !keyEpisodes?.previousEpisode || !rules?.shauhinMode?.enabled) {
+      return false;
+    }
 
-    if (!league || !rules?.shauhinMode?.enabled || !keyEpisodes?.previousEpisode) return false;
+    if (league.status === 'Draft') {
+      return false;
+    }
+
     const prevEpisodeNumber = keyEpisodes.previousEpisode.episodeNumber;
     const mergeEpisodeNumber = keyEpisodes.mergeEpisode?.episodeNumber ?? null;
-
-    if (league.status === 'Draft') return false;
-
     const setting = rules.shauhinMode.startWeek;
+
     switch (setting) {
       case 'After Premiere':
         return prevEpisodeNumber >= 1;
       case 'After Merge':
         return mergeEpisodeNumber !== null && prevEpisodeNumber >= mergeEpisodeNumber;
       case 'Before Finale':
-        return keyEpisodes.nextEpisode?.isFinale;
+        return keyEpisodes.nextEpisode?.isFinale === true;
       case 'Custom':
         return prevEpisodeNumber >= (rules.shauhinMode.customStartWeek ?? Infinity);
       default:
         return false;
     }
-  }, [rules?.shauhinMode, keyEpisodes, league]);
+  }, [league,
+    keyEpisodes?.previousEpisode,
+    keyEpisodes?.mergeEpisode?.episodeNumber,
+    keyEpisodes?.nextEpisode?.isFinale,
+    rules?.shauhinMode?.enabled,
+    rules?.shauhinMode?.startWeek,
+    rules?.shauhinMode?.customStartWeek
+  ]);
 
   return shauhinActive;
 }
-

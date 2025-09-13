@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { type Elimination, type Eliminations } from '~/types/events';
+import { useIsEpisodeAiringForSeason } from '~/hooks/helpers/useIsEpisodeAiring';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 
 /**
   * Fetches eliminations data from the API.
@@ -7,6 +9,9 @@ import { type Elimination, type Eliminations } from '~/types/events';
   * @returnObj `Eliminations`
   */
 export function useEliminations(seasonId: number | null) {
+  const isEpisodeAiring = useIsEpisodeAiringForSeason(seasonId);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
+
   return useQuery<Eliminations>({
     queryKey: ['eliminations', seasonId],
     queryFn: async () => {
@@ -22,9 +27,7 @@ export function useEliminations(seasonId: number | null) {
         return elimination;
       });
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: true,
-    enabled: !!seasonId
+    enabled: !!seasonId,
+    ...refreshConfig,
   });
 }

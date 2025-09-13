@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { useEnrichedTribeMembers } from '~/hooks/seasons/enrich/useEnrichedTribeMembers';
 import { type ReferenceType } from '~/types/events';
 
@@ -9,22 +9,31 @@ import { type ReferenceType } from '~/types/events';
   */
 export function useEventOptions(seasonId: number | null, selectedEpisode: number | null) {
   const tribeMembers = useEnrichedTribeMembers(seasonId, selectedEpisode);
+
+  const tribeMembersArray = useMemo(() =>
+    Object.values(tribeMembers ?? {}),
+    [tribeMembers]
+  );
+
   const tribeOptions = useMemo(() =>
-    Object.values(tribeMembers ?? {}).map(({ tribe }) => ({
+    tribeMembersArray.map(({ tribe }) => ({
       value: tribe.tribeId,
       label: tribe.tribeName,
       color: tribe.tribeColor,
     })),
-    [tribeMembers]
+    [tribeMembersArray]
   );
+
   const castawayOptions = useMemo(() =>
-    Object.values(tribeMembers ?? {}).flatMap(({ castaways: members }) =>
-      members.map(member => ({
-        value: member.castawayId,
-        label: member.fullName,
-      }))),
-    [tribeMembers]
+    tribeMembersArray.flatMap(({ castaways }) =>
+      castaways.map(castaway => ({
+        value: castaway.castawayId,
+        label: castaway.fullName,
+      }))
+    ),
+    [tribeMembersArray]
   );
+
   const combinedReferenceOptions = useMemo(() => [
     { label: 'Tribes', value: null },
     ...tribeOptions.map(tribe => ({
@@ -39,21 +48,19 @@ export function useEventOptions(seasonId: number | null, selectedEpisode: number
     })),
   ], [tribeOptions, castawayOptions]);
 
-  const handleCombinedReferenceSelection = (values: (string | number)[]) => {
-    // strings are in the format TYPE_ID
-    const selectedReferences = values.map(value => {
-      const parts = String(value).split('_');
+  const handleCombinedReferenceSelection = useCallback((values: (string | number)[]) => {
+    return values.map(value => {
+      const [type, id] = String(value).split('_');
       return {
-        type: parts[0]! as ReferenceType,
-        id: Number(parts[1]),
+        type: type as ReferenceType,
+        id: Number(id),
       };
     });
-    return selectedReferences;
-  };
+  }, []);
 
-  const getDefaultStringValues = (references: { type: ReferenceType; id: number }[]) => {
+  const getDefaultStringValues = useCallback((references: { type: ReferenceType; id: number }[]) => {
     return references.map(ref => `${ref.type}_${ref.id}`);
-  };
+  }, []);
 
   return {
     tribeOptions,

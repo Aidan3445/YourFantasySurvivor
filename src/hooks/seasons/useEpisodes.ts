@@ -3,6 +3,7 @@ import { type Episode } from '~/types/episodes';
 
 /**
   * Fetches episodes data from the API.
+  * Optimized for data that updates approximately once per week.
   * @param seasonId The ID of the season to fetch episodes for.
   * @returnObj `Episode[]`
   */
@@ -19,9 +20,13 @@ export function useEpisodes(seasonId: number | null) {
       const { episodes } = await res.json() as { episodes: Episode[] };
       return episodes.map(ep => ({ ...ep, airDate: new Date(ep.airDate) }));
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: true,
+    staleTime: 2 * 60 * 60 * 1000, // 2 hours
+    gcTime: 7 * 24 * 60 * 60 * 1000, // 1 week
+    refetchInterval: 4 * 60 * 60 * 1000, // 4 hours
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchIntervalInBackground: false,
     enabled: !!seasonId
   });
 }

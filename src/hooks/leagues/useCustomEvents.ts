@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { type CustomEvents } from '~/types/events';
+import { useIsEpisodeAiring } from '~/hooks/helpers/useIsEpisodeAiring';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 
 /**
   * Fetches custom events and predictions for a league based on the league hash from the URL parameters.
@@ -10,6 +12,9 @@ import { type CustomEvents } from '~/types/events';
 export function useCustomEvents(overrideHash?: string) {
   const params = useParams();
   const hash = overrideHash ?? params.hash as string;
+
+  const isEpisodeAiring = useIsEpisodeAiring(overrideHash);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
 
   return useQuery<CustomEvents>({
     queryKey: ['customEvents', hash],
@@ -23,8 +28,7 @@ export function useCustomEvents(overrideHash?: string) {
       return response.json();
     },
     enabled: !!hash,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 10 * 60 * 1000, // 10 minutes
+    ...refreshConfig,
   });
 }
 

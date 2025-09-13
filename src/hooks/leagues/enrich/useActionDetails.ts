@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePredictionTiming } from '~/hooks/leagues/usePredictionTiming';
 import { useSelectionTimeline } from '~/hooks/leagues/useSelectionTimeline';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
-import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
@@ -30,34 +29,71 @@ export function useLeagueActionDetails(overrideHash?: string) {
   const { customPredictionsMade, basePredictionsMade } = usePredictionsMade(overrideHash);
 
   const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
-  const nextEpisode = useMemo(() => keyEpisodes?.nextEpisode?.episodeNumber ?? null, [keyEpisodes]);
+
+  const nextEpisode = useMemo(() =>
+    keyEpisodes?.nextEpisode?.episodeNumber ?? null,
+    [keyEpisodes?.nextEpisode?.episodeNumber]
+  );
+
   const tribeMembers = useEnrichedTribeMembers(league?.seasonId ?? null, nextEpisode);
   const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
-  const { actionDetails, membersWithPicks } = useMemo(() => {
-    if (!league || !rules || !selectionTimeline ||
-      !nextEpisode || !tribeMembers || !leagueMembers || !eliminations) return {};
+  const eliminationLookup = useMemo(() => {
+    if (!eliminations) return new Map<number, number>();
 
-    const membersWithPicks: { member: LeagueMember; castawayFullName: string }[] = [];
+    const lookup = new Map<number, number>();
+    eliminations.forEach((episodeElims, index) => {
+      episodeElims.forEach(elim => {
+        if (elim?.castawayId) {
+          lookup.set(elim.castawayId, index + 1);
+        }
+      });
+    });
+    return lookup;
+  }, [eliminations]);
 
-    const actionDetails: DraftDetails = Object.entries(tribeMembers).reduce((acc, [tribeId, { tribe, castaways }]) => {
+  const membersWithPicks = useMemo(() => {
+    if (!nextEpisode || !tribeMembers || !leagueMembers || !selectionTimeline) {
+      return [];
+    }
+
+    const picks: { member: LeagueMember; castawayFullName: string }[] = [];
+
+    Object.values(tribeMembers).forEach(({ castaways }) => {
+      castaways.forEach(castaway => {
+        const selection = selectionTimeline.castawayMembers[castaway.castawayId]?.[nextEpisode];
+        if (selection) {
+          const member = leagueMembers.members.find(m => m.memberId === selection);
+          if (member) {
+            picks.push({ member, castawayFullName: castaway.fullName });
+          }
+        }
+      });
+    });
+
+    return picks;
+  }, [nextEpisode, tribeMembers, leagueMembers, selectionTimeline]);
+
+  const actionDetails = useMemo(() => {
+    if (!league || !rules || !selectionTimeline || !nextEpisode ||
+      !tribeMembers || !leagueMembers || !eliminationLookup) {
+      return undefined;
+    }
+
+    const details: DraftDetails = {};
+
+    Object.entries(tribeMembers).forEach(([tribeId, { tribe, castaways }]) => {
       const selections = castaways.map(castaway => {
         const selection = selectionTimeline.castawayMembers[castaway.castawayId]?.[nextEpisode];
-
-        const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
-          episodeElims.some(elim => elim?.castawayId === castaway.castawayId)
-        );
+        const eliminatedEpisode = eliminationLookup.get(castaway.castawayId) ?? null;
 
         const castawayWithTribe: EnrichedCastaway = {
           ...castaway,
           tribe: { name: tribe.tribeName, color: tribe.tribeColor },
-          eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex + 1 : null
+          eliminatedEpisode
         };
 
         const member = selection ? leagueMembers.members.find(m => m.memberId === selection) ?? null : null;
-        if (member) {
-          membersWithPicks.push({ member, castawayFullName: castaway.fullName });
-        }
 
         return {
           castaway: castawayWithTribe,
@@ -65,81 +101,73 @@ export function useLeagueActionDetails(overrideHash?: string) {
         };
       });
 
-      acc[Number(tribeId)] = {
+      details[Number(tribeId)] = {
         tribe,
         castaways: selections,
       };
-      return acc;
-    }, {} as Record<number, {
-      tribe: Tribe,
-      castaways: {
-        castaway: EnrichedCastaway,
-        member: LeagueMember | null
-      }[]
-    }>);
+    });
 
-    return {
-      actionDetails,
-      membersWithPicks
-    };
-  }, [league, rules, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminations]);
-
+    return details;
+  }, [league, rules, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminationLookup]);
 
   const router = useRouter();
-  // undefined = not yet displayed, true = open, false = dismissed
   const [dialogOpen, setDialogOpen] = useState<boolean>();
 
   const { onTheClock, onDeck, onTheClockIndex } = useMemo(() => {
-    if (!leagueMembers || !selectionTimeline) {
+    if (!leagueMembers?.members || !selectionTimeline?.memberCastaways || !nextEpisode) {
       return { onTheClock: null, onDeck: null, onTheClockIndex: -1 };
     }
 
-    const onTheClockIndex = leagueMembers?.members?.findIndex(member =>
-      selectionTimeline?.memberCastaways?.[member.memberId]?.[nextEpisode ?? -1] === undefined
-    ) ?? 0;
+    const onTheClockIndex = leagueMembers.members.findIndex(member =>
+      selectionTimeline.memberCastaways[member.memberId]?.[nextEpisode] === undefined
+    );
 
-    const onTheClock = leagueMembers?.members?.[onTheClockIndex];
-    const onDeck = leagueMembers?.members?.[onTheClockIndex + 1];
+    const onTheClock = leagueMembers.members[onTheClockIndex];
+    const onDeck = leagueMembers.members[onTheClockIndex + 1];
+    const loggedInId = leagueMembers.loggedIn?.memberId;
 
     return {
-      onTheClock: {
+      onTheClock: onTheClock ? {
         ...onTheClock,
-        loggedIn: onTheClock?.memberId === leagueMembers?.loggedIn?.memberId,
-      },
-      onDeck: {
+        loggedIn: onTheClock.memberId === loggedInId,
+      } : null,
+      onDeck: onDeck ? {
         ...onDeck,
-        loggedIn: onDeck?.memberId === leagueMembers?.loggedIn?.memberId,
-      },
-      onTheClockIndex
+        loggedIn: onDeck.memberId === loggedInId,
+      } : null,
+      onTheClockIndex: onTheClockIndex >= 0 ? onTheClockIndex : -1
     };
-  }, [leagueMembers, selectionTimeline, nextEpisode]);
+  }, [
+    leagueMembers?.members,
+    leagueMembers?.loggedIn?.memberId,
+    selectionTimeline?.memberCastaways,
+    nextEpisode
+  ]);
 
   useEffect(() => {
     if ((!!onTheClock?.loggedIn || !!onDeck?.loggedIn) && dialogOpen === undefined) {
       setDialogOpen(true);
     }
-  }, [dialogOpen, onTheClock, setDialogOpen, onDeck, leagueMembers, leagueMembers?.loggedIn?.draftOrder]);
+  }, [dialogOpen, onTheClock?.loggedIn, onDeck?.loggedIn]);
 
   useEffect(() => {
     setDialogOpen(undefined);
   }, [leagueMembers?.loggedIn?.draftOrder]);
 
   useEffect(() => {
-    const func = async () => {
-      if (!league) return;
-
-      if (onTheClockIndex === -1 || league.status !== 'Draft') {
-        router.push(`/leagues/${league.hash}`);
-      }
-    };
-    void func();
-  }, [onTheClockIndex, league, router]);
+    if (league && (onTheClockIndex === -1 || league.status !== 'Draft')) {
+      router.push(`/leagues/${league.hash}`);
+    }
+  }, [onTheClockIndex, league?.status, league?.hash, router, league]);
 
   const predictionRuleCount = useMemo(() => {
     if (!rules) return 0;
-    const enabledBasePredictions = Object.values(rules.basePrediction ?? {})
-      .reduce((count, event) => count + Number(event.enabled), 0);
-    return enabledBasePredictions + rules.custom.length;
+
+    const enabledBasePredictions = rules.basePrediction
+      ? Object.values(rules.basePrediction).reduce((count, event) => count + Number(event.enabled), 0)
+      : 0;
+
+    return enabledBasePredictions + (rules.custom?.length ?? 0);
   }, [rules]);
 
   const predictionsMade = useMemo(() => {
@@ -153,15 +181,21 @@ export function useLeagueActionDetails(overrideHash?: string) {
   const rulesBasedOnTiming = useMemo(() => {
     if (!rules || !predictionTiming) return rules;
 
-    const filteredCustom = rules.custom
-      .filter(rule => rule.eventType === 'Direct' ||
-        rule.timing.some(t => predictionTiming.includes(t)));
+    const timingSet = new Set(predictionTiming);
+
+    const filteredCustom = rules.custom?.filter(rule =>
+      rule.eventType === 'Direct' || rule.timing.some(t => timingSet.has(t))
+    ) ?? [];
 
     if (rules.basePrediction) {
       const filteredBase = { ...rules.basePrediction };
+
       Object.entries(filteredBase).forEach(([eventName, rule]) => {
-        if (rule.enabled && !rule.timing.some(t => predictionTiming.includes(t))) {
-          filteredBase[eventName as ScoringBaseEventName].enabled = false;
+        if (rule.enabled && !rule.timing.some(t => timingSet.has(t))) {
+          filteredBase[eventName as ScoringBaseEventName] = {
+            ...rule,
+            enabled: false
+          };
         }
       });
 

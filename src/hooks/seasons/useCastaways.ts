@@ -3,6 +3,7 @@ import { type Castaway } from '~/types/castaways';
 
 /**
   * Fetches castaways data from the API.
+  * Optimized for static data that rarely changes in the database.
   * @param {number} seasonId The season ID to get castaways for.
   * @returnObj `Castaway[]`
   */
@@ -19,9 +20,11 @@ export function useCastaways(seasonId: number | null) {
       const { castaways } = await res.json() as { castaways: Castaway[] };
       return castaways;
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: true,
+    staleTime: Infinity,
+    gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
     enabled: !!seasonId
   });
 }

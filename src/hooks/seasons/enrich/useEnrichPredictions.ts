@@ -28,23 +28,74 @@ export function useEnrichPredictions(
   const { data: leagueMembers } = useLeagueMembers();
   const { data: eliminations } = useEliminations(seasonId);
 
+  const lookupMaps = useMemo(() => {
+    if (!tribes || !castaways || !leagueMembers || !events || !eliminations) {
+      return null;
+    }
+
+    const tribesById = new Map(tribes.map(tribe => [tribe.tribeId, tribe]));
+    const castawaysById = new Map(castaways.map(castaway => [castaway.castawayId, castaway]));
+    const membersById = new Map(leagueMembers.members.map(member => [member.memberId, member]));
+    const eventsById = new Map(events.map(event => [event.eventName, event]));
+
+    const eliminationEpisodes = new Map<number, number>();
+    eliminations.forEach((episodeElims, index) => {
+      episodeElims.forEach(elim => {
+        if (elim?.castawayId) {
+          eliminationEpisodes.set(elim.castawayId, index + 1);
+        }
+      });
+    });
+
+    return {
+      tribesById,
+      castawaysById,
+      membersById,
+      eventsById,
+      eliminationEpisodes
+    };
+  }, [tribes, castaways, leagueMembers, events, eliminations]);
+
+  const createTribeFinder = useMemo(() => {
+    if (!tribesTimeline || !lookupMaps) return null;
+
+    return (castawayId: number, episodeNumber: number) => {
+      const sortedTimeline = Object.entries(tribesTimeline)
+        .filter(([epNumStr]) => parseInt(epNumStr) <= episodeNumber)
+        .sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+
+      for (const [, tribesInEpisode] of sortedTimeline) {
+        for (const [tribeIdStr, tribeMembers] of Object.entries(tribesInEpisode)) {
+          if (tribeMembers.includes(castawayId)) {
+            const tribe = lookupMaps.tribesById.get(parseInt(tribeIdStr));
+            return tribe ? {
+              name: tribe.tribeName,
+              color: tribe.tribeColor
+            } : null;
+          }
+        }
+      }
+      return null;
+    };
+  }, [tribesTimeline, lookupMaps]);
+
   const enrichedPredictions = useMemo(() => {
-    if (!seasonId || !events || !predictions || !tribesTimeline ||
-      !eliminations || !castaways || !tribes || !leagueMembers || !rules) {
+    if (!seasonId || !predictions || !lookupMaps || !createTribeFinder || !rules) {
       return [];
     }
 
-    return predictions.reduce((acc, prediction) => {
+    const predictionGroups: Record<string, EnrichedPrediction> = {};
+
+    for (const prediction of predictions) {
       if (!prediction.eventName || prediction.hit === null) {
-        return acc; // skip if eventName or hit is missing
+        continue;
       }
 
-      let existingPrediction = acc[prediction.eventName];
+      let existingPrediction = predictionGroups[prediction.eventName];
       if (!existingPrediction) {
-        const event = events.find(e => e.eventName === prediction.eventName);
-        if (!event) {
-          return acc; // skip if event not found
-        }
+        const event = lookupMaps.eventsById.get(prediction.eventName);
+        if (!event) continue;
+
         let points: number | null = null;
         if (event.eventSource === 'Base') {
           const basePredictionRules = rules.basePrediction ?? defaultBasePredictionRules;
@@ -53,18 +104,14 @@ export function useEnrichPredictions(
           points = rules.custom?.find(r => r.eventName === event.eventName)?.points ?? null;
         }
 
-        if (points === null) {
-          return acc; // skip if rule/points not found
-        }
+        if (points === null) continue;
 
         existingPrediction = { event, points, hits: [], misses: [] };
-        acc[prediction.eventName] = existingPrediction;
+        predictionGroups[prediction.eventName] = existingPrediction;
       }
 
-      const member = leagueMembers.members.find(m => m.memberId === prediction.predictionMakerId);
-      if (!member) {
-        return acc; // skip if member not found
-      }
+      const member = lookupMaps.membersById.get(prediction.predictionMakerId);
+      if (!member) continue;
 
       const entry = {
         member,
@@ -76,52 +123,20 @@ export function useEnrichPredictions(
         existingPrediction.hits.push(entry);
       } else {
         if (prediction.referenceType === 'Castaway') {
-          const findTribe = (castawayId: number) => {
-            let tribe: { name: string; color: string } | null = null;
-            const sortedTimeline = Object.entries(tribesTimeline)
-              .filter(([epNumStr]) => parseInt(epNumStr) <= existingPrediction.event.episodeNumber)
-              .sort((a, b) => parseInt(b[0]) - parseInt(a[0]));
+          const castaway = lookupMaps.castawaysById.get(prediction.referenceId);
+          if (!castaway) continue;
 
-            // find the most recent tribe update for the castaway
-            for (const [, tribesInEpisode] of sortedTimeline) {
-              for (const [tribeIdStr, tribeMembers] of Object.entries(tribesInEpisode)) {
-                if (tribeMembers.includes(castawayId)) {
-                  const foundTribe = tribes.find(t => t.tribeId === parseInt(tribeIdStr));
-                  if (foundTribe) {
-                    tribe = {
-                      name: foundTribe.tribeName,
-                      color: foundTribe.tribeColor
-                    };
-                    break;
-                  }
-                }
-              }
-              if (tribe) break; // stop if tribe is found
-            }
-            return tribe;
-          };
+          const tribe = createTribeFinder(castaway.castawayId, existingPrediction.event.episodeNumber);
+          if (!tribe) continue;
 
-          const castaway = castaways.find(c => c.castawayId === prediction.referenceId) ?? null;
-          if (!castaway) {
-            console.warn(`Castaway with ID ${prediction.referenceId} not found for prediction on event ${prediction.eventName}`);
-            return acc;
-          }
-
-          const tribe = findTribe(castaway.castawayId);
-          if (!tribe) {
-            console.warn(`Tribe not found for castaway ID ${castaway.castawayId} in prediction on event ${prediction.eventName}`);
-            return acc;
-          }
-
-          const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
-            episodeElims.some(elim => elim.castawayId === castaway.castawayId)
-          );
+          const eliminatedEpisode = lookupMaps.eliminationEpisodes.get(castaway.castawayId) ?? null;
 
           const castawayWithTribe: EnrichedCastaway = {
             ...castaway,
             tribe,
-            eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex + 1 : null
+            eliminatedEpisode
           };
+
           existingPrediction.misses.push({
             ...entry,
             reference: {
@@ -130,12 +145,11 @@ export function useEnrichPredictions(
               color: castawayWithTribe.tribe?.color ?? '#AAAAAA'
             },
           });
+
         } else if (prediction.referenceType === 'Tribe') {
-          const tribe = tribes.find(t => t.tribeId === prediction.referenceId) ?? null;
-          if (!tribe) {
-            console.warn(`Tribe with ID ${prediction.referenceId} not found for prediction on event ${prediction.eventName}`);
-            return acc;
-          }
+          const tribe = lookupMaps.tribesById.get(prediction.referenceId);
+          if (!tribe) continue;
+
           existingPrediction.misses.push({
             ...entry,
             reference: {
@@ -146,14 +160,10 @@ export function useEnrichPredictions(
           });
         }
       }
+    }
 
-      return acc;
-    }, {} as Record<string, EnrichedPrediction>);
-  }, [
-    castaways, events, leagueMembers, predictions,
-    rules, seasonId, tribes, tribesTimeline, eliminations
-  ]);
+    return Object.values(predictionGroups);
+  }, [seasonId, predictions, lookupMaps, createTribeFinder, rules]);
 
-  return Object.values(enrichedPredictions);
+  return enrichedPredictions;
 }
-

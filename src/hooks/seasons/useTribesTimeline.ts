@@ -1,5 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { type TribesTimeline } from '~/types/tribes';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
+import { useIsEpisodeAiringForSeason } from '~/hooks/helpers/useIsEpisodeAiring';
 
 /**
   * Fetches tribes timeline data from the API.
@@ -7,6 +9,9 @@ import { type TribesTimeline } from '~/types/tribes';
   * @returnObj `TribesTimeline`
   */
 export function useTribesTimeline(seasonId: number | null) {
+  const isEpisodeAiring = useIsEpisodeAiringForSeason(seasonId ?? null);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
+
   return useQuery<TribesTimeline>({
     queryKey: ['tribesTimeline', seasonId],
     queryFn: async () => {
@@ -18,9 +23,7 @@ export function useTribesTimeline(seasonId: number | null) {
       }
       return res.json();
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: true,
-    enabled: !!seasonId
+    enabled: !!seasonId,
+    ...refreshConfig,
   });
 }

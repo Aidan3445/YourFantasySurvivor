@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { type PredictionTiming } from '~/types/events';
+import { useIsEpisodeAiring } from '~/hooks/helpers/useIsEpisodeAiring';
+import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 
 /**
   * Fetches prediction timing currently active for a league based on the league hash from the URL parameters.
@@ -10,6 +12,9 @@ import { type PredictionTiming } from '~/types/events';
 export function usePredictionTiming(overrideHash?: string) {
   const params = useParams();
   const hash = overrideHash ?? params.hash as string;
+
+  const isEpisodeAiring = useIsEpisodeAiring(overrideHash);
+  const refreshConfig = useRefreshConfig(isEpisodeAiring);
 
   return useQuery<PredictionTiming[]>({
     queryKey: ['predictionTiming', hash],
@@ -24,8 +29,7 @@ export function usePredictionTiming(overrideHash?: string) {
       return predictionTiming;
     },
     enabled: !!hash,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    refetchInterval: 10 * 60 * 1000, // 10 minutes
+    ...refreshConfig,
   });
 }
 
