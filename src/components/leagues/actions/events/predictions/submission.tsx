@@ -127,7 +127,9 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
                       value={field.value ?
                         String(field.value) :
                         prediction.predictionMade ? String(prediction.predictionMade.referenceId) : undefined}>
-                      <SelectTrigger className={cn(reactForm.formState.isDirty && 'bg-amber-400')}>
+                      <SelectTrigger className={cn(reactForm.formState.isDirty &&
+                        field.value !== prediction?.predictionMade?.referenceId &&
+                        'bg-amber-400')}>
                         <SelectValue placeholder='Select prediction' />
                       </SelectTrigger>
                       <SelectContent>
@@ -174,7 +176,9 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
                     <FormLabel className='sr-only'>Bet</FormLabel>
                     <FormControl>
                       <Input
-                        className={cn(reactForm.formState.isDirty && 'bg-amber-400')}
+                        className={cn(reactForm.formState.isDirty &&
+                          betField.value !== prediction?.predictionMade?.bet &&
+                          'bg-amber-400')}
                         type='number'
                         placeholder='Enter bet'
                         min={0}
