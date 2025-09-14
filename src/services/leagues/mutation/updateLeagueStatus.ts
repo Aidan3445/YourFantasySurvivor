@@ -2,7 +2,7 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
-import { leagueSchema } from '~/server/db/schema/leagues';
+import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueStatus } from '~/types/leagues';
 import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
@@ -59,6 +59,19 @@ export default async function updateLeagueStatusLogic(
 
     if (!update) {
       throw new Error('Failed to update league status');
+    }
+
+    if (update.status === 'Draft') {
+      const draftDateUpdate = await trx
+        .update(leagueSettingsSchema)
+        .set({ draftDate: new Date().toISOString() })
+        .where(eq(leagueSettingsSchema.leagueId, auth.leagueId))
+        .returning({ draftDate: leagueSettingsSchema.draftDate })
+        .then((res) => res[0]);
+
+      if (!draftDateUpdate) {
+        throw new Error('Failed to set draft date');
+      }
     }
 
     return { success: true };
