@@ -68,7 +68,7 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
                 points={scores.slice().pop() ?? 0}
                 castaway={castaway}
                 color={member.color}
-                doubleBelow={maxRows ? loggedInIndex > maxRows && index >= (maxRows - 2) : false}
+                doubleBelow={!!maxRows && maxRows - 1 !== loggedInIndex && maxRows - 2 === index}
                 overrideHash={overrideHash} />
             );
           })}
