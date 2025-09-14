@@ -1,11 +1,23 @@
 import { useMemo } from 'react';
+import { useLeague } from '~/hooks/leagues/useLeague';
 
 /**
  * Hook to get dynamic refresh configuration based on episode airing status
  * @param {boolean} isEpisodeAiring Whether an episode is currently airing
  */
-export function useRefreshConfig(isEpisodeAiring: boolean) {
+export function useRefreshConfig(isEpisodeAiring: boolean, hash?: string) {
+  const { data: league } = useLeague(hash);
+
   return useMemo(() => {
+    if (league?.status === 'Predraft' || league?.status === 'Draft') {
+      return {
+        staleTime: 15 * 1000,      // 15 seconds
+        refetchInterval: 30 * 1000, // 30 seconds
+        refetchOnWindowFocus: true,
+        refetchOnReconnect: true,
+      };
+    }
+
     if (isEpisodeAiring) {
       return {
         staleTime: 30 * 1000,      // 30 seconds
@@ -21,6 +33,6 @@ export function useRefreshConfig(isEpisodeAiring: boolean) {
         refetchOnReconnect: false,
       };
     }
-  }, [isEpisodeAiring]);
+  }, [isEpisodeAiring, league?.status]);
 }
 

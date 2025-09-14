@@ -6,7 +6,7 @@ import { cn } from '~/lib/utils';
 export default function SideNavLink({ href, icon, label, className }: NavLinkProps) {
   return (
     <SidebarMenuButton className='' asChild size='lg'>
-      <Link className={cn('w-full flex gap-5 items-center transition-all', className)} href={href}>
+      <Link className={cn('w-full flex gap-5 items-center transition-all h-min', className)} href={href}>
         {icon}
         {label}
       </Link>

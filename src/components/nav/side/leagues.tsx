@@ -54,7 +54,7 @@ export default function SideNavLeagues() {
               .slice(0, 5)
               .map(({ league }) => (
                 <SideNavLink
-                  className={league.hash === hash ? 'font-semibold' : ''}
+                  className={league.hash === hash ? 'font-semibold' : 'pr-3'}
                   key={league.hash}
                   href={`/leagues/${league.hash}`}
                   label={league.name} />
