@@ -18,6 +18,7 @@ import { EliminationEventNames } from '~/lib/events';
  */
 export default async function getUserLeagues() {
   const { userId } = await auth();
+  console.log('Getting leagues for userId:', userId);
   if (!userId) return [];
 
   return db

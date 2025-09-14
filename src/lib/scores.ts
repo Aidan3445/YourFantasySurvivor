@@ -257,8 +257,6 @@ export function compileScores(
     }
   }
 
-  console.log({ scores, currentStreaks, baseEvents, basePredictions, customEvents, rules });
-
   return { scores, currentStreaks };
 }
 

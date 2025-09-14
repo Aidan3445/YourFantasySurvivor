@@ -18,6 +18,7 @@ import NextButton from '~/components/leagues/actions/league/create/next';
 import LeagueNameField from '~/components/leagues/actions/league/create/name';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
 import { ColorZod, DisplayNameZod } from '~/types/leagueMembers';
+import { useQueryClient } from '@tanstack/react-query';
 
 const formSchema = z.object({
   leagueName: LeagueNameZod,
@@ -35,6 +36,7 @@ interface CreateLeagueFormProps {
 
 export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useUser();
   const { api, setApi, current, count } = useCarouselProgress();
   const progress = count > 0 ? current / (count - 1) * 100 : 0;
@@ -59,6 +61,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
         data.draftDate);
       if (!newHash) throw new Error('Failed to create league');
 
+      await queryClient.invalidateQueries({ queryKey: ['leagues'] });
       alert(`League created called ${data.leagueName}`);
       onSubmit?.();
       router.push(`/leagues/${newHash}/predraft`);
