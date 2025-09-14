@@ -32,7 +32,7 @@ export default function Clock({ endDate, replacedBy }: ClockProps) {
 
   return (
     !timer || timer > 0 ?
-      <span className='w-full flex text-white text-4xl  justify-evenly'>
+      <span className='w-full flex text-sidebar text-4xl  justify-evenly'>
         <ClockPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
         :
         <ClockPlace value={hours.toString()} label={hours === 1 ? 'Hour' : 'Hours'} />

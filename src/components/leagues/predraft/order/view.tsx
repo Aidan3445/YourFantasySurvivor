@@ -40,8 +40,8 @@ export default function DraftOrder({ overrideHash, className }: DraftOrderProps)
   const [order, setOrder] = useState(dbOrder);
 
   useEffect(() => {
-    if (league?.status !== 'Predraft' && league?.hash) router.push(`/leagues/${league.hash}/draft`);
-  }, [league, router]);
+    if (!overrideHash && league?.status !== 'Predraft' && league?.hash) router.push(`/leagues/${league.hash}/draft`);
+  }, [league, overrideHash, router]);
 
   useEffect(() => {
     if (!leagueMembers?.members) return;
