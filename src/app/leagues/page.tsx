@@ -4,9 +4,11 @@ import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
 import { Separator } from '~/components/common/separator';
 import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 import getUserLeagues from '~/services/users/query/userLeagues';
+import { auth } from '@clerk/nextjs/server';
 
 export default async function LeaguesPage() {
-  const leagues = await getUserLeagues();
+  const { userId } = await auth();
+  const leagues = await getUserLeagues(userId ?? '');
 
   const { currentLeagues, inactiveLeagues } = leagues.reduce((acc, league) => {
     if (league.league.status === 'Inactive') {

@@ -6,15 +6,17 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 export async function GET(request: NextRequest) {
   return await withAuth(async () => {
-    const leagueHashParam = request.nextUrl.searchParams.get('leagueHash');
-    const leagueHash = leagueHashParam ? leagueHashParam : undefined;
+    const hashParam = request.nextUrl.searchParams.get('hash');
+    const hash = hashParam ? hashParam : undefined;
 
-    if (!leagueHash) {
-      return NextResponse.json({ error: 'Missing or invalid leagueHash parameter' }, { status: 400 });
+    console.log('Fetching public league data for hash:', request.headers);
+
+    if (!hash) {
+      return NextResponse.json({ error: 'Missing or invalid hash parameter' }, { status: 400 });
     }
 
     try {
-      const publicLeagueData = await getPublicLeague(leagueHash);
+      const publicLeagueData = await getPublicLeague(hash);
       if (!publicLeagueData) {
         return NextResponse.json({ error: 'League not found' }, { status: 404 });
       }

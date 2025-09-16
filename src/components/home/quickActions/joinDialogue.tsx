@@ -37,7 +37,7 @@ export default function JoinLeagueDialog() {
           Join League
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className='bg-card'>
         <DialogHeader>
           <DialogTitle>Join an Existing League</DialogTitle>
           <DialogDescription>

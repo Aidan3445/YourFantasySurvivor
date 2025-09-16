@@ -10,6 +10,7 @@ export function withAuth(handler: (userId: string) => Promise<NextResponse>) {
     const { userId } = await auth();
 
     if (!userId) {
+      console.log('Not authenticated');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     return handler(userId);

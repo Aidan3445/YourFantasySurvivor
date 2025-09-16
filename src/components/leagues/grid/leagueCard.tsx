@@ -15,9 +15,9 @@ export default function LeagueCard({ league, member, currentSelection }: LeagueC
     <Link
       key={league.hash}
       href={`/leagues/${league.hash}`}>
-      <section className='px-2 py-1 rounded-lg bg-card hover:bg-card/80 hover:shadow-lg transition-all'>
+      <section className='px-2 py-1 h-full flex-col flex rounded-lg bg-card hover:bg-card/80 hover:shadow-lg transition-all'>
         <h3 className='text-xl font-semibold'>{league.name}</h3>
-        <p className='text-sm'>{league.season}</p>
+        <p className='text-sm mt-auto'>{league.season}</p>
         {currentSelection ? (
           <p>
             <i>{currentSelection.fullName}</i>

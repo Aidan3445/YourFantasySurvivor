@@ -4,7 +4,6 @@ import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
-import { auth } from '~/lib/auth';
 import { type League } from '~/types/leagues';
 import { type CurrentSelection, type LeagueMember } from '~/types/leagueMembers';
 import { castawaySchema } from '~/server/db/schema/castaways';
@@ -13,13 +12,11 @@ import { EliminationEventNames } from '~/lib/events';
 
 /**
  * Get the leagues that you're a member of
+* @param userId The user id of the user
  * @returns the leagues you're a member of
  * @returnObj `{League, LeagueMember, CurrentSelection, memberCount}[]`
  */
-export default async function getUserLeagues() {
-  const { userId } = await auth();
-  if (!userId) return [];
-
+export default async function getUserLeagues(userId: string) {
   const leagues = await db
     .select({
       league: {
