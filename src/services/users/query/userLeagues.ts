@@ -1,6 +1,6 @@
 import 'server-only';
 import { db } from '~/server/db';
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
@@ -14,13 +14,13 @@ import { EliminationEventNames } from '~/lib/events';
 /**
  * Get the leagues that you're a member of
  * @returns the leagues you're a member of
- * @returnObj `{League, LeagueMember, CurrentSelection}[]`
+ * @returnObj `{League, LeagueMember, CurrentSelection, memberCount}[]`
  */
 export default async function getUserLeagues() {
   const { userId } = await auth();
   if (!userId) return [];
 
-  return db
+  const leagues = await db
     .select({
       league: {
         leagueId: leagueSchema.leagueId,
@@ -75,4 +75,25 @@ export default async function getUserLeagues() {
         member: LeagueMember,
         currentSelection: CurrentSelection
       }[]);
+
+  const leagueMemberCounts = await db
+    .select({
+      leagueId: leagueMemberSchema.leagueId,
+      memberCount: count(leagueMemberSchema.memberId).as('memberCount'),
+    })
+    .from(leagueMemberSchema)
+    .where(inArray(leagueMemberSchema.leagueId, leagues.map(l => l.league.leagueId)))
+    .groupBy(leagueMemberSchema.leagueId)
+    .then((rows) => {
+      const map: Record<number, number> = {};
+      rows.forEach(row => {
+        map[row.leagueId] = Number(row.memberCount);
+      });
+      return map;
+    });
+
+  return leagues.map(l => ({
+    ...l,
+    memberCount: leagueMemberCounts[l.league.leagueId] ?? 0,
+  }));
 }

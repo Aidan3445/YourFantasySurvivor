@@ -7,7 +7,12 @@ import { type League } from '~/types/leagues';
   */
 export function useLeagues() {
 
-  return useQuery<{ league: League, member: LeagueMember, castaway: CurrentSelection }[]>({
+  return useQuery<{
+    league: League,
+    member: LeagueMember,
+    castaway: CurrentSelection,
+    memberCount: number
+  }[]>({
     queryKey: ['leagues'],
     queryFn: async () => {
       const response = await fetch('/api/leagues/');
@@ -18,7 +23,8 @@ export function useLeagues() {
         leagues: {
           league: League,
           member: LeagueMember,
-          castaway: CurrentSelection
+          castaway: CurrentSelection,
+          memberCount: number
         }[]
       };
       return leagues;

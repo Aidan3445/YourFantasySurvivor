@@ -16,7 +16,8 @@ export async function CastawayScoreboard() {
 
   const mostRecent6 = scoreData
     .filter(s => s.tribes.length > 0)
-    .toSorted((a, b) => b.season.premiereDate.getTime() - a.season.premiereDate.getTime());
+    .sort((a, b) => b.season.premiereDate.getTime() - a.season.premiereDate.getTime())
+    .slice(0, 6);
 
   return (
     <ScoreboardTable scoreData={mostRecent6} someHidden={scoreData.length > 6} />

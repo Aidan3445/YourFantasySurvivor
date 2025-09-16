@@ -10,11 +10,12 @@ import { cn } from '~/lib/utils';
 import { useMemo } from 'react';
 
 interface LeagueMemberFieldsProps {
+  formPrefix?: string;
   memberColors?: string[];
   currentColor?: string;
 }
 
-export default function LeagueMemberFields({ memberColors = [], currentColor }: LeagueMemberFieldsProps) {
+export default function LeagueMemberFields({ formPrefix, memberColors = [], currentColor }: LeagueMemberFieldsProps) {
   const availableColors = useMemo(() => twentyColors.map((color) => {
     if (color !== currentColor && memberColors.some((memberColor) => memberColor === color)) {
       const rgb = hexToRgba(color);
@@ -36,7 +37,7 @@ export default function LeagueMemberFields({ memberColors = [], currentColor }: 
   return (
     <section className='flex flex-wrap gap-4 justify-center w-full'>
       <FormField
-        name='displayName'
+        name={formPrefix ? `${formPrefix}.displayName` : 'displayName'}
         render={({ field }) => (
           <FormItem className='w-full'>
             <FormDescription className='mt-2 text-sm text-left'>
@@ -58,7 +59,7 @@ export default function LeagueMemberFields({ memberColors = [], currentColor }: 
           </FormItem>
         )} />
       <FormField
-        name='color'
+        name={formPrefix ? `${formPrefix}.color` : 'color'}
         render={({ field }) => (
           <FormItem>
             <FormControl>

@@ -103,17 +103,19 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
                   <Flame className='align-top inline w-4 h-4 stroke-muted-foreground' />
                 </TableHead>
                 <TableHead className='text-center'>
-                  Castaway
-                  {a === 1 && (
-                    <SelectSeason
-                      seasons={scoreData.map(s => ({
-                        value: s.season.name,
-                        label: s.season.name,
-                      }))}
-                      value={selectedSeasonData.data.season.name}
-                      setValue={selectSeason}
-                      someHidden={someHidden}
-                    />
+                  {a === 0 ? 'Castaway' : (
+                    <>
+                      {selectedSeasonData.data.season.name}
+                      <SelectSeason
+                        seasons={scoreData.map(s => ({
+                          value: s.season.name,
+                          label: s.season.name,
+                        }))}
+                        value={selectedSeasonData.data.season.name}
+                        setValue={selectSeason}
+                        someHidden={someHidden}
+                      />
+                    </>
                   )}
                 </TableHead>
               </Fragment>

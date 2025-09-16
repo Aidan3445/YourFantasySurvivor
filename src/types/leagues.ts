@@ -4,7 +4,7 @@ import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, M
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
-import { type LeagueMember } from '~/types/leagueMembers';
+import { ColorZod, DisplayNameZod, type LeagueMember } from '~/types/leagueMembers';
 
 export type LeagueStatus = (typeof LeagueStatuses)[number];
 
@@ -28,6 +28,19 @@ export type PublicLeague = {
 export const LeagueNameZod = z.string()
   .min(LEAGUE_NAME_MIN_LENGTH, { message: `League name must be between ${LEAGUE_NAME_MIN_LENGTH} and ${LEAGUE_NAME_MAX_LENGTH} characters` })
   .max(LEAGUE_NAME_MAX_LENGTH, { message: `League name must be between ${LEAGUE_NAME_MIN_LENGTH} and ${LEAGUE_NAME_MAX_LENGTH} characters` });
+
+export const LeagueInsertZod = z.object({
+  leagueName: LeagueNameZod,
+  member: z.object({
+    displayName: DisplayNameZod,
+    color: ColorZod,
+  }).transform(data => ({
+    ...data,
+    displayName: data.displayName.trim(),
+  })),
+  draftDate: z.date().optional(),
+});
+export type LeagueInsert = z.infer<typeof LeagueInsertZod>;
 
 export type LeagueSettings = {
   leagueId: number;

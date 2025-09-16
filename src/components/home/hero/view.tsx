@@ -1,6 +1,6 @@
 import { Card, CardContent } from '~/components/common/card';
 import { SignIn } from '@clerk/nextjs';
-import { Trophy, Users, Gamepad2, BarChart, CirclePlus } from 'lucide-react';
+import { Trophy, Users, Gamepad2, BarChart, ListPlus } from 'lucide-react';
 import { Button } from '~/components/common/button';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
@@ -48,8 +48,8 @@ export function HeroSection() {
             <hr className='my-8' />
             <span className='flex w-full justify-evenly items-center pt-2'>
               <CreateLeagueModal>
-                <Button className='w-60'>
-                  <CirclePlus stroke='white' className='mr-2' />
+                <Button className='w-80'>
+                  <ListPlus stroke='white' className='mr-2' />
                   Get Started
                 </Button>
               </CreateLeagueModal>

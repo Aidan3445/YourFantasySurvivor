@@ -32,8 +32,8 @@ export default function JoinLeagueDialog() {
   return (
     <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant='outline' className='w-80'>
-          <Users className='mr-2' />
+        <Button variant='secondary' className='w-80 text-white'>
+          <Users className='mr-2' color='white' />
           Join League
         </Button>
       </DialogTrigger>

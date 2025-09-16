@@ -2,9 +2,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { Form } from '~/components/common/form';
-import { LeagueNameZod } from '~/types/leagues';
+import { type LeagueInsert, LeagueInsertZod, LeagueNameZod } from '~/types/leagues';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '~/components/common/carousel';
 import { Button } from '~/components/common/button';
 import { Progress } from '~/components/common/progress';
@@ -17,18 +16,7 @@ import { useUser } from '@clerk/nextjs';
 import NextButton from '~/components/leagues/actions/league/create/next';
 import LeagueNameField from '~/components/leagues/actions/league/create/name';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
-import { ColorZod, DisplayNameZod } from '~/types/leagueMembers';
 import { useQueryClient } from '@tanstack/react-query';
-
-const formSchema = z.object({
-  leagueName: LeagueNameZod,
-  displayName: DisplayNameZod,
-  color: ColorZod,
-  draftDate: z.date().optional(),
-}).transform(data => ({
-  ...data,
-  leagueName: data.leagueName.trim()
-}));
 
 interface CreateLeagueFormProps {
   onSubmit?: () => void;
@@ -40,25 +28,24 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
   const { user } = useUser();
   const { api, setApi, current, count } = useCarouselProgress();
   const progress = count > 0 ? current / (count - 1) * 100 : 0;
-  const reactForm = useForm<z.infer<typeof formSchema>>({
+  const reactForm = useForm<LeagueInsert>({
     defaultValues: {
       leagueName: '',
-      displayName: '',
-      color: '',
+      member: {
+        displayName: '',
+        color: '',
+      },
     },
-    resolver: zodResolver(formSchema)
+    resolver: zodResolver(LeagueInsertZod),
   });
 
   useEffect(() => {
-    reactForm.setValue('displayName', user?.username ?? '');
+    reactForm.setValue('member.displayName', user?.username ?? '');
   }, [user, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const { newHash } = await createNewLeague(
-        data.leagueName,
-        { displayName: data.displayName, color: data.color },
-        data.draftDate);
+      const { newHash } = await createNewLeague(data.leagueName, data.member, data.draftDate);
       if (!newHash) throw new Error('Failed to create league');
 
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
@@ -99,7 +86,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
             </CarouselItem>
             <CarouselItem className='pl-14 flex flex-col pt-4'>
               <div className='pr-4'>
-                <LeagueMemberFields />
+                <LeagueMemberFields formPrefix='member' />
               </div>
               <Button
                 className='m-4 mt-auto w-80 self-center'

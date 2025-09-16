@@ -57,11 +57,13 @@ export default function SelectSeason({ seasons, value, setValue, someHidden }: C
                   {seasons.label}
                 </CommandItem>
               ))}
-              <CommandItem onSelect={() => router.push('/playground')}>
-                <span className='mx-auto text-xs py-0.5'>
-                  {someHidden ? 'See all seasons' : 'Try scoring playground'}
-                </span>
-              </CommandItem>
+              {someHidden !== undefined && (
+                <CommandItem onSelect={() => router.push('/playground')} className='bg-accent/50'>
+                  <span className='mx-auto text-xs py-0.5'>
+                    {someHidden ? 'See all seasons' : 'Try scoring playground'}
+                  </span>
+                </CommandItem>
+              )}
             </CommandGroup>
           </CommandList>
         </Command>

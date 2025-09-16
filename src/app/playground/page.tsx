@@ -73,7 +73,6 @@ export default function PlaygroundPage() {
       </Form>
       <ScoreboardTable
         scoreData={sortedSeasons}
-        someHidden={sortedSeasons.length > 6}
         overrideBaseRules={BaseEventRulesZod.parse(reactForm.watch('baseEventRules'))} />
     </div>
   );
