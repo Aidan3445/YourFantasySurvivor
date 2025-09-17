@@ -5,6 +5,7 @@ import getPublicLeague from '~/services/leagues/query/public';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 export async function GET(request: NextRequest) {
+  console.log(request.headers);
   return await withAuth(async () => {
     const hashParam = request.nextUrl.searchParams.get('hash');
     const hash = hashParam ? hashParam : undefined;
