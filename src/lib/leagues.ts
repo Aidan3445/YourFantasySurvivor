@@ -117,5 +117,4 @@ export const defaultShauhinModeSettings: ShauhinModeSettings = {
     'fireWin',
     'soleSurvivor'
   ],
-  noEventIsMiss: false
 };

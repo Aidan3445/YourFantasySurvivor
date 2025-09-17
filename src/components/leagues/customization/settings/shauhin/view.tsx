@@ -98,25 +98,43 @@ export default function ShauhinMode() {
       <br />
       <Form {...reactForm}>
         <form onSubmit={handleSubmit}>
-          <FormField
-            name='enabled'
-            render={({ field }) => (
-              <FormItem className='flex items-center gap-2'>
-                <FormLabel className='text-sm'>Shauhin Mode</FormLabel>
-                <FormControl>
-                  {locked ? (
-                    <h2 className={cn('font-semibold', field.value ? 'text-green-600' : 'text-destructive')}>
-                      {field.value ? 'On' : 'Off'}
-                    </h2>
-                  ) : (
-                    <Switch
-                      checked={field.value as boolean}
-                      onCheckedChange={(checked) => field.onChange(checked)}
-                      className='' />
-                  )}
-                </FormControl>
-              </FormItem>
-            )} />
+          <span className='flex items-end justify-between'>
+            <FormField
+              name='enabled'
+              render={({ field }) => (
+                <FormItem className='flex items-center gap-2'>
+                  <FormLabel className='text-sm'>Shauhin Mode</FormLabel>
+                  <FormControl>
+                    {locked ? (
+                      <h2 className={cn('font-semibold', field.value ? 'text-green-600' : 'text-destructive')}>
+                        {field.value ? 'On' : 'Off'}
+                      </h2>
+                    ) : (
+                      <Switch
+                        checked={field.value as boolean}
+                        onCheckedChange={(checked) => field.onChange(checked)}
+                        className='' />
+                    )}
+                  </FormControl>
+                </FormItem>
+              )} />
+            {
+              !(disabled || locked) && (
+                <span className='w-fit ml-auto grid grid-cols-2 gap-2 mt-4'>
+                  <Button
+                    type='button'
+                    variant='destructive'
+                    onClick={() => { reactForm.reset(); setLocked(true); }}>
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
+                    type='submit'>
+                    Save
+                  </Button>
+                </span>)
+            }
+          </span>
           {reactForm.watch('enabled') && (
             <>
               <hr className='my-1 stroke-primary' />
@@ -177,7 +195,7 @@ export default function ShauhinMode() {
                                   )} />
                               )}
                             </span>
-                          </FormControl >
+                          </FormControl>
                           <FormMessage />
                         </FormItem >
                       );
@@ -185,7 +203,7 @@ export default function ShauhinMode() {
                   <FormDescription>
                     Choose when Shauhin Mode activates.You can choose from predefined timings or
                     set a custom week for betting to start.
-                  </FormDescription >
+                  </FormDescription>
                 </div >
                 <div>
                   <span className='flex w-full items-center gap-2'>
@@ -274,7 +292,7 @@ export default function ShauhinMode() {
                               ? values.map((name: ScoringBaseEventName) => BaseEventFullName[name]).join(', ')
                               : 'None'
                             }
-                          </span >
+                          </span>
                         );
                       }
 
@@ -302,57 +320,13 @@ export default function ShauhinMode() {
                     }} />
                   <FormDescription>
                     Select what you can bet on from your enabled official and custom prediction events.
-                  </FormDescription >
-                </div >
-                <FormField
-                  name='noEventIsMiss'
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className={cn('text-sm text-nowrap', locked ? '-ml-1' : 'ml-4')}>
-                        {'\'No Event\''} is <div
-                          className={cn('inline', field.value ? 'text-destructive' : 'text-green-600')} >
-                          {field.value ? 'Missed' : 'Refunded'}
-                        </div ></FormLabel >
-                      <span className='flex items-center gap-2'>
-                        {!locked && (
-                          <FormControl>
-                            <Switch
-                              checked={field.value as boolean}
-                              onCheckedChange={(checked) => field.onChange(checked)}
-                              className='' />
-                          </FormControl>
-                        )}
-                        <FormDescription>
-                          <i className='text-muted-foreground'>Missed</i>: bets on events
-                          that do not occur will not be considered a missed prediction<br />
-                          <i className='text-muted-foreground'>Refunded</i>:
-                          if an event does not occur, you get your bet back
-                        </FormDescription>
-                      </span>
-                    </FormItem >
-                  )
-                  } />
-              </div >
+                  </FormDescription>
+                </div>
+              </div>
             </>
           )}
-          {
-            !(disabled || locked) && (
-              <span className='w-fit ml-auto grid grid-cols-2 gap-2 mt-4'>
-                <Button
-                  type='button'
-                  variant='destructive'
-                  onClick={() => { reactForm.reset(); setLocked(true); }}>
-                  Cancel
-                </Button>
-                <Button
-                  disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
-                  type='submit'>
-                  Save
-                </Button>
-              </span>)
-          }
-        </form >
-      </Form >
-    </article >
+        </form>
+      </Form>
+    </article>
   );
 }

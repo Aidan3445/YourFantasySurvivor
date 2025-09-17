@@ -155,6 +155,5 @@ export const shauhinModeSettingsSchema = createTable(
     startWeek: shauhinModeStart('start_week'),
     customStartWeek: integer('custom_start_week'),
     enabledBets: scoringEventName('enabled_bets').array().notNull(),
-    noEventIsMiss: boolean('no_event_is_miss').notNull()
   }
 );

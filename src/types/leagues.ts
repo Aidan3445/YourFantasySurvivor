@@ -169,7 +169,6 @@ export type ShauhinModeSettings = {
   startWeek: ShauhinModeTiming;
   customStartWeek: number | null;
   enabledBets: ScoringBaseEventName[];
-  noEventIsMiss: boolean;
 };
 export const ShauhinModeSettingsZod = z.object({
   enabled: z.boolean(),
@@ -180,7 +179,6 @@ export const ShauhinModeSettingsZod = z.object({
   startWeek: z.enum(ShauhinModeTimings),
   customStartWeek: z.coerce.number().int().min(3).nullable(),
   enabledBets: z.array(z.enum(ScoringBaseEventNames)).min(1, { message: 'At least one bet type must be enabled' }),
-  noEventIsMiss: z.boolean(),
 }).refine(data => data.startWeek !== 'Custom' || (data.customStartWeek !== null && data.customStartWeek >= 3), {
   message: 'Custom start week must be set and at least 3 when start week is Custom'
 });
