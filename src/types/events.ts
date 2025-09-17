@@ -111,13 +111,13 @@ export type CustomEvents = {
 };
 
 export const BaseEventInsertZod = z.object({
-  episodeId: z.number().int().min(0),
+  episodeId: z.coerce.number().int().min(0),
   eventName: z.enum(BaseEventNames),
   label: z.string().max(64).nullable().optional(),
   notes: z.string().array().max(10).nullable().optional(),
   references: z.object({
     type: z.enum(ReferenceTypes),
-    id: z.number().int().min(0),
+    id: z.coerce.number().int().min(0),
   }).array().min(1)
 }).refine((data) => {
   // If eventName is 'tribeUpdate', we need at least one tribe and at least one castaway
@@ -131,23 +131,23 @@ export const BaseEventInsertZod = z.object({
 export type BaseEventInsert = z.infer<typeof BaseEventInsertZod>;
 
 export const CustomEventInsertZod = z.object({
-  episodeId: z.number().int().min(0),
-  customEventRuleId: z.number().int().min(0),
+  episodeId: z.coerce.number().int().min(0),
+  customEventRuleId: z.coerce.number().int().min(0),
   label: z.string().max(64).nullable().optional(),
   notes: z.string().array().max(10).nullable().optional(),
   references: z.object({
     type: z.enum(ReferenceTypes),
-    id: z.number().int().min(0),
+    id: z.coerce.number().int().min(0),
   }).array().min(1)
 });
 export type CustomEventInsert = z.infer<typeof CustomEventInsertZod>;
 
 export const PredictionInsertZod = z.object({
   eventSource: z.enum(EventSources),
-  referenceId: z.number().int().min(0),
+  referenceId: z.coerce.number().int().min(0),
   referenceType: z.enum(ReferenceTypes),
   eventName: z.string().max(64),
-  bet: z.number().int().min(0).nullable(),
+  bet: z.coerce.number().int().min(0).nullable(),
 });
 export type PredictionInsert = z.infer<typeof PredictionInsertZod>;
 

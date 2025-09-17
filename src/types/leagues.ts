@@ -59,7 +59,7 @@ export type LeagueSettingsUpdate = {
 
 export const LeagueDetailsUpdateZod = z.object({
   name: LeagueNameZod,
-  admins: z.array(z.number()),
+  admins: z.array(z.coerce.number()),
 });
 export type LeagueDetailsUpdate = z.infer<typeof LeagueDetailsUpdateZod>;
 
@@ -205,7 +205,7 @@ export type LeagueRules = {
 export const CustomEventRuleInsertZod = z.object({
   eventName: z.string().max(64),
   description: z.string().max(256),
-  points: z.number().int().min(-100).max(100),
+  points: EventPointsZod,
   eventType: z.enum(EventTypes),
   referenceTypes: z.enum(ReferenceTypes).array().min(1),
   timing: z.enum(PredictionTimings).array(),
