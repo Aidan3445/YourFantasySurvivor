@@ -93,7 +93,7 @@ export default function ShauhinMode() {
         </ColorRow>,
         from Survivor 48, posted, this twist allows you to bet points {'you\'ve'} earned
         throughout the season on predictions. If you win, you gain those points in addition to
-        the base points for the event.If you miss the prediction, you get nothing.
+        the base points for the event. If you miss the prediction, you get nothing.
       </p >
       <br />
       <Form {...reactForm}>
