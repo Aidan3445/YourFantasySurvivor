@@ -109,7 +109,10 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
                 <Select
                   defaultValue={field.value as string}
                   value={field.value as string}
-                  onValueChange={(value) => { onTypeChange(value); field.onChange(value); }} >
+                  onValueChange={(value) => {
+                    onTypeChange(value);
+                    field.onChange(value);
+                  }} >
                   <SelectTrigger>
                     <SelectValue placeholder='Select event type' />
                   </SelectTrigger>

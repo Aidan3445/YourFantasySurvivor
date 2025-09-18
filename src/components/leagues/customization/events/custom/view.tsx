@@ -102,7 +102,12 @@ export default function CustomEvents() {
                 <LeagueEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
                 <AlertDialogFooter>
                   <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
-                  <Button type='submit' onClick={() => handleSubmit()}>Create Event</Button>
+                  <Button
+                    type='submit'
+                    disabled={!reactForm.formState.isValid}
+                    onClick={() => handleSubmit()}>
+                    Create Event
+                  </Button>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </form>

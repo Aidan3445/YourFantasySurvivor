@@ -201,12 +201,14 @@ export type LeagueRules = {
 };
 
 export const CustomEventRuleInsertZod = z.object({
-  eventName: z.string().max(64),
+  eventName: z.string().max(64).min(3),
   description: z.string().max(256),
   points: EventPointsZod,
   eventType: z.enum(EventTypes),
   referenceTypes: z.enum(ReferenceTypes).array().min(1),
   timing: z.enum(PredictionTimings).array(),
+}).refine(data => data.eventType !== 'Prediction' || (data.timing.length > 0), {
+  message: 'At least one timing must be selected for prediction events'
 });
 export type CustomEventRuleInsert = z.infer<typeof CustomEventRuleInsertZod>;
 

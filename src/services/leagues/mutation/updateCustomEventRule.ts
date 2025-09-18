@@ -27,6 +27,7 @@ export default async function updateCustomEventRuleLogic(
     // Get league information
     const league = await trx
       .select({
+        leagueId: leagueSchema.leagueId,
         leagueStatus: leagueSchema.status,
       })
       .from(leagueSchema)
@@ -37,14 +38,17 @@ export default async function updateCustomEventRuleLogic(
     if (league.leagueStatus === 'Inactive')
       throw new Error('League rules cannot be updated while the league is inactive');
 
+    // Snip off fields that should not be updated they come in from mobile sometimes
+    delete (rule as unknown as { created_at?: string }).created_at;
+    delete (rule as unknown as { updated_at?: string }).updated_at;
+
     // Error can be ignored, the where clause is not understood by the type system
     const update = await trx
       .update(customEventRuleSchema)
       .set(rule)
       .from(leagueSchema)
       .where(and(
-        eq(customEventRuleSchema.leagueId, leagueSchema.leagueId),
-        eq(leagueSchema.leagueId, auth.leagueId),
+        eq(customEventRuleSchema.leagueId, league.leagueId),
         eq(customEventRuleSchema.customEventRuleId, ruleId)))
       .returning({ customEventRuleId: customEventRuleSchema.customEventRuleId })
       .then(res => res[0]);
