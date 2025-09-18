@@ -32,8 +32,8 @@ export default async function LeaguePage() {
               </h2>
               <SetSurvivalCap />
               <LeagueScoring />
-              <CustomEvents />
               <ShauhinMode />
+              <CustomEvents />
             </div>
           </TabsContent>
           <TabsContent value='settings'>

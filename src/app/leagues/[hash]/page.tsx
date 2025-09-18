@@ -85,8 +85,8 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </h2>
               <SetSurvivalCap />
               <LeagueScoring />
-              <CustomEvents />
               <ShauhinMode />
+              <CustomEvents />
             </section>
           </TabsContent>
           <ScrollBar orientation='vertical' className='invisible md:visible' />
