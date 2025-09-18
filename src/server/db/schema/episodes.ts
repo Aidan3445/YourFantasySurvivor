@@ -17,6 +17,6 @@ export const episodeSchema = createTable(
     seasonId: integer('season_id').references(() => seasonSchema.seasonId, { onDelete: 'cascade' }).notNull(),
   },
   (table) => [
-    unique().on(table.seasonId, table.episodeNumber),
+    unique('ep_season_number_unq').on(table.seasonId, table.episodeNumber),
   ]
 );

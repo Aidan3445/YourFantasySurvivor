@@ -20,8 +20,8 @@ export const castawaySchema = createTable(
   },
   // unique name and shortname for each season
   (table) => [
-    unique().on(table.fullName, table.seasonId),
-    unique().on(table.shortName, table.seasonId)
+    unique('cast_fullname_season_unq').on(table.fullName, table.seasonId),
+    unique('cast_shortname_season_unq').on(table.shortName, table.seasonId)
   ]
 );
 

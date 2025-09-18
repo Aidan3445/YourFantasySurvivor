@@ -14,7 +14,7 @@ export const tribeSchema = createTable(
     seasonId: integer('season_id').references(() => seasonSchema.seasonId, { onDelete: 'cascade' })
   },
   (table) => ([
-    unique().on(table.tribeName, table.seasonId)
+    unique('tribe_name_season_unq').on(table.tribeName, table.seasonId)
   ])
 );
 

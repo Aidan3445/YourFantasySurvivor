@@ -19,7 +19,7 @@ export const leagueSchema = createTable(
     startWeek: integer('start_week')
   },
   (table) => [
-    uniqueIndex('league_hash_idx').on(table.hash),
+    uniqueIndex('league_hash_unq_idx').on(table.hash),
   ]
 );
 

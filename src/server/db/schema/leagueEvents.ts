@@ -24,8 +24,8 @@ export const leagueEventsRulesSchema = createTable(
     timing: timing('event_timing').array().notNull().default(sql`ARRAY[]::event_timing[]`),
   },
   (table) => [
-    unique().on(table.leagueId, table.eventName),
-    index().on(table.leagueId),
+    unique('rule_league_event_unq').on(table.leagueId, table.eventName),
+    index('rule_league_idx').on(table.leagueId),
   ]
 );
 
@@ -40,9 +40,9 @@ export const leagueEventPredictionsSchema = createTable(
   },
   (table) => [
     primaryKey({ columns: [table.leagueEventRuleId, table.episodeId, table.memberId] }),
-    index().on(table.leagueEventRuleId),
-    index().on(table.episodeId),
-    index().on(table.memberId),
+    index('pred_rule_idx').on(table.leagueEventRuleId),
+    index('pred_episode_idx').on(table.episodeId),
+    index('pred_member_idx').on(table.memberId),
   ]
 );
 
@@ -57,7 +57,7 @@ export const leagueEventsSchema = createTable(
     notes: notes('notes'),
   },
   (table) => [
-    index().on(table.leagueEventRuleId),
-    index().on(table.episodeId),
+    index('event_rule_idx').on(table.leagueEventRuleId),
+    index('event_episode_idx').on(table.episodeId),
   ]
 );

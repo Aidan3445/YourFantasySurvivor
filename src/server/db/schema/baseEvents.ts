@@ -21,8 +21,8 @@ export const baseEventSchema = createTable(
     notes: notes('notes'),
   },
   (table) => [
-    index().on(table.episodeId),
-    index().on(table.eventName)
+    index('base_event_episode_idx').on(table.episodeId),
+    index('base_event_name_idx').on(table.eventName)
   ]
 );
 
@@ -35,9 +35,9 @@ export const baseEventReferenceSchema = createTable(
     referenceId: integer('reference_id').notNull(),
   },
   (table) => [
-    index().on(table.baseEventId),
-    index().on(table.referenceId, table.referenceType),
-    unique().on(table.baseEventId, table.referenceType, table.referenceId)
+    index('base_ref_event_idx').on(table.baseEventId),
+    index('base_ref_id_type_idx').on(table.referenceId, table.referenceType),
+    unique('base_ref_event_type_id_unq').on(table.baseEventId, table.referenceType, table.referenceId)
   ]
 );
 
@@ -135,10 +135,10 @@ export const baseEventPredictionSchema = createTable(
     bet: integer('bet')
   },
   (table) => [
-    index().on(table.episodeId),
-    index().on(table.memberId),
-    index().on(table.baseEventName),
-    unique().on(table.baseEventName, table.episodeId, table.memberId)
+    index('base_pred_episode_idx').on(table.episodeId),
+    index('base_pred_member_idx').on(table.memberId),
+    index('base_pred_name_idx').on(table.baseEventName),
+    unique('base_pred_name_ep_member_unq').on(table.baseEventName, table.episodeId, table.memberId)
   ]
 );
 

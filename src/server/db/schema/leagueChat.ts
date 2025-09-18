@@ -16,6 +16,6 @@ export const leagueChatSchema = createTable(
     timestamp: timestamp('timestamp', { mode: 'string' }).notNull().defaultNow(),
   },
   (table) => [
-    index('league_idx').on(table.leagueId),
+    index('chat_league_idx').on(table.leagueId),
   ]
 );

@@ -21,10 +21,10 @@ export const leagueMemberSchema = createTable(
     draftOrder: smallint('draft_order').notNull(),
   },
   (table) => [
-    uniqueIndex('league_user_idx').on(table.leagueId, table.userId),
-    unique('league_displayName_unq').on(table.leagueId, table.displayName),
-    unique('league_color_unq').on(table.leagueId, table.color),
-    unique('league_draftOrder_unq').on(table.leagueId, table.draftOrder),
+    uniqueIndex('member_league_user_unq_idx').on(table.leagueId, table.userId),
+    unique('member_league_name_unq').on(table.leagueId, table.displayName),
+    unique('member_league_color_unq').on(table.leagueId, table.color),
+    unique('member_league_order_unq').on(table.leagueId, table.draftOrder),
   ]
 );
 
@@ -44,7 +44,7 @@ export const selectionUpdateSchema = createTable(
   },
   (table) => [
     primaryKey({ columns: [table.memberId, table.episodeId] }),
-    index('member_idx').on(table.memberId),
+    index('selection_member_idx').on(table.memberId),
   ]
 );
 export type SelectionUpdate = typeof selectionUpdateSchema.$inferSelect;

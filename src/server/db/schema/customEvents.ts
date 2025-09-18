@@ -23,8 +23,8 @@ export const customEventRuleSchema = createTable(
     timing: timing('event_timing').array().notNull(),
   },
   (table) => [
-    unique().on(table.leagueId, table.eventName),
-    index().on(table.leagueId),
+    unique('custom_rule_league_event_unq').on(table.leagueId, table.eventName),
+    index('custom_rule_league_idx').on(table.leagueId),
   ]
 );
 
@@ -38,8 +38,8 @@ export const customEventSchema = createTable(
     notes: notes('notes'),
   },
   (table) => [
-    index().on(table.episodeId),
-    index().on(table.customEventRuleId),
+    index('custom_event_episode_idx').on(table.episodeId),
+    index('custom_event_rule_idx').on(table.customEventRuleId),
   ]
 );
 
@@ -52,9 +52,9 @@ export const customEventReferenceSchema = createTable(
     referenceId: integer('reference_id').notNull(),
   },
   (table) => [
-    index().on(table.customEventId),
-    index().on(table.referenceId, table.referenceType),
-    unique().on(table.customEventId, table.referenceType, table.referenceId)
+    index('custom_ref_event_idx').on(table.customEventId),
+    index('custom_ref_id_type_idx').on(table.referenceId, table.referenceType),
+    unique('custom_ref_event_type_id_unq').on(table.customEventId, table.referenceType, table.referenceId)
   ]
 );
 
@@ -70,10 +70,10 @@ export const customEventPredictionSchema = createTable(
     bet: integer('bet')
   },
   (table) => [
-    index().on(table.episodeId),
-    index().on(table.memberId),
-    index().on(table.customEventRuleId),
-    unique().on(table.customEventRuleId, table.episodeId, table.memberId)
+    index('custom_pred_episode_idx').on(table.episodeId),
+    index('custom_pred_member_idx').on(table.memberId),
+    index('custom_pred_rule_idx').on(table.customEventRuleId),
+    unique('custom_pred_rule_ep_member_unq').on(table.customEventRuleId, table.episodeId, table.memberId)
   ]
 );
 
