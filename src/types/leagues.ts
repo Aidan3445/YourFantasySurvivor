@@ -51,7 +51,7 @@ export type LeagueSettings = {
 
 export type LeagueSettingsUpdate = {
   name?: string;
-  draftDate?: Date | null;
+  draftDate?: Date | null | string;
   survivalCap?: number;
   preserveStreak?: boolean;
   admins?: number[];

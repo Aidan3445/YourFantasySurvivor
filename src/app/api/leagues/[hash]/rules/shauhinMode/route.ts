@@ -17,7 +17,7 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     }
 
     try {
-      const { success } = await updateShauhinModeLogic(auth, body.shauhinMode);
+      const success = await updateShauhinModeLogic(auth, body.shauhinMode);
       return NextResponse.json(success, { status: 200 });
     } catch (e) {
       console.error('Failed to update Shauhin Mode settings', e);

@@ -6,7 +6,7 @@ export async function GET(_: NextRequest, { params }: LeagueRouteParams) {
   const { hash } = await params;
 
   try {
-    const usedColors = getUsedColors(hash);
+    const usedColors = await getUsedColors(hash);
     return NextResponse.json({ usedColors }, { status: 200 });
   } catch (e) {
     console.error(e);

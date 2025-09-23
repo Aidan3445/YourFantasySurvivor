@@ -88,12 +88,10 @@ export function LeagueSettings() {
               <FormMessage />
             </FormItem>
           )} />
-        {editable && <>
-          <LeagueAdminsField members={membersList} />
-          <Button className='mt-auto' disabled={!reactForm.formState.isDirty} type='submit'>
-            Save
-          </Button>
-        </>}
+        <LeagueAdminsField members={membersList} />
+        <Button className='mt-auto' disabled={!reactForm.formState.isDirty} type='submit'>
+          Save
+        </Button>
       </form>
     </Form>
   );

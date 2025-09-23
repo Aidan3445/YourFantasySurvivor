@@ -28,6 +28,8 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
       member: LeagueMemberInsert
     };
 
+    console.log('PUT body', body);
+
     if (!body.member) {
       return NextResponse.json({ error: 'Missing member in request body' }, { status: 400 });
     }
