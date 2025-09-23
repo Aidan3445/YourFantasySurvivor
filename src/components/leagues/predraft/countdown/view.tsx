@@ -52,7 +52,9 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
             {leagueSettings?.draftDate
               ? (leagueSettings.draftDate.getTime() > Date.now()
                 ? `Starts at: ${leagueSettings.draftDate.toLocaleString()}`
-                : 'Draft is live')
+                : (league?.status === 'Draft'
+                  ? 'Draft is live!'
+                  : 'Draft ready to start!'))
               : 'Draft set to manual start by commissioner'}
           </p>
         </div>
@@ -67,8 +69,9 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'
             variant='positive'
+            disabled={league?.status !== 'Draft' || !league}
             onClick={onDraftJoin}>
-            Join now!
+            {league?.status === 'Draft' ? 'Join Draft' : 'Waiting for Commissioner'}
           </Button>
         } />
       </span>
