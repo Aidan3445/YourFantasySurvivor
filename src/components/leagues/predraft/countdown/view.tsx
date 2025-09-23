@@ -69,9 +69,10 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'
             variant='positive'
-            disabled={league?.status !== 'Draft' || !league}
+            disabled={!league || (leagueMembers?.loggedIn?.role !== 'Owner' && league?.status !== 'Draft')}
             onClick={onDraftJoin}>
-            {league?.status === 'Draft' ? 'Join Draft' : 'Waiting for Commissioner'}
+            {league?.status === 'Draft' ? 'Join Draft' :
+              (leagueMembers?.loggedIn?.role === 'Owner' ? 'Start Draft' : 'Waiting for Commissioner')}
           </Button>
         } />
       </span>
