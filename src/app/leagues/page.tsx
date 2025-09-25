@@ -8,7 +8,14 @@ import { auth } from '@clerk/nextjs/server';
 
 export default async function LeaguesPage() {
   const { userId } = await auth();
+  // Debug auth state
+  console.log('Server userId:', userId);
+  console.log('Environment:', process.env.NODE_ENV);
+
   const leagues = await getUserLeagues(userId ?? '');
+
+  // Debug the response
+  console.log('Leagues fetched:', leagues.length);
 
   const { currentLeagues, inactiveLeagues } = leagues.reduce((acc, league) => {
     if (league.league.status === 'Inactive') {
@@ -22,6 +29,9 @@ export default async function LeaguesPage() {
   return (
     <main className='w-full flex flex-col gap-5 items-center text-center'>
       <div className='w-full place-items-center space-y-2'>
+        <div className='text-xs opacity-50'>
+          UserId: {userId ?? 'null'} | Leagues: {leagues.length}
+        </div>
         {leagues.length > 0 ?
           <h1 className='text-3xl w-5/6 bg-secondary rounded-full mt-10'>My Leagues</h1> :
           <>
@@ -53,6 +63,7 @@ export default async function LeaguesPage() {
       <Separator className='w-11/12 mt-3' />
       <LeagueGrid leagues={inactiveLeagues} isInactive />
       <pre className='text-left'>
+        Debug Info: {JSON.stringify({ userId, leaguesCount: leagues.length, env: process.env.NODE_ENV }, null, 2)}
         {JSON.stringify(leagues, null, 2)}
       </pre>
     </main>
