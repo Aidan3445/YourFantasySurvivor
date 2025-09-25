@@ -48,6 +48,13 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
+  // Only handle GET requests
+  if (req.method !== 'GET') {
+    console.log('~~~~Non-GET request, skipping middleware', req.nextUrl.pathname, req.method);
+    return NextResponse.next();
+  }
+  console.log('~~~~Authenticated user', userId, req.nextUrl.pathname, req.method);
+
   // Check if the request is for home or leagues
   const leaguesRedirect = await leaguesRoute(req, userId);
   if (leaguesRedirect) {
@@ -71,6 +78,7 @@ export default clerkMiddleware(async (auth, req) => {
 const leaguesMatcher = createRouteMatcher(['/leagues']);
 async function leaguesRoute(req: NextRequest, userId: string) {
   if (leaguesMatcher(req)) {
+    console.log('Checking leagues for user', userId, req.method);
     const hasLeagues = await db
       .select({ count: count() })
       .from(leagueSchema)

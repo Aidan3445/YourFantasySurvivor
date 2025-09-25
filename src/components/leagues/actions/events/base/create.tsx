@@ -239,7 +239,12 @@ export default function CreateBaseEvent() {
               </span>
               <br />
               <Button
-                disabled={!reactForm.formState.isValid}
+                disabled={
+                  !selectedEvent ||
+                  setLabel === '' ||
+                  !selectedReferences ||
+                  selectedReferences.length === 0
+                }
                 type='submit'>
                 Create
               </Button>

@@ -15,7 +15,7 @@ export function useLeagues() {
   }[]>({
     queryKey: ['leagues'],
     queryFn: async () => {
-      const response = await fetch('/api/leagues/');
+      const response = await fetch('/api/leagues');
       if (!response.ok) {
         throw new Error('Failed to fetch league');
       }

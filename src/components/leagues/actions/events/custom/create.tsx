@@ -229,7 +229,12 @@ export default function CreateCustomEvent() {
               </span>
               <br />
               <Button
-                disabled={CustomEventInsertZod.safeParse(reactForm.getValues()).success === false}
+                disabled={
+                  !selectedEvent ||
+                  setLabel === '' ||
+                  !selectedReferences ||
+                  selectedReferences.length === 0
+                }
                 type='submit'>
                 Create
               </Button>
