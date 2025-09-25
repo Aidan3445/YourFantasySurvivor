@@ -43,7 +43,7 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
                 render={({ field: pointsField }) => (
                   <FormItem>
                     {disabled &&
-                      <h2 className='font-bold text-card-foreground text-nowrap'>
+                      <h2 className='font-bold text-nowrap text-green-600'>
                         {pointsField.value}
                         <Flame size={14} className='inline align-text-bottom mb-0.5 stroke-green-600' />
                       </h2>}

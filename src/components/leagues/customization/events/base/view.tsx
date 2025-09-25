@@ -39,12 +39,11 @@ export default function LeagueScoring() {
   const [locked, setLocked] = useState(true);
 
   useEffect(() => {
-    reactForm.setValue('baseEventRules', rules?.base ?? defaultBaseRules);
-  }, [rules?.base, reactForm]);
-
-  useEffect(() => {
-    reactForm.setValue('basePredictionRules', rules?.basePrediction ?? defaultBasePredictionRules);
-  }, [rules?.basePrediction, reactForm]);
+    reactForm.reset({
+      baseEventRules: rules?.base ?? defaultBaseRules,
+      basePredictionRules: rules?.basePrediction ?? defaultBasePredictionRules
+    }, { keepDefaultValues: false });
+  }, [rules?.base, rules?.basePrediction, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     if (!league) return;

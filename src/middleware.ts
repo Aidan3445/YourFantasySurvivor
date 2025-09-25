@@ -38,6 +38,11 @@ export const config = {
 
 
 export default clerkMiddleware(async (auth, req) => {
+  // Only handle GET requests
+  if (req.method !== 'GET') {
+    return NextResponse.next();
+  }
+
   // Authenticate the user
   const res = await auth();
   const userId = res.sessionClaims?.userId ?? res.userId;
@@ -47,13 +52,6 @@ export default clerkMiddleware(async (auth, req) => {
   if (!userId || !sessionId) {
     return NextResponse.next();
   }
-
-  // Only handle GET requests
-  if (req.method !== 'GET') {
-    console.log('~~~~Non-GET request, skipping middleware', req.nextUrl.pathname, req.method);
-    return NextResponse.next();
-  }
-  console.log('~~~~Authenticated user', userId, req.nextUrl.pathname, req.method);
 
   // Check if the request is for home or leagues
   const leaguesRedirect = await leaguesRoute(req, userId);

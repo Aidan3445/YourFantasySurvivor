@@ -52,7 +52,10 @@ export default async function LeaguesPage() {
       </SignedOut>
       <Separator className='w-11/12 mt-3' />
       <LeagueGrid leagues={inactiveLeagues} isInactive />
-    </main >
+      <pre className='text-left'>
+        {JSON.stringify(leagues, null, 2)}
+      </pre>
+    </main>
   );
 }
 
