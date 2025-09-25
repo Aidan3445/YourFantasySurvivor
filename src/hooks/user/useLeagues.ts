@@ -10,7 +10,7 @@ export function useLeagues() {
   return useQuery<{
     league: League,
     member: LeagueMember,
-    castaway: CurrentSelection,
+    currentSelection: CurrentSelection,
     memberCount: number
   }[]>({
     queryKey: ['leagues'],
@@ -23,7 +23,7 @@ export function useLeagues() {
         leagues: {
           league: League,
           member: LeagueMember,
-          castaway: CurrentSelection,
+          currentSelection: CurrentSelection,
           memberCount: number
         }[]
       };
