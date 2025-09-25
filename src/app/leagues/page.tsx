@@ -6,6 +6,9 @@ import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 import getUserLeagues from '~/services/users/query/userLeagues';
 import { auth } from '@clerk/nextjs/server';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function LeaguesPage() {
   const { userId } = await auth();
   // Debug auth state
