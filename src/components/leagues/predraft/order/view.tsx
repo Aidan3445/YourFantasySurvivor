@@ -15,7 +15,6 @@ import ColorRow from '~/components/shared/colorRow';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
-import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import updateDraftOrder from '~/actions/updateDraftOrder';
 
 const SUFFLE_DURATION = 500;
@@ -30,7 +29,6 @@ export default function DraftOrder({ overrideHash, className }: DraftOrderProps)
   const queryClient = useQueryClient();
   const { data: league } = useLeague(overrideHash);
   const { data: leagueMembers } = useLeagueMembers(overrideHash);
-  const { data: settings } = useLeagueSettings(overrideHash);
 
   const router = useRouter();
   const sensors = useSensors(useSensor(PointerSensor));
@@ -72,9 +70,7 @@ export default function DraftOrder({ overrideHash, className }: DraftOrderProps)
     }, SUFFLE_DURATION / (order.length * SHUFFLE_LOOPS));
   };
 
-  const orderLocked = locked ||
-    league?.status !== 'Predraft' ||
-    (!!settings?.draftDate && Date.now() > settings.draftDate.getTime());
+  const orderLocked = locked || league?.status !== 'Predraft';
 
   const handleSubmit = async () => {
     if (!league || !orderChanged || !leagueMembers) return;
