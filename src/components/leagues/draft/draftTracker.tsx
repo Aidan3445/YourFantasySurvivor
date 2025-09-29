@@ -11,6 +11,7 @@ import MakePredictions from '~/components/leagues/actions/events/predictions/vie
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
 import { useMemo } from 'react';
 import SkipMember from '~/components/leagues/draft/skipMember';
+import { useIsMobile } from '~/hooks/ui/useMobile';
 
 interface DraftTrackerProps {
   hash: string;
@@ -30,6 +31,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
     dialogOpen,
     setDialogOpen,
   } = useLeagueActionDetails(hash);
+  const isMobile = useIsMobile();
 
   const castaways = useMemo(() =>
     Object.values(actionDetails ?? {})
@@ -62,11 +64,13 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
               </h2>
               {onTheClock?.memberId === pick.memberId && (
                 <>
-                  <h3
-                    className='ml-auto inline-flex text-lg self-end animate-bounce'
-                    style={{ color: getContrastingColor(pick.color) }}>
-                    Picking...
-                  </h3>
+                  {!isMobile && (
+                    <h3
+                      className='ml-auto inline-flex text-lg self-end animate-bounce'
+                      style={{ color: getContrastingColor(pick.color) }}>
+                      Picking...
+                    </h3>
+                  )}
                   {leagueMembers.loggedIn?.role !== 'Member' &&
                     pick.draftOrder < leagueMembers.members.length && (
                       <SkipMember hash={hash} member={pick} leagueMembers={leagueMembers.members} />

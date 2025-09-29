@@ -33,6 +33,6 @@ export default function SideNav() {
           <SideNavFooter />
         </SidebarGroup>
       </SidebarContent>
-    </Sidebar >
+    </Sidebar>
   );
 }

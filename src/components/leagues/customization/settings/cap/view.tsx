@@ -85,9 +85,9 @@ export default function SetSurvivalCap() {
             render={({ field: valueField }) => (
               <>
                 <FormItem>
-                  <FormLabel className='inline-flex gap-2 items-center'>Streak Cap
+                  <FormLabel className='inline-flex items-center'>Streak Cap
                     {locked && <>
-                      <h2 className={cn('text-lg font-bold text-card-foreground',
+                      <h2 className={cn('text-lg font-bold text-card-foreground ml-2',
                         valueField.value > 0 ? 'text-green-600' : 'text-destructive')}>
                         {valueField.value === 0
                           ? 'Off'
@@ -96,7 +96,7 @@ export default function SetSurvivalCap() {
                             : valueField.value}
                       </h2>
                       {valueField.value > 0 && valueField.value < MAX_SURVIVAL_CAP &&
-                        <Flame className={cn('inline align-top',
+                        <Flame size={20} className={cn('inline align-top',
                           valueField.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
                         )} />}
                     </>}
