@@ -8,7 +8,7 @@ import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
 import ChangeCastaway from '~/components/leagues/hub/picks/changeSurvivor/view';
 import CreateBaseEvent from '~/components/leagues/actions/events/base/create';
 import CustomEvents from '~/components/leagues/customization/events/custom/view';
-import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
+import LeagueSettings from '~/components/leagues/customization/settings/league/view';
 import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
 import Predictions from '~/components/leagues/hub/picks/predictions/view';
@@ -19,6 +19,7 @@ import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 import getLeague from '~/services/leagues/query/legaue';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
+import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
@@ -78,7 +79,10 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
                   Settings
                 </h2>
                 <MemberEditForm className='flex-1' />
-                <LeagueSettings />
+                <span className='w-full flex flex-wrap gap-4 justify-center'>
+                  <LeagueSettings />
+                  <DeleteLeague />
+                </span>
               </>}
               <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
                 Scoring

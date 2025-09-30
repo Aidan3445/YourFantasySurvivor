@@ -1,5 +1,5 @@
 import CustomEvents from '~/components/leagues/customization/events/custom/view';
-import { LeagueSettings } from '~/components/leagues/customization/settings/league/view';
+import LeagueSettings from '~/components/leagues/customization/settings/league/view';
 import MemberEditForm from '~/components/leagues/customization/member/view';
 import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
 import { DraftCountdown } from '~/components/leagues/predraft/countdown/view';
@@ -9,6 +9,7 @@ import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
+import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 
 export default async function LeaguePage() {
 
@@ -39,7 +40,10 @@ export default async function LeaguePage() {
           <TabsContent value='settings'>
             <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-12'>
               <MemberEditForm className='w-full' />
-              <LeagueSettings />
+              <span className='w-full flex flex-wrap gap-4 justify-center'>
+                <LeagueSettings />
+                <DeleteLeague />
+              </span>
             </section>
           </TabsContent>
           <ScrollBar orientation='vertical' />

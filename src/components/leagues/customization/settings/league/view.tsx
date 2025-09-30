@@ -14,7 +14,7 @@ import { useEffect, useMemo } from 'react';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
 import updateAdmins from '~/actions/updateAdmins';
 
-export function LeagueSettings() {
+export default function LeagueSettings() {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
   const { data: leagueMembers } = useLeagueMembers();
@@ -69,7 +69,7 @@ export function LeagueSettings() {
 
   return (
     <Form {...reactForm}>
-      <form className='lg:flex-1 w-full lg:w-min flex flex-col p-2 gap-2 bg-card rounded-xl items-center' action={() => handleSubmit()}>
+      <form className='flex-1 flex flex-col p-2 gap-2 bg-card rounded-xl items-center min-w-sm' action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit League Details</FormLabel>
         <FormField
           name='name'
@@ -89,7 +89,7 @@ export function LeagueSettings() {
             </FormItem>
           )} />
         <LeagueAdminsField members={membersList} />
-        <Button className='mt-auto' disabled={!reactForm.formState.isDirty} type='submit'>
+        <Button className='mt-auto w-full' disabled={!reactForm.formState.isDirty} type='submit'>
           Save
         </Button>
       </form>
