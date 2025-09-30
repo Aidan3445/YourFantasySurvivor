@@ -1,6 +1,6 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
+import { requireLeagueOwnerAuth } from '~/lib/auth';
 import updateAdminsLogic from '~/services/leagues/mutation/updateAdmins';
 
 /**
@@ -13,7 +13,7 @@ import updateAdminsLogic from '~/services/leagues/mutation/updateAdmins';
   */
 export default async function updateAdmins(hash: string, admins: number[]) {
   try {
-    return await requireLeagueMemberAuth(updateAdminsLogic)(hash, admins);
+    return await requireLeagueOwnerAuth(updateAdminsLogic)(hash, admins);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

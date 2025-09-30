@@ -1,6 +1,6 @@
 'use server';
 
-import { requireLeagueAdminAuth } from '~/lib/auth';
+import { requireLeagueOwnerAuth } from '~/lib/auth';
 import updateCustomEventRuleLogic from '~/services/leagues/mutation/updateCustomEventRule';
 import { type CustomEventRuleInsert } from '~/types/leagues';
 
@@ -19,7 +19,7 @@ export default async function updateCustomEventRule(
   ruleId: number,
 ) {
   try {
-    return await requireLeagueAdminAuth(updateCustomEventRuleLogic)(hash, rule, ruleId);
+    return await requireLeagueOwnerAuth(updateCustomEventRuleLogic)(hash, rule, ruleId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

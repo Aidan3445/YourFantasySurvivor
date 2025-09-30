@@ -1,6 +1,6 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
+import { requireLeagueOwnerAuth } from '~/lib/auth';
 import updateBaseEventRulesLogic from '~/services/leagues/mutation/updateBaseEventRules';
 import { type BaseEventPredictionRules, type BaseEventRules } from '~/types/leagues';
 
@@ -19,7 +19,7 @@ export default async function updateBaseEventRules(
   predictionRules: BaseEventPredictionRules
 ) {
   try {
-    return await requireLeagueMemberAuth(updateBaseEventRulesLogic)(hash, baseRules, predictionRules);
+    return await requireLeagueOwnerAuth(updateBaseEventRulesLogic)(hash, baseRules, predictionRules);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

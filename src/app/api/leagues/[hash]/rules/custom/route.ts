@@ -2,14 +2,14 @@ import 'server-only';
 
 import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
-import { withLeagueAdminAuth } from '~/lib/apiMiddleware';
+import { withLeagueOwnerAuth } from '~/lib/apiMiddleware';
 import createCustomEventRuleLogic from '~/services/leagues/mutation/createCustomEventRule';
 import updateCustomEventRuleLogic from '~/services/leagues/mutation/updateCustomEventRule';
 import deleteCustomEventRuleLogic from '~/services/leagues/mutation/deleteCustomEventRule';
 import { type CustomEventRuleInsert } from '~/types/leagues';
 
 export async function POST(request: NextRequest, context: LeagueRouteParams) {
-  return withLeagueAdminAuth(async (auth) => {
+  return withLeagueOwnerAuth(async (auth) => {
     const body = await request.json() as {
       rule: CustomEventRuleInsert;
     };
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
 }
 
 export async function PUT(request: NextRequest, context: LeagueRouteParams) {
-  return withLeagueAdminAuth(async (auth) => {
+  return withLeagueOwnerAuth(async (auth) => {
     const body = await request.json() as {
       rule: CustomEventRuleInsert;
       ruleId: number;
@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
 }
 
 export async function DELETE(request: NextRequest, context: LeagueRouteParams) {
-  return withLeagueAdminAuth(async (auth) => {
+  return withLeagueOwnerAuth(async (auth) => {
     const { searchParams } = new URL(request.url);
     const ruleIdParam = searchParams.get('ruleId');
 

@@ -2,11 +2,11 @@ import 'server-only';
 
 import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
-import { withLeagueMemberAuth } from '~/lib/apiMiddleware';
+import { withLeagueOwnerAuth } from '~/lib/apiMiddleware';
 import updateAdminsLogic from '~/services/leagues/mutation/updateAdmins';
 
 export async function POST(request: NextRequest, context: LeagueRouteParams) {
-  return await withLeagueMemberAuth(async (auth) => {
+  return await withLeagueOwnerAuth(async (auth) => {
     const body = await request.json() as {
       admins: number[];
     };

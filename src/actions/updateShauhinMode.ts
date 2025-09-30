@@ -1,6 +1,6 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
+import { requireLeagueOwnerAuth } from '~/lib/auth';
 import updateShauhinModeLogic from '~/services/leagues/mutation/updateShauhinMode';
 import { type ShauhinModeSettings } from '~/types/leagues';
 
@@ -18,7 +18,7 @@ export default async function updateShauhinMode(
   shauhinMode: ShauhinModeSettings,
 ) {
   try {
-    return await requireLeagueMemberAuth(updateShauhinModeLogic)(hash, shauhinMode);
+    return await requireLeagueOwnerAuth(updateShauhinModeLogic)(hash, shauhinMode);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

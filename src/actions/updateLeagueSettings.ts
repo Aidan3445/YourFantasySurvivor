@@ -1,6 +1,6 @@
 'use server';
 
-import { requireLeagueMemberAuth } from '~/lib/auth';
+import { requireLeagueOwnerAuth } from '~/lib/auth';
 import updateLeagueSettingsLogic from '~/services/leagues/mutation/updateLeagueSettings';
 import { type LeagueSettingsUpdate } from '~/types/leagues';
 
@@ -17,7 +17,7 @@ export default async function updateLeagueSettings(
   update: LeagueSettingsUpdate
 ) {
   try {
-    return await requireLeagueMemberAuth(updateLeagueSettingsLogic)(hash, update);
+    return await requireLeagueOwnerAuth(updateLeagueSettingsLogic)(hash, update);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

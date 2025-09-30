@@ -4,10 +4,10 @@ import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
 import updateBaseEventRulesLogic from '~/services/leagues/mutation/updateBaseEventRules';
 import { type BaseEventPredictionRules, type BaseEventRules } from '~/types/leagues';
-import { withLeagueAdminAuth } from '~/lib/apiMiddleware';
+import { withLeagueOwnerAuth } from '~/lib/apiMiddleware';
 
 export async function PUT(request: NextRequest, context: LeagueRouteParams) {
-  return await withLeagueAdminAuth(async (auth) => {
+  return await withLeagueOwnerAuth(async (auth) => {
     const body = await request.json() as {
       baseRules: BaseEventRules,
       predictionRules: BaseEventPredictionRules

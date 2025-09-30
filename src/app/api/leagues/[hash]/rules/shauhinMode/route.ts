@@ -4,10 +4,10 @@ import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
 import updateShauhinModeLogic from '~/services/leagues/mutation/updateShauhinMode';
 import { type ShauhinModeSettings } from '~/types/leagues';
-import { withLeagueAdminAuth } from '~/lib/apiMiddleware';
+import { withLeagueOwnerAuth } from '~/lib/apiMiddleware';
 
 export async function PUT(request: NextRequest, context: LeagueRouteParams) {
-  return await withLeagueAdminAuth(async (auth) => {
+  return await withLeagueOwnerAuth(async (auth) => {
     const body = await request.json() as {
       shauhinMode: ShauhinModeSettings;
     };
