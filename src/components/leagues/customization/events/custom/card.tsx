@@ -6,7 +6,7 @@ import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
 import { Flame, Settings2 } from 'lucide-react';
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialog, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
 import { useState } from 'react';
@@ -42,6 +42,7 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
     try {
       await updateCustomEventRule(league.hash, data, rule.customEventRuleId);
       await queryClient.invalidateQueries({ queryKey: ['rules', league.hash] });
+      setIsEditing(false);
       alert(`Custom event ${data.eventName} updated.`);
     } catch (error) {
       console.error(error);
@@ -101,10 +102,18 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
                 <LeagueEventFields predictionDefault={rule.eventType === 'Prediction'} />
                 <AlertDialogFooter className='grid grid-cols-2 gap-2'>
                   <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
-                  <AlertDialogAction asChild>
-                    {/* Not sure why the form action isn't working */}
-                    <Button onClick={() => handleSubmit()} type='submit'>Save Changes</Button>
-                  </AlertDialogAction>
+                  {/* Not sure why the form action isn't working */}
+                  <Button
+                    type='submit'
+                    onClick={() => {
+                      if (CustomEventRuleInsertZod.safeParse(reactForm.getValues()).success) {
+                        void handleSubmit();
+                      } else {
+                        void reactForm.trigger();
+                      }
+                    }}>
+                    Save Changes
+                  </Button>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
