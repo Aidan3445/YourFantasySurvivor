@@ -58,6 +58,7 @@ function getActiveTimings({
   // - if the league is in draft status
   // - if there are no previous episodes
   // - if the draft date is after the last aired episode
+  console.log(startWeek, nextEpisode?.episodeNumber);
   if (leagueStatus === 'Draft' || !previousEpisode || startWeek === nextEpisode?.episodeNumber) {
     timings.push('Draft');
   }

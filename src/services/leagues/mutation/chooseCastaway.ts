@@ -117,7 +117,7 @@ export default async function chooseCastawayLogic(
       if (totalPicks === totalMembers) {
         await trx
           .update(leagueSchema)
-          .set({ status: 'Active' })
+          .set({ status: 'Active', startWeek: nextEpisode.episodeNumber })
           .where(eq(leagueSchema.leagueId, auth.leagueId));
 
         return { success: true, draftComplete: true };
