@@ -116,8 +116,8 @@ export default function CustomEvents() {
       {
         rules?.custom?.length ?
           <article className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-            {rules?.custom.map((rule, index) => (
-              <LeagueEventCard key={index} rule={rule} locked={disabled || locked} />
+            {rules?.custom.map((rule) => (
+              <LeagueEventCard key={rule.customEventRuleId} rule={rule} locked={disabled || locked} />
             ))}
           </article>
           :
