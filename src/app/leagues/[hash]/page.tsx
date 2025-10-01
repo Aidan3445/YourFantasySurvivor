@@ -49,10 +49,10 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           {isActive && userId && <TabsTrigger className='flex-1' value='Base'>Base</TabsTrigger>}
           <TabsTrigger className='flex-0 ml-10' value='settings'>Settings</TabsTrigger>
         </TabsList>
-        <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-visible @container/tabs-content'>
+        <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-clip @container/tabs-content'>
           <TabsContent className='mb-2' value='scores'>
             <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-12 pb-2'>
-              <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-2 lg:grid-rows-1 gap-4 items-center justify-center overflow-x-auto'>
+              <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-2 lg:grid-rows-1 gap-4 items-center justify-center overflow-x-clip'>
                 <Scoreboard />
                 <Chart />
               </span>

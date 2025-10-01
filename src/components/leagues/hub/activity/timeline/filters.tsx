@@ -63,7 +63,7 @@ export default function TimelineFilters({
   return (
     <Accordion type='single' collapsible>
       <AccordionItem value='filter' className='border-none'>
-        <span className='w-full flex flex-wrap items-center gap-x-4 md:items-baseline px-12 mr-14 justify-center'>
+        <span className='w-full flex flex-wrap items-center gap-x-4 md:items-baseline px-12 md:mr-14 justify-center'>
           <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
           <span className='flex flex-wrap gap-x-4 items-center justify-center'>
             <Select
