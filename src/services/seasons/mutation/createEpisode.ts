@@ -6,6 +6,7 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { type EpisodeInsert } from '~/types/episodes';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { revalidateTag } from 'next/cache';
+import { setToNY8PM } from '~/lib/utils';
 
 /**
   * Create a new episode
@@ -36,12 +37,14 @@ export async function createEpisodeLogic(
       runtime = 120;
     }
 
+    const date = setToNY8PM(episode.airDate);
+
     // Insert the episode
     const newEpisodeId = await trx
       .insert(episodeSchema)
       .values({
         ...episode,
-        airDate: episode.airDate.toUTCString(),
+        airDate: date.toUTCString(),
         seasonId: season.seasonId,
         runtime
       })
@@ -49,7 +52,7 @@ export async function createEpisodeLogic(
         target: [episodeSchema.episodeNumber, episodeSchema.seasonId],
         set: {
           ...episode,
-          airDate: episode.airDate.toUTCString(),
+          airDate: date.toUTCString(),
         }
       })
       .returning({ episodeId: episodeSchema.episodeId })
@@ -60,7 +63,7 @@ export async function createEpisodeLogic(
       // Update the premiere date of the season
       await trx
         .update(seasonSchema)
-        .set({ premiereDate: episode.airDate.toUTCString() })
+        .set({ premiereDate: date.toUTCString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
       // Invalidate seasons
       revalidateTag('seasons');
@@ -70,7 +73,7 @@ export async function createEpisodeLogic(
       // Update the finale date of the season
       await trx
         .update(seasonSchema)
-        .set({ finaleDate: episode.airDate.toUTCString() })
+        .set({ finaleDate: date.toUTCString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
       // Invalidate seasons
       revalidateTag('seasons');

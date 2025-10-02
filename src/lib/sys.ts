@@ -92,7 +92,7 @@ export async function fetchSurvivorSeasonData(seasonName: string) {
         const episodeNumber = +$e(columns[0]).text().trim();
         const episodeTitle = $e(columns[1]).text().trim();
         const premiereDate = $e(columns[2]).text().trim();
-        episodes.push({ episodeNumber, episodeTitle, episodeAirDate: new Date(`${premiereDate} 20:00:00`) });
+        episodes.push({ episodeNumber, episodeTitle, episodeAirDate: new Date(`${premiereDate}`) });
       }
     });
 

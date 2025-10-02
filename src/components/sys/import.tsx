@@ -173,7 +173,7 @@ function ImportEpisode({ seasonName: seasonId, episodeNumber, episodeTitle, epis
     <div className='items-center bg-card rounded-lg p-4'>
       <h2 className='font-bold'>Episode {episodeNumber}</h2>
       <p>{episodeTitle}</p>
-      <p>{new Date(episodeAirDate).toLocaleString()}</p>
+      <p>{new Date(episodeAirDate).toDateString()}</p>
       <form action={() => handleSubmit()}>
         <label className='inline-flex items-center space-x-2'>
           <input
