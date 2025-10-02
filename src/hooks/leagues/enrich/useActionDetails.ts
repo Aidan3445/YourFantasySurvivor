@@ -212,8 +212,6 @@ export function useLeagueActionDetails(overrideHash?: string) {
     };
   }, [rules, predictionTiming]);
 
-  console.log(rulesBasedOnTiming, predictionTiming);
-
   return {
     actionDetails,
     membersWithPicks,

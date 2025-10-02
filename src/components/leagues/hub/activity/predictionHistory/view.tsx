@@ -50,7 +50,6 @@ export default function PredictionHistory() {
       });
     }
 
-
     if (!customEvents?.events) return predictions;
 
     Object.entries(customPredictionsMade).forEach(([episodeNumber, preds]) => {

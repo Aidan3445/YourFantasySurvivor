@@ -15,7 +15,7 @@ export default async function getKeyEpisodes(seasonId: number) {
   const episodes = await getEpisodes(seasonId);
 
   return episodes.reduce((acc, episode) => {
-    if (episode.airStatus === 'Aired') {
+    if (episode.airStatus === 'Aired' || episode.airStatus === 'Airing') {
       acc.previousEpisode = episode;
     }
 

@@ -5,12 +5,9 @@ import getPublicLeague from '~/services/leagues/query/public';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 export async function GET(request: NextRequest) {
-  console.log(request.headers);
   return await withAuth(async () => {
     const hashParam = request.nextUrl.searchParams.get('hash');
     const hash = hashParam ? hashParam : undefined;
-
-    console.log('Fetching public league data for hash:', request.headers);
 
     if (!hash) {
       return NextResponse.json({ error: 'Missing or invalid hash parameter' }, { status: 400 });
