@@ -4,7 +4,7 @@ import { cn } from '~/lib/utils';
 import { Flame } from 'lucide-react';
 import { CoverCarousel } from '~/components/common/carousel';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
-import SubmissionCard from '~/components/leagues/actions/events/predictions/submission';
+import SubmissionCard, { BaseSubmissionCard } from '~/components/leagues/actions/events/predictions/submission';
 import { BaseEventDescriptions, BaseEventFullName, BasePredictionReferenceTypes } from '~/lib/events';
 import { type MakePredictionsProps } from '~/components/leagues/actions/events/predictions/view';
 import { type ScoringBaseEventName, type ReferenceType, type MakePrediction } from '~/types/events';
@@ -13,7 +13,6 @@ import { useShauhinActive } from '~/hooks/leagues/enrich/useShauhinActive';
 
 export default function PredictionCards({
   rules,
-  predictionRuleCount,
   predictionsMade,
   castaways,
   tribes,
@@ -108,12 +107,12 @@ export default function PredictionCards({
     setBetTotal(totalBet);
   }, [formBetValues, setBetTotal]);
 
-  if (predictionRuleCount === 0) return null;
-  if (predictionRuleCount === 1) {
+  if (enabledBasePredictions.length + customPredictions.length === 0) return null;
+  if (enabledBasePredictions.length + customPredictions.length === 1) {
     const prediction = enabledBasePredictions[0] ?? customPredictions[0]!;
     return (
       <article
-        className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg min-w-96', className)}>
+        className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg min-w-96 mb-2', className)}>
         <span className='flex gap-1 items-start self-center px-1'>
           <h3 className='text-lg font-semibold text-card-foreground'>
             {prediction.label}
@@ -124,8 +123,8 @@ export default function PredictionCards({
             <Flame size={16} />
           </div>
         </span>
-        <p className='text-sm'>{prediction.description}</p>
-        <SubmissionCard
+        <p className='text-sm px-2 bg-b3'>{prediction.description}</p>
+        <BaseSubmissionCard
           prediction={prediction}
           options={getOptions(prediction.referenceTypes)}
           wallet={wallet}

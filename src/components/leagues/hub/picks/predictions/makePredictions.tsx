@@ -67,8 +67,7 @@ export default function MakePredictions() {
             wallet={balance}
             totalBet={formBetTotal}
             setBetTotal={setFormBetTotal} />
-        )
-      }
-    </div >
+        )}
+    </div>
   );
 }

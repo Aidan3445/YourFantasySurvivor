@@ -17,7 +17,7 @@ import ColorRow from '~/components/shared/colorRow';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useQueryClient } from '@tanstack/react-query';
 import makePrediction from '~/actions/makePrediction';
-import { useCarousel } from '~/components/common/carousel';
+import { type CarouselContextProps, useCarousel } from '~/components/common/carousel';
 
 const formSchema = z.object({
   referenceId: z.coerce.number(),
@@ -33,10 +33,29 @@ interface SubmissionCardProps {
   totalBet?: number;
 }
 
-export default function SubmissionCard({ wallet, prediction, options, maxBet, updateBetTotal, totalBet }: SubmissionCardProps) {
+export default function SubmissionCard(props: SubmissionCardProps) {
+  const { canScrollNext, scrollNext } = useCarousel();
+
+  return <BaseSubmissionCard {...props} canScrollNext={canScrollNext} scrollNext={scrollNext} />;
+}
+
+interface BaseSubmissionCardProps extends SubmissionCardProps {
+  canScrollNext?: CarouselContextProps['canScrollNext'];
+  scrollNext?: CarouselContextProps['scrollNext'];
+}
+
+export function BaseSubmissionCard({
+  wallet,
+  prediction,
+  options,
+  maxBet,
+  updateBetTotal,
+  totalBet,
+  canScrollNext,
+  scrollNext
+}: BaseSubmissionCardProps) {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
-  const { canScrollNext, scrollNext } = useCarousel();
 
   const schema = useMemo(() => {
     return formSchema.extend({
@@ -94,7 +113,7 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
 
       alert('Prediction submitted');
 
-      if (canScrollNext) scrollNext();
+      if (canScrollNext && scrollNext) scrollNext();
     } catch (error) {
       console.error(error);
       alert('Failed to submit prediction');
@@ -105,7 +124,7 @@ export default function SubmissionCard({ wallet, prediction, options, maxBet, up
   return (
     <Form {...reactForm}>
       <form action={() => handleSubmit()}>
-        <span className='grid grid-cols-[min-content_1fr] items-center pl-4'>
+        <span className='grid grid-cols-[min-content_1fr] items-center pl-4 bg-b2 rounded-b-lg'>
           <RotateCcw
             className={cn('cursor-pointer hover:text-primary transition-all',
               !reactForm.formState.isDirty && 'opacity-50 cursor-not-allowed')}

@@ -22,7 +22,7 @@ type CarouselProps = {
   setApi?: (api: CarouselApi) => void
 }
 
-type CarouselContextProps = {
+export type CarouselContextProps = {
   carouselRef: ReturnType<typeof useEmblaCarousel>[0]
   api: ReturnType<typeof useEmblaCarousel>[1]
   scrollPrev: () => void
@@ -376,13 +376,13 @@ function CoverCarousel({ items }: CoverCarouselProps) {
                     </TableFooter>
                   )
                 }
-              </Table >
-            </CarouselItem >
+              </Table>
+            </CarouselItem>
           );
         })}
-      </CarouselContent >
+      </CarouselContent>
       <CarouselProgress current={current} count={items.length} />
-    </Carousel >
+    </Carousel>
   );
 }
 
