@@ -103,7 +103,7 @@ export function getHslIndex(index: number, total: number) {
 }
 
 export function setToNY8PM(inputDate: Date): Date {
-  // Extract the parts of the date in New York time
+  // Extract Y/M/D in NY
   const parts = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/New_York',
     year: 'numeric',
@@ -115,20 +115,15 @@ export function setToNY8PM(inputDate: Date): Date {
   const month = parseInt(parts.find(p => p.type === 'month')!.value, 10);
   const day = parseInt(parts.find(p => p.type === 'day')!.value, 10);
 
-  // Build a Date for *that day at 8:00 PM New York time*
-  // Trick: first make a UTC date, then adjust with Intl
-  const nyMidnightUTC = new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
+  // Get the NY offset at that date
+  const utcAtMidnight = Date.UTC(year, month - 1, day);
+  const offsetMinutes = new Date(utcAtMidnight)
+    .toLocaleString('en-US', { timeZone: 'America/New_York' });
+  const offsetDate = new Date(offsetMinutes);
+  const tzOffsetMinutes = offsetDate.getTimezoneOffset();
 
-  // Use the timezone offset at that day in New York to land on 8:00 PM
-  const tzOffsetMinutes = -new Date(
-    nyMidnightUTC.toLocaleString('en-US', { timeZone: 'America/New_York' })
-  ).getTimezoneOffset();
-
-  // 20:00 in NY = 20 hours * 60 minutes + offset
-  const ny8pmUTC = new Date(
-    Date.UTC(year, month - 1, day, 20, 0, 0) +
-    tzOffsetMinutes * 60 * 1000
-  );
+  // 8 PM NY = 20 hours * 60 minutes - offset
+  const ny8pmUTC = new Date(Date.UTC(year, month - 1, day, 20 + tzOffsetMinutes / 60, 0, 0));
 
   return ny8pmUTC;
 }

@@ -44,7 +44,7 @@ export async function createEpisodeLogic(
       .insert(episodeSchema)
       .values({
         ...episode,
-        airDate: date.toUTCString(),
+        airDate: date.toISOString(),
         seasonId: season.seasonId,
         runtime
       })
@@ -52,7 +52,7 @@ export async function createEpisodeLogic(
         target: [episodeSchema.episodeNumber, episodeSchema.seasonId],
         set: {
           ...episode,
-          airDate: date.toUTCString(),
+          airDate: date.toISOString(),
         }
       })
       .returning({ episodeId: episodeSchema.episodeId })
@@ -63,7 +63,7 @@ export async function createEpisodeLogic(
       // Update the premiere date of the season
       await trx
         .update(seasonSchema)
-        .set({ premiereDate: date.toUTCString() })
+        .set({ premiereDate: date.toISOString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
       // Invalidate seasons
       revalidateTag('seasons');
@@ -73,7 +73,7 @@ export async function createEpisodeLogic(
       // Update the finale date of the season
       await trx
         .update(seasonSchema)
-        .set({ finaleDate: date.toUTCString() })
+        .set({ finaleDate: date.toISOString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
       // Invalidate seasons
       revalidateTag('seasons');

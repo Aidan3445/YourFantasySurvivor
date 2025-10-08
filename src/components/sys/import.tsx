@@ -167,7 +167,7 @@ function ImportEpisode({ seasonName: seasonId, episodeNumber, episodeTitle, epis
 
   const [isMerge, setIsMerge] = useState(false);
   const [isFinale, setIsFinale] = useState(false);
-  const [runtime, setRuntime] = useState(0);
+  const [runtime, setRuntime] = useState(90);
 
   return (
     <div className='items-center bg-card rounded-lg p-4'>
