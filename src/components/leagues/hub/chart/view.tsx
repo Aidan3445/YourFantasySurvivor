@@ -54,7 +54,7 @@ export default function Chart() {
           <CartesianGrid stroke='#4D4D4D' />
           <XAxis
             dataKey='episode' type='category' stroke='black'
-            label={<text x={250} y={(memberCount + 1) * 38.5} fill='black' transform='rotate(0)'>Episodes</text>} />
+            label={<text x={250} y={(memberCount + 1) * 38.5} fill='black' transform='rotate(0)'>Episode</text>} />
           <YAxis
             stroke='black'
             tickCount={10}
