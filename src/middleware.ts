@@ -6,6 +6,7 @@ import { db } from '~/server/db';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { and, count, eq } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
+import { systemSchema } from '~/server/db/schema/system';
 
 
 /* Routing Logic
@@ -43,6 +44,7 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
+
   // Authenticate the user
   const res = await auth();
   const userId = res.sessionClaims?.userId ?? res.userId;
@@ -50,6 +52,15 @@ export default clerkMiddleware(async (auth, req) => {
 
   // Check if the user is logged in
   if (!userId || !sessionId) {
+    return NextResponse.next();
+  }
+
+  // Sys auth gets no redirects
+  const isSys = await db.select()
+    .from(systemSchema)
+    .where(eq(systemSchema.userId, userId))
+    .then((r) => r.length > 0);
+  if (isSys) {
     return NextResponse.next();
   }
 

@@ -17,7 +17,7 @@ export default async function getCastaways(seasonId: number) {
     async (sid: number) => fetchCastaways(sid),
     ['castaways', seasonId.toString()],
     {
-      revalidate: false,
+      revalidate: 3600, // 1 hour
       tags: [`castaways-${seasonId}`, 'castaways']
     }
   )(seasonId);

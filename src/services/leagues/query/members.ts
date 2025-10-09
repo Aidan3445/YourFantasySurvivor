@@ -22,11 +22,15 @@ export default async function getLeagueMembers(auth: VerifiedLeagueMemberAuth) {
       role: leagueMemberSchema.role,
       draftOrder: leagueMemberSchema.draftOrder,
       loggedIn: sql<boolean>`CASE WHEN 
-        ${leagueMemberSchema.memberId} = ${auth.memberId}
-        THEN true ELSE false END`.as('loggedIn'),
+         ${leagueMemberSchema.memberId} = ${auth.memberId}
+         THEN true ELSE false END`.as('loggedIn'),
     })
     .from(leagueMemberSchema)
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
     .orderBy(leagueMemberSchema.draftOrder)
-    .then((members) => members as LeagueMember[]);
+    .then((members) => members.map((member) => ({
+      ...member,
+      // override role for logged in user
+      role: member.memberId === auth.memberId ? auth.role : member.role,
+    }) as LeagueMember));
 }

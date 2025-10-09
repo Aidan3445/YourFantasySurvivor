@@ -16,7 +16,7 @@ export default async function getAllSeasons() {
     async () => fetchAllSeasons(),
     ['all-seasons'],
     {
-      revalidate: false,
+      revalidate: 3600, // 1 hour
       tags: ['seasons', 'all-seasons']
     }
   )();

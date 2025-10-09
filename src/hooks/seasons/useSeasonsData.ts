@@ -36,13 +36,6 @@ export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
       }));
     },
     enabled: true,
-    ...(isEpisodeAiring ? refreshConfig : {
-      staleTime: Infinity,
-      gcTime: 24 * 60 * 60 * 1000, // 24 hours
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      refetchInterval: false,
-    })
+    ...refreshConfig
   });
 }

@@ -214,6 +214,7 @@ export function compileScores(
     // get the episode of the first pick, this will be the same for all members for now
     // but doing it this way allows for the possibility of members joining late
     const firstPickEpisode = castaways.findIndex((c) => c);
+    console.log(firstPickEpisode, eliminations);
     // ensure at least zero entry exists for the member
     scores.Member[mid] ??= [0];
     // iterate to add the streak bonus

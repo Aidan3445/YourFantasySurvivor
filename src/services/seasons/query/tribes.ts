@@ -19,7 +19,7 @@ export default async function getTribes(seasonId: number) {
     async (sid: number) => fetchTribes(sid),
     ['tribes', seasonId.toString()],
     {
-      revalidate: false,
+      revalidate: 3600, // 1 hour
       tags: [`tribes-${seasonId}`, 'tribes']
     }
   )(seasonId);

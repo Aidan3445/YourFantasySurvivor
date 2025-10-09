@@ -28,8 +28,6 @@ export default function ChangeCastaway() {
   const { data: league } = useLeague();
   const { actionDetails, keyEpisodes, leagueMembers } = useLeagueActionDetails();
 
-  console.log('actionDetails', actionDetails);
-
   const reactForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });

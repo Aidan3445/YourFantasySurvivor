@@ -82,8 +82,6 @@ export function useLeagueActionDetails(overrideHash?: string) {
 
     const details: DraftDetails = {};
 
-    console.log('selectionTimeline', selectionTimeline);
-
     Object.entries(tribeMembers).forEach(([tribeId, { tribe, castaways }]) => {
       const selections = castaways.map(castaway => {
         const castawaySelections = selectionTimeline.castawayMembers[castaway.castawayId] ?? [null];

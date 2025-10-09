@@ -22,6 +22,25 @@ export async function auth() {
 }
 
 /**
+  * Authenticate for system admin pages
+  * @returns the user id if the user is a system admin
+  * OR an empty object if the user is not authenticated
+  */
+export async function systemAdminAuth() {
+  const { userId } = await auth();
+  if (!userId) return { userId };
+
+  // Ensure the user is a system admin
+  const isAdmin = await db
+    .select()
+    .from(systemSchema)
+    .where(eq(systemSchema.userId, userId))
+    .then((admins) => admins.length > 0);
+
+  return { userId: isAdmin ? userId : null };
+}
+
+/**
   * Authenticate the user within a league
   * @param hash - the hash of the league
   * @returns the user id and league id if the user is a member of the league
@@ -50,31 +69,41 @@ export async function leagueMemberAuth(hash: string) {
     .where(eq(leagueMemberSchema.userId, userId))
     .then((members) => members[0]);
 
-  if (!member) return noAuth;
+  const isAdmin = (await systemAdminAuth()).userId;
+
+  if (!member && !isAdmin) return noAuth;
+
+  if (!member) {
+    // if the user is a sys admin but not a member of the league, get league owner and return as admin
+    const owner = await db
+      .select({
+        memberId: leagueMemberSchema.memberId,
+        role: leagueMemberSchema.role,
+        leagueId: leagueMemberSchema.leagueId,
+        status: leagueSchema.status,
+        seasonId: leagueSchema.seasonId,
+      })
+      .from(leagueMemberSchema)
+      .innerJoin(leagueSchema, and(
+        eq(leagueMemberSchema.leagueId, leagueSchema.leagueId),
+        eq(leagueSchema.hash, hash)))
+      .where(eq(leagueMemberSchema.role, 'Owner'))
+      .then((members) => members[0]);
+    if (!owner) return noAuth;
+    return {
+      userId,
+      memberId: owner.memberId,
+      role: 'Admin', // Sys admin gets admin access
+      leagueId: owner.leagueId,
+      status: owner.status,
+      seasonId: owner.seasonId,
+    } as LeagueMemberAuth;
+  }
 
   return {
     userId,
     ...member,
   } as LeagueMemberAuth;
-}
-
-/**
-  * Authenticate for system admin pages
-  * @returns the user id if the user is a system admin
-  * OR an empty object if the user is not authenticated
-  */
-export async function systemAdminAuth() {
-  const { userId } = await auth();
-  if (!userId) return { userId };
-
-  // Ensure the user is a system admin
-  const isAdmin = await db
-    .select()
-    .from(systemSchema)
-    .where(eq(systemSchema.userId, userId))
-    .then((admins) => admins.length > 0);
-
-  return { userId: isAdmin ? userId : null };
 }
 
 /**

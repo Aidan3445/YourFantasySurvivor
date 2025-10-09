@@ -16,7 +16,7 @@ export default async function getCurrentSeasons() {
     async () => fetchCurrentSeasons(),
     ['current-seasons'],
     {
-      revalidate: false,
+      revalidate: 3600, // 1 hour
       tags: ['seasons', 'current-seasons']
     }
   )();

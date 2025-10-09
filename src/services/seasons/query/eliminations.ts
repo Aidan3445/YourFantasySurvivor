@@ -20,7 +20,7 @@ export default async function getEliminations(seasonId: number) {
     async (seasonId: number) => fetchEliminations(seasonId),
     ['eliminations', seasonId.toString()],
     {
-      revalidate: false,
+      revalidate: 3600, // 1 hour
       tags: [`eliminations-${seasonId}`, 'eliminations']
     }
   )(seasonId);
@@ -36,7 +36,7 @@ async function fetchEliminations(seasonId: number) {
       castawayId: castawaySchema.castawayId,
     })
     .from(episodeSchema)
-    .leftJoin(baseEventSchema, and(
+    .innerJoin(baseEventSchema, and(
       eq(episodeSchema.episodeId, baseEventSchema.episodeId),
       inArray(baseEventSchema.eventName, EliminationEventNames)))
     .leftJoin(baseEventReferenceSchema, and(
