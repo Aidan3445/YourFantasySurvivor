@@ -28,6 +28,8 @@ export default function ChangeCastaway() {
   const { data: league } = useLeague();
   const { actionDetails, keyEpisodes, leagueMembers } = useLeagueActionDetails();
 
+  console.log('actionDetails', actionDetails);
+
   const reactForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
@@ -153,14 +155,14 @@ export default function ChangeCastaway() {
                     <SelectContent className='z-50'>
                       <SelectGroup>
                         {availableCastaways.map((castaway) => {
-                          return (castaway.pickedBy ?
+                          return ((castaway.pickedBy ?? castaway.eliminatedEpisode) ?
                             <SelectLabel
                               key={castaway.castawayId}
                               className='cursor-not-allowed'
-                              style={{ backgroundColor: castaway.pickedBy.color }}>
+                              style={{ backgroundColor: castaway.pickedBy?.color ?? '#6b7280' }}>
                               <span
                                 className='flex items-center gap-1'
-                                style={{ color: getContrastingColor(castaway.pickedBy.color) }}>
+                                style={{ color: getContrastingColor(castaway.pickedBy?.color ?? '#6b7280') }}>
                                 {castaway.tribe &&
                                   <ColorRow
                                     className='w-20 px-0 justify-center leading-tight font-normal'
@@ -168,7 +170,7 @@ export default function ChangeCastaway() {
                                     {castaway.tribe.name}
                                   </ColorRow>
                                 }
-                                {castaway.fullName} ({castaway.pickedBy.displayName})
+                                {castaway.fullName} {castaway.pickedBy && `(${castaway.pickedBy.displayName})`}
                               </span>
                             </SelectLabel> :
                             <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
@@ -178,6 +180,7 @@ export default function ChangeCastaway() {
                                     className='w-20 px-0 justify-center leading-tight'
                                     color={castaway.tribe.color}>
                                     {castaway.tribe.name}
+                                    {castaway.pickedBy}
                                   </ColorRow>}
                                 {castaway.fullName}
                               </span>

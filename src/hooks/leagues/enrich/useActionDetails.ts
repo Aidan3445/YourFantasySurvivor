@@ -82,9 +82,13 @@ export function useLeagueActionDetails(overrideHash?: string) {
 
     const details: DraftDetails = {};
 
+    console.log('selectionTimeline', selectionTimeline);
+
     Object.entries(tribeMembers).forEach(([tribeId, { tribe, castaways }]) => {
       const selections = castaways.map(castaway => {
-        const selection = selectionTimeline.castawayMembers[castaway.castawayId]?.[nextEpisode];
+        const castawaySelections = selectionTimeline.castawayMembers[castaway.castawayId] ?? [null];
+        const latestSelection = Math.min(nextEpisode, castawaySelections.length - 1);
+        const selection = selectionTimeline.castawayMembers[castaway.castawayId]?.[latestSelection];
         const eliminatedEpisode = eliminationLookup.get(castaway.castawayId) ?? null;
 
         const castawayWithTribe: EnrichedCastaway = {
