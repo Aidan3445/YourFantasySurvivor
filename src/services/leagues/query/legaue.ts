@@ -23,6 +23,7 @@ export default async function getLeague(auth: VerifiedLeagueMemberAuth) {
       status: leagueSchema.status,
       season: seasonSchema.name,
       seasonId: seasonSchema.seasonId,
+      startWeek: leagueSchema.startWeek,
     })
     .from(leagueSchema)
     .innerJoin(seasonSchema, eq(leagueSchema.seasonId, seasonSchema.seasonId))

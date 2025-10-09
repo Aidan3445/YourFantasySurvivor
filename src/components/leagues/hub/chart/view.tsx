@@ -15,7 +15,7 @@ import { formatData } from '~/components/leagues/hub/chart/utils';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 export default function Chart() {
-  const { sortedMemberScores, } = useLeagueData();
+  const { sortedMemberScores, league } = useLeagueData();
 
   const highestScore = useMemo(() => Math.max(
     ...sortedMemberScores.map(({ scores }) => scores.slice().pop() ?? 0)
@@ -29,6 +29,11 @@ export default function Chart() {
 
   const memberCount = data.length;
 
+  const formatedData = useMemo(() => formatData({
+    data,
+    startWeek: league?.startWeek ?? 1
+  }), [data, league?.startWeek]);
+
   return (
     <div
       className='w-full rounded-lg bg-card'
@@ -36,7 +41,7 @@ export default function Chart() {
       <ResponsiveContainer>
         <LineChart
           id='score-chart'
-          data={formatData({ data: data })}
+          data={formatedData}
           margin={{
             top: 10,
             right: 10,

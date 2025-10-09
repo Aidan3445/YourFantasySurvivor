@@ -9,15 +9,17 @@ type ScoreChartProps = {
     episodeScores: number[];
     color: string;
   }[];
+  startWeek: number;
 };
 
-export function formatData({ data }: ScoreChartProps) {
+export function formatData({ data, startWeek }: ScoreChartProps) {
   const formattedData: FormattedData = [{ episode: '' }];
   data.forEach((data) => {
     const ep1 = formattedData[0]!;
     ep1[data.name] = 0;
 
     data.episodeScores.forEach((value, episodeNumber) => {
+      if (episodeNumber < startWeek) return;
       if (!formattedData[episodeNumber]) {
         formattedData[episodeNumber] = {
           episode: episodeNumber,
@@ -28,5 +30,6 @@ export function formatData({ data }: ScoreChartProps) {
     });
   });
 
-  return formattedData;
+  return formattedData.filter((ep) => ep.episode === '' ||
+    (typeof ep.episode === 'number' && ep.episode >= startWeek));
 }

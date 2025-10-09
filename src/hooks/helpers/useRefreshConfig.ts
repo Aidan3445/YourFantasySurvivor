@@ -15,6 +15,7 @@ export function useRefreshConfig(isEpisodeAiring: boolean, hash?: string) {
         refetchInterval: 30 * 1000, // 30 seconds
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,
+        gcTime: 2 * 60 * 1000, // 5 minutes
       };
     }
 
@@ -24,6 +25,7 @@ export function useRefreshConfig(isEpisodeAiring: boolean, hash?: string) {
         refetchInterval: 60 * 1000, // 1 minute
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,
+        gcTime: 5 * 60 * 1000, // 5 minutes
       };
     } else {
       return {
@@ -31,6 +33,7 @@ export function useRefreshConfig(isEpisodeAiring: boolean, hash?: string) {
         refetchInterval: 10 * 60 * 1000, // 10 minutes
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
+        gcTime: 15 * 60 * 1000, // 15 minutes
       };
     }
   }, [isEpisodeAiring, league?.status]);
