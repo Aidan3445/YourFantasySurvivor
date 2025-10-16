@@ -23,7 +23,8 @@ export function useTribeMembers(seasonId: number | null, episodeNumber: number |
       if (!res.ok) {
         throw new Error('Failed to fetch tribes timeline data');
       }
-      return res.json();
+      const members = await res.json() as Record<number, number[]>;
+      return members;
     },
     enabled: !!seasonId && !!episodeNumber,
     ...refreshConfig,

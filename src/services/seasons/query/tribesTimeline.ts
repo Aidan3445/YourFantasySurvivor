@@ -20,7 +20,7 @@ export default async function getTribesTimeline(seasonId: number) {
     async (seasonId: number) => fetchTribesTimeline(seasonId),
     ['tribes-timeline', seasonId.toString()],
     {
-      revalidate: 3600, // 1 hour
+      revalidate: 10,//3600, // 1 hour
       tags: [
         `tribe-members-${seasonId}`,
         'tribe-members',
