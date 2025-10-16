@@ -109,7 +109,8 @@ export default function ChangeCastaway() {
     );
   }
 
-  if (keyEpisodes?.previousEpisode && pickPriority.length > 0 && !dialogOpen) {
+  if (keyEpisodes?.previousEpisode && pickPriority.length > 0 && !dialogOpen
+    && Date.now() - keyEpisodes.previousEpisode.airDate.getTime() < 1000 * 60 * 60 * 48) {
     return (
       <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
         <h1 className='text-2xl font-semibold'>Wait to Swap your Survivor Pick</h1>
