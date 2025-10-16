@@ -18,6 +18,7 @@ import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
 import chooseCastaway from '~/actions/chooseCastaway';
 import { type LeagueMember } from '~/types/leagueMembers';
+import { useEliminations } from '~/hooks/seasons/useEliminations';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
@@ -26,7 +27,8 @@ const formSchema = z.object({
 export default function ChangeCastaway() {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
-  const { actionDetails, keyEpisodes, leagueMembers } = useLeagueActionDetails();
+  const { actionDetails, keyEpisodes, leagueMembers, membersWithPicks } = useLeagueActionDetails();
+  const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,17 +60,20 @@ export default function ChangeCastaway() {
   });
 
   const { pickPriority, elim } = useMemo(() => {
-    return availableCastaways
-      .reduce((acc, castaway) => {
-        if (castaway.pickedBy && castaway.eliminatedEpisode) {
-          acc.elim.push(castaway.pickedBy);
-          if (castaway.eliminatedEpisode === keyEpisodes?.previousEpisode?.episodeNumber) {
-            acc.pickPriority.push(castaway.pickedBy);
-          }
-        }
-        return acc;
-      }, { pickPriority: [], elim: [] } as { pickPriority: LeagueMember[], elim: LeagueMember[] });
-  }, [availableCastaways, keyEpisodes]);
+    return membersWithPicks.reduce(({ pickPriority, elim }, memberWPick) => {
+      const pickId = memberWPick.castawayId;
+      const eliminatedEpisode = eliminations?.findIndex(elims =>
+        elims.some(elim => elim.castawayId === pickId)) ?? -1;
+
+      if (eliminatedEpisode === -1) return { pickPriority, elim };
+
+      if (keyEpisodes?.previousEpisode?.episodeNumber === eliminatedEpisode) {
+        pickPriority.push(memberWPick.member);
+      }
+      elim.push(memberWPick.member);
+      return { pickPriority, elim };
+    }, { pickPriority: [], elim: [] } as { pickPriority: LeagueMember[], elim: LeagueMember[] });
+  }, [eliminations, keyEpisodes, membersWithPicks]);
 
 
   const [dialogOpen, setDialogOpen] = useState(false);

@@ -212,6 +212,9 @@ export const CustomEventRuleInsertZod = z.object({
 });
 export type CustomEventRuleInsert = z.infer<typeof CustomEventRuleInsertZod>;
 
+/**
+  * Record<castawayId | memberId, (castawayId | null)[] | (memberId | null)[]>
+  */
 export type SelectionTimeline = Record<number, (number | null)[]>;
 /**
   * Selection timelines for both member->castaway and castaway->member selections.
@@ -230,6 +233,9 @@ export type SelectionTimelines = {
   castawayMembers: SelectionTimeline
 };
 
+/**
+  * Record<tribeId, { tribe, castaways }>
+  */
 export type DraftDetails = Record<number, {
   tribe: Tribe;
   castaways: {
