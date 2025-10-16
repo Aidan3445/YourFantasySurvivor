@@ -20,7 +20,7 @@ export default async function getBaseEvents(seasonId: number) {
     async (seasonId: number) => fetchBaseEvents(seasonId),
     ['base-events', seasonId.toString()],
     {
-      revalidate: 3600, // 1 hour
+      revalidate: 60, // 1 minute
       tags: [`base-events-${seasonId}`, 'base-events']
     }
   )(seasonId);

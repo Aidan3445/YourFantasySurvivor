@@ -192,10 +192,10 @@ export default function ChangeCastaway() {
               </FormItem>
             )} />
           <Button
-            className='lg:w-24 w-full'
+            className='lg:w-26 w-full'
             disabled={!formSchema.safeParse(reactForm.watch())?.success || reactForm.formState.isSubmitting || keyEpisodes?.previousEpisode?.airStatus === 'Airing'}
             type='submit'>
-            Submit
+            {keyEpisodes?.previousEpisode?.airStatus === 'Airing' ? 'Episode Airing' : 'Submit'}
           </Button>
         </span>
       </form>

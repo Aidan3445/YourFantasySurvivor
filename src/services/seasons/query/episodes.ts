@@ -17,7 +17,7 @@ export default async function getEpisodes(seasonId: number) {
     async (seasonId: number) => fetchEpisodes(seasonId),
     ['episodes', seasonId.toString()],
     {
-      revalidate: 60 * 60 * 24, // 24 hours
+      revalidate: 60, // 1 minute
       tags: [`episodes-${seasonId}`, 'episodes']
     }
   )(seasonId);

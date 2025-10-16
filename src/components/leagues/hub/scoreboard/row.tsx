@@ -6,15 +6,15 @@ import { MoveRight, Circle, Flame, History, Skull } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/ui/useMobile';
-import { cn } from '~/lib/utils';
+import { cn, getTribeTimeline } from '~/lib/utils';
 import { Separator } from '~/components/common/separator';
 import { getContrastingColor } from '@uiw/color-convert';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { useMemo } from 'react';
 import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
-import { type Tribe } from '~/types/tribes';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
+import { useTribes } from '~/hooks/seasons/useTribes';
 
 interface MemberRowProps {
   place: number;
@@ -33,12 +33,14 @@ export default function MemberRow({
   member,
   currentStreak,
   selectionList,
-  points, castaway,
+  points,
+  castaway,
   color,
   doubleBelow,
   overrideHash
 }: MemberRowProps) {
   const { data: tribesTimeline } = useTribesTimeline(castaway?.seasonId ?? null);
+  const { data: tribes } = useTribes(castaway?.seasonId ?? null);
   const { data: leagueSettings } = useLeagueSettings(overrideHash);
   const isMobile = useIsMobile();
 
@@ -62,35 +64,6 @@ export default function MemberRow({
       }];
     }, [] as { castaway: EnrichedCastaway, start: number | string, end: number | null }[]),
     [selectionList]);
-
-  const castawayTribes = useMemo(() => {
-    if (!castaway || !tribesTimeline) return [];
-
-    const sortedTimeline = Object.entries(tribesTimeline)
-      .map(([episode, tribeUpdates]) => ({
-        episode: Number(episode),
-        tribeUpdates
-      }))
-      .sort((a, b) => a.episode - b.episode);
-
-    const tribes: { tribe: Tribe, episode: number }[] = [];
-
-    for (const { tribeUpdates } of sortedTimeline) {
-      for (const [tribeId, castawayIds] of Object.entries(tribeUpdates)) {
-        if (castawayIds.includes(castaway.castawayId)) {
-          const tribeInfo = tribes.find(t => t.tribe.tribeId === Number(tribeId));
-          if (tribeInfo) continue;
-
-          const tribeData = tribes.find(t => t.tribe.tribeId === Number(tribeId));
-          if (tribeData) {
-            tribes.push(tribeData);
-          }
-        }
-      }
-    }
-
-    return tribes;
-  }, [castaway, tribesTimeline]);
 
   return (
     <TableRow className={cn(doubleBelow && 'border-double border-b-3')}>
@@ -119,17 +92,25 @@ export default function MemberRow({
           color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color}>
           {isMobile ? castaway?.shortName : castaway?.fullName}
           <div className='ml-auto flex gap-0.5'>
-            {castawayTribes.length > 1 && castawayTribes.map(({ tribe, episode }) => (
-              <Popover key={`${tribe.tribeName}-${episode}`}>
-                <PopoverTrigger>
-                  <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
-                </PopoverTrigger>
-                <PopoverContent className='w-min text-nowrap p-1' align='end'>
-                  <PopoverArrow />
-                  {tribe.tribeName} - Episode {episode}
-                </PopoverContent>
-              </Popover>
-            ))}
+            {(() => {
+              const tribeTimeline = getTribeTimeline(
+                castaway?.castawayId ?? -1,
+                tribesTimeline ?? {},
+                tribes ?? []
+              );
+              return tribeTimeline && (tribeTimeline.length > 1 || castaway?.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
+                <Popover key={`${tribe.tribeName}-${episode}`}>
+                  <PopoverTrigger>
+                    <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
+                  </PopoverTrigger>
+                  <PopoverContent className='w-min text-nowrap p-1' align='end'>
+                    <PopoverArrow />
+                    {tribe.tribeName} - Episode {episode}
+                  </PopoverContent>
+                </Popover>
+              ));
+            })()
+            }
             <Popover>
               <PopoverTrigger className='ml-2 mr-1'>
                 <History

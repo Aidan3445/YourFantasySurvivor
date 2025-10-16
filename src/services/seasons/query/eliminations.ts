@@ -20,7 +20,7 @@ export default async function getEliminations(seasonId: number) {
     async (seasonId: number) => fetchEliminations(seasonId),
     ['eliminations', seasonId.toString()],
     {
-      revalidate: 3600, // 1 hour
+      revalidate: 60, // 1 hour
       tags: [`eliminations-${seasonId}`, 'eliminations']
     }
   )(seasonId);

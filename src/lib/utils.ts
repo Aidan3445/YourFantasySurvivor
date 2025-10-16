@@ -1,6 +1,6 @@
 import { type BaseEventPredictionRules, type BaseEventPredictionRulesSchema } from '~/types/leagues';
 import { type Eliminations, type PredictionTiming } from '~/types/events';
-import { type TribesTimeline } from '~/types/tribes';
+import { type Tribe, type TribesTimeline } from '~/types/tribes';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { defaultBasePredictionRules } from '~/lib/leagues';
@@ -39,6 +39,22 @@ export function findTribeCastaways(
   }
 
   return Array.from(onTribe);
+}
+
+
+export function getTribeTimeline(castawayId: number, tribesTimeline: TribesTimeline, tribes: Tribe[]) {
+  return Object.entries(tribesTimeline)
+    .map(([episode, tribeUpdates]) => {
+      const update = Object.entries(tribeUpdates)
+        .find(([_, castawayIds]) => castawayIds.includes(castawayId));
+      if (update) {
+        const tribe = tribes.find(t => t.tribeId === Number(update[0]));
+        return { episode: Number(episode), tribe: tribe };
+      }
+      return null;
+    })
+    .filter((entry): entry is { episode: number; tribe: Tribe; } => entry !== null)
+    .sort((a, b) => a.episode - b.episode);
 }
 
 export function basePredictionRulesSchemaToObject(
