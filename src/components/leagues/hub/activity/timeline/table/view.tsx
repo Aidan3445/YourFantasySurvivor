@@ -33,6 +33,10 @@ export interface EpisodeEventsProps {
   };
 }
 
+export type EventWithReferencesAndPredOnly = EventWithReferences & {
+  predOnly?: boolean;
+};
+
 export default function EpisodeEvents(
   { episodeNumber, mockEvents, edit, filters }: EpisodeEventsProps
 ) {
@@ -116,15 +120,10 @@ export default function EpisodeEvents(
   ]);
 
   const filteredEvents = useMemo(() => {
-    const filtered: Record<number, EventWithReferences[] | undefined> = {};
+    const filtered: Record<number, EventWithReferencesAndPredOnly[] | undefined> = {};
     Object.keys(combinedEvents).forEach((key) => {
       const numKey = Number(key);
-      filtered[numKey] = combinedEvents[numKey]?.filter((event) => {
-        // before we check anything else, see if the event is referenced by a prediction
-        if (filteredPredictions[numKey]?.some((prediction) => prediction.eventName === event.eventName)) {
-          return true;
-        }
-
+      filtered[numKey] = combinedEvents[numKey]?.filter((event: EventWithReferencesAndPredOnly) => {
         const eventMembers = event.references
           .map((ref) => ref.type === 'Castaway'
             ? selectionTimeline?.castawayMembers?.[ref.id]?.[numKey] ?? []
@@ -139,7 +138,14 @@ export default function EpisodeEvents(
           filters.member.includes(ref));
         const eventMatch = filters.event.length === 0 || filters.event.includes(event.eventName);
 
-        return castawayMatch && tribeMatch && memberMatch && eventMatch;
+        const keep = castawayMatch && tribeMatch && memberMatch && eventMatch;
+
+        // if we're not keeping the event from filters, check if any predictions for it exist
+        if (!keep && filteredPredictions[numKey]?.some((prediction) => prediction.eventId === event.eventId)) {
+          event.predOnly = true;
+        }
+
+        return keep || event.predOnly;
       });
     });
     return filtered;

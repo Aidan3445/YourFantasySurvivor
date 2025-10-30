@@ -1,8 +1,8 @@
 'use client';
 
 import { TableCell, TableRow } from '~/components/common/table';
-import { type EpisodeEventsProps } from '~/components/leagues/hub/activity/timeline/table/view';
-import { type EnrichedEvent, type EventWithReferences, type Prediction } from '~/types/events';
+import { type EventWithReferencesAndPredOnly, type EpisodeEventsProps } from '~/components/leagues/hub/activity/timeline/table/view';
+import { type EnrichedEvent, type Prediction } from '~/types/events';
 import { useEnrichEvents } from '~/hooks/seasons/enrich/useEnrichEvents';
 import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPredictions';
 import PredictionRow from '~/components/leagues/hub/activity/timeline/table/row/predictionRow';
@@ -10,7 +10,7 @@ import EventRow from '~/components/leagues/hub/activity/timeline/table/row/event
 
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
-  filteredEvents: EventWithReferences[];
+  filteredEvents: EventWithReferencesAndPredOnly[];
   filteredPredictions: Prediction[];
   index: number;
 }
@@ -84,18 +84,22 @@ export default function EpisodeEventsTableBody({
             Notes
           </TableCell>
         </TableRow>}
-      {baseEvents.map((event, index) => (
-        <EventRow key={index} event={event} editCol={edit} />
-      ))}
+      {baseEvents
+        .filter(event => !filteredEvents.some(fe => fe.eventId === event.eventId && fe.predOnly))
+        .map((event, index) => (
+          <EventRow key={index} event={event} editCol={edit} />
+        ))}
       {customEvents.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
           <TableCell colSpan={7} className='text-xs text-muted-foreground'>
             Custom Events
           </TableCell>
         </TableRow>}
-      {customEvents.map((event, index) => (
-        <EventRow key={index} event={event} editCol={edit} />
-      ))}
+      {customEvents
+        .filter(event => !filteredEvents.some(fe => fe.eventId === event.eventId && fe.predOnly))
+        .map((event, index) => (
+          <EventRow key={index} event={event} editCol={edit} />
+        ))}
       {enrichedPredictions.length + enrichedMockPredictions.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
           <TableCell colSpan={7} className='text-xs text-muted-foreground'>
