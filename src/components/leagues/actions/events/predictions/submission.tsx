@@ -26,7 +26,7 @@ const formSchema = z.object({
 
 interface SubmissionCardProps {
   prediction: MakePrediction;
-  options: Record<ReferenceType, Record<string, { id: number, color: string, tribeName?: string }>>;
+  options: Record<ReferenceType | 'Direct Castaway', Record<string, { id: number, color: string, tribeName?: string }>>;
   maxBet?: number;
   wallet?: number;
   updateBetTotal: (eventName: string, bet: number) => void;
@@ -90,10 +90,13 @@ export function BaseSubmissionCard({
     if (!league) return;
 
     try {
-      const selectedType = Object.keys(options).find((type) =>
+      // NOTE this breaks if ever there are a tribe and castaway with the same ID
+      // that shouldn't happen for now but something to keep in mind
+      let selectedType = Object.keys(options).find((type) =>
         Object.values(options[type as ReferenceType]).some(({ id }) =>
-          id === data.referenceId)) as ReferenceType | undefined;
+          id === data.referenceId)) as ReferenceType | 'Direct Castaway' | undefined;
       if (!selectedType) throw new Error('Invalid reference type');
+      if (selectedType === 'Direct Castaway') selectedType = 'Castaway';
 
       const { success, reason } = await makePrediction(league?.hash, {
         eventSource: prediction.eventSource,

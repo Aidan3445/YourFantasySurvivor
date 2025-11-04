@@ -64,26 +64,29 @@ export default function PredictionCards({
       })) ?? [], [rules, predictionsMade]);
 
   const getOptions = useCallback((referenceTypes: ReferenceType[]) => {
-    const options: Record<ReferenceType, Record<string, {
+    const options: Record<ReferenceType | 'Direct Castaway', Record<string, {
       id: number,
       color: string,
       tribeName?: string
     }>> = {
-      Castaway: {},
-      Tribe: {},
+      'Castaway': {},
+      'Tribe': {},
+      'Direct Castaway': {}
     };
 
-    if (referenceTypes.length === 0 || referenceTypes.includes('Castaway')) {
-      castaways.forEach((castaway) => {
-        if (castaway.eliminatedEpisode) return;
-        const tribe = castaway.tribe;
-        options.Castaway[castaway.fullName] = {
-          id: castaway.castawayId,
-          color: tribe?.color ?? '#AAAAAA',
-          tribeName: tribe?.name ?? 'No Tribe'
-        };
-      });
-    }
+    const castawayKey = (referenceTypes.length === 0 || referenceTypes.includes('Castaway')) ?
+      'Castaway' : 'Direct Castaway';
+
+    castaways.forEach((castaway) => {
+      if (castaway.eliminatedEpisode) return;
+      const tribe = castaway.tribe;
+      options[castawayKey][castaway.fullName] = {
+        id: castaway.castawayId,
+        color: tribe?.color ?? '#AAAAAA',
+        tribeName: tribe?.name ?? 'No Tribe'
+      };
+    });
+
     if (referenceTypes.length === 0 || referenceTypes.includes('Tribe')) {
       tribes.forEach((tribe) => {
         options.Tribe[tribe.tribeName] = {
