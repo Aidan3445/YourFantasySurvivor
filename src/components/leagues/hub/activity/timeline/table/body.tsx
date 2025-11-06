@@ -1,8 +1,8 @@
 'use client';
 
 import { TableCell, TableRow } from '~/components/common/table';
-import { type EventWithReferencesAndPredOnly, type EpisodeEventsProps } from '~/components/leagues/hub/activity/timeline/table/view';
-import { type EnrichedEvent, type Prediction } from '~/types/events';
+import { type EventWithReferencesAndPredOnly, type EpisodeEventsProps, type PredictionAndPredOnly } from '~/components/leagues/hub/activity/timeline/table/view';
+import { type EnrichedEvent } from '~/types/events';
 import { useEnrichEvents } from '~/hooks/seasons/enrich/useEnrichEvents';
 import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPredictions';
 import PredictionRow from '~/components/leagues/hub/activity/timeline/table/row/predictionRow';
@@ -11,7 +11,7 @@ import EventRow from '~/components/leagues/hub/activity/timeline/table/row/event
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
   filteredEvents: EventWithReferencesAndPredOnly[];
-  filteredPredictions: Prediction[];
+  filteredPredictions: PredictionAndPredOnly[];
   index: number;
 }
 
@@ -110,7 +110,12 @@ export default function EpisodeEventsTableBody({
         <PredictionRow key={index} className='bg-yellow-500' prediction={mock} editCol={edit} />
       )}
       {enrichedPredictions.map((prediction, index) =>
-        <PredictionRow key={index} prediction={prediction} editCol={edit} />
+        <PredictionRow
+          key={index}
+          prediction={prediction}
+          editCol={edit}
+          defaultOpenMisses={filteredPredictions.some((fp) => fp.eventId === prediction.event.eventId && fp.predOnly)}
+        />
       )}
     </>
   );

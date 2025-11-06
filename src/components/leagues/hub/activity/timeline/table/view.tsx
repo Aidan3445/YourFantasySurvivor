@@ -37,6 +37,10 @@ export type EventWithReferencesAndPredOnly = EventWithReferences & {
   predOnly?: boolean;
 };
 
+export type PredictionAndPredOnly = Prediction & {
+  predOnly?: boolean;
+};
+
 export default function EpisodeEvents(
   { episodeNumber, mockEvents, edit, filters }: EpisodeEventsProps
 ) {
@@ -91,7 +95,7 @@ export default function EpisodeEvents(
 
   // filter predictions first because they may require an event that gets filtered out
   const filteredPredictions = useMemo(() => {
-    const filtered: Record<number, Prediction[] | undefined> = {};
+    const filtered: Record<number, PredictionAndPredOnly[] | undefined> = {};
     Object.keys(combinedPredictions).forEach((key) => {
       const numKey = Number(key);
       filtered[numKey] = combinedPredictions[numKey]?.filter((prediction) => {
@@ -141,8 +145,17 @@ export default function EpisodeEvents(
         const keep = castawayMatch && tribeMatch && memberMatch && eventMatch;
 
         // if we're not keeping the event from filters, check if any predictions for it exist
-        if (!keep && filteredPredictions[numKey]?.some((prediction) => prediction.eventId === event.eventId)) {
+        const matchPredictions = filteredPredictions[numKey]?.filter((prediction) =>
+          prediction.eventId === event.eventId);
+        if (!keep && matchPredictions && matchPredictions.length > 0) {
           event.predOnly = true;
+
+          filteredPredictions[numKey] = filteredPredictions[numKey]?.map((prediction) => {
+            if (prediction.eventId === event.eventId) {
+              prediction.predOnly = true;
+            }
+            return prediction;
+          });
         }
 
         return keep || event.predOnly;
