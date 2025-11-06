@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq, inArray, count, gte, gt } from 'drizzle-orm';
+import { and, eq, inArray, count, gte, gt, not } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
@@ -43,11 +43,11 @@ export default async function chooseCastawayLogic(
       ))
       .innerJoin(episodeSchema, eq(baseEventSchema.episodeId, episodeSchema.episodeId))
       .innerJoin(selectionUpdateSchema, eq(selectionUpdateSchema.castawayId, baseEventReferenceSchema.referenceId))
-      .innerJoin(leagueMemberSchema, and(
-        eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId),
-        eq(leagueMemberSchema.leagueId, 196)
-      ))
-      .where(gte(episodeSchema.airDate, fortyEightHoursAgo));
+      .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId))
+      .where(and(
+        gte(episodeSchema.airDate, fortyEightHoursAgo),
+        not(eq(leagueMemberSchema.memberId, auth.memberId))
+      ));
 
     // Then check if they have made a new selection
     const allMadeNewSelection = await db
