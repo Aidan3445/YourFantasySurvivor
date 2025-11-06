@@ -113,17 +113,17 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                   {pred.timing.every((t) => t.includes('Weekly')) &&
                     (keyEpisodes?.previousEpisode?.episodeNumber ?? 0) >= pred.episodeNumber &&
                     !pred.event
-                    ? (<span className='text-muted-foreground'>N/A</span>)
+                    ? (<span className='text-muted-foreground'>--</span>)
                     : (findReferenceNames(pred.event?.references)
                       .map((res) => isMobile ? res.short : res.full)
                       .join(', ')
                     )}
                 </TableCell>
-              </TableRow >
+              </TableRow>
             );
           })}
-      </TableBody >
-    </Table >
+      </TableBody>
+    </Table>
   );
 }
 

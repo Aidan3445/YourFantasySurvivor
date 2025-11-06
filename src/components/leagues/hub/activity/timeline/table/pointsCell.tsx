@@ -8,7 +8,7 @@ interface PointsCellProps {
 
 export default function PointsCell({ points }: PointsCellProps) {
   if (!points) return (
-    <TableCell className='text-xs text-muted-foreground text-center'>N/A</TableCell>
+    <TableCell />
   );
 
   return (
