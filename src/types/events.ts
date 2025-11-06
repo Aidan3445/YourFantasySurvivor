@@ -82,6 +82,11 @@ export type EnrichedPrediction = {
     member: LeagueMember
     hit: boolean;
     bet: number | null;
+    reference: {
+      type: ReferenceType;
+      name: string;
+      color: string;
+    };
   }[];
   misses: {
     member: LeagueMember

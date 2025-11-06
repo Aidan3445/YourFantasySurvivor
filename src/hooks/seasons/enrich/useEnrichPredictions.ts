@@ -116,49 +116,50 @@ export function useEnrichPredictions(
       const entry = {
         member,
         hit: prediction.hit,
-        bet: prediction.bet
+        bet: prediction.bet,
+        reference: {
+          type: prediction.referenceType,
+          name: '',
+          color: ''
+        }
       };
+
+      if (prediction.referenceType === 'Castaway') {
+        const castaway = lookupMaps.castawaysById.get(prediction.referenceId);
+        if (!castaway) continue;
+
+        const tribe = createTribeFinder(castaway.castawayId, existingPrediction.event.episodeNumber);
+        if (!tribe) continue;
+
+        const eliminatedEpisode = lookupMaps.eliminationEpisodes.get(castaway.castawayId) ?? null;
+
+        const castawayWithTribe: EnrichedCastaway = {
+          ...castaway,
+          tribe,
+          eliminatedEpisode
+        };
+
+        entry.reference = {
+          ...entry.reference,
+          name: castaway.fullName,
+          color: castawayWithTribe.tribe?.color ?? '#AAAAAA'
+        };
+
+      } else if (prediction.referenceType === 'Tribe') {
+        const tribe = lookupMaps.tribesById.get(prediction.referenceId);
+        if (!tribe) continue;
+
+        entry.reference = {
+          ...entry.reference,
+          name: tribe.tribeName,
+          color: tribe.tribeColor
+        };
+      }
 
       if (prediction.hit) {
         existingPrediction.hits.push(entry);
       } else {
-        if (prediction.referenceType === 'Castaway') {
-          const castaway = lookupMaps.castawaysById.get(prediction.referenceId);
-          if (!castaway) continue;
-
-          const tribe = createTribeFinder(castaway.castawayId, existingPrediction.event.episodeNumber);
-          if (!tribe) continue;
-
-          const eliminatedEpisode = lookupMaps.eliminationEpisodes.get(castaway.castawayId) ?? null;
-
-          const castawayWithTribe: EnrichedCastaway = {
-            ...castaway,
-            tribe,
-            eliminatedEpisode
-          };
-
-          existingPrediction.misses.push({
-            ...entry,
-            reference: {
-              type: 'Castaway',
-              name: castaway.fullName,
-              color: castawayWithTribe.tribe?.color ?? '#AAAAAA'
-            },
-          });
-
-        } else if (prediction.referenceType === 'Tribe') {
-          const tribe = lookupMaps.tribesById.get(prediction.referenceId);
-          if (!tribe) continue;
-
-          existingPrediction.misses.push({
-            ...entry,
-            reference: {
-              type: 'Tribe',
-              name: tribe.tribeName,
-              color: tribe.tribeColor
-            }
-          });
-        }
+        existingPrediction.misses.push(entry);
       }
     }
 

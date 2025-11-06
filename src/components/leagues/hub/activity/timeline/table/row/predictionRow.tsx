@@ -77,6 +77,16 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                   color={hit.member.color}>
                   {hit.member.displayName}
                 </ColorRow>
+                {event.references.length > 1 && hit.reference &&
+                  <>
+                    <MoveRight size={12} stroke='#000000' />
+                    <ColorRow
+                      className='leading-tight px-1 w-min'
+                      color={hit.reference.color}>
+                      {hit.reference.name}
+                    </ColorRow>
+                  </>
+                }
                 {hit.bet && <p className='text-xs text-green-600'>
                   +{hit.bet}
                   <Flame className='inline align-top w-3.5 h-min stroke-green-600' />
