@@ -61,7 +61,12 @@ export default async function chooseCastawayLogic(
       .then(res => res.length === eliminatedSelection.length);
 
     if (eliminatedSelection.length > 0 && !allMadeNewSelection) {
-      throw new Error('A league member has a castaway eliminated within the last 48 hours and has not made a new selection');
+      //throw new Error('A league member has a castaway eliminated within the last 48 hours and has not made a new selection');
+      console.error('A league member has a castaway eliminated within the last 48 hours and has not made a new selection', {
+        eliminatedSelection,
+        allMadeNewSelection,
+        auth
+      });
     }
     // Get league and validate
     const league = await trx
