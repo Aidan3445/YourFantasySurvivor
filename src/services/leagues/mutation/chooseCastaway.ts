@@ -43,11 +43,12 @@ export default async function chooseCastawayLogic(
       ))
       .innerJoin(episodeSchema, eq(baseEventSchema.episodeId, episodeSchema.episodeId))
       .innerJoin(selectionUpdateSchema, eq(selectionUpdateSchema.castawayId, baseEventReferenceSchema.referenceId))
-      .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId))
-      .where(and(
-        gte(episodeSchema.airDate, fortyEightHoursAgo),
-        not(eq(leagueMemberSchema.memberId, auth.memberId))
-      ));
+      .innerJoin(leagueMemberSchema, and(
+        eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId),
+        eq(leagueMemberSchema.leagueId, auth.leagueId),
+        not(eq(leagueMemberSchema.memberId, auth.memberId)) // Exclude the requesting member
+      ))
+      .where(gte(episodeSchema.airDate, fortyEightHoursAgo));
 
     // Then check if they have made a new selection
     const allMadeNewSelection = await db
@@ -61,12 +62,12 @@ export default async function chooseCastawayLogic(
       .then(res => res.length === eliminatedSelection.length);
 
     if (eliminatedSelection.length > 0 && !allMadeNewSelection) {
-      //throw new Error('A league member has a castaway eliminated within the last 48 hours and has not made a new selection');
       console.error('A league member has a castaway eliminated within the last 48 hours and has not made a new selection', {
         eliminatedSelection,
         allMadeNewSelection,
         auth
       });
+      throw new Error('Cannot choose castaway at this time.');
     }
     // Get league and validate
     const league = await trx

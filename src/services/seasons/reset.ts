@@ -13,13 +13,13 @@ export async function resetServersideCache() {
       'seasons',
       'all-seasons',
       'base-events',
-    'castaways',
-    'current-seasons',
-    'eliminations',
-    'episodes',
-    'events',
-    'tribes',
-    'tribe-members',
+      'castaways',
+      'current-seasons',
+      'eliminations',
+      'episodes',
+      'events',
+      'tribes',
+      'tribe-members',
     ];
 
     for (const tag of tagsToRevalidate) {
