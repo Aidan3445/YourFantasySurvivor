@@ -7,10 +7,12 @@ import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails'
 import { useMemo, useState } from 'react';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { cn } from '~/lib/utils';
+import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
 
 export default function MakePredictions() {
   const { scores, leagueMembers } = useLeagueData();
   const { actionDetails, predictionRuleCount, keyEpisodes, predictionsMade, rules } = useLeagueActionDetails();
+  const { basePredictionsMade } = usePredictionsMade();
 
   const castaways = useMemo(() =>
     Object.values(actionDetails ?? {})
@@ -19,11 +21,17 @@ export default function MakePredictions() {
     Object.values(actionDetails ?? {}).map(({ tribe }) => tribe), [actionDetails]);
 
   const [formBetTotal, setFormBetTotal] = useState(0);
+  const pendingBetTotal = useMemo(() =>
+    Object.values(basePredictionsMade ?? {})
+      .flatMap(preds => preds)
+      .filter(p => p.eventId === null && (p.bet ?? 0) > 0)
+      .reduce((total, p) => total + (p.bet ?? 0), 0),
+    [basePredictionsMade]);
   const submittedBetTotal = useMemo(() => predictionsMade
     .reduce((total, p) => total + (p.bet ?? 0), 0), [predictionsMade]);
   const balance = useMemo(() =>
-    scores?.Member[leagueMembers?.loggedIn?.memberId ?? -1]?.slice().pop() ?? 0,
-    [scores, leagueMembers?.loggedIn]);
+    (scores?.Member[leagueMembers?.loggedIn?.memberId ?? -1]?.slice().pop() ?? 0) - submittedBetTotal - pendingBetTotal,
+    [scores?.Member, leagueMembers?.loggedIn?.memberId, submittedBetTotal, pendingBetTotal]);
 
   if (predictionRuleCount === 0 || !keyEpisodes?.nextEpisode) return null;
 
@@ -31,7 +39,7 @@ export default function MakePredictions() {
     <div className='text-center bg-card rounded-lg w-full relative overflow-clip'>
       {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
         <div className='absolute top-2 right-4 text-sm italic text-muted-foreground text-right'>
-          Bet Balance: {balance - submittedBetTotal}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
+          Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
           {formBetTotal !== submittedBetTotal && <>
             <br />
             <span className={cn('text-xs rounded-sm text-muted-foreground p-0.5 bg-amber-400', {
