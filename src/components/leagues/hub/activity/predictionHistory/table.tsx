@@ -90,17 +90,18 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                   hasBets &&
                   <TableCell className='text-nowrap'>
                     {pred.bet && pred.bet > 0 ? (
-                      pred.hit ? (
-                        <span className='text-sm text-center text-green-800'>
-                          +{pred.bet}
-                          <Flame className='inline align-top w-4 h-min stroke-green-800' />
-                        </span>
-                      ) : (
-                        <span className='text-sm text-center text-red-800'>
-                          -{pred.bet}
-                          <Flame className='inline align-top w-4 h-min stroke-red-800' />
-                        </span>
-                      )
+                      <span className={cn('text-sm text-center', {
+                        'text-green-800': pred.hit,
+                        'text-red-800': !pred.hit,
+                        'text-muted-foreground': !pred.eventId,
+                      })}>
+                        {pred.eventId && (pred.hit ? '+' : '-')} {pred.bet}
+                        <Flame className={cn('inline align-top w-4 h-min', {
+                          'stroke-green-800': pred.hit,
+                          'stroke-red-800': !pred.hit,
+                          'stroke-muted-foreground': !pred.eventId,
+                        })} />
+                      </span>
                     ) : <span className='text-sm text-center text-muted-foreground'>-</span>}
                   </TableCell>
                 }
