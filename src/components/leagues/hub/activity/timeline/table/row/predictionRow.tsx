@@ -87,7 +87,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                     </ColorRow>
                   </>
                 }
-                {hit.bet && <p className='text-xs text-green-600'>
+                {(hit.bet ?? 0) > 0 && <p className='text-xs text-green-600'>
                   +{hit.bet}
                   <Flame className='inline align-top w-3.5 h-min stroke-green-600' />
                 </p>}
@@ -125,7 +125,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                             </ColorRow>
                           </>
                         }
-                        {miss.bet && <p className='text-xs text-red-600'>
+                        {(miss.bet ?? 0) > 0 && <p className='text-xs text-red-600'>
                           -{miss.bet}
                           <Flame className='inline align-top w-3.5 h-min stroke-red-600' />
                         </p>}
