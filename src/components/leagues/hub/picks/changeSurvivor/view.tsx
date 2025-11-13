@@ -19,6 +19,7 @@ import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails'
 import chooseCastaway from '~/actions/chooseCastaway';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
+import { getAirStatus } from '~/lib/episodes';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
@@ -199,9 +200,15 @@ export default function ChangeCastaway() {
             )} />
           <Button
             className='lg:w-26 w-full'
-            disabled={!formSchema.safeParse(reactForm.watch())?.success || reactForm.formState.isSubmitting || keyEpisodes?.previousEpisode?.airStatus === 'Airing'}
+            disabled={
+              !formSchema.safeParse(reactForm.watch())?.success
+              || reactForm.formState.isSubmitting
+              || (!!keyEpisodes?.previousEpisode
+                && getAirStatus(
+                  keyEpisodes.previousEpisode.airDate,
+                  keyEpisodes.previousEpisode.runtime) === 'Airing')}
             type='submit'>
-            {keyEpisodes?.previousEpisode?.airStatus === 'Airing' ? 'Episode Airing' : 'Submit'}
+            {keyEpisodes?.previousEpisode && getAirStatus(keyEpisodes.previousEpisode.airDate, keyEpisodes.previousEpisode.runtime) === 'Airing' ? 'Episode Airing' : 'Submit'}
           </Button>
         </span>
       </form>

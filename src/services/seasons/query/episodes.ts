@@ -3,8 +3,9 @@ import 'server-only';
 import { db } from '~/server/db';
 import { asc, eq } from 'drizzle-orm';
 import { episodeSchema } from '~/server/db/schema/episodes';
-import { type Episode, type AirStatus } from '~/types/episodes';
+import { type Episode } from '~/types/episodes';
 import { unstable_cache } from 'next/cache';
+import { getAirStatus } from '~/lib/episodes';
 
 /**
   * Get the episodes for a season and caches the result
@@ -24,8 +25,6 @@ export default async function getEpisodes(seasonId: number) {
 }
 
 async function fetchEpisodes(seasonId: number) {
-  const now = new Date();
-
   const episodes = await db
     .select()
     .from(episodeSchema)
@@ -34,16 +33,7 @@ async function fetchEpisodes(seasonId: number) {
 
   const processedEpisodes = episodes.map(episode => {
     const airDate = new Date(`${episode.airDate} Z`);
-    const endTime = new Date(airDate.getTime() + episode.runtime * 60 * 1000);
-
-    let airStatus: AirStatus;
-    if (now < airDate) {
-      airStatus = 'Upcoming';
-    } else if (now < endTime) {
-      airStatus = 'Airing';
-    } else {
-      airStatus = 'Aired';
-    }
+    const airStatus = getAirStatus(airDate, episode.runtime);
 
     return {
       seasonId: episode.seasonId,

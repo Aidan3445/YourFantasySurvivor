@@ -7,7 +7,7 @@ import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Label } from '~/components/common/label';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { useLeague } from '~/hooks/leagues/useLeague';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { useCastaways } from '~/hooks/seasons/useCastaways';
@@ -15,6 +15,7 @@ import { useTribes } from '~/hooks/seasons/useTribes';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
 import { BaseEventFullName } from '~/lib/events';
+import { getAirStatus, getAirStatusPollingInterval } from '~/lib/episodes';
 
 
 export interface TimelineFiltersProps {
@@ -50,15 +51,35 @@ export default function TimelineFilters({
   const { data: leagueMembers } = useLeagueMembers();
   const { data: episodes } = useEpisodes(league?.seasonId ?? null);
 
-  useEffect(() => {
-    if (selectedEpisode ?? !episodes) return;
+  // State to trigger re-renders for air status updates
+  const [pollingTick, setPollingTick] = useState(0);
 
-    const latestEpisode = episodes.find((episode) => episode.airStatus === 'Airing') ??
-      episodes.findLast((episode) => episode.airStatus === 'Aired') ??
+  useEffect(() => {
+    if (selectedEpisode !== undefined || !episodes) return;
+
+    const latestEpisode = episodes.find((episode) => getAirStatus(episode.airDate, episode.runtime) === 'Airing') ??
+      episodes.findLast((episode) => getAirStatus(episode.airDate, episode.runtime) === 'Aired') ??
       episodes[0];
 
     setSelectedEpisode(latestEpisode?.episodeNumber);
   }, [episodes, selectedEpisode, setSelectedEpisode]);
+
+  // Dynamic polling based on next air status change
+  useEffect(() => {
+    const pollingInterval = getAirStatusPollingInterval(episodes);
+
+    // No upcoming status changes, no need to poll
+    if (pollingInterval === null) return;
+
+    const timeoutId = setTimeout(() => {
+      // Trigger re-render by updating state, which will recalculate the next interval
+      setPollingTick((prev) => prev + 1);
+    }, pollingInterval);
+
+    return () => clearTimeout(timeoutId);
+  }, [episodes, pollingTick]);
+
+  const selectedEpisodeData = episodes?.find((ep) => ep.episodeNumber === selectedEpisode);
 
   return (
     <Accordion type='single' collapsible>
@@ -71,7 +92,20 @@ export default function TimelineFilters({
               value={`${selectedEpisode}`}
               onValueChange={(value) => setSelectedEpisode(Number(value))}>
               <SelectTrigger className='w-min'>
-                <SelectValue placeholder='Select an episode' />
+                <SelectValue placeholder='Select an episode'>
+                  {selectedEpisode === -1 ? 'All Episodes' : selectedEpisodeData ? (
+                    <>
+                      {`${selectedEpisodeData.episodeNumber}:`} {selectedEpisodeData.title}
+                      <div className='inline ml-1'>
+                        <AirStatus
+                          airDate={selectedEpisodeData.airDate}
+                          airStatus={getAirStatus(selectedEpisodeData.airDate, selectedEpisodeData.runtime)}
+                          showTime={false}
+                          showDate={!isMobile} />
+                      </div>
+                    </>
+                  ) : 'Select an episode'}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value='-1'>
@@ -83,7 +117,7 @@ export default function TimelineFilters({
                     <div className='inline ml-1'>
                       <AirStatus
                         airDate={episode.airDate}
-                        airStatus={episode.airStatus}
+                        airStatus={getAirStatus(episode.airDate, episode.runtime)}
                         showTime={false}
                         showDate={!isMobile} />
                     </div>

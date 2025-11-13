@@ -24,7 +24,7 @@ export function useEpisodes(seasonId: number | null) {
     gcTime: 7 * 24 * 60 * 60 * 1000, // 1 week
     refetchInterval: 4 * 60 * 60 * 1000, // 4 hours
     refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnMount: false,
     refetchIntervalInBackground: false,
     enabled: !!seasonId
