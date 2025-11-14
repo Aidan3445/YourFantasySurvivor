@@ -151,7 +151,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
 
   const { onTheClock, onDeck, onTheClockIndex } = useMemo(() => {
     if (!leagueMembers?.members || !selectionTimeline?.memberCastaways || !nextEpisode) {
-      return { onTheClock: null, onDeck: null, onTheClockIndex: -1 };
+      return { onTheClock: null, onDeck: null, onTheClockIndex: null };
     }
 
     const onTheClockIndex = leagueMembers.members.findIndex(member =>
@@ -171,7 +171,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
         ...onDeck,
         loggedIn: onDeck.memberId === loggedInId,
       } : null,
-      onTheClockIndex: onTheClockIndex >= 0 ? onTheClockIndex : -1
+      onTheClockIndex: onTheClockIndex
     };
   }, [
     leagueMembers?.members,
@@ -191,7 +191,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
   }, [leagueMembers?.loggedIn?.draftOrder]);
 
   useEffect(() => {
-    if (league && (onTheClockIndex === -1 || league.status !== 'Draft')) {
+    if (league && onTheClockIndex !== null && (onTheClockIndex === -1 || league.status !== 'Draft')) {
       router.push(`/leagues/${league.hash}`);
     }
   }, [onTheClockIndex, league?.status, league?.hash, router, league]);
