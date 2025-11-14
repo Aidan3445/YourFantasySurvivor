@@ -24,7 +24,7 @@ export default async function createNewLeagueLogic(
   userId: string,
   leagueName: string,
   newMember: LeagueMemberInsert,
-  draftDate?: Date
+  draftDate?: Date | string
 ) {
   // Create the league in a transaction
   return await db.transaction(async (trx) => {
@@ -65,7 +65,11 @@ export default async function createNewLeagueLogic(
     // Insert the league settings
     await trx
       .insert(leagueSettingsSchema)
-      .values({ leagueId, draftDate: draftDate?.toUTCString() });
+      .values({
+        leagueId, draftDate: typeof draftDate === 'string'
+          ? new Date(draftDate).toUTCString()
+          : draftDate?.toUTCString()
+      });
 
     return { newHash: hash };
   });
