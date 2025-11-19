@@ -76,6 +76,7 @@ const Popover = ({ hover, hoverDelay = 200, hoverOpenDelay = 300, ...props }: Po
             setTapped(!tapped);
           }
         }}
+        className='flex'
       >
         {props.children}
       </div>
