@@ -26,6 +26,7 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
     currentStreaks
   } = useLeagueData(overrideHash);
 
+
   return (
     <ScrollArea className={cn('bg-card rounded-lg gap-0', className)}>
       <Table>
@@ -68,7 +69,7 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
                 points={scores.slice().pop() ?? 0}
                 castaway={castaway}
                 color={member.color}
-                doubleBelow={!!maxRows && maxRows - 1 !== loggedInIndex && maxRows - 2 === index}
+                doubleBelow={!!maxRows && maxRows <= loggedInIndex && maxRows - 2 === index}
                 overrideHash={overrideHash} />
             );
           })}

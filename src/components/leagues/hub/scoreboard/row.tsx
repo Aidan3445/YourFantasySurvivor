@@ -99,6 +99,7 @@ export default function MemberRow({
                 tribes ?? []
               );
               return tribeTimeline && (tribeTimeline.length > 1 || castaway?.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
+                tribe &&
                 <Popover key={`${tribe.tribeName}-${episode}`}>
                   <PopoverTrigger>
                     <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
