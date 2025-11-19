@@ -127,7 +127,7 @@ export function BaseSubmissionCard({
   return (
     <Form {...reactForm}>
       <form action={() => handleSubmit()}>
-        <span className='grid grid-cols-[min-content_1fr] items-center pl-4 bg-b2 rounded-b-lg'>
+        <span className='grid grid-cols-[min-content_1fr] items-center pl-2 bg-b2 rounded-b-lg'>
           <RotateCcw
             className={cn('cursor-pointer hover:text-primary transition-all',
               !reactForm.formState.isDirty && 'opacity-50 cursor-not-allowed')}
@@ -137,7 +137,7 @@ export function BaseSubmissionCard({
               reactForm.setValue('bet', prediction.predictionMade?.bet ?? undefined);
               updateBetTotal(prediction.eventName, prediction.predictionMade?.bet ?? 0);
             }} />
-          <span className='grid lg:grid-cols-6 grid-cols-1 gap-2 items-center py-2 px-4'>
+          <span className='grid lg:grid-cols-6 grid-cols-1 gap-2 items-center py-2 px-2 pr-4'>
             <FormField
               name='referenceId'
               render={({ field }) => (
@@ -148,7 +148,7 @@ export function BaseSubmissionCard({
                       onValueChange={field.onChange}
                       value={field.value ?
                         String(field.value) :
-                        prediction.predictionMade ? String(prediction.predictionMade.referenceId) : undefined}>
+                        prediction.predictionMade ? String(prediction.predictionMade.referenceId) : ''}>
                       <SelectTrigger className={cn(reactForm.formState.isDirty &&
                         field.value !== prediction?.predictionMade?.referenceId &&
                         'bg-amber-400')}>
@@ -194,7 +194,7 @@ export function BaseSubmissionCard({
               <FormField
                 name='bet'
                 render={({ field: betField }) => (
-                  <FormItem className='relative col-span-2'>
+                  <FormItem className='relative lg:col-span-2'>
                     <FormLabel className='sr-only'>Bet</FormLabel>
                     <FormControl>
                       <Input
@@ -219,8 +219,8 @@ export function BaseSubmissionCard({
                         }}
                       />
                     </FormControl>
-                    <Popover>
-                      <PopoverTrigger className='absolute -translate-y-1/2 top-1/2 right-8'>
+                    <Popover hover>
+                      <PopoverTrigger className='absolute -translate-y-1/2 top-1/2 right-8 lg:top-0 lg:-right-2'>
                         <HelpCircle size={12} />
                       </PopoverTrigger >
                       <PopoverContent className='w-80'>
@@ -242,7 +242,7 @@ export function BaseSubmissionCard({
                 } />
             )}
             <Button
-              className={cn(prediction.shauhinEnabled && !!wallet ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full')}
+              className={cn(prediction.shauhinEnabled && !!wallet ? 'lg:col-span-1' : 'lg:col-span-2', 'w-full lg:ml-2')}
               disabled={
                 !reactForm.formState.isDirty ||
                 reactForm.formState.isSubmitting ||
