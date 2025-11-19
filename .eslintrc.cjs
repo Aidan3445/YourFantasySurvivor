@@ -5,6 +5,9 @@ const config =
     browser: true,
     es2023: true,
   },
+  globals: {
+    NodeJS: 'readonly',
+  },
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project: true

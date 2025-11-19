@@ -1,11 +1,87 @@
 'use client';
-
 import * as React from 'react';
 import * as PopoverPrimitive from '@radix-ui/react-popover';
-
 import { cn } from '~/lib/utils';
 
-const Popover = PopoverPrimitive.Root;
+interface PopoverProps extends React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Root> {
+  hover?: boolean;
+  hoverDelay?: number;
+  hoverOpenDelay?: number;
+}
+
+const Popover = ({ hover, hoverDelay = 200, hoverOpenDelay = 300, ...props }: PopoverProps) => {
+  const [tapped, setTapped] = React.useState(props.defaultOpen ?? false);
+  const [isHovering, setIsHovering] = React.useState(false);
+  const hoverTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const openTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    if (hover) {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+
+      if (hoverOpenDelay > 0) {
+        openTimeoutRef.current = setTimeout(() => {
+          setIsHovering(true);
+        }, hoverOpenDelay);
+      } else {
+        setIsHovering(true);
+      }
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (hover) {
+      if (openTimeoutRef.current) {
+        clearTimeout(openTimeoutRef.current);
+      }
+
+      hoverTimeoutRef.current = setTimeout(() => {
+        setIsHovering(false);
+      }, hoverDelay);
+    }
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (hoverTimeoutRef.current) {
+        clearTimeout(hoverTimeoutRef.current);
+      }
+      if (openTimeoutRef.current) {
+        clearTimeout(openTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <PopoverPrimitive.Root
+      open={hover ? isHovering || tapped : props.open}
+      onOpenChange={open => {
+        if (hover) {
+          if (!open) {
+            setIsHovering(false);
+            setTapped(false);
+          }
+        } else {
+          props.onOpenChange?.(open);
+        }
+      }}
+    >
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={() => {
+          if (hover) {
+            setTapped(!tapped);
+          }
+        }}
+      >
+        {props.children}
+      </div>
+    </PopoverPrimitive.Root>
+  );
+};
 
 const PopoverTrigger = React.forwardRef<
   React.ElementRef<typeof PopoverPrimitive.Trigger>,

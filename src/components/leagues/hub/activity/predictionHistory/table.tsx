@@ -13,6 +13,7 @@ import { useIsMobile } from '~/hooks/ui/useMobile';
 import { BaseEventFullName } from '~/lib/events';
 import { cn } from '~/lib/utils';
 import { type PredictionWithEvent, type BaseEventName, type EventReference } from '~/types/events';
+import TimingPopover from '~/components/leagues/hub/activity/predictionHistory/timingPopover';
 
 interface PredictionTableProps {
   predictions: PredictionWithEvent[];
@@ -65,12 +66,10 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
             return (
               <TableRow key={index} className='bg-b3'>
                 <TableCell>
-                  <div className='flex flex-col text-nowrap'>
+                  <div className='flex text-nowrap gap-2'>
+                    <TimingPopover timing={pred.timing} />
                     {BaseEventFullName[pred.eventName as BaseEventName] ?? pred.eventName}
-                    <span className='text-xs italic'>
-                      {pred.timing.join(' - ')}
-                    </span>
-                  </div >
+                  </div>
                 </TableCell>
                 <TableCell className='text-nowrap'>
                   <span className={cn('text-sm text-center',

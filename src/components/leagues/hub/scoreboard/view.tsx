@@ -26,7 +26,6 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
     currentStreaks
   } = useLeagueData(overrideHash);
 
-
   return (
     <ScrollArea className={cn('bg-card rounded-lg gap-0', className)}>
       <Table>
