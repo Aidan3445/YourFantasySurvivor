@@ -90,15 +90,23 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       acc[episodeKey] ??= {};
       const predictions = acc[episodeKey];
 
-      const previousPredictionIndex = predictions[episodeKey]?.findIndex(p =>
-        p.predictionId === row.predictionId);
+      const previousPredictionIndex = predictions[row.eventName]?.findIndex(p =>
+        // a prediction can only 'hit' or 'miss' once, no duplicate predictions
+        p.predictionMakerId === row.predictionMakerId
+      );
 
       if (previousPredictionIndex !== undefined && previousPredictionIndex > -1) {
-        // if we already have this prediction, just update the hit status
-        predictions[row.eventName]![previousPredictionIndex] = {
-          ...predictions[row.eventName]![previousPredictionIndex]!,
-          hit: row.hit || predictions[row.eventName]![previousPredictionIndex]!.hit,
-        };
+        // overwrite if: bet is bigger or hit is true and previous was false
+        // this really shouldn't happen, but just in case to prevent duplicates
+        const previousPrediction = predictions[row.eventName]![previousPredictionIndex]!;
+        const shouldOverwrite = (row.bet ?? 0) > (previousPrediction.bet ?? 0)
+          || (row.hit && !previousPrediction.hit);
+        if (shouldOverwrite) {
+          predictions[row.eventName]![previousPredictionIndex] = {
+            ...previousPrediction,
+            ...row,
+          };
+        }
         return acc;
       }
 

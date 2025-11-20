@@ -142,14 +142,22 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       const predictions = acc[episodeKey];
 
       const previousPredictionIndex = predictions[row.eventName]?.findIndex(p =>
-        p.predictionId === row.predictionId);
+        // a prediction can only 'hit' or 'miss' once, no duplicate predictions
+        p.predictionMakerId === row.predictionMakerId
+      );
 
-      if (previousPredictionIndex !== undefined && previousPredictionIndex >= 0) {
-        // already have this prediction, just add the hit status
-        predictions[row.eventName]![previousPredictionIndex] = {
-          ...predictions[row.eventName]![previousPredictionIndex]!,
-          hit: row.hit || predictions[row.eventName]![previousPredictionIndex]!.hit,
-        };
+      if (previousPredictionIndex !== undefined && previousPredictionIndex > -1) {
+        // overwrite if: bet is bigger or hit is true and previous was false
+        // this really shouldn't happen, but just in case to prevent duplicates
+        const previousPrediction = predictions[row.eventName]![previousPredictionIndex]!;
+        const shouldOverwrite = (row.bet ?? 0) > (previousPrediction.bet ?? 0)
+          || (row.hit && !previousPrediction.hit);
+        if (shouldOverwrite) {
+          predictions[row.eventName]![previousPredictionIndex] = {
+            ...previousPrediction,
+            ...row,
+          };
+        }
         return acc;
       }
 
