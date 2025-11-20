@@ -17,7 +17,10 @@ import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useSelectionTimeline } from '~/hooks/leagues/useSelectionTimeline';
 import { useBaseEvents } from '~/hooks/seasons/useBaseEvents';
+import { useEliminations } from '~/hooks/seasons/useEliminations';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
+import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
+import { findTribeCastaways } from '~/lib/utils';
 import { type Prediction, type EventWithReferences } from '~/types/events';
 
 
@@ -50,6 +53,8 @@ export default function EpisodeEvents(
   const { data: basePredictions } = useBasePredictions();
   const { data: baseEvents } = useBaseEvents(league?.seasonId ?? null);
   const { data: episodes } = useEpisodes(league?.seasonId ?? null);
+  const { data: tribeTimeline } = useTribesTimeline(league?.seasonId ?? null);
+  const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
   const combinedEvents = useMemo(() => {
     const events: Record<number, EventWithReferences[]> = {};
@@ -128,11 +133,19 @@ export default function EpisodeEvents(
     Object.keys(combinedEvents).forEach((key) => {
       const numKey = Number(key);
       filtered[numKey] = combinedEvents[numKey]?.filter((event: EventWithReferencesAndPredOnly) => {
-        const eventMembers = event.references
-          .map((ref) => ref.type === 'Castaway'
-            ? selectionTimeline?.castawayMembers?.[ref.id]?.[numKey] ?? []
-            : [])
-          .flat();
+        const castawayMembers = selectionTimeline?.castawayMembers;
+        const eventMembers = event.references.flatMap((ref) => {
+          if (ref.type === 'Castaway') {
+            const data = castawayMembers?.[ref.id];
+            return data?.[numKey] ?? data?.[data.length - 1] ?? [];
+          }
+
+          return findTribeCastaways(tribeTimeline ?? {}, eliminations ?? [], ref.id, numKey)
+            .flatMap((cid) => {
+              const data = castawayMembers?.[cid];
+              return data?.[numKey] ?? data?.[data.length - 1] ?? [];
+            });
+        });
 
         const castawayMatch = filters.castaway.length === 0 || event.references.some((ref) =>
           ref.type === 'Castaway' && filters.castaway.includes(ref.id));
@@ -164,13 +177,16 @@ export default function EpisodeEvents(
     return filtered;
   }, [
     combinedEvents,
+    eliminations,
     filteredPredictions,
     filters.castaway,
     filters.event,
     filters.member,
     filters.tribe,
-    selectionTimeline?.castawayMembers
+    selectionTimeline?.castawayMembers,
+    tribeTimeline
   ]);
+
 
   const noTribes = useMemo(() =>
     episodeNumber !== -1 && (
