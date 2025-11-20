@@ -83,13 +83,13 @@ export default function EpisodeEvents(
             ? Object.values(customEvents.predictions[episode.episodeNumber]!).flat() : []),
         ].filter((prediction) => combinedEvents[episode.episodeNumber]?.some((event) => event.eventName === prediction.eventName));
       });
-      return predictions;
+    } else {
+      predictions[episodeNumber] = [
+        ...(basePredictions?.[episodeNumber] ? Object.values(basePredictions[episodeNumber]).flat() : []),
+        ...(customEvents?.predictions?.[episodeNumber] ? Object.values(customEvents.predictions[episodeNumber]).flat() : []),
+      ].filter((prediction) => combinedEvents[episodeNumber]?.some((event) => event.eventName === prediction.eventName));
     }
 
-    predictions[episodeNumber] = [
-      ...(basePredictions?.[episodeNumber] ? Object.values(basePredictions[episodeNumber]).flat() : []),
-      ...(customEvents?.predictions?.[episodeNumber] ? Object.values(customEvents.predictions[episodeNumber]).flat() : []),
-    ].filter((prediction) => combinedEvents[episodeNumber]?.some((event) => event.eventName === prediction.eventName));
     return predictions;
   }, [basePredictions, customEvents, combinedEvents, episodeNumber, episodes]);
 

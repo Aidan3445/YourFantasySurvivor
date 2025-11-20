@@ -1,15 +1,17 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq, or, sql } from 'drizzle-orm';
+import { aliasedTable, and, eq, or, sql } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { baseEventPredictionRulesSchema, baseEventPredictionSchema, baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
-import { type Predictions } from '~/types/events';
+import { type ReferenceType, type Predictions } from '~/types/events';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { basePredictionRulesSchemaToObject } from '~/lib/utils';
 import { type BaseEventPredictionRules } from '~/types/leagues';
 import { leagueSchema } from '~/server/db/schema/leagues';
+
+const eventEpisodeAlias = aliasedTable(episodeSchema, 'eventEpisode');
 
 /**
  * Get the base predictions for a league
@@ -33,7 +35,8 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
 
   return db.selectDistinct({
     predictionId: baseEventPredictionSchema.baseEventPredictionId,
-    episodeNumber: episodeSchema.episodeNumber,
+    predictionEpisodeNumber: episodeSchema.episodeNumber,
+    eventEpisodeNumber: eventEpisodeAlias.episodeNumber,
     predictionMakerId: baseEventPredictionSchema.memberId,
     eventName: baseEventPredictionSchema.baseEventName,
     referenceId: baseEventPredictionSchema.referenceId,
@@ -67,14 +70,27 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
         eq(getEventTimingType(rulesObject), 'non-weekly')
       )
     ))
+    .leftJoin(eventEpisodeAlias, eq(eventEpisodeAlias.episodeId, baseEventSchema.episodeId))
     .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventSchema.baseEventId))
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
     .orderBy(episodeSchema.episodeNumber)
-    .then((rows) => rows.reduce((acc, row) => {
-      acc[row.episodeNumber] ??= {};
-      const predictions = acc[row.episodeNumber]!;
+    .then((rows: {
+      predictionId: number;
+      predictionEpisodeNumber: number;
+      eventEpisodeNumber: number | null;
+      predictionMakerId: number;
+      eventName: string;
+      referenceId: number;
+      referenceType: ReferenceType;
+      bet: number | null;
+      eventId: number | null;
+      hit: boolean;
+    }[]) => rows.reduce((acc, row) => {
+      const episodeKey = row.eventEpisodeNumber ?? row.predictionEpisodeNumber;
+      acc[episodeKey] ??= {};
+      const predictions = acc[episodeKey];
 
-      const previousPredictionIndex = predictions[row.eventName]?.findIndex(p =>
+      const previousPredictionIndex = predictions[episodeKey]?.findIndex(p =>
         p.predictionId === row.predictionId);
 
       if (previousPredictionIndex !== undefined && previousPredictionIndex > -1) {
@@ -89,6 +105,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       predictions[row.eventName] ??= [];
       predictions[row.eventName]!.push({
         eventSource: 'Base',
+        episodeNumber: episodeKey,
         ...row,
       });
       return acc;

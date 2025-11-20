@@ -55,6 +55,7 @@ export default function EpisodeEventsTableBody({
     );
   }
 
+  //console.log({ enrichedPredictions, filteredPredictions });
   return (
     <>
       {enrichedMockEvents.map((mock, index) =>

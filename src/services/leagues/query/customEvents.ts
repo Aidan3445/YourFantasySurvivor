@@ -83,7 +83,8 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
   return db
     .select({
       predictionId: customEventPredictionSchema.customEventPredictionId,
-      episodeNumber: episodeSchema.episodeNumber,
+      predictionEpisodeNumber: episodeSchema.episodeNumber,
+      eventEpisodeNumber: eventEpisodeAlias.episodeNumber,
       predictionMakerId: customEventPredictionSchema.memberId,
       eventName: customEventRuleSchema.eventName,
       referenceId: customEventPredictionSchema.referenceId,
@@ -126,7 +127,8 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
     .orderBy(episodeSchema.episodeNumber)
     .then((rows: {
       predictionId: number;
-      episodeNumber: number;
+      predictionEpisodeNumber: number;
+      eventEpisodeNumber: number;
       predictionMakerId: number;
       eventName: string;
       referenceId: number;
@@ -135,8 +137,9 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       eventId: number | null;
       hit: boolean;
     }[]) => rows.reduce((acc, row) => {
-      acc[row.episodeNumber] ??= {};
-      const predictions = acc[row.episodeNumber]!;
+      const episodeKey = row.eventEpisodeNumber ?? row.predictionEpisodeNumber;
+      acc[episodeKey] ??= {};
+      const predictions = acc[episodeKey];
 
       const previousPredictionIndex = predictions[row.eventName]?.findIndex(p =>
         p.predictionId === row.predictionId);
@@ -152,7 +155,8 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
 
       predictions[row.eventName] ??= [];
       predictions[row.eventName]!.push({
-        eventSource: 'Base',
+        eventSource: 'Custom',
+        episodeNumber: episodeKey,
         ...row,
       });
       return acc;
