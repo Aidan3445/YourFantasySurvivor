@@ -1,10 +1,23 @@
 /* eslint-disable @next/next/no-img-element */
-import { ClerkLoaded, ClerkLoading, SignedIn, UserButton } from '@clerk/nextjs';
+'use client';
+
+import { SignedIn, UserButton } from '@clerk/nextjs';
 import { SidebarMenuButton, SidebarMenu } from '~/components/common/sidebar';
 import { LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
+import { type MouseEvent, useRef } from 'react';
 
 export default function SideNavFooter() {
+  const userButtonRef = useRef<HTMLDivElement>(null);
+
+  const handleMenuButtonClick = (e: MouseEvent) => {
+    e.preventDefault();
+    const userButtonTrigger = userButtonRef.current?.querySelector('button');
+    if (userButtonTrigger && !userButtonTrigger.contains(e.target as Node)) {
+      userButtonTrigger.click();
+    }
+  };
+
   return (
     <SidebarMenu className='mt-2'>
       <SidebarMenuButton
@@ -20,18 +33,15 @@ export default function SideNavFooter() {
             height={50} />
         </Link>
       </SidebarMenuButton>
-      <ClerkLoading>
-        <SidebarMenuButton className='' size='lg'>
-          <LoaderCircle className='animate-spin' color='#7f633f' />
+      <SignedIn>
+        <SidebarMenuButton size='lg' onClick={handleMenuButtonClick}>
+          <div className='pointer-events-none' ref={userButtonRef}>
+            <UserButton showName fallback={
+              <LoaderCircle className='animate-spin' color='#7f633f' />
+            } />
+          </div>
         </SidebarMenuButton>
-      </ClerkLoading>
-      <ClerkLoaded>
-        <SignedIn>
-          <SidebarMenuButton className='' size='lg'>
-            <UserButton showName />
-          </SidebarMenuButton>
-        </SignedIn>
-      </ClerkLoaded>
+      </SignedIn>
     </SidebarMenu >
   );
 }

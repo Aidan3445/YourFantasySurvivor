@@ -20,10 +20,10 @@ export default function SideNav() {
                   alt='Your Fantasy Survivor Logo'
                   width={24}
                   height={24}
-                  className='brightness-0' />
+                />
               }
               label='Your Fantasy Survivor' />
-            <SideNavLink href='/playground' icon={<Flame />} label='Playground' />
+            <SideNavLink href='/playground' icon={<Flame className='stroke-primary' />} label='Playground' />
             <SignedIn>
               <SideNavLeagues />
             </SignedIn>

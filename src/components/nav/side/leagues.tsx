@@ -30,26 +30,27 @@ export default function SideNavLeagues() {
   };
 
   if (leaguesData?.length === 0) {
-    return <SideNavLink href='/leagues' icon={<Trophy />} label='Leagues' />;
+    return <SideNavLink href='/leagues' icon={<Trophy className='stroke-primary' />} label='Leagues' />;
   }
 
   return (
     <Accordion
       type='single'
+      className='border-b-primary'
       collapsible
       value={open}
       onValueChange={() => toggleOpen()}>
       <AccordionItem value='leagues'>
         <SidebarMenuButton className='' asChild size='lg'>
-          <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all'>
-            <span className='w-full flex gap-5 items-center'>
-              <Trophy />
+          <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all stroke-primary'>
+            <span className='w-full flex gap-5 items-center text-primary'>
+              <Trophy className='stroke-primary' />
               Leagues
             </span>
           </AccordionTrigger>
         </SidebarMenuButton>
         <AccordionContent className='pb-1'>
-          <SidebarMenuSub>
+          <SidebarMenuSub className='border-l-primary'>
             {leaguesData?.filter(({ league }) => league.status !== 'Inactive')
               .slice(0, 5)
               .map(({ league }) => (
@@ -59,18 +60,18 @@ export default function SideNavLeagues() {
                   href={`/leagues/${league.hash}`}
                   label={league.name} />
               ))}
-            <Separator />
+            <Separator className='bg-primary' />
             {(leaguesData && (leaguesData.length > 5 || leaguesData.some(({ league }) => league.status === 'Inactive'))) && (
               <SideNavLink
-                className='text-nowrap'
+                className='text-nowrap text-primary'
                 href='/leagues'
                 label='View All Leagues' />
             )}
             <CreateLeagueModal>
               <SidebarMenuButton asChild size='lg'>
-                <span className='w-full flex gap-5  items-center transition-all text-nowrap'>
+                <span className='w-full flex gap-5  items-center transition-all text-nowrap text-primary'>
                   Create League
-                  <ListPlus />
+                  <ListPlus className='stroke-primary' />
                 </span>
               </SidebarMenuButton>
             </CreateLeagueModal>
