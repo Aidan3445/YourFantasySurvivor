@@ -70,6 +70,7 @@
   --animate-scale-in-fast: scale-in 0.1s ease-out;
   --animate-scale-out: scale-out 2s ease-out;
   --animate-scale-out-fast: scale-out 0.1s ease-out;
+  --animate-loading-spin: spin 2s linear infinite;
 
   --transition-delay-400: 400ms;
 
@@ -237,6 +238,10 @@
     @apply w-full;
   }
 
+  .cl-userButtonOuterIdentifier {
+    @apply !text-primary;
+  }
+
   .cl-userButtonBox {
     @apply flex-row-reverse -ml-1.5;
   }
@@ -389,13 +394,6 @@
   .shimmer-fast::before {
     @apply animate-shimmer-fast;
   }
-
-  /*
-
-
----break---
-
-*/
 }
 
 @layer base {
