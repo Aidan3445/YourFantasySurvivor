@@ -1,18 +1,33 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/common/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/common/card';
 import { Button } from '~/components/common/button';
 import { Trophy } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '~/components/common/carousel';
+import { Carousel, type CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselProgress } from '~/components/common/carousel';
 import { cn } from '~/lib/utils';
 import Autoplay from 'embla-carousel-autoplay';
 import NoActiveLeagues from '~/components/home/activeLeagues/noActiveLeagues';
 import ActiveLeague from '~/components/home/activeLeagues/activeLeague';
 import { useLeagues } from '~/hooks/user/useLeagues';
+import { useEffect, useState } from 'react';
 
 export function ActiveLeagues() {
   const { data: leagues } = useLeagues();
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!api) {
+      return;
+    }
+
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on('select', () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
 
   const topLeagues = leagues?.filter(({ league }) => league.status !== 'Inactive')
     .sort((a, b) => {
@@ -37,6 +52,7 @@ export function ActiveLeagues() {
             ignoreKeys: topLeagues.length > 1
           }}
           plugins={[Autoplay({ delay: 8000, stopOnMouseEnter: true })]}
+          setApi={setApi}
         >
           <CardHeader className='grid grid-cols-[min-content_1fr_auto_1fr_min-content] items-center px-4 mb-4'>
             <div className='w-full invisible' />
@@ -62,6 +78,9 @@ export function ActiveLeagues() {
             ))}
           </CarouselContent>
         </Carousel>
+        <CardFooter>
+          <CarouselProgress current={current} count={topLeagues.length} />
+        </CardFooter>
       </CardContent>
     </Card>
   );
