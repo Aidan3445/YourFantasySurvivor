@@ -52,7 +52,7 @@ export default function MakePredictions() {
         </div>
       }
       {
-        keyEpisodes.nextEpisode.airStatus === 'Airing' ?
+        keyEpisodes.previousEpisode?.airStatus === 'Airing' ?
           <h1 className='text-3xl'>
             Predictions are locked until the episode ends.
           </h1> :
@@ -65,7 +65,8 @@ export default function MakePredictions() {
         <AirStatus airDate={new Date(keyEpisodes.nextEpisode.airDate)} airStatus={keyEpisodes.nextEpisode.airStatus} />
       </span>
       {
-        keyEpisodes.nextEpisode.airStatus === 'Upcoming' && (
+        keyEpisodes.nextEpisode.airStatus === 'Upcoming' &&
+        keyEpisodes.previousEpisode?.airStatus !== 'Airing' && (
           <PredictionCards
             predictionRuleCount={predictionRuleCount}
             rules={rules}
