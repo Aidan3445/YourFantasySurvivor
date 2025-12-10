@@ -36,7 +36,7 @@ export default function Chart() {
 
   return (
     <div
-      className='w-full rounded-lg bg-card'
+      className='w-full rounded-lg bg-card pl-1 pb-1'
       style={{ height: `calc(2.45*${memberCount + 1}rem)` }}>
       <ResponsiveContainer>
         <LineChart
@@ -53,17 +53,24 @@ export default function Chart() {
           }}>
           <CartesianGrid stroke='#4D4D4D' />
           <XAxis
-            dataKey='episode' type='category' stroke='black'
-            label={<text x={250} y={(memberCount + 1) * 38.5} fill='black' transform='rotate(0)'>Episode</text>} />
+            dataKey='episode'
+            type='category'
+            stroke='black'
+            label={<text x='50%' y='98%' fill='black'>Episode</text>} />
           <YAxis
             stroke='black'
             tickCount={10}
             allowDecimals={false}
-            label={<text x={(memberCount + 1) * -22} y={15} fill='black' transform='rotate(-90)'>Points</text>}
+            label={
+              <text x='15' y='50%' fill='black' transform='rotate(-90)' transformOrigin='15 50%' textAnchor='middle'>
+                Points
+              </text>
+            }
             domain={[
               (dataMin: number) => dataMin,
               (dataMax: number) => dataMax + 1,
-            ]} />
+            ]}
+          />
           <Tooltip
             content={<CustomTooltip data={data} />}
             allowEscapeViewBox={{ x: false, y: false }}
