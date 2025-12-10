@@ -121,8 +121,8 @@ export async function createCastawayLogic(
       .onConflictDoNothing();
 
     // Invalidate caches
-    revalidateTag(`castaways-${seasonId}`);
-    revalidateTag('seasons');
+    revalidateTag(`castaways-${seasonId}`, 'max');
+    revalidateTag('seasons', 'max');
 
     return { newCastawayId };
   });

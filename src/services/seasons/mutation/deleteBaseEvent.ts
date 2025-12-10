@@ -29,10 +29,10 @@ export default async function deleteBaseEventLogic(baseEventId: number) {
 
   if (['tribeUpdate', ...EliminationEventNames].includes(result[0]!.eventName)) {
     // Invalidate cache
-    revalidateTag('tribe-members');
-    revalidateTag('eliminations');
+    revalidateTag('tribe-members', 'max');
+    revalidateTag('eliminations', 'max');
   }
-  revalidateTag('base-events');
+  revalidateTag('base-events', 'max');
 
   return { success: true };
 }

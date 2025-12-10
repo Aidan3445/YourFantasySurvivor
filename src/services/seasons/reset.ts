@@ -23,7 +23,7 @@ export async function resetServersideCache() {
     ];
 
     for (const tag of tagsToRevalidate) {
-      revalidateTag(tag);
+      revalidateTag(tag, 'max');
     }
 
     return true;

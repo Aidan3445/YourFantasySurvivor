@@ -74,7 +74,7 @@ export default function LeagueMemberFields({ formPrefix, memberColors = [], curr
                         className={cn(
                           'border border-primary flex justify-center items-center',
                           !ensureNewColor(hexToHsva(props.color)) ? 'cursor-not-allowed!' : '')}
-                        {...props}>
+                        {...(props as React.HTMLAttributes<HTMLDivElement>)}>
                         <Point color={props.color} checked={props.checked} />
                       </div>
                     );

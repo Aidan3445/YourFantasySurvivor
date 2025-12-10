@@ -47,9 +47,9 @@ export default async function updateBaseEventLogic(baseEventId: number, baseEven
 
     if (['tribeUpdate', ...EliminationEventNames].includes(event[0]!.eventName)) {
       // Invalidate cache
-      revalidateTag('tribe-members');
+      revalidateTag('tribe-members', 'max');
     }
-    revalidateTag('base-events');
+    revalidateTag('base-events', 'max');
 
     return { success: true };
   });

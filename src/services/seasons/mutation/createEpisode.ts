@@ -66,7 +66,7 @@ export async function createEpisodeLogic(
         .set({ premiereDate: date.toISOString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
       // Invalidate seasons
-      revalidateTag('seasons');
+      revalidateTag('seasons', 'max');
     }
 
     if (episode.isFinale) {
@@ -76,11 +76,11 @@ export async function createEpisodeLogic(
         .set({ finaleDate: date.toISOString() })
         .where(eq(seasonSchema.seasonId, season.seasonId));
       // Invalidate seasons
-      revalidateTag('seasons');
+      revalidateTag('seasons', 'max');
     }
 
     // Invalidate cache for the season's episodes
-    revalidateTag(`episodes-${season.seasonId}`);
+    revalidateTag(`episodes-${season.seasonId}`, 'max');
 
     return { newEpisodeId };
   });

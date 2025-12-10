@@ -40,7 +40,7 @@ export async function updateEpisodeLogic(
         .set({ premiereDate: episode.airDate.toUTCString() })
         .where(eq(seasonSchema.seasonId, update.seasonId));
       // Invalidate seasons
-      revalidateTag('seasons');
+      revalidateTag('seasons', 'max');
     }
 
     if (episode.isFinale && episode.airDate) {
@@ -50,11 +50,11 @@ export async function updateEpisodeLogic(
         .set({ finaleDate: episode.airDate.toUTCString() })
         .where(eq(seasonSchema.seasonId, update.seasonId));
       // Invalidate seasons
-      revalidateTag('seasons');
+      revalidateTag('seasons', 'max');
     }
 
     // Invalidate cache for the season's episodes
-    revalidateTag(`episodes-${update.seasonId}`);
+    revalidateTag(`episodes-${update.seasonId}`, 'max');
 
     return { success: true };
   });

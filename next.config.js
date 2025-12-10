@@ -9,9 +9,6 @@ const config = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   crossOrigin: 'anonymous',
   images: {
     dangerouslyAllowSVG: true,

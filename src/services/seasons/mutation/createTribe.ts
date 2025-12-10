@@ -48,8 +48,8 @@ export async function createTribeLogic(
     if (!newTribeId) throw new Error('Failed to create tribe');
 
     // Invalidate caches
-    revalidateTag(`tribes-${season.seasonId}`);
-    revalidateTag('seasons');
+    revalidateTag(`tribes-${season.seasonId}`, 'max');
+    revalidateTag('seasons', 'max');
 
     return { newTribeId };
   });
