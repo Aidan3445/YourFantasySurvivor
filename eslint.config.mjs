@@ -1,5 +1,4 @@
 import js from '@eslint/js';
-import nextPlugin from 'eslint-config-next';
 import tseslint from 'typescript-eslint';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
