@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { aliasedTable, and, eq, or, sql } from 'drizzle-orm';
+import { aliasedTable, and, eq, gte, or, sql } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { baseEventPredictionRulesSchema, baseEventPredictionSchema, baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
@@ -33,7 +33,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
 
   const rulesObject = basePredictionRulesSchemaToObject(baseEventPredictionRules);
 
-  return db.selectDistinct({
+  const x = await db.selectDistinct({
     predictionId: baseEventPredictionSchema.baseEventPredictionId,
     predictionEpisodeNumber: episodeSchema.episodeNumber,
     eventEpisodeNumber: eventEpisodeAlias.episodeNumber,
@@ -55,11 +55,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
     .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
     // result
     .leftJoin(baseEventSchema, and(
-      eq(
-        sql`cast(${baseEventSchema.eventName} as varchar)`,
-        sql`cast(${baseEventPredictionSchema.baseEventName} as varchar)`),
-      eq(baseEventSchema.episodeId, episodeSchema.episodeId),
-      eq(episodeSchema.seasonId, leagueSchema.seasonId),
+      eq(sql`cast(${baseEventSchema.eventName} as varchar)`, sql`cast(${baseEventPredictionSchema.baseEventName} as varchar)`),
       or(
         // Weekly predictions need episode match
         and(
@@ -70,7 +66,11 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
         eq(getEventTimingType(rulesObject), 'non-weekly')
       )
     ))
-    .leftJoin(eventEpisodeAlias, eq(eventEpisodeAlias.episodeId, baseEventSchema.episodeId))
+    // ensure event episode is same or after prediction episode
+    .leftJoin(eventEpisodeAlias, and(
+      eq(eventEpisodeAlias.episodeId, baseEventSchema.episodeId),
+      eq(eventEpisodeAlias.seasonId, episodeSchema.seasonId),
+      gte(eventEpisodeAlias.episodeNumber, episodeSchema.episodeNumber)))
     .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventSchema.baseEventId))
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
     .orderBy(episodeSchema.episodeNumber)
@@ -86,6 +86,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       eventId: number | null;
       hit: boolean;
     }[]) => rows.reduce((acc, row) => {
+      if (row.eventName === 'finalists') console.log(row);
       const episodeKey = row.eventEpisodeNumber ?? row.predictionEpisodeNumber;
       acc[episodeKey] ??= {};
       const predictions = acc[episodeKey];
@@ -118,6 +119,10 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       });
       return acc;
     }, {} as Predictions));
+
+  console.log(rulesObject);
+  console.log(x['8']!.finalists);
+  return x;
 }
 
 // Helper function - returns timing type for an event
@@ -125,6 +130,7 @@ function getEventTimingType(rulesObject: BaseEventPredictionRules) {
   const whenClauses = Object.entries(rulesObject)
     .map(([eventName, { timing }]) => {
       const isWeekly = timing.some(t => t.includes('Weekly'));
+      if (eventName === 'finalists') console.log({ eventName, isWeekly });
       return sql`WHEN ${baseEventPredictionSchema.baseEventName} = ${eventName} THEN ${isWeekly ? 'weekly' : 'non-weekly'}`;
     });
   return sql`CASE ${sql.join(whenClauses, sql` `)} ELSE null END`;

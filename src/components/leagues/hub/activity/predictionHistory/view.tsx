@@ -19,6 +19,8 @@ export default function PredictionHistory() {
   const { data: customEvents } = useCustomEvents();
   const { data: baseEvents } = useBaseEvents(league?.seasonId ?? null);
 
+  console.log(basePredictionsMade);
+
   const predictionsWithEvents = useMemo(() => {
     const predictions: Record<number, PredictionWithEvent[]> = {};
     if (!keyEpisodes?.previousEpisode) return predictions;
