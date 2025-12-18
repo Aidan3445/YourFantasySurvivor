@@ -239,7 +239,7 @@
   }
 
   .cl-userButtonOuterIdentifier {
-    @apply !text-primary;
+    @apply text-primary!;
   }
 
   .cl-userButtonBox {
