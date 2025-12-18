@@ -13,6 +13,7 @@ export function usePredictionsMade(overrideHash?: string) {
   const { data: leagueMembers } = useLeagueMembers(overrideHash);
   const { data: basePredictions } = useBasePredictions(overrideHash);
   const { data: customEvents } = useCustomEvents(overrideHash);
+  console.log({ basePredictions, customEvents });
 
   const loggedInMemberId = useMemo(() =>
     leagueMembers?.loggedIn?.memberId,

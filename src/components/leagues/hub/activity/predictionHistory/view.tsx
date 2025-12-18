@@ -19,7 +19,7 @@ export default function PredictionHistory() {
   const { data: customEvents } = useCustomEvents();
   const { data: baseEvents } = useBaseEvents(league?.seasonId ?? null);
 
-  console.log(basePredictionsMade);
+  console.log({ basePredictionsMade, customPredictionsMade });
 
   const predictionsWithEvents = useMemo(() => {
     const predictions: Record<number, PredictionWithEvent[]> = {};

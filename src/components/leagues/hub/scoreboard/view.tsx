@@ -57,11 +57,16 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
               (castaways?.find((c) => c.castawayId === castawayId)) : undefined;
             const selectionList = selectionTimeline?.memberCastaways?.[member.memberId]?.map(
               (id) => castaways?.find((c) => c.castawayId === id) ?? null) ?? [];
+            // place is index + 1 - number of members above them with same score
+            const numberSameScore = sortedMemberScores.slice(0, index)
+              .filter(({ scores: s }) => (s.slice().pop() ?? 0) === (scores.slice().pop() ?? 0))
+              .length;
+            const place = index + 1 - numberSameScore;
 
             return (
               <MemberRow
                 key={index}
-                place={index + 1}
+                place={place}
                 member={member}
                 currentStreak={currentStreaks?.[member.memberId] ?? 0}
                 selectionList={selectionList}
