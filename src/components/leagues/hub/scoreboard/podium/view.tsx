@@ -32,7 +32,7 @@ export default function Podium({ overrideHash, className }: PodiumProps) {
       className
     )}>
       <h2 className='text-2xl font-bold text-primary'>
-        Winner&apos;s Podium
+        Winners&apos; Podium
       </h2>
       <div className='flex gap-4 mt-2 items-end justify-center w-full'>
         <Tier
