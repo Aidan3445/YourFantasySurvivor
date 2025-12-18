@@ -6,7 +6,7 @@ import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { type PredictionTiming } from '~/types/events';
 import { type KeyEpisodes } from '~/types/episodes';
 import { type LeagueStatus } from '~/types/leagues';
-import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
+import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**

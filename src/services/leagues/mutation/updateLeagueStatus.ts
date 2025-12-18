@@ -5,7 +5,7 @@ import { eq } from 'drizzle-orm';
 import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueStatus } from '~/types/leagues';
-import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
+import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 
 /**
   * Update the league status to the next stage

@@ -6,7 +6,7 @@ import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
-import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
+import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { EliminationEventNames } from '~/lib/events';
 import { episodeSchema } from '~/server/db/schema/episodes';
 

@@ -7,7 +7,7 @@ import getPredictionTimings from '~/services/leagues/query/predictionTimings';
 import getLeagueRules from '~/services/leagues/query/rules';
 import { baseEventPredictionSchema } from '~/server/db/schema/baseEvents';
 import { customEventPredictionSchema } from '~/server/db/schema/customEvents';
-import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
+import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { getSeasonData } from '~/services/seasons/query/seasonsData';
 import getSelectionTimeline from '~/services/leagues/query/selectionTimeline';
 import getCustomEventsAndPredictions from '~/services/leagues/query/customEvents';

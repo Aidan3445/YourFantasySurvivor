@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
+import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 
 export async function GET(request: NextRequest) {
   const seasonIdParam = request.nextUrl.searchParams.get('seasonId');

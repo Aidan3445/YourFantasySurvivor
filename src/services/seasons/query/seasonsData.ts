@@ -10,7 +10,7 @@ import getTribesTimeline from '~/services/seasons/query/tribesTimeline';
 import getEpisodes from '~/services/seasons/query/episodes';
 import { type Season, type SeasonsDataQuery } from '~/types/seasons';
 import { type EnrichedCastaway } from '~/types/castaways';
-import getKeyEpisodes from '~/services/leagues/query/getKeyEpisodes';
+import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
