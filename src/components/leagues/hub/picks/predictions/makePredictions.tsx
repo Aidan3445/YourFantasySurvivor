@@ -28,7 +28,10 @@ export default function MakePredictions() {
       .reduce((total, p) => total + (p.bet ?? 0), 0),
     [basePredictionsMade]);
   const submittedBetTotal = useMemo(() => predictionsMade
-    .reduce((total, p) => total + (p.bet ?? 0), 0), [predictionsMade]);
+    .reduce((total, p) => total +
+      (p.eventId !== null
+        ? 0
+        : (p.bet ?? 0)), 0), [predictionsMade]);
   const balance = useMemo(() =>
     (scores?.Member[leagueMembers?.loggedIn?.memberId ?? -1]?.slice().pop() ?? 0) - submittedBetTotal - pendingBetTotal,
     [scores?.Member, leagueMembers?.loggedIn?.memberId, submittedBetTotal, pendingBetTotal]);
@@ -49,6 +52,13 @@ export default function MakePredictions() {
               Pending Balance: {balance - formBetTotal}<Flame className='inline mb-1 w-4 h-min stroke-muted-foreground' />
             </span>
           </>}
+          <div className='flex-col'>
+            form{formBetTotal} -
+            bal{balance} -
+            pts{scores?.Member[leagueMembers?.loggedIn?.memberId ?? -1]?.slice().pop()} -
+            sub{submittedBetTotal} -
+            pen{pendingBetTotal}
+          </div>
         </div>
       }
       {

@@ -55,7 +55,7 @@ export default function ChangeCastaway() {
       reactForm.reset();
       setSelected('');
       alert('Castaway chosen successfully');
-    } catch (error) {
+    } catch {
       alert('Failed to choose castaway');
     }
   });

@@ -20,6 +20,7 @@ import ShauhinMode from '~/components/leagues/customization/settings/shauhin/vie
 import getLeague from '~/services/leagues/query/legaue';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
+import Podium from '~/components/leagues/hub/scoreboard/podium/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
@@ -52,6 +53,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-clip @container/tabs-content'>
           <TabsContent className='mb-2' value='scores'>
             <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-12 pb-2'>
+              <Podium />
               <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-[min-content_minmax(24rem,1fr)] lg:grid-rows-1 gap-4 items-center justify-center'>
                 <Scoreboard />
                 <Chart />
