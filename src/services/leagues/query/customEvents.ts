@@ -137,7 +137,7 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       eventId: number | null;
       hit: boolean;
     }[]) => rows.reduce((acc, row) => {
-      const episodeKey = row.eventEpisodeNumber ?? row.predictionEpisodeNumber;
+      const episodeKey = row.predictionEpisodeNumber;
       acc[episodeKey] ??= {};
       const predictions = acc[episodeKey];
 
@@ -164,7 +164,6 @@ export async function getCustomPredictions(auth: VerifiedLeagueMemberAuth) {
       predictions[row.eventName] ??= [];
       predictions[row.eventName]!.push({
         eventSource: 'Custom',
-        episodeNumber: episodeKey,
         ...row,
       });
       return acc;

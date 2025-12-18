@@ -10,7 +10,6 @@ import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { Flame, MoveRight } from 'lucide-react';
-import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
 
 interface PredictionRowProps {
   className?: string;
@@ -137,7 +136,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
             </Accordion>}
         </div>
       </TableCell>
-      <NotesCell notes={null} />
+      <TableCell />
     </TableRow>
   );
 }

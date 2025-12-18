@@ -59,7 +59,8 @@ export type PredictionTiming = (typeof PredictionTimings)[number];
 export type Prediction = {
   predictionId: number;
   eventSource: EventSource;
-  episodeNumber: number; // episode that the prediction was made in
+  predictionEpisodeNumber: number; // episode that the prediction was made in
+  eventEpisodeNumber: number | null; // episode that the event occurs in, if any
   eventName: string;
   predictionMakerId: number;
   referenceId: number;

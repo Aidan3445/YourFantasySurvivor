@@ -56,6 +56,12 @@ export default function EpisodeEvents(
   const { data: tribeTimeline } = useTribesTimeline(league?.seasonId ?? null);
   const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
+  console.log({
+    customEvents,
+    basePredictions,
+    baseEvents
+  });
+
   const combinedEvents = useMemo(() => {
     const events: Record<number, EventWithReferences[]> = {};
     if (episodeNumber === -1) {

@@ -33,7 +33,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
 
   const rulesObject = basePredictionRulesSchemaToObject(baseEventPredictionRules);
 
-  const x = await db.selectDistinct({
+  return db.selectDistinct({
     predictionId: baseEventPredictionSchema.baseEventPredictionId,
     predictionEpisodeNumber: episodeSchema.episodeNumber,
     eventEpisodeNumber: eventEpisodeAlias.episodeNumber,
@@ -94,8 +94,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       eventId: number | null;
       hit: boolean;
     }[]) => rows.reduce((acc, row) => {
-      if (row.eventName === 'finalists') console.log(row);
-      const episodeKey = row.eventEpisodeNumber ?? row.predictionEpisodeNumber;
+      const episodeKey = row.predictionEpisodeNumber;
       acc[episodeKey] ??= {};
       const predictions = acc[episodeKey];
 
@@ -122,15 +121,10 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       predictions[row.eventName] ??= [];
       predictions[row.eventName]!.push({
         eventSource: 'Base',
-        episodeNumber: episodeKey,
         ...row,
       });
       return acc;
     }, {} as Predictions));
-
-  console.log(rulesObject);
-  console.log(x['8']!.finalists);
-  return x;
 }
 
 // Helper function - returns timing type for an event
@@ -138,7 +132,6 @@ function getEventTimingType(rulesObject: BaseEventPredictionRules) {
   const whenClauses = Object.entries(rulesObject)
     .map(([eventName, { timing }]) => {
       const isWeekly = timing.some(t => t.includes('Weekly'));
-      if (eventName === 'finalists') console.log({ eventName, isWeekly });
       return sql`WHEN ${baseEventPredictionSchema.baseEventName} = ${eventName} THEN ${isWeekly ? 'weekly' : 'non-weekly'}`;
     });
   return sql`CASE ${sql.join(whenClauses, sql` `)} ELSE null END`;

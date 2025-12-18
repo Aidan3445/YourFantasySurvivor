@@ -28,6 +28,11 @@ export function useEnrichPredictions(
   const { data: leagueMembers } = useLeagueMembers();
   const { data: eliminations } = useEliminations(seasonId);
 
+  console.log('useEnrichPredictions', {
+    events,
+    predictions
+  });
+
   const lookupMaps = useMemo(() => {
     if (!tribes || !castaways || !leagueMembers || !events || !eliminations) {
       return null;
@@ -36,7 +41,7 @@ export function useEnrichPredictions(
     const tribesById = new Map(tribes.map(tribe => [tribe.tribeId, tribe]));
     const castawaysById = new Map(castaways.map(castaway => [castaway.castawayId, castaway]));
     const membersById = new Map(leagueMembers.members.map(member => [member.memberId, member]));
-    const eventsById = new Map(events.map(event => [event.eventName, event]));
+    const eventsById = new Map(events.map(event => [event.eventId, event]));
 
     const eliminationEpisodes = new Map<number, number>();
     eliminations.forEach((episodeElims, index) => {
@@ -56,7 +61,7 @@ export function useEnrichPredictions(
     };
   }, [tribes, castaways, leagueMembers, events, eliminations]);
 
-  const createTribeFinder = useMemo(() => {
+  const findTribe = useMemo(() => {
     if (!tribesTimeline || !lookupMaps) return null;
 
     return (castawayId: number, episodeNumber: number) => {
@@ -80,22 +85,22 @@ export function useEnrichPredictions(
   }, [tribesTimeline, lookupMaps]);
 
   const enrichedPredictions = useMemo(() => {
-    if (!seasonId || !predictions || !lookupMaps || !createTribeFinder || !rules) {
+    if (!seasonId || !predictions || !lookupMaps || !findTribe || !rules) {
       return [];
     }
 
     const predictionGroups: Record<string, EnrichedPrediction> = {};
 
     for (const prediction of predictions) {
-      if (!prediction.eventName || prediction.hit === null) {
+      if (!prediction.eventId || prediction.hit === null) {
         continue;
       }
 
+      const event = prediction.eventId ? lookupMaps.eventsById.get(prediction.eventId) : null;
+      if (!event) continue;
+
       let existingPrediction = predictionGroups[prediction.eventName];
       if (!existingPrediction) {
-        const event = lookupMaps.eventsById.get(prediction.eventName);
-        if (!event) continue;
-
         let points: number | null = null;
         if (event.eventSource === 'Base') {
           const basePredictionRules = rules.basePrediction ?? defaultBasePredictionRules;
@@ -108,6 +113,23 @@ export function useEnrichPredictions(
 
         existingPrediction = { event, points, hits: [], misses: [] };
         predictionGroups[prediction.eventName] = existingPrediction;
+      } else if (existingPrediction.event.eventId !== event.eventId) {
+        // we then need to make sure to combine the references if multiple events with the same name exist
+        // only add new references to both referenceMap and references list
+        existingPrediction.event.referenceMap = [
+          ...existingPrediction.event.referenceMap,
+          ...event.referenceMap.filter(newRef =>
+            !existingPrediction!.event.referenceMap.some(existingRef =>
+              JSON.stringify(existingRef) === JSON.stringify(newRef)))
+        ];
+        existingPrediction.event.references = [
+          ...existingPrediction.event.references,
+          ...event.references.filter(newRef =>
+            !existingPrediction!.event.references.some(existingRef =>
+              existingRef.id === newRef.id &&
+              existingRef.type === newRef.type))
+        ];
+        console.log('existingPrediction found', existingPrediction.event.referenceMap, 'new', event.referenceMap);
       }
 
       const member = lookupMaps.membersById.get(prediction.predictionMakerId);
@@ -128,7 +150,7 @@ export function useEnrichPredictions(
         const castaway = lookupMaps.castawaysById.get(prediction.referenceId);
         if (!castaway) continue;
 
-        const tribe = createTribeFinder(castaway.castawayId, existingPrediction.event.episodeNumber);
+        const tribe = findTribe(castaway.castawayId, existingPrediction.event.episodeNumber);
         if (!tribe) continue;
 
         const eliminatedEpisode = lookupMaps.eliminationEpisodes.get(castaway.castawayId) ?? null;
@@ -164,7 +186,7 @@ export function useEnrichPredictions(
     }
 
     return Object.values(predictionGroups);
-  }, [seasonId, predictions, lookupMaps, createTribeFinder, rules]);
+  }, [seasonId, predictions, lookupMaps, findTribe, rules]);
 
   return enrichedPredictions;
 }

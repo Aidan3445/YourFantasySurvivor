@@ -69,6 +69,10 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                   <div className='flex text-nowrap gap-2'>
                     <TimingPopover timing={pred.timing} />
                     {BaseEventFullName[pred.eventName as BaseEventName] ?? pred.eventName}
+                    {pred.eventEpisodeNumber !== pred.predictionEpisodeNumber &&
+                      <span className='text-muted-foreground text-xs -ml-2'>
+                        ({pred.eventEpisodeNumber})
+                      </span>}
                   </div>
                 </TableCell>
                 <TableCell className='text-nowrap'>
@@ -111,7 +115,7 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                 </TableCell>
                 <TableCell>
                   {pred.timing.every((t) => t.includes('Weekly')) &&
-                    (keyEpisodes?.previousEpisode?.episodeNumber ?? 0) >= pred.episodeNumber &&
+                    (keyEpisodes?.previousEpisode?.episodeNumber ?? 0) >= pred.predictionEpisodeNumber &&
                     !pred.event
                     ? (<span className='text-muted-foreground'>--</span>)
                     : (findReferenceNames(pred.event?.references)
