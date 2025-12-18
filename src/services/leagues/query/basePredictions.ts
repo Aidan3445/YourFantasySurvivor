@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { aliasedTable, and, eq, gte, or, sql } from 'drizzle-orm';
+import { aliasedTable, and, eq, gte, isNull, or, sql } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { baseEventPredictionRulesSchema, baseEventPredictionSchema, baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
@@ -55,7 +55,9 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
     .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
     // result
     .leftJoin(baseEventSchema, and(
-      eq(sql`cast(${baseEventSchema.eventName} as varchar)`, sql`cast(${baseEventPredictionSchema.baseEventName} as varchar)`),
+      eq(
+        sql`cast(${baseEventSchema.eventName} as varchar)`,
+        sql`cast(${baseEventPredictionSchema.baseEventName} as varchar)`),
       or(
         // Weekly predictions need episode match
         and(
@@ -72,7 +74,13 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       eq(eventEpisodeAlias.seasonId, episodeSchema.seasonId),
       gte(eventEpisodeAlias.episodeNumber, episodeSchema.episodeNumber)))
     .leftJoin(baseEventReferenceSchema, eq(baseEventReferenceSchema.baseEventId, baseEventSchema.baseEventId))
-    .where(eq(leagueMemberSchema.leagueId, auth.leagueId))
+    .where(and(
+      eq(leagueMemberSchema.leagueId, auth.leagueId),
+      or(
+        // if base event exists, ensure it's in a valid episode
+        isNull(baseEventSchema.baseEventId),
+        eq(eventEpisodeAlias.seasonId, leagueSchema.seasonId),
+      )))
     .orderBy(episodeSchema.episodeNumber)
     .then((rows: {
       predictionId: number;

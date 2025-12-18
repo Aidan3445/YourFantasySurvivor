@@ -29,7 +29,7 @@ export default function PredictionHistory() {
       // note we have two different episode numbers available to us here:
       // * prediction.eventNumber is the episode when the prediction was made
       // * event.episodeNumber is the episode when the event occurs (if there is one)
-      // for weekly events these are the same, but for sole survivor they may differ
+      // for weekly events these are the same, but for sole survivor, fire win, etc they may differ
       Object.entries(basePredictionsMade).forEach(([episodeNumber, predictionMap]) => {
         const episodeNum = Number(episodeNumber);
         if (episodeNum > keyEpisodes.previousEpisode!.episodeNumber) return;
