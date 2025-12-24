@@ -28,11 +28,6 @@ export function useEnrichPredictions(
   const { data: leagueMembers } = useLeagueMembers();
   const { data: eliminations } = useEliminations(seasonId);
 
-  console.log('useEnrichPredictions', {
-    events,
-    predictions
-  });
-
   const lookupMaps = useMemo(() => {
     if (!tribes || !castaways || !leagueMembers || !events || !eliminations) {
       return null;
@@ -129,7 +124,6 @@ export function useEnrichPredictions(
               existingRef.id === newRef.id &&
               existingRef.type === newRef.type))
         ];
-        console.log('existingPrediction found', existingPrediction.event.referenceMap, 'new', event.referenceMap);
       }
 
       const member = lookupMaps.membersById.get(prediction.predictionMakerId);

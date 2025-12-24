@@ -28,7 +28,6 @@ export default function EpisodeEventsTableBody({
   filters,
   index
 }: EpisodeEventsTableBodyProps) {
-  console.log({ filteredEvents, filteredPredictions });
   const enrichedEvents = useEnrichEvents(seasonId, filteredEvents);
   const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents ?? null);
   const enrichedEnrichmentEvents = useEnrichEvents(seasonId, enrichmentEvents ?? null);
