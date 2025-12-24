@@ -14,9 +14,9 @@ export default function TimingPopover({ timing }: TimingPopoverProps) {
       <PopoverTrigger>
         <Clock size={12} className='inline-block' />
       </PopoverTrigger>
-      <PopoverContent className='w-80 md:w-full'>
+      <PopoverContent className='w-min mx-1'>
         <PopoverArrow />
-        <span className='text-xs italic'>
+        <span className='text-xs italic text-nowrap'>
           {timing.join(', ')}
         </span>
       </PopoverContent>

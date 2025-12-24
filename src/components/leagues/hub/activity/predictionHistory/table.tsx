@@ -14,6 +14,9 @@ import { BaseEventFullName } from '~/lib/events';
 import { cn } from '~/lib/utils';
 import { type PredictionWithEvent, type BaseEventName, type EventReference } from '~/types/events';
 import TimingPopover from '~/components/leagues/hub/activity/predictionHistory/timingPopover';
+import { Popover, PopoverTrigger, PopoverContent } from '~/components/common/popover';
+import { PopoverArrow } from '@radix-ui/react-popover';
+import { Separator } from '~/components/common/separator';
 
 interface PredictionTableProps {
   predictions: PredictionWithEvent[];
@@ -70,9 +73,22 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                     <TimingPopover timing={pred.timing} />
                     {BaseEventFullName[pred.eventName as BaseEventName] ?? pred.eventName}
                     {pred.eventEpisodeNumber !== pred.predictionEpisodeNumber &&
-                      <span className='text-muted-foreground text-xs -ml-2'>
-                        ({pred.eventEpisodeNumber})
-                      </span>}
+                      <Popover modal hover>
+                        <PopoverTrigger className='text-muted-foreground text-xs -ml-2 -mt-2'>
+                          ({pred.eventEpisodeNumber})
+                        </PopoverTrigger>
+                        <PopoverContent className='w-min'>
+                          <PopoverArrow />
+                          <p className='text-xs italic text-nowrap'>
+                            Predicted episode {pred.predictionEpisodeNumber}
+                          </p>
+                          <Separator className='my-1 w-4/5 mx-auto' />
+                          <p className='text-xs italic text-nowrap'>
+                            Resolved episode {pred.eventEpisodeNumber}
+                          </p>
+                        </PopoverContent>
+                      </Popover>
+                    }
                   </div>
                 </TableCell>
                 <TableCell className='text-nowrap'>
