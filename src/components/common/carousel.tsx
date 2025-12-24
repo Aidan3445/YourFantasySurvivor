@@ -264,10 +264,12 @@ interface CoverCarouselProps {
     header: React.ReactNode
     content: React.ReactNode
     footer?: React.ReactNode
-  }[]
+  }[],
+  reset?: boolean,
+  setReset?: (_: boolean) => void
 }
 
-function CoverCarousel({ items }: CoverCarouselProps) {
+function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>();
   const [current, setCurrent] = React.useState(0);
 
@@ -282,6 +284,13 @@ function CoverCarousel({ items }: CoverCarouselProps) {
       setCurrent(api.selectedScrollSnap() + 1);
     });
   }, [api]);
+
+  React.useEffect(() => {
+    if (api && reset) {
+      api.scrollTo(0);
+      setReset?.(false);
+    }
+  }, [api, reset, setReset]);
 
   return (
     <Carousel className='relative' setApi={setApi} opts={{ containScroll: false, duration: 20 }}>

@@ -24,6 +24,8 @@ export default function PredictionHistory() {
   const { data: customEvents } = useCustomEvents();
   const { data: baseEvents } = useBaseEvents(league?.seasonId ?? null);
 
+  const [resetCarousel, setResetCarousel] = useState(false);
+
   useEffect(() => {
     if (leagueMembers?.loggedIn?.memberId) {
       setSelectedMemberId(leagueMembers.loggedIn.memberId);
@@ -152,7 +154,10 @@ export default function PredictionHistory() {
           <h1 className='text-3xl py-2'>Prediction History</h1>
           <Select
             value={`${selectedMemberId}`}
-            onValueChange={value => setSelectedMemberId(+value)}>
+            onValueChange={value => {
+              setSelectedMemberId(+value);
+              setResetCarousel(true);
+            }}>
             <SelectTrigger className='w-min absolute top-1/2 -translate-y-1/2 right-2'>
               <SelectValue placeholder='Select Member' />
             </SelectTrigger>
@@ -172,10 +177,13 @@ export default function PredictionHistory() {
         <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
         <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
       </span>
-      <CoverCarousel items={Object.entries(predictionsWithEvents).toReversed().map(([episode, preds]) => ({
-        header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
-        content: (<PredctionTable predictions={preds} />)
-      }))} />
-    </div >
+      <CoverCarousel
+        items={Object.entries(predictionsWithEvents).toReversed().map(([episode, preds]) => ({
+          header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
+          content: (<PredctionTable predictions={preds} />)
+        }))}
+        reset={resetCarousel}
+        setReset={setResetCarousel} />
+    </div>
   );
 }
