@@ -53,7 +53,10 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
   }, [castaways, tribes]);
 
   return (
-    <ScrollArea className='max-h-44 transform-gpu will-change-transform **:data-radix-scroll-area-viewport:max-h-44'>
+    <ScrollArea className={cn(
+      predictions.length >= 4 && 'max-h-44 **:data-radix-scroll-area-viewport:max-h-44',
+      'transform-gpu will-change-transform'
+    )}>
       <Table>
         <TableCaption className='sr-only'>Member Predictions</TableCaption>
         <TableHeader className='sticky top-0 z-10 bg-white'>
