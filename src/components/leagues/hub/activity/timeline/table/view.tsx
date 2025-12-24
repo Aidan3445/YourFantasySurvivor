@@ -137,29 +137,34 @@ export default function EpisodeEvents(
     return { combinedPredictions: predictions, enrichmentOnlyEvents: enrichmentEvents };
   }, [basePredictions, customEvents, allEvents, episodeNumber, episodes]);
 
-  // filter predictions first because they may require an event that gets filtered out
   const filteredPredictions = useMemo(() => {
     const filtered: Record<number, PredictionAndPredOnly[] | undefined> = {};
     Object.keys(combinedPredictions).forEach((key) => {
       const numKey = Number(key);
       filtered[numKey] = combinedPredictions[numKey]?.filter((prediction) => {
-        const castawayMatch = filters.castaway.length === 0 || (
-          prediction.referenceType === 'Castaway' && filters.castaway.includes(prediction.referenceId)
+        // Reference match: if either castaway or tribe filters are set,
+        // the prediction must match at least one of them based on its type
+        const hasReferenceFilters = filters.castaway.length > 0 || filters.tribe.length > 0;
+        const referenceMatch = !hasReferenceFilters || (
+          (prediction.referenceType === 'Castaway' && filters.castaway.includes(prediction.referenceId)) ||
+          (prediction.referenceType === 'Tribe' && filters.tribe.includes(prediction.referenceId))
         );
-        const tribeMatch = filters.tribe.length === 0 || (
-          prediction.referenceType === 'Tribe' && filters.tribe.includes(prediction.referenceId)
-        );
+
         const memberMatch = filters.member.length === 0 ||
           filters.member.includes(prediction.predictionMakerId);
-        const eventMatch = filters.event.length === 0 || combinedEvents[numKey]?.some((event) =>
-          event.eventName === prediction.eventName && filters.event.includes(event.eventName));
 
-        return castawayMatch && tribeMatch && memberMatch && eventMatch;
+        const eventEpNum = prediction.eventEpisodeNumber;
+        const eventMatch = filters.event.length === 0 || (
+          eventEpNum && allEvents[eventEpNum]?.some((event) =>
+            event.eventName === prediction.eventName && filters.event.includes(event.eventName))
+        );
+
+        return referenceMatch && memberMatch && eventMatch;
       });
     });
     return filtered;
   }, [
-    combinedEvents,
+    allEvents,
     combinedPredictions,
     filters.castaway,
     filters.event,
@@ -171,7 +176,7 @@ export default function EpisodeEvents(
     const filtered: Record<number, EventWithReferencesAndPredOnly[] | undefined> = {};
     Object.keys(combinedEvents).forEach((key) => {
       const numKey = Number(key);
-      filtered[numKey] = combinedEvents[numKey]?.filter((event: EventWithReferencesAndPredOnly) => {
+      filtered[numKey] = combinedEvents[numKey]?.map((event): EventWithReferencesAndPredOnly | null => {
         const castawayMembers = selectionTimeline?.castawayMembers;
         const eventMembers = event.references.flatMap((ref) => {
           if (ref.type === 'Castaway' && numKey >= (league?.startWeek ?? 0)) {
@@ -197,22 +202,17 @@ export default function EpisodeEvents(
 
         const keep = castawayMatch && tribeMatch && memberMatch && eventMatch;
 
-        // if we're not keeping the event from filters, check if any predictions for it exist
-        const matchPredictions = filteredPredictions[numKey]?.filter((prediction) =>
+        // Check if any predictions for this event exist (without mutating)
+        const hasPredictions = filteredPredictions[numKey]?.some((prediction) =>
           prediction.eventId === event.eventId);
-        if (!keep && matchPredictions && matchPredictions.length > 0) {
-          event.predOnly = true;
 
-          filteredPredictions[numKey] = filteredPredictions[numKey]?.map((prediction) => {
-            if (prediction.eventId === event.eventId) {
-              prediction.predOnly = true;
-            }
-            return prediction;
-          });
+        if (keep) {
+          return { ...event, predOnly: false };
+        } else if (hasPredictions) {
+          return { ...event, predOnly: true };
         }
-
-        return keep || event.predOnly;
-      });
+        return null;
+      }).filter((event): event is EventWithReferencesAndPredOnly => event !== null);
     });
     return filtered;
   }, [
@@ -225,7 +225,24 @@ export default function EpisodeEvents(
     filters.tribe,
     league?.startWeek,
     selectionTimeline?.castawayMembers,
-    tribeTimeline]);
+    tribeTimeline
+  ]);
+
+  // Compute predOnly for predictions based on filtered events (separate, no mutation)
+  const filteredPredictionsWithPredOnly = useMemo(() => {
+    const result: Record<number, PredictionAndPredOnly[] | undefined> = {};
+    Object.keys(filteredPredictions).forEach((key) => {
+      const numKey = Number(key);
+      result[numKey] = filteredPredictions[numKey]?.map((prediction) => {
+        const event = filteredEvents[numKey]?.find(e => e.eventId === prediction.eventId);
+        return {
+          ...prediction,
+          predOnly: event?.predOnly ?? false
+        };
+      });
+    });
+    return result;
+  }, [filteredPredictions, filteredEvents]);
 
   const noTribes = useMemo(() => episodeNumber !== -1 && (
     !combinedEvents[episodeNumber]?.some((event) => event.references.some((ref) => ref.type === 'Tribe'))
@@ -267,7 +284,7 @@ export default function EpisodeEvents(
                   episodeNumber={episode.episodeNumber}
                   mockEvents={mockEvents}
                   filteredEvents={filteredEvents[episode.episodeNumber] ?? []}
-                  filteredPredictions={filteredPredictions[episode.episodeNumber] ?? []}
+                  filteredPredictions={filteredPredictionsWithPredOnly[episode.episodeNumber] ?? []}
                   enrichmentEvents={enrichmentOnlyEvents}
                   edit={edit}
                   filters={filters} />

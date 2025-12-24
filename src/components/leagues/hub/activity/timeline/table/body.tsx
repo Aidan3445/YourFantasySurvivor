@@ -75,7 +75,7 @@ export default function EpisodeEventsTableBody({
           {edit && <TableCell className='w-0'>
             Edit
           </TableCell>}
-          <TableCell>
+          <TableCell className='text-nowrap'>
             Official Events
           </TableCell>
           <TableCell className='text-center'>
