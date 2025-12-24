@@ -1,11 +1,14 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { CoverCarousel } from '~/components/common/carousel';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import PredctionTable from '~/components/leagues/hub/activity/predictionHistory/table';
+import ColorRow from '~/components/shared/colorRow';
 import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
 import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
 import { useLeague } from '~/hooks/leagues/useLeague';
+import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { useBaseEvents } from '~/hooks/seasons/useBaseEvents';
 import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
@@ -15,9 +18,17 @@ export default function PredictionHistory() {
   const { data: league } = useLeague();
   const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
   const { data: rules } = useLeagueRules();
-  const { basePredictionsMade, customPredictionsMade } = usePredictionsMade();
+  const { data: leagueMembers } = useLeagueMembers();
+  const [selectedMemberId, setSelectedMemberId] = useState(leagueMembers?.loggedIn?.memberId);
+  const { basePredictionsMade, customPredictionsMade } = usePredictionsMade(undefined, selectedMemberId);
   const { data: customEvents } = useCustomEvents();
   const { data: baseEvents } = useBaseEvents(league?.seasonId ?? null);
+
+  useEffect(() => {
+    if (leagueMembers?.loggedIn?.memberId) {
+      setSelectedMemberId(leagueMembers.loggedIn.memberId);
+    }
+  }, [leagueMembers?.loggedIn?.memberId]);
 
   const predictionsWithEvents = useMemo(() => {
     const predictions: Record<number, PredictionWithEvent[]> = {};
@@ -136,7 +147,27 @@ export default function PredictionHistory() {
 
   return (
     <div className='text-center bg-card rounded-lg w-full overflow-clip'>
-      <h1 className='text-3xl'>Prediction History</h1>
+      <div className='text-center bg-card rounded-lg w-full overflow-clip'>
+        <div className='relative'>
+          <h1 className='text-3xl py-2'>Prediction History</h1>
+          <Select
+            value={`${selectedMemberId}`}
+            onValueChange={value => setSelectedMemberId(+value)}>
+            <SelectTrigger className='w-min absolute top-1/2 -translate-y-1/2 right-2'>
+              <SelectValue placeholder='Select Member' />
+            </SelectTrigger>
+            <SelectContent>
+              {leagueMembers?.members.map(member => (
+                <SelectItem key={member.memberId} value={`${member.memberId}`}>
+                  <ColorRow color={member.color} className='w-full'>
+                    {member.displayName}
+                  </ColorRow>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       <span className='flex justify-center items-center gap-2 text-sm'>
         <p className=' text-muted-foreground'>Accuracy: {stats.count.correct}/{stats.count.total}</p>
         <p className=' text-muted-foreground'>Points: {stats.points.earned}/{stats.points.possible}</p>
@@ -145,6 +176,6 @@ export default function PredictionHistory() {
         header: (<h2 className='text-2xl leading-loose'>{`Episode ${episode}`}</h2>),
         content: (<PredctionTable predictions={preds} />)
       }))} />
-    </div>
+    </div >
   );
 }

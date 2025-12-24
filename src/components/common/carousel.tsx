@@ -19,7 +19,7 @@ type CarouselProps = {
   opts?: CarouselOptions & { ignoreKeys?: boolean }
   plugins?: CarouselPlugin
   orientation?: 'horizontal' | 'vertical'
-  setApi?: (api: CarouselApi) => void
+  setApi?: (_: CarouselApi) => void
 }
 
 export type CarouselContextProps = {
