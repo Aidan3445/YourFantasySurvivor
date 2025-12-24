@@ -7,11 +7,13 @@ import { useEnrichEvents } from '~/hooks/seasons/enrich/useEnrichEvents';
 import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPredictions';
 import PredictionRow from '~/components/leagues/hub/activity/timeline/table/row/predictionRow';
 import EventRow from '~/components/leagues/hub/activity/timeline/table/row/eventRow';
+import { useMemo } from 'react';
 
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
   filteredEvents: EventWithReferencesAndPredOnly[];
   filteredPredictions: PredictionAndPredOnly[];
+  enrichmentEvents?: EventWithReferencesAndPredOnly[];
   index: number;
 }
 
@@ -21,13 +23,21 @@ export default function EpisodeEventsTableBody({
   mockEvents,
   filteredEvents,
   filteredPredictions,
+  enrichmentEvents,
   edit,
   filters,
   index
 }: EpisodeEventsTableBodyProps) {
   const enrichedEvents = useEnrichEvents(seasonId, filteredEvents);
   const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents ?? null);
-  const enrichedPredictions = useEnrichPredictions(seasonId, enrichedEvents, filteredPredictions);
+  const enrichedEnrichmentEvents = useEnrichEvents(seasonId, enrichmentEvents ?? null);
+
+  const eventsForEnrichment = useMemo(() => [
+    ...enrichedEvents,
+    ...enrichedEnrichmentEvents,
+  ], [enrichedEvents, enrichedEnrichmentEvents]);
+
+  const enrichedPredictions = useEnrichPredictions(seasonId, eventsForEnrichment, filteredPredictions);
   const enrichedMockPredictions = useEnrichPredictions(seasonId, enrichedMockEvents, filteredPredictions);
 
   const { baseEvents, customEvents } = enrichedEvents.reduce((acc, event) => {

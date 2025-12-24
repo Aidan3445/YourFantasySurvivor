@@ -56,35 +56,40 @@ export default function EpisodeEvents(
   const { data: tribeTimeline } = useTribesTimeline(league?.seasonId ?? null);
   const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
+  /*
   console.log({
     customEvents,
     basePredictions,
     baseEvents
   });
+  */
+
+  // All events for lookup purposes (needed to validate predictions reference valid events)
+  const allEvents = useMemo(() => {
+    const events: Record<number, EventWithReferences[]> = {};
+    (episodes ?? []).forEach((episode) => {
+      events[episode.episodeNumber] = [
+        ...(baseEvents?.[episode.episodeNumber]
+          ? Object.values(baseEvents[episode.episodeNumber]!) : []),
+        ...(customEvents?.events?.[episode.episodeNumber]
+          ? Object.values(customEvents.events[episode.episodeNumber]!) : [])
+      ];
+    });
+    return events;
+  }, [baseEvents, customEvents, episodes]);
 
   const combinedEvents = useMemo(() => {
-    const events: Record<number, EventWithReferences[]> = {};
     if (episodeNumber === -1) {
-      (episodes ?? []).forEach((episode) => {
-        events[episode.episodeNumber] = [
-          ...(baseEvents?.[episode.episodeNumber]
-            ? Object.values(baseEvents[episode.episodeNumber]!) : []),
-          ...(customEvents?.events?.[episode.episodeNumber]
-            ? Object.values(customEvents.events[episode.episodeNumber]!) : [])
-        ];
-      });
-      return events;
+      return allEvents;
     }
 
-    events[episodeNumber] = [
-      ...(baseEvents?.[episodeNumber] ? Object.values(baseEvents[episodeNumber]) : []),
-      ...(customEvents?.events?.[episodeNumber] ? Object.values(customEvents.events[episodeNumber]) : [])
-    ];
-    return events;
-  }, [baseEvents, customEvents, episodeNumber, episodes]);
+    return { [episodeNumber]: allEvents[episodeNumber] ?? [] };
+  }, [allEvents, episodeNumber]);
 
-  const combinedPredictions = useMemo(() => {
+  const { combinedPredictions, enrichmentOnlyEvents } = useMemo(() => {
     const predictions: Record<number, Prediction[]> = {};
+    const enrichmentEvents: EventWithReferences[] = [];
+
     if (episodeNumber === -1) {
       (episodes ?? []).forEach((episode) => {
         predictions[episode.episodeNumber] = [
@@ -92,17 +97,40 @@ export default function EpisodeEvents(
             ? Object.values(basePredictions[episode.episodeNumber]!).flat() : []),
           ...(customEvents?.predictions?.[episode.episodeNumber]
             ? Object.values(customEvents.predictions[episode.episodeNumber]!).flat() : []),
-        ].filter((prediction) => combinedEvents[episode.episodeNumber]?.some((event) => event.eventName === prediction.eventName));
+        ].filter((prediction) => {
+          const eventEpNum = prediction.eventEpisodeNumber;
+          if (!eventEpNum) return false;
+          // Use allEvents to look up the event in its actual episode
+          return allEvents[eventEpNum]?.some((event) => event.eventName === prediction.eventName);
+        });
       });
     } else {
       predictions[episodeNumber] = [
         ...(basePredictions?.[episodeNumber] ? Object.values(basePredictions[episodeNumber]).flat() : []),
         ...(customEvents?.predictions?.[episodeNumber] ? Object.values(customEvents.predictions[episodeNumber]).flat() : []),
-      ].filter((prediction) => combinedEvents[episodeNumber]?.some((event) => event.eventName === prediction.eventName));
-    }
+      ].filter((prediction) => {
+        const eventEpNum = prediction.eventEpisodeNumber;
+        if (!eventEpNum) return false;
 
-    return predictions;
-  }, [basePredictions, customEvents, combinedEvents, episodeNumber, episodes]);
+        const matchingEvent = allEvents[eventEpNum]?.find(
+          (event) => event.eventName === prediction.eventName
+        );
+
+        if (matchingEvent) {
+          // If the event is from a different episode, add it to enrichment only
+          if (eventEpNum !== episodeNumber) {
+            // Avoid duplicates
+            if (!enrichmentEvents.some(e => e.eventId === matchingEvent.eventId)) {
+              enrichmentEvents.push(matchingEvent);
+            }
+          }
+          return true;
+        }
+        return false;
+      });
+    }
+    return { combinedPredictions: predictions, enrichmentOnlyEvents: enrichmentEvents };
+  }, [basePredictions, customEvents, allEvents, episodeNumber, episodes]);
 
   // filter predictions first because they may require an event that gets filtered out
   const filteredPredictions = useMemo(() => {
@@ -193,7 +221,6 @@ export default function EpisodeEvents(
     tribeTimeline
   ]);
 
-
   const noTribes = useMemo(() =>
     episodeNumber !== -1 && (
       !combinedEvents[episodeNumber]?.some((event) => event.references.some((ref) => ref.type === 'Tribe'))
@@ -236,6 +263,7 @@ export default function EpisodeEvents(
                   mockEvents={mockEvents}
                   filteredEvents={filteredEvents[episode.episodeNumber] ?? []}
                   filteredPredictions={filteredPredictions[episode.episodeNumber] ?? []}
+                  enrichmentEvents={enrichmentOnlyEvents}
                   edit={edit}
                   filters={filters} />
               </Fragment>
