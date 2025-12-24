@@ -151,24 +151,30 @@ export default function PredictionHistory() {
     <div className='text-center bg-card rounded-lg w-full overflow-clip'>
       <div className='text-center bg-card rounded-lg w-full overflow-clip'>
         <div className='relative'>
-          <h1 className='text-3xl py-2'>Prediction History</h1>
+          <h1 className='text-3xl md:py-2'>Prediction History</h1>
           <Select
             value={`${selectedMemberId}`}
             onValueChange={value => {
               setSelectedMemberId(+value);
               setResetCarousel(true);
             }}>
-            <SelectTrigger className='w-min absolute top-1/2 -translate-y-1/2 right-2'>
+            <SelectTrigger className='w-min mx-auto md:absolute top-1/2 md:-translate-y-1/2 md:right-2'>
               <SelectValue placeholder='Select Member' />
             </SelectTrigger>
             <SelectContent>
-              {leagueMembers?.members.map(member => (
-                <SelectItem key={member.memberId} value={`${member.memberId}`}>
-                  <ColorRow color={member.color} className='w-full'>
-                    {member.displayName}
-                  </ColorRow>
-                </SelectItem>
-              ))}
+              {leagueMembers?.members
+                .sort((a, b) => {
+                  if (a.loggedIn) return -1;
+                  if (b.loggedIn) return 1;
+                  return a.displayName.localeCompare(b.displayName);
+                })
+                .map(member => (
+                  <SelectItem key={member.memberId} value={`${member.memberId}`}>
+                    <ColorRow color={member.color} className='w-full'>
+                      {member.displayName}
+                    </ColorRow>
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
