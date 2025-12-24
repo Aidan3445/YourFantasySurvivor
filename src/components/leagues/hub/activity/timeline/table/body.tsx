@@ -28,6 +28,7 @@ export default function EpisodeEventsTableBody({
   filters,
   index
 }: EpisodeEventsTableBodyProps) {
+  console.log({ filteredEvents, filteredPredictions });
   const enrichedEvents = useEnrichEvents(seasonId, filteredEvents);
   const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents ?? null);
   const enrichedEnrichmentEvents = useEnrichEvents(seasonId, enrichmentEvents ?? null);
@@ -124,7 +125,13 @@ export default function EpisodeEventsTableBody({
           key={index}
           prediction={prediction}
           editCol={edit}
-          defaultOpenMisses={filteredPredictions.some((fp) => fp.eventId === prediction.event.eventId && fp.predOnly)}
+          defaultOpenMisses={
+            prediction.misses.some(miss =>
+              filters.member.includes(miss.member.memberId)
+              || (miss.reference?.type === 'Castaway' && filters.castaway.includes(miss.reference.id))
+              || (miss.reference?.type === 'Tribe' && filters.tribe.includes(miss.reference.id))
+            )
+          }
         />
       )}
     </>

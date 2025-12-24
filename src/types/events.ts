@@ -85,6 +85,7 @@ export type EnrichedPrediction = {
     bet: number | null;
     reference: {
       type: ReferenceType;
+      id: number;
       name: string;
       color: string;
     };
@@ -93,6 +94,7 @@ export type EnrichedPrediction = {
     member: LeagueMember
     reference: {
       type: ReferenceType;
+      id: number;
       name: string;
       color: string;
     } | null;

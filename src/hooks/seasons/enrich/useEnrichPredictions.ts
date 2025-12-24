@@ -141,6 +141,7 @@ export function useEnrichPredictions(
         bet: prediction.bet,
         reference: {
           type: prediction.referenceType,
+          id: prediction.referenceId,
           name: '',
           color: ''
         }
