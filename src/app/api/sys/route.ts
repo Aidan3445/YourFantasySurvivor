@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { withSystemAdminAuth } from '~/lib/apiMiddleware';
-import { fetchSurvivorSeasonData } from '~/lib/sys';
+import getExternalData from '~/services/seasons/query/externalData';
 import { resetServersideCache } from '~/services/seasons/reset';
 
 export async function GET(req: NextRequest) {
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     }
 
     try {
-      const castaways = await fetchSurvivorSeasonData(seasonName);
+      const castaways = await getExternalData(seasonName.trim());
       return NextResponse.json(castaways);
     } catch (error) {
       console.error('Error fetching castaways', error);

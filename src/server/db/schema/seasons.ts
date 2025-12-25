@@ -7,7 +7,7 @@ export const seasonSchema = createTable(
   'season',
   {
     seasonId: serial('season_id').notNull().primaryKey(),
-    name: varchar('season_name', { length: 64 }).notNull(),
+    name: varchar('season_name', { length: 64 }).notNull().unique(),
     premiereDate: timestamp('premier_date', { mode: 'string' }).notNull(),
     finaleDate: timestamp('finale_date', { mode: 'string' }),
   }

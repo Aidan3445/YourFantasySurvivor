@@ -6,7 +6,6 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { type EpisodeInsert } from '~/types/episodes';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { revalidateTag } from 'next/cache';
-import { setToNY8PM } from '~/lib/utils';
 
 /**
   * Create a new episode
@@ -37,7 +36,7 @@ export async function createEpisodeLogic(
       runtime = 120;
     }
 
-    const date = setToNY8PM(episode.airDate);
+    const date = episode.airDate;
 
     // Insert the episode
     const newEpisodeId = await trx

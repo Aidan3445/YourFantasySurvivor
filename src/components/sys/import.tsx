@@ -8,7 +8,6 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Input } from '~/components/common/input';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '~/components/common/form';
-import { DateTimePicker } from '~/components/common/dateTimePicker';
 import { Circle } from 'lucide-react';
 import { type CastawayInsert } from '~/types/castaways';
 import { type TribeInsert } from '~/types/tribes';
@@ -18,7 +17,6 @@ import createCastaway from '~/actions/sys/createCastaway';
 
 const formSchema = z.object({
   seasonName: z.string(),
-  premiereDate: z.date(),
 });
 
 export default function Import() {
@@ -31,36 +29,30 @@ export default function Import() {
 
   const [castaways, setCastaways] = useState<CastawayInsert[]>([]);
   const [tribes, setTribes] = useState<TribeInsert[]>([]);
-  const [premiere, setPremiere] = useState<{ episodeNumber: number, episodeTitle: string, episodeAirDate: string }>();
-  const [episodes, setEpisodes] = useState<{ episodeNumber: number, episodeTitle: string, episodeAirDate: string }[]>([]);
+  const [episodes, setEpisodes] = useState<{ episodeNumber: number, title: string, airDate: string }[]>([]);
 
   const handleClick = async () => {
-    const { castaways, tribes, episodes, premiere } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
+    const { castaways, tribes, episodes } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
       method: 'GET',
     })
       .then(res => res.json())) as {
         castaways: CastawayInsert[],
         tribes: TribeInsert[],
-        episodes: { episodeNumber: number, episodeTitle: string, episodeAirDate: string }[],
-        premiere?: { episodeNumber: number, episodeTitle: string, episodeAirDate: string },
+        episodes: { episodeNumber: number, title: string, airDate: string }[],
       };
 
-    if (castaways.length === 0) {
-      alert('No season found');
+    if (!castaways || castaways.length === 0) {
+      alert('No castaways found');
       return;
     }
 
     setCastaways(castaways);
     setTribes(tribes);
     setEpisodes(episodes);
-    if (premiere) {
-      reactForm.setValue('premiereDate', new Date(premiere.episodeAirDate));
-      setPremiere(premiere);
-    }
   };
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    if (!reactForm.watch('premiereDate') || !premiere) return;
+    console.log('Importing contestants for season', data.seasonName);
     try {
       await Promise.all(tribes.map(tribe => createTribe(data.seasonName, tribe)));
       await Promise.all(castaways.map(castaway => createCastaway(data.seasonName, castaway)));
@@ -89,16 +81,6 @@ export default function Import() {
                     placeholder='Season Name'
                     {...field}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )} />
-          <FormField
-            name='premiereDate'
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <DateTimePicker value={field.value as Date} onChange={field.onChange} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -132,6 +114,7 @@ export default function Import() {
             <p>occupation: {castaway.occupation}</p>
             <p>imageUrl: {castaway.imageUrl}</p>
             <p>tribe: {castaway.tribe}</p>
+            <p>previouslyOn: {castaway.previouslyOn?.join(', ') ?? 'N/A'}</p>
           </div>
         </div>
       ))}
@@ -141,18 +124,18 @@ export default function Import() {
 
 interface ImportEpisodeProps {
   episodeNumber: number;
-  episodeTitle: string;
-  episodeAirDate: string;
+  title: string;
+  airDate: string;
   seasonName: string;
 }
 
-function ImportEpisode({ seasonName: seasonId, episodeNumber, episodeTitle, episodeAirDate }: ImportEpisodeProps) {
+function ImportEpisode({ seasonName: seasonId, episodeNumber, title, airDate }: ImportEpisodeProps) {
   const handleSubmit = async () => {
     try {
       await createEpisode(seasonId, {
         episodeNumber,
-        title: episodeTitle.replaceAll('"', ''),
-        airDate: new Date(episodeAirDate),
+        title: title.replaceAll('"', ''),
+        airDate: new Date(airDate),
         isMerge: isMerge,
         isFinale,
         runtime,
@@ -172,8 +155,8 @@ function ImportEpisode({ seasonName: seasonId, episodeNumber, episodeTitle, epis
   return (
     <div className='items-center bg-card rounded-lg p-4'>
       <h2 className='font-bold'>Episode {episodeNumber}</h2>
-      <p>{episodeTitle}</p>
-      <p>{new Date(episodeAirDate).toDateString()}</p>
+      <p>{title}</p>
+      <p>{new Date(airDate).toDateString()}</p>
       <form action={() => handleSubmit()}>
         <label className='inline-flex items-center space-x-2'>
           <input
