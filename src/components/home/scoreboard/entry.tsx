@@ -35,7 +35,7 @@ export default function CastawayEntry({ place, castaway, points, color, tribeTim
           </TableCell>
         </>
       )}
-      <TableCell className='text-nowrap px-1'>
+      <TableCell className='text-nowrap px-1 w-1/2'>
         <ColorRow
           className='justify-center gap-0'
           color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color ?? color}>
