@@ -122,7 +122,6 @@ export default async function getExternalData(seasonName: string) {
           const $ca = cheerio.load(castawayData.parse.text['*']);
           const sectionText = $ca('div[data-source=occupation] div').text();
           occupation = sectionText.trim();
-          console.log(`Fetched occupation for ${fullName}: ${occupation}`);
 
           const previousSeasons = rest.substring(residenceEnd).trim();
           // split by commans and may have ", &" before last one
@@ -152,8 +151,6 @@ export default async function getExternalData(seasonName: string) {
           tribe: tribeName,
           previouslyOn: previouslyOn
         });
-
-        console.log(`Fetched castaway: ${fullName}`, castaways[castaways.length - 1]);
       }
     }
 
