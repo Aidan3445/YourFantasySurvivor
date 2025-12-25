@@ -12,4 +12,10 @@ export const newtwentyColors = [
   '#1e90ff', '#fa8072', '#98fb98', '#87cefa', '#ffdab9'
 ];
 
-
+export const twentyFourColors = [
+  '#556b2f', '#483d8b', '#b22222', '#778899', '#008000',
+  '#9acd32', '#20b2aa', '#00008b', '#8b008b', '#ff0000',
+  '#ff8c00', '#ffd700', '#7cfc00', '#00ff7f', '#00bfff',
+  '#0000ff', '#ff00ff', '#1e90ff', '#db7093', '#f0e68c',
+  '#ff1493', '#ffa07a', '#ee82ee', '#f2dfa0'
+];
