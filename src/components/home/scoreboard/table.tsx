@@ -92,7 +92,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
   return (
     <ScrollArea className='bg-card rounded-xl gap-0'>
       <Table>
-        <TableCaption className='sr-only'>A list of your recent invoices.</TableCaption>
+        <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
         <TableHeader>
           <TableRow className={cn('px-4 bg-white hover:bg-white')}>
             {!allZero ? [0, 1].map((a) => (
