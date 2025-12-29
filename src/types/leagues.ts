@@ -4,7 +4,7 @@ import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, M
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
-import { ColorZod, DisplayNameZod, type LeagueMember } from '~/types/leagueMembers';
+import { ColorZod, type CurrentSelection, DisplayNameZod, type LeagueMember } from '~/types/leagueMembers';
 
 export type LeagueStatus = (typeof LeagueStatuses)[number];
 
@@ -23,6 +23,13 @@ export type PublicLeague = {
   status: LeagueStatus;
   season: string;
   usedColors: string[];
+};
+
+export type LeagueDetails = {
+  league: League;
+  member: LeagueMember;
+  currentSelection: CurrentSelection;
+  memberCount: number
 };
 
 export const LeagueNameZod = z.string()

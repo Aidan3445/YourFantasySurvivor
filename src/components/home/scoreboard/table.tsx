@@ -11,7 +11,7 @@ import ScorboardBody from '~/components/home/scoreboard/body';
 import SelectSeason from '~/components/home/scoreboard/selectSeason';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import { compileScores } from '~/lib/scores';
-import { newtwentyColors } from '~/lib/colors';
+import { twentyFourColors } from '~/lib/colors';
 import { type BaseEventRules } from '~/types/leagues';
 
 export interface ScoreboardTableProps {
@@ -51,7 +51,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
     const castawayColors: Record<string, string> =
       data.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
         .reduce((acc, { castawayId }, index) => {
-          acc[castawayId] = newtwentyColors[index % newtwentyColors.length]!;
+          acc[castawayId] = twentyFourColors[index % twentyFourColors.length]!;
           return acc;
         }, {} as Record<string, string>);
 
@@ -90,7 +90,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
   }
 
   return (
-    <ScrollArea className='bg-card rounded-xl gap-0'>
+    <ScrollArea className='bg-card rounded-xl gap-0 mb-2'>
       <Table>
         <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
         <TableHeader>

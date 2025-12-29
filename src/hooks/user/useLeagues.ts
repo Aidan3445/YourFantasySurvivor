@@ -1,32 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
-import { type CurrentSelection, type LeagueMember } from '~/types/leagueMembers';
-import { type League } from '~/types/leagues';
+import { type LeagueDetails } from '~/types/leagues';
 
 /**
   * Fetches the leagues for the current user.
   */
 export function useLeagues() {
 
-  return useQuery<{
-    league: League,
-    member: LeagueMember,
-    currentSelection: CurrentSelection,
-    memberCount: number
-  }[]>({
+  return useQuery<LeagueDetails[]>({
     queryKey: ['leagues'],
     queryFn: async () => {
       const response = await fetch('/api/leagues');
       if (!response.ok) {
         throw new Error('Failed to fetch league');
       }
-      const { leagues } = await response.json() as {
-        leagues: {
-          league: League,
-          member: LeagueMember,
-          currentSelection: CurrentSelection,
-          memberCount: number
-        }[]
-      };
+      const { leagues } = await response.json() as { leagues: LeagueDetails[] };
       return leagues;
     },
     staleTime: Infinity,

@@ -4,7 +4,10 @@ import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/common/card';
 import { Button } from '~/components/common/button';
 import { Trophy } from 'lucide-react';
-import { Carousel, type CarouselApi, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, CarouselProgress } from '~/components/common/carousel';
+import {
+  Carousel, type CarouselApi, CarouselContent, CarouselItem,
+  CarouselNext, CarouselPrevious, CarouselProgress
+} from '~/components/common/carousel';
 import { cn } from '~/lib/utils';
 import Autoplay from 'embla-carousel-autoplay';
 import NoActiveLeagues from '~/components/home/activeLeagues/noActiveLeagues';
@@ -13,6 +16,7 @@ import { useLeagues } from '~/hooks/user/useLeagues';
 import { useEffect, useRef, useState } from 'react';
 import { useIsFetching } from '@tanstack/react-query';
 import LoadingLeagues from '~/components/home/activeLeagues/loadingLeagues';
+import { type LeagueDetails } from '~/types/leagues';
 
 export function ActiveLeagues() {
   const { data: leagues } = useLeagues();
@@ -57,14 +61,20 @@ export function ActiveLeagues() {
     });
   }, [api]);
 
-  const topLeagues = leagues?.filter(({ league }) => league.status !== 'Inactive')
-    .sort((a, b) => {
-      const statusOrder = { Draft: 0, Predraft: 1, Active: 2, Inactive: 3 };
-      if (a.league.status !== b.league.status) {
-        return statusOrder[a.league.status] - statusOrder[b.league.status];
-      }
-      return b.league.season.localeCompare(a.league.season);
-    });
+  const topLeagues: LeagueDetails[] = [];
+  const inactiveLeagues: LeagueDetails[] = [];
+
+  leagues?.forEach(leagueDetails => leagueDetails.league.status !== 'Inactive'
+    ? topLeagues.push(leagueDetails)
+    : inactiveLeagues.push(leagueDetails)
+  );
+  topLeagues.sort((a, b) => {
+    const statusOrder = { Draft: 0, Predraft: 1, Active: 2, Inactive: 3 };
+    if (a.league.status !== b.league.status) {
+      return statusOrder[a.league.status] - statusOrder[b.league.status];
+    }
+    return b.league.season.localeCompare(a.league.season);
+  });
 
   const showLoading = !hasLoadedOnce;
 
@@ -79,7 +89,7 @@ export function ActiveLeagues() {
         </div>
       )}
       {(!topLeagues || topLeagues.length === 0)
-        ? <NoActiveLeagues />
+        ? <NoActiveLeagues inactiveLeagues={inactiveLeagues} />
         : (
           <Card className={cn('h-full transition-opacity', showLoading && 'opacity-0')}>
             <CardContent className='px-0 overflow-y-auto'>
@@ -93,14 +103,14 @@ export function ActiveLeagues() {
                 setApi={setApi}>
                 <CardHeader className='grid grid-cols-[min-content_1fr_auto_1fr_min-content] items-center px-4 mb-4'>
                   <div className='w-full invisible' />
-                  <CarouselPrevious className={cn('static !translate-0 place-self-center',
-                    topLeagues.length > 1 ? 'visible' : 'invisible')} />
+                  <CarouselPrevious className={cn('static translate-0! place-self-center',
+                    (topLeagues.length + inactiveLeagues.length) > 1 ? 'visible' : 'invisible')} />
                   <CardTitle className='flex items-center gap-2 place-self-center text-nowrap'>
                     <Trophy className='w-5 h-5 text-yellow-500' />
                     Current Leagues
                   </CardTitle>
-                  <CarouselNext className={cn('static !translate-0 place-self-center',
-                    topLeagues.length > 1 ? 'visible' : 'invisible')} />
+                  <CarouselNext className={cn('static translate-0! place-self-center',
+                    (topLeagues.length + inactiveLeagues.length) > 1 ? 'visible' : 'invisible')} />
                   <Button variant='outline' size='sm' asChild>
                     <Link href='/leagues' className='place-self-center'>
                       View all leagues
