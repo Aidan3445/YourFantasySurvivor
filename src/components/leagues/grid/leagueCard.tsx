@@ -4,7 +4,7 @@ import { type CurrentSelection, type LeagueMember } from '~/types/leagueMembers'
 import { type League } from '~/types/leagues';
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
-import RefreshLeague from '~/components/home/activeLeagues/refreshLeague';
+import RecreateLeague from '~/components/home/activeLeagues/recreateLeague';
 
 interface LeagueCardProps {
   league: League;
@@ -36,7 +36,7 @@ export default function LeagueCard({ league, member, currentSelection, refresh, 
         <ColorRow className='justify-center' color={member.color}>
           {member.displayName}
         </ColorRow>
-        {refresh && <RefreshLeague leagueHash={league.hash} />}
+        {refresh && <RecreateLeague leagueHash={league.hash} />}
       </section>
     </Link >
   );

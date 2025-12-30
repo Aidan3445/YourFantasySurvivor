@@ -19,7 +19,7 @@ type CarouselProps = {
   opts?: CarouselOptions & { ignoreKeys?: boolean }
   plugins?: CarouselPlugin
   orientation?: 'horizontal' | 'vertical'
-  setApi?: (_: CarouselApi) => void
+  setApi?: (_api: CarouselApi) => void
 }
 
 export type CarouselContextProps = {
@@ -266,7 +266,7 @@ interface CoverCarouselProps {
     footer?: React.ReactNode
   }[],
   reset?: boolean,
-  setReset?: (_: boolean) => void
+  setReset?: (_reset: boolean) => void
 }
 
 function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {

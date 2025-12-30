@@ -110,8 +110,8 @@ export async function leagueMemberAuth(hash: string) {
  * Wrapper for server actions with general user authentication
  */
 export function requireAuth<TArgs extends unknown[], TReturn>(
-  handler: (userId: string, ...args: TArgs) => TReturn
-): (...args: TArgs) => Promise<TReturn> {
+  handler: (_userId: string, ..._args: TArgs) => TReturn
+): (...__args: TArgs) => Promise<TReturn> {
   return async (...args: TArgs) => {
     const { userId } = await auth();
     if (!userId) throw new Error('User not authenticated');
@@ -121,8 +121,8 @@ export function requireAuth<TArgs extends unknown[], TReturn>(
 
 function requireLeagueAuthGenerator(minimunPermissions: LeagueMemberRole) {
   return <TArgs extends unknown[], TReturn>(
-    handler: (auth: VerifiedLeagueMemberAuth, ...args: TArgs) => TReturn
-  ): (hash: string, ...args: TArgs) => Promise<TReturn> => {
+    handler: (_auth: VerifiedLeagueMemberAuth, ..._args: TArgs) => TReturn
+  ): (_hash: string, ...__args: TArgs) => Promise<TReturn> => {
     return async (hash: string, ...args: TArgs) => {
       const auth = await leagueMemberAuth(hash);
       if (!auth.userId) throw new Error('User not authenticated');
@@ -165,8 +165,8 @@ export const requireLeagueOwnerAuth = requireLeagueAuthGenerator('Owner');
   * Wrapper for server actions with system admin authentication
   */
 export function requireSystemAdminAuth<TArgs extends unknown[], TReturn>(
-  handler: (...args: TArgs) => TReturn
-): (...args: TArgs) => Promise<TReturn> {
+  handler: (..._args: TArgs) => TReturn
+): (...__args: TArgs) => Promise<TReturn> {
   return async (...args: TArgs) => {
     const { userId } = await systemAdminAuth();
     if (!userId) throw new Error('User not authorized');

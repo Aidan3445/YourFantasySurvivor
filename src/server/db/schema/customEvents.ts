@@ -1,6 +1,6 @@
 import 'server-only';
-import { index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 
+import { index, integer, pgEnum, serial, unique, varchar } from 'drizzle-orm/pg-core';
 import { createTable } from '~/server/db/schema/createTable';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { label, notes, reference, timing } from '~/server/db/schema/shared';

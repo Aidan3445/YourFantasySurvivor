@@ -1,5 +1,8 @@
-import { Fragment } from 'react';
+'use client';
+
+import { Fragment, useMemo } from 'react';
 import LeagueCard from '~/components/leagues/grid/leagueCard';
+import { useSeasons } from '~/hooks/seasons/useSeasons';
 import { type CurrentSelection, type LeagueMember } from '~/types/leagueMembers';
 import { type League } from '~/types/leagues';
 
@@ -9,6 +12,9 @@ interface LeagueGridProps {
 }
 
 export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridProps) {
+  const { data: seasons } = useSeasons(false);
+  const refresh = useMemo(() => seasons?.length === 0, [seasons]);
+
   if (leagues.length === 0) return null;
 
   if (isInactive) {
@@ -26,7 +32,11 @@ export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridPr
                   {league.season}
                 </h3>
               )}
-              <LeagueCard league={league} member={member} currentSelection={currentSelection} />
+              <LeagueCard
+                league={league}
+                member={member}
+                currentSelection={currentSelection}
+                refresh={refresh} />
             </Fragment>
           ))
         }

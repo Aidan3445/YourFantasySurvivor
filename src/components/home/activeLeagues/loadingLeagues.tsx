@@ -15,7 +15,7 @@ export default function LoadingLeagues() {
           alt='Loading'
           width={150}
           height={150}
-          className='animate-loading-spin'
+          className='animate-loading-spin w-auto h-auto'
         />
       </CardContent>
     </Card>

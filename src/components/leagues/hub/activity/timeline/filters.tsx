@@ -19,11 +19,11 @@ import { getAirStatus, getAirStatusPollingInterval } from '~/lib/episodes';
 
 
 export interface TimelineFiltersProps {
-  setFilterCastaway: (_: number[]) => void;
-  setFilterTribe: (_: number[]) => void;
-  setFilterMember: (_: number[]) => void;
-  setFilterEvent: (_: string[]) => void;
-  setSelectedEpisode: (_?: number) => void;
+  setFilterCastaway: (_castawayIds: number[]) => void;
+  setFilterTribe: (_tribeIds: number[]) => void;
+  setFilterMember: (_memberIds: number[]) => void;
+  setFilterEvent: (_eventNames: string[]) => void;
+  setSelectedEpisode: (_episodeNumber?: number) => void;
   filterCastaway: number[];
   filterTribe: number[];
   filterMember: number[];
