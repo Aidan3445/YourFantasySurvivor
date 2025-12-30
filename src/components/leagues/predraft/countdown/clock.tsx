@@ -32,13 +32,13 @@ export default function Clock({ endDate, replacedBy }: ClockProps) {
 
   return (
     !timer || timer > 0 ?
-      <span className='w-full flex text-sidebar text-4xl  justify-evenly'>
+      <span className='w-full text-sidebar text-4xl grid grid-cols-7 max-w-3xl mx-auto'>
         <ClockPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
-        :
+        <span className='text-4xl font-bold text-sidebar flex items-center justify-center'>:</span>
         <ClockPlace value={hours.toString()} label={hours === 1 ? 'Hour' : 'Hours'} />
-        :
+        <span className='text-4xl font-bold text-sidebar flex items-center justify-center'>:</span>
         <ClockPlace value={minutes.toString()} label={minutes === 1 ? 'Minute' : 'Minutes'} />
-        :
+        <span className='text-4xl font-bold text-sidebar flex items-center justify-center'>:</span>
         <ClockPlace value={seconds.toString()} label={seconds === 1 ? 'Second' : 'Seconds'} />
       </span>
       :

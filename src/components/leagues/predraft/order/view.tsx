@@ -16,16 +16,18 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateDraftOrder from '~/actions/updateDraftOrder';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
 
 interface DraftOrderProps {
   overrideHash?: string;
+  scrollHeight?: string;
   className?: string;
 }
 
-export default function DraftOrder({ overrideHash, className }: DraftOrderProps) {
+export default function DraftOrder({ overrideHash, scrollHeight, className }: DraftOrderProps) {
   const queryClient = useQueryClient();
   const { data: league } = useLeague(overrideHash);
   const { data: leagueMembers } = useLeagueMembers(overrideHash);
@@ -122,13 +124,13 @@ export default function DraftOrder({ overrideHash, className }: DraftOrderProps)
         modifiers={[restrictToParentElement]}
         onDragEnd={(event) => handleDragEnd(event, setOrder)}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
-          <div className='flex flex-col gap-2'>
+          <ScrollArea className={cn('flex flex-col', scrollHeight && `overflow-y-auto ${scrollHeight}`)}>
             {order.map((member, index) => {
               return (
                 <SortableItem
                   key={member.memberId}
                   id={member.memberId}
-                  className='grid col-span-3 grid-cols-subgrid'
+                  className='grid col-span-3 grid-cols-subgrid mx-3 mb-2'
                   disabled={orderLocked}>
                   <ColorRow
                     color={member.color}
@@ -141,9 +143,10 @@ export default function DraftOrder({ overrideHash, className }: DraftOrderProps)
                 </SortableItem>
               );
             })}
-          </div>
+            <ScrollBar orientation='vertical' />
+          </ScrollArea>
         </SortableContext>
       </DndContext>
-    </article>
+    </article >
   );
 }

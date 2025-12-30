@@ -27,7 +27,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         ? <Scoreboard overrideHash={league.hash} maxRows={5} className='bg-accent' />
         : <div className='space-y-0'>
           <DraftCountdown overrideHash={league.hash} />
-          <DraftOrder overrideHash={league.hash} className='bg-accent' />
+          <DraftOrder overrideHash={league.hash} className='bg-accent' scrollHeight='max-h-36' />
         </div>}
     </div>
   );
