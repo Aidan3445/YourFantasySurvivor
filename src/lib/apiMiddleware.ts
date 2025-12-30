@@ -5,7 +5,7 @@ import { auth, leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import type { LeagueRouteParams, VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueMemberRole } from '~/types/leagueMembers';
 
-export function withAuth(handler: (userId: string) => Promise<NextResponse>) {
+export function withAuth(handler: (_userId: string) => Promise<NextResponse>) {
   return async () => {
     const { userId } = await auth();
 
@@ -18,7 +18,7 @@ export function withAuth(handler: (userId: string) => Promise<NextResponse>) {
 }
 
 function withLeagueAuth(minimumPermissions: LeagueMemberRole) {
-  return function(handler: (auth: VerifiedLeagueMemberAuth) => Promise<NextResponse>) {
+  return function(handler: (_auth: VerifiedLeagueMemberAuth) => Promise<NextResponse>) {
     return async (context: LeagueRouteParams) => {
       const { hash } = await context.params;
 
@@ -63,7 +63,7 @@ export const withLeagueMemberAuth = withLeagueAuth('Member');
 export const withLeagueAdminAuth = withLeagueAuth('Admin');
 export const withLeagueOwnerAuth = withLeagueAuth('Owner');
 
-export function withSystemAdminAuth(handler: (userId: string) => Promise<NextResponse>) {
+export function withSystemAdminAuth(handler: (_userId: string) => Promise<NextResponse>) {
   return async () => {
     const { userId } = await systemAdminAuth();
 

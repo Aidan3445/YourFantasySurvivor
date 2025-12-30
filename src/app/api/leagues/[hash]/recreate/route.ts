@@ -5,12 +5,12 @@ import { type LeagueRouteParams } from '~/types/api';
 
 export async function POST(request: NextRequest, context: LeagueRouteParams) {
   return withLeagueOwnerAuth(async (auth) => {
-    const body = await request.json() as {
-      leagueHash: string;
-      memberIds: number[];
-    };
-
     try {
+      const body = await request.json() as {
+        leagueHash: string;
+        memberIds: number[];
+      };
+
       const { newHash } = await recreateLeagueLogic(
         auth,
         body.memberIds
