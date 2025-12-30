@@ -4,7 +4,7 @@ import { type SetStateAction } from 'react';
 
 export function handleDragEnd<T>(
   event: DragEndEvent,
-  setItems: (items: SetStateAction<(T & { id: UniqueIdentifier })[]>) => void) {
+  setItems: (_items: SetStateAction<(T & { id: UniqueIdentifier })[]>) => void) {
   const { active, over } = event;
 
   if (over && active.id !== over.id) {

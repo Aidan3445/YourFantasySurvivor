@@ -20,7 +20,7 @@ export function useSelectionTimeline(overrideHash?: string) {
       if (!response.ok) {
         throw new Error('Failed to fetch league');
       }
-      return response.json();
+      return response.json() as Promise<SelectionTimelines>;
     },
     enabled: !!hash,
     staleTime: 5 * 60 * 1000, // 5 minutes

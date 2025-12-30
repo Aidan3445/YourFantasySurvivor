@@ -26,9 +26,9 @@ export async function resetServersideCache() {
       revalidateTag(tag, 'max');
     }
 
-    return true;
+    return { success: true };
   } catch (error) {
     console.error('Error resetting serverside cache', error);
-    return false;
+    return { success: false };
   }
 }

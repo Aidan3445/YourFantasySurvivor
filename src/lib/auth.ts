@@ -31,13 +31,13 @@ export async function systemAdminAuth() {
   if (!userId) return { userId };
 
   // Ensure the user is a system admin
-  const isAdmin = await db
+  const admin = await db
     .select()
     .from(systemSchema)
     .where(eq(systemSchema.userId, userId))
-    .then((admins) => admins.length > 0);
+    .then((admins) => admins[0]);
 
-  return { userId: isAdmin ? userId : null };
+  return { userId: admin?.userId ?? null, noRedirects: admin?.noRedirects ?? undefined };
 }
 
 /**

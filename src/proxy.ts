@@ -55,10 +55,12 @@ export default clerkMiddleware(async (auth, req) => {
     return NextResponse.next();
   }
 
-  // Sys auth gets no redirects
+  // Sys auth can get no redirects
   const isSys = await db.select()
     .from(systemSchema)
-    .where(eq(systemSchema.userId, userId))
+    .where(and(
+      eq(systemSchema.userId, userId),
+      eq(systemSchema.noRedirects, true)))
     .then((r) => r.length > 0);
   if (isSys) {
     return NextResponse.next();

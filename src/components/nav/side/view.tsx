@@ -6,8 +6,12 @@ import SideNavFooter from '~/components/nav/side/footer';
 import SideNavLink from '~/components/nav/side/link';
 import SideNavLeagues from '~/components/nav/side/leagues';
 import { Flame } from 'lucide-react';
+import { systemAdminAuth } from '~/lib/auth';
+import SysAdminNav from '~/components/nav/side/sys';
 
-export default function SideNav() {
+export default async function SideNav() {
+  const { userId, noRedirects } = await systemAdminAuth();
+
   return (
     <Sidebar className='hidden md:block' variant='sidebar' collapsible='none'>
       <SidebarContent className='overflow-y-auto sticky top-0'>
@@ -31,6 +35,7 @@ export default function SideNav() {
             <SidebarSeparator />*/}
           </SidebarMenu>
           <SideNavFooter />
+          <SysAdminNav userId={userId} noRedirects={noRedirects} />
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>

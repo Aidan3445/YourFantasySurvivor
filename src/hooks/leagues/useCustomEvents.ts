@@ -25,7 +25,7 @@ export function useCustomEvents(overrideHash?: string) {
       if (!response.ok) {
         throw new Error('Failed to fetch league');
       }
-      return response.json();
+      return response.json() as Promise<CustomEvents>;
     },
     enabled: !!hash,
     ...refreshConfig,

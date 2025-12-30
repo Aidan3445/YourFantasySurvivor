@@ -21,7 +21,7 @@ export function useTribesTimeline(seasonId: number | null) {
       if (!res.ok) {
         throw new Error('Failed to fetch tribes timeline data');
       }
-      return res.json();
+      return res.json() as Promise<TribesTimeline>;
     },
     enabled: !!seasonId,
     ...refreshConfig,

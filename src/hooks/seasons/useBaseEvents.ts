@@ -21,7 +21,7 @@ export function useBaseEvents(seasonId: number | null) {
       if (!res.ok) {
         throw new Error('Failed to fetch base events data');
       }
-      return res.json();
+      return res.json() as Promise<Events>;
     },
     enabled: !!seasonId,
     ...refreshConfig,
