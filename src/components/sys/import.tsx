@@ -52,7 +52,6 @@ export default function Import() {
   };
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    console.log('Importing contestants for season', data.seasonName);
     try {
       await Promise.all(tribes.map(tribe => createTribe(data.seasonName, tribe)));
       await Promise.all(castaways.map(castaway => createCastaway(data.seasonName, castaway)));

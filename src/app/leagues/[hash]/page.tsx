@@ -21,6 +21,7 @@ import getLeague from '~/services/leagues/query/legaue';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import Podium from '~/components/leagues/hub/scoreboard/podium/view';
+import ManageMembers from '~/components/leagues/actions/league/members/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
@@ -84,6 +85,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
                 <span className='w-full flex flex-wrap gap-4 justify-center'>
                   <LeagueSettings />
                   <DeleteLeague />
+                  <ManageMembers />
                 </span>
               </>}
               <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>

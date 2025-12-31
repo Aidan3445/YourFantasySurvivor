@@ -100,8 +100,6 @@ export default async function recreateLeagueLogic(
       .onConflictDoNothing()
       .returning({ memberId: leagueMemberSchema.memberId, draftOrder: leagueMemberSchema.draftOrder });
 
-    console.log({ newMembers });
-
     if (newMembers.length !== members.length - 1) {
       console.error('Failed to add all members to the new league', {
         expected: members.length - 1,
