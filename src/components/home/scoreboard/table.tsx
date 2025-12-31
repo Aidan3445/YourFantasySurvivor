@@ -121,7 +121,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
               </Fragment>
             )) : (
               <TableHead className='text-center' colSpan={2}>
-                {selectedSeasonData.data.season.name} Castaways
+                {selectedSeasonData.data.season.name}
                 <SelectSeason
                   seasons={scoreData.map(s => ({
                     value: s.season.name,
