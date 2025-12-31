@@ -114,7 +114,7 @@ export default async function recreateLeagueLogic(
     // copy league settings, but clear the draft date
     await trx
       .update(leagueSettingsSchema)
-      .set({ ...originalLeague.league_settings, draftDate: null })
+      .set({ ...originalLeague.league_settings, leagueId, draftDate: null })
       .where(eq(leagueSettingsSchema.leagueId, leagueId));
 
     // copy base event and prediction rules
