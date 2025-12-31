@@ -22,6 +22,7 @@ export default async function updateRoleLogic(
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
   if (auth.role !== 'Owner') throw new Error('Only league owners can update member roles');
+  if (auth.memberId === memberId) throw new Error('Owners cannot change their own role without transferring ownership');
 
   return await db.transaction(async (trx) => {
     await trx

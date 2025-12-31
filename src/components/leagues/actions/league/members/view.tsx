@@ -31,10 +31,10 @@ export default function ManageMembers() {
             </p>
             <ul className='list-disc list-inside ml-4 text-sm'>
               <li className='text-muted-foreground'>
-                Help score custom events throughout the season
+                Help score custom events
               </li>
               <li className='text-muted-foreground'>
-                Admit new members to the league
+                Admit and remove members
               </li>
             </ul>
             <p className='text-sm text-muted-foreground'>
@@ -42,7 +42,7 @@ export default function ManageMembers() {
             </p>
             <ul className='list-disc list-inside ml-4 mb-2 text-sm'>
               <li className='text-muted-foreground'>
-                Manage admins, members, and remove members from the league
+                Manage member roles
               </li>
               <li className='text-muted-foreground'>
                 Edit league details and scoring settings
@@ -53,10 +53,7 @@ export default function ManageMembers() {
             </ul>
             <ScrollArea className='flex flex-col max-h-72'>
               {leagueMembers?.members.map(member => (
-                <CurrentMember
-                  key={member.memberId}
-                  member={member}
-                  loggedInRole={loggedInRole} />
+                <CurrentMember key={member.memberId} member={member} loggedInMember={leagueMembers.loggedIn} />
               ))}
               <ScrollBar orientation='vertical' />
             </ScrollArea>

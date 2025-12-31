@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { getContrastingColor } from '@uiw/color-convert';
 import { type CurrentMemberProps } from '~/components/leagues/actions/league/members/current';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from '~/components/common/alertDialog';
@@ -10,18 +10,20 @@ import updateMemberRole from '~/actions/updateMemberRole';
 import { useParams } from 'next/navigation';
 import { Button } from '~/components/common/button';
 import { useState } from 'react';
+import { Input } from '~/components/common/input';
 import { cn } from '~/lib/utils';
 
-export default function AdminToggle({ member, loggedInMember }: CurrentMemberProps) {
+export default function OwnerToggle({ member, loggedInMember }: CurrentMemberProps) {
   const { hash } = useParams();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [iUnderstand, setIUnderstand] = useState(false);
 
   const enabled = loggedInMember?.role === 'Owner' && loggedInMember?.memberId !== member.memberId;
 
-  async function handleToggleAdmin() {
+  async function handleToggleOwner() {
     if (!enabled) {
-      alert('Only the Owner can change admin roles.');
+      alert('Only the current Owner can transfer ownership.');
       return;
     }
 
@@ -29,12 +31,12 @@ export default function AdminToggle({ member, loggedInMember }: CurrentMemberPro
       await updateMemberRole(
         String(hash),
         member.memberId,
-        member.role === 'Admin' ? 'Member' : 'Admin'
+        member.role === 'Owner' ? 'Member' : 'Owner'
       );
       await queryClient.invalidateQueries({ queryKey: ['league', hash] });
       await queryClient.invalidateQueries({ queryKey: ['settings', hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
-      alert(`Member ${member.displayName} is now a ${member.role === 'Admin' ? 'Member' : 'Admin'}.`);
+      alert(`Member ${member.displayName} is now a ${member.role === 'Owner' ? 'Member' : 'Owner'}.`);
       setOpen(false);
     } catch (error) {
       console.error('Error updating member role:', error);
@@ -45,29 +47,41 @@ export default function AdminToggle({ member, loggedInMember }: CurrentMemberPro
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger disabled={!enabled}>
-        <Shield
+        <Crown
           className={cn('my-auto', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
           color={getContrastingColor(member.color)}
-          fill={member.role === 'Admin' ? getContrastingColor(member.color) : 'none'}
+          fill={member.role === 'Owner' ? getContrastingColor(member.color) : 'none'}
           size={14} />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>
-          {member.role === 'Admin' ? 'Demote to Member' : 'Promote to Admin'}
+          {member.role === 'Owner' ? 'Demote to Member' : 'Promote to Owner'}
         </AlertDialogTitle>
         <AlertDialogDescription className='flex gap-1 my-4'>
-          Are you sure you want to {member.role === 'Admin' ? 'demote' : 'promote'}
+          Are you sure you want to {member.role === 'Owner' ? 'demote' : 'promote'}
           <ColorRow
             className='inline w-min px-1 leading-tight my-auto'
             color={member.color}>
             {member.displayName}
           </ColorRow>
-          to {member.role === 'Admin' ? 'Member' : 'Admin'}?
+          to {member.role === 'Owner' ? 'Member' : 'Owner'}?
         </AlertDialogDescription>
+        <span className='flex mb-4'>
+          <Input
+            type='checkbox'
+            id='understandOwnerToggle'
+            className='mr-2 w-min h-min'
+            checked={iUnderstand}
+            onChange={(e) => setIUnderstand(e.target.checked)} />
+          <label htmlFor='understandOwnerToggle' className='mr-4 text-xs text-muted-foreground'>
+            I understand that this will transfer ownership rights to this member and
+            only they will be able to undo this action.
+          </label>
+        </span>
         <AlertDialogFooter>
-          <form action={() => handleToggleAdmin()}>
-            <Button type='submit'>
-              Yes, {member.role === 'Admin' ? 'demote' : 'promote'}
+          <form action={() => handleToggleOwner()}>
+            <Button type='submit' disabled={!iUnderstand}>
+              Yes, {member.role === 'Owner' ? 'demote' : 'promote'}
             </Button>
           </form>
           <AlertDialogCancel>
