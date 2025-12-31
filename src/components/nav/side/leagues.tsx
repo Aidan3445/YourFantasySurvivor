@@ -4,16 +4,17 @@ import { SidebarMenuButton, SidebarMenuSub } from '~/components/common/sidebar';
 import { ListPlus, Trophy } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import { Separator } from '~/components/common/separator';
 import SideNavLink from '~/components/nav/side/link';
 import { useLeagues } from '~/hooks/user/useLeagues';
+import { usePathname } from 'next/navigation';
+import { cn } from '~/lib/utils';
 
 export default function SideNavLeagues() {
   const { data: leaguesData } = useLeagues();
+  const pathname = usePathname();
   const [open, setOpen] = useState('');
-  const { hash } = useParams();
 
   useEffect(() => {
     if (leaguesData && leaguesData.length > 0) {
@@ -30,7 +31,9 @@ export default function SideNavLeagues() {
   };
 
   if (leaguesData?.length === 0) {
-    return <SideNavLink href='/leagues' icon={<Trophy className='stroke-primary' />} label='Leagues' />;
+    return (
+      <SideNavLink href='/leagues' icon={<Trophy className='stroke-primary' />} label='Leagues' />
+    );
   }
 
   return (
@@ -43,7 +46,10 @@ export default function SideNavLeagues() {
       <AccordionItem value='leagues'>
         <SidebarMenuButton className='' asChild size='lg'>
           <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all stroke-primary'>
-            <span className='w-full flex gap-5 items-center text-primary'>
+            <span className={cn(
+              'w-full flex gap-5 items-center text-primary transition-all',
+              !open && (pathname.startsWith('/leagues') ? 'font-semibold' : '')
+            )}>
               <Trophy className='stroke-primary' />
               Leagues
             </span>
@@ -55,17 +61,14 @@ export default function SideNavLeagues() {
               .slice(0, 5)
               .map(({ league }) => (
                 <SideNavLink
-                  className={league.hash === hash ? 'font-semibold' : 'pr-3'}
                   key={league.hash}
                   href={`/leagues/${league.hash}`}
-                  label={league.name} />
+                  label={league.name}
+                  pathnameMatch={`/leagues/${league.hash}`} />
               ))}
             <Separator className='bg-primary' />
             {(leaguesData && (leaguesData.length > 5 || leaguesData.some(({ league }) => league.status === 'Inactive'))) && (
-              <SideNavLink
-                className='text-nowrap text-primary'
-                href='/leagues'
-                label='View All Leagues' />
+              <SideNavLink className='text-nowrap text-primary' href='/leagues' label='View All Leagues' />
             )}
             <CreateLeagueModal>
               <SidebarMenuButton asChild size='lg'>
