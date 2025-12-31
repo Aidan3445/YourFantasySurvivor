@@ -3,9 +3,9 @@
 import ColorRow from '~/components/shared/colorRow';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { getContrastingColor } from '@uiw/color-convert';
-import { Ban } from 'lucide-react';
 import AdminToggle from '~/components/leagues/actions/league/members/adminToggle';
 import OwnerToggle from '~/components/leagues/actions/league/members/ownerToggle';
+import RemoveMember from '~/components/leagues/actions/league/members/remove';
 
 export interface CurrentMemberProps {
   member: LeagueMember;
@@ -27,10 +27,7 @@ export default function CurrentMember({ member, loggedInMember }: CurrentMemberP
         <span className='justify-self-end flex gap-2'>
           <AdminToggle member={member} loggedInMember={loggedInMember} />
           <OwnerToggle member={member} loggedInMember={loggedInMember} />
-          <Ban
-            className='my-auto ml-4'
-            color={getContrastingColor(member.color)}
-            size={14} />
+          <RemoveMember member={member} loggedInMember={loggedInMember} />
         </span>
       </span>
     </ColorRow >
