@@ -56,10 +56,10 @@ export default async function recreateLeagueLogic(
     const originalLeague = await trx
       .select()
       .from(leagueSchema)
-      .innerJoin(leagueSettingsSchema, eq(leagueSchema.leagueId, leagueSettingsSchema.leagueId))
-      .innerJoin(baseEventRulesSchema, eq(leagueSchema.leagueId, baseEventRulesSchema.leagueId))
-      .innerJoin(baseEventPredictionRulesSchema, eq(leagueSchema.leagueId, baseEventPredictionRulesSchema.leagueId))
-      .innerJoin(shauhinModeSettingsSchema, eq(leagueSchema.leagueId, shauhinModeSettingsSchema.leagueId))
+      .leftJoin(leagueSettingsSchema, eq(leagueSchema.leagueId, leagueSettingsSchema.leagueId))
+      .leftJoin(baseEventRulesSchema, eq(leagueSchema.leagueId, baseEventRulesSchema.leagueId))
+      .leftJoin(baseEventPredictionRulesSchema, eq(leagueSchema.leagueId, baseEventPredictionRulesSchema.leagueId))
+      .leftJoin(shauhinModeSettingsSchema, eq(leagueSchema.leagueId, shauhinModeSettingsSchema.leagueId))
       .where(eq(leagueSchema.leagueId, auth.leagueId))
       .then((res) => res[0]);
     if (!originalLeague) {
@@ -114,24 +114,30 @@ export default async function recreateLeagueLogic(
     // copy league settings, but clear the draft date
     await trx
       .update(leagueSettingsSchema)
-      .set({ ...originalLeague.league_settings, leagueId, draftDate: null })
+      .set({ ...originalLeague.league_settings, draftDate: null })
       .where(eq(leagueSettingsSchema.leagueId, leagueId));
 
     // copy base event and prediction rules
-    await trx
-      .insert(baseEventRulesSchema)
-      .values({ ...originalLeague.event_base_rule, leagueId });
-    await trx
-      .insert(baseEventPredictionRulesSchema)
-      .values({ ...originalLeague.event_base_prediction_rule, leagueId });
-    // copy custom event and prediction rules
+    if (originalLeague.event_base_rule) {
+      await trx
+        .insert(baseEventRulesSchema)
+        .values({ ...originalLeague.event_base_rule, leagueId });
+    }
+    if (originalLeague.event_base_prediction_rule) {
+      await trx
+        .insert(baseEventPredictionRulesSchema)
+        .values({ ...originalLeague.event_base_prediction_rule, leagueId });
+    }
+    // copy shauhin mode settings
+    if (originalLeague.event_shauhin_mode_settings) {
+      await trx
+        .insert(shauhinModeSettingsSchema)
+        .values({ ...originalLeague.event_shauhin_mode_settings, leagueId });
+    }
+    // copy custom event and prediction rules - list insert makes if redundant here
     await trx
       .insert(customEventRuleSchema)
       .values(customEventRules.map((r) => ({ ...r, leagueId, customEventRuleId: undefined })));
-    // copy shauhin mode settings
-    await trx
-      .insert(shauhinModeSettingsSchema)
-      .values({ ...originalLeague.event_shauhin_mode_settings, leagueId });
 
     return { newHash };
   });
