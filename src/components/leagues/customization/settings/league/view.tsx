@@ -55,7 +55,7 @@ export default function LeagueSettings() {
   return (
     <Form {...reactForm}>
       <form
-        className='flex-1 flex flex-col p-2 gap-2 bg-card rounded-xl items-center min-w-sm'
+        className='flex flex-col h-64 p-2 gap-2 bg-card rounded-xl items-center min-w-sm'
         action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit League Details</FormLabel>
         <FormField

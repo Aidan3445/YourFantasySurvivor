@@ -26,7 +26,6 @@ export function usePendingMembers(overrideHash?: string) {
         throw new Error('Failed to fetch leagueMembers data');
       }
       const { leagueMembers } = await res.json() as { leagueMembers: PendingLeagueMember[] };
-      console.log('Pending Members', leagueMembers);
       return { members: leagueMembers };
     },
     enabled: !!hash,

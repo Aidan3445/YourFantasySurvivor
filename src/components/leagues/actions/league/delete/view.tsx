@@ -53,7 +53,9 @@ export default function DeleteLeague() {
 
   return (
     <Form {...reactForm}>
-      <form action={() => handleSubmit()} className='flex flex-col gap-4 bg-card p-2 justify-between rounded-xl flex-1 min-w-sm'>
+      <form
+        action={() => handleSubmit()}
+        className='flex flex-col gap-4 h-66 bg-card p-2 justify-between rounded-xl min-w-sm'>
         <h3 className='text-lg font-bold text-card-foreground text-center cursor-default'>
           Delete League
         </h3>

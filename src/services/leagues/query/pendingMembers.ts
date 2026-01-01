@@ -15,17 +15,25 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
 export default async function getPendingMembers(auth: VerifiedLeagueMemberAuth) {
   if (auth.role === 'Member') throw new Error('Not authorized to view pending members');
 
-  const t = db
+  const pendingMembers = db
     .select({
       memberId: leagueMemberSchema.memberId,
       displayName: leagueMemberSchema.displayName,
-      color: leagueMemberSchema.color
+      color: leagueMemberSchema.color,
+      updateAt: leagueMemberSchema.updated_at,
     })
     .from(leagueMemberSchema)
     .where(and(
       eq(leagueMemberSchema.leagueId, auth.leagueId),
       isNull(leagueMemberSchema.draftOrder)))
     .orderBy(leagueMemberSchema.draftOrder);
-  console.log('T', t);
-  return t;
+
+  // pending members are hidden after 7 days
+  // a user can re-join to try again after that period
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  return pendingMembers.then((members) => members.filter((member) => {
+    return member.updateAt >= sevenDaysAgo;
+  }));
 }
