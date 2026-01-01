@@ -1,58 +1,43 @@
 'use client';
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { useForm } from 'react-hook-form';
 import { Button } from '~/components/common/button';
 import { Input } from '~/components/common/input';
-import LeagueAdminsField from '~/components/leagues/customization/settings/league/admin';
 import { LeagueDetailsUpdateZod, type LeagueSettingsUpdate } from '~/types/leagues';
 import { useQueryClient } from '@tanstack/react-query';
-import { useLeague } from '~/hooks/leagues/useLeague';
-import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
-import updateAdmins from '~/actions/updateAdmins';
+import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
+import { Switch } from '~/components/common/switch';
 
 export default function LeagueSettings() {
   const queryClient = useQueryClient();
-  const { data: league } = useLeague();
-  const { data: leagueMembers } = useLeagueMembers();
-
-  const membersList = useMemo(() =>
-    leagueMembers?.members
-      .map(member => ({
-        value: member.memberId,
-        label: member.displayName,
-        role: member.role,
-      }))
-      .filter(member =>
-        member.value !== leagueMembers.loggedIn?.memberId && member.role !== 'Owner') ?? [],
-    [leagueMembers]);
+  const { league, leagueSettings, leagueMembers } = useLeagueData();
 
   const reactForm = useForm<LeagueSettingsUpdate>({
     defaultValues: {
       name: league?.name ?? '',
-      admins: membersList.filter(m => m.role === 'Admin').map(m => m.value) ?? [],
+      isProtected: leagueSettings?.isProtected ?? true
     },
     resolver: zodResolver(LeagueDetailsUpdateZod)
   });
 
   useEffect(() => {
     if (league) reactForm.setValue('name', league.name);
-    if (membersList.length > 0) reactForm.setValue('admins',
-      membersList.filter(m => m.role === 'Admin').map(m => m.value) ?? []
-    );
-  }, [league, membersList, reactForm]);
+    if (leagueSettings) reactForm.setValue('isProtected', leagueSettings.isProtected);
+  }, [league, leagueSettings, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     if (!league) return;
+    if (leagueMembers?.loggedIn?.role !== 'Owner') {
+      alert('Only the league Owner can update league settings.');
+      return;
+    }
 
     try {
-      await Promise.all([
-        updateLeagueSettings(league.hash, data),
-        data.admins ? updateAdmins(league.hash, data.admins) : Promise.resolve(),
-      ]);
+      await updateLeagueSettings(league.hash, data);
       await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['settings', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
@@ -69,7 +54,9 @@ export default function LeagueSettings() {
 
   return (
     <Form {...reactForm}>
-      <form className='flex-1 flex flex-col p-2 gap-2 bg-card rounded-xl items-center min-w-sm' action={() => handleSubmit()}>
+      <form
+        className='flex-1 flex flex-col p-2 gap-2 bg-card rounded-xl items-center min-w-sm'
+        action={() => handleSubmit()}>
         <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit League Details</FormLabel>
         <FormField
           name='name'
@@ -88,8 +75,26 @@ export default function LeagueSettings() {
               <FormMessage />
             </FormItem>
           )} />
-        <LeagueAdminsField members={membersList} />
-        <Button className='mt-auto w-full' disabled={!reactForm.formState.isDirty} type='submit'>
+        <FormField
+          name='isProtected'
+          render={({ field }) => (
+            <FormItem className='w-full'>
+              <span className='flex gap-2 items-center'>
+                <FormLabel className='text-base'>Protected League</FormLabel>
+                <FormControl>
+                  <Switch checked={field.value as boolean} onCheckedChange={field.onChange} />
+                </FormControl>
+              </span>
+              <FormDescription className='mb-0 mt-1 text-sm text-muted-foreground'>
+                When enabled, new members must be admitted by an admin to join the league.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )} />
+        <Button
+          className='mt-auto w-full'
+          disabled={!reactForm.formState.isDirty}
+          type='submit'>
           Save
         </Button>
       </form>

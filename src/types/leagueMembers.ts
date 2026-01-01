@@ -17,6 +17,10 @@ export type LeagueMemberInsert = {
   color: string;
 };
 
+export type PendingLeagueMember = LeagueMemberInsert & {
+  memberId: number;
+};
+
 export const DisplayNameZod = z.string()
   .min(DISPLAY_NAME_MIN_LENGTH, { message: `Display name must be between ${DISPLAY_NAME_MIN_LENGTH} and ${DISPLAY_NAME_MAX_LENGTH} characters` })
   .max(DISPLAY_NAME_MAX_LENGTH, { message: `Display name must be between ${DISPLAY_NAME_MIN_LENGTH} and ${DISPLAY_NAME_MAX_LENGTH} characters` });

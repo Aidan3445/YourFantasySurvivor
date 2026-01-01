@@ -15,6 +15,7 @@ import { type DBTransaction } from '~/types/server';
  * @param leagueName - the league to create
  * @param newMember - the new member to add
  * @param draftDate - the draft date for the league
+ * @param protected - whether the league is protected
  * @param trxOverride - optional transaction override for nesting
  * @throws an error if the league cannot be inserted
  * @throws an error if the league settings cannot be inserted
@@ -27,6 +28,7 @@ export default async function createNewLeagueLogic(
   leagueName: string,
   newMember: LeagueMemberInsert,
   draftDate?: Date | string,
+  isProtected?: boolean,
   trxOverride?: DBTransaction
 ) {
   // Create the league in a transaction
@@ -88,7 +90,9 @@ export default async function createNewLeagueLogic(
       await trx
         .insert(leagueSettingsSchema)
         .values({
-          leagueId, draftDate: typeof draftDate === 'string'
+          leagueId,
+          isProtected: isProtected ?? true,
+          draftDate: typeof draftDate === 'string'
             ? new Date(draftDate).toUTCString()
             : draftDate?.toUTCString()
         });

@@ -59,7 +59,10 @@ export default async function getUserLeagues(userId: string) {
           .where(and(
             eq(baseEventReferenceSchema.referenceId, castawaySchema.castawayId),
             eq(baseEventReferenceSchema.referenceType, 'Castaway'))))))
-    .where(eq(leagueMemberSchema.userId, userId))
+    .where(and(
+      eq(leagueMemberSchema.userId, userId),
+      eq(leagueMemberSchema.admitted, true),
+    ))
     .orderBy(desc(seasonSchema.premiereDate))
     .then((rows) => rows
       .map((row) => {

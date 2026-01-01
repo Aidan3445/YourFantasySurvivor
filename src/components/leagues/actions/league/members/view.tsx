@@ -4,9 +4,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/ta
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import CurrentMember from '~/components/leagues/actions/league/members/current';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 
 export default function ManageMembers() {
   const { data: leagueMembers } = useLeagueMembers();
+  const { data: leagueSettings } = useLeagueSettings();
 
   const loggedInRole = leagueMembers?.loggedIn?.role;
 
@@ -22,7 +24,9 @@ export default function ManageMembers() {
       <Tabs defaultValue='current' className='h-full rounded-lg'>
         <TabsList className='grid grid-flow-col auto-cols-fr w-full px-2 z-50'>
           <TabsTrigger value='current'>Current</TabsTrigger>
-          <TabsTrigger value='pending'>Pending</TabsTrigger>
+          <TabsTrigger value='pending' disabled={!leagueSettings?.isProtected}>
+            Pending
+          </TabsTrigger>
         </TabsList>
         <TabsContent value='current'>
           <div className='flex flex-col w-full'>
@@ -60,10 +64,18 @@ export default function ManageMembers() {
           </div>
         </TabsContent>
         <TabsContent value='pending'>
-          {/* Pending Invites Management Component Goes Here */}
           <p className='text-sm text-muted-foreground'>
             Manage pending invites here.
           </p>
+          {leagueSettings?.isProtected ? (
+            <p className='text-sm text-muted-foreground'>
+              Since this league is protected, new members must be admitted by an admin.
+            </p>
+          ) : (
+            <p className='text-sm text-muted-foreground'>
+              This league is not protected; new members can join freely.
+            </p>
+          )}
         </TabsContent>
       </Tabs>
     </div>

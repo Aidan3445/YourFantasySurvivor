@@ -29,7 +29,7 @@ export type LeagueDetails = {
   league: League;
   member: LeagueMember;
   currentSelection: CurrentSelection;
-  memberCount: number
+  memberCount: number,
 };
 
 export const LeagueNameZod = z.string()
@@ -51,6 +51,7 @@ export type LeagueInsert = z.infer<typeof LeagueInsertZod>;
 
 export type LeagueSettings = {
   leagueId: number;
+  isProtected: boolean;
   draftDate: Date | null;
   survivalCap: number;
   preserveStreak: boolean;
@@ -58,15 +59,15 @@ export type LeagueSettings = {
 
 export type LeagueSettingsUpdate = {
   name?: string;
+  isProtected?: boolean;
   draftDate?: Date | null | string;
   survivalCap?: number;
   preserveStreak?: boolean;
-  admins?: number[];
 }
 
 export const LeagueDetailsUpdateZod = z.object({
   name: LeagueNameZod,
-  admins: z.array(z.coerce.number()),
+  isProtected: z.boolean(),
 });
 export type LeagueDetailsUpdate = z.infer<typeof LeagueDetailsUpdateZod>;
 

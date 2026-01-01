@@ -17,6 +17,7 @@ export default async function getLeagueSettings(auth: VerifiedLeagueMemberAuth) 
   return db
     .select({
       leagueId: leagueSettingsSchema.leagueId,
+      isProtected: leagueSettingsSchema.isProtected,
       draftDate: leagueSettingsSchema.draftDate,
       survivalCap: leagueSettingsSchema.survivalCap,
       preserveStreak: leagueSettingsSchema.preserveStreak

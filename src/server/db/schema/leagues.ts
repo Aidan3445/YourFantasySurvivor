@@ -27,6 +27,7 @@ export const leagueSettingsSchema = createTable(
   'league_settings',
   {
     leagueId: integer('league_id').references(() => leagueSchema.leagueId, { onDelete: 'cascade' }).primaryKey(),
+    isProtected: boolean('protected').notNull().default(true),
     draftDate: timestamp('draft_date', { mode: 'string' }),
     survivalCap: integer('survival_cap').notNull().default(DEFAULT_SURVIVAL_CAP),
     preserveStreak: boolean('preserve_streak').notNull().default(true)

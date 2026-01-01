@@ -66,7 +66,9 @@ export async function leagueMemberAuth(hash: string) {
     .innerJoin(leagueSchema, and(
       eq(leagueMemberSchema.leagueId, leagueSchema.leagueId),
       eq(leagueSchema.hash, hash)))
-    .where(eq(leagueMemberSchema.userId, userId))
+    .where(and(
+      eq(leagueMemberSchema.userId, userId),
+      eq(leagueMemberSchema.admitted, true)))
     .then((members) => members[0]);
 
   const isAdmin = (await systemAdminAuth()).userId;
