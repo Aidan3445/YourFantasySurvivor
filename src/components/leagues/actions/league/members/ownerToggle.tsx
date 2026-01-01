@@ -36,7 +36,7 @@ export default function OwnerToggle({ member, loggedInMember }: CurrentMemberPro
       await queryClient.invalidateQueries({ queryKey: ['league', hash] });
       await queryClient.invalidateQueries({ queryKey: ['settings', hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
-      alert(`Member ${member.displayName} is now a ${member.role === 'Owner' ? 'Member' : 'Owner'}.`);
+      alert(`Member ${member.displayName} is now the Owner.`);
       setOpen(false);
     } catch (error) {
       console.error('Error updating member role:', error);
@@ -55,16 +55,16 @@ export default function OwnerToggle({ member, loggedInMember }: CurrentMemberPro
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>
-          {member.role === 'Owner' ? 'Demote to Member' : 'Promote to Owner'}
+          Transfer Ownership
         </AlertDialogTitle>
-        <AlertDialogDescription className='flex gap-1 my-4'>
-          Are you sure you want to {member.role === 'Owner' ? 'demote' : 'promote'}
+        <AlertDialogDescription className='my-4'>
+          Are you sure you want to make{' '}
           <ColorRow
             className='inline w-min px-1 leading-tight my-auto'
             color={member.color}>
             {member.displayName}
-          </ColorRow>
-          to {member.role === 'Owner' ? 'Member' : 'Owner'}?
+          </ColorRow>{' '}
+          the new <b>Owner</b> of this league? This action cannot be undone.
         </AlertDialogDescription>
         <span className='flex mb-4'>
           <Input

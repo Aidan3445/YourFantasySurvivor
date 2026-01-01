@@ -31,6 +31,7 @@ export default function RemoveMember({ member, loggedInMember }: CurrentMemberPr
       await queryClient.invalidateQueries({ queryKey: ['league', hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
       setOpen(false);
+      alert(`Member ${member.displayName} has been removed from the league.`);
     } catch (error) {
       console.error('Error removing member:', error);
       alert('An error occurred while removing the member.');
@@ -47,14 +48,13 @@ export default function RemoveMember({ member, loggedInMember }: CurrentMemberPr
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>Remove Member</AlertDialogTitle>
-        <AlertDialogDescription className='flex gap-1 my-4'>
-          Are you sure you want to remove
+        <AlertDialogDescription className='my-4'>
+          Are you sure you want to remove{' '}
           <ColorRow
             className='inline w-min px-1 leading-tight my-auto'
-            color={member.color}
-          >
+            color={member.color}>
             {member.displayName}
-          </ColorRow>
+          </ColorRow>{' '}
           from this league? This action cannot be undone.
         </AlertDialogDescription>
         <AlertDialogFooter>

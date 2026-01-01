@@ -34,7 +34,7 @@ export default function AdminToggle({ member, loggedInMember }: CurrentMemberPro
       await queryClient.invalidateQueries({ queryKey: ['league', hash] });
       await queryClient.invalidateQueries({ queryKey: ['settings', hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
-      alert(`Member ${member.displayName} is now a ${member.role === 'Admin' ? 'Member' : 'Admin'}.`);
+      alert(`Member ${member.displayName} is now ${member.role === 'Admin' ? 'a Member' : 'an Admin'}.`);
       setOpen(false);
     } catch (error) {
       console.error('Error updating member role:', error);
@@ -55,14 +55,14 @@ export default function AdminToggle({ member, loggedInMember }: CurrentMemberPro
         <AlertDialogTitle>
           {member.role === 'Admin' ? 'Demote to Member' : 'Promote to Admin'}
         </AlertDialogTitle>
-        <AlertDialogDescription className='flex gap-1 my-4'>
-          Are you sure you want to {member.role === 'Admin' ? 'demote' : 'promote'}
+        <AlertDialogDescription className='my-4'>
+          Are you sure you want to {member.role === 'Admin' ? 'demote ' : 'promote '}
           <ColorRow
             className='inline w-min px-1 leading-tight my-auto'
             color={member.color}>
             {member.displayName}
-          </ColorRow>
-          to {member.role === 'Admin' ? 'Member' : 'Admin'}?
+          </ColorRow>{' '}
+          to <b>{member.role === 'Admin' ? 'Member' : 'Admin'}</b>?
         </AlertDialogDescription>
         <AlertDialogFooter>
           <form action={() => handleToggleAdmin()}>
