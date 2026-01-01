@@ -19,15 +19,14 @@ export const leagueMemberSchema = createTable(
     displayName: varchar('display_name', { length: DISPLAY_NAME_MAX_LENGTH }).notNull(),
     color: varchar('color', { length: 7 }).notNull(),
     role: leagueMemberRole('role').notNull().default('Member'),
-    draftOrder: smallint('draft_order').notNull(),
-    admitted: boolean('admitted').notNull().default(false),
+    draftOrder: smallint('draft_order')
   },
   (table) => [
     uniqueIndex('member_league_user_unq_idx').on(table.leagueId, table.userId),
     unique('member_league_name_unq').on(table.leagueId, table.displayName),
     unique('member_league_color_unq').on(table.leagueId, table.color),
     unique('member_league_order_unq').on(table.leagueId, table.draftOrder),
-    check('member_pending_check', sql`${table.admitted} = TRUE OR ${table.role} = 'Member'`),
+    check('member_pending_check', sql`${table.draftOrder} = NULL OR ${table.role} = 'Member'`),
   ]
 );
 

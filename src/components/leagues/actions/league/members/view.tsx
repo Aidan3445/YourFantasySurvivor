@@ -5,9 +5,12 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import CurrentMember from '~/components/leagues/actions/league/members/current';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
+import { usePendingMembers } from '~/hooks/leagues/usePendingMembers';
+import PendingMember from '~/components/leagues/actions/league/members/pending';
 
 export default function ManageMembers() {
   const { data: leagueMembers } = useLeagueMembers();
+  const { data: pendingMembers } = usePendingMembers();
   const { data: leagueSettings } = useLeagueSettings();
 
   const loggedInRole = leagueMembers?.loggedIn?.role;
@@ -57,20 +60,31 @@ export default function ManageMembers() {
             </ul>
             <ScrollArea className='flex flex-col max-h-72'>
               {leagueMembers?.members.map(member => (
-                <CurrentMember key={member.memberId} member={member} loggedInMember={leagueMembers.loggedIn} />
+                <CurrentMember
+                  key={member.memberId}
+                  member={member}
+                  loggedInMember={leagueMembers.loggedIn} />
               ))}
               <ScrollBar orientation='vertical' />
             </ScrollArea>
           </div>
         </TabsContent>
         <TabsContent value='pending'>
-          <p className='text-sm text-muted-foreground'>
-            Manage pending invites here.
-          </p>
           {leagueSettings?.isProtected ? (
-            <p className='text-sm text-muted-foreground'>
-              Since this league is protected, new members must be admitted by an admin.
-            </p>
+            <div className='flex flex-col w-full'>
+              <p className='text-sm text-muted-foreground mb-2'>
+                Since this league is protected, new members must be admitted by an admin.
+              </p>
+              <ScrollArea className='flex flex-col max-h-72'>
+                {pendingMembers?.members.map(member => (
+                  <PendingMember
+                    key={member.memberId}
+                    member={member}
+                    loggedInMember={leagueMembers?.loggedIn} />
+                ))}
+                <ScrollBar orientation='vertical' />
+              </ScrollArea>
+            </div>
           ) : (
             <p className='text-sm text-muted-foreground'>
               This league is not protected; new members can join freely.

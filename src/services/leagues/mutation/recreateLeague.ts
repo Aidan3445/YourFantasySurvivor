@@ -78,6 +78,7 @@ export default async function recreateLeagueLogic(
       originalLeague.league.name,
       { ...ownerMember },
       undefined,
+      originalLeague.league_settings?.isProtected,
       trx,
     );
 

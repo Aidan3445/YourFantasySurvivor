@@ -49,7 +49,7 @@ export default function AdminToggle({ member, loggedInMember }: CurrentMemberPro
           className={cn('my-auto', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
           color={getContrastingColor(member.color)}
           fill={member.role === 'Admin' ? getContrastingColor(member.color) : 'none'}
-          size={14} />
+          size={18} />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>

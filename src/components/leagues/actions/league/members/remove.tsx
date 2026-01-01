@@ -44,7 +44,7 @@ export default function RemoveMember({ member, loggedInMember }: CurrentMemberPr
         <Ban
           className={cn('my-auto ml-4', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
           color={getContrastingColor(member.color)}
-          size={14} />
+          size={18} />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>Remove Member</AlertDialogTitle>

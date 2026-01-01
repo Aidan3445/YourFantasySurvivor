@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, isNotNull, sql } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
@@ -28,7 +28,7 @@ export default async function getLeagueMembers(auth: VerifiedLeagueMemberAuth) {
     .from(leagueMemberSchema)
     .where(and(
       eq(leagueMemberSchema.leagueId, auth.leagueId),
-      eq(leagueMemberSchema.admitted, true)))
+      isNotNull(leagueMemberSchema.draftOrder)))
     .orderBy(leagueMemberSchema.draftOrder)
     .then((members) => members.map((member) => ({
       ...member,

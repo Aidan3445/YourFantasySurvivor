@@ -15,7 +15,6 @@ export interface CurrentMemberProps {
 export default function CurrentMember({ member, loggedInMember }: CurrentMemberProps) {
   return (
     <ColorRow
-      key={member.memberId}
       className='w-full mb-1'
       color={member.color}>
       <span className='w-full grid grid-cols-2'>
