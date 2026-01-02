@@ -26,6 +26,7 @@ export default function PendingMember({ member, loggedInMember }: PendingMemberP
       await admitMember(String(hash), member.memberId);
       await queryClient.invalidateQueries({ queryKey: ['league', hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
+      await queryClient.invalidateQueries({ queryKey: ['leagueMembers', 'pending', hash] });
       alert(`Member ${member.displayName} has been admitted to the league.`);
     } catch (error) {
       console.error('Error admitting member:', error);
