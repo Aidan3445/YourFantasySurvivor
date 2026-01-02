@@ -23,6 +23,7 @@ export type PublicLeague = {
   status: LeagueStatus;
   season: string;
   usedColors: string[];
+  isProtected: boolean;
 };
 
 export type LeagueDetails = {

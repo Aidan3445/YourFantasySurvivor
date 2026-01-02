@@ -53,7 +53,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
 
   if (!name || !status || !season || !usedColors) {
     return (
-      <main className='w-full place-items-center'>
+      <main className='w-full flex justify-center mt-2'>
         <h1 className='text-3xl'>League Not Found</h1>
         <p>{'The league you are trying to join does not exist. Please check the link and try again.'}</p>
         <Link href='/'>
@@ -65,7 +65,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
 
   if (status !== 'Predraft') {
     return (
-      <main className='w-full place-items-center'>
+      <main className='w-full flex justify-center mt-2'>
         <h1 className='text-3xl'>Sorry, {name} is no longer accepting members!</h1>
         <p>{'You can\'t join this league because it has already started.'}</p>
         <Link href='/'>
@@ -76,7 +76,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
   }
 
   return (
-    <main className='w-full place-items-center mt-4'>
+    <main className='w-full flex flex-col items-center justify-center mt-2'>
       <h1 className='text-3xl'>Join {name}</h1>
       <JoinLeagueForm hash={hash} colors={usedColors} />
     </main>

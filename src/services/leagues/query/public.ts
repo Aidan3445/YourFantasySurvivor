@@ -2,7 +2,7 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { eq } from 'drizzle-orm';
-import { leagueSchema } from '~/server/db/schema/leagues';
+import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import getUsedColors from '~/services/leagues/query/colors';
 import { type PublicLeague } from '~/types/leagues';
@@ -20,9 +20,11 @@ export default async function getPublicLeague(hash: string) {
       name: leagueSchema.name,
       status: leagueSchema.status,
       season: seasonSchema.name,
+      isProtected: leagueSettingsSchema.isProtected,
     })
     .from(leagueSchema)
     .innerJoin(seasonSchema, eq(leagueSchema.seasonId, seasonSchema.seasonId))
+    .innerJoin(leagueSettingsSchema, eq(leagueSchema.leagueId, leagueSettingsSchema.leagueId))
     .where(eq(leagueSchema.hash, hash));
 
   const [colors, league] = await Promise.all([colorsReq, leagueReq]);
