@@ -16,8 +16,8 @@ import { type DBTransaction } from '~/types/server';
   * @throws an error if the member is already admitted to the league
   * @throws an error if the user cannot be added as a member
   * @throws an error if the league is not in the predraft status
-  * @returns an object indicating success
-  * @returnObj `{ success: true }`
+  * @returns an object indicating success and admission
+  * @returnObj `{ success: true, admitted: true }`
   */
 export default async function admitMemberLogic(
   auth: VerifiedLeagueMemberAuth,
@@ -52,6 +52,6 @@ export default async function admitMemberLogic(
         .then((res) => res[0]?.memberId);
       if (!member) throw new Error('Failed to add user as a member');
 
-      return { success: true };
+      return { success: true, admitted: true };
     });
 }

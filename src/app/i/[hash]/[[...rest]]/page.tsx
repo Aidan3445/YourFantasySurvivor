@@ -34,7 +34,7 @@ export async function generateMetadata(
 export default async function LeagueJoinPage({ searchParams, params }: JoinPageProps) {
   const [{ hash }, query] = await Promise.all([params, searchParams]);
   const { userId, memberId } = await leagueMemberAuth(hash);
-  const { name, status, season, usedColors } = await getPublicLeague(hash) ?? {};
+  const { name, status, season, usedColors, isProtected } = await getPublicLeague(hash) ?? {};
 
   if (!userId) {
     return (
@@ -51,9 +51,9 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
     redirect(`/leagues/${hash}`);
   }
 
-  if (!name || !status || !season || !usedColors) {
+  if (!name || !status || !season || !usedColors || isProtected === undefined) {
     return (
-      <main className='w-full flex justify-center mt-2'>
+      <main className='w-full flex flex-col items-center justify-center mt-2'>
         <h1 className='text-3xl'>League Not Found</h1>
         <p>{'The league you are trying to join does not exist. Please check the link and try again.'}</p>
         <Link href='/'>
@@ -78,7 +78,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
   return (
     <main className='w-full flex flex-col items-center justify-center mt-2'>
       <h1 className='text-3xl'>Join {name}</h1>
-      <JoinLeagueForm hash={hash} colors={usedColors} />
+      <JoinLeagueForm hash={hash} colors={usedColors} isProtected={isProtected} />
     </main>
   );
 }

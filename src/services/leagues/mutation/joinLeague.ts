@@ -19,8 +19,8 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
   * @throws an error if the user is already a member of the league
   * @throws an error if the user cannot be added as a member
   * @throws an error if the league is not in the predraft status
-  * @returns an object indicating success
-  * @returnObj `{ success: true }`
+  * @returns an object indicating success and admission if applicable
+  * @returnObj `{ success: true, admitted: boolean }`
   */
 export default async function joinLeagueLogic(
   userId: string,
@@ -75,6 +75,6 @@ export default async function joinLeagueLogic(
       return await admitMemberLogic(auth, member.memberId, trx);
     }
 
-    return { success: true };
+    return { success: true, admitted: false };
   });
 }
