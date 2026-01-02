@@ -7,7 +7,7 @@ export async function POST(request: NextRequest, context: LeagueRouteParams) {
   return withLeagueOwnerAuth(async (auth) => {
     try {
       const body = await request.json() as {
-        leagueHash: string;
+        hash: string;
         memberIds: number[];
       };
 

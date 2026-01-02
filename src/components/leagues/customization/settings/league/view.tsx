@@ -7,14 +7,16 @@ import { Input } from '~/components/common/input';
 import { LeagueDetailsUpdateZod, type LeagueSettingsUpdate } from '~/types/leagues';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { Switch } from '~/components/common/switch';
+import ManagePendingMembers from '~/components/leagues/customization/settings/league/admitPending';
 
 export default function LeagueSettings() {
   const queryClient = useQueryClient();
   const { league, leagueSettings, leagueMembers } = useLeagueData();
+  const [open, setOpen] = useState(false);
 
   const reactForm = useForm<LeagueSettingsUpdate>({
     defaultValues: {
@@ -42,6 +44,9 @@ export default function LeagueSettings() {
       await queryClient.invalidateQueries({ queryKey: ['settings', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
       alert(`League settings updated for ${data.name}`);
+      reactForm.reset(data);
+
+      if (data.isProtected === false) setOpen(true);
     } catch (error) {
       console.error(error);
       alert('Failed to update league some or all settings');
@@ -62,7 +67,9 @@ export default function LeagueSettings() {
           name='name'
           render={({ field }) => (
             <FormItem className='w-full'>
-              <FormLabel className='text-lg'>League Name</FormLabel>
+              <FormLabel className='text-lg'>
+                League Name
+              </FormLabel>
               <FormControl>
                 <Input
                   className='w-full h-12 indent-2 placeholder:italic'
@@ -98,6 +105,9 @@ export default function LeagueSettings() {
           Save
         </Button>
       </form>
+      {league && (
+        <ManagePendingMembers hash={league.hash} open={open} />
+      )}
     </Form>
   );
 }

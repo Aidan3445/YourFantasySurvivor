@@ -13,7 +13,6 @@ import { customEventRuleSchema } from '~/server/db/schema/customEvents';
 /**
  * Recreate a league by copying its settings and adding specified members
  * @param auth - the authenticated league member performing the action
- * @param leagueHash - the hash of the league to recreate
  * @param memberIds - array of member IDs to add to the new league in new draft order
  * @throws an error if the original league cannot be found
  * @throws an error if any member cannot be added

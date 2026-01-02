@@ -8,14 +8,21 @@ import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { usePendingMembers } from '~/hooks/leagues/usePendingMembers';
 import PendingMember from '~/components/leagues/actions/league/members/pending';
 import { Circle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function ManageMembers() {
   const { data: leagueMembers } = useLeagueMembers();
   const { data: pendingMembers } = usePendingMembers();
   const { data: leagueSettings } = useLeagueSettings();
+  const [tab, setTab] = useState<'current' | 'pending'>('current');
+
+  useEffect(() => {
+    if (!leagueSettings?.isProtected && tab === 'pending') {
+      setTab('current');
+    }
+  }, [leagueSettings, tab]);
 
   const loggedInRole = leagueMembers?.loggedIn?.role;
-
   if (loggedInRole !== 'Owner' && loggedInRole !== 'Admin') {
     return null;
   }
@@ -25,7 +32,10 @@ export default function ManageMembers() {
       <h3 className='text-lg font-bold text-card-foreground text-center cursor-default'>
         Manage Members
       </h3>
-      <Tabs defaultValue='current' className='h-full rounded-lg flex flex-col'>
+      <Tabs
+        className='h-full rounded-lg flex flex-col'
+        value={tab}
+        onValueChange={setTab as (_value: string) => void}>
         <TabsList className='grid grid-flow-col auto-cols-fr w-full px-2 z-50'>
           <TabsTrigger value='current'>Current</TabsTrigger>
           <TabsTrigger value='pending' disabled={!leagueSettings?.isProtected}>

@@ -19,6 +19,7 @@ export default async function updateLeagueSettingsLogic(
   update: LeagueSettingsUpdate
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
+  if (auth.role === 'Member') throw new Error('Not authorized to update league settings');
 
   const { name, draftDate } = update;
 

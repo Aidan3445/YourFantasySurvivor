@@ -15,12 +15,12 @@ import recreateLeague from '~/actions/recreateLeague';
 import { useRouter } from 'next/navigation';
 
 interface RecreateLeagueProps {
-  leagueHash: string;
+  hash: string;
 }
 
-export default function RecreateLeague({ leagueHash }: RecreateLeagueProps) {
+export default function RecreateLeague({ hash }: RecreateLeagueProps) {
   const { data: seasons } = useSeasons(true);
-  const { sortedMemberScores } = useLeagueData(leagueHash);
+  const { sortedMemberScores } = useLeagueData(hash);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<Set<number>>(new Set());
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function RecreateLeague({ leagueHash }: RecreateLeagueProps) {
         .toReversed()
         .filter(({ member }) => selectedMembers.has(member.memberId))
         .map(({ member }) => member.memberId);
-      const { newHash } = await recreateLeague(leagueHash, sortedSelectedMembers);
+      const { newHash } = await recreateLeague(hash, sortedSelectedMembers);
       alert('League recreated successfully!');
       router.push(`/leagues/${newHash}/predraft`);
     } catch (e) {
