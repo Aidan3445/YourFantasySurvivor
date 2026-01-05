@@ -1,6 +1,6 @@
 'use client';
 
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { useForm } from 'react-hook-form';
 import { Button } from '~/components/common/button';
 import { Input } from '~/components/common/input';
@@ -10,8 +10,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
-import { Switch } from '~/components/common/switch';
 import ManagePendingMembers from '~/components/leagues/customization/settings/league/admitPending';
+import IsProtectedToggle from '~/components/leagues/customization/settings/league/isProtected';
 
 export default function LeagueSettings() {
   const queryClient = useQueryClient();
@@ -82,22 +82,7 @@ export default function LeagueSettings() {
               <FormMessage />
             </FormItem>
           )} />
-        <FormField
-          name='isProtected'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <span className='flex gap-2 items-center'>
-                <FormLabel className='text-base'>Protected League</FormLabel>
-                <FormControl>
-                  <Switch checked={field.value as boolean} onCheckedChange={field.onChange} />
-                </FormControl>
-              </span>
-              <FormDescription className='mb-0 mt-1 text-sm text-muted-foreground'>
-                When enabled, new members must be admitted by an admin to join the league.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )} />
+        <IsProtectedToggle />
         <Button
           className='mt-auto w-full'
           disabled={!reactForm.formState.isDirty}

@@ -47,6 +47,7 @@ export const LeagueInsertZod = z.object({
     displayName: data.displayName.trim(),
   })),
   draftDate: z.date().optional(),
+  isProtected: z.boolean().optional(),
 });
 export type LeagueInsert = z.infer<typeof LeagueInsertZod>;
 

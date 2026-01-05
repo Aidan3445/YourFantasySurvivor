@@ -130,7 +130,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                 <SortableItem
                   key={member.memberId}
                   id={member.memberId}
-                  className='grid col-span-3 grid-cols-subgrid mx-3 mb-2'
+                  className='grid col-span-3 grid-cols-subgrid mx-3 my-1'
                   disabled={orderLocked}>
                   <ColorRow
                     color={member.color}

@@ -9,6 +9,7 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
   * @param leagueName The league to create
   * @param newMember The new member to add
   * @param draftDate The draft date for the league
+  * @param isProtected Whether the league is protected
   * @throws an error if the league cannot be inserted
   * @throws an error if the league settings cannot be inserted
   * @throws an error if the user cannot be added as a member
@@ -19,10 +20,11 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
 export default async function createNewLeague(
   leagueName: string,
   newMember: LeagueMemberInsert,
-  draftDate?: Date
+  draftDate?: Date,
+  isProtected?: boolean,
 ) {
   try {
-    return await requireAuth(createNewLeagueLogic)(leagueName, newMember, draftDate);
+    return await requireAuth(createNewLeagueLogic)(leagueName, newMember, draftDate, isProtected);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

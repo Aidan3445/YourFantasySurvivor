@@ -17,6 +17,7 @@ import NextButton from '~/components/leagues/actions/league/create/next';
 import LeagueNameField from '~/components/leagues/actions/league/create/name';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
 import { useQueryClient } from '@tanstack/react-query';
+import IsProtectedToggle from '~/components/leagues/customization/settings/league/isProtected';
 
 interface CreateLeagueFormProps {
   onSubmit?: () => void;
@@ -35,6 +36,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
         displayName: '',
         color: '',
       },
+      isProtected: true,
     },
     resolver: zodResolver(LeagueInsertZod),
   });
@@ -45,7 +47,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     try {
-      const { newHash } = await createNewLeague(data.leagueName, data.member, data.draftDate);
+      const { newHash } = await createNewLeague(data.leagueName, data.member, data.draftDate, data.isProtected);
       if (!newHash) throw new Error('Failed to create league');
 
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
@@ -68,7 +70,8 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
               {count > 0 &&
                 <p className='w-full text-center text-sm'>
                   Step {current + 1} of {count}
-                </p>}
+                </p>
+              }
               <Progress className='w-full' value={progress} />
             </div>
             <div className='w-8' />
@@ -80,8 +83,9 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
                 disabled={!LeagueNameZod.safeParse(reactForm.watch('leagueName')).success}
                 onClick={() => api?.scrollNext()} />
             </CarouselItem>
-            <CarouselItem className='pl-14 flex flex-col pt-4'>
+            <CarouselItem className='pl-14 flex flex-col gap-4 pt-4'>
               <DraftDateField />
+              <IsProtectedToggle />
               <NextButton onClick={() => api?.scrollNext()} />
             </CarouselItem>
             <CarouselItem className='pl-14 flex flex-col pt-4'>

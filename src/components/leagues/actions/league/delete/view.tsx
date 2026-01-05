@@ -36,10 +36,10 @@ export default function DeleteLeague() {
         alert('Failed to delete league. Please try again later.');
         return;
       }
-      alert(`League ${league.name} has been deleted.`);
       await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
       router.push('/leagues');
+      alert(`League ${league.name} has been deleted.`);
     }
     catch (error) {
       console.error('Failed to delete league', error);
