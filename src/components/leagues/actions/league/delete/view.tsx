@@ -84,8 +84,10 @@ export default function DeleteLeague() {
             type='submit'
             className='mt-auto'
             variant='destructive'
-            disabled={league?.status === 'Inactive' || reactForm.watch('confirmName') !== league?.name}>
-            Delete League
+            disabled={league?.status === 'Inactive'
+              || reactForm.watch('confirmName') !== league?.name
+              || reactForm.formState.isSubmitting}>
+            {reactForm.formState.isSubmitting ? 'Deleting...' : 'Delete League'}
           </Button>
           {league?.status === 'Inactive' && (
             <p className='text-sm text-red-600'>
