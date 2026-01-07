@@ -31,7 +31,7 @@ export function compileScores(
   basePredictions: Predictions = {},
   rules: LeagueRules | null = null,
   survivalCap = 0,
-  preserveStreak = false
+  preserveStreak = false,
 ) {
   const scores: Scores = {
     Castaway: {},
@@ -43,6 +43,11 @@ export function compileScores(
   const basePredictionRules = rules?.basePrediction ?? defaultBasePredictionRules;
   const shauhinModeRules = rules?.shauhinMode ?? defaultShauhinModeSettings;
   const customEventRules = rules?.custom ?? [];
+
+  // initialize member scores if selection timelines are not empty
+  Object.keys(selectionTimelines.memberCastaways).forEach((memberId) => {
+    scores.Member[parseInt(memberId, 10)] = [0];
+  });
 
   // score base events
   Object.entries(baseEvents).forEach(([episodeNumber, events]) => {
@@ -103,9 +108,8 @@ export function compileScores(
     });
   });
 
-
   // score base predictions
-  Object.entries(basePredictions ?? {})
+  Object.entries(basePredictions)
     .forEach(([episodeNumber, predictionsMap]) => {
       const episodeNum = parseInt(episodeNumber, 10);
       const shauhinModeActive =
@@ -121,6 +125,8 @@ export function compileScores(
         const rule = basePredictionRules[prediction.eventName as ScoringBaseEventName];
         const points = rule?.points;
         if (!points || !rule?.enabled) return;
+        // ensure bet amount is within allowed range, 0 to maxBet
+        const betAmount = Math.max(0, Math.min(prediction.bet ?? 0, shauhinModeRules.maxBet));
         if (prediction.hit) {
           // prediction events just earn points for the member who made the prediction
           scores.Member[prediction.predictionMakerId] ??= [];
@@ -129,13 +135,13 @@ export function compileScores(
           if (shauhinModeActive && prediction.bet) {
             scores.Member[prediction.predictionMakerId] ??= [];
             scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
-            scores.Member[prediction.predictionMakerId]![episodeNum]! += prediction.bet;
+            scores.Member[prediction.predictionMakerId]![episodeNum]! += betAmount;
           }
         } else if (shauhinModeActive && prediction.eventId !== null && prediction.bet) {
           // if the prediction was wrong but shauhin mode is active, subtract the bet
           scores.Member[prediction.predictionMakerId] ??= [];
           scores.Member[prediction.predictionMakerId]![episodeNum] ??= 0;
-          scores.Member[prediction.predictionMakerId]![episodeNum]! -= prediction.bet;
+          scores.Member[prediction.predictionMakerId]![episodeNum]! -= betAmount;
         }
       });
     });
@@ -245,11 +251,15 @@ export function compileScores(
   });
 
   // fill in missing episodes and convert to running totals
-  const episodes = Math.max(...Object.values(scores.Castaway).map((s) => s.length)) - 1;
+  const episodes = Math.max(
+    ...Object.values(scores.Castaway).map((s) => s.length),
+    ...Object.values(scores.Tribe).map((s) => s.length),
+    ...Object.values(scores.Member).map((s) => s.length),
+  ) - 1;
   for (const referenceType in scores) {
-    const references = scores[referenceType as ReferenceType];
+    const references = scores[referenceType as ReferenceType | 'Member'];
     for (const reference in references) {
-      const points = scores[referenceType as ReferenceType][reference];
+      const points = scores[referenceType as ReferenceType | 'Member'][reference];
       for (let i = 0; i <= episodes; i++) {
         points![i] ??= 0;
         points![i]! += points![i - 1] ?? 0;
