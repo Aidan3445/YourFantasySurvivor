@@ -6,6 +6,7 @@ import reactCompilerPlugin from 'eslint-plugin-react-compiler';
 import drizzlePlugin from 'eslint-plugin-drizzle';
 import stylisticJs from '@stylistic/eslint-plugin-js';
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
+import vitest from 'eslint-plugin-vitest';
 
 export default tseslint.config(
   js.configs.recommended,
@@ -14,8 +15,10 @@ export default tseslint.config(
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
         tsconfigRootDir: import.meta.dirname,
+        projectService: {
+          allowDefaultProject: ['eslint.config.mjs'],
+        }
       },
       globals: {
         NodeJS: 'readonly',
@@ -26,17 +29,20 @@ export default tseslint.config(
   },
   {
     plugins: {
-      react: reactPlugin,
+      'react': reactPlugin,
       'react-hooks': reactHooksPlugin,
       'react-compiler': reactCompilerPlugin,
-      drizzle: drizzlePlugin,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      'drizzle': drizzlePlugin,
       '@stylistic/js': stylisticJs,
       'no-relative-import-paths': noRelativeImportPaths,
+      vitest,
     },
     rules: {
       ...reactPlugin.configs.recommended.rules,
       ...reactPlugin.configs['jsx-runtime'].rules,
       ...reactHooksPlugin.configs.recommended.rules,
+      ...vitest.configs.recommended.rules,
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
       'react/jsx-indent': ['error', 2],
@@ -97,7 +103,9 @@ export default tseslint.config(
           prefix: '~',
         },
       ],
+      '@typescript-eslint/unbound-method': 'off',
     },
+
     settings: {
       react: {
         version: 'detect',
