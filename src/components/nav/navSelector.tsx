@@ -6,6 +6,7 @@ export interface NavLinkProps {
   href: string;
   icon?: ReactNode;
   label?: string;
+  pathnameMatch?: string;
   className?: string;
 }
 

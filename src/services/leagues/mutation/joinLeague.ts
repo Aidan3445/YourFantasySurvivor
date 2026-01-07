@@ -1,12 +1,14 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
+import admitMemberLogic from '~/services/leagues/mutation/admitMember';
+import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
 /**
   * Join a league
@@ -17,8 +19,8 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
   * @throws an error if the user is already a member of the league
   * @throws an error if the user cannot be added as a member
   * @throws an error if the league is not in the predraft status
-  * @returns an object indicating success
-  * @returnObj `{ success: true }`
+  * @returns an object indicating success and admission if applicable
+  * @returnObj `{ success: true, admitted: boolean }`
   */
 export default async function joinLeagueLogic(
   userId: string,
@@ -33,6 +35,8 @@ export default async function joinLeagueLogic(
         name: leagueSchema.name,
         status: leagueSchema.status,
         season: seasonSchema.name,
+        isProtected: leagueSettingsSchema.isProtected,
+        seasonId: leagueSchema.seasonId
       })
       .from(leagueSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))
@@ -46,22 +50,31 @@ export default async function joinLeagueLogic(
       throw new Error('Cannot join after the draft has started');
     }
 
-    const draftOrder = await db
-      .select({ draftOrder: sql`COALESCE(MAX(draft_order), 0) + 1` })
-      .from(leagueMemberSchema)
-      .where(eq(leagueMemberSchema.leagueId, league.leagueId))
-      .then(res => res[0]?.draftOrder as number | null);
-
-    if (!draftOrder) throw new Error('Failed to determine draft order');
-
     // Try to add the member, if there is a conflict, the user is already a member
-    const memberId = await trx
+    const member = await trx
       .insert(leagueMemberSchema)
-      .values({ leagueId: league.leagueId, userId: userId, ...newMember, draftOrder })
-      .returning({ memberId: leagueMemberSchema.memberId })
-      .then((res) => res[0]?.memberId);
-    if (!memberId) throw new Error('Failed to add user as a member');
+      .values({ leagueId: league.leagueId, userId: userId, ...newMember })
+      .returning({
+        userId: leagueMemberSchema.userId,
+        memberId: leagueMemberSchema.memberId,
+        role: leagueMemberSchema.role,
+        leagueId: leagueMemberSchema.leagueId
+      })
+      .then((res) => res[0]);
 
-    return { success: true };
+    if (!member?.memberId) throw new Error('Failed to add user as a member');
+
+    if (!league.isProtected) {
+      const auth: VerifiedLeagueMemberAuth = {
+        ...member,
+        status: league.status,
+        seasonId: league.seasonId,
+        // override role for admittance
+        role: 'Admin'
+      };
+      return await admitMemberLogic(auth, member.memberId, trx);
+    }
+
+    return { success: true, admitted: false };
   });
 }

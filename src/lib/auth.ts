@@ -2,7 +2,7 @@ import 'server-only';
 
 import { auth as clerkAuth } from '@clerk/nextjs/server';
 import { db } from '~/server/db';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, isNotNull } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { systemSchema } from '~/server/db/schema/system';
@@ -66,7 +66,9 @@ export async function leagueMemberAuth(hash: string) {
     .innerJoin(leagueSchema, and(
       eq(leagueMemberSchema.leagueId, leagueSchema.leagueId),
       eq(leagueSchema.hash, hash)))
-    .where(eq(leagueMemberSchema.userId, userId))
+    .where(and(
+      eq(leagueMemberSchema.userId, userId),
+      isNotNull(leagueMemberSchema.draftOrder)))
     .then((members) => members[0]);
 
   const isAdmin = (await systemAdminAuth()).userId;

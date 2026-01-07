@@ -5,7 +5,6 @@ import { eq } from 'drizzle-orm';
 import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueSettingsUpdate } from '~/types/leagues';
-import updateAdminsLogic from '~/services/leagues/mutation/updateAdmins';
 
 /**
   * Update the league settings
@@ -20,8 +19,9 @@ export default async function updateLeagueSettingsLogic(
   update: LeagueSettingsUpdate
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
+  if (auth.role === 'Member') throw new Error('Not authorized to update league settings');
 
-  const { name, draftDate, admins } = update;
+  const { name, draftDate } = update;
 
   let safeDraftDate: Date | null | undefined = undefined;
 
@@ -54,10 +54,6 @@ export default async function updateLeagueSettingsLogic(
         .where(eq(leagueSchema.leagueId, auth.leagueId))
         .returning({ name: leagueSchema.name })
         .then((res) => res[0]);
-    }
-
-    if (admins) {
-      await updateAdminsLogic(auth, admins);
     }
 
     return { success: true };

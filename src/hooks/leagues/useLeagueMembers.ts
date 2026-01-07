@@ -5,7 +5,7 @@ import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 import { type LeagueMember } from '~/types/leagueMembers';
 
 /**
-  * Fetches league member's data from the API.
+  * Fetches league members data from the API.
   * @param {string} overrideHash Optional hash to override the URL parameter.
   * @returnObj `LeagueMember[]`
   */

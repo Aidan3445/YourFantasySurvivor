@@ -19,10 +19,11 @@ const defaultValues = {
 
 interface JoinLeagueFormProps {
   hash: string;
+  isProtected: boolean;
   colors: string[];
 }
 
-export default function JoinLeagueForm({ hash, colors }: JoinLeagueFormProps) {
+export default function JoinLeagueForm({ hash, isProtected, colors }: JoinLeagueFormProps) {
   const queryClient = useQueryClient();
   const { user } = useUser();
   const router = useRouter();
@@ -43,10 +44,15 @@ export default function JoinLeagueForm({ hash, colors }: JoinLeagueFormProps) {
         color: data.color,
       };
 
-      await joinLeague(hash, member);
+      const result = await joinLeague(hash, member);
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
-      alert('Successfully joined league');
-      router.push(`/leagues/${hash}`);
+      if (result.admitted) {
+        alert('Successfully joined league');
+        router.push(`/leagues/${hash}`);
+      } else {
+        alert('Join request submitted and is pending approval');
+        router.push('/');
+      }
     } catch (error) {
       console.error(error);
       alert('Failed to join league');
@@ -61,7 +67,7 @@ export default function JoinLeagueForm({ hash, colors }: JoinLeagueFormProps) {
           className='w-full'
           type='submit'
           disabled={!reactForm.formState.isValid}>
-          Join League
+          {isProtected && 'Request to'} Join League
         </Button>
       </form>
     </Form>

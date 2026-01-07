@@ -10,6 +10,7 @@ import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
+import ManageMembers from '~/components/leagues/actions/league/members/view';
 
 export default async function LeaguePage() {
 
@@ -41,8 +42,11 @@ export default async function LeaguePage() {
             <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-12'>
               <MemberEditForm className='w-full' />
               <span className='w-full flex flex-wrap gap-4 justify-center'>
-                <LeagueSettings />
-                <DeleteLeague />
+                <span className='flex flex-col gap-4 w-full lg:w-1/2 lg:max-w-lg'>
+                  <LeagueSettings />
+                  <DeleteLeague />
+                </span>
+                <ManageMembers />
               </span>
             </section>
           </TabsContent>

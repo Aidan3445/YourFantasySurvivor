@@ -1,6 +1,6 @@
 import 'server-only';
 import { db } from '~/server/db';
-import { and, count, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
@@ -59,7 +59,10 @@ export default async function getUserLeagues(userId: string) {
           .where(and(
             eq(baseEventReferenceSchema.referenceId, castawaySchema.castawayId),
             eq(baseEventReferenceSchema.referenceType, 'Castaway'))))))
-    .where(eq(leagueMemberSchema.userId, userId))
+    .where(and(
+      eq(leagueMemberSchema.userId, userId),
+      isNotNull(leagueMemberSchema.draftOrder)
+    ))
     .orderBy(desc(seasonSchema.premiereDate))
     .then((rows) => rows
       .map((row) => {

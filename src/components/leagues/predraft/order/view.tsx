@@ -130,12 +130,12 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                 <SortableItem
                   key={member.memberId}
                   id={member.memberId}
-                  className='grid col-span-3 grid-cols-subgrid mx-3 mb-2'
+                  className='grid col-span-3 grid-cols-subgrid mx-3 my-1'
                   disabled={orderLocked}>
                   <ColorRow
                     color={member.color}
                     loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}>
-                    <h3 className='text-lg' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
+                    <h3 className='text-lg w-4' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
                     <h2 className='text-3xl font-semibold' style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h2>
                     {!orderLocked &&
                       <GripVertical className='ml-auto cursor-row-resize' color={getContrastingColor(member.color)} />}

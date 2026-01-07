@@ -19,15 +19,13 @@ export default async function SideNav() {
           <SidebarMenu>
             <SideNavLink
               href='/' icon={
-                <Image
-                  src='/Icon.ico'
-                  alt='Your Fantasy Survivor Logo'
-                  width={24}
-                  height={24}
-                />
+                <Image src='/Icon.ico' alt='Your Fantasy Survivor Logo' width={24} height={24} />
               }
               label='Your Fantasy Survivor' />
-            <SideNavLink href='/playground' icon={<Flame className='stroke-primary' />} label='Playground' />
+            <SideNavLink
+              href='/playground'
+              icon={<Flame className='stroke-primary' />}
+              label='Playground' />
             <SignedIn>
               <SideNavLeagues />
             </SignedIn>

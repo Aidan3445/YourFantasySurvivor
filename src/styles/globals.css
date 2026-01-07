@@ -198,7 +198,8 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+    border-color: var(--color-primary, currentcolor);
+    text-wrap: pretty;
   }
 }
 
@@ -243,7 +244,7 @@
   }
 
   .cl-userButtonBox {
-    @apply flex-row-reverse -ml-1.5;
+    @apply flex-row-reverse! -ml-1;
   }
 
   .cl-userButtonAvatarBox {
@@ -255,7 +256,7 @@
   }
 
   .cl-userButtonOuterIdentifier {
-    @apply whitespace-nowrap;
+    @apply whitespace-nowrap font-normal! text-sm!;
   }
 
   .cl-modalBackdrop {
@@ -280,8 +281,41 @@
     @apply grid! grid-cols-5;
   }
 
-  /* Sidebar */
+  /* Shimmer Effect */
+  .shimmer-1,
+  .shimmer-2,
+  .shimmer-3,
+  .shimmer-fast {
+    @apply relative overflow-hidden;
+  }
+
+  .shimmer-1::before,
+  .shimmer-2::before,
+  .shimmer-3::before,
+  .shimmer-fast::before {
+    content: '';
+    @apply flex box-border absolute w-[200%] h-full 
+    bg-linear-to-r from-transparent via-white/50 to-transparent;
+  }
+
+  .shimmer-1::before {
+    @apply animate-shimmer1;
+  }
+
+  .shimmer-2::before {
+    @apply animate-shimmer2;
+  }
+
+  .shimmer-3::before {
+    @apply animate-shimmer3;
+  }
+
+  .shimmer-fast::before {
+    @apply animate-shimmer-fast;
+  }
 }
+
+/* Sidebar */
 @layer base { 
   :root {
         --sidebar-background: 112 100% 88%;
@@ -353,54 +387,6 @@
         --chart-5: 340 75% 55%;
     }
 }
-@layer base {
-  * {
-    @apply border-border;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
-}
 
 @layer utilities {
-  .shimmer-1,
-  .shimmer-2,
-  .shimmer-3,
-  .shimmer-fast {
-    @apply relative overflow-hidden;
-  }
-
-  .shimmer-1::before,
-  .shimmer-2::before,
-  .shimmer-3::before,
-  .shimmer-fast::before {
-    content: '';
-    @apply flex box-border absolute w-[200%] h-full 
-    bg-linear-to-r from-transparent via-white/50 to-transparent;
-  }
-
-  .shimmer-1::before {
-    @apply animate-shimmer1;
-  }
-
-  .shimmer-2::before {
-    @apply animate-shimmer2;
-  }
-
-  .shimmer-3::before {
-    @apply animate-shimmer3;
-  }
-
-  .shimmer-fast::before {
-    @apply animate-shimmer-fast;
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-    }
-  body {
-    @apply bg-background text-foreground;
-    }
 }

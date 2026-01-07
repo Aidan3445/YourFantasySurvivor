@@ -19,7 +19,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         className='block'>
         <div className='px-2 py-1 rounded-lg border hover:bg-accent/50 transition-colors flex items-center justify-between mb-2'>
           <h4 className='font-semibold mr-auto'>{league.name}</h4>
-          <Badge variant='secondary'>{league.season}</Badge>
+          <Badge variant='secondary' className='hover:bg-secondary'>{league.season}</Badge>
           <SquareArrowOutUpRight size={20} className='ml-2 stroke-primary' />
         </div>
       </Link>

@@ -89,7 +89,6 @@ export default clerkMiddleware(async (auth, req) => {
 const leaguesMatcher = createRouteMatcher(['/leagues']);
 async function leaguesRoute(req: NextRequest, userId: string) {
   if (leaguesMatcher(req)) {
-    console.log('Checking leagues for user', userId, req.method);
     const hasLeagues = await db
       .select({ count: count() })
       .from(leagueSchema)

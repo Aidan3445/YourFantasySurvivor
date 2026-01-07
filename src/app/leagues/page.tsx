@@ -25,7 +25,7 @@ export default function LeaguesPage() {
 
   return (
     <main className='w-full flex flex-col gap-5 items-center text-center'>
-      <div className='w-full place-items-center space-y-2'>
+      <div className='w-full flex flex-col items-center gap-2'>
         {currentLeagues.length + inactiveLeagues.length > 0 ?
           <h1 className='text-3xl w-5/6 bg-secondary rounded-full mt-10'>My Leagues</h1> :
           <>

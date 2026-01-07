@@ -13,7 +13,6 @@ import { customEventRuleSchema } from '~/server/db/schema/customEvents';
 /**
  * Recreate a league by copying its settings and adding specified members
  * @param auth - the authenticated league member performing the action
- * @param leagueHash - the hash of the league to recreate
  * @param memberIds - array of member IDs to add to the new league in new draft order
  * @throws an error if the original league cannot be found
  * @throws an error if any member cannot be added
@@ -56,10 +55,10 @@ export default async function recreateLeagueLogic(
     const originalLeague = await trx
       .select()
       .from(leagueSchema)
-      .innerJoin(leagueSettingsSchema, eq(leagueSchema.leagueId, leagueSettingsSchema.leagueId))
-      .innerJoin(baseEventRulesSchema, eq(leagueSchema.leagueId, baseEventRulesSchema.leagueId))
-      .innerJoin(baseEventPredictionRulesSchema, eq(leagueSchema.leagueId, baseEventPredictionRulesSchema.leagueId))
-      .innerJoin(shauhinModeSettingsSchema, eq(leagueSchema.leagueId, shauhinModeSettingsSchema.leagueId))
+      .leftJoin(leagueSettingsSchema, eq(leagueSchema.leagueId, leagueSettingsSchema.leagueId))
+      .leftJoin(baseEventRulesSchema, eq(leagueSchema.leagueId, baseEventRulesSchema.leagueId))
+      .leftJoin(baseEventPredictionRulesSchema, eq(leagueSchema.leagueId, baseEventPredictionRulesSchema.leagueId))
+      .leftJoin(shauhinModeSettingsSchema, eq(leagueSchema.leagueId, shauhinModeSettingsSchema.leagueId))
       .where(eq(leagueSchema.leagueId, auth.leagueId))
       .then((res) => res[0]);
     if (!originalLeague) {
@@ -78,6 +77,7 @@ export default async function recreateLeagueLogic(
       originalLeague.league.name,
       { ...ownerMember },
       undefined,
+      originalLeague.league_settings?.isProtected,
       trx,
     );
 
@@ -100,8 +100,6 @@ export default async function recreateLeagueLogic(
       .onConflictDoNothing()
       .returning({ memberId: leagueMemberSchema.memberId, draftOrder: leagueMemberSchema.draftOrder });
 
-    console.log({ newMembers });
-
     if (newMembers.length !== members.length - 1) {
       console.error('Failed to add all members to the new league', {
         expected: members.length - 1,
@@ -118,20 +116,26 @@ export default async function recreateLeagueLogic(
       .where(eq(leagueSettingsSchema.leagueId, leagueId));
 
     // copy base event and prediction rules
-    await trx
-      .insert(baseEventRulesSchema)
-      .values({ ...originalLeague.event_base_rule, leagueId });
-    await trx
-      .insert(baseEventPredictionRulesSchema)
-      .values({ ...originalLeague.event_base_prediction_rule, leagueId });
-    // copy custom event and prediction rules
+    if (originalLeague.event_base_rule) {
+      await trx
+        .insert(baseEventRulesSchema)
+        .values({ ...originalLeague.event_base_rule, leagueId });
+    }
+    if (originalLeague.event_base_prediction_rule) {
+      await trx
+        .insert(baseEventPredictionRulesSchema)
+        .values({ ...originalLeague.event_base_prediction_rule, leagueId });
+    }
+    // copy shauhin mode settings
+    if (originalLeague.event_shauhin_mode_settings) {
+      await trx
+        .insert(shauhinModeSettingsSchema)
+        .values({ ...originalLeague.event_shauhin_mode_settings, leagueId });
+    }
+    // copy custom event and prediction rules - list insert makes if redundant here
     await trx
       .insert(customEventRuleSchema)
       .values(customEventRules.map((r) => ({ ...r, leagueId, customEventRuleId: undefined })));
-    // copy shauhin mode settings
-    await trx
-      .insert(shauhinModeSettingsSchema)
-      .values({ ...originalLeague.event_shauhin_mode_settings, leagueId });
 
     return { newHash };
   });

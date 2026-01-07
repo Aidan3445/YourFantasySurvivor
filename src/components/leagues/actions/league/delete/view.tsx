@@ -36,10 +36,10 @@ export default function DeleteLeague() {
         alert('Failed to delete league. Please try again later.');
         return;
       }
-      alert(`League ${league.name} has been deleted.`);
       await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
       router.push('/leagues');
+      alert(`League ${league.name} has been deleted.`);
     }
     catch (error) {
       console.error('Failed to delete league', error);
@@ -47,14 +47,18 @@ export default function DeleteLeague() {
     }
   });
 
-  if (!leagueMembers?.loggedIn || leagueMembers.loggedIn.role !== 'Owner') {
+  if (leagueMembers?.loggedIn?.role !== 'Owner') {
     return null;
   }
 
   return (
     <Form {...reactForm}>
-      <form action={() => handleSubmit()} className='flex flex-col gap-4 bg-card p-2 justify-between rounded-lg flex-1 min-w-sm'>
-        <h3 className='text-lg font-bold text-card-foreground text-center cursor-default'>Delete League</h3>
+      <form
+        action={() => handleSubmit()}
+        className='flex flex-col gap-4 h-66 bg-card p-2 justify-between rounded-xl min-w-sm'>
+        <h3 className='text-lg font-bold text-card-foreground text-center cursor-default'>
+          Delete League
+        </h3>
         <p className='text-sm text-muted-foreground'>
           Deleting a league is permanent and cannot be undone. All data associated with the league will be lost.
           Please type the league name to confirm deletion.
