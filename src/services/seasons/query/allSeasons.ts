@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { asc } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type Season } from '~/types/seasons';
 import { unstable_cache } from 'next/cache';
@@ -26,7 +26,7 @@ async function fetchAllSeasons() {
   return db
     .select()
     .from(seasonSchema)
-    .orderBy(asc(seasonSchema.premiereDate))
+    .orderBy(desc(seasonSchema.premiereDate))
     .then(rows => rows.map(row => ({
       ...row,
       premiereDate: new Date(`${row.premiereDate} Z`),

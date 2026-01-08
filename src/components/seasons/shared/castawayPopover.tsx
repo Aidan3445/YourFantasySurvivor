@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type ReactNode } from 'react';
+import { PopoverArrow } from '@radix-ui/react-popover';
 
 interface CastawayPopoverProps {
   castaway?: EnrichedCastaway;
@@ -19,6 +20,7 @@ export default function CastawayPopover({ castaway, children }: CastawayPopoverP
         {children}
       </PopoverTrigger>
       <PopoverContent className='flex flex-col w-fit gap-2 p-2 text-nowrap' side='top'>
+        <PopoverArrow />
         <h3 className='text-lg font-semibold'>{castaway.fullName}</h3>
         <p><b>Age:</b> {castaway.age}</p>
         <p><b>Current Residence:</b> {castaway.residence}</p>
