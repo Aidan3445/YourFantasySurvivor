@@ -1,8 +1,8 @@
 'use client';
 
 import { type SeasonsDataQuery } from '~/types/seasons';
-import TribeCards from './tribeCards';
-import CastawayGrid from './castawayGrid';
+import TribeCards from '~/components/seasons/castaways/tribeCards';
+import CastawayGrid from '~/components/seasons/castaways/castawayGrid';
 
 interface CastawaysViewProps {
   seasonData: SeasonsDataQuery;
@@ -11,14 +11,16 @@ interface CastawaysViewProps {
 export default function CastawaysView({ seasonData }: CastawaysViewProps) {
   const { castaways, tribes, tribesTimeline } = seasonData;
 
+  // Filter out non-season castaways (Jeff Probst, etc.)
+  const seasonCastaways = castaways.filter(c => c.seasonId !== null);
+
   return (
-    <div className='flex flex-col gap-4'>
-      <TribeCards castaways={castaways} tribes={tribes} />
+    <div className='w-full flex flex-col gap-4 mx-2'>
+      <TribeCards tribes={tribes} />
       <CastawayGrid
-        castaways={castaways}
+        castaways={seasonCastaways}
         tribesTimeline={tribesTimeline}
-        tribes={tribes}
-      />
+        tribes={tribes} />
     </div>
   );
 }
