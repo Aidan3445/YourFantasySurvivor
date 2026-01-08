@@ -13,6 +13,7 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { BaseEventFullName } from '~/lib/events';
 import { getAirStatus, getAirStatusPollingInterval } from '~/lib/episodes';
 import { type SeasonsDataQuery } from '~/types/seasons';
+import { cn } from '~/lib/utils';
 
 
 export interface TimelineFiltersProps {
@@ -84,7 +85,7 @@ export default function TimelineFilters({
   const selectedEpisodeData = episodes?.find((ep) => ep.episodeNumber === selectedEpisode);
 
   return (
-    <Accordion type='single' collapsible>
+    <Accordion type='single' collapsible className='w-full'>
       <AccordionItem value='filter' className='border-none pt-2'>
         <span className='w-full flex flex-wrap items-center gap-x-4 md:items-baseline px-12 md:mr-14 justify-center'>
           <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
@@ -132,14 +133,14 @@ export default function TimelineFilters({
             Filters
           </AccordionTrigger>
         </span>
-        <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center gap-4 px-2'>
+        <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center'>
           {castaways &&
-            <div className='w-min flex flex-col items-center'>
+            <div className='flex flex-col items-center'>
               <Label className='text-sm font-semibold text-muted-foreground'>
                 Castaway Filter
               </Label>
               <MultiSelect
-                className='w-48'
+                className={cn('min-w-56', hideMemberFilter ? 'w-1/3' : 'w-1/4')}
                 options={castaways.map((castaway) => ({
                   value: castaway.castawayId,
                   label: castaway.fullName
@@ -151,12 +152,12 @@ export default function TimelineFilters({
               />
             </div>}
           {tribes &&
-            <div className='w-min flex flex-col items-center'>
+            <div className='flex flex-col items-center'>
               <Label className='text-sm font-semibold text-muted-foreground'>
                 Tribe Filter
               </Label>
               <MultiSelect
-                className='w-48'
+                className={cn('min-w-56', hideMemberFilter ? 'w-1/3' : 'w-1/4')}
                 options={tribes.map((tribe) => ({
                   value: tribe.tribeId,
                   label: tribe.tribeName
@@ -168,12 +169,12 @@ export default function TimelineFilters({
               />
             </div>}
           {!hideMemberFilter && leagueMembers &&
-            <div className='w-min flex flex-col items-center'>
+            <div className='flex flex-col items-center'>
               <Label className='text-sm font-semibold text-muted-foreground'>
                 Member Filter
               </Label>
               <MultiSelect
-                className='w-48'
+                className={cn('min-w-56', hideMemberFilter ? 'w-1/3' : 'w-1/4')}
                 options={leagueMembers.members.map((member) => ({
                   value: member.memberId,
                   label: member.displayName
@@ -184,12 +185,12 @@ export default function TimelineFilters({
                 placeholder='All Members'
               />
             </div>}
-          <div className='w-min flex flex-col items-center'>
+          <div className='flex flex-col items-center'>
             <Label className='text-sm font-semibold text-muted-foreground'>
               Event Filter
             </Label>
             <MultiSelect
-              className='w-48'
+              className={cn('min-w-56', hideMemberFilter ? 'w-1/3' : 'w-1/4')}
               options={[
                 { label: 'Official Events', value: null },
                 ...Object.entries(BaseEventFullName)

@@ -20,19 +20,26 @@ export default function EventTimeline({ seasonData, hideMemberFilter = false }: 
 
   const [selectedEpisode, setSelectedEpisode] = useState<number>();
 
-  // Convert date strings back to Date objects after crossing server/client boundary
-  const seasonDataWithDates = useMemo(() => ({
-    ...seasonData,
-    episodes: seasonData.episodes.map(ep => ({
-      ...ep,
-      airDate: new Date(ep.airDate)
-    })),
-    season: seasonData.season ? {
-      ...seasonData.season,
-      premiereDate: new Date(seasonData.season.premiereDate),
-      finaleDate: seasonData.season.finaleDate ? new Date(seasonData.season.finaleDate) : null
-    } : null
-  }), [seasonData]);
+  const seasonDataWithDates = useMemo(() => {
+    // Convert date strings back to Date objects after crossing server/client boundary
+    // if dates are already Date objects, return as is. One date check is sufficient
+    if (seasonData.season.premiereDate instanceof Date) {
+      return seasonData;
+    }
+
+    return {
+      ...seasonData,
+      episodes: seasonData.episodes.map(ep => ({
+        ...ep,
+        airDate: new Date(ep.airDate)
+      })),
+      season: {
+        ...seasonData.season,
+        premiereDate: new Date(seasonData.season.premiereDate),
+        finaleDate: seasonData.season.finaleDate ? new Date(seasonData.season.finaleDate) : null
+      }
+    };
+  }, [seasonData]);
 
   return (
     <section className='w-full bg-card rounded-lg relative place-items-center'>
