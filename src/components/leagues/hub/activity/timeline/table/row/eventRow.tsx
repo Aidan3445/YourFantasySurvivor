@@ -69,7 +69,9 @@ export default function EventRow({ className, event, editCol: edit, isMock }: Ev
                   <span
                     className='text-nowrap'
                     style={{
-                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
+                      color: getContrastingColor(castaway?.eliminatedEpisode
+                        ? '#AAAAAA'
+                        : castaway?.tribe?.color ?? '#AAAAAA')
                     }}>
                     {castaway.fullName}
                   </span>
