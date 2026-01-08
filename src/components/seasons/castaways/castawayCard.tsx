@@ -10,6 +10,7 @@ import { getTribeTimeline } from '~/lib/utils';
 import { type TribesTimeline } from '~/types/tribes';
 import CastawayPopover from '~/components/seasons/shared/castawayPopover';
 import { useMemo } from 'react';
+import { getContrastingColor } from '@uiw/color-convert';
 
 interface CastawayCardProps {
   castaway: EnrichedCastaway;
@@ -29,7 +30,13 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes }: Casta
         className='justify-center gap-2 px-2 py-1'
         color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color}>
         <CastawayPopover castaway={castaway}>
-          <span>{castaway.fullName}</span>
+          <span
+            className='text-nowrap'
+            style={{
+              color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
+            }}>
+            {castaway.fullName}
+          </span>
         </CastawayPopover>
 
         {castaway.eliminatedEpisode && (

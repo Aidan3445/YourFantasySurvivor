@@ -51,7 +51,7 @@ export default function TimelineView({ seasonData }: TimelineViewProps) {
   };
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-4 w-full'>
       <div className='bg-card rounded-lg p-4'>
         <h2 className='text-2xl font-semibold mb-4'>Tribe Timeline</h2>
         <p className='text-muted-foreground mb-4'>

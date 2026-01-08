@@ -10,6 +10,8 @@ import { BaseEventFullName } from '~/lib/events';
 import { useMemo } from 'react';
 import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
+import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import { getContrastingColor } from '@uiw/color-convert';
 
 interface EventRowProps {
   className?: string;
@@ -63,7 +65,15 @@ export default function EventRow({ className, event, editCol: edit, isMock }: Ev
                 key={castaway.castawayId}
                 className='leading-tight px-1 w-min'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
-                {castaway.fullName}
+                <CastawayPopover castaway={castaway}>
+                  <span
+                    className='text-nowrap'
+                    style={{
+                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
+                    }}>
+                    {castaway.fullName}
+                  </span>
+                </CastawayPopover>
               </ColorRow>
             )
           ))}
