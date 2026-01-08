@@ -25,46 +25,44 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes }: Casta
 
   return (
     <div className='flex flex-col gap-1'>
-      <CastawayPopover castaway={castaway}>
-        <div className='cursor-pointer'>
-          <ColorRow
-            className='justify-center gap-2 px-2 py-1'
-            color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color}>
-            <span>{castaway.fullName}</span>
+      <ColorRow
+        className='justify-center gap-2 px-2 py-1'
+        color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color}>
+        <CastawayPopover castaway={castaway}>
+          <span>{castaway.fullName}</span>
+        </CastawayPopover>
 
-            {castaway.eliminatedEpisode && (
-              <Popover>
+        {castaway.eliminatedEpisode && (
+          <Popover>
+            <PopoverTrigger>
+              <span className='text-muted-foreground cursor-help text-nowrap'>
+                <FlameKindling className='align-text-bottom inline w-4 h-4' />
+                ({castaway.eliminatedEpisode})
+              </span>
+            </PopoverTrigger>
+            <PopoverContent className='w-min text-nowrap p-1' align='end'>
+              <PopoverArrow />
+              Eliminated Episode {castaway.eliminatedEpisode}
+            </PopoverContent>
+          </Popover>
+        )}
+
+        <div className='ml-auto flex gap-0.5'>
+          {tribeTimeline && (tribeTimeline.length > 1 || castaway.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
+            tribe && (
+              <Popover key={`${tribe.tribeName}-${episode}`}>
                 <PopoverTrigger>
-                  <span className='text-muted-foreground cursor-help'>
-                    <FlameKindling className='align-text-bottom inline w-4 h-4' />
-                    ({castaway.eliminatedEpisode})
-                  </span>
+                  <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
                 </PopoverTrigger>
                 <PopoverContent className='w-min text-nowrap p-1' align='end'>
                   <PopoverArrow />
-                  Eliminated Episode {castaway.eliminatedEpisode}
+                  {tribe.tribeName} - Episode {episode}
                 </PopoverContent>
               </Popover>
-            )}
-
-            <div className='ml-auto flex gap-0.5'>
-              {tribeTimeline && (tribeTimeline.length > 1 || castaway.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
-                tribe && (
-                  <Popover key={`${tribe.tribeName}-${episode}`}>
-                    <PopoverTrigger>
-                      <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
-                    </PopoverTrigger>
-                    <PopoverContent className='w-min text-nowrap p-1' align='end'>
-                      <PopoverArrow />
-                      {tribe.tribeName} - Episode {episode}
-                    </PopoverContent>
-                  </Popover>
-                )
-              ))}
-            </div>
-          </ColorRow>
+            )
+          ))}
         </div>
-      </CastawayPopover>
+      </ColorRow>
     </div>
   );
 }
