@@ -80,7 +80,7 @@ export default function MemberRow({
       </TableCell>
       <TableCell className='text-nowrap px-1'>
         <ColorRow
-          className={cn('justify-center',
+          className={cn('justify-center px-1',
             member.loggedIn &&
             'border-white border-2 font-bold leading-snug')}
           color={color}>
@@ -89,7 +89,7 @@ export default function MemberRow({
       </TableCell>
       <TableCell className='text-nowrap px-1'>
         <ColorRow
-          className='justify-center pr-0'
+          className='justify-center pr-0 px-1'
           color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color}>
           <CastawayPopover castaway={castaway}>
             <span

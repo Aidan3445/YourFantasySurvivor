@@ -31,13 +31,13 @@ export function useEnrichEvents(
   const { data: eliminations } = useEliminations(seasonId);
 
   const lookupMaps = useMemo(() => {
-    if (!tribes || !castaways || !leagueMembers || !eliminations) {
+    if (!tribes || !castaways || !eliminations) {
       return null;
     }
 
     const tribesById = new Map(tribes.map(tribe => [tribe.tribeId, tribe]));
     const castawaysById = new Map(castaways.map(castaway => [castaway.castawayId, castaway]));
-    const membersById = new Map(leagueMembers.members.map(member => [member.memberId, member]));
+    const membersById = new Map((leagueMembers ?? { members: [] }).members.map(member => [member.memberId, member]));
     const eliminationEpisodes = new Map<number, number>();
     eliminations.forEach((episodeElims, index) => {
       episodeElims.forEach(elim => {
@@ -96,7 +96,7 @@ export function useEnrichEvents(
   }, [tribesTimeline, lookupMaps]);
 
   return useMemo(() => {
-    if (!events || !tribesTimeline || !selectionTimeline || !lookupMaps || !createTribeFinder) {
+    if (!events || !tribesTimeline || !lookupMaps || !createTribeFinder) {
       return [];
     }
 
@@ -108,7 +108,8 @@ export function useEnrichEvents(
             return null;
           }
 
-          const castawaySelections = selectionTimeline.castawayMembers[castawayId];
+          // Handle the case where there's no league/selectionTimeline
+          const castawaySelections = selectionTimeline?.castawayMembers?.[castawayId];
           const selectionLength = castawaySelections?.length ?? 0;
           const memberId = castawaySelections?.[Math.min(selectionLength - 1, episodeNumber)] ?? null;
 

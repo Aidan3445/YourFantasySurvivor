@@ -29,13 +29,13 @@ export function useEnrichPredictions(
   const { data: eliminations } = useEliminations(seasonId);
 
   const lookupMaps = useMemo(() => {
-    if (!tribes || !castaways || !leagueMembers || !events || !eliminations) {
+    if (!tribes || !castaways || !events || !eliminations) {
       return null;
     }
 
     const tribesById = new Map(tribes.map(tribe => [tribe.tribeId, tribe]));
     const castawaysById = new Map(castaways.map(castaway => [castaway.castawayId, castaway]));
-    const membersById = new Map(leagueMembers.members.map(member => [member.memberId, member]));
+    const membersById = new Map((leagueMembers ?? { members: [] }).members.map(member => [member.memberId, member]));
     const eventsById = new Map(events.map(event => [event.eventId, event]));
 
     const eliminationEpisodes = new Map<number, number>();

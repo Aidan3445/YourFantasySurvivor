@@ -6,19 +6,17 @@ import { SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/compone
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Label } from '~/components/common/label';
 import { MultiSelect } from '~/components/common/multiSelect';
-import { useLeague } from '~/hooks/leagues/useLeague';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
-import { useCastaways } from '~/hooks/seasons/useCastaways';
-import { useTribes } from '~/hooks/seasons/useTribes';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
-import { useEpisodes } from '~/hooks/seasons/useEpisodes';
 import { BaseEventFullName } from '~/lib/events';
 import { getAirStatus, getAirStatusPollingInterval } from '~/lib/episodes';
+import { type SeasonsDataQuery } from '~/types/seasons';
 
 
 export interface TimelineFiltersProps {
+  seasonData: SeasonsDataQuery;
   setFilterCastaway: (_castawayIds: number[]) => void;
   setFilterTribe: (_tribeIds: number[]) => void;
   setFilterMember: (_memberIds: number[]) => void;
@@ -29,9 +27,11 @@ export interface TimelineFiltersProps {
   filterMember: number[];
   filterEvent: string[];
   selectedEpisode?: number;
+  hideMemberFilter?: boolean;
 }
 
 export default function TimelineFilters({
+  seasonData,
   setFilterCastaway,
   setFilterTribe,
   setFilterMember,
@@ -41,15 +41,17 @@ export default function TimelineFilters({
   filterTribe,
   filterMember,
   filterEvent,
-  selectedEpisode
+  selectedEpisode,
+  hideMemberFilter = false
 }: TimelineFiltersProps) {
   const isMobile = useIsMobile();
-  const { data: league } = useLeague();
   const { data: leagueRules } = useLeagueRules();
-  const { data: castaways } = useCastaways(league?.seasonId ?? null);
-  const { data: tribes } = useTribes(league?.seasonId ?? null);
   const { data: leagueMembers } = useLeagueMembers();
-  const { data: episodes } = useEpisodes(league?.seasonId ?? null);
+
+  // Derive data from seasonData prop
+  const castaways = useMemo(() => seasonData.castaways, [seasonData.castaways]);
+  const tribes = useMemo(() => seasonData.tribes, [seasonData.tribes]);
+  const episodes = useMemo(() => seasonData.episodes, [seasonData.episodes]);
 
   // State to trigger re-renders for air status updates
   const [pollingTick, setPollingTick] = useState(0);
@@ -83,7 +85,7 @@ export default function TimelineFilters({
 
   return (
     <Accordion type='single' collapsible>
-      <AccordionItem value='filter' className='border-none'>
+      <AccordionItem value='filter' className='border-none pt-2'>
         <span className='w-full flex flex-wrap items-center gap-x-4 md:items-baseline px-12 md:mr-14 justify-center'>
           <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
           <span className='flex flex-wrap gap-x-4 items-center justify-center'>
@@ -91,7 +93,7 @@ export default function TimelineFilters({
               defaultValue={`${selectedEpisode}`}
               value={`${selectedEpisode}`}
               onValueChange={(value) => setSelectedEpisode(Number(value))}>
-              <SelectTrigger className='w-min'>
+              <SelectTrigger className='w-full'>
                 <SelectValue placeholder='Select an episode'>
                   {selectedEpisode === -1 ? 'All Episodes' : selectedEpisodeData ? (
                     <>
@@ -125,10 +127,10 @@ export default function TimelineFilters({
                 ))}
               </SelectContent>
             </Select>
-            <AccordionTrigger className='w-full'>
-              Filters
-            </AccordionTrigger>
           </span>
+          <AccordionTrigger className='w-full'>
+            Filters
+          </AccordionTrigger>
         </span>
         <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center gap-4 px-2'>
           {castaways &&
@@ -137,6 +139,7 @@ export default function TimelineFilters({
                 Castaway Filter
               </Label>
               <MultiSelect
+                className='w-48'
                 options={castaways.map((castaway) => ({
                   value: castaway.castawayId,
                   label: castaway.fullName
@@ -153,6 +156,7 @@ export default function TimelineFilters({
                 Tribe Filter
               </Label>
               <MultiSelect
+                className='w-48'
                 options={tribes.map((tribe) => ({
                   value: tribe.tribeId,
                   label: tribe.tribeName
@@ -163,12 +167,13 @@ export default function TimelineFilters({
                 placeholder='All Tribes'
               />
             </div>}
-          {leagueMembers &&
+          {!hideMemberFilter && leagueMembers &&
             <div className='w-min flex flex-col items-center'>
               <Label className='text-sm font-semibold text-muted-foreground'>
                 Member Filter
               </Label>
               <MultiSelect
+                className='w-48'
                 options={leagueMembers.members.map((member) => ({
                   value: member.memberId,
                   label: member.displayName
@@ -184,6 +189,7 @@ export default function TimelineFilters({
               Event Filter
             </Label>
             <MultiSelect
+              className='w-48'
               options={[
                 { label: 'Official Events', value: null },
                 ...Object.entries(BaseEventFullName)
@@ -191,12 +197,15 @@ export default function TimelineFilters({
                     value: eventName,
                     label: eventFullName
                   })),
-                { label: 'Custom Events', value: null },
-                ...Object.values(leagueRules?.custom ?? [])
-                  .map((event) => ({
-                    value: event.eventName,
-                    label: event.eventName
-                  }))
+                ...(leagueRules?.custom && Object.keys(leagueRules.custom).length > 0
+                  ? [
+                    { label: 'Custom Events', value: null },
+                    ...Object.values(leagueRules?.custom ?? [])
+                      .map((event) => ({
+                        value: event.eventName,
+                        label: event.eventName
+                      }))
+                  ] : [])
               ]}
               value={filterEvent}
               onValueChange={(value) => setFilterEvent(value as string[])}

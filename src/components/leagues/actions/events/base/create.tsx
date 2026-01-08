@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
+import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { BaseEventInsertZod, type EventWithReferences, type BaseEventInsert } from '~/types/events';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
@@ -19,11 +19,14 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
 import { cn } from '~/lib/utils';
 import { getAirStatus } from '~/lib/episodes';
+import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 
 export default function CreateBaseEvent() {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
   const { data: episodes } = useEpisodes(league?.seasonId ?? null);
+  const { data: seasonsData } = useSeasonsData(true, league?.seasonId ?? undefined);
+  const season = seasonsData?.[0];
 
   const reactForm = useForm<BaseEventInsert>({
     defaultValues: {
@@ -205,7 +208,7 @@ export default function CreateBaseEvent() {
                 <FormField
                   name='references'
                   render={() => (
-                    <FormItem className={cn('w-full', eventSubtype === '' && '!pointer-events-none !cursor-not-allowed')}>
+                    <FormItem className={cn('w-full', eventSubtype === '' && 'pointer-events-none! cursor-not-allowed!')}>
                       <FormLabel className='ml-2'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
@@ -252,6 +255,7 @@ export default function CreateBaseEvent() {
             </form>
             <EpisodeEvents
               episodeNumber={selectedEpisode ?? 1}
+              seasonData={season!}
               mockEvents={mockEvent ? [mockEvent] : []}
               edit
               filters={{

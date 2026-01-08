@@ -1,6 +1,6 @@
 import MemberEditForm from '~/components/leagues/customization/member/view';
 import Chart from '~/components/leagues/hub/chart/view';
-import Timeline from '~/components/leagues/hub/activity/timeline/view';
+import EventTimeline from '~/components/shared/eventTimeline/eventTimeline';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
@@ -22,15 +22,21 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import Podium from '~/components/leagues/hub/scoreboard/podium/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
+import { getSeasonData } from '~/services/seasons/query/seasonsData';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
   const auth = await leagueMemberAuth(hash);
   const { userId } = await systemAdminAuth();
   let isActive = false;
+  let league = null;
+  let seasonData = null;
   if (auth.memberId) {
-    const league = await getLeague(auth as VerifiedLeagueMemberAuth);
+    league = await getLeague(auth as VerifiedLeagueMemberAuth);
     isActive = league?.status === 'Active';
+    if (league) {
+      seasonData = await getSeasonData(league.seasonId);
+    }
   }
   //const chatHistory = await QUERIES.getChatHistory(hash);
 
@@ -61,7 +67,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </span>
               <ChangeCastaway />
               <Predictions />
-              <Timeline />
+              {seasonData && <EventTimeline seasonData={seasonData} />}
             </section>
           </TabsContent>
           {/*

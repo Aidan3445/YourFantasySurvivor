@@ -26,13 +26,13 @@ export default async function SideNav() {
               href='/playground'
               icon={<Flame className='stroke-primary' />}
               label='Playground' />
-            <SignedIn>
-              <SideNavLeagues />
-            </SignedIn>
             <SideNavLink
               href='/seasons'
               icon={<BookUser className='stroke-primary' />}
               label='Seasons' />
+            <SignedIn>
+              <SideNavLeagues />
+            </SignedIn>
           </SidebarMenu>
           <SideNavFooter />
           <SysAdminNav userId={userId} noRedirects={noRedirects} />

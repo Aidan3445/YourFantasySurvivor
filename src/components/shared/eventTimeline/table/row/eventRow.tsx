@@ -3,8 +3,8 @@
 import { cn } from '~/lib/utils';
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
-import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
+import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
+import NotesCell from '~/components/shared/eventTimeline/table/notesCell';
 import { type EnrichedEvent, type BaseEventName } from '~/types/events';
 import { BaseEventFullName } from '~/lib/events';
 import { useMemo } from 'react';
@@ -18,9 +18,10 @@ interface EventRowProps {
   event: EnrichedEvent;
   editCol?: boolean;
   isMock?: boolean;
+  noMembers?: boolean;
 }
 
-export default function EventRow({ className, event, editCol: edit, isMock }: EventRowProps) {
+export default function EventRow({ className, event, editCol: edit, isMock, noMembers }: EventRowProps) {
   const isBaseEvent = useMemo(() => event.eventSource === 'Base', [event.eventSource]);
 
   const label = useEventLabel(event.eventName, isBaseEvent, event.label);
@@ -69,9 +70,7 @@ export default function EventRow({ className, event, editCol: edit, isMock }: Ev
                   <span
                     className='text-nowrap'
                     style={{
-                      color: getContrastingColor(castaway?.eliminatedEpisode
-                        ? '#AAAAAA'
-                        : castaway?.tribe?.color ?? '#AAAAAA')
+                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
                     }}>
                     {castaway.fullName}
                   </span>
@@ -81,7 +80,7 @@ export default function EventRow({ className, event, editCol: edit, isMock }: Ev
           ))}
         </div>
       </TableCell>
-      <TableCell>
+      {!noMembers && <TableCell>
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5',
           event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.member)) && 'justify-center')}>
@@ -100,7 +99,7 @@ export default function EventRow({ className, event, editCol: edit, isMock }: Ev
             )
           )}
         </div>
-      </TableCell>
+      </TableCell>}
       <NotesCell notes={event.notes} />
     </TableRow >
   );

@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { type SeasonsDataQuery } from '~/types/seasons';
-import EpisodeMarker from '~/components/seasons/timeline/episodeMarker';
+import EpisodeMarker from '~/components/seasons/tribes/episodeMarker';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
 
@@ -10,7 +10,7 @@ interface TimelineViewProps {
   seasonData: SeasonsDataQuery;
 }
 
-export default function TimelineView({ seasonData }: TimelineViewProps) {
+export default function TribesTimeline({ seasonData }: TimelineViewProps) {
   const { season, castaways, tribes, tribesTimeline, keyEpisodes } = seasonData;
   const { data: episodes } = useEpisodes(season.seasonId);
 

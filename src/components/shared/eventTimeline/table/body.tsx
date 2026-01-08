@@ -1,20 +1,21 @@
 'use client';
 
 import { TableCell, TableRow } from '~/components/common/table';
-import { type EventWithReferencesAndPredOnly, type EpisodeEventsProps, type PredictionAndPredOnly } from '~/components/leagues/hub/activity/timeline/table/view';
+import { type EventWithReferencesAndPredOnly, type EpisodeEventsProps, type PredictionAndPredOnly } from '~/components/shared/eventTimeline/table/view';
 import { type EnrichedEvent } from '~/types/events';
 import { useEnrichEvents } from '~/hooks/seasons/enrich/useEnrichEvents';
 import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPredictions';
-import PredictionRow from '~/components/leagues/hub/activity/timeline/table/row/predictionRow';
-import EventRow from '~/components/leagues/hub/activity/timeline/table/row/eventRow';
+import PredictionRow from '~/components/shared/eventTimeline/table/row/predictionRow';
+import EventRow from '~/components/shared/eventTimeline/table/row/eventRow';
 import { useMemo } from 'react';
 
-interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
+interface EpisodeEventsTableBodyProps extends Omit<EpisodeEventsProps, 'seasonData'> {
   seasonId: number;
   filteredEvents: EventWithReferencesAndPredOnly[];
   filteredPredictions: PredictionAndPredOnly[];
   enrichmentEvents?: EventWithReferencesAndPredOnly[];
   index: number;
+  noMembers: boolean;
 }
 
 export default function EpisodeEventsTableBody({
@@ -26,7 +27,8 @@ export default function EpisodeEventsTableBody({
   enrichmentEvents,
   edit,
   filters,
-  index
+  index,
+  noMembers
 }: EpisodeEventsTableBodyProps) {
   const enrichedEvents = useEnrichEvents(seasonId, filteredEvents);
   const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents ?? null);
@@ -39,6 +41,21 @@ export default function EpisodeEventsTableBody({
 
   const enrichedPredictions = useEnrichPredictions(seasonId, eventsForEnrichment, filteredPredictions);
   const enrichedMockPredictions = useEnrichPredictions(seasonId, enrichedMockEvents, filteredPredictions);
+
+  console.log('EpisodeEventsTableBody render with:', {
+    seasonId,
+    episodeNumber,
+    mockEvents,
+    filteredEvents,
+    filteredPredictions,
+    enrichmentEvents,
+    enrichedEvents,
+    enrichedMockEvents,
+    enrichedEnrichmentEvents,
+    eventsForEnrichment,
+    enrichedPredictions,
+    enrichedMockPredictions
+  });
 
   const { baseEvents, customEvents } = enrichedEvents.reduce((acc, event) => {
     if (event.eventSource === 'Base') {
@@ -68,7 +85,7 @@ export default function EpisodeEventsTableBody({
   return (
     <>
       {enrichedMockEvents.map((mock, index) =>
-        <EventRow key={index} className='bg-yellow-500' event={mock} editCol={edit} isMock />
+        <EventRow key={index} className='bg-yellow-500' event={mock} editCol={edit} isMock noMembers={noMembers} />
       )}
       {index > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200 text-xs text-muted-foreground'>
@@ -87,9 +104,9 @@ export default function EpisodeEventsTableBody({
           <TableCell className='text-right'>
             Castaways
           </TableCell>
-          <TableCell className='text-left'>
+          {!noMembers && <TableCell className='text-left'>
             Members
-          </TableCell>
+          </TableCell>}
           <TableCell className='text-right'>
             Notes
           </TableCell>
@@ -97,7 +114,7 @@ export default function EpisodeEventsTableBody({
       {baseEvents
         .filter(event => !filteredEvents.some(fe => fe.eventId === event.eventId && fe.predOnly))
         .map((event, index) => (
-          <EventRow key={index} event={event} editCol={edit} />
+          <EventRow key={index} event={event} editCol={edit} noMembers={noMembers} />
         ))}
       {customEvents.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
@@ -108,7 +125,7 @@ export default function EpisodeEventsTableBody({
       {customEvents
         .filter(event => !filteredEvents.some(fe => fe.eventId === event.eventId && fe.predOnly))
         .map((event, index) => (
-          <EventRow key={index} event={event} editCol={edit} />
+          <EventRow key={index} event={event} editCol={edit} noMembers={noMembers} />
         ))}
       {enrichedPredictions.length + enrichedMockPredictions.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
@@ -117,13 +134,14 @@ export default function EpisodeEventsTableBody({
           </TableCell>
         </TableRow>}
       {enrichedMockPredictions.map((mock, index) =>
-        <PredictionRow key={index} className='bg-yellow-500' prediction={mock} editCol={edit} />
+        <PredictionRow key={index} className='bg-yellow-500' prediction={mock} editCol={edit} noMembers={noMembers} />
       )}
       {enrichedPredictions.map((prediction, index) =>
         <PredictionRow
           key={index}
           prediction={prediction}
           editCol={edit}
+          noMembers={noMembers}
           defaultOpenMisses={
             prediction.misses.some(miss =>
               filters.member.includes(miss.member.memberId)
