@@ -4,15 +4,18 @@ import { useState, useMemo } from 'react';
 import TimelineFilters from '~/components/shared/eventTimeline/filters';
 import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
 import { type SeasonsDataQuery } from '~/types/seasons';
+import type { LeagueData } from '~/components/shared/eventTimeline/filters';
 
 // TODO: add survivor streak to event timeline
 
 interface EventTimelineProps {
   seasonData: SeasonsDataQuery;
+  leagueData?: LeagueData;
   hideMemberFilter?: boolean;
 }
 
-export default function EventTimeline({ seasonData, hideMemberFilter = false }: EventTimelineProps) {
+export default function EventTimeline({ seasonData, leagueData, hideMemberFilter = false }: EventTimelineProps) {
+
   const [filterCastaway, setFilterCastaway] = useState<number[]>([]);
   const [filterTribe, setFilterTribe] = useState<number[]>([]);
   const [filterMember, setFilterMember] = useState<number[]>([]);
@@ -23,9 +26,7 @@ export default function EventTimeline({ seasonData, hideMemberFilter = false }: 
   const seasonDataWithDates = useMemo(() => {
     // Convert date strings back to Date objects after crossing server/client boundary
     // if dates are already Date objects, return as is. One date check is sufficient
-    if (seasonData.season.premiereDate instanceof Date) {
-      return seasonData;
-    }
+    if (seasonData.episodes[0]?.airDate instanceof Date) return seasonData;
 
     return {
       ...seasonData,
@@ -45,6 +46,7 @@ export default function EventTimeline({ seasonData, hideMemberFilter = false }: 
     <section className='w-full bg-card rounded-lg relative place-items-center'>
       <TimelineFilters
         seasonData={seasonDataWithDates}
+        leagueData={leagueData}
         filterCastaway={filterCastaway}
         setFilterCastaway={setFilterCastaway}
         filterTribe={filterTribe}
@@ -60,6 +62,7 @@ export default function EventTimeline({ seasonData, hideMemberFilter = false }: 
         <EpisodeEvents
           episodeNumber={selectedEpisode}
           seasonData={seasonDataWithDates}
+          leagueData={leagueData}
           filters={{
             castaway: filterCastaway,
             tribe: filterTribe,

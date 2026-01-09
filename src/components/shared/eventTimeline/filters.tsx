@@ -8,16 +8,29 @@ import { Label } from '~/components/common/label';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { useEffect, useState, useMemo } from 'react';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
-import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { BaseEventFullName } from '~/lib/events';
 import { getAirStatus, getAirStatusPollingInterval } from '~/lib/episodes';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import { cn } from '~/lib/utils';
+import { type SelectionTimelines, type League, type LeagueRules } from '~/types/leagues';
+import { type LeagueMember } from '~/types/leagueMembers';
+import { type CustomEvents, type Predictions } from '~/types/events';
 
+export interface LeagueData {
+  league: League | undefined;
+  selectionTimeline: SelectionTimelines | undefined;
+  customEvents: CustomEvents | undefined;
+  basePredictions: Predictions | undefined;
+  leagueRules: LeagueRules | undefined;
+  leagueMembers: {
+    loggedIn?: LeagueMember;
+    members: LeagueMember[];
+  } | undefined;
+}
 
 export interface TimelineFiltersProps {
   seasonData: SeasonsDataQuery;
+  leagueData?: LeagueData;
   setFilterCastaway: (_castawayIds: number[]) => void;
   setFilterTribe: (_tribeIds: number[]) => void;
   setFilterMember: (_memberIds: number[]) => void;
@@ -33,6 +46,7 @@ export interface TimelineFiltersProps {
 
 export default function TimelineFilters({
   seasonData,
+  leagueData,
   setFilterCastaway,
   setFilterTribe,
   setFilterMember,
@@ -46,8 +60,7 @@ export default function TimelineFilters({
   hideMemberFilter = false
 }: TimelineFiltersProps) {
   const isMobile = useIsMobile();
-  const { data: leagueRules } = useLeagueRules();
-  const { data: leagueMembers } = useLeagueMembers();
+  const { leagueRules, leagueMembers } = leagueData ?? {};
 
   // Derive data from seasonData prop
   const castaways = useMemo(() => seasonData.castaways, [seasonData.castaways]);

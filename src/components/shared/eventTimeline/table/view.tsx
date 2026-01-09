@@ -12,18 +12,16 @@ import {
   TableRow,
 } from '~/components/common/table';
 import EpisodeEventsTableBody from '~/components/shared/eventTimeline/table/body';
-import { useBasePredictions } from '~/hooks/leagues/useBasePredictions';
-import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
-import { useLeague } from '~/hooks/leagues/useLeague';
-import { useSelectionTimeline } from '~/hooks/leagues/useSelectionTimeline';
 import { findTribeCastaways } from '~/lib/utils';
 import { type Prediction, type EventWithReferences } from '~/types/events';
 import { type SeasonsDataQuery } from '~/types/seasons';
+import type { LeagueData } from '~/components/shared/eventTimeline/filters';
 
 
 export interface EpisodeEventsProps {
   episodeNumber: number;
   seasonData: SeasonsDataQuery;
+  leagueData?: LeagueData;
   mockEvents?: EventWithReferences[];
   edit?: boolean;
   filters: {
@@ -43,17 +41,13 @@ export type PredictionAndPredOnly = Prediction & {
 };
 
 export default function EpisodeEvents(
-  { episodeNumber, seasonData, mockEvents, edit, filters }: EpisodeEventsProps
+  { episodeNumber, seasonData, leagueData, mockEvents, edit, filters }: EpisodeEventsProps
 ) {
-  const { data: league } = useLeague();
-  const { data: selectionTimeline } = useSelectionTimeline();
-  const { data: customEvents } = useCustomEvents();
-  const { data: basePredictions } = useBasePredictions();
+
+  const { league, selectionTimeline, customEvents, basePredictions } = leagueData ?? {};
 
   const { baseEvents, episodes, tribesTimeline, eliminations } = useMemo(() =>
     seasonData, [seasonData]);
-
-  console.log('EpisodeEvents render with seasonData:', seasonData);
 
   // All events for lookup purposes (needed to validate predictions reference valid events)
   const allEvents = useMemo(() => {
@@ -63,7 +57,7 @@ export default function EpisodeEvents(
         ...(baseEvents?.[episode.episodeNumber]
           ? Object.values(baseEvents[episode.episodeNumber]!) : []),
         ...(customEvents?.events?.[episode.episodeNumber]
-          ? Object.values(customEvents.events[episode.episodeNumber]!) : [])
+          ? Object.values(customEvents.events[episode.episodeNumber] ?? {}) : [])
       ];
     });
     return events;
@@ -85,9 +79,9 @@ export default function EpisodeEvents(
       (episodes ?? []).forEach((episode) => {
         predictions[episode.episodeNumber] = [
           ...(basePredictions?.[episode.episodeNumber]
-            ? Object.values(basePredictions[episode.episodeNumber]!).flat() : []),
+            ? Object.values(basePredictions[episode.episodeNumber] ?? {}).flat() : []),
           ...(customEvents?.predictions?.[episode.episodeNumber]
-            ? Object.values(customEvents.predictions[episode.episodeNumber]!).flat() : []),
+            ? Object.values(customEvents.predictions[episode.episodeNumber] ?? {}).flat() : []),
         ].filter((prediction) => {
           const eventEpNum = prediction.eventEpisodeNumber;
           if (!eventEpNum) return false;
@@ -181,18 +175,18 @@ export default function EpisodeEvents(
         // Calculate event members only if we have league context and member filters
         const eventMembers = (castawayMembers && filters.member.length > 0)
           ? event.references.flatMap((ref) => {
-              if (ref.type === 'Castaway' && numKey >= (league?.startWeek ?? 0)) {
-                const data = castawayMembers[ref.id];
-                return data?.[numKey] ?? data?.[data.length - 1] ?? [];
-              }
+            if (ref.type === 'Castaway' && numKey >= (league?.startWeek ?? 0)) {
+              const data = castawayMembers[ref.id];
+              return data?.[numKey] ?? data?.[data.length - 1] ?? [];
+            }
 
-              return findTribeCastaways(tribesTimeline ?? {}, eliminations ?? [], ref.id, numKey)
-                .flatMap((cid) => {
-                  if (numKey < (league?.startWeek ?? 0)) return [];
-                  const data = castawayMembers[cid];
-                  return data?.[numKey] ?? data?.[data.length - 1] ?? [];
-                });
-            })
+            return findTribeCastaways(tribesTimeline ?? {}, eliminations ?? [], ref.id, numKey)
+              .flatMap((cid) => {
+                if (numKey < (league?.startWeek ?? 0)) return [];
+                const data = castawayMembers[cid];
+                return data?.[numKey] ?? data?.[data.length - 1] ?? [];
+              });
+          })
           : [];
 
         const castawayMatch = filters.castaway.length === 0 || event.references.some((ref) =>
@@ -290,10 +284,11 @@ export default function EpisodeEvents(
                   mockEvents={mockEvents}
                   filteredEvents={filteredEvents[episode.episodeNumber] ?? []}
                   filteredPredictions={filteredPredictionsWithPredOnly[episode.episodeNumber] ?? []}
-                  enrichmentEvents={enrichmentOnlyEvents}
+                  predictionEnrichmentEvents={enrichmentOnlyEvents}
                   edit={edit}
                   filters={filters}
-                  noMembers={noMembers} />
+                  noMembers={noMembers}
+                  seasonData={seasonData} />
               </Fragment>
             ))}
         </TableBody >

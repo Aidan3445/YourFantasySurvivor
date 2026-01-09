@@ -27,11 +27,11 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes }: Casta
   return (
     <div className='flex flex-col gap-1'>
       <ColorRow
-        className='justify-center gap-2 px-2 py-1'
+        className='justify-center gap-2 px-1 py-1 h-8'
         color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color}>
         <CastawayPopover castaway={castaway}>
           <span
-            className='text-nowrap'
+            className='leading-none text-sm'
             style={{
               color: getContrastingColor(castaway?.eliminatedEpisode
                 ? '#AAAAAA'
@@ -44,7 +44,7 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes }: Casta
         {castaway.eliminatedEpisode && (
           <Popover>
             <PopoverTrigger>
-              <span className='text-muted-foreground cursor-help text-nowrap'>
+              <span className='text-xs text-muted-foreground cursor-help text-nowrap'>
                 <FlameKindling className='align-text-bottom inline w-4 h-4' />
                 ({castaway.eliminatedEpisode})
               </span>

@@ -9,53 +9,49 @@ import PredictionRow from '~/components/shared/eventTimeline/table/row/predictio
 import EventRow from '~/components/shared/eventTimeline/table/row/eventRow';
 import { useMemo } from 'react';
 
-interface EpisodeEventsTableBodyProps extends Omit<EpisodeEventsProps, 'seasonData'> {
+interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
   filteredEvents: EventWithReferencesAndPredOnly[];
   filteredPredictions: PredictionAndPredOnly[];
-  enrichmentEvents?: EventWithReferencesAndPredOnly[];
+  predictionEnrichmentEvents?: EventWithReferencesAndPredOnly[];
   index: number;
   noMembers: boolean;
 }
 
 export default function EpisodeEventsTableBody({
-  seasonId,
+  seasonData,
+  leagueData,
   episodeNumber,
   mockEvents,
   filteredEvents,
   filteredPredictions,
-  enrichmentEvents,
+  predictionEnrichmentEvents,
   edit,
   filters,
   index,
   noMembers
 }: EpisodeEventsTableBodyProps) {
-  const enrichedEvents = useEnrichEvents(seasonId, filteredEvents);
-  const enrichedMockEvents = useEnrichEvents(seasonId, mockEvents ?? null);
-  const enrichedEnrichmentEvents = useEnrichEvents(seasonId, enrichmentEvents ?? null);
+  const enrichedEvents = useEnrichEvents(seasonData, filteredEvents);
+  const enrichedMockEvents = useEnrichEvents(seasonData, mockEvents ?? []);
+  const enrichedEnrichmentEvents = useEnrichEvents(seasonData, predictionEnrichmentEvents ?? []);
 
-  const eventsForEnrichment = useMemo(() => [
+  const eventsForPredictionEnrichment = useMemo(() => [
     ...enrichedEvents,
     ...enrichedEnrichmentEvents,
   ], [enrichedEvents, enrichedEnrichmentEvents]);
 
-  const enrichedPredictions = useEnrichPredictions(seasonId, eventsForEnrichment, filteredPredictions);
-  const enrichedMockPredictions = useEnrichPredictions(seasonId, enrichedMockEvents, filteredPredictions);
-
-  console.log('EpisodeEventsTableBody render with:', {
-    seasonId,
-    episodeNumber,
-    mockEvents,
-    filteredEvents,
+  const enrichedPredictions = useEnrichPredictions(
+    seasonData,
+    eventsForPredictionEnrichment,
     filteredPredictions,
-    enrichmentEvents,
-    enrichedEvents,
+    leagueData
+  );
+  const enrichedMockPredictions = useEnrichPredictions(
+    seasonData,
     enrichedMockEvents,
-    enrichedEnrichmentEvents,
-    eventsForEnrichment,
-    enrichedPredictions,
-    enrichedMockPredictions
-  });
+    filteredPredictions,
+    leagueData
+  );
 
   const { baseEvents, customEvents } = enrichedEvents.reduce((acc, event) => {
     if (event.eventSource === 'Base') {
@@ -67,6 +63,7 @@ export default function EpisodeEventsTableBody({
   }, { baseEvents: [] as EnrichedEvent[], customEvents: [] as EnrichedEvent[] });
 
   if (!enrichedEvents.length && !enrichedPredictions.length && !mockEvents) {
+    console.log('No events or predictions after filtering for episode', episodeNumber);
     const hasFilters =
       filters.member.length > 0 ||
       filters.castaway.length > 0 ||

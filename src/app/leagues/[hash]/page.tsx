@@ -1,6 +1,5 @@
 import MemberEditForm from '~/components/leagues/customization/member/view';
 import Chart from '~/components/leagues/hub/chart/view';
-import EventTimeline from '~/components/shared/eventTimeline/eventTimeline';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
@@ -23,6 +22,7 @@ import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import Podium from '~/components/leagues/hub/scoreboard/podium/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
 import { getSeasonData } from '~/services/seasons/query/seasonsData';
+import LeagueTimeline from '~/components/leagues/hub/activity/leagueTimeline/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
@@ -67,7 +67,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </span>
               <ChangeCastaway />
               <Predictions />
-              {seasonData && <EventTimeline seasonData={seasonData} />}
+              {seasonData && <LeagueTimeline seasonData={seasonData} />}
             </section>
           </TabsContent>
           {/*

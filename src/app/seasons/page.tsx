@@ -5,7 +5,7 @@ import { useSeasons } from '~/hooks/seasons/useSeasons';
 import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import CastawaysView from '~/components/seasons/castaways/view';
-import EventTimeline from '~/components/shared/eventTimeline/eventTimeline';
+import EventTimeline from '~/components/shared/eventTimeline/view';
 import TribesTimeline from '~/components/seasons/tribes/view';
 import Image from 'next/image';
 import {
@@ -20,7 +20,7 @@ export default function SeasonsPage() {
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
   const [selectedTab, setSelectedTab] = useState('castaways');
   const { data: seasons } = useSeasons(true);
-  const { data: seasonData, isLoading } = useSeasonsData(true, selectedSeasonId ?? undefined);
+  const { data: seasonData } = useSeasonsData(true, selectedSeasonId ?? undefined);
   const season = seasonData?.[0];
 
   // Auto-select most recent season on mount
