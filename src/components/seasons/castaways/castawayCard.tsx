@@ -8,9 +8,9 @@ import { type EnrichedCastaway } from '~/types/castaways';
 import { type Tribe } from '~/types/tribes';
 import { getTribeTimeline } from '~/lib/utils';
 import { type TribesTimeline } from '~/types/tribes';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
 import { useMemo } from 'react';
 import { getContrastingColor } from '@uiw/color-convert';
+import Link from 'next/link';
 
 interface CastawayCardProps {
   castaway: EnrichedCastaway;
@@ -25,36 +25,36 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes }: Casta
   );
 
   return (
-    <div className='flex flex-col gap-1'>
+    <div className='bg-accent flex flex-col gap-1 border rounded-md p-2'>
       <ColorRow
         className='justify-center gap-2 px-1 py-1 h-8'
-        color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color}>
-        <CastawayPopover castaway={castaway}>
-          <span
-            className='leading-none text-sm'
-            style={{
-              color: getContrastingColor(castaway?.eliminatedEpisode
-                ? '#AAAAAA'
-                : castaway?.tribe?.color ?? '#AAAAAA')
-            }}>
-            {castaway.fullName}
-          </span>
-        </CastawayPopover>
+        color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color} >
+        <span
+          className='leading-none text-sm'
+          style={{
+            color: getContrastingColor(castaway?.eliminatedEpisode
+              ? '#AAAAAA'
+              : castaway?.tribe?.color ?? '#AAAAAA')
+          }}>
+          {castaway.fullName}
+        </span>
 
-        {castaway.eliminatedEpisode && (
-          <Popover>
-            <PopoverTrigger>
-              <span className='text-xs text-muted-foreground cursor-help text-nowrap'>
-                <FlameKindling className='align-text-bottom inline w-4 h-4' />
-                ({castaway.eliminatedEpisode})
-              </span>
-            </PopoverTrigger>
-            <PopoverContent className='w-min text-nowrap p-1' align='end'>
-              <PopoverArrow />
-              Eliminated Episode {castaway.eliminatedEpisode}
-            </PopoverContent>
-          </Popover>
-        )}
+        {
+          castaway.eliminatedEpisode && (
+            <Popover>
+              <PopoverTrigger>
+                <span className='text-xs text-muted-foreground cursor-help text-nowrap'>
+                  <FlameKindling className='align-text-bottom inline w-4 h-4' />
+                  ({castaway.eliminatedEpisode})
+                </span>
+              </PopoverTrigger>
+              <PopoverContent className='w-min text-nowrap p-1' align='end'>
+                <PopoverArrow />
+                Eliminated Episode {castaway.eliminatedEpisode}
+              </PopoverContent>
+            </Popover>
+          )
+        }
 
         <div className='ml-auto flex gap-0.5'>
           {tribeTimeline && (tribeTimeline.length > 1 || castaway.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
@@ -71,7 +71,23 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes }: Casta
             )
           ))}
         </div>
-      </ColorRow>
-    </div>
+      </ColorRow >
+
+      <p><b>Current Residence:</b> {castaway.residence}</p>
+      <p><b>Occupation:</b> {castaway.occupation}</p>
+      {
+        castaway.previouslyOn && castaway.previouslyOn.length > 0 && (
+          <p className='text-pretty max-w-xs'>
+            <b>Previously On:</b> {castaway.previouslyOn.join(', ')}
+          </p>
+        )
+      }
+      <Link
+        className='text-blue-800 hover:underline w-min text-nowrap mt-auto'
+        href={`https://survivor.fandom.com/wiki/${castaway.fullName}`}
+        target='_blank'>
+        Learn more
+      </Link>
+    </div >
   );
 }

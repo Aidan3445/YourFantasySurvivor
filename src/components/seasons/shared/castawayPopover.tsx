@@ -3,6 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/pop
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type ReactNode } from 'react';
 import { PopoverArrow } from '@radix-ui/react-popover';
+import Image from 'next/image';
 
 interface CastawayPopoverProps {
   castaway?: EnrichedCastaway;
@@ -21,8 +22,20 @@ export default function CastawayPopover({ castaway, children }: CastawayPopoverP
       </PopoverTrigger>
       <PopoverContent className='flex flex-col w-fit gap-2 p-2 text-nowrap' side='top'>
         <PopoverArrow />
-        <h3 className='text-lg font-semibold'>{castaway.fullName}</h3>
-        <p><b>Age:</b> {castaway.age}</p>
+        <div className='flex justify-between gap-2 items-center'>
+          <div>
+            <h3 className='text-lg font-semibold'>{castaway.fullName}</h3>
+            <p><b>Age:</b> {castaway.age}</p>
+          </div>
+          <Image
+            src={castaway.imageUrl}
+            preload
+            alt={castaway.fullName}
+            width={80}
+            height={80}
+            className='rounded-md' />
+        </div>
+
         <p><b>Current Residence:</b> {castaway.residence}</p>
         <p><b>Occupation:</b> {castaway.occupation}</p>
         {castaway.previouslyOn && castaway.previouslyOn.length > 0 && (

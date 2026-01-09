@@ -1,14 +1,11 @@
 import { Flame, Trophy, BookUser } from 'lucide-react';
-import { cn } from '~/lib/utils';
 import Image from 'next/image';
 import BottomNavUser from '~/components/nav/bottom/user';
 import BottomNavLink from '~/components/nav/bottom/link';
 
-export const navHeight = 'h-10';
-
 export default async function BottomNav() {
   return (
-    <div className={cn('fixed bottom-0 left-0 right-0 bg-sidebar shadow-md z-50 md:hidden', navHeight)}>
+    <div className='fixed bottom-0 left-0 right-0 bg-sidebar shadow-md z-50 md:hidden h-(--navbar-height)'>
       <span className='flex items-center justify-evenly h-full'>
         <BottomNavLink
           href='/'

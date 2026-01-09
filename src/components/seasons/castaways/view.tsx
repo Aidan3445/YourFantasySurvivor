@@ -15,7 +15,7 @@ export default function CastawaysView({ seasonData }: CastawaysViewProps) {
   const seasonCastaways = castaways.filter(c => c.seasonId !== null);
 
   return (
-    <div className='w-full flex flex-col gap-4 mx-2 mb-12'>
+    <div className='w-full flex flex-col gap-4 mx-2'>
       <TribeCards tribes={tribes} />
       <CastawayGrid
         castaways={seasonCastaways}

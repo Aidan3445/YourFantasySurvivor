@@ -63,7 +63,6 @@ export default function EpisodeEventsTableBody({
   }, { baseEvents: [] as EnrichedEvent[], customEvents: [] as EnrichedEvent[] });
 
   if (!enrichedEvents.length && !enrichedPredictions.length && !mockEvents) {
-    console.log('No events or predictions after filtering for episode', episodeNumber);
     const hasFilters =
       filters.member.length > 0 ||
       filters.castaway.length > 0 ||

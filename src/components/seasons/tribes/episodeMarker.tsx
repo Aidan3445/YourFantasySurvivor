@@ -55,20 +55,17 @@ export default function EpisodeMarker({
               if (tribesMembers.length === 0) return null;
 
               return (
-                <div
-                  key={tribe.tribeId}
-                  className='bg-b2 rounded-lg p-3'
-                  style={{ border: `3px solid ${tribe.tribeColor}` }}>
+                <div key={tribe.tribeId} className='bg-accent border rounded-lg p-2'>
                   <h4 className='font-semibold mb-2'>{tribe.tribeName}</h4>
                   <div className='w-full grid grid-cols-2 auto-cols-auto  gap-1'>
                     {tribesMembers.map(castaway => (
                       <ColorRow
                         key={castaway.castawayId}
-                        className='text-sm px-2 py-1'
+                        className='gap-2 px-1 py-1 h-8'
                         color={tribe.tribeColor}>
                         <CastawayPopover castaway={castaway}>
                           <span
-                            className='text-nowrap'
+                            className='leading-none text-sm'
                             style={{
                               color: getContrastingColor(tribe.tribeColor)
                             }}>
@@ -84,6 +81,6 @@ export default function EpisodeMarker({
           </div>
         </AccordionContent>
       </AccordionItem>
-    </Accordion>
+    </Accordion >
   );
 }
