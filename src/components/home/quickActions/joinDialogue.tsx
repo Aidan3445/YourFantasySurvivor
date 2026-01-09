@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/common/button';
 import { Input } from '~/components/common/input';
 import { Label } from '~/components/common/label';
@@ -8,7 +8,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
 
-export default function JoinLeagueDialog() {
+interface JoinLeagueDialogProps {
+  children?: ReactNode;
+}
+
+export default function JoinLeagueDialog({ children }: JoinLeagueDialogProps) {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState('');
   const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
@@ -17,7 +21,7 @@ export default function JoinLeagueDialog() {
     // if the join code is in the URL, cut out everything but the code
     // http://localhost:1234/i/-rfJ3Ju9uNAsPBOy --> -rfJ3Ju9uNAsPBOy
     const urlMaybe = joinCode;
-    const match = urlMaybe.match(/\/i\/([a-zA-Z0-9-_]+)/);
+    const match = /\/i\/([a-zA-Z0-9-_]+)/.exec(urlMaybe);
     if (match) {
       setJoinCode(match[1] ?? joinCode);
     }
@@ -32,10 +36,12 @@ export default function JoinLeagueDialog() {
   return (
     <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant='secondary' className='w-80 text-white'>
-          <Users className='mr-2' color='white' />
-          Join League
-        </Button>
+        {children ?? (
+          <Button variant='secondary' className='w-80 text-white'>
+            <Users className='mr-2' color='white' />
+            Join League
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className='bg-card'>
         <DialogHeader>
@@ -63,15 +69,13 @@ export default function JoinLeagueDialog() {
             <Button
               onClick={handleJoinLeague}
               disabled={!joinCode.trim()}
-              className='flex-1'
-            >
+              className='flex-1'>
               Join League
             </Button>
             <Button
               variant='outline'
               onClick={() => setIsJoinDialogOpen(false)}
-              className='flex-1'
-            >
+              className='flex-1'>
               Cancel
             </Button>
           </div>

@@ -1,12 +1,14 @@
 'use client';
 
-import { ListPlus } from 'lucide-react';
+import { ListPlus, Users } from 'lucide-react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
 import { Separator } from '~/components/common/separator';
 import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 import { useLeagues } from '~/hooks/user/useLeagues';
 import { useMemo } from 'react';
+import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 export default function LeaguesPage() {
   const { data: leagues } = useLeagues();
@@ -24,39 +26,61 @@ export default function LeaguesPage() {
   }, [leagues]);
 
   return (
-    <main className='w-full flex flex-col gap-5 items-center text-center'>
-      <div className='w-full flex flex-col items-center gap-2'>
-        {currentLeagues.length + inactiveLeagues.length > 0 ?
-          <h1 className='text-3xl w-5/6 bg-secondary rounded-full mt-10'>My Leagues</h1> :
-          <>
-            <SignedIn>
-              <h1 className='text-3xl'>No Leagues Yet...</h1>
-            </SignedIn>
-            <SignedOut>
-              <h1 className='text-3xl'>Sign in or sign up to view and create leagues</h1>
-            </SignedOut>
-          </>}
-        <LeagueGrid leagues={currentLeagues} />
-      </div>
-      {currentLeagues.length === 0 &&
+    <div>
+      <div className='sticky z-50 flex flex-col w-full h-32 justify-center bg-card shadow-md shadow-primary px-2 items-center'>
+        <div className='text-center'>
+          <h1 className='text-4xl font-bold'>My Leagues</h1>
+          <p className='text-muted-foreground text-pretty text-sm md:text-base'>
+            {currentLeagues.length + inactiveLeagues.length > 0 ?
+              'View and manage your leagues below.' :
+              'Create and join leagues to compete with others!'}
+          </p>
+        </div>
+
         <SignedIn>
-          <h2 className='text-2xl'>No leagues for this season yet... Create one to get started!</h2>
+          <div className='flex gap-4'>
+            <CreateLeagueModal>
+              <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-primary hover:bg-primary/80 hover:shadow-lg transition-all'>
+                <h3 className='text-xl text-primary-foreground'>Create League</h3>
+                <ListPlus size={24} color='white' />
+              </section>
+            </CreateLeagueModal>
+            <JoinLeagueDialog>
+              <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-secondary hover:bg-secondary/80 hover:shadow-lg transition-all'>
+                <h3 className='text-xl text-white'>Join League</h3>
+                <Users size={22} color='white' />
+              </section>
+            </JoinLeagueDialog>
+          </div>
         </SignedIn>
-      }
-      <SignedIn>
-        <CreateLeagueModal>
-          <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-card hover:bg-card/80 hover:shadow-lg transition-all'>
-            <h3 className='text-xl'>Create New League</h3>
-            <ListPlus size={24} />
-          </section>
-        </CreateLeagueModal>
-      </SignedIn>
-      <SignedOut>
-        <SignIn forceRedirectUrl='/leagues' />
-      </SignedOut>
-      <Separator className='w-11/12 mt-3' />
-      <LeagueGrid leagues={inactiveLeagues} isInactive />
-    </main>
+      </div>
+
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-9rem)] h-[calc(100svh-8rem-var(--navbar-height))]'>
+        <div className='mt-2 mb-4'>
+          <div className='flex flex-col gap-4'>
+            {currentLeagues.length + inactiveLeagues.length > 0
+              ? (
+                <LeagueGrid leagues={currentLeagues} />
+              ) : (
+                <>
+                  <SignedIn>
+                    <h1 className='text-3xl'>No Leagues Yet...</h1>
+                  </SignedIn>
+                  <SignedOut>
+                    <h1 className='text-3xl'>Sign in or sign up to view and create leagues</h1>
+                  </SignedOut>
+                </>
+              )}
+          </div>
+          <SignedOut>
+            <SignIn forceRedirectUrl='/leagues' />
+          </SignedOut>
+          {inactiveLeagues.length > 0 && <Separator className='my-4' />}
+          <LeagueGrid leagues={inactiveLeagues} isInactive />
+        </div>
+        <ScrollBar className='pt-2 pb-4' />
+      </ScrollArea>
+    </div>
   );
 }
 

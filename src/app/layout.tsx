@@ -40,9 +40,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <body className={`font-sans ${inter.variable}`}>
               <SidebarProvider defaultOpen>
                 <Nav />
-                <div className='w-full'>
-                  {children}
-                </div>
+                <main className='w-full md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-svh h-[calc(100svh-(var(--navbar-height)))]'>
+                  <div className='w-full md:shadow-lg md:bg-secondary md:rounded-3xl md:border overflow-hidden'>
+                    {children}
+                  </div>
+                </main>
               </SidebarProvider>
             </body>
           </html>
