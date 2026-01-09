@@ -64,7 +64,7 @@ export default function SeasonsPage() {
             )}
           </div>
 
-          <TabsList className='sticky top-40 md:static grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
+          <TabsList className='sticky top-40 grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
             <TabsTrigger value='castaways'>Castaways</TabsTrigger>
             <TabsTrigger value='timeline'>Tribes</TabsTrigger>
             <TabsTrigger value='events'>Events</TabsTrigger>
@@ -104,7 +104,7 @@ export default function SeasonsPage() {
               <p className='text-muted-foreground'>Select a season to get started</p>
             </div>
           )}
-          <ScrollBar />
+          <ScrollBar className='pb-4 pt-2' />
         </ScrollArea>
       </Tabs>
     </main >
