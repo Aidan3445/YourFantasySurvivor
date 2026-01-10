@@ -3,12 +3,20 @@
 import { type SeasonsDataQuery } from '~/types/seasons';
 import TribeCards from '~/components/seasons/castaways/tribeCards';
 import CastawayGrid from '~/components/seasons/castaways/castawayGrid';
+import { type SelectionTimelines } from '~/types/leagues';
+import { type LeagueMember } from '~/types/leagueMembers';
 
 interface CastawaysViewProps {
   seasonData: SeasonsDataQuery;
+  leagueData?: {
+    selectionTimeline?: SelectionTimelines;
+    leagueMembers?: {
+      members: LeagueMember[];
+    };
+  };
 }
 
-export default function CastawaysView({ seasonData }: CastawaysViewProps) {
+export default function CastawaysView({ seasonData, leagueData }: CastawaysViewProps) {
   const { castaways, tribes, tribesTimeline } = seasonData;
 
   // Filter out non-season castaways (Jeff Probst, etc.)
@@ -20,7 +28,8 @@ export default function CastawaysView({ seasonData }: CastawaysViewProps) {
       <CastawayGrid
         castaways={seasonCastaways}
         tribesTimeline={tribesTimeline}
-        tribes={tribes} />
+        tribes={tribes}
+        leagueData={leagueData} />
     </div>
   );
 }

@@ -6,19 +6,22 @@ import { PopoverArrow } from '@radix-ui/react-popover';
 import ColorRow from '~/components/shared/colorRow';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type Tribe } from '~/types/tribes';
-import { getTribeTimeline } from '~/lib/utils';
+import { cn, getTribeTimeline } from '~/lib/utils';
 import { type TribesTimeline } from '~/types/tribes';
 import { useMemo } from 'react';
 import { getContrastingColor } from '@uiw/color-convert';
 import Link from 'next/link';
+import Image from 'next/image';
+import { type LeagueMember } from '~/types/leagueMembers';
 
 interface CastawayCardProps {
   castaway: EnrichedCastaway;
   tribesTimeline: TribesTimeline;
   tribes: Tribe[];
+  member?: LeagueMember;
 }
 
-export default function CastawayCard({ castaway, tribesTimeline, tribes }: CastawayCardProps) {
+export default function CastawayCard({ castaway, tribesTimeline, tribes, member }: CastawayCardProps) {
   const tribeTimeline = useMemo(
     () => getTribeTimeline(castaway.castawayId, tribesTimeline, tribes),
     [castaway.castawayId, tribesTimeline, tribes]
@@ -27,26 +30,40 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes }: Casta
   return (
     <div className='bg-accent flex flex-col gap-1 border rounded-md p-2'>
       <ColorRow
-        className='justify-center gap-2 px-1 py-1 h-8'
+        className='relative justify-center gap-2 px-1 py-1 h-14'
         color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color} >
-        <span
-          className='leading-none text-sm'
+        <div
+          className='leading-none flex items-center gap-2'
           style={{
             color: getContrastingColor(castaway?.eliminatedEpisode
               ? '#AAAAAA'
               : castaway?.tribe?.color ?? '#AAAAAA')
           }}>
+          <Image
+            src={castaway.imageUrl}
+            alt={castaway.fullName}
+            width={50}
+            height={50}
+            className={cn('rounded-full',
+              (!!member || !!castaway.eliminatedEpisode) && 'grayscale')} />
           {castaway.fullName}
-        </span>
+          {member && (
+            <ColorRow
+              className='absolute -right-1 top-1 rotate-30 text-xs leading-tight p-0 px-1 z-50'
+              color={member.color}>
+              {member.displayName}
+            </ColorRow>
+          )}
+        </div>
 
         {
           castaway.eliminatedEpisode && (
             <Popover>
               <PopoverTrigger>
-                <span className='text-xs text-muted-foreground cursor-help text-nowrap'>
+                <div className='text-xs text-muted-foreground cursor-help text-nowrap'>
                   <FlameKindling className='align-text-bottom inline w-4 h-4' />
                   ({castaway.eliminatedEpisode})
-                </span>
+                </div>
               </PopoverTrigger>
               <PopoverContent className='w-min text-nowrap p-1' align='end'>
                 <PopoverArrow />

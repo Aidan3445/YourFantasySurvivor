@@ -36,7 +36,7 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
       await chooseCastaway(league.hash, data.castawayId);
       await queryClient.invalidateQueries({ queryKey: ['selectionTimeline', league.hash] });
       alert('Castaway chosen successfully');
-    } catch (error) {
+    } catch {
       alert('Failed to choose castaway');
     }
   });
