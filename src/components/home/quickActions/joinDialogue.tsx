@@ -4,18 +4,18 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/common/button';
 import { Input } from '~/components/common/input';
 import { Label } from '~/components/common/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '~/components/common/dialog';
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/common/alertDialog';
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
 
-interface JoinLeagueDialogProps {
+interface JoinLeagueAlertDialogProps {
   children?: ReactNode;
 }
 
-export default function JoinLeagueDialog({ children }: JoinLeagueDialogProps) {
+export default function JoinLeagueModal({ children }: JoinLeagueAlertDialogProps) {
   const router = useRouter();
   const [joinCode, setJoinCode] = useState('');
-  const [isJoinDialogOpen, setIsJoinDialogOpen] = useState(false);
+  const [isJoinAlertDialogOpen, setIsJoinAlertDialogOpen] = useState(false);
 
   useEffect(() => {
     // if the join code is in the URL, cut out everything but the code
@@ -34,22 +34,22 @@ export default function JoinLeagueDialog({ children }: JoinLeagueDialogProps) {
   };
 
   return (
-    <Dialog open={isJoinDialogOpen} onOpenChange={setIsJoinDialogOpen}>
-      <DialogTrigger asChild>
+    <AlertDialog open={isJoinAlertDialogOpen} onOpenChange={setIsJoinAlertDialogOpen}>
+      <AlertDialogTrigger asChild>
         {children ?? (
           <Button variant='secondary' className='w-80 text-white'>
             <Users className='mr-2' color='white' />
             Join League
           </Button>
         )}
-      </DialogTrigger>
-      <DialogContent className='bg-card'>
-        <DialogHeader>
-          <DialogTitle>Join an Existing League</DialogTitle>
-          <DialogDescription>
+      </AlertDialogTrigger>
+      <AlertDialogContent className='bg-card animate-scale-in-fast'>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Join an Existing League</AlertDialogTitle>
+          <AlertDialogDescription>
             Enter the league code or invitation link to join a league.
-          </DialogDescription>
-        </DialogHeader>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
         <div className='space-y-4 pt-4'>
           <div className='space-y-2'>
             <Label htmlFor='league-code'>League Code</Label>
@@ -74,13 +74,13 @@ export default function JoinLeagueDialog({ children }: JoinLeagueDialogProps) {
             </Button>
             <Button
               variant='outline'
-              onClick={() => setIsJoinDialogOpen(false)}
+              onClick={() => setIsJoinAlertDialogOpen(false)}
               className='flex-1'>
               Cancel
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }

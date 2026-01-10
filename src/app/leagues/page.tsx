@@ -7,7 +7,7 @@ import { Separator } from '~/components/common/separator';
 import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 import { useLeagues } from '~/hooks/user/useLeagues';
 import { useMemo } from 'react';
-import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
+import JoinLeagueModal from '~/components/home/quickActions/joinDialogue';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 export default function LeaguesPage() {
@@ -45,12 +45,12 @@ export default function LeaguesPage() {
                 <ListPlus size={24} color='white' />
               </section>
             </CreateLeagueModal>
-            <JoinLeagueDialog>
+            <JoinLeagueModal>
               <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-secondary hover:bg-secondary/80 hover:shadow-lg transition-all'>
                 <h3 className='text-xl text-white'>Join League</h3>
                 <Users size={22} color='white' />
               </section>
-            </JoinLeagueDialog>
+            </JoinLeagueModal>
           </div>
         </SignedIn>
       </div>

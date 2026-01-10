@@ -20,7 +20,7 @@ export default function LeagueCard({ league, member, currentSelection, refresh, 
       key={league.hash}
       href={`/leagues/${league.hash}`}>
       <section className={cn(
-        'px-2 py-1 h-full flex-col flex rounded-lg bg-card hover:bg-card/80 hover:shadow-lg transition-all',
+        'px-2 py-2 h-full flex-col flex rounded-lg bg-card hover:bg-card/80 hover:shadow-lg transition-all',
         className
       )}>
         <h3 className='text-xl font-semibold'>{league.name}</h3>

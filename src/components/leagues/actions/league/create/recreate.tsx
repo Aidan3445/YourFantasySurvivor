@@ -20,22 +20,20 @@ interface RecreateLeagueProps {
 
 export default function RecreateLeague({ hash }: RecreateLeagueProps) {
   const { data: seasons } = useSeasons(true);
-  const { sortedMemberScores } = useLeagueData(hash);
+  const { sortedMemberScores, leagueMembers } = useLeagueData(hash);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedMembers, setSelectedMembers] = useState<Set<number>>(new Set());
   const router = useRouter();
 
   const currentSeason = useMemo(() => {
     if (!seasons || seasons.length === 0) return null;
-    return seasons[seasons.length - 1];
+    return seasons[0];
   }, [seasons]);
 
   const ownerLoggedIn = useMemo(() => {
-    if (!sortedMemberScores) return false;
-    const owner = sortedMemberScores.find(({ member }) =>
-      member.role === 'Owner' && member.loggedIn);
-    return owner !== undefined;
-  }, [sortedMemberScores]);
+    if (!leagueMembers?.loggedIn) return false;
+    return leagueMembers.loggedIn.role === 'Owner';
+  }, [leagueMembers]);
 
   useEffect(() => {
     if (sortedMemberScores) {
@@ -66,7 +64,7 @@ export default function RecreateLeague({ hash }: RecreateLeagueProps) {
             <Button
               size='sm'
               variant='default'
-              className={cn('mt-2 w-full')}
+              className={cn('mt-1 w-full')}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -146,7 +144,7 @@ export default function RecreateLeague({ hash }: RecreateLeagueProps) {
             <Button
               size='sm'
               variant='default'
-              className={cn('mt-2 w-full opacity-50 cursor-help')}
+              className={cn('mt-1 w-full opacity-50 cursor-help')}
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -159,7 +157,7 @@ export default function RecreateLeague({ hash }: RecreateLeagueProps) {
           </PopoverTrigger>
           <PopoverContent className='w-48'>
             <PopoverArrow />
-            Only the league owner can recreate the league.
+            Only the league owner can recreate a league.
           </PopoverContent>
         </Popover>
       )}
