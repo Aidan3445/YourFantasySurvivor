@@ -85,12 +85,14 @@ describe('useLeagueActionDetails', () => {
   const mockCastaway: Castaway = {
     castawayId: 10,
     fullName: 'John Doe',
-    firstName: 'John',
-    lastName: 'Doe',
+    shortName: 'John',
     age: 30,
     hometown: 'New York',
+    residence: 'USA',
     occupation: 'Teacher',
     seasonId: 1,
+    imageUrl: 'http://example.com/image.jpg',
+    previouslyOn: null
   };
 
   const mockTribe: Tribe = {
@@ -106,6 +108,7 @@ describe('useLeagueActionDetails', () => {
     color: '#0000FF',
     role: 'Member',
     draftOrder: 1,
+    loggedIn: false,
   };
 
   const mockLeague = {
@@ -289,7 +292,7 @@ describe('useLeagueActionDetails', () => {
     const { result } = renderHook(() => useLeagueActionDetails());
 
     expect(result.current.predictionsMade).toHaveLength(3);
-    expect(result.current.predictionsMade.map((p: any) => p.predictionId)).toEqual([1, 2, 3]);
+    expect(result.current.predictionsMade.map((p) => p.predictionId)).toEqual([1, 2, 3]);
   });
 
   it('should filter rules based on prediction timing', () => {
@@ -324,7 +327,7 @@ describe('useLeagueActionDetails', () => {
     // custom2: excluded (only has Finale)
     // custom3: included (Direct type always included)
     expect(result.current.rules?.custom).toHaveLength(2);
-    expect(result.current.rules?.custom?.map((c: any) => c.eventName)).toEqual(['custom1', 'custom3']);
+    expect(result.current.rules?.custom?.map((c) => c.eventName)).toEqual(['custom1', 'custom3']);
   });
 
   it('should handle null eliminations gracefully', () => {
