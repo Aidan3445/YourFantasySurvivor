@@ -89,7 +89,7 @@ export async function getSeasonData(seasonId: number, season?: Season) {
     return {
       ...castaway,
       tribe,
-      eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex + 1 : null
+      eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex : null
     };
   });
 

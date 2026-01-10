@@ -5,20 +5,23 @@ import { TableCell, TableRow } from '~/components/common/table';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import { BaseEventFullName } from '~/lib/events';
 import { type BaseEventName, type EnrichedPrediction } from '~/types/events';
-import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
+import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { Flame, MoveRight } from 'lucide-react';
+import { getContrastingColor } from '@uiw/color-convert';
+import CastawayPopover from '~/components/seasons/shared/castawayPopover';
 
 interface PredictionRowProps {
   className?: string;
   prediction: EnrichedPrediction;
   editCol?: boolean;
   defaultOpenMisses?: boolean;
+  noMembers?: boolean;
 }
 
-export default function PredictionRow({ className, prediction, editCol, defaultOpenMisses }: PredictionRowProps) {
+export default function PredictionRow({ className, prediction, editCol, defaultOpenMisses, noMembers }: PredictionRowProps) {
   const isBaseEvent = useMemo(() => prediction.event.eventSource === 'Base', [prediction.event.eventSource]);
   const label = useEventLabel(prediction.event.eventName, isBaseEvent, prediction.event.label);
 
@@ -58,13 +61,21 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                 key={castaway.castawayId}
                 className='leading-tight px-1 w-min'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
-                {castaway.fullName}
+                <CastawayPopover castaway={castaway}>
+                  <span
+                    className='text-nowrap'
+                    style={{
+                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
+                    }}>
+                    {castaway.fullName}
+                  </span>
+                </CastawayPopover>
               </ColorRow>
             )
           ))}
         </div>
       </TableCell>
-      <TableCell className='text-xs text-nowrap'>
+      {!noMembers && <TableCell className='text-xs text-nowrap'>
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5 relative',
           prediction.hits.length === 1 && 'justify-center')}>
@@ -135,7 +146,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
               </AccordionItem>
             </Accordion>}
         </div>
-      </TableCell>
+      </TableCell>}
       <TableCell />
     </TableRow>
   );

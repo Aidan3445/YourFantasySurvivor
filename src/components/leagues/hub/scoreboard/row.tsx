@@ -8,13 +8,14 @@ import { PopoverArrow } from '@radix-ui/react-popover';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn, getTribeTimeline } from '~/lib/utils';
 import { Separator } from '~/components/common/separator';
-import { getContrastingColor } from '@uiw/color-convert';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { useMemo } from 'react';
 import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { useTribes } from '~/hooks/seasons/useTribes';
+import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import { getContrastingColor } from '@uiw/color-convert';
 
 interface MemberRowProps {
   place: number;
@@ -79,7 +80,7 @@ export default function MemberRow({
       </TableCell>
       <TableCell className='text-nowrap px-1'>
         <ColorRow
-          className={cn('justify-center',
+          className={cn('justify-center px-1',
             member.loggedIn &&
             'border-white border-2 font-bold leading-snug')}
           color={color}>
@@ -88,9 +89,19 @@ export default function MemberRow({
       </TableCell>
       <TableCell className='text-nowrap px-1'>
         <ColorRow
-          className='justify-center pr-0'
+          className='justify-center pr-0 px-1'
           color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color}>
-          {isMobile ? castaway?.shortName : castaway?.fullName}
+          <CastawayPopover castaway={castaway}>
+            <span
+              className='text-nowrap'
+              style={{
+                color: getContrastingColor(castaway?.eliminatedEpisode
+                  ? '#AAAAAA'
+                  : castaway?.tribe?.color ?? '#AAAAAA')
+              }}>
+              {isMobile ? castaway?.shortName : castaway?.fullName}
+            </span>
+          </CastawayPopover>
           <div className='ml-auto flex gap-0.5'>
             {(() => {
               const tribeTimeline = getTribeTimeline(

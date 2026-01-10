@@ -20,7 +20,7 @@ export default function SettingsWrapper({ label, children }: SettingsWrapperProp
           <AccordionTrigger className='py-0'>
             <FormLabel className='text-2xl'>{label}</FormLabel>
           </AccordionTrigger>
-          <AccordionContent className='grid gap-y-2'>
+          <AccordionContent className='grid sm:grid-cols-2 gap-2'>
             {children}
           </AccordionContent>
         </AccordionItem>
@@ -29,8 +29,8 @@ export default function SettingsWrapper({ label, children }: SettingsWrapperProp
   }
 
   return (
-    <div className='grid grid-rows-subgrid row-span-6'>
-      <FormLabel className='text-2xl '>{label}</FormLabel>
+    <div className='grid grid-rows-subgrid row-span-6 md:grid-cols-2 lg:grid-cols-1 md:gap-2'>
+      <FormLabel className='text-2xl md:col-span-2 lg:col-span-1'>{label}</FormLabel>
       {children}
     </div>
   );

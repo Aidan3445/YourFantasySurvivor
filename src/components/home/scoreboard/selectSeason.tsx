@@ -21,7 +21,7 @@ import { useState } from 'react';
 interface ComboboxProps {
   seasons: { value: string; label: string }[];
   value: string;
-  setValue: (value: string) => void;
+  setValue: (_value: string) => void;
   someHidden?: boolean;
 }
 
@@ -58,11 +58,22 @@ export default function SelectSeason({ seasons, value, setValue, someHidden }: C
                 </CommandItem>
               ))}
               {someHidden !== undefined && (
-                <CommandItem onSelect={() => router.push('/playground')} className='bg-accent/50'>
-                  <span className='mx-auto text-xs py-0.5'>
-                    {someHidden ? 'See all seasons' : 'Try scoring playground'}
-                  </span>
-                </CommandItem>
+                <div className='grid grid-cols-2 gap-1'>
+                  <CommandItem
+                    className='bg-accent/50'
+                    onSelect={() => router.push('/playground')}>
+                    <span className='mx-auto text-nowrap text-xs py-0.5'>
+                      {someHidden ? 'See all seasons' : 'Scoring playground'}
+                    </span>
+                  </CommandItem>
+                  <CommandItem
+                    className='bg-accent/50'
+                    onSelect={() => router.push('/seasons')}>
+                    <span className='mx-auto text-nowrap text-xs py-0.5'>
+                      Browse seasons
+                    </span>
+                  </CommandItem>
+                </div>
               )}
             </CommandGroup>
           </CommandList>

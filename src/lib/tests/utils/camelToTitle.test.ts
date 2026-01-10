@@ -14,7 +14,7 @@ describe('camelToTitle', () => {
     expect(camelToTitle('thisIsATest')).toBe('This Is A Test');
   });
 
-  it('should handle already capitalized first letter', () => {
+  it('should handle Title Case input (idempotent)', () => {
     expect(camelToTitle('Already Capitalized')).toBe('Already Capitalized');
   });
 

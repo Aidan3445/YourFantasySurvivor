@@ -8,6 +8,8 @@ import { PopoverArrow } from '@radix-ui/react-popover';
 import ColorRow from '~/components/shared/colorRow';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type Tribe } from '~/types/tribes';
+import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import { getContrastingColor } from '@uiw/color-convert';
 
 interface CastawayRowProps {
   place: number;
@@ -37,13 +39,23 @@ export default function CastawayEntry({ place, castaway, points, color, tribeTim
       )}
       <TableCell className='text-nowrap px-1 w-1/2'>
         <ColorRow
-          className='justify-center gap-0'
-          color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color ?? color}>
-          {castaway?.fullName ?? 'Jeff Probst'}
+          className='justify-center gap-0 px-1'
+          color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color ?? '#FFFFFF'}>
+          <CastawayPopover castaway={castaway}>
+            <span
+              className='text-nowrap'
+              style={{
+                color: getContrastingColor(castaway?.eliminatedEpisode
+                  ? '#AAAAAA'
+                  : castaway?.tribe?.color ?? '#AAAAAA')
+              }}>
+              {castaway?.fullName}
+            </span>
+          </CastawayPopover>
           {castaway?.eliminatedEpisode && (
             <Popover>
               <PopoverTrigger>
-                <span className='ml-1 text-muted-foreground cursor-help'>
+                <span className='mx-1 text-xs text-muted-foreground cursor-help text-nowrap'>
                   <FlameKindling className='align-text-bottom inline w-4 h-4' />
                   ({castaway.eliminatedEpisode})
                 </span>

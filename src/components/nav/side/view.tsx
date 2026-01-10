@@ -5,7 +5,7 @@ import Image from 'next/image';
 import SideNavFooter from '~/components/nav/side/footer';
 import SideNavLink from '~/components/nav/side/link';
 import SideNavLeagues from '~/components/nav/side/leagues';
-import { Flame } from 'lucide-react';
+import { Flame, BookUser } from 'lucide-react';
 import { systemAdminAuth } from '~/lib/auth';
 import SysAdminNav from '~/components/nav/side/sys';
 
@@ -26,11 +26,13 @@ export default async function SideNav() {
               href='/playground'
               icon={<Flame className='stroke-primary' />}
               label='Playground' />
+            <SideNavLink
+              href='/seasons'
+              icon={<BookUser className='stroke-primary' />}
+              label='Seasons' />
             <SignedIn>
               <SideNavLeagues />
             </SignedIn>
-            {/*<SideNavLink href='/seasons' icon={<BookUser />} label='Seasons' />
-            <SidebarSeparator />*/}
           </SidebarMenu>
           <SideNavFooter />
           <SysAdminNav userId={userId} noRedirects={noRedirects} />

@@ -80,5 +80,9 @@ describe('getLeagueSettings', () => {
     const result = await getLeagueSettings(mockAuth);
 
     expect(result.draftDate).toBeNull();
+    expect(result.leagueId).toBeUndefined();
+    expect(result.isProtected).toBeUndefined();
+    expect(result.survivalCap).toBeUndefined();
+    expect(result.preserveStreak).toBeUndefined();
   });
 });

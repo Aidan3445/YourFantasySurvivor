@@ -8,11 +8,10 @@ vi.mock('~/server/db', () => ({
 
 // Mock unstable_cache to just call the function directly
 vi.mock('next/cache', () => ({
-  unstable_cache: (fn: Function) => fn,
+  unstable_cache: <T extends (..._args: string[]) => string>(fn: T) => fn,
   revalidateTag: vi.fn(),
-}));
 
-describe('getEliminations', () => {
+})); describe('getEliminations', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -106,7 +105,7 @@ describe('getEliminations', () => {
 
       const result = await getEliminations(1);
 
-      expect(result).toEqual([]);
+      expect(result).toEqual([[]]);
       expect(Array.isArray(result)).toBe(true);
     });
 

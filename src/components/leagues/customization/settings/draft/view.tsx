@@ -17,6 +17,7 @@ import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { type LeagueSettingsUpdate } from '~/types/leagues';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
 import { useQueryClient } from '@tanstack/react-query';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const formSchema = z.object({
   draftDate: z.date().nullable(),
@@ -36,6 +37,7 @@ export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
     defaultValues: {
       draftDate: leagueSettings?.draftDate
     },
+    resolver: zodResolver(formSchema)
   });
 
   useEffect(() => {
@@ -93,8 +95,8 @@ export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
               <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
                 <X stroke='white' />
               </AlertDialogCancel>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
               <Button type='submit'>Save
-
                 Draft as {reactForm.watch('draftDate') ? ` ${reactForm.getValues('draftDate')?.toLocaleString()}` : ' Manually'}
               </Button>
             </AlertDialogFooter>

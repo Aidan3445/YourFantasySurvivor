@@ -27,11 +27,11 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -41,7 +41,7 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
               <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.advFound}
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'advFound'} disabled={disabled} />}
             <FormMessage />
           </FormItem>
@@ -64,11 +64,11 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -78,7 +78,7 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
               <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.advPlay}
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'advPlay'} disabled={disabled} />}
             <FormMessage />
           </FormItem>
@@ -101,11 +101,11 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -116,7 +116,7 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                 {BaseEventDescriptions.main.badAdvPlay} <i className='text-xs text-muted-foreground'>
                   {BaseEventDescriptions.italics.badAdvPlay}</i>
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'badAdvPlay'} disabled={disabled} />}
             <FormMessage />
           </FormItem>
@@ -139,11 +139,11 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -154,7 +154,7 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                 {BaseEventDescriptions.main.advElim} <i className='text-xs text-muted-foreground'>
                   {BaseEventDescriptions.italics.advElim}</i>
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'advElim'} disabled={disabled} />}
             <FormMessage />
           </FormItem>

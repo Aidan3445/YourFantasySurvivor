@@ -29,7 +29,7 @@ export default async function getEliminations(seasonId: number) {
 async function fetchEliminations(seasonId: number) {
   const now = new Date().toISOString();
 
-  return db
+  const elims = await db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
       eventId: baseEventSchema.baseEventId,
@@ -57,4 +57,6 @@ async function fetchEliminations(seasonId: number) {
       }
       return acc;
     }, [] as Eliminations));
+  elims[0] = [];
+  return elims;
 }

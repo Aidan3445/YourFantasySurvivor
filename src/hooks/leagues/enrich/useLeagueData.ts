@@ -75,7 +75,10 @@ export function useLeagueData(overrideHash?: string) {
       sortedMemberScores,
       loggedInIndex,
     };
-  }, [league, membersArray, seasonData, selectionTimeline, basePredictions, leagueRules, leagueSettings, customEvents]);
+  }, [
+    league, membersArray, seasonData, selectionTimeline,
+    basePredictions, leagueRules, leagueSettings, customEvents
+  ]);
 
   return useMemo(() => ({
     ...scoreData,

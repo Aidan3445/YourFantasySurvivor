@@ -41,7 +41,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
 
 
   return (
-    <section className='w-full space-y-4 overflow-x-hidden p-4'>
+    <section className='w-full space-y-4 overflow-x-hidden'>
       <article className='flex flex-col w-full p-2 bg-card rounded-lg'>
         <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
         <div className='grid grid-cols-1 gap-2'>
@@ -53,7 +53,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
               color={pick.color}
               loggedIn={leagueMembers.loggedIn?.displayName === pick.displayName}>
               <h3
-                className='text-lg'
+                className='text-lg w-4'
                 style={{ color: getContrastingColor(pick.color) }}>
                 {index + 1}
               </h3>

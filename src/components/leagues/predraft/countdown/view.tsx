@@ -24,7 +24,7 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
   const router = useRouter();
 
   const editable = useMemo(() =>
-    (leagueMembers?.loggedIn && leagueMembers.loggedIn.role === 'Owner') && leagueSettings &&
+    leagueMembers?.loggedIn?.role === 'Owner' && leagueSettings &&
     (leagueSettings.draftDate === null || Date.now() < leagueSettings.draftDate.getTime()),
     [leagueMembers, leagueSettings]);
 
@@ -64,7 +64,7 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
           {editable && <SetDraftDate overrideHash={overrideHash} />}
         </div>
       </span>
-      <span className='bg-primary rounded-2xl p-2 mt-2 text-primary-foreground text-2xl shadow-sm shadow-black'>
+      <span className='bg-primary rounded-lg p-2 mt-2 text-primary-foreground text-2xl shadow-sm shadow-black'>
         <Clock endDate={leagueSettings?.draftDate ?? null} replacedBy={
           <Button
             className='w-full p-2 rounded-xl text-sidebar-foreground text-2xl'

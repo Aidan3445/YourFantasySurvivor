@@ -3,14 +3,14 @@ import { SignIn } from '@clerk/nextjs';
 import { Trophy, Users, Gamepad2, BarChart, ListPlus } from 'lucide-react';
 import { Button } from '~/components/common/button';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
-import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
+import JoinLeagueModal from '~/components/home/quickActions/joinDialogue';
 import FeatureCard from '~/components/home/hero/featureCard';
 
 export function HeroSection() {
   return (
     <div className='flex flex-col lg:flex-row items-center lg:items-start gap-8'>
       <div className='flex flex-col items-center gap-4'>
-        <Card className='shadow-2xl h-[35rem]'>
+        <Card className='shadow-2xl h-140'>
           <CardContent className='p-6 space-y-4'>
             <h1 className='text-4xl font-bold text-center'>Welcome to Your Fantasy Survivor!</h1>
             <div className='space-y-3 mb-0'>
@@ -54,13 +54,13 @@ export function HeroSection() {
                 </Button>
               </CreateLeagueModal>
               <h3 className='text-center text-lg font-semibold text-muted-foreground'>OR</h3>
-              <JoinLeagueDialog />
+              <JoinLeagueModal />
             </span>
           </CardContent>
         </Card>
       </div>
 
-      <div className='flex-shrink-0'>
+      <div className='shrink-0'>
         <SignIn
           routing='hash'
           appearance={{

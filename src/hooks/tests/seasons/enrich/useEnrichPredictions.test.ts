@@ -3,7 +3,7 @@ import { renderHook } from '@testing-library/react';
 import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPredictions';
 import type { EnrichedEvent, Prediction } from '~/types/events';
 import type { Tribe } from '~/types/tribes';
-import type { Castaway } from '~/types/castaways';
+import type { Castaway, EnrichedCastaway } from '~/types/castaways';
 import type { LeagueMember } from '~/types/leagueMembers';
 import type { Eliminations } from '~/types/events';
 
@@ -38,6 +38,8 @@ import { useTribes } from '~/hooks/seasons/useTribes';
 import { useCastaways } from '~/hooks/seasons/useCastaways';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
+import { type SeasonsDataQuery } from '~/types/seasons';
+import { type LeagueRules } from '~/types/leagues';
 
 const mockUseLeagueRules = useLeagueRules as ReturnType<typeof vi.fn>;
 const mockUseTribesTimeline = useTribesTimeline as ReturnType<typeof vi.fn>;
@@ -57,12 +59,23 @@ describe('useEnrichPredictions', () => {
   const mockCastaway: Castaway = {
     castawayId: 10,
     fullName: 'John Doe',
-    firstName: 'John',
-    lastName: 'Doe',
+    shortName: 'John',
     age: 30,
     hometown: 'New York',
+    residence: 'Los Angeles',
     occupation: 'Teacher',
     seasonId: 1,
+    imageUrl: 'http://example.com/john.jpg',
+    previouslyOn: null,
+  };
+
+  const mockEnrichedCastaway: EnrichedCastaway = {
+    ...mockCastaway,
+    eliminatedEpisode: null,
+    tribe: {
+      name: mockTribe.tribeName,
+      color: mockTribe.tribeColor,
+    }
   };
 
   const mockMember: LeagueMember = {
@@ -71,6 +84,7 @@ describe('useEnrichPredictions', () => {
     color: '#0000FF',
     role: 'Member',
     draftOrder: 1,
+    loggedIn: false,
   };
 
   const mockRules = {
@@ -80,7 +94,9 @@ describe('useEnrichPredictions', () => {
       tribe1st: { enabled: true, points: 8, timing: ['Weekly'] },
     },
     custom: [],
-  };
+    base: null,
+    shauhinMode: null
+  } as unknown as LeagueRules;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -95,23 +111,38 @@ describe('useEnrichPredictions', () => {
   });
 
   it('should return empty array when dependencies are not loaded', () => {
+    const seasonData = {
+      tribes: null,
+      castaways: null,
+      eliminations: null,
+      tribesTimeline: null,
+    };
+
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, null, null)
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, null, null)
     );
 
     expect(result.current).toEqual([]);
   });
 
   it('should return empty array when predictions is null', () => {
-    mockUseLeagueRules.mockReturnValue({ data: mockRules });
-    mockUseTribesTimeline.mockReturnValue({ data: {} });
-    mockUseTribes.mockReturnValue({ data: [mockTribe] });
-    mockUseCastaways.mockReturnValue({ data: [mockCastaway] });
-    mockUseLeagueMembers.mockReturnValue({ data: { members: [mockMember] } });
-    mockUseEliminations.mockReturnValue({ data: [] });
+    const seasonData = {
+      tribes: [mockTribe],
+      castaways: [mockCastaway],
+      eliminations: [[]],
+      tribesTimeline: {},
+    };
+
+    const leagueData = {
+      leagueMembers: {
+        members: [mockMember],
+        loggedIn: mockMember
+      },
+      leagueRules: mockRules,
+    };
 
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, [], null)
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, [], null, leagueData)
     );
 
     expect(result.current).toEqual([]);
@@ -122,9 +153,21 @@ describe('useEnrichPredictions', () => {
       eventId: 1,
       eventName: 'advFound',
       eventSource: 'Base',
+      eventType: 'Direct',
       episodeNumber: 3,
-      referenceMap: [[10, 'Castaway']],
+      episodeId: 100,
+      points: 5,
+      referenceMap: [
+        {
+          tribe: null,
+          pairs: [
+            { castaway: mockEnrichedCastaway, member: mockMember },
+          ],
+        },
+      ],
       references: [{ type: 'Castaway', id: 10 }],
+      label: null,
+      notes: null,
     };
 
     const mockPrediction: Prediction = {
@@ -135,6 +178,10 @@ describe('useEnrichPredictions', () => {
       referenceType: 'Castaway',
       referenceId: 10,
       bet: null,
+      eventEpisodeNumber: 3,
+      eventSource: 'Base',
+      predictionId: 500,
+      predictionEpisodeNumber: 3
     };
 
     const mockTribesTimeline = {
@@ -143,15 +190,20 @@ describe('useEnrichPredictions', () => {
       },
     };
 
-    mockUseLeagueRules.mockReturnValue({ data: mockRules });
-    mockUseTribesTimeline.mockReturnValue({ data: mockTribesTimeline });
-    mockUseTribes.mockReturnValue({ data: [mockTribe] });
-    mockUseCastaways.mockReturnValue({ data: [mockCastaway] });
-    mockUseLeagueMembers.mockReturnValue({ data: { members: [mockMember] } });
-    mockUseEliminations.mockReturnValue({ data: [] as Eliminations });
+    const seasonData = {
+      tribes: [mockTribe],
+      castaways: [mockCastaway],
+      eliminations: [[]] as Eliminations,
+      tribesTimeline: mockTribesTimeline,
+    };
+
+    const leagueData = {
+      leagueMembers: { members: [mockMember] },
+      leagueRules: mockRules,
+    };
 
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, [mockEvent], [mockPrediction])
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, [mockEvent], [mockPrediction], leagueData)
     );
 
     expect(result.current).toHaveLength(1);
@@ -168,9 +220,21 @@ describe('useEnrichPredictions', () => {
       eventId: 1,
       eventName: 'advFound',
       eventSource: 'Base',
+      eventType: 'Direct',
       episodeNumber: 3,
-      referenceMap: [[10, 'Castaway']],
+      episodeId: 100,
+      points: 5,
+      referenceMap: [
+        {
+          tribe: null,
+          pairs: [
+            { castaway: mockEnrichedCastaway, member: mockMember },
+          ],
+        },
+      ],
       references: [{ type: 'Castaway', id: 10 }],
+      label: null,
+      notes: null,
     };
 
     const hitPrediction: Prediction = {
@@ -181,6 +245,10 @@ describe('useEnrichPredictions', () => {
       referenceType: 'Castaway',
       referenceId: 10,
       bet: null,
+      eventEpisodeNumber: 3,
+      eventSource: 'Base',
+      predictionId: 501,
+      predictionEpisodeNumber: 3
     };
 
     const missPrediction: Prediction = {
@@ -191,6 +259,10 @@ describe('useEnrichPredictions', () => {
       referenceType: 'Castaway',
       referenceId: 10,
       bet: null,
+      eventEpisodeNumber: 3,
+      eventSource: 'Base',
+      predictionId: 502,
+      predictionEpisodeNumber: 3
     };
 
     const member2: LeagueMember = {
@@ -199,21 +271,27 @@ describe('useEnrichPredictions', () => {
       color: '#00FF00',
       role: 'Member',
       draftOrder: 2,
+      loggedIn: false,
     };
 
     const mockTribesTimeline = {
       3: { 1: [10] },
     };
 
-    mockUseLeagueRules.mockReturnValue({ data: mockRules });
-    mockUseTribesTimeline.mockReturnValue({ data: mockTribesTimeline });
-    mockUseTribes.mockReturnValue({ data: [mockTribe] });
-    mockUseCastaways.mockReturnValue({ data: [mockCastaway] });
-    mockUseLeagueMembers.mockReturnValue({ data: { members: [mockMember, member2] } });
-    mockUseEliminations.mockReturnValue({ data: [] as Eliminations });
+    const seasonData = {
+      tribes: [mockTribe],
+      castaways: [mockCastaway],
+      eliminations: [[]] as Eliminations,
+      tribesTimeline: mockTribesTimeline,
+    };
+
+    const leagueData = {
+      leagueMembers: { members: [mockMember, member2] },
+      leagueRules: mockRules,
+    };
 
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, [mockEvent], [hitPrediction, missPrediction])
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, [mockEvent], [hitPrediction, missPrediction], leagueData)
     );
 
     expect(result.current[0]?.hits).toHaveLength(1);
@@ -227,9 +305,17 @@ describe('useEnrichPredictions', () => {
       eventId: 1,
       eventName: 'tribe1st',
       eventSource: 'Base',
+      eventType: 'Direct',
       episodeNumber: 3,
-      referenceMap: [[1, 'Tribe']],
+      episodeId: 100,
+      points: 8,
+      referenceMap: [{
+        tribe: mockTribe,
+        pairs: [],
+      }],
       references: [{ type: 'Tribe', id: 1 }],
+      label: null,
+      notes: null,
     };
 
     const mockPrediction: Prediction = {
@@ -240,17 +326,26 @@ describe('useEnrichPredictions', () => {
       referenceType: 'Tribe',
       referenceId: 1,
       bet: null,
+      eventEpisodeNumber: 3,
+      eventSource: 'Base',
+      predictionId: 503,
+      predictionEpisodeNumber: 3
     };
 
-    mockUseLeagueRules.mockReturnValue({ data: mockRules });
-    mockUseTribesTimeline.mockReturnValue({ data: {} });
-    mockUseTribes.mockReturnValue({ data: [mockTribe] });
-    mockUseCastaways.mockReturnValue({ data: [] });
-    mockUseLeagueMembers.mockReturnValue({ data: { members: [mockMember] } });
-    mockUseEliminations.mockReturnValue({ data: [] as Eliminations });
+    const seasonData = {
+      tribes: [mockTribe],
+      castaways: [],
+      eliminations: [[]] as Eliminations,
+      tribesTimeline: {},
+    };
+
+    const leagueData = {
+      leagueMembers: { members: [mockMember] },
+      leagueRules: mockRules,
+    };
 
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, [mockEvent], [mockPrediction])
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, [mockEvent], [mockPrediction], leagueData)
     );
 
     expect(result.current[0]?.hits[0]?.reference.name).toBe('Red Tribe');
@@ -262,9 +357,17 @@ describe('useEnrichPredictions', () => {
       eventId: 1,
       eventName: 'advFound',
       eventSource: 'Base',
+      eventType: 'Direct',
       episodeNumber: 3,
-      referenceMap: [[10, 'Castaway']],
+      episodeId: 100,
+      points: 5,
+      referenceMap: [{
+        tribe: null,
+        pairs: [],
+      }],
       references: [{ type: 'Castaway', id: 10 }],
+      label: null,
+      notes: null,
     };
 
     const mockPrediction: Prediction = {
@@ -275,21 +378,30 @@ describe('useEnrichPredictions', () => {
       referenceType: 'Castaway',
       referenceId: 10,
       bet: null,
+      eventEpisodeNumber: 3,
+      eventSource: 'Base',
+      predictionId: 504,
+      predictionEpisodeNumber: 3
     };
 
     const mockTribesTimeline = {
       3: { 1: [10] },
     };
 
-    mockUseLeagueRules.mockReturnValue({ data: mockRules });
-    mockUseTribesTimeline.mockReturnValue({ data: mockTribesTimeline });
-    mockUseTribes.mockReturnValue({ data: [mockTribe] });
-    mockUseCastaways.mockReturnValue({ data: [mockCastaway] });
-    mockUseLeagueMembers.mockReturnValue({ data: { members: [mockMember] } });
-    mockUseEliminations.mockReturnValue({ data: [] as Eliminations });
+    const seasonData = {
+      tribes: [mockTribe],
+      castaways: [mockCastaway],
+      eliminations: [[]] as Eliminations,
+      tribesTimeline: mockTribesTimeline,
+    };
+
+    const leagueData = {
+      leagueMembers: { members: [mockMember] },
+      leagueRules: mockRules,
+    };
 
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, [mockEvent], [mockPrediction])
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, [mockEvent], [mockPrediction], leagueData)
     );
 
     expect(result.current).toEqual([]);
@@ -300,9 +412,19 @@ describe('useEnrichPredictions', () => {
       eventId: 1,
       eventName: 'advFound',
       eventSource: 'Base',
+      eventType: 'Direct',
       episodeNumber: 3,
-      referenceMap: [[10, 'Castaway']],
+      episodeId: 100,
+      points: 5,
+      referenceMap: [
+        {
+          tribe: null,
+          pairs: [],
+        },
+      ],
       references: [{ type: 'Castaway', id: 10 }],
+      label: null,
+      notes: null,
     };
 
     const mockPrediction: Prediction = {
@@ -313,17 +435,26 @@ describe('useEnrichPredictions', () => {
       referenceType: 'Castaway',
       referenceId: 10,
       bet: null,
+      eventEpisodeNumber: 3,
+      eventSource: 'Base',
+      predictionId: 505,
+      predictionEpisodeNumber: 3
     };
 
-    mockUseLeagueRules.mockReturnValue({ data: mockRules });
-    mockUseTribesTimeline.mockReturnValue({ data: {} });
-    mockUseTribes.mockReturnValue({ data: [mockTribe] });
-    mockUseCastaways.mockReturnValue({ data: [mockCastaway] });
-    mockUseLeagueMembers.mockReturnValue({ data: { members: [mockMember] } });
-    mockUseEliminations.mockReturnValue({ data: [] as Eliminations });
+    const seasonData = {
+      tribes: [mockTribe],
+      castaways: [mockCastaway],
+      eliminations: [[]] as Eliminations,
+      tribesTimeline: {},
+    };
+
+    const leagueData = {
+      leagueMembers: { members: [mockMember] },
+      leagueRules: mockRules,
+    };
 
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, [mockEvent], [mockPrediction])
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, [mockEvent], [mockPrediction], leagueData)
     );
 
     expect(result.current).toEqual([]);
@@ -334,9 +465,14 @@ describe('useEnrichPredictions', () => {
       eventId: 1,
       eventName: 'advFound',
       eventSource: 'Base',
+      eventType: 'Direct',
       episodeNumber: 3,
-      referenceMap: [[10, 'Castaway']],
+      episodeId: 100,
+      points: 5,
+      referenceMap: [],
       references: [{ type: 'Castaway', id: 10 }],
+      label: null,
+      notes: null,
     };
 
     const mockPrediction: Prediction = {
@@ -347,6 +483,10 @@ describe('useEnrichPredictions', () => {
       referenceType: 'Castaway',
       referenceId: 10,
       bet: null,
+      eventEpisodeNumber: 3,
+      eventSource: 'Base',
+      predictionId: 506,
+      predictionEpisodeNumber: 3
     };
 
     const mockTribesTimeline = {
@@ -361,15 +501,20 @@ describe('useEnrichPredictions', () => {
       [{ castawayId: 10, eventId: 10 }], // Eliminated in episode 5
     ];
 
-    mockUseLeagueRules.mockReturnValue({ data: mockRules });
-    mockUseTribesTimeline.mockReturnValue({ data: mockTribesTimeline });
-    mockUseTribes.mockReturnValue({ data: [mockTribe] });
-    mockUseCastaways.mockReturnValue({ data: [mockCastaway] });
-    mockUseLeagueMembers.mockReturnValue({ data: { members: [mockMember] } });
-    mockUseEliminations.mockReturnValue({ data: mockEliminations });
+    const seasonData = {
+      tribes: [mockTribe],
+      castaways: [mockCastaway],
+      eliminations: mockEliminations,
+      tribesTimeline: mockTribesTimeline,
+    };
+
+    const leagueData = {
+      leagueMembers: { members: [mockMember] },
+      leagueRules: mockRules,
+    };
 
     const { result } = renderHook(() =>
-      useEnrichPredictions(1, [mockEvent], [mockPrediction])
+      useEnrichPredictions(seasonData as unknown as SeasonsDataQuery, [mockEvent], [mockPrediction], leagueData)
     );
 
     expect(result.current).toHaveLength(1);

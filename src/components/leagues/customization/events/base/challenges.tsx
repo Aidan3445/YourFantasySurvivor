@@ -27,11 +27,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -41,7 +41,7 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
               <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.indivWin}
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'indivWin'} disabled={disabled} />}
             <FormMessage />
           </FormItem>
@@ -64,11 +64,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -78,7 +78,7 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
               <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.indivReward}
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'indivReward'} disabled={disabled} />}
             <FormMessage />
           </FormItem>
@@ -101,11 +101,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -115,7 +115,7 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
               <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                 {BaseEventDescriptions.main.tribe1st}
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'tribe1st'} disabled={disabled} />}
             <FormMessage />
           </FormItem>
@@ -138,11 +138,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
                   )} />
                 </h2>}
             </FormLabel>
-            <span className='flex gap-4 items-top'>
+            <div className='flex-col gap-4 items-top'>
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-24 text-black my-1'
+                    className='w-full text-black my-1'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -153,7 +153,7 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
                 {BaseEventDescriptions.main.tribe2nd} <i className='text-xs text-muted-foreground'>
                   {BaseEventDescriptions.italics.tribe2nd}</i>
               </FormDescription>
-            </span>
+            </div>
             {!hidePredictions && <BasePredictionFormField eventName={'tribe2nd'} disabled={disabled} />}
             <FormMessage />
           </FormItem>

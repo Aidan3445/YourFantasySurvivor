@@ -11,21 +11,17 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/common/table';
-import EpisodeEventsTableBody from '~/components/leagues/hub/activity/timeline/table/body';
-import { useBasePredictions } from '~/hooks/leagues/useBasePredictions';
-import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
-import { useLeague } from '~/hooks/leagues/useLeague';
-import { useSelectionTimeline } from '~/hooks/leagues/useSelectionTimeline';
-import { useBaseEvents } from '~/hooks/seasons/useBaseEvents';
-import { useEliminations } from '~/hooks/seasons/useEliminations';
-import { useEpisodes } from '~/hooks/seasons/useEpisodes';
-import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
+import EpisodeEventsTableBody from '~/components/shared/eventTimeline/table/body';
 import { findTribeCastaways } from '~/lib/utils';
 import { type Prediction, type EventWithReferences } from '~/types/events';
+import { type SeasonsDataQuery } from '~/types/seasons';
+import type { LeagueData } from '~/components/shared/eventTimeline/filters';
 
 
 export interface EpisodeEventsProps {
   episodeNumber: number;
+  seasonData: SeasonsDataQuery;
+  leagueData?: LeagueData;
   mockEvents?: EventWithReferences[];
   edit?: boolean;
   filters: {
@@ -45,16 +41,13 @@ export type PredictionAndPredOnly = Prediction & {
 };
 
 export default function EpisodeEvents(
-  { episodeNumber, mockEvents, edit, filters }: EpisodeEventsProps
+  { episodeNumber, seasonData, leagueData, mockEvents, edit, filters }: EpisodeEventsProps
 ) {
-  const { data: league } = useLeague();
-  const { data: selectionTimeline } = useSelectionTimeline();
-  const { data: customEvents } = useCustomEvents();
-  const { data: basePredictions } = useBasePredictions();
-  const { data: baseEvents } = useBaseEvents(league?.seasonId ?? null);
-  const { data: episodes } = useEpisodes(league?.seasonId ?? null);
-  const { data: tribeTimeline } = useTribesTimeline(league?.seasonId ?? null);
-  const { data: eliminations } = useEliminations(league?.seasonId ?? null);
+
+  const { league, selectionTimeline, customEvents, basePredictions } = leagueData ?? {};
+
+  const { baseEvents, episodes, tribesTimeline, eliminations } = useMemo(() =>
+    seasonData, [seasonData]);
 
   // All events for lookup purposes (needed to validate predictions reference valid events)
   const allEvents = useMemo(() => {
@@ -64,7 +57,7 @@ export default function EpisodeEvents(
         ...(baseEvents?.[episode.episodeNumber]
           ? Object.values(baseEvents[episode.episodeNumber]!) : []),
         ...(customEvents?.events?.[episode.episodeNumber]
-          ? Object.values(customEvents.events[episode.episodeNumber]!) : [])
+          ? Object.values(customEvents.events[episode.episodeNumber] ?? {}) : [])
       ];
     });
     return events;
@@ -86,9 +79,9 @@ export default function EpisodeEvents(
       (episodes ?? []).forEach((episode) => {
         predictions[episode.episodeNumber] = [
           ...(basePredictions?.[episode.episodeNumber]
-            ? Object.values(basePredictions[episode.episodeNumber]!).flat() : []),
+            ? Object.values(basePredictions[episode.episodeNumber] ?? {}).flat() : []),
           ...(customEvents?.predictions?.[episode.episodeNumber]
-            ? Object.values(customEvents.predictions[episode.episodeNumber]!).flat() : []),
+            ? Object.values(customEvents.predictions[episode.episodeNumber] ?? {}).flat() : []),
         ].filter((prediction) => {
           const eventEpNum = prediction.eventEpisodeNumber;
           if (!eventEpNum) return false;
@@ -178,19 +171,23 @@ export default function EpisodeEvents(
       const numKey = Number(key);
       filtered[numKey] = combinedEvents[numKey]?.map((event): EventWithReferencesAndPredOnly | null => {
         const castawayMembers = selectionTimeline?.castawayMembers;
-        const eventMembers = event.references.flatMap((ref) => {
-          if (ref.type === 'Castaway' && numKey >= (league?.startWeek ?? 0)) {
-            const data = castawayMembers?.[ref.id];
-            return data?.[numKey] ?? data?.[data.length - 1] ?? [];
-          }
 
-          return findTribeCastaways(tribeTimeline ?? {}, eliminations ?? [], ref.id, numKey)
-            .flatMap((cid) => {
-              if (numKey < (league?.startWeek ?? 0)) return [];
-              const data = castawayMembers?.[cid];
+        // Calculate event members only if we have league context and member filters
+        const eventMembers = (castawayMembers && filters.member.length > 0)
+          ? event.references.flatMap((ref) => {
+            if (ref.type === 'Castaway' && numKey >= (league?.startWeek ?? 0)) {
+              const data = castawayMembers[ref.id];
               return data?.[numKey] ?? data?.[data.length - 1] ?? [];
-            });
-        });
+            }
+
+            return findTribeCastaways(tribesTimeline ?? {}, eliminations ?? [], ref.id, numKey)
+              .flatMap((cid) => {
+                if (numKey < (league?.startWeek ?? 0)) return [];
+                const data = castawayMembers[cid];
+                return data?.[numKey] ?? data?.[data.length - 1] ?? [];
+              });
+          })
+          : [];
 
         const castawayMatch = filters.castaway.length === 0 || event.references.some((ref) =>
           ref.type === 'Castaway' && filters.castaway.includes(ref.id));
@@ -225,7 +222,7 @@ export default function EpisodeEvents(
     filters.tribe,
     league?.startWeek,
     selectionTimeline?.castawayMembers,
-    tribeTimeline
+    tribesTimeline
   ]);
 
   // Compute predOnly for predictions based on filtered events (separate, no mutation)
@@ -250,6 +247,8 @@ export default function EpisodeEvents(
     && !mockEvents?.some((event) => event.references.some((ref) => ref.type === 'Tribe'))
   ), [combinedEvents, combinedPredictions, episodeNumber, mockEvents]);
 
+  const noMembers = useMemo(() => !selectionTimeline || !league, [selectionTimeline, league]);
+
   return (
     <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-var(--sidebar-width)-3rem)] lg:w-full bg-card rounded-lg gap-0'>
       <Table className='w-full'>
@@ -263,7 +262,7 @@ export default function EpisodeEvents(
             <TableHead className='text-center'>Points</TableHead>
             <TableHead>{noTribes ? null : 'Tribes'}</TableHead>
             <TableHead className='text-right'>Castaways</TableHead>
-            <TableHead className='w-full'>Members</TableHead>
+            {!noMembers && <TableHead className='w-full'>Members</TableHead>}
             <TableHead className='text-right'>Notes</TableHead>
           </TableRow>
         </TableHeader>
@@ -285,9 +284,11 @@ export default function EpisodeEvents(
                   mockEvents={mockEvents}
                   filteredEvents={filteredEvents[episode.episodeNumber] ?? []}
                   filteredPredictions={filteredPredictionsWithPredOnly[episode.episodeNumber] ?? []}
-                  enrichmentEvents={enrichmentOnlyEvents}
+                  predictionEnrichmentEvents={enrichmentOnlyEvents}
                   edit={edit}
-                  filters={filters} />
+                  filters={filters}
+                  noMembers={noMembers}
+                  seasonData={seasonData} />
               </Fragment>
             ))}
         </TableBody >

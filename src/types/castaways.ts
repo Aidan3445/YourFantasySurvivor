@@ -8,6 +8,7 @@ export type Castaway = {
   occupation: string;
   imageUrl: string;
   seasonId: number | null;
+  previouslyOn: string[] | null;
 };
 
 export type EnrichedCastaway = Castaway & {
