@@ -32,10 +32,7 @@ export default function SeasonsPage() {
   }, [seasons, selectedSeasonId]);
 
   return (
-    <Tabs
-      className='w-full'
-      value={selectedTab}
-      onValueChange={setSelectedTab}>
+    <Tabs className='w-full' value={selectedTab} onValueChange={setSelectedTab}>
       <div className='flex flex-col w-full h-40 justify-between bg-card'>
         <div className='px-2 flex flex-col items-center justify-center h-full w-full'>
           <div className='text-center'>
@@ -63,7 +60,7 @@ export default function SeasonsPage() {
           )}
         </div>
 
-        <TabsList className='sticky top-40 grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
+        <TabsList className='sticky grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
           <TabsTrigger value='castaways'>Castaways</TabsTrigger>
           <TabsTrigger value='timeline'>Tribes</TabsTrigger>
           <TabsTrigger value='events'>Events</TabsTrigger>
