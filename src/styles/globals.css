@@ -26,6 +26,8 @@
   --color-sidebar-border: hsl(var(--sidebar-border));
   --color-sidebar-ring: hsl(var(--sidebar-ring));
 
+  --navbar-height: 2.5rem;
+
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
@@ -205,7 +207,7 @@
 
 @layer utilities {
   /* styles */
-  body {
+  body, html {
     @apply bg-linear-to-b from-b3 to-b1 min-h-screen bg-fixed overscroll-none;
   }
 

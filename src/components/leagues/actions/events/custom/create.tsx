@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import EpisodeEvents from '~/components/leagues/hub/activity/timeline/table/view';
+import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { CustomEventInsertZod, type EventWithReferences, type CustomEventInsert } from '~/types/events';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
@@ -18,12 +18,15 @@ import createCustomEvent from '~/actions/createCustomEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
 import { getAirStatus } from '~/lib/episodes';
+import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 
 export default function CreateCustomEvent() {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
   const { data: rules } = useLeagueRules();
   const { data: episodes } = useEpisodes(league?.seasonId ?? null);
+  const { data: seasonData } = useSeasonsData(true, league?.seasonId ?? undefined);
+  const season = seasonData?.[0];
 
   const reactForm = useForm<CustomEventInsert>({
     defaultValues: {
@@ -242,6 +245,7 @@ export default function CreateCustomEvent() {
             </form>
             <EpisodeEvents
               episodeNumber={selectedEpisode ?? 1}
+              seasonData={season!}
               mockEvents={mockEvent ? [mockEvent] : []}
               edit
               filters={{

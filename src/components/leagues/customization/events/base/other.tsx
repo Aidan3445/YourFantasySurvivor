@@ -28,11 +28,11 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     )} />
                   </h2>}
               </FormLabel>
-              <span className='flex gap-4 items-top'>
+              <div className='flex-col gap-4 items-top'>
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black my-1'
+                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -42,7 +42,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.elim}
                 </FormDescription>
-              </span>
+              </div>
               {!hidePredictions && <BasePredictionFormField eventName={'elim'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
@@ -67,11 +67,11 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     )} />
                   </h2>}
               </FormLabel>
-              <span className='flex gap-4 items-top'>
+              <div className='flex-col gap-4 items-top'>
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black my-1'
+                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -81,7 +81,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.spokeEpTitle}
                 </FormDescription>
-              </span>
+              </div>
               {!hidePredictions && <BasePredictionFormField eventName={'spokeEpTitle'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
@@ -106,11 +106,11 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     )} />
                   </h2>}
               </FormLabel>
-              <span className='flex gap-4 items-top'>
+              <div className='flex-col gap-4 items-top'>
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black my-1'
+                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -120,7 +120,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.finalists}
                 </FormDescription>
-              </span>
+              </div>
               {!hidePredictions && <BasePredictionFormField eventName={'finalists'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
@@ -145,11 +145,11 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     )} />
                   </h2>}
               </FormLabel>
-              <span className='flex gap-4 items-top'>
+              <div className='flex-col gap-4 items-top'>
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black my-1'
+                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -159,7 +159,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.fireWin}
                 </FormDescription>
-              </span>
+              </div>
               {!hidePredictions && <BasePredictionFormField eventName={'fireWin'} disabled={disabled} />}
               <FormMessage />
             </FormItem>
@@ -185,11 +185,11 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     )} />
                   </h2>}
               </FormLabel>
-              <span className='flex gap-4 items-top'>
+              <div className='flex-col gap-4 items-top'>
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-24 text-black my-1'
+                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
@@ -199,7 +199,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
                   {BaseEventDescriptions.main.soleSurvivor}
                 </FormDescription>
-              </span>
+              </div>
               {!hidePredictions && <BasePredictionFormField eventName={'soleSurvivor'} disabled={disabled} />}
               <FormMessage />
             </FormItem>

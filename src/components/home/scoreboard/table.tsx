@@ -13,6 +13,7 @@ import { type SeasonsDataQuery } from '~/types/seasons';
 import { compileScores } from '~/lib/scores';
 import { twentyFourColors } from '~/lib/colors';
 import { type BaseEventRules } from '~/types/leagues';
+import Image from 'next/image';
 
 export interface ScoreboardTableProps {
   scoreData: SeasonsDataQuery[];
@@ -86,7 +87,18 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
   }, [scoreData, selectedSeasonIndex]);
 
   if (!selectedSeasonData) {
-    return <div className='text-center py-6'>No seasons available.</div>;
+    return (
+      <div className='flex flex-col items-center justify-center gap-4'>
+        <p className='text-primary'>Loading season...</p>
+        <Image
+          src='/Logo.png'
+          alt='Loading'
+          width={150}
+          height={150}
+          className='animate-loading-spin w-auto h-auto'
+        />
+      </div>
+    );
   }
 
   return (
@@ -122,15 +134,17 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
             )) : (
               <TableHead className='text-center' colSpan={2}>
                 {selectedSeasonData.data.season.name}
-                <SelectSeason
-                  seasons={scoreData.map(s => ({
-                    value: s.season.name,
-                    label: s.season.name,
-                  }))}
-                  value={selectedSeasonData.data.season.name}
-                  setValue={selectSeason}
-                  someHidden={someHidden}
-                />
+                {scoreData.length > 1 && (
+                  <SelectSeason
+                    seasons={scoreData.map(s => ({
+                      value: s.season.name,
+                      label: s.season.name,
+                    }))}
+                    value={selectedSeasonData.data.season.name}
+                    setValue={selectSeason}
+                    someHidden={someHidden}
+                  />
+                )}
               </TableHead>
             )}
           </TableRow>

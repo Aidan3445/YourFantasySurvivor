@@ -3,22 +3,25 @@
 import { cn } from '~/lib/utils';
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import PointsCell from '~/components/leagues/hub/activity/timeline/table/pointsCell';
-import NotesCell from '~/components/leagues/hub/activity/timeline/table/notesCell';
+import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
+import NotesCell from '~/components/shared/eventTimeline/table/notesCell';
 import { type EnrichedEvent, type BaseEventName } from '~/types/events';
 import { BaseEventFullName } from '~/lib/events';
 import { useMemo } from 'react';
 import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
+import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import { getContrastingColor } from '@uiw/color-convert';
 
 interface EventRowProps {
   className?: string;
   event: EnrichedEvent;
   editCol?: boolean;
   isMock?: boolean;
+  noMembers?: boolean;
 }
 
-export default function EventRow({ className, event, editCol: edit, isMock }: EventRowProps) {
+export default function EventRow({ className, event, editCol: edit, isMock, noMembers }: EventRowProps) {
   const isBaseEvent = useMemo(() => event.eventSource === 'Base', [event.eventSource]);
 
   const label = useEventLabel(event.eventName, isBaseEvent, event.label);
@@ -63,13 +66,21 @@ export default function EventRow({ className, event, editCol: edit, isMock }: Ev
                 key={castaway.castawayId}
                 className='leading-tight px-1 w-min'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
-                {castaway.fullName}
+                <CastawayPopover castaway={castaway}>
+                  <span
+                    className='text-nowrap'
+                    style={{
+                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
+                    }}>
+                    {castaway.fullName}
+                  </span>
+                </CastawayPopover>
               </ColorRow>
             )
           ))}
         </div>
       </TableCell>
-      <TableCell>
+      {!noMembers && <TableCell>
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5',
           event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.member)) && 'justify-center')}>
@@ -88,7 +99,7 @@ export default function EventRow({ className, event, editCol: edit, isMock }: Ev
             )
           )}
         </div>
-      </TableCell>
+      </TableCell>}
       <NotesCell notes={event.notes} />
     </TableRow >
   );

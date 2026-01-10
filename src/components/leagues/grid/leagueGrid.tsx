@@ -19,7 +19,7 @@ export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridPr
 
   if (isInactive) {
     return (
-      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-12 w-5/6'>
+      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
         {leagues
           .toSorted(({ league: a }, { league: b }) => b.season.localeCompare(a.season))
           .map(({ league, member, currentSelection }, index) => (
@@ -45,7 +45,11 @@ export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridPr
   }
 
   return (
-    <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-12 w-5/6'>
+    <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full'>
+      <h3
+        className='md:col-span-2 lg:col-span-4 -mb-2 text-center px-2 text-xl text-primary-foreground font-semibold bg-primary rounded-full shimmer-fast'>
+        {leagues[0]!.league.season}
+      </h3>
       {leagues.map((leagueItem) => (
         <LeagueCard key={leagueItem.league.hash} {...leagueItem} />
       ))}

@@ -1,8 +1,7 @@
 import MemberEditForm from '~/components/leagues/customization/member/view';
 import Chart from '~/components/leagues/hub/chart/view';
-import Timeline from '~/components/leagues/hub/activity/timeline/view';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
-import { DynamicTabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
 import ChangeCastaway from '~/components/leagues/hub/picks/changeSurvivor/view';
@@ -13,8 +12,6 @@ import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
 import Predictions from '~/components/leagues/hub/picks/predictions/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-//import LeagueChatCard from '~/components/leagues/main/leagueChatCard';
-//import { leaguesService as QUERIES } from '~/services/leagues';
 import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 import getLeague from '~/services/leagues/query/legaue';
@@ -22,87 +19,88 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import Podium from '~/components/leagues/hub/scoreboard/podium/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
+import { getSeasonData } from '~/services/seasons/query/seasonsData';
+import LeagueTimeline from '~/components/leagues/hub/activity/leagueTimeline/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
   const auth = await leagueMemberAuth(hash);
   const { userId } = await systemAdminAuth();
   let isActive = false;
+  let league = null;
+  let seasonData = null;
   if (auth.memberId) {
-    const league = await getLeague(auth as VerifiedLeagueMemberAuth);
+    league = await getLeague(auth as VerifiedLeagueMemberAuth);
     isActive = league?.status === 'Active';
+    if (league) {
+      seasonData = await getSeasonData(league.seasonId);
+    }
   }
-  //const chatHistory = await QUERIES.getChatHistory(hash);
 
   return (
-    <main className='flex gap-6 md:w-[calc(100svw-var(--sidebar-width))] md:p-2 pb-0 md:h-auto'>
-      <DynamicTabs
-        className='w-full shadow-lg md:bg-secondary rounded-3xl md:border md:h-[calc(100svh-5rem)] md:overflow-hidden'
-        defaultValue='scores'
-        rules={[
-          //{ tabName: 'chat', maxWidth: '1024px' }
-        ]} >
-        <TabsList className='sticky top-10 md:static flex w-full px-10 rounded-none z-50'>
-          <TabsTrigger className='flex-1' value='scores'>Scores</TabsTrigger>
-          {/*
-          <TabsTrigger className='flex-1 lg:hidden' value='chat'>Chat</TabsTrigger>
-          */}
-          {isActive && auth.role !== 'Member' && <TabsTrigger className='flex-1' value='events'>Commish</TabsTrigger>}
-          {isActive && userId && <TabsTrigger className='flex-1' value='Base'>Base</TabsTrigger>}
-          <TabsTrigger className='flex-0 ml-10' value='settings'>Settings</TabsTrigger>
-        </TabsList>
-        <ScrollArea className='md:h-full h-[calc(100svh-7.5rem)] overflow-y-clip @container/tabs-content'>
-          <TabsContent className='mb-2' value='scores'>
-            <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-12 pb-2'>
-              <Podium />
-              <span className='w-full grid grid-cols-1 grid-rows-2 lg:grid-cols-[min-content_minmax(24rem,1fr)] lg:grid-rows-1 gap-4 items-center justify-center'>
-                <Scoreboard />
-                <Chart />
-              </span>
-              <ChangeCastaway />
-              <Predictions />
-              <Timeline />
-            </section>
+    <Tabs className='w-full' defaultValue='scores'>
+      <TabsList className='sticky flex w-full px-10 rounded-none z-50 *:flex-1 [&>*:last-child]:flex-none [&>*:last-child]:w-fit'>
+        <TabsTrigger value='scores'>Scores</TabsTrigger>
+        {isActive && auth.role !== 'Member' && <TabsTrigger value='events'>Commish</TabsTrigger>}
+        {isActive && userId && <TabsTrigger value='Base'>Base</TabsTrigger>}
+        <TabsTrigger value='settings'>Settings</TabsTrigger>
+      </TabsList>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-7rem)] h-[calc(100svh-6rem-var(--navbar-height))]'>
+        <div className='pb-4'>
+          <TabsContent className='space-y-4' value='scores'>
+            <div className='w-full bg-card rounded-xl'>
+              <Tabs className='w-full' defaultValue={isActive ? 'scoreboard' : 'podium'}>
+                <TabsList className='grid grid-flow-col auto-cols-fr mx-2 z-50 m-2'>
+                  {!isActive && <TabsTrigger value='podium'>Podium</TabsTrigger>}
+                  <TabsTrigger value='scoreboard'>Scoreboard</TabsTrigger>
+                  <TabsTrigger value='chart'>Chart</TabsTrigger>
+                </TabsList>
+                {!isActive && (
+                  <TabsContent value='podium'>
+                    <Podium />
+                  </TabsContent>
+                )}
+                <TabsContent value='scoreboard'>
+                  <Scoreboard />
+                </TabsContent>
+                <TabsContent value='chart'>
+                  <Chart />
+                </TabsContent>
+              </Tabs>
+            </div>
+            <ChangeCastaway />
+            <Predictions />
+            {seasonData && <LeagueTimeline seasonData={seasonData} />}
           </TabsContent>
-          {/*
-          <TabsContent value='chat' className='m-2 mt-0'>
-            <LeagueChatCard className='w-full px-2 h-[calc(100svh-8.5rem)]' chatHistory={chatHistory} defaultOpen />
-          </TabsContent>
-          */}
           <TabsContent value='events'>
             <CreateCustomEvent />
           </TabsContent>
           <TabsContent value='Base'>
             <CreateBaseEvent />
           </TabsContent>
-          <TabsContent value='settings'>
-            <section className='w-fit flex flex-wrap gap-4 justify-center px-4 md:pb-14'>
-              {isActive && <>
-                <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
-                  Settings
-                </h2>
-                <MemberEditForm className='flex-1' />
-                <span className='w-full flex flex-wrap gap-4 justify-center'>
-                  <LeagueSettings />
-                  <DeleteLeague />
-                  <ManageMembers />
-                </span>
-              </>}
+          <TabsContent value='settings' className='space-y-4'>
+            {isActive && <>
               <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
-                Scoring
+                Settings
               </h2>
-              <SetSurvivalCap />
-              <LeagueScoring />
-              <ShauhinMode />
-              <CustomEvents />
-            </section>
+              <MemberEditForm className='flex-1' />
+              <span className='w-full flex flex-wrap gap-4 justify-center'>
+                <LeagueSettings />
+                <DeleteLeague />
+                <ManageMembers />
+              </span>
+            </>}
+            <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
+              Scoring
+            </h2>
+            <SetSurvivalCap />
+            <LeagueScoring />
+            <ShauhinMode />
+            <CustomEvents />
           </TabsContent>
-          <ScrollBar orientation='vertical' className='invisible md:visible' />
-        </ScrollArea>
-      </DynamicTabs>
-      {/*
-      <LeagueChatCard className='hidden lg:block' chatHistory={chatHistory} />
-      */}
-    </main >
+        </div>
+        <ScrollBar className='pb-4 pt-2' />
+      </ScrollArea >
+    </Tabs >
   );
 }

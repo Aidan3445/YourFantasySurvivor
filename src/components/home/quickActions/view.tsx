@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/common/card';
 import CreateLeagueForm from '~/components/leagues/actions/league/create/view';
 import { Zap } from 'lucide-react';
-import JoinLeagueDialog from '~/components/home/quickActions/joinDialogue';
+import JoinLeagueModal from '~/components/home/quickActions/joinDialogue';
 
 export function QuickActions() {
   return (
@@ -15,7 +15,7 @@ export function QuickActions() {
       <CardContent className='space-y-4'>
         <CreateLeagueForm />
         <h3 className='text-center text-lg font-semibold text-muted-foreground'>OR</h3>
-        <JoinLeagueDialog />
+        <JoinLeagueModal />
       </CardContent>
     </Card>
   );
