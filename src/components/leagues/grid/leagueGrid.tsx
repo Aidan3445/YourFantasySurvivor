@@ -29,7 +29,7 @@ export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridPr
                 <h3
                   key={league.season}
                   className='md:col-span-2 lg:col-span-4 -mb-2 text-center text-lg text-primary-foreground font-semibold bg-primary rounded-full'>
-                  {league.season} {leagues.length}
+                  {league.season}
                 </h3>
               )}
               <LeagueCard

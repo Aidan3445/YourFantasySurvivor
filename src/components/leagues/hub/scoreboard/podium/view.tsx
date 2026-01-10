@@ -10,10 +10,7 @@ interface PodiumProps {
 }
 
 export default function Podium({ overrideHash, className }: PodiumProps) {
-  const { sortedMemberScores, league } = useLeagueData(overrideHash);
-
-  if (league?.status !== 'Inactive') return null;
-
+  const { sortedMemberScores } = useLeagueData(overrideHash);
 
   // Handle ties:
   // 1st and 2nd place tie -> both gold, no silver, next is bronze

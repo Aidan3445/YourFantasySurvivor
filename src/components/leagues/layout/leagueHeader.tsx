@@ -26,6 +26,6 @@ export default function LeagueHeader() {
           </Link>
         </>
       )}
-    </div >
+    </div>
   );
 }
