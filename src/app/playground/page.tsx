@@ -79,7 +79,7 @@ export default function PlaygroundPage() {
         <div className='flex flex-col gap-4 my-2'>
           <Form {...reactForm}>
             <form className='p-4 bg-card rounded-lg'>
-              <span className='grid lg:grid-cols-3 gap-x-4 gap-y-2'>
+              <span className='grid lg:grid-cols-3 gap-2'>
                 <ChallengeScoreSettings hidePredictions />
                 <AdvantageScoreSettings hidePredictions>
                   <Button
