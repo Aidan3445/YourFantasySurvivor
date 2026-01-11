@@ -4,9 +4,9 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { Button } from '~/components/common/button';
 import { Input } from '~/components/common/input';
 import { Label } from '~/components/common/label';
-import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '~/components/common/alertDialog';
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, AlertDialogCancel } from '~/components/common/alertDialog';
 import { useRouter } from 'next/navigation';
-import { Users } from 'lucide-react';
+import { Users, X } from 'lucide-react';
 
 interface JoinLeagueAlertDialogProps {
   children?: ReactNode;
@@ -80,6 +80,11 @@ export default function JoinLeagueModal({ children }: JoinLeagueAlertDialogProps
             </Button>
           </div>
         </div>
+        <AlertDialogFooter className='absolute top-1 right-1'>
+          <AlertDialogCancel className='h-min p-1'>
+            <X stroke='white' />
+          </AlertDialogCancel>
+        </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );

@@ -8,7 +8,7 @@ import { cn } from '~/lib/utils';
 import { Button } from '~/components/common/button';
 
 export function FloatingActionsWidget() {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div

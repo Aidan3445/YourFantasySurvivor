@@ -14,7 +14,7 @@ export default function SideNavLink({ href, icon, label, pathnameMatch, classNam
     : pathname === href;
 
   return (
-    <SidebarMenuButton className='' asChild size='lg'>
+    <SidebarMenuButton className='h-10!' asChild size='lg'>
       <Link
         className={cn(
           'w-full flex gap-5 items-center transition-all h-min text-primary text-nowrap hover:text-primary!',

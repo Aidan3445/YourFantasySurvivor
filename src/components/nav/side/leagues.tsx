@@ -44,13 +44,13 @@ export default function SideNavLeagues() {
       value={open}
       onValueChange={() => toggleOpen()}>
       <AccordionItem value='leagues'>
-        <SidebarMenuButton className='' asChild size='lg'>
-          <AccordionTrigger className='mb-1 hover:no-underline font-normal data-[state=open]:mb-0 transition-all stroke-primary'>
+        <SidebarMenuButton className='h-10!' asChild size='lg'>
+          <AccordionTrigger className='hover:no-underline font-normal data-[state=open]:mb-0 transition-all stroke-primary'>
             <span className={cn(
               'w-full flex gap-5 items-center text-primary transition-all',
               !open && (pathname.startsWith('/leagues') ? 'font-semibold' : '')
             )}>
-              <Trophy className='stroke-primary' />
+              <Trophy className='stroke-primary' size={24} />
               Leagues
             </span>
           </AccordionTrigger>
@@ -72,9 +72,9 @@ export default function SideNavLeagues() {
             )}
             <CreateLeagueModal>
               <SidebarMenuButton asChild size='lg'>
-                <span className='w-full flex gap-5  items-center transition-all text-nowrap text-primary'>
+                <span className='w-full flex gap-5  items-center transition-all text-nowrap text-primary h-10!'>
                   Create League
-                  <ListPlus className='stroke-primary' />
+                  <ListPlus className='stroke-primary' size={24} />
                 </span>
               </SidebarMenuButton>
             </CreateLeagueModal>
