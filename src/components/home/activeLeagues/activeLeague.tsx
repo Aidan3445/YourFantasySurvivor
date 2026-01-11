@@ -17,9 +17,9 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         key={league.hash}
         href={`/leagues/${league.hash}`}
         className='block'>
-        <div className='px-2 py-1 rounded-lg border hover:bg-accent/50 transition-colors flex items-center justify-between mb-2'>
-          <h4 className='font-semibold mr-auto'>{league.name}</h4>
-          <Badge variant='secondary' className='hover:bg-secondary'>{league.season}</Badge>
+        <div className='px-2 py-1 rounded-lg border hover:bg-accent/50 transition-colors flex items-center justify-between'>
+          <h4 className='font-semibold mr-auto leading-none'>{league.name}</h4>
+          <Badge variant='secondary' className='hover:bg-secondary text-nowrap'>{league.season}</Badge>
           <SquareArrowOutUpRight size={20} className='ml-2 stroke-primary' />
         </div>
       </Link>
@@ -28,7 +28,8 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         : <div className='space-y-0'>
           <DraftCountdown overrideHash={league.hash} />
           <DraftOrder overrideHash={league.hash} className='bg-accent' scrollHeight='max-h-36' />
-        </div>}
+        </div>
+      }
     </div>
   );
 }

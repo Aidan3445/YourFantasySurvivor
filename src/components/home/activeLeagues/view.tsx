@@ -91,7 +91,7 @@ export function ActiveLeagues() {
       {(!topLeagues || topLeagues.length === 0)
         ? <NoActiveLeagues inactiveLeagues={inactiveLeagues} />
         : (
-          <Card className={cn('h-full transition-opacity', showLoading && 'opacity-0')}>
+          <Card className={cn('h-full transition-opacity py-2', showLoading && 'opacity-0')}>
             <CardContent className='px-0 overflow-y-auto'>
               <Carousel
                 opts={{

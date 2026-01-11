@@ -401,6 +401,7 @@ interface CarouselProgressProps {
 }
 
 function CarouselProgress({ current, count }: CarouselProgressProps) {
+  if (count <= 1) return null;
   return (
     <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
       <div

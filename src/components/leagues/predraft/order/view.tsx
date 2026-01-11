@@ -89,7 +89,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
   };
 
   return (
-    <article className={cn('flex flex-col w-full p-2 bg-card rounded-xl relative', className)}>
+    <article className={cn('flex flex-col w-full bg-card rounded-xl relative overflow-clip', className)}>
       {leagueMembers.loggedIn?.role === 'Owner' && (orderLocked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
@@ -97,7 +97,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
         <LockOpen
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => { setLocked(true); setOrder(dbOrder); }} />)}
-      <span className='flex gap-4 items-center mb-4 w-full'>
+      <div className='flex gap-4 items-center w-full p-2 border-b bg-accent'>
         <h2 className='text-lg font-bold text-card-foreground h-9 place-content-center'>Draft Order</h2>
         {!orderLocked && <>
           <Shuffle
@@ -117,7 +117,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
             </span>
           </form>
         </>}
-      </span>
+      </div>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -125,25 +125,27 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
         onDragEnd={(event) => handleDragEnd(event, setOrder)}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <ScrollArea className={cn('flex flex-col', scrollHeight && `overflow-y-auto ${scrollHeight}`)}>
-            {order.map((member, index) => {
-              return (
-                <SortableItem
-                  key={member.memberId}
-                  id={member.memberId}
-                  className='grid col-span-3 grid-cols-subgrid mx-3 my-1'
-                  disabled={orderLocked}>
-                  <ColorRow
-                    color={member.color}
-                    loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}>
-                    <h3 className='text-lg w-4' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
-                    <h2 className='text-3xl font-semibold' style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h2>
-                    {!orderLocked &&
-                      <GripVertical className='ml-auto cursor-row-resize' color={getContrastingColor(member.color)} />}
-                  </ColorRow>
-                </SortableItem>
-              );
-            })}
-            <ScrollBar orientation='vertical' />
+            <div className='pb-2'>
+              {order.map((member, index) => {
+                return (
+                  <SortableItem
+                    key={member.memberId}
+                    id={member.memberId}
+                    className='grid col-span-3 grid-cols-subgrid mx-3 my-1'
+                    disabled={orderLocked}>
+                    <ColorRow
+                      color={member.color}
+                      loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}>
+                      <h3 className='text-lg w-4' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
+                      <h2 className='text-3xl font-semibold' style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h2>
+                      {!orderLocked &&
+                        <GripVertical className='ml-auto cursor-row-resize' color={getContrastingColor(member.color)} />}
+                    </ColorRow>
+                  </SortableItem>
+                );
+              })}
+            </div>
+            <ScrollBar className='pb-2 pt-1' />
           </ScrollArea>
         </SortableContext>
       </DndContext>

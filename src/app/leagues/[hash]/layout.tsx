@@ -27,9 +27,9 @@ export default async function LeagueLayout({ children, params }: LeagueLayoutPro
   }
 
   return (
-    <div>
+    <>
       <LeagueHeader />
       {children}
-    </div>
+    </>
   );
 }
