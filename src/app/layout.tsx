@@ -7,6 +7,7 @@ import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
 import { type Metadata } from 'next';
 import QueryClientContextProvider from '~/context/reactQueryContext';
+import { FloatingActionsWidget } from '~/components/shared/floatingActions/widget';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -45,6 +46,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                     {children}
                   </div>
                 </main>
+                <FloatingActionsWidget />
               </SidebarProvider>
             </body>
           </html>

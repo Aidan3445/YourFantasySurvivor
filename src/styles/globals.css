@@ -71,6 +71,7 @@
   --animate-scale-out: scale-out 2s ease-out;
   --animate-scale-out-fast: scale-out 0.1s ease-out;
   --animate-loading-spin: spin 2s linear infinite;
+  --animate-widget-bounce: bounce 5s infinite;
 
   --transition-delay-400: 400ms;
 
