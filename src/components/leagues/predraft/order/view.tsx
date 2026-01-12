@@ -92,8 +92,8 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
   return (
     <article className={cn('relative overflow-hidden rounded-lg border-2 border-primary/20', className)}>
       {/* Header */}
-      <div className='flex items-center justify-between p-4 border-b-2 border-primary/20 bg-primary/5'>
-        <span className='flex items-center gap-3'>
+      <div className='flex items-center justify-between px-4 py-1 border-b-2 border-primary/20 bg-primary/5'>
+        <span className='flex items-center gap-3 h-8'>
           <span className='h-6 w-1 bg-primary rounded-full' />
           <h2 className='text-xl font-black uppercase tracking-tight leading-none'>
             Draft Order
@@ -111,8 +111,8 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
             <>
               <button
                 onClick={shuffleOrderWithAnimation}
-                className='p-2 bg-primary/10 border-2 border-primary/30 rounded-lg hover:bg-primary/20 hover:border-primary/40 transition-all'>
-                <Shuffle className='w-5 h-5 text-primary' />
+                className='p-1 bg-primary/10 border-2 border-primary/30 rounded-lg hover:bg-primary/20 hover:border-primary/40 transition-all'>
+                <Shuffle className='w-4 h-4 text-primary' />
               </button>
               <Button
                 type='button'
@@ -157,7 +157,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
         onDragEnd={(event) => handleDragEnd(event, setOrder)}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <ScrollArea className={cn('flex flex-col', scrollHeight && `overflow-y-auto ${scrollHeight}`)}>
-            <div className='p-2 space-y-2'>
+            <div className='py-1 px-4 pb-4 space-y-2'>
               {order.map((member, index) => {
                 return (
                   <SortableItem

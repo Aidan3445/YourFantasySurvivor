@@ -58,7 +58,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
         <div className='absolute top-0 right-0 w-32 h-32 bg-green-500/20 rounded-full blur-3xl' />
       )}
 
-      <div className='relative z-10 p-4'>
+      <div className='relative z-10'>
         {/* Header */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-3'>
@@ -66,7 +66,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
             <h2 className='text-xl font-black uppercase tracking-tight leading-none'>
               Draft Status
             </h2>
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-2 pointer-events-none tracking-wider'>
               {isDraftLive ? (
                 <Badge className='bg-green-500/20 text-green-600 border-green-500/40 border-2 font-black text-xs'>
                   <Zap className='w-3 h-3 mr-1' />
@@ -99,25 +99,23 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
           </div>
         </div>
 
-        {/* Draft Date Info */}
-        {leagueSettings?.draftDate && (
-          <div className='text-sm font-medium text-muted-foreground'>
-            {isScheduled ? (
-              <div className='flex items-center gap-2'>
-                <Calendar className='w-4 h-4 text-primary' />
-                <span>Starts: {leagueSettings.draftDate.toLocaleString()}</span>
-              </div>
-            ) : (
-              <div className='flex items-center gap-2 text-primary'>
-                <Zap className='w-4 h-4' />
-                <span className='font-bold'>{isDraftLive ? 'Draft is live!' : 'Draft ready to start!'}</span>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Countdown / Action */}
         <div className='mt-1 bg-primary/10 border-2 border-primary/30 rounded-lg overflow-hidden'>
+          {leagueSettings?.draftDate && (
+            <div className='pl-2 text-sm font-medium text-muted-foreground h-0'>
+              {isScheduled ? (
+                <div className='flex items-center gap-2'>
+                  <Calendar className='w-4 h-4 text-primary' />
+                  <span>Starts: {leagueSettings.draftDate.toLocaleString()}</span>
+                </div>
+              ) : (
+                <div className='flex items-center gap-2 text-primary'>
+                  <Zap className='w-4 h-4' />
+                  <span className='font-bold'>{isDraftLive ? 'Draft is live!' : 'Draft ready to start!'}</span>
+                </div>
+              )}
+            </div>
+          )}
           <Clock endDate={leagueSettings?.draftDate ?? null} replacedBy={
             <Button
               className='w-full py-6 rounded-none font-black text-xl uppercase tracking-wider shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]'

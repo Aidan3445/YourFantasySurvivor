@@ -30,7 +30,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         className='group block'>
         <div className='relative bg-primary/5 border-2 border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/30 transition-all'>
           {/* Status Badge */}
-          <Badge className={cn('absolute top-4 right-4 flex items-center gap-1.5 rounded-md border-2 text-xs font-black tracking-wider', status.color)}>
+          <Badge className={cn('absolute top-4 right-4 flex items-center gap-1.5 rounded-md border-2 text-xs font-black tracking-wider pointer-events-none', status.color)}>
             <StatusIcon className='w-3 h-3' />
             {status.label}
           </Badge>
@@ -54,8 +54,8 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
       {league.status === 'Active'
         ? <Scoreboard overrideHash={league.hash} maxRows={5} className='bg-transparent' />
         : <div className='space-y-4'>
-          <DraftCountdown overrideHash={league.hash} className='bg-primary/5 border border-primary/20 p-4' />
-          <DraftOrder overrideHash={league.hash} className='bg-primary/5 border border-primary/20 mb-3' scrollHeight='max-h-36 h-36' />
+          <DraftCountdown overrideHash={league.hash} className='bg-primary/5 border border-primary/20 p-4 pt-1' />
+          <DraftOrder overrideHash={league.hash} className='bg-primary/5 border border-primary/20 mb-4' scrollHeight='max-h-36 h-36' />
         </div>
       }
     </div>
