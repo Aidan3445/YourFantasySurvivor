@@ -10,12 +10,14 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { cn } from '~/lib/utils';
 
 interface DraftCountdownProps {
   overrideHash?: string;
+  className?: string;
 }
 
-export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
+export function DraftCountdown({ overrideHash, className }: DraftCountdownProps) {
   const queryClient = useQueryClient();
   const { data: league } = useLeague(overrideHash);
   const { data: leagueSettings } = useLeagueSettings(overrideHash);
@@ -44,7 +46,7 @@ export function DraftCountdown({ overrideHash }: DraftCountdownProps) {
   };
 
   return (
-    <article className='flex flex-col w-full p-2 bg-card rounded-xl'>
+    <article className={cn('flex flex-col w-full p-2 bg-card rounded-xl', className)}>
       <span className='flex w-full items-start'>
         <div className='flex flex-wrap gap-x-2 items-baseline'>
           <h2 className='text-lg font-bold text-accent-foreground'>Draft Countdown</h2>

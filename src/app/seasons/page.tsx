@@ -91,8 +91,7 @@ export default function SeasonsPage() {
                 alt='Loading'
                 width={150}
                 height={150}
-                className='animate-loading-spin w-auto h-auto'
-              />
+                className='animate-loading-spin w-auto h-auto' />
             </div>
           )
         ) : (

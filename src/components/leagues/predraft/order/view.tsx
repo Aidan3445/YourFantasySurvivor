@@ -90,7 +90,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
 
   return (
     <article className={cn('flex flex-col w-full bg-card rounded-xl relative overflow-clip', className)}>
-      {leagueMembers.loggedIn?.role === 'Owner' && (orderLocked ?
+      {leagueMembers.members.length > 1 && leagueMembers.loggedIn?.role === 'Owner' && (orderLocked ?
         <Lock
           className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
           onClick={() => setLocked(false)} /> :

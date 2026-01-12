@@ -19,7 +19,7 @@ export default async function HomePage() {
 
           <CastawayScoreboard />
         </div>
-        <ScrollBar className='pt-2 pb-4' />
+        <ScrollBar className='py-4' />
       </ScrollArea>
     </div>
   );

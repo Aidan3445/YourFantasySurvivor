@@ -54,7 +54,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
       {league.status === 'Active'
         ? <Scoreboard overrideHash={league.hash} maxRows={5} className='bg-transparent' />
         : <div className='space-y-4'>
-          <DraftCountdown overrideHash={league.hash} />
+          <DraftCountdown overrideHash={league.hash} className='bg-primary/5 border border-primary/20 p-4' />
           <DraftOrder overrideHash={league.hash} className='bg-primary/5 border border-primary/20 mb-3' scrollHeight='max-h-36 h-36' />
         </div>
       }
