@@ -23,13 +23,13 @@ export default async function SideNav() {
               }
               label='Your Fantasy Survivor' />
             <SideNavLink
-              href='/playground'
-              icon={<Flame className='stroke-primary' />}
-              label='Playground' />
-            <SideNavLink
               href='/seasons'
               icon={<BookUser className='stroke-primary' />}
               label='Seasons' />
+            <SideNavLink
+              href='/playground'
+              icon={<Flame className='stroke-primary' />}
+              label='Playground' />
             <SignedIn>
               <SideNavLeagues />
             </SignedIn>
