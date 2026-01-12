@@ -1,10 +1,16 @@
 import { SignInButton } from '@clerk/nextjs';
+import Image from 'next/image';
 import { Card, CardContent } from '~/components/common/card';
 
 export function HeroSection() {
   return (
     <Card className='bg-card border-border/50 shadow-sm'>
-      <CardContent>
+      <CardContent className='relative'>
+        {/* Logo - Top Right Corner */}
+        <div className='absolute top-0 right-4 opacity-40 hover:opacity-60 transition-opacity'>
+          <Image src='/Logo.png' alt='YFS Logo' width={80} height={80} className='w-16 h-16 md:w-auto md:h-auto' />
+        </div>
+
         <div className='space-y-4'>
           {/* Hero Headline */}
           <div>
@@ -13,8 +19,10 @@ export function HeroSection() {
               <br />
               <span className='text-primary font-semibold'>Survivor</span>
             </h1>
-            <div className='w-20 h-0.5 bg-primary/80' />
+            <div className='w-20 h-0.5 bg-primary/80 mt-6' />
           </div>
+
+
 
           {/* Subtext */}
           <div className='max-w-lg space-y-4'>
