@@ -30,10 +30,10 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         className='group block'>
         <div className='relative bg-primary/5 border-2 border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/30 transition-all'>
           {/* Status Badge */}
-          <div className={cn('absolute top-4 right-4 flex items-center gap-1.5 px-2 py-1 rounded-md border-2 text-xs font-black tracking-wider', status.color)}>
+          <Badge className={cn('absolute top-4 right-4 flex items-center gap-1.5 rounded-md border-2 text-xs font-black tracking-wider', status.color)}>
             <StatusIcon className='w-3 h-3' />
             {status.label}
-          </div>
+          </Badge>
 
           <div className=''>
             <h3 className='text-2xl md:text-3xl font-black leading-tight group-hover:text-primary transition-colors'>

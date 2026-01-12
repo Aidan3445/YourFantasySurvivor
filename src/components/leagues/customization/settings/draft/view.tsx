@@ -69,35 +69,54 @@ export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
   return (
     <Form {...reactForm}>
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <AlertDialogTrigger>
-          <Settings
-            className='cursor-pointer stroke-primary hover:stroke-secondary transition-all'
-            size={34} />
+        <AlertDialogTrigger asChild>
+          <Settings className='w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary active:stroke-secondary/75 transition-all' />
         </AlertDialogTrigger>
-        <AlertDialogContent className='h-3/4 flex flex-col'>
+        <AlertDialogContent className='h-3/4 flex flex-col border-primary/30 shadow-lg shadow-primary/20'>
           <AlertDialogHeader>
-            <AlertDialogTitle>Edit Draft Type and Date</AlertDialogTitle>
-            <AlertDialogDescription>
-              You can draft before the season starts or set a data after the premiere.
+            <span className='flex items-center gap-3 mb-2'>
+              <span className='h-6 w-1 bg-primary rounded-full' />
+              <AlertDialogTitle className='text-2xl font-black uppercase tracking-tight'>
+                Draft Settings
+              </AlertDialogTitle>
+            </span>
+            <AlertDialogDescription className='text-base'>
+              Schedule your draft or set it to manual start by the commissioner.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <form className='flex flex-col gap-2 justify-between h-full' action={() => handleSubmit()}>
-            <span className='space-y-2'>
-              <DraftDateField />
-              {reactForm.watch('draftDate') && <>
-                <h3 className='text-lg'>OR</h3>
-                <Button type='button' onClick={() => reactForm.setValue('draftDate', null)}>
-                  Set draft to manually start
-                </Button>
-              </>}
-            </span>
-            <AlertDialogFooter>
-              <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
-                <X stroke='white' />
+          <form className='flex flex-col gap-4 justify-between h-full' action={() => handleSubmit()}>
+            <div className='space-y-4'>
+              <div className='bg-primary/5 border border-primary/20 rounded-lg p-4'>
+                <DraftDateField />
+              </div>
+              {reactForm.watch('draftDate') && (
+                <>
+                  <div className='flex items-center gap-3'>
+                    <div className='flex-1 h-px bg-border' />
+                    <span className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>OR</span>
+                    <div className='flex-1 h-px bg-border' />
+                  </div>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='w-full font-bold uppercase text-xs tracking-wider border-primary/30 hover:bg-primary/10'
+                    onClick={() => reactForm.setValue('draftDate', null)}>
+                    Switch to Manual Start
+                  </Button>
+                </>
+              )}
+            </div>
+            <AlertDialogFooter className='gap-3'>
+              <AlertDialogCancel className='absolute top-4 right-4 h-auto w-auto p-2 bg-destructive/10 border-destructive/30 hover:bg-destructive/20'>
+                <X className='w-4 h-4' />
               </AlertDialogCancel>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <Button type='submit'>Save
-                Draft as {reactForm.watch('draftDate') ? ` ${reactForm.getValues('draftDate')?.toLocaleString()}` : ' Manually'}
+              <AlertDialogCancel className='font-bold uppercase text-xs tracking-wider'>
+                Cancel
+              </AlertDialogCancel>
+              <Button
+                type='submit'
+                className='font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'>
+                Save Settings
               </Button>
             </AlertDialogFooter>
           </form>

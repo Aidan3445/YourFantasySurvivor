@@ -32,15 +32,23 @@ export default function Clock({ endDate, replacedBy }: ClockProps) {
 
   return (
     !timer || timer > 0 ?
-      <span className='w-full text-sidebar text-4xl grid grid-cols-7 max-w-3xl mx-auto'>
-        <ClockPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
-        <span className='text-4xl font-bold text-sidebar flex items-center justify-center'>:</span>
-        <ClockPlace value={hours.toString()} label={hours === 1 ? 'Hour' : 'Hours'} />
-        <span className='text-4xl font-bold text-sidebar flex items-center justify-center'>:</span>
-        <ClockPlace value={minutes.toString()} label={minutes === 1 ? 'Minute' : 'Minutes'} />
-        <span className='text-4xl font-bold text-sidebar flex items-center justify-center'>:</span>
-        <ClockPlace value={seconds.toString()} label={seconds === 1 ? 'Second' : 'Seconds'} />
-      </span>
+      <div className='w-full py-6 px-4'>
+        <div className='grid grid-cols-7 gap-2 max-w-2xl mx-auto'>
+          <ClockPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
+          <div className='flex items-center justify-center'>
+            <span className='text-3xl md:text-4xl font-black text-primary'>:</span>
+          </div>
+          <ClockPlace value={hours.toString()} label={hours === 1 ? 'Hour' : 'Hours'} />
+          <div className='flex items-center justify-center'>
+            <span className='text-3xl md:text-4xl font-black text-primary'>:</span>
+          </div>
+          <ClockPlace value={minutes.toString()} label={minutes === 1 ? 'Minute' : 'Minutes'} />
+          <div className='flex items-center justify-center'>
+            <span className='text-3xl md:text-4xl font-black text-primary'>:</span>
+          </div>
+          <ClockPlace value={seconds.toString()} label={seconds === 1 ? 'Second' : 'Seconds'} />
+        </div>
+      </div>
       :
       replacedBy
   );
@@ -53,9 +61,13 @@ interface ClockPlaceProps {
 
 function ClockPlace({ value, label }: ClockPlaceProps) {
   return (
-    <div className='flex flex-col text-center'>
-      <h1 className='text-4xl font-bold text-sidebar'>{value}</h1>
-      <p className='text-xs text-muted'>{label}</p>
+    <div className='flex flex-col items-center justify-center bg-primary/5 border border-primary/20 rounded-lg p-2'>
+      <span className='text-3xl md:text-4xl font-black text-primary tabular-nums'>
+        {value.toString().padStart(2, '0')}
+      </span>
+      <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1'>
+        {label}
+      </span>
     </div>
   );
 }

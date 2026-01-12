@@ -92,11 +92,10 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
     <article className={cn('flex flex-col w-full bg-card rounded-xl relative overflow-clip', className)}>
       {leagueMembers.members.length > 1 && leagueMembers.loggedIn?.role === 'Owner' && (orderLocked ?
         <Lock
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary active:stroke-secondary/75 transition-all'
           onClick={() => setLocked(false)} /> :
         <LockOpen
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
-          onClick={() => { setLocked(true); setOrder(dbOrder); }} />)}
+          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary active:stroke-secondary/75 transition-all' onClick={() => { setLocked(true); setOrder(dbOrder); }} />)}
       <div className='flex gap-4 items-center w-full p-2 border-b bg-accent'>
         <h2 className='text-lg font-bold text-card-foreground h-9 place-content-center'>Draft Order</h2>
         {!orderLocked && <>
