@@ -6,7 +6,7 @@ import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from 
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { cn } from '~/lib/utils';
-import { GripVertical, Lock, LockOpen, Shuffle } from 'lucide-react';
+import { GripVertical, Lock, LockOpen, Shuffle, ListOrdered } from 'lucide-react';
 import SortableItem from '~/components/common/sortableItem';
 import { handleDragEnd } from '~/hooks/ui/useSortableItem';
 import { Button } from '~/components/common/button';
@@ -17,6 +17,7 @@ import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateDraftOrder from '~/actions/updateDraftOrder';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { Badge } from '~/components/common/badge';
 
 const SUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -89,34 +90,66 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
   };
 
   return (
-    <article className={cn('flex flex-col w-full bg-card rounded-xl relative overflow-clip', className)}>
-      {leagueMembers.members.length > 1 && leagueMembers.loggedIn?.role === 'Owner' && (orderLocked ?
-        <Lock
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary active:stroke-secondary/75 transition-all'
-          onClick={() => setLocked(false)} /> :
-        <LockOpen
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary active:stroke-secondary/75 transition-all' onClick={() => { setLocked(true); setOrder(dbOrder); }} />)}
-      <div className='flex gap-4 items-center w-full p-2 border-b bg-accent'>
-        <h2 className='text-lg font-bold text-card-foreground h-9 place-content-center'>Draft Order</h2>
-        {!orderLocked && <>
-          <Shuffle
-            className='cursor-pointer stroke-primary hover:stroke-secondary transition-all mr-2'
-            size={24}
-            onClick={shuffleOrderWithAnimation} />
-          <form className='ml-auto' action={() => handleSubmit()}>
-            <span className='grid grid-cols-2 gap-2 mr-12'>
+    <article className={cn('relative overflow-hidden rounded-lg border-2 border-primary/20', className)}>
+      {/* Header */}
+      <div className='flex items-center justify-between p-4 border-b-2 border-primary/20 bg-primary/5'>
+        <span className='flex items-center gap-3'>
+          <span className='h-6 w-1 bg-primary rounded-full' />
+          <h2 className='text-xl font-black uppercase tracking-tight leading-none'>
+            Draft Order
+          </h2>
+          {!orderLocked && (
+            <Badge className='bg-blue-500/20 text-blue-600 border-blue-500/40 border-2 font-black text-xs pointer-events-none'>
+              <ListOrdered className='w-3 h-3 mr-1' />
+              EDITING
+            </Badge>
+          )}
+        </span>
+
+        <span className='flex items-center gap-2'>
+          {!orderLocked && (
+            <>
+              <button
+                onClick={shuffleOrderWithAnimation}
+                className='p-2 bg-primary/10 border-2 border-primary/30 rounded-lg hover:bg-primary/20 hover:border-primary/40 transition-all'>
+                <Shuffle className='w-5 h-5 text-primary' />
+              </button>
               <Button
                 type='button'
+                size='sm'
                 disabled={!orderChanged}
-                variant='destructive'
+                variant='outline'
+                className='font-bold uppercase text-xs tracking-wider border-destructive/40 text-destructive hover:bg-destructive/10'
                 onClick={() => { setOrder(dbOrder); setLocked(true); }}>
                 Cancel
               </Button>
-              <Button type='submit' disabled={!orderChanged}>Save</Button>
-            </span>
-          </form>
-        </>}
+              <Button
+                type='submit'
+                size='sm'
+                disabled={!orderChanged}
+                className='font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'
+                onClick={handleSubmit}>
+                Save
+              </Button>
+            </>
+          )}
+          {leagueMembers.members.length > 1 && leagueMembers.loggedIn?.role === 'Owner' && (
+            orderLocked ? (
+              <Lock
+                className='w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary active:stroke-secondary/75 transition-all'
+                onClick={() => setLocked(false)}
+              />
+            ) : (
+              <LockOpen
+                className='w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary active:stroke-secondary/75 transition-all'
+                onClick={() => { setLocked(true); setOrder(dbOrder); }}
+              />
+            )
+          )}
+        </span>
       </div>
+
+      {/* Order List */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -124,21 +157,45 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
         onDragEnd={(event) => handleDragEnd(event, setOrder)}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <ScrollArea className={cn('flex flex-col', scrollHeight && `overflow-y-auto ${scrollHeight}`)}>
-            <div className='pb-2'>
+            <div className='p-2 space-y-2'>
               {order.map((member, index) => {
                 return (
                   <SortableItem
                     key={member.memberId}
                     id={member.memberId}
-                    className='grid col-span-3 grid-cols-subgrid mx-3 my-1'
+                    className='group'
                     disabled={orderLocked}>
                     <ColorRow
                       color={member.color}
-                      loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}>
-                      <h3 className='text-lg w-4' style={{ color: getContrastingColor(member.color) }}>{index + 1}</h3>
-                      <h2 className='text-3xl font-semibold' style={{ color: getContrastingColor(member.color) }}>{member.displayName}</h2>
-                      {!orderLocked &&
-                        <GripVertical className='ml-auto cursor-row-resize' color={getContrastingColor(member.color)} />}
+                      loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}
+                      className='rounded-lg border-2 transition-all hover:border-primary/40'>
+                      <span className='flex items-center gap-3 w-full'>
+                        {/* Rank Badge */}
+                        <span
+                          className='inline-flex items-center justify-center w-8 h-8 rounded-md font-black text-sm shrink-0'
+                          style={{
+                            backgroundColor: `${member.color}40`,
+                            color: getContrastingColor(member.color),
+                            border: `2px solid ${member.color}66`
+                          }}>
+                          {index + 1}
+                        </span>
+
+                        {/* Name */}
+                        <span
+                          className='text-xl font-bold'
+                          style={{ color: getContrastingColor(member.color) }}>
+                          {member.displayName}
+                        </span>
+
+                        {/* Drag Handle */}
+                        {!orderLocked && (
+                          <GripVertical
+                            className='ml-auto cursor-row-resize opacity-50 group-hover:opacity-100 transition-opacity shrink-0'
+                            color={getContrastingColor(member.color)}
+                          />
+                        )}
+                      </span>
                     </ColorRow>
                   </SortableItem>
                 );
@@ -148,6 +205,6 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
           </ScrollArea>
         </SortableContext>
       </DndContext>
-    </article >
+    </article>
   );
 }

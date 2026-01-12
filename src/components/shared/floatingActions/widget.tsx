@@ -135,7 +135,7 @@ export function FloatingActionsWidget() {
               : 'opacity-0 pointer-events-none top-0'
           )}>
           <CreateLeagueModal>
-            <button className='relative w-12 h-12 rounded-lg bg-primary/20 border-2 border-primary/40 flex items-center justify-center hover:bg-primary/30 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20'>
+            <button className='relative w-12 h-12 rounded-lg bg-primary/50 border-2 border-primary/40 flex items-center justify-center hover:bg-primary/30 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20'>
               <ListPlus className='w-5 h-5 text-primary' />
             </button>
           </CreateLeagueModal>
@@ -148,7 +148,7 @@ export function FloatingActionsWidget() {
               : 'opacity-0 pointer-events-none left-0'
           )}>
           <JoinLeagueModal>
-            <Button className='relative w-12 h-12 rounded-lg bg-primary/20 border-2 border-primary/40 flex items-center justify-center hover:bg-primary/30 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'>
+            <Button className='relative w-12 h-12 rounded-lg bg-primary/50 border-2 border-primary/40 flex items-center justify-center hover:bg-primary/30 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'>
               <Users className='w-5 h-5 text-primary' />
             </Button>
           </JoinLeagueModal>
