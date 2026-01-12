@@ -6,8 +6,8 @@ export async function CastawayScoreboard() {
 
   if (scoreData.length === 0) {
     return (
-      <div className='text-center py-6'>
-        <p className='text-muted-foreground mb-4'>
+      <div className='text-center py-6 bg-card rounded-lg shadow-sm'>
+        <p className='text-muted-foreground'>
           No active leagues with scoring data.
         </p>
       </div>

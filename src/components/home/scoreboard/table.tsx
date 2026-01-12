@@ -98,11 +98,13 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
           {/* Section Header */}
           <div className='flex justify-between'>
             <div>
-              <h2 className='text-3xl md:text-4xl font-light tracking-tight leading-none'>
-                {selectedSeasonIndex === 0 ? 'Current Standings' : 'Season Standings'}
+              <h2 className='text-left text-3xl md:text-4xl font-light tracking-tight leading-none'>
+                {selectedSeasonIndex === 0
+                  ? (allZero ? 'Castaways' : 'Current Standings')
+                  : 'Season Standings'}
               </h2>
               <div className='flex items-center gap-2 leading-none ml-0.5'>
-                <span className='text-sm text-muted-foreground'>
+                <span className='text-left text-sm text-muted-foreground'>
                   {selectedSeasonData.data.season.name}
                 </span>
                 {scoreData.length > 1 && (

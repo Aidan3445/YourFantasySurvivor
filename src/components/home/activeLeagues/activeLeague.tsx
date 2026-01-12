@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Badge } from '~/components/common/badge';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { DraftCountdown } from '~/components/leagues/predraft/countdown/view';
@@ -12,22 +11,30 @@ interface ActiveLeagueProps {
 
 export default function ActiveLeague({ league }: ActiveLeagueProps) {
   return (
-    <div className='px-2 space-y-2'>
+    <div className='space-y-6 px-8'>
       <Link
         key={league.hash}
         href={`/leagues/${league.hash}`}
-        className='block'>
-        <div className='px-2 py-1 rounded-lg border hover:bg-accent/50 transition-colors flex items-center justify-between'>
-          <h4 className='font-semibold mr-auto leading-none'>{league.name}</h4>
-          <Badge variant='secondary' className='hover:bg-secondary text-nowrap'>{league.season}</Badge>
-          <SquareArrowOutUpRight size={20} className='ml-2 stroke-primary' />
+        className='group block'>
+        <div className='text-left flex items-baseline justify-between gap-4 mt-1 border-b border-border/40'>
+          <div className='space-y-1'>
+            <h3 className='text-2xl md:text-3xl leading-none font-light tracking-wide group-hover:opacity-70 transition-opacity'>
+              {league.name}
+            </h3>
+            <p className='text-sm text-muted-foreground leading-none font-light ml-0.5'>
+              {league.season}
+            </p>
+          </div>
+          <SquareArrowOutUpRight
+            size={18}
+            className='stroke-muted-foreground opacity-0 group-hover:opacity-100 group-active:opacity-75 transition-all shrink-0 hover:stroke-primary active:stroke-secondary' />
         </div>
       </Link>
       {league.status === 'Active'
-        ? <Scoreboard overrideHash={league.hash} maxRows={5} className='bg-accent' />
-        : <div className='space-y-0'>
+        ? <Scoreboard overrideHash={league.hash} maxRows={5} className='bg-transparent' />
+        : <div className='space-y-4'>
           <DraftCountdown overrideHash={league.hash} />
-          <DraftOrder overrideHash={league.hash} className='bg-accent' scrollHeight='max-h-36' />
+          <DraftOrder overrideHash={league.hash} className='bg-secondary/75 mb-3' scrollHeight='max-h-36 h-36' />
         </div>
       }
     </div>

@@ -397,15 +397,22 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
 
 interface CarouselProgressProps {
   current: number
-  count: number
+  count: number,
+  className?: string
 }
 
-function CarouselProgress({ current, count }: CarouselProgressProps) {
+function CarouselProgress({ current, count, className }: CarouselProgressProps) {
   if (count <= 1) return null;
   return (
-    <div className='absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full'>
+    <div className={cn(
+      'absolute bottom-0 left-0 right-0 h-1 bg-secondary/50 rounded-full',
+      className
+    )}>
       <div
-        className='h-full bg-primary rounded-full transition-all ease-linear duration-300'
+        className={cn(
+          'h-full bg-primary rounded-full transition-all ease-linear duration-300',
+          className
+        )}
         style={{
           width: `${((current - 1) / (count - 1)) * 100}%`,
         }}

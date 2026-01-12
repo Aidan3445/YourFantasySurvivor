@@ -7,31 +7,23 @@ import { CastawayScoreboard } from '~/components/home/scoreboard/view';
 
 export default async function HomePage() {
   return (
-    <div>
-      <div className='sticky z-50 flex flex-col w-full h-20 justify-center bg-card shadow-md shadow-primary px-2 items-center'>
-        <div className='text-center'>
-          <h1 className='text-4xl font-bold'>Welcome to YFS!</h1>
-          <p className='text-muted-foreground text-pretty text-sm md:text-base'>
-            <SignedIn>
-              Ready to dominate your fantasy leagues?
-            </SignedIn>
-            <SignedOut>
-              Sign in to get started with your fantasy leagues!
-            </SignedOut>
-          </p>
-        </div>
-      </div>
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-6rem)] h-[calc(100svh-5rem-var(--navbar-height))]'>
-        <div className='py-2 space-y-4'>
+    <div className='relative'>
+      <ScrollArea className='overflow-y-visible md:h-[calc(100svh-1rem)] h-[calc(100svh-var(--navbar-height))]'>
+        <div className=' p-4'>
           <SignedOut>
             <HeroSection />
           </SignedOut>
 
           <SignedIn>
-            <ActiveLeagues />
+            <div className='space-y-4'>
+              <ActiveLeagues />
+              <CastawayScoreboard />
+            </div>
           </SignedIn>
 
-          <CastawayScoreboard />
+          <SignedOut>
+            <CastawayScoreboard />
+          </SignedOut>
 
           <FloatingActionsWidget />
         </div>
