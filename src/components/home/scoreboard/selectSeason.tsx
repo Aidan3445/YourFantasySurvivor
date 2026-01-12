@@ -32,7 +32,9 @@ export default function SelectSeason({ seasons, value, setValue, someHidden }: C
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Ellipsis className='absolute top-3 right-2 h-5 w-5 cursor-pointer' aria-expanded={open} />
+        <Ellipsis
+          className='absolute top-3 right-6 h-5 w-5 cursor-pointer hover:stroke-primary active:stroke-secondary transition-colors'
+          aria-expanded={open} />
       </PopoverTrigger>
       <PopoverContent className='p-0'>
         <Command>

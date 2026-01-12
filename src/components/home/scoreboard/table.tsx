@@ -3,15 +3,13 @@
 import {
   Table, TableCaption, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
+import { Card, CardContent } from '~/components/common/card';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import { cn } from '~/lib/utils';
-import { Flame } from 'lucide-react';
-import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ScorboardBody from '~/components/home/scoreboard/body';
 import SelectSeason from '~/components/home/scoreboard/selectSeason';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import { compileScores } from '~/lib/scores';
-import { twentyFourColors } from '~/lib/colors';
 import { type BaseEventRules } from '~/types/leagues';
 import Image from 'next/image';
 
@@ -49,18 +47,10 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
       .sort(([_, scoresA], [__, scoresB]) => (scoresB.slice().pop() ?? 0) - (scoresA.slice().pop() ?? 0))
       .map(([castawayId, scores]) => [Number(castawayId), scores] as [number, number[]]);
 
-    const castawayColors: Record<string, string> =
-      data.castaways.sort(({ fullName: a }, { fullName: b }) => a.localeCompare(b))
-        .reduce((acc, { castawayId }, index) => {
-          acc[castawayId] = twentyFourColors[index % twentyFourColors.length]!;
-          return acc;
-        }, {} as Record<string, string>);
-
     const castawaySplitIndex = Math.ceil(sortedCastaways.length / 2);
 
     return {
       sortedCastaways,
-      castawayColors,
       castawaySplitIndex,
       data
     };
@@ -93,8 +83,8 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
         <Image
           src='/Logo.png'
           alt='Loading'
-          width={150}
-          height={150}
+          width={100}
+          height={100}
           className='animate-loading-spin w-auto h-auto'
         />
       </div>
@@ -102,38 +92,19 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
   }
 
   return (
-    <ScrollArea className='bg-card rounded-xl gap-0 mb-2'>
-      <Table>
-        <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
-        <TableHeader>
-          <TableRow className={cn('px-4 bg-white hover:bg-white')}>
-            {!allZero ? [0, 1].map((a) => (
-              <Fragment key={a}>
-                <TableHead className='text-center w-0'>Place</TableHead>
-                <TableHead className='text-center w-0 text-nowrap'>
-                  Points
-                  <Flame className='align-top inline w-4 h-4 stroke-muted-foreground' />
-                </TableHead>
-                <TableHead className='text-center'>
-                  {a === 0 ? 'Castaway' : (
-                    <>
-                      {selectedSeasonData.data.season.name}
-                      <SelectSeason
-                        seasons={scoreData.map(s => ({
-                          value: s.season.name,
-                          label: s.season.name,
-                        }))}
-                        value={selectedSeasonData.data.season.name}
-                        setValue={selectSeason}
-                        someHidden={someHidden}
-                      />
-                    </>
-                  )}
-                </TableHead>
-              </Fragment>
-            )) : (
-              <TableHead className='text-center' colSpan={2}>
-                {selectedSeasonData.data.season.name}
+    <Card className='bg-card border-border/50 shadow-sm'>
+      <CardContent>
+        <div>
+          {/* Section Header */}
+          <div className='flex justify-between'>
+            <div>
+              <h2 className='text-3xl md:text-4xl font-light tracking-tight leading-none'>
+                {selectedSeasonIndex === 0 ? 'Current Standings' : 'Season Standings'}
+              </h2>
+              <div className='flex items-center gap-2 leading-none ml-0.5'>
+                <span className='text-sm text-muted-foreground'>
+                  {selectedSeasonData.data.season.name}
+                </span>
                 {scoreData.length > 1 && (
                   <SelectSeason
                     seasons={scoreData.map(s => ({
@@ -145,19 +116,42 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
                     someHidden={someHidden}
                   />
                 )}
-              </TableHead>
-            )}
-          </TableRow>
-        </TableHeader>
-        <ScorboardBody
-          allZero={allZero}
-          sortedCastaways={selectedSeasonData.sortedCastaways}
-          castawayColors={selectedSeasonData.castawayColors}
-          castawaySplitIndex={selectedSeasonData.castawaySplitIndex}
-          data={selectedSeasonData.data}
-        />
-      </Table>
-      <ScrollBar orientation='horizontal' />
-    </ScrollArea>
+              </div>
+            </div>
+          </div>
+
+          {/* Scoreboard List */}
+          <ScrollArea className='gap-0'>
+            <Table>
+              <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
+              <TableHeader className='select-none'>
+                <TableRow>
+                  {!allZero && (
+                    <>
+                      <TableHead>Place</TableHead>
+                      <TableHead>Points</TableHead>
+                    </>
+                  )}
+                  <TableHead>Castaway</TableHead>
+                  {!allZero && (
+                    <>
+                      <TableHead>Place</TableHead>
+                      <TableHead>Points</TableHead>
+                    </>
+                  )}
+                  <TableHead>Castaway</TableHead>
+                </TableRow>
+              </TableHeader>
+              <ScorboardBody
+                allZero={allZero}
+                sortedCastaways={selectedSeasonData.sortedCastaways}
+                castawaySplitIndex={selectedSeasonData.castawaySplitIndex}
+                data={selectedSeasonData.data} />
+            </Table>
+            <ScrollBar orientation='horizontal' />
+          </ScrollArea>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
