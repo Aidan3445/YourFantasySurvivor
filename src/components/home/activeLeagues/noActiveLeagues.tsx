@@ -30,18 +30,26 @@ export default function NoActiveLeagues({ inactiveLeagues }: NoActiveLeaguesProp
   }, [api]);
 
   return (
-    <Card className='bg-card border-border/50 shadow-sm'>
-      <CardContent className='p-6 md:p-8'>
+    <Card className='shadow shadow-primary relative overflow-hidden'>
+      {/* Accent Glow */}
+      <div className='absolute top-0 left-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
+
+      <CardContent className='p-6 md:p-8 relative z-10'>
         <div className='space-y-8'>
-          <h2 className='text-3xl md:text-4xl font-light tracking-tight'>
-            Your Leagues
-          </h2>
+          <div className='flex items-center gap-3'>
+            <div className='h-8 w-1 bg-primary rounded-full' />
+            <h2 className='text-3xl md:text-4xl font-black tracking-tight uppercase'>
+              Your Leagues
+            </h2>
+          </div>
 
           {inactiveLeagues.length === 0 ? (
             <div className='text-center py-12'>
-              <Trophy className='w-16 h-16 text-muted-foreground/30 mx-auto mb-6' />
-              <p className='text-lg text-muted-foreground font-light max-w-md mx-auto'>
-                You don&apos;t have any leagues yet. Create or join one to get started.
+              <div className='inline-flex p-6 bg-primary/10 rounded-2xl mb-6'>
+                <Trophy className='w-16 h-16 text-primary' />
+              </div>
+              <p className='text-lg font-medium max-w-md mx-auto'>
+                You don&apos;t have any leagues yet. Create or join one to start competing!
               </p>
             </div>
           ) : (

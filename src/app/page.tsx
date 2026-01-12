@@ -8,20 +8,16 @@ export default async function HomePage() {
   return (
     <div className='relative'>
       <ScrollArea className='overflow-y-visible md:h-[calc(100svh-1rem)] h-[calc(100svh-var(--navbar-height))]'>
-        <div className='p-4 space-y-4'>
+        <div className='relative z-10 p-4 space-y-4'>
           <SignedOut>
             <HeroSection />
           </SignedOut>
 
           <SignedIn>
             <ActiveLeagues />
-            <CastawayScoreboard />
           </SignedIn>
 
-          <SignedOut>
-            <CastawayScoreboard />
-          </SignedOut>
-
+          <CastawayScoreboard />
         </div>
         <ScrollBar className='pt-2 pb-4' />
       </ScrollArea>

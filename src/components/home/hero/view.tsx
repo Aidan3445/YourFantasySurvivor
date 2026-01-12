@@ -1,85 +1,94 @@
 import { SignInButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import { Card, CardContent } from '~/components/common/card';
+import { Trophy, Zap, Target, TrendingUp } from 'lucide-react';
 
 export function HeroSection() {
   return (
-    <Card className='bg-card border-border/50 shadow-sm'>
-      <CardContent className='relative'>
+    <Card className='shadow shadow-primary relative overflow-hidden'>
+      {/* Accent Glow */}
+      <div className='absolute -top-20 -right-20 w-60 h-60 bg-primary/20 rounded-full blur-3xl' />
+      <div className='absolute -bottom-20 -left-20 w-60 h-60 bg-primary/10 rounded-full blur-3xl' />
+
+      <CardContent className='relative z-10'>
         {/* Logo - Top Right Corner */}
-        <div className='absolute top-0 right-4 opacity-40 hover:opacity-60 transition-opacity'>
-          <Image src='/Logo.png' alt='YFS Logo' width={80} height={80} className='w-16 h-16 md:w-auto md:h-auto' />
+        <div className='absolute top-0 right-6 opacity-50 hover:opacity-100 hover:rotate-360 transition-all'>
+          <Image src='/Logo.png' alt='YFS Logo' width={125} height={125} className='' />
         </div>
 
-        <div className='space-y-4'>
+        <div className='space-y-8'>
           {/* Hero Headline */}
           <div>
-            <h1 className='text-primary text-6xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[0.95]'>
-              Your Fantasy
+            <h1 className='text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] text-foreground'>
+              YOUR FANTASY
               <br />
-              <span className='text-primary font-semibold'>Survivor</span>
+              <span className='bg-linear-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent'>
+                SURVIVOR
+              </span>
             </h1>
-            <div className='w-20 h-0.5 bg-primary/80 mt-6' />
+            <div className='flex items-center gap-2 mt-4'>
+              <div className='h-1 w-16 bg-primary rounded-full' />
+              <div className='h-1 w-8 bg-primary/50 rounded-full' />
+              <div className='h-1 w-4 bg-primary/25 rounded-full' />
+            </div>
           </div>
-
-
 
           {/* Subtext */}
-          <div className='max-w-lg space-y-4'>
-            <p className='text-lg md:text-xl leading-relaxed text-muted-primary font-light'>
-              Draft castaways. Track their journey.
-              Compete with friends in the ultimate
-              Survivor fantasy league.
+          <div className='max-w-2xl'>
+            <p className='text-lg md:text-xl leading-relaxed text-muted-foreground font-medium'>
+              Draft elite castaways. Dominate the competition.
+              Climb the leaderboards in the ultimate Survivor fantasy experience.
             </p>
-
-            {/* CTA */}
-            <SignInButton mode='modal'>
-              <button className='group inline-flex items-center gap-2 text-base font-medium border-b-2 border-primary transition-all hover:border-muted-primary'>
-                <span className='group-hover:opacity-70 transition-opacity'>
-                  Get Started
-                </span>
-                <span className='text-sm group-hover:translate-x-1 transition-transform'>→</span>
-              </button>
-            </SignInButton>
           </div>
 
-          {/* Features - Minimal List */}
-          <div className='pt-4 border-t border-border/40'>
-            <dl className='grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8'>
-              <div>
-                <dt className='font-medium mb-2 text-sm uppercase tracking-wider text-muted-primary'>
-                  Make it yours
-                </dt>
-                <dd className='text-muted-primary leading-relaxed font-light'>
-                  Completely customize your league, add custom scoring events and predictions,
-                  or just use our reasonable defaults
-                </dd>
+          {/* CTA */}
+          <SignInButton mode='modal'>
+            <button className='group relative px-8 py-3 bg-primary font-bold rounded-lg overflow-hidden shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all hover:scale-[1.02] active:scale-[0.98]'>
+              <span className='relative z-10 flex items-end gap-2 text-primary-foreground'>
+                START COMPETING
+                <Trophy className='w-6 h-6 stroke-primary-foreground' />
+              </span>
+              <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700' />
+            </button>
+          </SignInButton>
+
+          {/* Features - Game Stats Grid */}
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4 pt-4'>
+            <div className='bg-primary/5 border border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/30 transition-all'>
+              <div className='flex items-center gap-3 mb-2'>
+                <div className='p-2 bg-primary/20 rounded-lg'>
+                  <Target className='w-5 h-5 text-primary' />
+                </div>
+                <h3 className='font-bold text-sm uppercase tracking-wider'>Custom Leagues</h3>
               </div>
-              <div>
-                <dt className='font-medium mb-2 text-sm uppercase tracking-wider text-muted-primary'>
-                  Draft & Score
-                </dt>
-                <dd className='text-muted-primary leading-relaxed font-light'>
-                  Select your castaway and earn points for their performance and strategic moves
-                </dd>
+              <p className='text-sm text-muted-foreground'>
+                Create your rules. Set your scoring. Build your perfect competition.
+              </p>
+            </div>
+
+            <div className='bg-primary/5 border border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/30 transition-all'>
+              <div className='flex items-center gap-3 mb-2'>
+                <div className='p-2 bg-primary/20 rounded-lg'>
+                  <Zap className='w-5 h-5 text-primary' />
+                </div>
+                <h3 className='font-bold text-sm uppercase tracking-wider'>Live Scoring</h3>
               </div>
-              <div>
-                <dt className='font-medium mb-2 text-sm uppercase tracking-wider text-muted-primary'>
-                  Predictions
-                </dt>
-                <dd className='text-muted-primary leading-relaxed font-light'>
-                  Predict key game events and raise the stakes by betting points on your choices
-                </dd>
+              <p className='text-sm text-muted-foreground'>
+                Track every move. Watch points accumulate. Stay ahead of rivals.
+              </p>
+            </div>
+
+            <div className='bg-primary/5 border border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/30 transition-all'>
+              <div className='flex items-center gap-3 mb-2'>
+                <div className='p-2 bg-primary/20 rounded-lg'>
+                  <TrendingUp className='w-5 h-5 text-primary' />
+                </div>
+                <h3 className='font-bold text-sm uppercase tracking-wider'>Strategic Swaps</h3>
               </div>
-              <div>
-                <dt className='font-medium mb-2 text-sm uppercase tracking-wider text-muted-primary'>
-                  Live Tracking
-                </dt>
-                <dd className='text-muted-primary leading-relaxed font-light'>
-                  Follow real-time scores and compete with friends
-                </dd>
-              </div>
-            </dl>
+              <p className='text-sm text-muted-foreground'>
+                Adapt your roster. Make bold predictions. Outplay the competition.
+              </p>
+            </div>
           </div>
         </div>
       </CardContent>

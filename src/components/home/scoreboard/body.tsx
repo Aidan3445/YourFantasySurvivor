@@ -38,7 +38,7 @@ export default function ScorboardBody({
         return (
           <TableRow
             key={`${castawayId}-${secondCastawayId ?? 'empty'}`}
-            className='border-b border-border/20 hover:bg-accent/20 transition-colors'>
+            className='border-b border-primary/10 hover:bg-primary/5 hover:border-primary/20 transition-all group'>
             <CastawayEntry
               allZero={allZero}
               place={index + 1}

@@ -92,19 +92,25 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
   }
 
   return (
-    <Card className='bg-card border-border/50 shadow-sm'>
-      <CardContent>
+    <Card className='shadow shadow-primary relative overflow-hidden'>
+      {/* Accent Elements */}
+      <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
+
+      <CardContent className='relative z-10'>
         <div>
           {/* Section Header */}
-          <div className='flex justify-between'>
+          <div className='flex justify-between items-start mb-6'>
             <div>
-              <h2 className='text-left text-3xl md:text-4xl font-light tracking-tight leading-none'>
-                {selectedSeasonIndex === 0
-                  ? (allZero ? 'Castaways' : 'Current Standings')
-                  : 'Season Standings'}
-              </h2>
-              <div className='flex items-center gap-2 leading-none ml-0.5'>
-                <span className='text-left text-sm text-muted-foreground'>
+              <div className='flex items-center gap-3 mb-2'>
+                <div className='h-8 w-1 bg-primary rounded-full' />
+                <h2 className='text-3xl md:text-4xl font-black tracking-tight leading-none uppercase'>
+                  {selectedSeasonIndex === 0
+                    ? (allZero ? 'Castaways' : 'Leaderboard')
+                    : 'Season Standings'}
+                </h2>
+              </div>
+              <div className='flex items-center gap-2 leading-none ml-4'>
+                <span className='text-sm font-bold text-primary uppercase tracking-wider'>
                   {selectedSeasonData.data.season.name}
                 </span>
                 {scoreData.length > 1 && (
