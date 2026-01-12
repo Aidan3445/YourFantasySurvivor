@@ -8,7 +8,7 @@ import { CastawayScoreboard } from '~/components/home/scoreboard/view';
 export default async function HomePage() {
   return (
     <div>
-      <div className='sticky z-50 flex flex-col w-full h-32 justify-center bg-card shadow-md shadow-primary px-2 items-center'>
+      <div className='sticky z-50 flex flex-col w-full h-20 justify-center bg-card shadow-md shadow-primary px-2 items-center'>
         <div className='text-center'>
           <h1 className='text-4xl font-bold'>Welcome to YFS!</h1>
           <p className='text-muted-foreground text-pretty text-sm md:text-base'>
@@ -21,18 +21,20 @@ export default async function HomePage() {
           </p>
         </div>
       </div>
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-9rem)] h-[calc(100svh-8rem-var(--navbar-height))]'>
-        <SignedOut>
-          <HeroSection />
-        </SignedOut>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-6rem)] h-[calc(100svh-5rem-var(--navbar-height))]'>
+        <div className='py-2 space-y-4'>
+          <SignedOut>
+            <HeroSection />
+          </SignedOut>
 
-        <SignedIn>
-          <ActiveLeagues />
-        </SignedIn>
+          <SignedIn>
+            <ActiveLeagues />
+          </SignedIn>
 
-        <CastawayScoreboard />
+          <CastawayScoreboard />
 
-        <FloatingActionsWidget />
+          <FloatingActionsWidget />
+        </div>
         <ScrollBar className='pt-2 pb-4' />
       </ScrollArea>
     </div>
