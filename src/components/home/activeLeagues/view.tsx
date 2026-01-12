@@ -81,7 +81,7 @@ export function ActiveLeagues() {
   return (
     <div className={cn(
       'relative transition-all cursor-ew-resize',
-      showLoadingScreen && 'h-72 lg:h-full overflow-hidden'
+      showLoadingScreen && 'h-96 overflow-hidden'
     )}>
       {showLoadingScreen ? (
         <div className={cn('transition-opacity duration-400', !showLoading && 'opacity-0')}>

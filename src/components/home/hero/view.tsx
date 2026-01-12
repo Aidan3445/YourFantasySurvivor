@@ -36,8 +36,9 @@ export function HeroSection() {
           {/* Subtext */}
           <div className='max-w-2xl'>
             <p className='text-lg md:text-xl leading-relaxed text-muted-foreground font-medium'>
-              Draft elite castaways. Dominate the competition.
-              Climb the leaderboards in the ultimate Survivor fantasy experience.
+              Draft castaways. Predict game events. Climb the leaderboard.
+              <br />
+              The ultimate Survivor fantasy experience.
             </p>
           </div>
 
@@ -59,10 +60,11 @@ export function HeroSection() {
                 <div className='p-2 bg-primary/20 rounded-lg'>
                   <Target className='w-5 h-5 text-primary' />
                 </div>
-                <h3 className='font-bold text-sm uppercase tracking-wider'>Custom Leagues</h3>
+                <h3 className='font-bold text-sm uppercase tracking-wider'>Make it yours</h3>
               </div>
               <p className='text-sm text-muted-foreground'>
-                Create your rules. Set your scoring. Build your perfect competition.
+                Completely customize your league, add custom scoring events and predictions,
+                or just use our reasonable defaults.
               </p>
             </div>
 
@@ -71,10 +73,10 @@ export function HeroSection() {
                 <div className='p-2 bg-primary/20 rounded-lg'>
                   <Zap className='w-5 h-5 text-primary' />
                 </div>
-                <h3 className='font-bold text-sm uppercase tracking-wider'>Live Scoring</h3>
+                <h3 className='font-bold text-sm uppercase tracking-wider'>Live Tracking</h3>
               </div>
               <p className='text-sm text-muted-foreground'>
-                Track every move. Watch points accumulate. Stay ahead of rivals.
+                Track every move. Follow real-time scores and compete with friends.
               </p>
             </div>
 
@@ -83,10 +85,10 @@ export function HeroSection() {
                 <div className='p-2 bg-primary/20 rounded-lg'>
                   <TrendingUp className='w-5 h-5 text-primary' />
                 </div>
-                <h3 className='font-bold text-sm uppercase tracking-wider'>Strategic Swaps</h3>
+                <h3 className='font-bold text-sm uppercase tracking-wider'>Predictions</h3>
               </div>
               <p className='text-sm text-muted-foreground'>
-                Adapt your roster. Make bold predictions. Outplay the competition.
+                Predict key game events and raise the stakes by betting points on your choices.
               </p>
             </div>
           </div>
