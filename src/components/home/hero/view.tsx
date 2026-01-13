@@ -12,8 +12,8 @@ export function HeroSection() {
 
       <CardContent className='relative z-10'>
         {/* Logo - Top Right Corner */}
-        <div className='absolute top-0 right-6 opacity-50 hover:opacity-100 hover:rotate-360 transition-all'>
-          <Image src='/Logo.png' alt='YFS Logo' width={125} height={125} className='' />
+        <div className='absolute top-0 right-2 opacity-50 hover:opacity-100 hover:rotate-360 transition-all'>
+          <Image src='/Logo.png' alt='YFS Logo' width={125} height={125} className='hidden md:block' />
         </div>
 
         <div className='space-y-8'>
@@ -35,7 +35,7 @@ export function HeroSection() {
 
           {/* Subtext */}
           <div className='max-w-2xl'>
-            <p className='text-lg md:text-xl leading-relaxed text-muted-foreground font-medium'>
+            <p className='text-lg md:text-xl leading-relaxed text-muted-foreground font-medium text-pretty'>
               Draft castaways. Predict game events. Climb the leaderboard.
               <br />
               The ultimate Survivor fantasy experience.

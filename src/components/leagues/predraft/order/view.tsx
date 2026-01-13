@@ -6,7 +6,7 @@ import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from 
 import { SortableContext, arrayMove, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { restrictToParentElement } from '@dnd-kit/modifiers';
 import { cn } from '~/lib/utils';
-import { GripVertical, Lock, LockOpen, Shuffle, ListOrdered } from 'lucide-react';
+import { GripVertical, Lock, LockOpen, Shuffle } from 'lucide-react';
 import SortableItem from '~/components/common/sortableItem';
 import { handleDragEnd } from '~/hooks/ui/useSortableItem';
 import { Button } from '~/components/common/button';
@@ -17,7 +17,6 @@ import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateDraftOrder from '~/actions/updateDraftOrder';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import { Badge } from '~/components/common/badge';
 
 const SHUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -105,16 +104,10 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
       {/* Header */}
       <div className='flex items-center justify-between px-4 py-1 border-b-2 border-primary/20 bg-primary/5'>
         <span className='flex items-center gap-3 h-8'>
-          <span className='h-6 w-1 bg-primary rounded-full' />
-          <h2 className='text-xl font-black uppercase tracking-tight leading-none'>
+          <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+          <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
             Draft Order
           </h2>
-          {!orderLocked && (
-            <Badge className='bg-blue-500/20 text-blue-600 border-blue-500/40 border-2 font-black text-xs pointer-events-none'>
-              <ListOrdered className='w-3 h-3 mr-1' />
-              EDITING
-            </Badge>
-          )}
         </span>
 
         <span className='flex items-center gap-2'>
@@ -130,7 +123,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                 size='sm'
                 disabled={!orderChanged}
                 variant='outline'
-                className='font-bold uppercase text-xs tracking-wider border-destructive/40 text-destructive hover:bg-destructive/10'
+                className='px-1 font-bold uppercase text-xs tracking-wider border-destructive/40 text-destructive hover:bg-destructive/10'
                 onClick={() => { setOrder(dbOrder); setLocked(true); }}>
                 Cancel
               </Button>
@@ -138,7 +131,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                 type='submit'
                 size='sm'
                 disabled={!orderChanged}
-                className='font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'
+                className='px-1 font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'
                 onClick={handleSubmit}>
                 Save
               </Button>

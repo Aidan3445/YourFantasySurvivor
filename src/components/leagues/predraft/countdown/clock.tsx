@@ -65,7 +65,7 @@ function ClockPlace({ value, label }: ClockPlaceProps) {
 
   return (
     <div className='flex flex-col items-center justify-center bg-primary/5 border border-primary/20 rounded-lg md:p-2'>
-      <span className='text-3xl md:text-4xl font-black text-primary tabular-nums'>
+      <span className='text-xl md:text-4xl font-black text-primary tabular-nums'>
         {value.toString().padStart(2, '0')}
       </span>
       <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1'>

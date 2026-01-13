@@ -108,7 +108,7 @@ export default function CustomEvents() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <LeagueEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
-                <AlertDialogFooter className='grid grid-cols-2 gap-2'>
+                <AlertDialogFooter className='grid grid-cols-2 gap-2 items-end'>
                   <AlertDialogCancel variant='secondary' className='font-bold uppercase text-xs tracking-wider'>
                     Cancel
                   </AlertDialogCancel>

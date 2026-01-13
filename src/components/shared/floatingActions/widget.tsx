@@ -182,22 +182,24 @@ export function FloatingActionsWidget() {
           {/* Shine Effect */}
           <div className='absolute inset-0 bg-linear-to-br from-white/30 via-transparent to-transparent opacity-50' />
 
-          {isDragging && dismissProgress > 0.5 ? (
-            <svg
-              className='w-8 h-8 text-white z-10'
-              xmlns='http://www.w3.org/2000/svg'
-              fill='none'
-              viewBox='0 0 24 24'
-              stroke='white'>
-              <path
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth={3}
-                d='M6 18L18 6M6 6l12 12' />
-            </svg>
-          ) : (
-            <Trophy className='w-8 h-8 stroke-primary-foreground z-10' />
-          )}
+          <div>
+            {isDragging && dismissProgress > 0.5 ? (
+              <svg
+                className='w-8 h-8 text-white z-10'
+                xmlns='http://www.w3.org/2000/svg'
+                fill='none'
+                viewBox='0 0 24 24'
+                stroke='white'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={3}
+                  d='M6 18L18 6M6 6l12 12' />
+              </svg>
+            ) : (
+              <Trophy className='w-8 h-8 stroke-primary-foreground z-10' />
+            )}
+          </div>
         </button>
 
         {/* Dismiss indicator */}

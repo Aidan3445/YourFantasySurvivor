@@ -125,7 +125,13 @@ export function ActiveLeagues() {
                       watchDrag: topLeagues.length > 1,
                       ignoreKeys: topLeagues.length > 1
                     }}
-                    plugins={[Autoplay({ delay: 8000, stopOnMouseEnter: true, stopOnInteraction: true, stopOnFocusIn: true })]}
+                    plugins={[Autoplay({
+                      delay: 8000,
+                      stopOnMouseEnter: true,
+                      stopOnInteraction: true,
+                      stopOnFocusIn: true,
+                      stopOnLastSnap: true
+                    })]}
                     setApi={setApi}>
                     <CarouselContent className={cn('p-0', topLeagues.length > 1 && 'cursor-ew-resize')}>
                       {topLeagues.map(({ league }) => (

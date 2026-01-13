@@ -8,6 +8,7 @@ import { MultiSelect } from '~/components/common/multiSelect';
 import { type ReactNode, useState } from 'react';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
 import { EventTypes, PredictionTimings, ReferenceTypes } from '~/lib/events';
+import { cn } from '~/lib/utils';
 
 interface LeagueEventFieldsProps {
   predictionDefault?: boolean;
@@ -134,15 +135,18 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
         <FormField
           name='timing'
           render={({ field }) => (
-            <FormItem className={!isPrediction ? 'pointer-events-none! w-full' : 'w-full'}>
-              <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1'>
+            <FormItem className={'w-full'}>
+              <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-0.5'>
                 Timing
                 <PredictionTimingHelp />
               </FormLabel>
               <FormControl>
                 <MultiSelect
-                  options={PredictionTimings
-                    .map((option) => ({ label: option, value: option }))}
+                  className={cn(!isPrediction && 'pointer-events-none')}
+                  options={
+                    PredictionTimings
+                      .map((option) => ({ label: option, value: option }))
+                  }
                   onValueChange={field.onChange}
                   defaultValue={field.value as string[]}
                   value={field.value as string[]}

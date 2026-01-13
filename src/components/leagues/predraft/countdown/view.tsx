@@ -114,7 +114,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
           )}
           <Clock endDate={leagueSettings?.draftDate ?? null} replacedBy={
             <Button
-              className='w-full rounded-none h-full font-black text-4xl uppercase tracking-wider shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]'
+              className='w-full rounded-none h-full font-black text-xl md:text-4xl uppercase tracking-wider shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]'
               variant='default'
               disabled={!league || (leagueMembers?.loggedIn?.role !== 'Owner' && league?.status !== 'Draft')}
               onClick={onDraftJoin}>

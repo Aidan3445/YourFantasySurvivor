@@ -145,7 +145,7 @@ export default function TimelineFilters({
               </SelectContent>
             </Select>
           </span>
-          <AccordionTrigger className='w-full font-bold uppercase text-xs tracking-wider z-100'>
+          <AccordionTrigger className='w-full font-bold uppercase text-xs tracking-wider z-10'>
             Filters
           </AccordionTrigger>
         </div>

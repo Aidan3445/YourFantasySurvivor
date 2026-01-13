@@ -18,8 +18,9 @@ export default function StartDraft({ startDraft }: StartDraftProps) {
           variant='default'
           size='sm'
           className='h-min p-1 gap-1 leading-none md:font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'>
-          <Zap className='w-3 h-3 stroke-primary-foreground' />
-          Start Now
+          <Zap className='hidden sm:block w-3 h-3 stroke-primary-foreground' />
+          Start
+          <p className='hidden sm:block text-inherit'>Now</p>
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className='border-primary/30 shadow-lg shadow-primary/20'>
