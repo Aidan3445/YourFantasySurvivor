@@ -9,7 +9,7 @@ interface TribeHistoryCirclesProps {
 }
 
 export default function TribeHistoryCircles({ tribeTimeline, showAll }: TribeHistoryCirclesProps) {
-  const shouldShow = showAll || tribeTimeline.length > 1;
+  const shouldShow = tribeTimeline.length > 1 || showAll;
 
   if (!shouldShow) return null;
 
@@ -19,15 +19,19 @@ export default function TribeHistoryCircles({ tribeTimeline, showAll }: TribeHis
         tribe && (
           <Popover key={`${tribe.tribeName}-${episode}`}>
             <PopoverTrigger>
-              <Circle size={16} fill={tribe.tribeColor} className='cursor-help shrink-0' />
+              <Circle
+                size={16}
+                fill={tribe.tribeColor}
+                className='cursor-pointer opacity-80 hover:opacity-100 active:opacity-60 transition-all hover:scale-110 drop-shadow-sm' />
             </PopoverTrigger>
-            <PopoverContent className='w-min text-nowrap p-2 border-2 border-primary/20 shadow-lg shadow-primary/20' align='end'>
-              <PopoverArrow className='fill-border' />
-              <span className='font-medium'>{tribe.tribeName} - Episode {episode}</span>
+            <PopoverContent className='w-min p-2 bg-card border-primary/30' align='end'>
+              <PopoverArrow />
+              <div className='font-bold text-xs text-nowrap'>
+                {tribe.tribeName} <span className='text-nowrap text-muted-foreground'>• Ep {episode}</span>
+              </div>
             </PopoverContent>
           </Popover>
-        )
-      ))}
+        )))}
     </div>
   );
 }

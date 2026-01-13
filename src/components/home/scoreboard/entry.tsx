@@ -2,13 +2,13 @@ import {
   TableCell,
 } from '~/components/common/table';
 
-import { Circle, Flame, FlameKindling } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
-import { PopoverArrow } from '@radix-ui/react-popover';
+import { Flame } from 'lucide-react';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type Tribe } from '~/types/tribes';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { cn } from '~/lib/utils';
+import EliminationIndicator from '~/components/shared/castaways/eliminationIndicator';
+import TribeHistoryCircles from '~/components/shared/castaways/tribeHistoryCircles';
 
 interface CastawayRowProps {
   place: number;
@@ -58,37 +58,11 @@ export default function CastawayEntry({ place, castaway, points, tribeTimeline, 
             </span>
           </CastawayPopover>
           <div className='ml-auto flex gap-1 items-center'>
-            {tribeTimeline && (tribeTimeline.length > 1 || castaway?.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
-              <Popover key={`${tribe.tribeName}-${episode}`}>
-                <PopoverTrigger>
-                  <Circle
-                    size={16}
-                    fill={tribe.tribeColor}
-                    className='cursor-pointer opacity-80 hover:opacity-100 active:opacity-60 transition-all hover:scale-110 drop-shadow-sm'
-                  />
-                </PopoverTrigger>
-                <PopoverContent className='w-min p-2 bg-card border-primary/30' align='end'>
-                  <PopoverArrow />
-                  <div className='font-bold text-xs text-nowrap'>
-                    {tribe.tribeName} <span className='text-nowrap text-muted-foreground'>• Ep {episode}</span>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            ))}
+            <TribeHistoryCircles
+              tribeTimeline={tribeTimeline ?? []}
+              showAll={castaway?.eliminatedEpisode !== null} />
             {castaway?.eliminatedEpisode && (
-              <Popover>
-                <PopoverTrigger>
-                  <div className='p-1 bg-destructive/20 rounded hover:bg-destructive/30 transition-colors cursor-pointer'>
-                    <FlameKindling className='w-3.5 h-3.5 text-destructive' />
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent className='w-min p-2 bg-card border-destructive/30' align='end'>
-                  <PopoverArrow />
-                  <div className='font-bold text-xs text-destructive text-nowrap'>
-                    Eliminated • Ep {castaway.eliminatedEpisode}
-                  </div>
-                </PopoverContent>
-              </Popover>
+              <EliminationIndicator episode={castaway.eliminatedEpisode} />
             )}
           </div>
         </div>

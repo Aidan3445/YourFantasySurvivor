@@ -10,14 +10,15 @@ export default function EliminationIndicator({ episode }: EliminationIndicatorPr
   return (
     <Popover>
       <PopoverTrigger>
-        <div className='text-xs font-bold uppercase tracking-wider text-muted-foreground cursor-help text-nowrap flex items-center gap-1'>
-          <FlameKindling className='w-4 h-4 shrink-0' />
-          <span>EP {episode}</span>
+        <div className='p-1 bg-destructive/20 rounded hover:bg-destructive/30 transition-colors cursor-pointer'>
+          <FlameKindling className='w-3.5 h-3.5 text-destructive' />
         </div>
       </PopoverTrigger>
-      <PopoverContent className='w-min text-nowrap p-2 border-2 border-primary/20 shadow-lg shadow-primary/20' align='end'>
-        <PopoverArrow className='fill-border' />
-        <span className='font-medium'>Eliminated Episode {episode}</span>
+      <PopoverContent className='w-min p-2 bg-card border-destructive/30' align='end'>
+        <PopoverArrow />
+        <div className='font-bold text-xs text-destructive text-nowrap'>
+          Eliminated • Ep {episode}
+        </div>
       </PopoverContent>
     </Popover>
   );
