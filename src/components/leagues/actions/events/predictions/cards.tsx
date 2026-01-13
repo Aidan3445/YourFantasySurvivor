@@ -115,18 +115,17 @@ export default function PredictionCards({
     const prediction = enabledBasePredictions[0] ?? customPredictions[0]!;
     return (
       <article
-        className={cn('flex flex-col mx-2 text-center bg-secondary rounded-lg min-w-96 mb-2', className)}>
-        <span className='flex gap-1 items-start self-center px-1'>
-          <h3 className='text-lg font-semibold text-card-foreground'>
+        className={cn('flex flex-col mx-2 text-center bg-accent/50 rounded-lg min-w-96 mb-2 border-2 border-primary/20 relative z-10 mt-4', className)}>
+        <span className='flex gap-2 items-center justify-cente'>
+          <h3 className='text-lg text-nowrap font-bold uppercase tracking-wider text-card-foreground'>
             {prediction.label}
           </h3>
-          -
-          <div className='inline-flex mt-1'>
-            <p className='text-sm'>{prediction.points}</p>
-            <Flame size={16} />
+          <div className='inline-flex items-center'>
+            <p className='text-sm font-bold'>{prediction.points}</p>
+            <Flame size={16} className='stroke-primary' />
           </div>
         </span>
-        <p className='text-sm px-2 bg-b3'>{prediction.description}</p>
+        <p className='text-sm px-2 py-2 bg-secondary font-medium'>{prediction.description}</p>
         <BaseSubmissionCard
           prediction={prediction}
           options={getOptions(prediction.referenceTypes)}
@@ -140,19 +139,21 @@ export default function PredictionCards({
 
   const customPredictionItems = customPredictions.map((prediction) => ({
     header: (
-      <h3 className='text-lg font-semibold text-card-foreground'>
-        {prediction.label ?? prediction.eventName}
-        <span className='ml-2 inline-flex mt-1'>
-          <p className='text-sm'>{prediction.points}</p>
-          <Flame size={16} />
-        </span>
-        <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+      <div>
+        <h3 className='text-lg text-nowrap font-bold uppercase tracking-wider text-card-foreground'>
+          {prediction.label ?? prediction.eventName}
+          <span className='ml-2 inline-flex items-center'>
+            <p className='text-sm font-bold'>{prediction.points}</p>
+            <Flame size={16} className='stroke-primary' />
+          </span>
+        </h3>
+        <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mt-1'>
           {prediction.timing.join(' - ')}
           <PredictionTimingHelp />
         </div>
-      </h3>
+      </div>
     ),
-    content: (<p className='text-sm bg-b3 py-1'>{prediction.description}</p>),
+    content: (<p className='text-sm bg-secondary py-2 px-2 font-medium'>{prediction.description}</p>),
     footer: (
       <SubmissionCard
         prediction={prediction}
@@ -166,20 +167,22 @@ export default function PredictionCards({
 
   const basePredictionItems = enabledBasePredictions.map((prediction) => ({
     header: (
-      <h3 className='text-lg font-semibold text-card-foreground py-1'>
-        {prediction.label ?? prediction.eventName}
-        <span className='ml-2 inline-flex mt-1'>
-          <p className='text-sm'>{prediction.points}</p>
-          <Flame size={16} />
-        </span>
-        <div className='flex text-xs font-normal italic text-card-foreground justify-center items-center gap-1'>
+      <div>
+        <h3 className='text-lg text-nowrap font-bold uppercase tracking-wider text-card-foreground'>
+          {prediction.label ?? prediction.eventName}
+          <span className='ml-2 inline-flex items-center'>
+            <p className='text-sm font-bold'>{prediction.points}</p>
+            <Flame size={16} className='stroke-primary' />
+          </span>
+        </h3>
+        <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mt-1'>
           {prediction.timing.join(' - ')}
           <PredictionTimingHelp />
         </div>
-      </h3>
+      </div>
     ),
     content: (
-      <p className='text-sm bg-b3 py-1'>{prediction.description}</p>
+      <p className='text-sm bg-secondary py-2 px-2 font-medium'>{prediction.description}</p>
     ),
     footer: (
       <SubmissionCard

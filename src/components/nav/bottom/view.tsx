@@ -16,8 +16,8 @@ export default async function BottomNav() {
               width={28}
               height={28}
               className='transition filter brightness-0 active:brightness-100 active:saturate-200 active:hue-rotate-90' />} />
-        <BottomNavLink href='/playground' icon={<Flame size={26} />} />
         <BottomNavLink href='/seasons' icon={<BookUser size={26} />} />
+        <BottomNavLink href='/playground' icon={<Flame size={26} />} />
         <BottomNavLink
           href='/leagues'
           icon={<Trophy className='active:stroke-green-800 transition-colors' size={28} />} />

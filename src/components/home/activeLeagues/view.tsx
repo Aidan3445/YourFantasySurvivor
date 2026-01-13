@@ -1,9 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/common/card';
+import { Card, CardContent, CardHeader } from '~/components/common/card';
 import { Button } from '~/components/common/button';
-import { Trophy } from 'lucide-react';
 import {
   Carousel, type CarouselApi, CarouselContent, CarouselItem,
   CarouselNext, CarouselPrevious, CarouselProgress
@@ -17,6 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useIsFetching } from '@tanstack/react-query';
 import LoadingLeagues from '~/components/home/activeLeagues/loadingLeagues';
 import { type LeagueDetails } from '~/types/leagues';
+import { Separator } from '~/components/common/separator';
 
 export function ActiveLeagues() {
   const { data: leagues } = useLeagues();
@@ -80,57 +80,79 @@ export function ActiveLeagues() {
 
   return (
     <div className={cn(
-      'relative transition-all h-full',
-      showLoadingScreen && 'h-72 lg:h-full overflow-hidden'
+      'relative transition-all',
+      showLoadingScreen && 'h-96 overflow-hidden'
     )}>
-      {showLoadingScreen && (
+      {showLoadingScreen ? (
         <div className={cn('transition-opacity duration-400', !showLoading && 'opacity-0')}>
           <LoadingLeagues />
         </div>
-      )}
-      {(!topLeagues || topLeagues.length === 0)
-        ? <NoActiveLeagues inactiveLeagues={inactiveLeagues} />
-        : (
-          <Card className={cn('h-full transition-opacity', showLoading && 'opacity-0')}>
-            <CardContent className='px-0 overflow-y-auto'>
-              <Carousel
-                opts={{
-                  loop: true,
-                  watchDrag: topLeagues.length > 1,
-                  ignoreKeys: topLeagues.length > 1
-                }}
-                plugins={[Autoplay({ delay: 8000, stopOnMouseEnter: true })]}
-                setApi={setApi}>
-                <CardHeader className='grid grid-cols-[min-content_1fr_auto_1fr_min-content] items-center px-4 mb-4'>
-                  <div className='w-full invisible' />
-                  <CarouselPrevious className={cn('static translate-0! place-self-center',
-                    (topLeagues.length + inactiveLeagues.length) > 1 ? 'visible' : 'invisible')} />
-                  <CardTitle className='flex items-center gap-2 place-self-center text-nowrap'>
-                    <Trophy className='w-5 h-5 text-yellow-500' />
-                    Current Leagues
-                  </CardTitle>
-                  <CarouselNext className={cn('static translate-0! place-self-center',
-                    (topLeagues.length + inactiveLeagues.length) > 1 ? 'visible' : 'invisible')} />
-                  <Button variant='outline' size='sm' asChild>
-                    <Link href='/leagues' className='place-self-center'>
-                      View all leagues
-                    </Link>
-                  </Button>
+      ) : (
+        <>
+          {(!topLeagues || topLeagues.length === 0)
+            ? <NoActiveLeagues inactiveLeagues={inactiveLeagues} />
+            : (
+              <Card className={cn('relative overflow-hidden transition-opacity border-2 border-primary/20', showLoading && 'opacity-0')}>
+                {/* Accent Glow */}
+                <div className='absolute top-0 left-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
+
+                <CardHeader className='relative z-10'>
+                  {/* Section Header */}
+                  <div className='flex items-end justify-between'>
+                    <div className='flex items-center gap-3'>
+                      <div className='h-6 md:h-8 w-1 bg-primary rounded-full' />
+                      <h2 className='text-xl md:text-4xl font-black tracking-tight uppercase'>
+                        Your Leagues
+                      </h2>
+                    </div>
+                    <Button
+                      variant='outline'
+                      size='sm'
+                      asChild
+                      className='border-primary/30 hover:bg-primary/10 hover:border-primary/50 font-bold uppercase text-xs tracking-wider'>
+                      <Link href='/leagues'>
+                        View All
+                      </Link>
+                    </Button>
+                  </div>
+                  <Separator className='bg-primary/20' />
                 </CardHeader>
-                <CarouselContent>
-                  {topLeagues.map(({ league }) => (
-                    <CarouselItem key={league.hash}>
-                      <ActiveLeague league={league} />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
-              <CardFooter>
-                <CarouselProgress current={current} count={topLeagues.length} />
-              </CardFooter>
-            </CardContent>
-          </Card>
-        )}
+
+                <CardContent className='px-0 mb-8 max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3rem-var(--sidebar-width))]'>
+                  <Carousel
+                    opts={{
+                      loop: true,
+                      watchDrag: topLeagues.length > 1,
+                      ignoreKeys: topLeagues.length > 1
+                    }}
+                    plugins={[Autoplay({
+                      delay: 8000,
+                      stopOnMouseEnter: true,
+                      stopOnInteraction: true,
+                      stopOnFocusIn: true,
+                      stopOnLastSnap: true
+                    })]}
+                    setApi={setApi}>
+                    <CarouselContent className={cn('p-0', topLeagues.length > 1 && 'cursor-ew-resize')}>
+                      {topLeagues.map(({ league }) => (
+                        <CarouselItem key={league.hash}>
+                          <ActiveLeague league={league} />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    {(topLeagues.length + inactiveLeagues.length) > 1 && (
+                      <>
+                        <CarouselPrevious className='absolute left-10 -bottom-14 top-auto' />
+                        <CarouselProgress className='rounded-none' current={current} count={topLeagues.length} />
+                        <CarouselNext className='absolute right-10 -bottom-14 top-auto' />
+                      </>
+                    )}
+                  </Carousel>
+                </CardContent>
+              </Card>
+            )}
+        </>
+      )}
     </div>
   );
 }

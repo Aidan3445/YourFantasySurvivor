@@ -13,7 +13,7 @@ export default function BottomNavUser() {
         </div>
       </SignedIn>
       <SignedOut>
-        <SignInButton>
+        <SignInButton mode='modal'>
           <LogIn size={28} />
         </SignInButton>
       </SignedOut>

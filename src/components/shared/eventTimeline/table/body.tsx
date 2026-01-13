@@ -31,9 +31,9 @@ export default function EpisodeEventsTableBody({
   index,
   noMembers
 }: EpisodeEventsTableBodyProps) {
-  const enrichedEvents = useEnrichEvents(seasonData, filteredEvents);
-  const enrichedMockEvents = useEnrichEvents(seasonData, mockEvents ?? []);
-  const enrichedEnrichmentEvents = useEnrichEvents(seasonData, predictionEnrichmentEvents ?? []);
+  const enrichedEvents = useEnrichEvents(seasonData, filteredEvents, leagueData);
+  const enrichedMockEvents = useEnrichEvents(seasonData, mockEvents ?? [], leagueData);
+  const enrichedEnrichmentEvents = useEnrichEvents(seasonData, predictionEnrichmentEvents ?? [], leagueData);
 
   const eventsForPredictionEnrichment = useMemo(() => [
     ...enrichedEvents,
@@ -144,8 +144,7 @@ export default function EpisodeEventsTableBody({
               || (miss.reference?.type === 'Castaway' && filters.castaway.includes(miss.reference.id))
               || (miss.reference?.type === 'Tribe' && filters.tribe.includes(miss.reference.id))
             )
-          }
-        />
+          } />
       )}
     </>
   );

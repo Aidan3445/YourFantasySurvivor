@@ -11,7 +11,7 @@ import { cn } from '~/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { Flame, MoveRight } from 'lucide-react';
 import { getContrastingColor } from '@uiw/color-convert';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 
 interface PredictionRowProps {
   className?: string;
@@ -30,7 +30,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
   return (
     <TableRow className={className}>
       {editCol && <TableCell className='w-0' />}
-      <TableCell className='text-nowrap sticky'>
+      <TableCell className='text-nowrap text-start'>
         {isBaseEvent &&
           <p className='text-xs text-muted-foreground'>
             {BaseEventFullName[event.eventName as BaseEventName]}

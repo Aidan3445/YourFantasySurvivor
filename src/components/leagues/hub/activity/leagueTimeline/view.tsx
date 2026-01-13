@@ -43,7 +43,6 @@ export default function LeagueTimeline({ seasonData, hideMemberFilter = false }:
     <EventTimeline
       seasonData={seasonData}
       leagueData={leagueData}
-      hideMemberFilter={hideMemberFilter}
-    />
+      hideMemberFilter={hideMemberFilter} />
   );
 }

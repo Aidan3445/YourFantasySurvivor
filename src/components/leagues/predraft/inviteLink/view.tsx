@@ -24,21 +24,31 @@ export default function InviteLink() {
     await navigator.clipboard.writeText(link);
     setHasCopied(true);
     alert('Link copied to clipboard');
-    setTimeout(() => setHasCopied(false), 1000);
+    setTimeout(() => setHasCopied(false), 5000);
+    (document.activeElement as HTMLElement)?.blur();
   };
 
   return (
-    <article className='p-2 bg-card rounded-xl w-full'>
-      <h2 className='text-lg font-bold text-card-foreground'>Invite friends to play</h2>
-      <p className='text-sm text-muted-foreground'>Copy the link and share with your friends</p>
+    <article className='p-3 bg-card rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10'>
+      <div className='flex items-center gap-2 mb-1'>
+        <span className='h-4 w-0.5 bg-primary rounded-full' />
+        <h2 className='text-base font-bold uppercase tracking-wider'>Invite Friends</h2>
+      </div>
+      <p className='text-sm text-muted-foreground mb-2'>Copy the link and share with your friends</p>
       <div
-        className='relative flex items-center cursor-pointer'
+        className='relative flex items-center cursor-pointer group'
         onClick={copyLink}>
         <Input
-          className={cn('w-full cursor-pointer transition-all pr-10', hasCopied && 'bg-white/40')}
+          className={cn(
+            'cursor-pointer pr-10',
+            hasCopied && 'border-green-500/40 bg-green-500/10'
+          )}
           readOnly
           value={link} />
-        <Link className='absolute right-4 transition-all' color={hasCopied ? 'gray' : 'black'} />
+        <Link className={cn(
+          'absolute right-4 w-5 h-5 shrink-0 transition-all',
+          hasCopied ? 'text-green-600' : 'text-primary group-hover:text-primary/70'
+        )} />
       </div>
     </article>
   );

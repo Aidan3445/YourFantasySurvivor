@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from '~/components/common/select';
 import { useSeasons } from '~/hooks/seasons/useSeasons';
+import { RotateCcw } from 'lucide-react';
 
 const formSchema = z.object({
   baseEventRules: BaseEventRulesZod,
@@ -49,10 +50,14 @@ export default function PlaygroundPage() {
 
   return (
     <div>
-      <div className='sticky z-50 flex flex-col w-full h-32 justify-center bg-card shadow-md shadow-primary px-2 items-center'>
+      <div className='sticky z-50 flex flex-col w-full justify-center bg-card shadow-lg shadow-primary/20 px-4 py-4 items-center border-b-2 border-primary/20'>
         <div className='text-center'>
-          <h1 className='text-4xl font-bold'>Scoring Playground</h1>
-          <p className='text-muted-foreground text-pretty text-sm md:text-base'>
+          <span className='flex items-center justify-center gap-3 mb-2'>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight'>Scoring Playground</h1>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+          </span>
+          <p className='text-muted-foreground text-pretty text-sm md:text-base font-medium'>
             Test out different scoring configurations and see how they impact the castaways scores!
           </p>
         </div>
@@ -61,7 +66,7 @@ export default function PlaygroundPage() {
           <Select
             value={selectedSeasonId?.toString() ?? ''}
             onValueChange={(value) => setSelectedSeasonId(Number(value))}>
-            <SelectTrigger className='max-w-lg'>
+            <SelectTrigger className='max-w-lg mt-3 border-2 border-primary/20 hover:border-primary/40 bg-primary/5 font-medium'>
               <SelectValue placeholder='Select a season' />
             </SelectTrigger>
             <SelectContent>
@@ -75,29 +80,31 @@ export default function PlaygroundPage() {
         )}
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-9rem)] h-[calc(100svh-8rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-10.5rem-var(--navbar-height))]'>
         <div className='flex flex-col gap-4 my-2'>
           <Form {...reactForm}>
-            <form className='p-4 bg-card rounded-lg'>
+            <form className='p-4 bg-card rounded-lg shadow-lg shadow-primary/10'>
               <span className='grid lg:grid-cols-3 gap-2'>
                 <ChallengeScoreSettings hidePredictions />
                 <AdvantageScoreSettings hidePredictions>
                   <Button
                     type='button'
-                    className='w-full h-full hidden lg:block'
-                    variant='destructive'
+                    className='w-full h-full hidden lg:flex items-center justify-center gap-2 font-bold uppercase text-xs tracking-wider border-2 border-primary/30 hover:bg-primary/10'
+                    variant='outline'
                     onClick={() => reactForm.reset()}>
-                    Reset to Default
+                    <RotateCcw className='w-4 h-4 shrink-0' />
+                    Reset Scoring
                   </Button>
                 </AdvantageScoreSettings>
                 <OtherScoreSettings hidePredictions />
               </span>
               <Button
                 type='button'
-                className='w-full h-full lg:hidden mt-4'
-                variant='destructive'
+                className='w-full lg:hidden mt-4 flex items-center justify-center gap-2 font-bold uppercase text-xs tracking-wider border-2 border-primary/30 hover:bg-primary/10'
+                variant='outline'
                 onClick={() => reactForm.reset()}>
-                Reset to Default
+                <RotateCcw className='w-4 h-4 shrink-0' />
+                Reset Scoring
               </Button>
             </form>
           </Form>

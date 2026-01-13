@@ -1,8 +1,10 @@
 'use client';
 
-import { SignedIn, UserButton } from '@clerk/nextjs';
+import '~/styles/globals.css';
+
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { SidebarMenuButton, SidebarMenu } from '~/components/common/sidebar';
-import { LoaderCircle } from 'lucide-react';
+import { LoaderCircle, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { type MouseEvent, useRef } from 'react';
 
@@ -33,14 +35,28 @@ export default function SideNavFooter() {
         </Link>
       </SidebarMenuButton>
       <SignedIn>
-        <SidebarMenuButton size='lg' onClick={handleMenuButtonClick}>
-          <div className='pointer-events-none' ref={userButtonRef}>
+        <SidebarMenuButton className='h-10!' size='lg' onClick={handleMenuButtonClick}>
+          <div className='pointer-events-none flex' ref={userButtonRef}>
             <UserButton showName fallback={
-              <LoaderCircle className='animate-spin' color='#7f633f' />
+              <div>
+                <LoaderCircle className='animate-spin stroke-primary' size={24} />
+              </div>
             } />
           </div>
         </SidebarMenuButton>
       </SignedIn>
-    </SidebarMenu >
+      <SignedOut>
+        <SidebarMenuButton className='h-10!' size='lg'>
+          <SignInButton mode='modal'>
+            <div>
+              <div className='w-full flex gap-5 items-center cursor-pointer'>
+                <LogIn size={24} className='stroke-primary' />
+                <p className='text-primary'> Sign In</p>
+              </div>
+            </div>
+          </SignInButton>
+        </SidebarMenuButton>
+      </SignedOut>
+    </SidebarMenu>
   );
 }

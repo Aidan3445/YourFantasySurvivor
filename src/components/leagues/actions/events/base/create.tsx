@@ -103,18 +103,21 @@ export default function CreateBaseEvent() {
 
   return (
     <div className='w-full px-4 md:pb-14'>
-      <section className='bg-card rounded-xl'>
+      <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 p-3'>
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
             <form
-              className='flex flex-col gap-1 px-2 max-md:w-full grow'
+              className='flex flex-col gap-2 px-2 max-md:w-full grow'
               action={() => handleSubmit()}>
-              <h2 className='text-2xl self-center'>Score Base Event</h2>
+              <div className='flex items-center gap-2 w-full justify-start mb-1'>
+                <span className='h-4 w-0.5 bg-primary rounded-full' />
+                <h2 className='text-base font-bold uppercase tracking-wider'>Score Base Event</h2>
+              </div>
               <FormField
                 name='episodeId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='ml-2'>Episode</FormLabel>
+                    <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Episode</FormLabel>
                     <FormControl>
                       <Select
                         value={field.value as string}
@@ -142,7 +145,7 @@ export default function CreateBaseEvent() {
                   name='eventName'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>Event</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Event</FormLabel>
                       <FormControl>
                         <Select
                           disabled={!selectedEpisode}
@@ -169,7 +172,7 @@ export default function CreateBaseEvent() {
                     </FormItem>
                   )} />
                 <div className='w-full'>
-                  <FormLabel className='ml-2'>Type</FormLabel>
+                  <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Type</FormLabel>
                   <Select
                     disabled={!selectedEvent}
                     value={eventSubtype}
@@ -191,7 +194,7 @@ export default function CreateBaseEvent() {
                   name='label'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>Label</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Label</FormLabel>
                       <FormControl>
                         <Input
                           disabled={eventSubtype === ''}
@@ -209,7 +212,7 @@ export default function CreateBaseEvent() {
                   name='references'
                   render={() => (
                     <FormItem className={cn('w-full', eventSubtype === '' && 'pointer-events-none! cursor-not-allowed!')}>
-                      <FormLabel className='ml-2'>References</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
                           className='h-full rounded-xl pt-1'
@@ -228,7 +231,7 @@ export default function CreateBaseEvent() {
                   name='notes'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>Notes (line separated)</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Notes (line separated)</FormLabel>
                       <FormControl>
                         <Textarea
                           disabled={!selectedReferences || selectedReferences.length === 0}
@@ -241,8 +244,8 @@ export default function CreateBaseEvent() {
                     </FormItem>
                   )} />
               </span>
-              <br />
               <Button
+                className='mt-2 font-bold uppercase text-xs tracking-wider'
                 disabled={
                   !selectedEvent ||
                   setLabel === '' ||

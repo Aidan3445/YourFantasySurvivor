@@ -22,17 +22,22 @@ export default function CreateLeagueModal({ children, className }: CreateLeagueM
       <AlertDialogTrigger className={className} asChild>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className='sm:w-160 w-96 flex flex-col animate-scale-in-fast'>
+      <AlertDialogContent className='sm:w-160 w-96 flex flex-col animate-scale-in-fast border-primary/30 shadow-lg shadow-primary/20'>
         <AlertDialogHeader>
-          <AlertDialogTitle className='text-2xl'>Create a New League</AlertDialogTitle>
+          <span className='flex items-center gap-3 mb-2'>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+            <AlertDialogTitle className='text-2xl font-black uppercase tracking-tight'>
+              Create League
+            </AlertDialogTitle>
+          </span>
           <AlertDialogDescription className='sr-only'>
             Create a new league to start drafting with your friends.
           </AlertDialogDescription>
           <CreateLeagueForm onSubmit={() => setIsOpen(false)} />
         </AlertDialogHeader>
-        <AlertDialogFooter className='absolute top-1 right-1'>
-          <AlertDialogCancel className='h-min p-1'>
-            <X stroke='white' />
+        <AlertDialogFooter className='absolute top-4 right-4'>
+          <AlertDialogCancel className='h-auto w-auto p-2 bg-destructive/10 border-destructive/30 hover:bg-destructive/20'>
+            <X className='w-4 h-4 shrink-0' />
           </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>

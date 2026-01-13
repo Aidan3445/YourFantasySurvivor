@@ -80,9 +80,9 @@ export default function CreateCustomEvent() {
 
   if (!rules?.custom || rules.custom.length === 0) return (
     <div className='px-4 w-full md:pb-14 text-center'>
-      <section className='bg-card rounded-xl pb-4 w-full'>
-        <h2 className='text-2xl self-center text-muted-foreground'>No Custom Events</h2>
-        <p className='text-center text-muted-foreground'>You can create a custom event in the <span className='font-bold'>Settings</span> tab.</p>
+      <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 p-4 w-full'>
+        <h2 className='text-xl font-bold uppercase tracking-wider text-muted-foreground'>No Custom Events</h2>
+        <p className='text-sm text-muted-foreground'>You can create a custom event in the <span className='font-bold'>Settings</span> tab.</p>
       </section>
     </div>
   );
@@ -106,18 +106,21 @@ export default function CreateCustomEvent() {
 
   return (
     <div className='w-full px-4 md:pb-14'>
-      <section className='bg-card rounded-xl'>
+      <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 p-3'>
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
             <form
-              className='flex flex-col gap-1 px-2 max-md:w-full grow'
+              className='flex flex-col gap-2 px-2 max-md:w-full grow'
               action={() => handleSubmit()}>
-              <h2 className='text-2xl self-center'>Create Custom Event</h2>
+              <div className='flex items-center gap-2 w-full justify-start mb-1'>
+                <span className='h-4 w-0.5 bg-primary rounded-full' />
+                <h2 className='text-base font-bold uppercase tracking-wider'>Create Custom Event</h2>
+              </div>
               <FormField
                 name='episodeId'
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='ml-2'>Episode</FormLabel>
+                    <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Episode</FormLabel>
                     <FormControl>
                       <Select
                         value={field.value as string}
@@ -145,7 +148,7 @@ export default function CreateCustomEvent() {
                   name='customEventRuleId'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>Event</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Event</FormLabel>
                       <FormControl>
                         <Select
                           disabled={!selectedEpisode}
@@ -181,7 +184,7 @@ export default function CreateCustomEvent() {
                   name='label'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>Label (optional)</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Label (optional)</FormLabel>
                       <FormControl>
                         <Input
                           disabled={!selectedEvent}
@@ -199,7 +202,7 @@ export default function CreateCustomEvent() {
                   name='references'
                   render={() => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>References</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
                           className='h-full rounded-xl pt-1'
@@ -218,7 +221,7 @@ export default function CreateCustomEvent() {
                   name='notes'
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='ml-2'>Notes (line separated)</FormLabel>
+                      <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Notes (line separated)</FormLabel>
                       <FormControl>
                         <Textarea
                           disabled={!selectedReferences || selectedReferences.length === 0}
@@ -231,8 +234,8 @@ export default function CreateCustomEvent() {
                     </FormItem>
                   )} />
               </span>
-              <br />
               <Button
+                className='mt-2 font-bold uppercase text-xs tracking-wider'
                 disabled={
                   !selectedEvent ||
                   setLabel === '' ||

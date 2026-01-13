@@ -2,12 +2,12 @@
 
 import { ListPlus, Users } from 'lucide-react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
+import JoinLeagueModal from '~/components/leagues/actions/league/join/modal';
 import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
 import { Separator } from '~/components/common/separator';
 import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 import { useLeagues } from '~/hooks/user/useLeagues';
 import { useMemo } from 'react';
-import JoinLeagueModal from '~/components/home/quickActions/joinDialogue';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 export default function LeaguesPage() {
@@ -27,10 +27,14 @@ export default function LeaguesPage() {
 
   return (
     <div>
-      <div className='sticky z-50 flex flex-col w-full h-32 justify-center bg-card shadow-md shadow-primary px-2 items-center'>
+      <div className='sticky z-50 flex flex-col w-full justify-center bg-card shadow-lg shadow-primary/20 px-4 py-4 items-center border-b-2 border-primary/20'>
         <div className='text-center'>
-          <h1 className='text-4xl font-bold'>My Leagues</h1>
-          <p className='text-muted-foreground text-pretty text-sm md:text-base'>
+          <span className='flex items-center justify-center gap-3 mb-2'>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight'>My Leagues</h1>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+          </span>
+          <p className='text-muted-foreground text-pretty text-sm md:text-base font-medium'>
             {currentLeagues.length + inactiveLeagues.length > 0 ?
               'View and manage your leagues below.' :
               'Create and join leagues to compete with others!'}
@@ -38,24 +42,24 @@ export default function LeaguesPage() {
         </div>
 
         <SignedIn>
-          <div className='flex gap-4'>
+          <div className='flex gap-3 mt-3'>
             <CreateLeagueModal>
-              <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-primary hover:bg-primary/80 hover:shadow-lg transition-all'>
-                <h3 className='text-xl text-primary-foreground'>Create League</h3>
-                <ListPlus size={24} color='white' />
+              <section className='flex gap-2 items-center px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all cursor-pointer'>
+                <ListPlus size={20} className='stroke-primary-foreground shrink-0' />
+                <h3 className='text-sm font-bold uppercase tracking-wider text-primary-foreground'>Create League</h3>
               </section>
             </CreateLeagueModal>
             <JoinLeagueModal>
-              <section className='flex gap-2 items-center px-2 py-1 rounded-lg bg-secondary hover:bg-secondary/80 hover:shadow-lg transition-all'>
-                <h3 className='text-xl text-white'>Join League</h3>
-                <Users size={22} color='white' />
+              <section className='flex gap-2 items-center px-4 py-2 rounded-lg bg-secondary hover:bg-secondary/90 shadow-lg hover:shadow-xl transition-all cursor-pointer'>
+                <Users size={20} className='stroke-white shrink-0' />
+                <h3 className='text-sm font-bold uppercase tracking-wider text-white'>Join League</h3>
               </section>
             </JoinLeagueModal>
           </div>
         </SignedIn>
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-9rem)] h-[calc(100svh-8rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9.5rem-var(--navbar-height))]'>
         <div className='mt-2 mb-4'>
           <div className='flex flex-col gap-4'>
             {currentLeagues.length + inactiveLeagues.length > 0
@@ -64,10 +68,14 @@ export default function LeaguesPage() {
               ) : (
                 <>
                   <SignedIn>
-                    <h1 className='text-3xl'>No Leagues Yet...</h1>
+                    <div className='text-center py-8'>
+                      <h1 className='text-2xl font-black uppercase tracking-tight text-muted-foreground'>No Leagues Yet...</h1>
+                    </div>
                   </SignedIn>
                   <SignedOut>
-                    <h1 className='text-3xl'>Sign in or sign up to view and create leagues</h1>
+                    <div className='text-center py-8'>
+                      <h1 className='text-2xl font-black uppercase tracking-tight text-muted-foreground'>Sign in or sign up to view and create leagues</h1>
+                    </div>
                   </SignedOut>
                 </>
               )}
@@ -75,7 +83,7 @@ export default function LeaguesPage() {
           <SignedOut>
             <SignIn forceRedirectUrl='/leagues' />
           </SignedOut>
-          {inactiveLeagues.length > 0 && <Separator className='my-4' />}
+          {inactiveLeagues.length > 0 && <Separator className='my-6 bg-primary' />}
           <LeagueGrid leagues={inactiveLeagues} isInactive />
         </div>
         <ScrollBar className='pt-2 pb-4' />

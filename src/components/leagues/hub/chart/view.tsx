@@ -1,25 +1,13 @@
 'use client';
 
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { LineChart } from '@mui/x-charts/LineChart';
 import { useMemo } from 'react';
 import CustomTooltip from '~/components/leagues/hub/chart/tooltip';
-import { formatData } from '~/components/leagues/hub/chart/utils';
+import { formatDataForMui } from '~/components/leagues/hub/chart/utils';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 export default function Chart() {
   const { sortedMemberScores, league } = useLeagueData();
-
-  const highestScore = useMemo(() => Math.max(
-    ...sortedMemberScores.map(({ scores }) => scores.slice().pop() ?? 0)
-    , 0), [sortedMemberScores]);
 
   const data = useMemo(() => sortedMemberScores.map(({ member, scores }) => ({
     name: member.displayName,
@@ -27,77 +15,56 @@ export default function Chart() {
     color: member.color,
   })), [sortedMemberScores]);
 
-  const memberCount = data.length;
-
-  const formatedData = useMemo(() => formatData({
+  const { xAxisData, series } = useMemo(() => formatDataForMui({
     data,
     startWeek: league?.startWeek ?? 1
   }), [data, league?.startWeek]);
 
   return (
-    <div
-      className='w-full rounded-lg bg-card pl-1 pb-1'
-      style={{ height: `calc(2.45*${memberCount + 1}rem)` }}>
-      <ResponsiveContainer>
-        <LineChart
-          id='score-chart'
-          data={formatedData}
-          margin={{
-            top: 10,
-            right: 10,
-            // add padding depending on the length of the highest score
-            // we multiply by 0.6 to get the value near the label where numbers may overlap
-            left: highestScore < 100 && highestScore > 10 ? -10 :
-              Math.floor(highestScore * 0.6).toString().length * 10 - 30,
-            bottom: 12,
-          }}>
-          <CartesianGrid stroke='#4D4D4D' />
-          <XAxis
-            dataKey='episode'
-            type='category'
-            stroke='black'
-            label={<text x='50%' y='98%' fill='black'>Episode</text>} />
-          <YAxis
-            stroke='black'
-            tickCount={10}
-            allowDecimals={false}
-            label={
-              <text x='15' y='50%' fill='black' transform='rotate(-90)' transformOrigin='15 50%' textAnchor='middle'>
-                Points
-              </text>
-            }
-            domain={[
-              (dataMin: number) => dataMin,
-              (dataMax: number) => dataMax + 1,
-            ]}
-          />
-          <Tooltip
-            content={<CustomTooltip data={data} />}
-            allowEscapeViewBox={{ x: false, y: false }}
-            offset={0} />
-          {data.map((line, index) => (
-            <Line
-              id={`line-${line.name}`}
-              name={`line-${index}`}
-              className='cursor-pointer'
-              type='monotone'
-              dataKey={line.name}
-              stroke={line.color}
-              strokeWidth={5}
-              strokeLinecap='round'
-              strokeOpacity={0.7}
-              dot={false}
-              key={index}
-            // onMouseOver={() => mouseOverLeaderboard(
-            //   line.name,
-            //   sortedData.map((d) => d.name))}
-            // onMouseOut={() => mouseOutLeaderboard(
-            //   line.name,
-            //   line.color,
-            //   sortedData.map((d) => d.name))} 
-            />))}
-        </LineChart>
-      </ResponsiveContainer >
+    <div className='w-full h-full rounded-lg bg-card'>
+      <LineChart
+        xAxis={[{
+          data: xAxisData,
+          label: 'Episode',
+          scaleType: 'point',
+        }]}
+        yAxis={[{
+          label: 'Points',
+        }]}
+        margin={{ top: 0, right: 0, bottom: 0, left: 24 }}
+        series={series}
+        grid={{ horizontal: true }}
+        slots={{
+          tooltip: CustomTooltip,
+        }}
+        slotProps={{
+          legend: {
+            position: { horizontal: 'center' },
+          },
+        }}
+        sx={{
+          '& .MuiLineElement-root': {
+            strokeWidth: 5,
+            strokeLinecap: 'round',
+            strokeOpacity: 0.7,
+          },
+          '& .MuiMarkElement-root': {
+            display: 'none',
+          },
+          '& .MuiChartsGrid-line': {
+            stroke: '#4D4D4D',
+          },
+          '& .MuiChartsAxis-line': {
+            stroke: 'black',
+          },
+          '& .MuiChartsAxis-tick': {
+            stroke: 'black',
+          },
+          '& .MuiChartsAxis-tickLabel': {
+            fill: 'currentColor',
+          },
+        }}
+      />
     </div >
   );
 }

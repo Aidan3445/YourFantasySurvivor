@@ -1,53 +1,26 @@
 import { SignedIn, SignedOut } from '@clerk/nextjs';
 import { HeroSection } from '~/components/home/hero/view';
 import { ActiveLeagues } from '~/components/home/activeLeagues/view';
-import { QuickActions } from '~/components/home/quickActions/view';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { CastawayScoreboard } from '~/components/home/scoreboard/view';
 
 export default async function HomePage() {
   return (
-    <main className='flex flex-col gap-2 w-full p-4 max-w-7xl mx-auto pb-12 lg:pb-0'>
-      {/* Non-logged in users */}
-      <SignedOut>
-        <div className='space-y-8 pb-12'>
-          <HeroSection />
+    <div className='relative'>
+      <ScrollArea className='overflow-y-visible md:h-[calc(100svh-1rem)] h-[calc(100svh-var(--navbar-height))]'>
+        <div className='p-4 space-y-4'>
+          <SignedOut>
+            <HeroSection />
+          </SignedOut>
 
-          {/* Global Castaway Scoreboard */}
-          <div className='w-full'>
-            <CastawayScoreboard />
-          </div>
-        </div>
-      </SignedOut>
+          <SignedIn>
+            <ActiveLeagues />
+          </SignedIn>
 
-      {/* Logged in users */}
-      <SignedIn>
-        <div>
-          <div className='text-center lg:hidden'>
-            <h1 className='text-4xl font-bold mb-2'>Welcome to YFS!</h1>
-            <p className='text-muted-foreground text-lg'>
-              Ready to dominate your fantasy leagues?
-            </p>
-          </div>
-          {/* Welcome back section */}
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-3 grid-rows-[1fr]'>
-            <div className='lg:col-span-2'>
-              <ActiveLeagues />
-            </div>
-            <div className='lg:col-span-2 lg:row-start-2'>
-              <CastawayScoreboard />
-            </div>
-            <div className='lg:row-span-2 min-w-96'>
-              <div className='text-center hidden lg:block'>
-                <h1 className='text-4xl font-bold mb-2'>Welcome to YFS!</h1>
-                <p className='text-muted-foreground text-lg'>
-                  Ready to dominate your fantasy leagues?
-                </p>
-              </div>
-              <QuickActions />
-            </div>
-          </div>
+          <CastawayScoreboard />
         </div>
-      </SignedIn>
-    </main>
+        <ScrollBar className='py-4' />
+      </ScrollArea>
+    </div>
   );
 }

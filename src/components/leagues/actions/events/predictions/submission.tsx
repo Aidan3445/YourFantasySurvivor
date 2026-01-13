@@ -29,7 +29,7 @@ interface SubmissionCardProps {
   options: Record<ReferenceType | 'Direct Castaway', Record<string, { id: number, color: string, tribeName?: string }>>;
   maxBet?: number;
   wallet?: number;
-  updateBetTotal: (eventName: string, bet: number) => void;
+  updateBetTotal: (_eventName: string, _bet: number) => void;
   totalBet?: number;
 }
 

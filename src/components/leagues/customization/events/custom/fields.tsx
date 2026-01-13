@@ -8,6 +8,7 @@ import { MultiSelect } from '~/components/common/multiSelect';
 import { type ReactNode, useState } from 'react';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
 import { EventTypes, PredictionTimings, ReferenceTypes } from '~/lib/events';
+import { cn } from '~/lib/utils';
 
 interface LeagueEventFieldsProps {
   predictionDefault?: boolean;
@@ -28,10 +29,9 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
         name='eventName'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Event Name</FormLabel>
+            <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Event Name</FormLabel>
             <FormControl>
               <Input
-                className='w-full text-black'
                 type='text'
                 placeholder='Enter the name of the event'
                 {...field} />
@@ -46,10 +46,10 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
         name='description'
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Description</FormLabel>
+            <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Description</FormLabel>
             <FormControl>
               <Textarea
-                className='w-full text-black max-h-20'
+                className='w-full border-2 border-primary/20 focus:border-primary/40 bg-accent max-h-20 font-medium'
                 placeholder='Points awarded to...'
                 {...field} />
             </FormControl>
@@ -63,7 +63,7 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
         name='referenceTypes'
         render={({ field }) => (
           <FormItem className='w-full'>
-            <FormLabel>Reference Type</FormLabel>
+            <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Reference Type</FormLabel>
             <FormControl>
               <MultiSelect
                 options={ReferenceTypes
@@ -85,10 +85,9 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
           name='points'
           render={({ field }) => (
             <FormItem className='w-1/3'>
-              <FormLabel>Points</FormLabel>
+              <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Points</FormLabel>
               <FormControl>
                 <Input
-                  className='w-full text-black'
                   type='number'
                   step={1}
                   placeholder='Points'
@@ -104,7 +103,7 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
           name='eventType'
           render={({ field }) => (
             <FormItem className='w-2/3'>
-              <FormLabel>Event Type</FormLabel>
+              <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Event Type</FormLabel>
               <FormControl>
                 <Select
                   defaultValue={field.value as string}
@@ -136,15 +135,18 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
         <FormField
           name='timing'
           render={({ field }) => (
-            <FormItem className={!isPrediction ? 'pointer-events-none! w-full' : 'w-full'}>
-              <FormLabel className='flex items-center gap-1'>
+            <FormItem className={'w-full'}>
+              <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1 mb-0.5'>
                 Timing
                 <PredictionTimingHelp />
               </FormLabel>
               <FormControl>
                 <MultiSelect
-                  options={PredictionTimings
-                    .map((option) => ({ label: option, value: option }))}
+                  className={cn(!isPrediction && 'pointer-events-none')}
+                  options={
+                    PredictionTimings
+                      .map((option) => ({ label: option, value: option }))
+                  }
                   onValueChange={field.onChange}
                   defaultValue={field.value as string[]}
                   value={field.value as string[]}

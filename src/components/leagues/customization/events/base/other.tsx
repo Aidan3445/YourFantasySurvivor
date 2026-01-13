@@ -13,8 +13,8 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
         <FormField
           name='baseEventRules.elim'
           render={({ field }) => (
-            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
-              <FormLabel className='inline-flex gap-2 items-center'>
+            <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
+              <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
                 {BaseEventFullName.elim}
                 {disabled &&
                   <h2 className={cn(
@@ -22,7 +22,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     field.value <= 0 ? 'text-destructive' : 'text-green-600',
                     field.value === 0 && 'text-muted-foreground')}>
                     {field.value}
-                    <Flame className={cn('inline align-top',
+                    <Flame className={cn('inline align-top w-5 h-5 shrink-0',
                       field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
                       field.value === 0 && 'stroke-muted-foreground'
                     )} />
@@ -32,14 +32,13 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap text-sm'>
                   {BaseEventDescriptions.main.elim}
                 </FormDescription>
               </div>
@@ -52,8 +51,8 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
         <FormField
           name='baseEventRules.spokeEpTitle'
           render={({ field }) => (
-            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
-              <FormLabel className='inline-flex gap-2 items-center'>
+            <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
+              <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
                 {BaseEventFullName.spokeEpTitle}
                 {disabled &&
                   <h2 className={cn(
@@ -61,7 +60,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     field.value <= 0 ? 'text-destructive' : 'text-green-600',
                     field.value === 0 && 'text-muted-foreground')}>
                     {field.value}
-                    <Flame className={cn('inline align-top',
+                    <Flame className={cn('inline align-top w-5 h-5 shrink-0',
                       field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
                       field.value === 0 && 'stroke-muted-foreground'
                     )} />
@@ -71,14 +70,13 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap text-sm'>
                   {BaseEventDescriptions.main.spokeEpTitle}
                 </FormDescription>
               </div>
@@ -91,8 +89,8 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
         <FormField
           name='baseEventRules.finalists'
           render={({ field }) => (
-            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
-              <FormLabel className='inline-flex gap-2 items-center'>
+            <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
+              <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
                 {BaseEventFullName.finalists}
                 {disabled &&
                   <h2 className={cn(
@@ -100,7 +98,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     field.value <= 0 ? 'text-destructive' : 'text-green-600',
                     field.value === 0 && 'text-muted-foreground')}>
                     {field.value}
-                    <Flame className={cn('inline align-top',
+                    <Flame className={cn('inline align-top w-5 h-5 shrink-0',
                       field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
                       field.value === 0 && 'stroke-muted-foreground'
                     )} />
@@ -110,14 +108,13 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap text-sm'>
                   {BaseEventDescriptions.main.finalists}
                 </FormDescription>
               </div>
@@ -130,8 +127,8 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
         <FormField
           name='baseEventRules.fireWin'
           render={({ field }) => (
-            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
-              <FormLabel className='inline-flex gap-2 items-center'>
+            <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
+              <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
                 {BaseEventFullName.fireWin}
                 {disabled &&
                   <h2 className={cn(
@@ -139,7 +136,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     field.value <= 0 ? 'text-destructive' : 'text-green-600',
                     field.value === 0 && 'text-muted-foreground')}>
                     {field.value}
-                    <Flame className={cn('inline align-top',
+                    <Flame className={cn('inline align-top w-5 h-5 shrink-0',
                       field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
                       field.value === 0 && 'stroke-muted-foreground'
                     )} />
@@ -149,14 +146,13 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap text-sm'>
                   {BaseEventDescriptions.main.fireWin}
                 </FormDescription>
               </div>
@@ -169,8 +165,8 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
         <FormField
           name='baseEventRules.soleSurvivor'
           render={({ field }) => (
-            <FormItem className={cn('rounded-lg px-1 shadow h-full transition-all', disabled ? 'bg-accent' : 'bg-orange-200')}>
-              <FormLabel className='inline-flex gap-2 items-center'>
+            <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
+              <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
                 {BaseEventFullName.soleSurvivor}
                 {disabled &&
                   <h2 className={cn(
@@ -179,7 +175,7 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                     field.value === 0 && 'text-muted-foreground'
                   )}>
                     {field.value}
-                    <Flame className={cn('inline align-top',
+                    <Flame className={cn('inline align-top w-5 h-5 shrink-0',
                       field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
                       field.value === 0 && 'stroke-muted-foreground'
                     )} />
@@ -189,14 +185,13 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                 {!disabled &&
                   <FormControl>
                     <Input
-                      className='w-full text-black my-1'
                       type='number'
                       step={1}
                       placeholder='Points'
                       disabled={disabled}
                       {...field} />
                   </FormControl>}
-                <FormDescription className='max-w-72 lg:max-w-none text-wrap'>
+                <FormDescription className='max-w-72 lg:max-w-none text-wrap text-sm'>
                   {BaseEventDescriptions.main.soleSurvivor}
                 </FormDescription>
               </div>

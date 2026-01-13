@@ -28,84 +28,98 @@ export default function ManageMembers() {
   }
 
   return (
-    <div className='flex flex-col gap-4 bg-card p-2 justify-between rounded-xl flex-1 min-w-sm max-h-134 min-h-0 overflow-hidden mb-2 md:mb-0'>
-      <h3 className='text-lg font-bold text-card-foreground text-center cursor-default'>
-        Manage Members
-      </h3>
+    <div className='flex flex-col gap-4 bg-card justify-between rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex-1 sm:min-w-sm min-h-0 overflow-hidden'>
+      <div className='flex items-center gap-2 w-full justify-start px-3 pt-3'>
+        <span className='h-4 w-0.5 bg-primary rounded-full' />
+        <h3 className='text-base font-bold uppercase tracking-wider text-center cursor-default'>
+          Manage Members
+        </h3>
+      </div>
       <Tabs
         className='h-full rounded-lg flex flex-col'
         value={tab}
         onValueChange={setTab as (_value: string) => void}>
-        <TabsList className='grid grid-flow-col auto-cols-fr w-full px-2 z-50'>
+        <TabsList className='grid grid-flow-col auto-cols-fr px-2 mx-3 z-50 bg-accent border-none'>
           <TabsTrigger value='current'>Current</TabsTrigger>
           <TabsTrigger value='pending' disabled={!leagueSettings?.isProtected}>
             Pending
             {leagueSettings?.isProtected && (pendingMembers?.members?.length ?? 0) > 0 && (
-              <Circle className='animate-pulse mb-2 stroke-primary fill-primary' size={8} />
+              <Circle className='animate-pulse mb-2 stroke-primary fill-primary shrink-0' size={8} />
             )}
           </TabsTrigger>
         </TabsList>
-        <TabsContent value='current' className='flex-1 min-h-0'>
-          <div className='flex flex-col w-full h-full'>
-            <p className='text-sm text-muted-foreground'>
-              <b>The Admins</b> can
-            </p>
-            <ul className='list-disc list-inside ml-4 text-sm'>
-              <li className='text-muted-foreground'>
-                Help score custom events
-              </li>
-              <li className='text-muted-foreground'>
-                Admit and remove members
-              </li>
-            </ul>
-            <p className='text-sm text-muted-foreground'>
-              <b>The Owner</b> can also
-            </p>
-            <ul className='list-disc list-inside ml-4 mb-2 text-sm'>
-              <li className='text-muted-foreground'>
-                Manage member roles
-              </li>
-              <li className='text-muted-foreground'>
-                Edit league details and scoring settings
-              </li>
-              <li className='text-muted-foreground'>
-                Delete the league
-              </li>
-            </ul>
-            <ScrollArea className='flex-1 min-h-0 pr-3 mb-9'>
-              {leagueMembers?.members.map(member => (
-                <CurrentMember
-                  key={member.memberId}
-                  member={member}
-                  loggedInMember={leagueMembers.loggedIn} />
-              ))}
+        <TabsContent value='current' className='flex-1 min-h-0 pb-0! mb-0!'>
+          <div className='flex flex-col w-full'>
+            <div className='px-4'>
+              <p className='text-sm text-muted-foreground'>
+                <b>The Admins</b> can
+              </p>
+              <ul className='list-disc list-inside ml-4 text-sm'>
+                <li className='text-muted-foreground'>
+                  Help score custom events
+                </li>
+                <li className='text-muted-foreground'>
+                  Admit and remove members
+                </li>
+              </ul>
+              <p className='text-sm text-muted-foreground'>
+                <b>The Owner</b> can also
+              </p>
+              <ul className='list-disc list-inside ml-4 mb-2 text-sm'>
+                <li className='text-muted-foreground'>
+                  Manage member roles
+                </li>
+                <li className='text-muted-foreground'>
+                  Edit league details and scoring settings
+                </li>
+                <li className='text-muted-foreground'>
+                  Delete the league
+                </li>
+              </ul>
+            </div>
+            <ScrollArea className='flex-1 min-h-0 max-h-74'>
+              <div className='p-4 pb-0'>
+                {leagueMembers?.members
+                  .map(member => (
+                    <CurrentMember
+                      key={member.memberId}
+                      member={member}
+                      loggedInMember={leagueMembers.loggedIn} />
+                  ))}
+              </div>
               <ScrollBar orientation='vertical' />
             </ScrollArea>
           </div>
         </TabsContent>
-        <TabsContent value='pending' className='flex-1 min-h-0'>
+        <TabsContent value='pending' className='flex-1 min-h-0 pb-0! mb-0!'>
           {leagueSettings?.isProtected ? (
-            <div className='flex flex-col w-full h-full'>
-              <p className='text-sm text-muted-foreground'>
-                Since this league is protected, new members must be admitted by an admin.
-              </p>
-              <p className='text-xs text-muted-foreground mb-2'>
-                Pending members will be removed after 7 days if not admitted.
-              </p>
-              <ScrollArea className='flex-1 min-h-0 pr-3 mb-9'>
-                {pendingMembers?.members.map((member, index) => (
-                  <PendingMember
-                    key={index}
-                    member={member}
-                    loggedInMember={leagueMembers?.loggedIn} />
-                ))}
+            <div className='flex flex-col w-full'>
+              <div className='px-4'>
+                <p className='text-sm text-muted-foreground'>
+                  Since this league is protected, new members must be admitted by an admin.
+                </p>
+                <p className='text-xs text-muted-foreground mb-2'>
+                  Pending members will be removed after 7 days if not admitted.
+                </p>
+              </div>
+              <ScrollArea className='flex-1 min-h-0 max-h-74'>
+                <div className='p-4 pb-0'>
+                  {pendingMembers?.members.map((member, index) => (
+                    <PendingMember
+                      key={index}
+                      member={member}
+                      loggedInMember={leagueMembers?.loggedIn} />
+                  ))}
+                </div>
                 <ScrollBar orientation='vertical' />
               </ScrollArea>
             </div>
           ) : (
-            <p className='text-sm text-muted-foreground'>
-              This league is not protected; new members can join freely.
-            </p>
+            <div className='px-4'>
+              <p className='text-sm text-muted-foreground'>
+                This league is not protected; new members can join freely.
+              </p>
+            </div>
           )}
         </TabsContent>
       </Tabs>

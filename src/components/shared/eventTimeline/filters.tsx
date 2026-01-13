@@ -99,19 +99,22 @@ export default function TimelineFilters({
 
   return (
     <Accordion type='single' collapsible className='w-full'>
-      <AccordionItem value='filter' className='border-none pt-2'>
-        <span className='w-full flex flex-wrap items-center gap-x-4 md:items-baseline px-12 md:mr-14 justify-center'>
-          <h2 className='text-lg font-bold text-card-foreground'>Activity</h2>
+      <AccordionItem value='filter' className='border-none'>
+        <div className='w-full flex flex-wrap gap-x-4 md:items-baseline justify-between'>
+          <div className='flex items-center gap-3 my-2 self-center'>
+            <div className='h-6 w-1 bg-primary rounded-full' />
+            <h2 className='text-xl font-black uppercase tracking-tight'>Activity</h2>
+          </div>
           <span className='flex flex-wrap gap-x-4 items-center justify-center'>
             <Select
               defaultValue={`${selectedEpisode}`}
               value={`${selectedEpisode}`}
               onValueChange={(value) => setSelectedEpisode(Number(value))}>
-              <SelectTrigger className='w-full'>
+              <SelectTrigger className='w-full border-2 border-primary/20 hover:border-primary/40 bg-primary/5 font-medium'>
                 <SelectValue placeholder='Select an episode'>
                   {selectedEpisode === -1 ? 'All Episodes' : selectedEpisodeData ? (
                     <>
-                      {`${selectedEpisodeData.episodeNumber}:`} {selectedEpisodeData.title}
+                      <span className='font-bold'>EP {selectedEpisodeData.episodeNumber}:</span> {selectedEpisodeData.title}
                       <div className='inline ml-1'>
                         <AirStatus
                           airDate={selectedEpisodeData.airDate}
@@ -129,7 +132,7 @@ export default function TimelineFilters({
                 </SelectItem>
                 {episodes?.map((episode) => (
                   <SelectItem key={episode.episodeNumber} value={`${episode.episodeNumber}`}>
-                    {`${episode.episodeNumber}:`} {episode.title}
+                    <span className='font-bold'>EP {episode.episodeNumber}:</span> {episode.title}
                     <div className='inline ml-1'>
                       <AirStatus
                         airDate={episode.airDate}
@@ -142,14 +145,14 @@ export default function TimelineFilters({
               </SelectContent>
             </Select>
           </span>
-          <AccordionTrigger className='w-full'>
+          <AccordionTrigger className='w-full font-bold uppercase text-xs tracking-wider z-10'>
             Filters
           </AccordionTrigger>
-        </span>
-        <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center'>
+        </div>
+        <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center gap-4 pb-4'>
           {castaways &&
-            <div className='flex flex-col items-center'>
-              <Label className='text-sm font-semibold text-muted-foreground'>
+            <div className='flex flex-col items-center gap-2'>
+              <Label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
                 Castaway Filter
               </Label>
               <MultiSelect
@@ -161,12 +164,13 @@ export default function TimelineFilters({
                 value={filterCastaway as unknown as string[]}
                 onValueChange={(value) => setFilterCastaway(value as number[])}
                 modalPopover
+                maxCount={0}
                 placeholder='All Castaways'
               />
             </div>}
           {tribes &&
-            <div className='flex flex-col items-center'>
-              <Label className='text-sm font-semibold text-muted-foreground'>
+            <div className='flex flex-col items-center gap-2'>
+              <Label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
                 Tribe Filter
               </Label>
               <MultiSelect
@@ -178,12 +182,13 @@ export default function TimelineFilters({
                 value={filterTribe as unknown as string[]}
                 onValueChange={(value) => setFilterTribe(value as number[])}
                 modalPopover
+                maxCount={0}
                 placeholder='All Tribes'
               />
             </div>}
           {!hideMemberFilter && leagueMembers &&
-            <div className='flex flex-col items-center'>
-              <Label className='text-sm font-semibold text-muted-foreground'>
+            <div className='flex flex-col items-center gap-2'>
+              <Label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
                 Member Filter
               </Label>
               <MultiSelect
@@ -195,11 +200,12 @@ export default function TimelineFilters({
                 value={filterMember as unknown as string[]}
                 onValueChange={(value) => setFilterMember(value as number[])}
                 modalPopover
+                maxCount={0}
                 placeholder='All Members'
               />
             </div>}
-          <div className='flex flex-col items-center'>
-            <Label className='text-sm font-semibold text-muted-foreground'>
+          <div className='flex flex-col items-center gap-2'>
+            <Label className='text-xs font-bold uppercase tracking-wider text-muted-foreground'>
               Event Filter
             </Label>
             <MultiSelect
@@ -224,6 +230,7 @@ export default function TimelineFilters({
               value={filterEvent}
               onValueChange={(value) => setFilterEvent(value as string[])}
               modalPopover
+              maxCount={0}
               placeholder='All Events'
             />
           </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useMemo } from 'react';
+import { Card, CardContent, CardHeader } from '~/components/common/card';
 import LeagueCard from '~/components/leagues/grid/leagueCard';
 import { useSeasons } from '~/hooks/seasons/useSeasons';
 import { type CurrentSelection, type LeagueMember } from '~/types/leagueMembers';
@@ -12,47 +12,68 @@ interface LeagueGridProps {
 }
 
 export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridProps) {
-  const { data: seasons } = useSeasons(false);
-  const refresh = useMemo(() => seasons?.length === 0, [seasons]);
+  const { data: seasons } = useSeasons(isInactive);
 
   if (leagues.length === 0) return null;
 
+  const leaguesBySeason = Object.values(leagues.reduce((acc, leagueItem) => {
+    const seasonId = leagueItem.league.seasonId;
+    acc[seasonId] ??= [];
+    acc[seasonId].push(leagueItem);
+    return acc;
+  }, {} as Record<number, typeof leagues>))
+    .sort((a, b) => {
+      const seasonA = seasons?.find(s => s.seasonId === a[0]!.league.seasonId);
+      const seasonB = seasons?.find(s => s.seasonId === b[0]!.league.seasonId);
+      if (!seasonA || !seasonB) return 0;
+      return new Date(seasonB.premiereDate).getTime() - new Date(seasonA.premiereDate).getTime();
+    });
+
   if (isInactive) {
     return (
-      <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
-        {leagues
-          .toSorted(({ league: a }, { league: b }) => b.season.localeCompare(a.season))
-          .map(({ league, member, currentSelection }, index) => (
-            <Fragment key={index}>
-              {/* Display season header only once for each season */}
-              {leagues.findIndex(({ league: l }) => l.seasonId === league.seasonId) === index && (
-                <h3
-                  key={league.season}
-                  className='md:col-span-2 lg:col-span-4 -mb-2 text-center text-lg text-primary-foreground font-semibold bg-primary rounded-full'>
-                  {league.season}
-                </h3>
-              )}
-              <LeagueCard
-                league={league}
-                member={member}
-                currentSelection={currentSelection}
-                refresh={refresh} />
-            </Fragment>
-          ))
-        }
+      <section className='space-y-6'>
+        {leaguesBySeason
+          .map(seasonLeagues => {
+            const season = seasons?.find(s => s.seasonId === seasonLeagues[0]!.league.seasonId);
+            if (!season) return null;
+            return (
+              <Card key={season.seasonId} className='relative overflow-hidden'>
+                <CardHeader className='flex items-center justify-start gap-4 mb-4 relative z-10'>
+                  <div className='h-6 w-1 bg-secondary rounded-full' />
+                  <h2 className='text-xl font-black text-muted-foreground uppercase tracking-tight leading-none'>
+                    {season.name}
+                  </h2>
+                </CardHeader>
+                <CardContent className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10'>
+                  {seasonLeagues.map(({ league, member, currentSelection }) => (
+                    <LeagueCard
+                      key={league.hash}
+                      league={league}
+                      member={member}
+                      currentSelection={currentSelection}
+                      refresh={isInactive} />
+                  ))}
+                </CardContent>
+              </Card>
+            );
+          })}
       </section>
     );
   }
 
   return (
-    <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full'>
-      <h3
-        className='md:col-span-2 lg:col-span-4 -mb-2 text-center px-2 text-xl text-primary-foreground font-semibold bg-primary rounded-full shimmer-fast'>
-        {leagues[0]!.league.season}
-      </h3>
-      {leagues.map((leagueItem) => (
-        <LeagueCard key={leagueItem.league.hash} {...leagueItem} />
-      ))}
-    </section>
+    <Card className='relative overflow-hidden'>
+      <CardHeader className='flex items-center justify-start gap-4 mb-4 relative z-10'>
+        <div className='h-6 w-1 bg-primary rounded-full' />
+        <h2 className='text-xl font-black uppercase tracking-tight leading-none'>
+          {leagues[0]!.league.season}
+        </h2>
+      </CardHeader>
+      <CardContent className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10'>
+        {leagues.map((leagueItem) => (
+          <LeagueCard key={leagueItem.league.hash} {...leagueItem} />
+        ))}
+      </CardContent>
+    </Card>
   );
 }

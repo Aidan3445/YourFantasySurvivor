@@ -2,84 +2,70 @@ import {
   TableCell,
 } from '~/components/common/table';
 
-import { Circle, FlameKindling } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
-import { PopoverArrow } from '@radix-ui/react-popover';
-import ColorRow from '~/components/shared/colorRow';
+import { Flame } from 'lucide-react';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type Tribe } from '~/types/tribes';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
-import { getContrastingColor } from '@uiw/color-convert';
+import CastawayPopover from '~/components/shared/castaways/castawayPopover';
+import { cn } from '~/lib/utils';
+import EliminationIndicator from '~/components/shared/castaways/eliminationIndicator';
+import TribeHistoryCircles from '~/components/shared/castaways/tribeHistoryCircles';
 
 interface CastawayRowProps {
   place: number;
   castaway?: EnrichedCastaway;
   points?: number;
-  color?: string;
   tribeTimeline?: { episode: number; tribe: Tribe; }[];
   allZero?: boolean;
 }
 
-export default function CastawayEntry({ place, castaway, points, color, tribeTimeline, allZero }: CastawayRowProps) {
+export default function CastawayEntry({ place, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
+  const isTopThree = place <= 3 && !allZero;
+  const rankBadgeColor = place === 1 ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40'
+    : place === 2 ? 'bg-gray-400/20 text-gray-600 border-gray-400/40'
+      : place === 3 ? 'bg-amber-700/20 text-amber-700 border-amber-700/40'
+        : 'bg-primary/10 text-primary border-primary/30';
+
   return (
     <>
       {!allZero && (
         <>
-          <TableCell className='px-1'>
-            <ColorRow color={color} className='justify-center p-0'>
+          <TableCell className='px-3 py-3 w-0 text-left'>
+            <div className={cn(
+              'inline-flex items-center justify-center w-8 h-8 rounded-md font-black text-sm border-2 transition-all',
+              rankBadgeColor,
+              isTopThree && 'shadow-md'
+            )}>
               {place}
-            </ColorRow>
+            </div>
           </TableCell>
-          <TableCell className='px-1'>
-            <ColorRow color={color} className='justify-center p-0'>
-              {points}
-            </ColorRow>
+          <TableCell>
+            <div className='flex justify-center items-center'>
+              <h3 className='leading-none font-black text-lg tabular-nums text-primary ml-auto'>{points}</h3>
+              <Flame className='inline w-5 h-5 stroke-muted-foreground -mt-0.5' />
+            </div>
           </TableCell>
         </>
       )}
-      <TableCell className='text-nowrap px-1 w-1/2'>
-        <ColorRow
-          className='justify-center gap-0 px-1'
-          color={castaway?.eliminatedEpisode ? '#AAAAAA' : castaway?.tribe?.color ?? '#FFFFFF'}>
+      <TableCell className={cn('text-nowrap px-3 py-3 w-1 /2')}>
+        <div className='flex items-center gap-2'>
           <CastawayPopover castaway={castaway}>
             <span
-              className='text-nowrap'
-              style={{
-                color: getContrastingColor(castaway?.eliminatedEpisode
-                  ? '#AAAAAA'
-                  : castaway?.tribe?.color ?? '#AAAAAA')
-              }}>
+              className={cn(
+                'text-base text-left md:text-lg font-bold transition-all hover:text-primary cursor-pointer',
+                castaway?.eliminatedEpisode && 'line-through opacity-40 hover:opacity-60'
+              )}>
               {castaway?.fullName}
             </span>
           </CastawayPopover>
-          {castaway?.eliminatedEpisode && (
-            <Popover>
-              <PopoverTrigger>
-                <span className='mx-1 text-xs text-muted-foreground cursor-help text-nowrap'>
-                  <FlameKindling className='align-text-bottom inline w-4 h-4' />
-                  ({castaway.eliminatedEpisode})
-                </span>
-              </PopoverTrigger>
-              <PopoverContent className='w-min text-nowrap p-1' align='end'>
-                <PopoverArrow />
-                Eliminated Episode {castaway.eliminatedEpisode}
-              </PopoverContent>
-            </Popover>
-          )}
-          <div className='ml-auto flex gap-0.5'>
-            {tribeTimeline && (tribeTimeline.length > 1 || castaway?.eliminatedEpisode) && tribeTimeline.map(({ episode, tribe }) => (
-              <Popover key={`${tribe.tribeName}-${episode}`}>
-                <PopoverTrigger>
-                  <Circle size={16} fill={tribe.tribeColor} className='cursor-help' />
-                </PopoverTrigger>
-                <PopoverContent className='w-min text-nowrap p-1' align='end'>
-                  <PopoverArrow />
-                  {tribe.tribeName} - Episode {episode}
-                </PopoverContent>
-              </Popover>
-            ))}
+          <div className='ml-auto flex gap-1 items-center'>
+            <TribeHistoryCircles
+              tribeTimeline={tribeTimeline ?? []}
+              showAll={castaway?.eliminatedEpisode !== null} />
+            {castaway?.eliminatedEpisode && (
+              <EliminationIndicator episode={castaway.eliminatedEpisode} />
+            )}
           </div>
-        </ColorRow>
+        </div>
       </TableCell>
     </>
   );

@@ -64,15 +64,15 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
     <Form {...reactForm}>
       <form className='bg-card rounded-lg' action={() => handleSubmit()}>
         <Carousel setApi={setApi} opts={{ watchDrag: false, ignoreKeys: true }}>
-          <span className='flex w-full justify-center items-end gap-4'>
-            <CarouselPrevious className='static translate-y-0' />
-            <div className='space-y-1 grow'>
+          <span className='flex w-full justify-center items-end gap-4 px-2'>
+            <CarouselPrevious className='static translate-y-0 border-2 border-primary/30 hover:bg-primary/10' />
+            <div className='space-y-2 grow'>
               {count > 0 &&
-                <p className='w-full text-center text-sm'>
+                <p className='w-full text-center text-xs font-bold uppercase tracking-wider text-muted-foreground'>
                   Step {current + 1} of {count}
                 </p>
               }
-              <Progress className='w-full' value={progress} />
+              <Progress className='w-full h-2' value={progress} />
             </div>
             <div className='w-8' />
           </span>
@@ -93,7 +93,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
                 <LeagueMemberFields formPrefix='member' />
               </div>
               <Button
-                className='m-4 mt-auto w-80 self-center'
+                className='m-4 mt-auto w-80 self-center font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'
                 disabled={!reactForm.formState.isValid}
                 type='submit'>
                 Create League
