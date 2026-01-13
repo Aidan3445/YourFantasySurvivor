@@ -23,8 +23,8 @@ export function useEnrichEvents(
       loggedIn?: LeagueMember;
       members: LeagueMember[];
     },
-    selectionTimeline: SelectionTimelines,
-    leagueRules: LeagueRules
+    selectionTimeline?: SelectionTimelines,
+    leagueRules?: LeagueRules
   },
 ) {
   const {

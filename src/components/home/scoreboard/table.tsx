@@ -3,7 +3,7 @@
 import {
   Table, TableCaption, TableHead, TableHeader, TableRow,
 } from '~/components/common/table';
-import { Card, CardContent } from '~/components/common/card';
+import { Card, CardContent, CardHeader } from '~/components/common/card';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ScorboardBody from '~/components/home/scoreboard/body';
@@ -96,9 +96,9 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
       {/* Accent Elements */}
       <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
 
-      <CardContent className='relative z-10'>
-        <div>
-          {/* Section Header */}
+      <CardContent className='relative z-10 px-0'>
+        {/* Section Header */}
+        <CardHeader className='space-y-4 relative z-10'>
           <div className='flex justify-between items-start mb-6'>
             <div>
               <div className='flex items-center gap-3 mb-2'>
@@ -127,38 +127,38 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
               </div>
             </div>
           </div>
+        </CardHeader>
 
-          {/* Scoreboard List */}
-          <ScrollArea className='gap-0'>
-            <Table>
-              <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
-              <TableHeader className='select-none'>
-                <TableRow>
-                  {!allZero && (
-                    <>
-                      <TableHead>Place</TableHead>
-                      <TableHead>Points</TableHead>
-                    </>
-                  )}
-                  <TableHead>Castaway</TableHead>
-                  {!allZero && (
-                    <>
-                      <TableHead>Place</TableHead>
-                      <TableHead>Points</TableHead>
-                    </>
-                  )}
-                  <TableHead>Castaway</TableHead>
-                </TableRow>
-              </TableHeader>
-              <ScorboardBody
-                allZero={allZero}
-                sortedCastaways={selectedSeasonData.sortedCastaways}
-                castawaySplitIndex={selectedSeasonData.castawaySplitIndex}
-                data={selectedSeasonData.data} />
-            </Table>
-            <ScrollBar orientation='horizontal' />
-          </ScrollArea>
-        </div>
+        {/* Scoreboard List */}
+        <ScrollArea className='gap-0'>
+          <Table>
+            <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
+            <TableHeader>
+              <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-primary/5 px-4 gap-4 rounded-md items-center text-nowrap'>
+                {!allZero && (
+                  <>
+                    <TableHead>Place</TableHead>
+                    <TableHead>Points</TableHead>
+                  </>
+                )}
+                <TableHead>Castaway</TableHead>
+                {!allZero && (
+                  <>
+                    <TableHead>Place</TableHead>
+                    <TableHead>Points</TableHead>
+                  </>
+                )}
+                <TableHead>Castaway</TableHead>
+              </TableRow>
+            </TableHeader>
+            <ScorboardBody
+              allZero={allZero}
+              sortedCastaways={selectedSeasonData.sortedCastaways}
+              castawaySplitIndex={selectedSeasonData.castawaySplitIndex}
+              data={selectedSeasonData.data} />
+          </Table>
+          <ScrollBar orientation='horizontal' />
+        </ScrollArea>
       </CardContent>
     </Card>
   );

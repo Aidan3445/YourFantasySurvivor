@@ -69,22 +69,22 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
             <div className='flex items-center gap-2 pointer-events-none tracking-wider'>
               {isDraftLive ? (
                 <Badge className='bg-green-500/20 text-green-600 border-green-500/40 border-2 font-black text-xs'>
-                  <Zap className='w-3 h-3 mr-1' />
+                  <Zap className='w-3 h-3 mr-1 stroke-green-600' />
                   LIVE NOW
                 </Badge>
               ) : isDraftReady ? (
                 <Badge className='bg-blue-500/20 text-blue-600 border-blue-500/40 border-2 font-black text-xs'>
-                  <ClockIcon className='w-3 h-3 mr-1' />
+                  <ClockIcon className='w-3 h-3 mr-1 stroke-blue-600' />
                   READY
                 </Badge>
               ) : isScheduled ? (
                 <Badge className='bg-yellow-500/20 text-yellow-600 border-yellow-500/40 border-2 font-black text-xs'>
-                  <Calendar className='w-3 h-3 mr-1' />
+                  <Calendar className='w-3 h-3 mr-1 stroke-yellow-600' />
                   SCHEDULED
                 </Badge>
               ) : (
                 <Badge className='bg-primary/20 text-primary border-primary/40 border-2 font-black text-xs'>
-                  <ClockIcon className='w-3 h-3 mr-1' />
+                  <ClockIcon className='w-3 h-3 mr-1 stroke-primary' />
                   MANUAL START
                 </Badge>
               )}
@@ -108,33 +108,23 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
                   <Calendar className='w-4 h-4 text-primary' />
                   <span>Starts: {leagueSettings.draftDate.toLocaleString()}</span>
                 </div>
-              ) : (
-                <div className='flex items-center gap-2 text-primary'>
-                  <Zap className='w-4 h-4' />
-                  <span className='font-bold'>{isDraftLive ? 'Draft is live!' : 'Draft ready to start!'}</span>
-                </div>
-              )}
+              ) : null
+              }
             </div>
           )}
           <Clock endDate={leagueSettings?.draftDate ?? null} replacedBy={
             <Button
-              className='w-full py-6 rounded-none font-black text-xl uppercase tracking-wider shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]'
+              className='w-full rounded-none h-34 font-black text-4xl uppercase tracking-wider shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]'
               variant='default'
               disabled={!league || (leagueMembers?.loggedIn?.role !== 'Owner' && league?.status !== 'Draft')}
               onClick={onDraftJoin}>
-              {league?.status === 'Draft' ? (
-                <span className='flex items-center gap-2'>
-                  <Zap className='w-5 h-5' />
-                  Join Draft
-                </span>
-              ) : leagueMembers?.loggedIn?.role === 'Owner' ? (
-                <span className='flex items-center gap-2'>
-                  <Zap className='w-5 h-5' />
-                  Start Draft
-                </span>
-              ) : (
-                'Waiting for Commissioner'
-              )}
+              {league?.status === 'Draft'
+                ? 'Join Draft'
+                : leagueMembers?.loggedIn?.role === 'Owner'
+                  ? 'Start Draft'
+                  :
+                  'Waiting for Commissioner'
+              }
             </Button>
           } />
         </div>

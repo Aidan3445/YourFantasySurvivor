@@ -5,6 +5,7 @@ import TimelineFilters from '~/components/shared/eventTimeline/filters';
 import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import type { LeagueData } from '~/components/shared/eventTimeline/filters';
+import { Card, CardContent, CardHeader } from '~/components/common/card';
 
 // TODO: add survivor streak to event timeline
 
@@ -43,33 +44,40 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
   }, [seasonData]);
 
   return (
-    <section className='w-full bg-card rounded-lg relative place-items-center shadow-lg shadow-primary/10'>
-      <TimelineFilters
-        seasonData={seasonDataWithDates}
-        leagueData={leagueData}
-        filterCastaway={filterCastaway}
-        setFilterCastaway={setFilterCastaway}
-        filterTribe={filterTribe}
-        setFilterTribe={setFilterTribe}
-        filterMember={filterMember}
-        setFilterMember={setFilterMember}
-        filterEvent={filterEvent}
-        setFilterEvent={setFilterEvent}
-        selectedEpisode={selectedEpisode}
-        setSelectedEpisode={setSelectedEpisode}
-        hideMemberFilter={hideMemberFilter} />
-      {selectedEpisode &&
-        <EpisodeEvents
-          episodeNumber={selectedEpisode}
+    <Card className='shadow shadow-primary relative overflow-hidden'>
+      {/* Accent Elements */}
+      <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
+      <CardHeader>
+        <TimelineFilters
           seasonData={seasonDataWithDates}
           leagueData={leagueData}
-          filters={{
-            castaway: filterCastaway,
-            tribe: filterTribe,
-            member: filterMember,
-            event: filterEvent
-          }} />
-      }
-    </section>
+          filterCastaway={filterCastaway}
+          setFilterCastaway={setFilterCastaway}
+          filterTribe={filterTribe}
+          setFilterTribe={setFilterTribe}
+          filterMember={filterMember}
+          setFilterMember={setFilterMember}
+          filterEvent={filterEvent}
+          setFilterEvent={setFilterEvent}
+          selectedEpisode={selectedEpisode}
+          setSelectedEpisode={setSelectedEpisode}
+          hideMemberFilter={hideMemberFilter} />
+      </CardHeader>
+
+      <CardContent className='relative z-10 px-0'>
+        {selectedEpisode &&
+          <EpisodeEvents
+            episodeNumber={selectedEpisode}
+            seasonData={seasonDataWithDates}
+            leagueData={leagueData}
+            filters={{
+              castaway: filterCastaway,
+              tribe: filterTribe,
+              member: filterMember,
+              event: filterEvent
+            }} />
+        }
+      </CardContent>
+    </Card>
   );
 }

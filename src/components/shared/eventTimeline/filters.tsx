@@ -99,12 +99,12 @@ export default function TimelineFilters({
 
   return (
     <Accordion type='single' collapsible className='w-full'>
-      <AccordionItem value='filter' className='border-none pt-4'>
-        <span className='w-full flex flex-wrap items-center gap-x-4 md:items-baseline px-4 md:px-12 md:mr-14 justify-center'>
-          <span className='flex items-center gap-2'>
-            <span className='h-5 w-0.5 bg-primary rounded-full' />
+      <AccordionItem value='filter' className='border-none'>
+        <div className='w-full flex flex-wrap gap-x-4 md:items-baseline justify-between'>
+          <div className='flex items-center gap-3 my-2 self-center'>
+            <div className='h-6 w-1 bg-primary rounded-full' />
             <h2 className='text-xl font-black uppercase tracking-tight'>Activity</h2>
-          </span>
+          </div>
           <span className='flex flex-wrap gap-x-4 items-center justify-center'>
             <Select
               defaultValue={`${selectedEpisode}`}
@@ -145,10 +145,10 @@ export default function TimelineFilters({
               </SelectContent>
             </Select>
           </span>
-          <AccordionTrigger className='w-full font-bold uppercase text-xs tracking-wider'>
+          <AccordionTrigger className='w-full font-bold uppercase text-xs tracking-wider z-100'>
             Filters
           </AccordionTrigger>
-        </span>
+        </div>
         <AccordionContent className='w-full flex-col md:flex-row flex flex-wrap justify-evenly items-center gap-4 pb-4'>
           {castaways &&
             <div className='flex flex-col items-center gap-2'>
