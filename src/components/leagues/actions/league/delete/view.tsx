@@ -55,10 +55,13 @@ export default function DeleteLeague() {
     <Form {...reactForm}>
       <form
         action={() => handleSubmit()}
-        className='flex flex-col gap-4 h-66 bg-card p-2 justify-between rounded-xl min-w-sm'>
-        <h3 className='text-lg font-bold text-card-foreground text-center cursor-default'>
-          Delete League
-        </h3>
+        className='flex flex-col gap-4 h-66 bg-card p-3 justify-between rounded-lg border-2 border-destructive/20 shadow-lg shadow-destructive/10 min-w-sm'>
+        <div className='flex items-center gap-2 w-full justify-start'>
+          <span className='h-4 w-0.5 bg-destructive rounded-full' />
+          <h3 className='text-base font-bold uppercase tracking-wider text-center cursor-default text-destructive'>
+            Delete League
+          </h3>
+        </div>
         <p className='text-sm text-muted-foreground'>
           Deleting a league is permanent and cannot be undone. All data associated with the league will be lost.
           Please type the league name to confirm deletion.
@@ -69,8 +72,8 @@ export default function DeleteLeague() {
             name='confirmName'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>League Name</FormLabel>
-                <FormDescription>Type the league name to confirm deletion</FormDescription>
+                <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>League Name</FormLabel>
+                <FormDescription className='text-xs'>Type the league name to confirm deletion</FormDescription>
                 <FormControl>
                   <Input
                     placeholder={`Enter "${league?.name ?? 'League Name'}" to confirm`}
@@ -82,7 +85,7 @@ export default function DeleteLeague() {
           />
           <Button
             type='submit'
-            className='mt-auto'
+            className='mt-auto font-bold uppercase text-xs tracking-wider'
             variant='destructive'
             disabled={league?.status === 'Inactive'
               || reactForm.watch('confirmName') !== league?.name

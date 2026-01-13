@@ -26,7 +26,7 @@ export default function Scores({ isActive = false }: ScoresProps) {
         className='w-full'
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as ScoreTab)}>
-        <TabsList className='bg-accent grid grid-flow-col auto-cols-fr mx-2 z-50 m-2'>
+        <TabsList className='bg-accent grid grid-flow-col auto-cols-fr mx-2 z-50 m-2 border-none'>
           {!isActive && <TabsTrigger value='podium'>Podium</TabsTrigger>}
           <TabsTrigger value='scoreboard'>Scoreboard</TabsTrigger>
           <TabsTrigger value='chart'>Chart</TabsTrigger>

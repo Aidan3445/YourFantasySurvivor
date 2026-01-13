@@ -54,4 +54,3 @@ export default async function LeaguePage() {
     </Tabs>
   );
 }
-/*<LeagueChatCard chatHistory={chatHistory} />*/

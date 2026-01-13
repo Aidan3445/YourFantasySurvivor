@@ -60,14 +60,17 @@ export default function LeagueSettings() {
   return (
     <Form {...reactForm}>
       <form
-        className='flex flex-col h-64 p-2 gap-2 bg-card rounded-xl items-center min-w-sm'
+        className='flex flex-col p-3 gap-3 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 items-center min-w-sm'
         action={() => handleSubmit()}>
-        <FormLabel className='text-lg font-bold text-card-foreground text-center'>Edit League Details</FormLabel>
+        <div className='flex items-center gap-2 w-full justify-start'>
+          <span className='h-4 w-0.5 bg-primary rounded-full' />
+          <FormLabel className='text-base font-bold uppercase tracking-wider text-center'>Edit League Details</FormLabel>
+        </div>
         <FormField
           name='name'
           render={({ field }) => (
             <FormItem className='w-full'>
-              <FormLabel className='text-lg'>
+              <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>
                 League Name
               </FormLabel>
               <FormControl>
@@ -83,7 +86,7 @@ export default function LeagueSettings() {
           )} />
         <IsProtectedToggle />
         <Button
-          className='mt-auto w-full'
+          className='mt-auto w-full font-bold uppercase text-xs tracking-wider'
           disabled={!reactForm.formState.isDirty}
           type='submit'>
           Save
