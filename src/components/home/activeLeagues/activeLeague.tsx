@@ -36,7 +36,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
           </Badge>
 
           <div>
-            <h3 className='text-lg md:text-3xl font-black leading-tight group-hover:text-primary transition-colors'>
+            <h3 className='text-lg md:text-3xl font-black leading-tight group-hover:text-primary transition-colors mt-1'>
               {league.name}
             </h3>
             <Badge variant='outline' className='border-primary/40 text-primary font-bold text-xs'>

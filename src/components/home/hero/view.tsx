@@ -5,7 +5,7 @@ import { Trophy, Zap, Target, TrendingUp } from 'lucide-react';
 
 export function HeroSection() {
   return (
-    <Card className='shadow shadow-primary relative overflow-hidden'>
+    <Card className='relative overflow-hidden'>
       {/* Accent Glow */}
       <div className='absolute -top-20 -right-20 w-60 h-60 bg-primary/20 rounded-full blur-3xl' />
       <div className='absolute -bottom-20 -left-20 w-60 h-60 bg-primary/10 rounded-full blur-3xl' />

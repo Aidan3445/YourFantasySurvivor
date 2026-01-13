@@ -30,7 +30,7 @@ export default function NoActiveLeagues({ inactiveLeagues }: NoActiveLeaguesProp
   }, [api]);
 
   return (
-    <Card className='shadow shadow-primary relative overflow-hidden'>
+    <Card className='relative overflow-hidden'>
       {/* Accent Glow */}
       <div className='absolute top-0 left-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
 

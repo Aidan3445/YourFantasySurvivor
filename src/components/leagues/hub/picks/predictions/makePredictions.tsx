@@ -40,7 +40,7 @@ export default function MakePredictions() {
   if (predictionRuleCount === 0 || !keyEpisodes?.nextEpisode) return null;
 
   return (
-    <Card className='p-0 pt-4 border-2 border-primary/20 shadow-lg shadow-primary/10 w-full relative overflow-clip'>
+    <Card className='p-0 pt-4 border-2 border-primary/20 w-full relative overflow-clip'>
       <CardHeader className='px-4!'>
         {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
           <div className='absolute top-2 right-4 text-sm italic text-muted-foreground text-right'>

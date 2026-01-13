@@ -59,13 +59,6 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
           </TabsContent>
           <TabsContent value='settings' className='space-y-4'>
             {!isActive && <>
-              <div className='w-full flex items-center gap-2 justify-center p-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20'>
-                <span className='h-5 w-0.5 bg-primary rounded-full' />
-                <h2 className='text-2xl font-black uppercase tracking-tight text-center'>
-                  League
-                </h2>
-                <span className='h-5 w-0.5 bg-primary rounded-full' />
-              </div>
               <MemberEditForm className='flex-1' />
               <div className='w-full flex flex-wrap gap-4 justify-center'>
                 <div className='flex flex-col gap-4 w-full lg:w-1/2 lg:max-w-lg'>

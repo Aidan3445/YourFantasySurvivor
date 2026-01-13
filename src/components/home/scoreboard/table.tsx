@@ -92,7 +92,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
   }
 
   return (
-    <Card className='shadow shadow-primary relative overflow-hidden p-0'>
+    <Card className='relative overflow-hidden p-0 border-2 border-primary/20'>
       {/* Accent Elements */}
       <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
 

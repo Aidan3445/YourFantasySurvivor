@@ -55,46 +55,46 @@ export default function LeagueSettings() {
 
   const editable = (!!leagueMembers && leagueMembers.loggedIn?.role === 'Owner') && league?.status !== 'Inactive';
 
-  if (!editable) return null;
-
   return (
-    <Form {...reactForm}>
-      <form
-        className='flex flex-col p-3 gap-3 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 items-center min-w-sm'
-        action={() => handleSubmit()}>
-        <div className='flex items-center gap-2 w-full justify-start'>
-          <span className='h-4 w-0.5 bg-primary rounded-full' />
-          <FormLabel className='text-base font-bold uppercase tracking-wider text-center'>Edit League Details</FormLabel>
-        </div>
-        <FormField
-          name='name'
-          render={({ field }) => (
-            <FormItem className='w-full'>
-              <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>
-                League Name
-              </FormLabel>
-              <FormControl>
-                <Input
-                  type='text'
-                  autoComplete='off'
-                  autoCapitalize='on'
-                  placeholder='League Name'
-                  {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )} />
-        <IsProtectedToggle />
-        <Button
-          className='mt-auto w-full font-bold uppercase text-xs tracking-wider'
-          disabled={!reactForm.formState.isDirty}
-          type='submit'>
-          Save
-        </Button>
-      </form>
-      {league && (
-        <ManagePendingMembers hash={league.hash} open={open} />
-      )}
-    </Form>
+    <div className={editable ? '' : 'pointer-events-none opacity-50'}>
+      <Form {...reactForm}>
+        <form
+          className='flex flex-col p-3 gap-3 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 items-center sm:min-w-sm'
+          action={() => handleSubmit()}>
+          <div className='flex items-center gap-2 w-full justify-start'>
+            <span className='h-4 w-0.5 bg-primary rounded-full' />
+            <FormLabel className='text-base font-bold uppercase tracking-wider text-center'>Edit League Details</FormLabel>
+          </div>
+          <FormField
+            name='name'
+            render={({ field }) => (
+              <FormItem className='w-full'>
+                <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>
+                  League Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    type='text'
+                    autoComplete='off'
+                    autoCapitalize='on'
+                    placeholder='League Name'
+                    {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )} />
+          <IsProtectedToggle />
+          <Button
+            className='mt-auto w-full font-bold uppercase text-xs tracking-wider'
+            disabled={!reactForm.formState.isDirty}
+            type='submit'>
+            Save
+          </Button>
+        </form>
+        {league && (
+          <ManagePendingMembers hash={league.hash} open={open} />
+        )}
+      </Form>
+    </div>
   );
 }

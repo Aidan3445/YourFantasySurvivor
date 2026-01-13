@@ -41,7 +41,7 @@ export default async function PredraftPage() {
           <TabsContent value='settings' className='space-y-4'>
             <MemberEditForm className='w-full' />
             <div className='w-full flex flex-wrap gap-4 justify-center'>
-              <div className='flex flex-col gap-4 w-full lg:w-1/2 lg:max-w-lg'>
+              <div className='flex flex-col gap-4 w-full'>
                 <LeagueSettings />
                 <DeleteLeague />
               </div>

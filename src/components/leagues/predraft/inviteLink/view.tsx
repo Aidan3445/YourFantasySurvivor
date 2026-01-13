@@ -40,7 +40,7 @@ export default function InviteLink() {
         onClick={copyLink}>
         <Input
           className={cn(
-            'cursor-pointer',
+            'cursor-pointer pr-10',
             hasCopied && 'border-green-500/40 bg-green-500/10'
           )}
           readOnly

@@ -22,7 +22,7 @@ export default function MakePredictions(props: MakePredictionsProps) {
 
 
   return (
-    <Card className='p-0 pt-4 border-2 border-primary/20 shadow-lg shadow-primary/10 relative'>
+    <Card className='p-0 pt-4 border-2 border-primary/20 relative'>
       {/* Accent Elements */}
       <div className='absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl' />
 

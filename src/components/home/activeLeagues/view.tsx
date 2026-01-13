@@ -92,7 +92,7 @@ export function ActiveLeagues() {
           {(!topLeagues || topLeagues.length === 0)
             ? <NoActiveLeagues inactiveLeagues={inactiveLeagues} />
             : (
-              <Card className={cn('shadow-lg shadow-primary/10 relative overflow-hidden transition-opacity', showLoading && 'opacity-0')}>
+              <Card className={cn('relative overflow-hidden transition-opacity border-2 border-primary/20', showLoading && 'opacity-0')}>
                 {/* Accent Glow */}
                 <div className='absolute top-0 left-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
 

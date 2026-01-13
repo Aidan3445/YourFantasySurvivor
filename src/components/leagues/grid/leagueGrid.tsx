@@ -37,7 +37,7 @@ export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridPr
             const season = seasons?.find(s => s.seasonId === seasonLeagues[0]!.league.seasonId);
             if (!season) return null;
             return (
-              <Card key={season.seasonId} className='shadow-lg shadow-primary/10 relative overflow-hidden'>
+              <Card key={season.seasonId} className='relative overflow-hidden'>
                 <CardHeader className='flex items-center justify-start gap-4 mb-4 relative z-10'>
                   <div className='h-6 w-1 bg-secondary rounded-full' />
                   <h2 className='text-xl font-black text-muted-foreground uppercase tracking-tight leading-none'>
@@ -62,7 +62,7 @@ export default function LeagueGrid({ leagues, isInactive = false }: LeagueGridPr
   }
 
   return (
-    <Card className='shadow-lg shadow-primary/10 relative overflow-hidden'>
+    <Card className='relative overflow-hidden'>
       <CardHeader className='flex items-center justify-start gap-4 mb-4 relative z-10'>
         <div className='h-6 w-1 bg-primary rounded-full' />
         <h2 className='text-xl font-black uppercase tracking-tight leading-none'>
