@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { cn } from '~/lib/utils';
 import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
+import { Card, CardContent, CardHeader } from '~/components/common/card';
 
 export default function MakePredictions() {
   const { scores, leagueMembers } = useLeagueData();
@@ -39,57 +40,54 @@ export default function MakePredictions() {
   if (predictionRuleCount === 0 || !keyEpisodes?.nextEpisode) return null;
 
   return (
-    <div className='text-center bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 w-full relative overflow-clip p-3'>
-      {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
-        <div className='absolute top-2 right-4 text-sm italic text-muted-foreground text-right'>
-          Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
-          {formBetTotal !== submittedBetTotal && <>
-            <br />
-            <span className={cn('text-xs rounded-sm text-muted-foreground p-0.5 bg-amber-400', {
-              'bg-red-400': balance - formBetTotal < 0,
-              'bg-green-400': formBetTotal < submittedBetTotal
-            })}>
-              Pending Balance: {balance - formBetTotal}<Flame className='inline mb-1 w-4 h-min stroke-muted-foreground' />
-            </span>
-          </>}
-          <div className='flex-col'>
-            form{formBetTotal} -
-            bal{balance} -
-            pts{scores?.Member[leagueMembers?.loggedIn?.memberId ?? -1]?.slice().pop()} -
-            sub{submittedBetTotal} -
-            pen{pendingBetTotal}
+    <Card className='p-0 pt-4 border-2 border-primary/20 shadow-lg shadow-primary/10 w-full relative overflow-clip'>
+      <CardHeader className='px-4!'>
+        {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
+          <div className='absolute top-2 right-4 text-sm italic text-muted-foreground text-right'>
+            Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
+            {formBetTotal !== submittedBetTotal && (
+              <>
+                <br />
+                <span className={cn('text-xs rounded-sm text-muted-foreground p-0.5 bg-amber-400', {
+                  'bg-red-400': balance - formBetTotal < 0,
+                  'bg-green-400': formBetTotal < submittedBetTotal
+                })}>
+                  Pending Balance: {balance - formBetTotal}<Flame className='inline mb-1 w-4 h-min stroke-muted-foreground' />
+                </span>
+              </>
+            )}
           </div>
-        </div>
-      }
-      <div className='flex items-center gap-2 w-full justify-start mb-2'>
-        <span className='h-4 w-0.5 bg-primary rounded-full' />
-        {
-          keyEpisodes.previousEpisode?.airStatus === 'Airing' ?
+        }
+        <div className='flex items-center gap-2 w-full justify-start'>
+          <span className='h-4 w-0.5 bg-primary rounded-full' />
+          {keyEpisodes.previousEpisode?.airStatus === 'Airing' ?
             <h1 className='text-base font-bold uppercase tracking-wider'>
               Predictions are locked until the episode ends.
             </h1> :
             <h1 className='text-base font-bold uppercase tracking-wider'>{'This Week\'s Prediction'}{predictionRuleCount > 1 ? 's' : ''}</h1>
-        }
-      </div>
-      <span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1' >
-        <span className='text-nowrap'>
-          {keyEpisodes.nextEpisode.episodeNumber}: {keyEpisodes.nextEpisode.title}
+          }
+        </div>
+        <span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1' >
+          <span className='text-nowrap'>
+            {keyEpisodes.nextEpisode.episodeNumber}: {keyEpisodes.nextEpisode.title}
+          </span>
+          <AirStatus airDate={new Date(keyEpisodes.nextEpisode.airDate)} airStatus={keyEpisodes.nextEpisode.airStatus} />
         </span>
-        <AirStatus airDate={new Date(keyEpisodes.nextEpisode.airDate)} airStatus={keyEpisodes.nextEpisode.airStatus} />
-      </span>
-      {
-        keyEpisodes.nextEpisode.airStatus === 'Upcoming' &&
-        keyEpisodes.previousEpisode?.airStatus !== 'Airing' && (
-          <PredictionCards
-            predictionRuleCount={predictionRuleCount}
-            rules={rules}
-            predictionsMade={predictionsMade}
-            castaways={castaways}
-            tribes={tribes}
-            wallet={balance}
-            totalBet={formBetTotal}
-            setBetTotal={setFormBetTotal} />
-        )}
-    </div>
+      </CardHeader>
+      <CardContent className='p-0'>
+        {keyEpisodes.nextEpisode.airStatus === 'Upcoming' &&
+          keyEpisodes.previousEpisode?.airStatus !== 'Airing' && (
+            <PredictionCards
+              predictionRuleCount={predictionRuleCount}
+              rules={rules}
+              predictionsMade={predictionsMade}
+              castaways={castaways}
+              tribes={tribes}
+              wallet={balance}
+              totalBet={formBetTotal}
+              setBetTotal={setFormBetTotal} />
+          )}
+      </CardContent>
+    </Card>
   );
 }

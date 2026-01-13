@@ -12,7 +12,7 @@ import ShauhinMode from '~/components/leagues/customization/settings/shauhin/vie
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
 
-export default async function LeaguePage() {
+export default async function PredraftPage() {
 
   return (
     <Tabs className='w-full' defaultValue='draft'>

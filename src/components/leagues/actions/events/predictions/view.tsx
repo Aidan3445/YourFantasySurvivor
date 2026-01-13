@@ -1,3 +1,4 @@
+import { Card, CardHeader } from '~/components/common/card';
 import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type Prediction } from '~/types/events';
@@ -12,7 +13,7 @@ export interface MakePredictionsProps {
   tribes: Tribe[];
   wallet?: number;
   totalBet?: number;
-  setBetTotal?: (betTotal: number) => void;
+  setBetTotal?: (_betTotal: number) => void;
   className?: string;
 }
 
@@ -21,13 +22,21 @@ export default function MakePredictions(props: MakePredictionsProps) {
 
 
   return (
-    <div className='bg-card rounded-lg text-center flex flex-col items-center'>
-      <h3 className='text-xl font-semibold'>While you wait...</h3>
-      <p>
-        Make your prediction{props.predictionRuleCount > 1 ? 's! Earn  points throughout the season for\
+    <Card className='p-0 pt-4 border-2 border-primary/20 shadow-lg shadow-primary/10 relative'>
+      {/* Accent Elements */}
+      <div className='absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl' />
+
+      <CardHeader className='px-4 flex items-center gap-3 mb-2'>
+        <div className='h-6 w-1 bg-primary rounded-full' />
+        <h2 className='text-2xl font-black uppercase tracking-wider text-card-foreground relative z-10'>
+          While you wait...
+        </h2>
+      </CardHeader>
+      <p className='font-medium relative z-10'>
+        Make your prediction{props.predictionRuleCount > 1 ? 's! Earn points throughout the season for\
         each correct prediction you make.' : ' and earn points if you are correct!'}
       </p>
       <PredictionCards {...props} />
-    </div>
+    </Card>
   );
 }

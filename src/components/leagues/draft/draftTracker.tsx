@@ -42,23 +42,31 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
 
   return (
     <section className='w-full space-y-4 overflow-x-hidden'>
-      <article className='flex flex-col w-full p-2 bg-card rounded-lg'>
-        <h2 className='text-lg font-bold text-card-foreground'>Draft Order</h2>
-        <div className='grid grid-cols-1 gap-2'>
+      <article className='flex flex-col w-full p-4 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 relative'>
+        {/* Accent Elements */}
+        <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
+
+        <div className='flex items-center gap-3 mb-2'>
+          <div className='h-6 w-1 bg-primary rounded-full' />
+          <h2 className='text-2xl font-black uppercase tracking-wider text-card-foreground relative z-10'>
+            Draft Order
+          </h2>
+        </div>
+        <div className='grid grid-cols-1 gap-2 relative z-10'>
           {leagueMembers?.members.map((pick, index) => (
             <ColorRow
               key={pick.memberId}
               className={onTheClock?.memberId === pick.memberId ?
-                'animate-pulse' : ''}
+                'animate-pulse border-2 border-primary/40 shadow-md shadow-primary/20' : 'border-2 border-transparent'}
               color={pick.color}
               loggedIn={leagueMembers.loggedIn?.displayName === pick.displayName}>
               <h3
-                className='text-lg w-4'
+                className='text-lg w-6 font-bold'
                 style={{ color: getContrastingColor(pick.color) }}>
                 {index + 1}
               </h3>
               <h2
-                className='text-3xl font-semibold text-nowrap'
+                className='text-3xl font-black text-nowrap'
                 style={{ color: getContrastingColor(pick.color) }}>
                 {pick.displayName}
               </h2>
@@ -66,7 +74,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
                 <>
                   {!isMobile && (
                     <h3
-                      className='ml-auto inline-flex text-lg self-end animate-bounce'
+                      className='ml-auto inline-flex text-lg self-end animate-bounce font-bold uppercase tracking-wider'
                       style={{ color: getContrastingColor(pick.color) }}>
                       Picking...
                     </h3>
@@ -79,7 +87,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
               )}
               {membersWithPicks?.find(m => m.member.memberId === pick.memberId) && (
                 <h3
-                  className='ml-auto text-lg text-wrap'
+                  className='ml-auto text-lg text-wrap font-medium'
                   style={{ color: getContrastingColor(pick.color) }}>
                   {membersWithPicks.find(m => m.member.memberId === pick.memberId)?.castawayFullName}
                 </h3>
@@ -97,12 +105,12 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
         castaways={castaways}
         tribes={tribes} />
       <AlertDialog open={dialogOpen ?? false} onOpenChange={setDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className='border-2 border-primary/30'>
           <AlertDialogHeader>
-            <AlertDialogTitle>
+            <AlertDialogTitle className='text-2xl font-black uppercase tracking-wider'>
               {`It's ${onDeck?.loggedIn ? 'almost ' : ' '}your turn to pick!`}
             </AlertDialogTitle>
-            <AlertDialogDescription className='text-left'>
+            <AlertDialogDescription className='text-left font-medium'>
               This castaway will earn you points based on their performance in the game.
               <br />
               Additionally you will earn points for each successive episode they
@@ -113,7 +121,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction className='w-full'>
+            <AlertDialogAction className='w-full font-bold uppercase tracking-wider'>
               {'I\'m ready!'}
             </AlertDialogAction>
           </AlertDialogFooter>

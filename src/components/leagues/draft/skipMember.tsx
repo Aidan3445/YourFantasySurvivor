@@ -59,12 +59,12 @@ export default function SkipMember({ hash, member, leagueMembers }: SkipMemberPr
   return (
     <span className='flex items-center gap-2 flex-wrap py-1 justify-end'>
       <form action={handleSkip}>
-        <Button type='submit' variant='secondary' size='sm' className='w-full'>
+        <Button type='submit' variant='secondary' size='sm' className='w-full font-bold uppercase tracking-wider text-xs'>
           SKIP
         </Button>
       </form>
       <form action={handleSendToBack}>
-        <Button type='submit' variant='destructive' size='sm'>
+        <Button type='submit' variant='destructive' size='sm' className='font-bold uppercase tracking-wider text-xs'>
           SEND TO BACK
         </Button>
       </form>

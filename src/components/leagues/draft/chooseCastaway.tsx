@@ -43,11 +43,13 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
 
   return (
     <Form {...reactForm}>
-      <form className='bg-card p-1 rounded-lg text-center' action={() => handleSubmit()}>
-        <h1 className='text-2xl font-semibold'>
+      <form className='bg-card p-4 rounded-lg text-center border-2 border-primary/20 shadow-lg shadow-primary/10 relative' action={() => handleSubmit()}>
+        {/* Accent Elements */}
+        <div className='absolute top-0 left-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl' />
+        <h1 className='text-2xl font-black uppercase tracking-wider relative z-10 mb-3'>
           {onDeck ? 'You\'re on deck' : 'You\'re on the clock!'}
         </h1>
-        <span className='w-full flex justify-between gap-4 items-center p-1'>
+        <span className='w-full flex justify-between gap-4 items-center relative z-10'>
           <FormField
             name='castawayId'
             render={({ field }) => (
@@ -68,7 +70,7 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
                                   className='cursor-not-allowed'
                                   style={{ backgroundColor: member.color }}>
                                   <span
-                                    className='flex items-center gap-1'
+                                    className='flex items-center gap-1 font-bold'
                                     style={{ color: getContrastingColor(member.color) }}>
                                     <ColorRow
                                       className='min-w-12 px-1 justify-center leading-tight font-normal'
@@ -79,7 +81,7 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
                                   </span>
                                 </SelectLabel> :
                                 <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                                  <span className='flex items-center gap-1'>
+                                  <span className='flex items-center gap-1 font-medium'>
                                     <ColorRow
                                       className='min-w-12 px-1 justify-center leading-tight'
                                       color={tribe.tribeColor}>
@@ -97,7 +99,7 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
               </FormItem>
             )} />
           <Button
-            className='w-40'
+            className='w-40 font-bold uppercase tracking-wider'
             disabled={!formSchema.safeParse(reactForm.watch())?.success || onDeck}
             type='submit'>
             {onDeck ? 'Almost time!' : 'Submit Pick'}

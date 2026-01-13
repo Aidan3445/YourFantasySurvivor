@@ -331,8 +331,8 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                   {`Slide ${index + 1} of ${items.length}`}
                 </TableCaption>
                 <TableHeader>
-                  <TableRow className='bg-transparent hover:bg-transparent border-none'>
-                    <TableHead className='text-center'>
+                  <TableRow className='bg-transparent hover:bg-transparent border-none px-0'>
+                    <TableHead className='text-center w-1/7 px-0'>
                       <Button
                         variant={'outline'}
                         type='button'
@@ -346,10 +346,10 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                         <span className='sr-only'>Previous slide</span>
                       </Button>
                     </TableHead>
-                    <TableHead className='place-items-center text-center font-normal text-nowrap'>
+                    <TableHead className='place-items-center text-center font-normal text-nowrap w-5/7 px-0'>
                       {item.header}
                     </TableHead>
-                    <TableHead className='text-center'>
+                    <TableHead className='text-center w-1/7 px-0'>
                       <Button
                         variant={'outline'}
                         type='button'
