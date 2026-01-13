@@ -78,16 +78,6 @@ export default function EpisodeEventsTableBody({
     );
   }
 
-  console.log('Rendering EpisodeEventsTableBody', {
-    enrichedEvents,
-    enrichedPredictions,
-    enrichedMockEvents,
-    enrichedMockPredictions,
-    baseEvents,
-    customEvents,
-    leagueData
-  });
-
   return (
     <>
       {enrichedMockEvents.map((mock, index) =>

@@ -72,7 +72,6 @@ export default function LeagueSettings() {
               </FormLabel>
               <FormControl>
                 <Input
-                  className='w-full h-12 indent-2 placeholder:italic'
                   type='text'
                   autoComplete='off'
                   autoCapitalize='on'

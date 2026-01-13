@@ -31,7 +31,6 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -68,7 +67,6 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -105,7 +103,6 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -143,7 +140,6 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'

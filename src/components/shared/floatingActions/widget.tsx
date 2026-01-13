@@ -186,7 +186,7 @@ export function FloatingActionsWidget() {
               xmlns='http://www.w3.org/2000/svg'
               fill='none'
               viewBox='0 0 24 24'
-              stroke='currentColor'>
+              stroke='white'>
               <path
                 strokeLinecap='round'
                 strokeLinejoin='round'
@@ -194,7 +194,7 @@ export function FloatingActionsWidget() {
                 d='M6 18L18 6M6 6l12 12' />
             </svg>
           ) : (
-            <Trophy className='w-8 h-8 text-primary-foreground z-10' />
+            <Trophy className='w-8 h-8 stroke-primary-foreground z-10' />
           )}
         </button>
 

@@ -51,16 +51,19 @@ export default function CustomEvents() {
   const disabled = (!!leagueMembers?.loggedIn && leagueMembers.loggedIn.role !== 'Owner') || league?.status === 'Inactive';
 
   return (
-    <article className='bg-card p-2 rounded-xl w-full relative space-y-2'>
+    <article className='bg-card p-3 rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10 relative space-y-2'>
       {!disabled && (locked ?
         <Lock
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          className='absolute top-3 right-3 w-8 h-8 shrink-0 cursor-pointer stroke-primary hover:stroke-primary/70 active:stroke-primary/50 transition-all'
           onClick={() => setLocked(false)} /> :
         <LockOpen
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          className='absolute top-3 right-3 w-8 h-8 shrink-0 cursor-pointer stroke-primary hover:stroke-primary/70 active:stroke-primary/50 transition-all'
           onClick={() => { setLocked(true); reactForm.reset(); }} />)}
       <div>
-        <h2 className='text-lg font-bold text-card-foreground'>Custom Events</h2>
+        <div className='flex items-center gap-2 mb-1'>
+          <span className='h-4 w-0.5 bg-primary rounded-full' />
+          <h2 className='text-base font-bold uppercase tracking-wider'>Custom Events</h2>
+        </div>
         <div className='flex flex-col gap-2'>
           <p className='text-sm mr-12 max-w-4xl'>
             These <i>Custom Events</i> let you make your league truly unique!
@@ -90,20 +93,28 @@ export default function CustomEvents() {
           <Form {...reactForm}>
             <form action={() => handleSubmit()}>
               <AlertDialogTrigger asChild>
-                <Button>Create Custom Event</Button>
+                <Button className='font-bold uppercase text-xs tracking-wider'>Create Custom Event</Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className='border-2 border-primary/30 shadow-lg shadow-primary/20'>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Create a Custom Event</AlertDialogTitle>
+                  <span className='flex items-center gap-3'>
+                    <span className='h-6 w-1 bg-primary rounded-full' />
+                    <AlertDialogTitle className='text-2xl font-black uppercase tracking-tight'>
+                      Create Custom Event
+                    </AlertDialogTitle>
+                  </span>
                   <AlertDialogDescription className='sr-only'>
                     Create a custom event to score in your league.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <LeagueEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
-                <AlertDialogFooter>
-                  <AlertDialogCancel variant='secondary'>Cancel</AlertDialogCancel>
+                <AlertDialogFooter className='grid grid-cols-2 gap-2'>
+                  <AlertDialogCancel variant='secondary' className='font-bold uppercase text-xs tracking-wider'>
+                    Cancel
+                  </AlertDialogCancel>
                   <Button
                     type='submit'
+                    className='font-bold uppercase text-xs tracking-wider'
                     disabled={!reactForm.formState.isValid}
                     onClick={() => handleSubmit()}>
                     Create Event
@@ -121,8 +132,8 @@ export default function CustomEvents() {
             ))}
           </article>
           :
-          <h3 className='text-lg w-full text-center font-semibold text-card-foreground px-2 pb-2'>
-            No custom events have been created yet.
+          <h3 className='text-base w-full text-center font-bold uppercase tracking-wider text-muted-foreground px-2 pb-2'>
+            No custom events created yet
           </h3>
       }
     </article >

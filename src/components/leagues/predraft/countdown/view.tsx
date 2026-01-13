@@ -52,7 +52,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
   const isScheduled = leagueSettings?.draftDate && leagueSettings.draftDate.getTime() > Date.now();
 
   return (
-    <article className={cn('relative overflow-hidden rounded-lg border-2 transition-all', className)}>
+    <article className={cn('relative overflow-hidden rounded-lg border-2 border-primary/20 bg-primary/5 shadow-lg shadow-primary/10 p-3 transition-all', className)}>
       {/* Accent glow for live draft */}
       {isDraftLive && (
         <div className='absolute top-0 right-0 w-32 h-32 bg-green-500/20 rounded-full blur-3xl' />
@@ -60,31 +60,31 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
 
       <div className='relative z-10'>
         {/* Header */}
-        <div className='flex items-center justify-between'>
+        <div className='flex items-center justify-between mb-2'>
           <div className='flex items-center gap-3'>
-            <div className='h-6 w-1 bg-primary rounded-full' />
+            <span className='h-6 w-1 bg-primary rounded-full' />
             <h2 className='text-xl font-black uppercase tracking-tight leading-none'>
               Draft Status
             </h2>
             <div className='flex items-center gap-2 pointer-events-none tracking-wider'>
               {isDraftLive ? (
                 <Badge className='bg-green-500/20 text-green-600 border-green-500/40 border-2 font-black text-xs'>
-                  <Zap className='w-3 h-3 mr-1 stroke-green-600' />
+                  <Zap className='w-3 h-3 mr-1 shrink-0 stroke-green-600' />
                   LIVE NOW
                 </Badge>
               ) : isDraftReady ? (
                 <Badge className='bg-blue-500/20 text-blue-600 border-blue-500/40 border-2 font-black text-xs'>
-                  <ClockIcon className='w-3 h-3 mr-1 stroke-blue-600' />
+                  <ClockIcon className='w-3 h-3 mr-1 shrink-0 stroke-blue-600' />
                   READY
                 </Badge>
               ) : isScheduled ? (
                 <Badge className='bg-yellow-500/20 text-yellow-600 border-yellow-500/40 border-2 font-black text-xs'>
-                  <Calendar className='w-3 h-3 mr-1 stroke-yellow-600' />
+                  <Calendar className='w-3 h-3 mr-1 shrink-0 stroke-yellow-600' />
                   SCHEDULED
                 </Badge>
               ) : (
                 <Badge className='bg-primary/20 text-primary border-primary/40 border-2 font-black text-xs'>
-                  <ClockIcon className='w-3 h-3 mr-1 stroke-primary' />
+                  <ClockIcon className='w-3 h-3 mr-1 shrink-0 stroke-primary' />
                   MANUAL START
                 </Badge>
               )}
@@ -100,12 +100,12 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
         </div>
 
         {/* Countdown / Action */}
-        <div className='mt-1 bg-primary/10 border-2 border-primary/30 rounded-lg overflow-hidden'>
+        <div className='bg-accent border-2 border-primary/30 rounded-lg overflow-hidden'>
           {leagueSettings?.draftDate && (
-            <div className='pl-2 text-sm font-medium text-muted-foreground h-0'>
+            <div className='pl-1.5 text-sm font-medium text-muted-foreground h-0'>
               {isScheduled ? (
-                <div className='flex items-center gap-2'>
-                  <Calendar className='w-4 h-4 text-primary' />
+                <div className='flex items-center gap-2 pt-1'>
+                  <Calendar className='w-4 h-4 shrink-0 text-primary' />
                   <span>Starts: {leagueSettings.draftDate.toLocaleString()}</span>
                 </div>
               ) : null

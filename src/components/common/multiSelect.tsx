@@ -223,7 +223,7 @@ export const MultiSelect = React.forwardRef<
             {...props}
             onClick={handleTogglePopover}
             className={cn(
-              'flex w-full p-1 py-0 rounded-3xl border border-input min-h-9 h-auto items-center justify-between bg-white/70 hover:bg-accent [&_svg]:pointer-events-auto disabled:[&_svg]:pointer-events-none',
+              'flex w-full p-1 py-0 rounded-lg border-2 border-primary/20 min-h-9 h-auto items-center justify-between bg-accent hover:bg-accent/80 hover:border-primary/30 transition-all [&_svg]:pointer-events-auto disabled:[&_svg]:pointer-events-none',
               className
             )}
           >
@@ -293,18 +293,18 @@ export const MultiSelect = React.forwardRef<
               </div>
             ) : (
               <div className='flex items-center justify-between w-full mx-auto'>
-                <span className='text-sm text-muted-foreground mx-3 font-normal'>
+                <span className='text-sm text-muted-foreground mx-3 font-medium'>
                   {placeholder}
                 </span>
                 <ChevronDown className={cn(
-                  'h-4 text-muted-foreground mx-2',
+                  'h-4 w-4 shrink-0 text-muted-foreground mx-2',
                   props.disabled ? 'pointer-events-none' : 'cursor-pointer')} />
               </div>
             )}
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className='w-auto p-0'
+          className='w-auto p-0 border-2 border-primary/30 shadow-lg shadow-primary/20'
           align='start'
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
         >
@@ -319,19 +319,19 @@ export const MultiSelect = React.forwardRef<
                 <CommandItem
                   key='all'
                   onSelect={toggleAll}
-                  className='cursor-pointer'
+                  className='cursor-pointer font-medium'
                 >
                   <div
                     className={cn(
-                      'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                      'mr-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border-2 border-primary',
                       selectedValues.length === options.length
                         ? 'bg-primary text-primary-foreground'
                         : 'opacity-50 [&_svg]:invisible'
                     )}
                   >
-                    <CheckIcon className='h-4 w-4' color='white' />
+                    <CheckIcon className='h-4 w-4 shrink-0' color='white' />
                   </div>
-                  <span>(Select All)</span>
+                  <span className='font-bold'>(Select All)</span>
                 </CommandItem>
                 {options.map((option) => {
                   const isLabel = option.value === null;
@@ -341,24 +341,24 @@ export const MultiSelect = React.forwardRef<
                       key={option.value ?? `label-${option.label}`}
                       disabled={isLabel}
                       onSelect={() => isLabel ? null : toggleOption(option.value!)}
-                      className={cn('cursor-pointer', isLabel && 'font-bold bg-b3')}
+                      className={cn('cursor-pointer font-medium', isLabel && 'font-bold bg-primary/10 text-xs uppercase tracking-wider')}
                     >
                       {isLabel ? null : (
                         <>
                           <div
                             className={cn(
-                              'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
+                              'mr-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border-2 border-primary',
                               isSelected
                                 ? 'bg-primary text-primary-foreground'
                                 : 'opacity-50 [&_svg]:invisible'
                             )}
                           >
-                            <CheckIcon className='h-4 w-4' color='white' />
+                            <CheckIcon className='h-4 w-4 shrink-0' color='white' />
                           </div>
                         </>
                       )}
                       {option.icon && (
-                        <option.icon className='mr-2 h-4 w-4 text-muted-foreground' />
+                        <option.icon className='mr-2 h-4 w-4 shrink-0 text-muted-foreground' />
                       )}
                       <span className='flex w-full justify-between'>
                         {option.label}
@@ -381,7 +381,7 @@ export const MultiSelect = React.forwardRef<
                     <>
                       <CommandItem
                         onSelect={handleClear}
-                        className='flex-1 justify-center cursor-pointer'
+                        className='flex-1 justify-center cursor-pointer font-bold text-xs uppercase tracking-wider'
                       >
                         Clear
                       </CommandItem>
@@ -393,7 +393,7 @@ export const MultiSelect = React.forwardRef<
                   )}
                   <CommandItem
                     onSelect={() => setIsPopoverOpen(false)}
-                    className='flex-1 justify-center cursor-pointer max-w-full'
+                    className='flex-1 justify-center cursor-pointer font-bold text-xs uppercase tracking-wider max-w-full'
                   >
                     Close
                   </CommandItem>

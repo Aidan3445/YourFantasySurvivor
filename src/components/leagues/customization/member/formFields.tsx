@@ -25,7 +25,7 @@ export default function LeagueMemberFields({ formPrefix, memberColors = [], curr
     return color;
   }), [memberColors, currentColor]);
 
-  const ensureNewColor = (color: HsvaColor, setColor?: (value: string) => void) => {
+  const ensureNewColor = (color: HsvaColor, setColor?: (_value: string) => void) => {
     if (color.s === 0) {
       if (setColor) alert('This color is taken by another member');
       return false;
@@ -48,7 +48,6 @@ export default function LeagueMemberFields({ formPrefix, memberColors = [], curr
             <FormLabel className='text-lg'>Display Name</FormLabel>
             <FormControl>
               <Input
-                className='w-full h-12 indent-2 placeholder:italic'
                 type='text'
                 autoComplete='off'
                 autoCapitalize='on'

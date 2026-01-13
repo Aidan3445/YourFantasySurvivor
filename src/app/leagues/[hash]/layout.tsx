@@ -19,10 +19,18 @@ export default async function LeagueLayout({ children, params }: LeagueLayoutPro
 
   if (!memberId) {
     return (
-      <main className='w-full place-items-center flex flex-col justify-center h-screen gap-4'>
-        <h1 className='text-3xl'>Sign in to view the League</h1>
-        <SignIn routing='hash' forceRedirectUrl={`/leagues/${hash}`} />
-      </main>
+      <div className='h-[calc(100svh-1rem)]'>
+        <div className='sticky z-50 flex flex-col w-full justify-center bg-card shadow-lg shadow-primary/20 px-4 py-4 items-center border-b-2 border-primary/20'>
+          <span className='flex items-center justify-center gap-3'>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight text-center'>Sign In to View League</h1>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+          </span>
+        </div>
+        <div className='flex flex-col items-center gap-4 my-2'>
+          <SignIn routing='hash' forceRedirectUrl={`/leagues/${hash}`} />
+        </div>
+      </div>
     );
   }
 

@@ -69,17 +69,20 @@ export default function ShauhinMode() {
   const disabled = (!!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner') || league?.status === 'Inactive';
 
   return (
-    <article className='p-2 bg-card rounded-xl w-full relative'>
+    <article className='p-3 bg-card rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10 relative'>
       {!disabled && (locked ?
         <Lock
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          className='absolute top-3 right-3 w-8 h-8 shrink-0 cursor-pointer stroke-primary hover:stroke-primary/70 active:stroke-primary/50 transition-all'
           onClick={() => setLocked(false)} /> :
         <LockOpen
-          className='absolute top-2 right-2 w-8 h-8 cursor-pointer stroke-primary hover:stroke-secondary transition-all'
+          className='absolute top-3 right-3 w-8 h-8 shrink-0 cursor-pointer stroke-primary hover:stroke-primary/70 active:stroke-primary/50 transition-all'
           onClick={() => { setLocked(true); reactForm.reset(); }} />)}
-      <h2 className='text-lg font-semibold'>
-        Shauhin Mode
-      </h2>
+      <div className='flex items-center gap-2 mb-1'>
+        <span className='h-4 w-0.5 bg-primary rounded-full' />
+        <h2 className='text-base font-bold uppercase tracking-wider'>
+          Shauhin Mode
+        </h2>
+      </div>
       <p className='text-sm mr-12 max-w-4xl'>
         Inspired by a <a
           className='text-primary underline hover:text-secondary transition-colors'

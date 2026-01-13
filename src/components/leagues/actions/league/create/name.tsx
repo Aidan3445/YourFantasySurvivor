@@ -29,7 +29,6 @@ export default function LeagueNameField() {
             <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>League Name</FormLabel>
             <FormControl>
               <Input
-                className='border-2 border-primary/20 focus:border-primary/40 bg-primary/5 font-medium text-lg py-6 placeholder:italic'
                 type='text'
                 autoComplete='off'
                 autoCapitalize='on'

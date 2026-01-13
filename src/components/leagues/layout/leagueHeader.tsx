@@ -40,7 +40,7 @@ export default function LeagueHeader() {
 
   return (
     <div
-      className='relative flex flex-col w-full h-14 bg-card items-center justify-around overflow-hidden'
+      className='relative flex flex-col w-full h-14 bg-card items-center justify-around overflow-hidden border-b-2 border-primary/20 shadow-lg shadow-primary/10'
       ref={containerRef}>
       {!league?.name ? (
         <>
@@ -51,7 +51,7 @@ export default function LeagueHeader() {
         <>
           <h1
             ref={measureRef}
-            className='absolute invisible whitespace-nowrap text-2xl font-bold w-full'>
+            className='absolute invisible whitespace-nowrap text-2xl font-black uppercase tracking-tight w-full'>
             {league.name}
           </h1>
 
@@ -63,18 +63,18 @@ export default function LeagueHeader() {
               play={needsMarquee && animating}
               gradient={false}
               onCycleComplete={() => setAnimating(false)}>
-              <h1 className='text-2xl font-bold leading-tight whitespace-nowrap ml-4'>
+              <h1 className='text-2xl font-black uppercase tracking-tight leading-tight whitespace-nowrap ml-4'>
                 {league.name}
               </h1>
             </Marquee>
           ) : (
-            <h1 className='text-2xl font-bold leading-tight whitespace-nowrap'>
+            <h1 className='text-2xl font-black uppercase tracking-tight leading-tight whitespace-nowrap'>
               {league.name}
             </h1>
           )}
 
           <Link href={`https://survivor.fandom.com/wiki/${league.season}`} target='_blank'>
-            <h3 className='text-nowrap leading-none text-lg italic font-medium text-muted-foreground hover:underline'>
+            <h3 className='text-nowrap leading-none text-sm font-bold uppercase tracking-wider text-muted-foreground hover:text-primary transition-colors'>
               {league.season}
             </h3>
           </Link>

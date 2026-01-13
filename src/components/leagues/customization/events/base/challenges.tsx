@@ -12,7 +12,9 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
       <FormField
         name='baseEventRules.indivWin'
         render={({ field }) => (
-          <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
+          <FormItem className={cn(
+            'rounded-lg px-3 py-2 h-full transition-all border-2',
+            disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
             <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
               {BaseEventFullName.indivWin}
               {disabled &&
@@ -31,7 +33,6 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -68,7 +69,6 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -105,7 +105,6 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'
@@ -142,7 +141,6 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
               {!disabled &&
                 <FormControl>
                   <Input
-                    className='w-full my-1 border-2 border-primary/20 focus:border-primary/40 font-medium'
                     type='number'
                     step={1}
                     placeholder='Points'
