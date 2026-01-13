@@ -43,7 +43,7 @@ export default function MakePredictions() {
     <Card className='p-0 pt-4 border-2 border-primary/20 w-full relative overflow-clip'>
       <CardHeader className='px-4!'>
         {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
-          <div className='absolute top-2 right-4 text-sm italic text-muted-foreground text-right'>
+          <div className='absolute top-0 right-2 text-sm italic text-muted-foreground text-right'>
             Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
             {formBetTotal !== submittedBetTotal && (
               <>
