@@ -22,7 +22,7 @@ export default function Scores({ isActive = false }: ScoresProps) {
   });
 
   return (
-    <Card className='w-full p-0 bg-card rounded-lg border-2 border-primary/20'>
+    <Card className='w-[calc(100svw-2rem)] md:w-[calc(100svw-3.25rem-var(--sidebar-width))] p-0 pb-0 bg-card rounded-lg border-2 border-primary/20'>
       <Tabs
         className='w-full'
         value={activeTab}
@@ -35,7 +35,7 @@ export default function Scores({ isActive = false }: ScoresProps) {
           </TabsList>
         </CardHeader>
         <CardContent className='p-0'>
-          <Carousel className='w-full' setApi={setApi}>
+          <Carousel className='' setApi={setApi}>
             <CarouselContent>
               {!isActive && (
                 <CarouselItem>
@@ -50,7 +50,7 @@ export default function Scores({ isActive = false }: ScoresProps) {
                 </TabsContent>
               </CarouselItem>
               <CarouselItem>
-                <TabsContent value='chart' forceMount>
+                <TabsContent value='chart' forceMount className='h-11/12'>
                   <Chart />
                 </TabsContent>
               </CarouselItem>

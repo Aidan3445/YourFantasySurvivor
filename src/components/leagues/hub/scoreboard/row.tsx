@@ -89,10 +89,10 @@ export default function MemberRow({
           {place}
         </div>
       </TableCell>
-      <TableCell className='px-3 py-3 w-24 text-left'>
-        <div className='font-black text-lg tabular-nums text-primary'>
-          {points}
-          <Flame className='inline w-5 h-5 stroke-muted-foreground align-text-top' />
+      <TableCell>
+        <div className='flex justify-center items-center'>
+          <h3 className='leading-none font-black text-lg tabular-nums text-primary ml-auto'>{points}</h3>
+          <Flame className='inline w-5 h-5 stroke-muted-foreground -mt-0.5' />
         </div>
       </TableCell>
       <TableCell className='text-nowrap px-3 py-3 w-0'>

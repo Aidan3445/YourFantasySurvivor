@@ -15,17 +15,13 @@ export default function Chart() {
     color: member.color,
   })), [sortedMemberScores]);
 
-  const memberCount = data.length;
-
   const { xAxisData, series } = useMemo(() => formatDataForMui({
     data,
     startWeek: league?.startWeek ?? 1
   }), [data, league?.startWeek]);
 
   return (
-    <div
-      className='w-full rounded-lg bg-card p-3'
-      style={{ height: `calc(3.15*${memberCount + 1}rem + 4rem)` }}>
+    <div className='w-full h-full rounded-lg bg-card'>
       <LineChart
         xAxis={[{
           data: xAxisData,
@@ -35,10 +31,16 @@ export default function Chart() {
         yAxis={[{
           label: 'Points',
         }]}
+        margin={{ top: 0, right: 0, bottom: 0, left: 24 }}
         series={series}
         grid={{ horizontal: true }}
         slots={{
           tooltip: CustomTooltip,
+        }}
+        slotProps={{
+          legend: {
+            position: { horizontal: 'center' },
+          },
         }}
         sx={{
           '& .MuiLineElement-root': {
