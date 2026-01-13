@@ -92,14 +92,14 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
   }
 
   return (
-    <Card className='shadow shadow-primary relative overflow-hidden'>
+    <Card className='shadow shadow-primary relative overflow-hidden p-0'>
       {/* Accent Elements */}
       <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
 
       <CardContent className='relative z-10 px-0'>
         {/* Section Header */}
-        <CardHeader className='space-y-4 relative z-10'>
-          <div className='flex justify-between items-start mb-6'>
+        <CardHeader className='space-y-4 relative z-10 pt-4'>
+          <div className='flex justify-between items-start'>
             <div>
               <div className='flex items-center gap-3 mb-2'>
                 <div className='h-8 w-1 bg-primary rounded-full' />
@@ -130,7 +130,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
         </CardHeader>
 
         {/* Scoreboard List */}
-        <ScrollArea className='gap-0'>
+        <ScrollArea className='max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3rem-var(--sidebar-width))]'>
           <Table>
             <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
             <TableHeader>
@@ -157,7 +157,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
               castawaySplitIndex={selectedSeasonData.castawaySplitIndex}
               data={selectedSeasonData.data} />
           </Table>
-          <ScrollBar orientation='horizontal' />
+          <ScrollBar orientation='horizontal' className='mx-1' />
         </ScrollArea>
       </CardContent>
     </Card>

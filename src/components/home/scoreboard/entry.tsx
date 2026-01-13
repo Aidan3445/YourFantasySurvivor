@@ -38,20 +38,20 @@ export default function CastawayEntry({ place, castaway, points, tribeTimeline, 
               {place}
             </div>
           </TableCell>
-          <TableCell className='px-3 py-3 w-0 text-left'>
-            <div className='font-black text-lg tabular-nums text-primary'>
-              {points}
-              <Flame className='inline w-5 h-5 stroke-muted-foreground align-text-top' />
+          <TableCell>
+            <div className='flex justify-center items-center'>
+              <h3 className='leading-none font-black text-lg tabular-nums text-primary ml-auto'>{points}</h3>
+              <Flame className='inline w-5 h-5 stroke-muted-foreground -mt-0.5' />
             </div>
           </TableCell>
         </>
       )}
-      <TableCell className={cn('text-nowrap px-3 py-3 w-1 /2', allZero && 'py-4')}>
+      <TableCell className={cn('text-nowrap px-3 py-3 w-1 /2')}>
         <div className='flex items-center gap-2'>
           <CastawayPopover castaway={castaway}>
             <span
               className={cn(
-                'text-base md:text-lg font-bold transition-all hover:text-primary cursor-pointer',
+                'text-base text-left md:text-lg font-bold transition-all hover:text-primary cursor-pointer',
                 castaway?.eliminatedEpisode && 'line-through opacity-40 hover:opacity-60'
               )}>
               {castaway?.fullName}
