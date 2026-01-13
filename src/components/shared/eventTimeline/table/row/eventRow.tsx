@@ -35,7 +35,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
             <EditEvent event={event} />
           </TableCell>) :
         null}
-      <TableCell className='text-nowrap'>
+      <TableCell className='text-nowrap text-start'>
         {isBaseEvent &&
           <p className='text-xs text-muted-foreground'>
             {BaseEventFullName[event.eventName as BaseEventName]}

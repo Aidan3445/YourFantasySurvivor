@@ -21,7 +21,7 @@ export default function Scores({ isActive = false }: ScoresProps) {
   });
 
   return (
-    <div className='w-full bg-card rounded-xl'>
+    <div className='w-full bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10'>
       <Tabs
         className='w-full'
         value={activeTab}

@@ -58,20 +58,30 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
             <CreateBaseEvent />
           </TabsContent>
           <TabsContent value='settings' className='space-y-4'>
-            {isActive && <>
-              <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
-                Settings
-              </h2>
+            {!isActive && <>
+              <div className='w-full flex items-center gap-2 justify-center p-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20'>
+                <span className='h-5 w-0.5 bg-primary rounded-full' />
+                <h2 className='text-2xl font-black uppercase tracking-tight text-center'>
+                  League
+                </h2>
+                <span className='h-5 w-0.5 bg-primary rounded-full' />
+              </div>
               <MemberEditForm className='flex-1' />
-              <span className='w-full flex flex-wrap gap-4 justify-center'>
-                <LeagueSettings />
-                <DeleteLeague />
+              <div className='w-full flex flex-wrap gap-4 justify-center'>
+                <div className='flex flex-col gap-4 w-full lg:w-1/2 lg:max-w-lg'>
+                  <LeagueSettings />
+                  <DeleteLeague />
+                </div>
                 <ManageMembers />
-              </span>
+              </div>
+              <div className='w-full flex items-center gap-2 justify-center p-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20'>
+                <span className='h-5 w-0.5 bg-primary rounded-full' />
+                <h2 className='text-2xl font-black uppercase tracking-tight text-center'>
+                  Scoring
+                </h2>
+                <span className='h-5 w-0.5 bg-primary rounded-full' />
+              </div>
             </>}
-            <h2 className='text-4xl leading-loose shadow-lg font-bold text-primary-foreground text-center w-full bg-primary rounded-lg'>
-              Scoring
-            </h2>
             <SetSurvivalCap />
             <LeagueScoring />
             <ShauhinMode />

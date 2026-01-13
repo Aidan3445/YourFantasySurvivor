@@ -30,7 +30,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
   return (
     <TableRow className={className}>
       {editCol && <TableCell className='w-0' />}
-      <TableCell className='text-nowrap sticky'>
+      <TableCell className='text-nowrap text-start'>
         {isBaseEvent &&
           <p className='text-xs text-muted-foreground'>
             {BaseEventFullName[event.eventName as BaseEventName]}

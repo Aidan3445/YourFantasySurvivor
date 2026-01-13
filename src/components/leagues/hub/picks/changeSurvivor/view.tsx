@@ -101,9 +101,9 @@ export default function ChangeCastaway() {
 
   if (availableCastaways.every(castaway => castaway.pickedBy)) {
     return (
-      <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
-        <h1 className='text-xl text-muted-foreground font-semibold'>No Castaways Available</h1>
-        <h3 className='text-md text-muted-foreground font-semibold'>
+      <div className='w-full text-center bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex flex-col p-4 place-items-center'>
+        <h1 className='text-xl font-bold uppercase tracking-wider text-muted-foreground'>No Castaways Available</h1>
+        <h3 className='text-sm text-muted-foreground'>
           All castaways are either selected or eliminated.
         </h3>
       </div>
@@ -113,9 +113,9 @@ export default function ChangeCastaway() {
   if (keyEpisodes?.previousEpisode && pickPriority.length > 0 && !dialogOpen
     && Date.now() - keyEpisodes.previousEpisode.airDate.getTime() < 1000 * 60 * 60 * 48) {
     return (
-      <div className='w-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center'>
-        <h1 className='text-2xl font-semibold'>Wait to Swap your Survivor Pick</h1>
-        <h3 className='text-lg font-semibold'>Recently Eliminated members have{' '}
+      <div className='w-full text-center bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex flex-col p-4 gap-2 place-items-center'>
+        <h1 className='text-xl font-bold uppercase tracking-wider'>Wait to Swap your Survivor Pick</h1>
+        <h3 className='text-sm text-muted-foreground'>Recently Eliminated members have{' '}
           {Math.floor((1000 * 60 * 60 * 48 - (Date.now() - keyEpisodes.previousEpisode.airDate.getTime())) / 1000 / 60 / 60)}
           {' hours left to pick first:'}
         </h3>
@@ -142,9 +142,12 @@ export default function ChangeCastaway() {
 
   return (
     <Form {...reactForm}>
-      <form className='w-full text-center bg-card rounded-lg flex flex-col' action={() => handleSubmit()}>
-        <h1 className='text-2xl font-semibold'>Swap your Survivor Pick</h1>
-        <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center p-2 mt-auto'>
+      <form className='w-full text-center bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex flex-col p-3 gap-2' action={() => handleSubmit()}>
+        <div className='flex items-center gap-2 w-full justify-start'>
+          <span className='h-4 w-0.5 bg-primary rounded-full' />
+          <h1 className='text-base font-bold uppercase tracking-wider'>Swap your Survivor Pick</h1>
+        </div>
+        <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center mt-auto'>
           <FormField
             name='castawayId'
             render={({ field }) => (
@@ -199,7 +202,7 @@ export default function ChangeCastaway() {
               </FormItem>
             )} />
           <Button
-            className='lg:w-26 w-full'
+            className='lg:w-26 w-full font-bold uppercase text-xs tracking-wider'
             disabled={
               !formSchema.safeParse(reactForm.watch())?.success
               || reactForm.formState.isSubmitting

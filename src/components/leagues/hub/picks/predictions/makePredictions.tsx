@@ -39,7 +39,7 @@ export default function MakePredictions() {
   if (predictionRuleCount === 0 || !keyEpisodes?.nextEpisode) return null;
 
   return (
-    <div className='text-center bg-card rounded-lg w-full relative overflow-clip'>
+    <div className='text-center bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 w-full relative overflow-clip p-3'>
       {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
         <div className='absolute top-2 right-4 text-sm italic text-muted-foreground text-right'>
           Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
@@ -61,13 +61,16 @@ export default function MakePredictions() {
           </div>
         </div>
       }
-      {
-        keyEpisodes.previousEpisode?.airStatus === 'Airing' ?
-          <h1 className='text-3xl'>
-            Predictions are locked until the episode ends.
-          </h1> :
-          <h1 className='text-3xl mt-8 lg:mt-0'>{'This Week\'s Prediction'}{predictionRuleCount > 1 ? 's' : ''}</h1>
-      }
+      <div className='flex items-center gap-2 w-full justify-start mb-2'>
+        <span className='h-4 w-0.5 bg-primary rounded-full' />
+        {
+          keyEpisodes.previousEpisode?.airStatus === 'Airing' ?
+            <h1 className='text-base font-bold uppercase tracking-wider'>
+              Predictions are locked until the episode ends.
+            </h1> :
+            <h1 className='text-base font-bold uppercase tracking-wider'>{'This Week\'s Prediction'}{predictionRuleCount > 1 ? 's' : ''}</h1>
+        }
+      </div>
       <span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1' >
         <span className='text-nowrap'>
           {keyEpisodes.nextEpisode.episodeNumber}: {keyEpisodes.nextEpisode.title}

@@ -26,7 +26,7 @@ export default async function LeaguePage() {
             <InviteLink />
             <DraftCountdown className='w-full bg-card' />
             <DraftOrder className='w-full bg-card' />
-            <div className='flex items-center gap-2 justify-center p-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20'>
+            <div className='w-full flex items-center gap-2 justify-center p-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20'>
               <span className='h-5 w-0.5 bg-primary rounded-full' />
               <h2 className='text-2xl font-black uppercase tracking-tight text-center'>
                 League Scoring

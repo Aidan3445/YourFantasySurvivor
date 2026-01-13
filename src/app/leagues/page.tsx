@@ -60,7 +60,7 @@ export default function LeaguesPage() {
       </div>
 
       <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9.5rem-var(--navbar-height))]'>
-        <div className='mt-4 mb-4'>
+        <div className='mt-2 mb-4'>
           <div className='flex flex-col gap-4'>
             {currentLeagues.length + inactiveLeagues.length > 0
               ? (
