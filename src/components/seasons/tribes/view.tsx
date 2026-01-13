@@ -50,13 +50,16 @@ export default function TribesTimeline({ seasonData }: TimelineViewProps) {
 
   return (
     <div className='flex flex-col gap-4 w-full'>
-      <div className='bg-card rounded-lg p-4'>
-        <h2 className='text-2xl font-semibold mb-4'>Tribe Timeline</h2>
-        <p className='text-muted-foreground mb-4'>
+      <div className='bg-card rounded-lg p-4 shadow-lg shadow-primary/10'>
+        <span className='flex items-center gap-2 mb-4'>
+          <span className='h-5 w-0.5 bg-primary rounded-full' />
+          <h2 className='text-xl font-black uppercase tracking-tight'>Tribe Timeline</h2>
+        </span>
+        <p className='text-muted-foreground mb-4 font-medium'>
           Explore how tribe compositions changed throughout the season. Click an episode to expand and see details.
         </p>
 
-        <div className='flex flex-col gap-3'>
+        <div className='flex flex-col gap-2'>
           {episodeData.map(({ episodeNumber, castawaysByTribe, tribes: episodeTribes }) => {
             const episode = episodes?.find(e => e.episodeNumber === episodeNumber);
             const keyLabel = getKeyEpisodeLabel(episodeNumber);
