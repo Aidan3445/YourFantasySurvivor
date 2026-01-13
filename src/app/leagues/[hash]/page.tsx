@@ -1,6 +1,4 @@
 import MemberEditForm from '~/components/leagues/customization/member/view';
-import Chart from '~/components/leagues/hub/chart/view';
-import Scoreboard from '~/components/leagues/hub/scoreboard/view';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { leagueMemberAuth, systemAdminAuth } from '~/lib/auth';
 import { type LeaguePageProps } from '~/app/leagues/[hash]/layout';
@@ -17,10 +15,10 @@ import ShauhinMode from '~/components/leagues/customization/settings/shauhin/vie
 import getLeague from '~/services/leagues/query/legaue';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
-import Podium from '~/components/leagues/hub/scoreboard/podium/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
 import { getSeasonData } from '~/services/seasons/query/seasonsData';
 import LeagueTimeline from '~/components/leagues/hub/activity/leagueTimeline/view';
+import Scores from '~/components/leagues/hub/shared/scores/view';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
@@ -48,26 +46,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
       <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-7rem)] h-[calc(100svh-6rem-var(--navbar-height))]'>
         <div className='pb-4'>
           <TabsContent className='space-y-4' value='scores'>
-            <div className='w-full bg-card rounded-xl'>
-              <Tabs className='w-full' defaultValue={isActive ? 'scoreboard' : 'podium'}>
-                <TabsList className='grid grid-flow-col auto-cols-fr mx-2 z-50 m-2'>
-                  {!isActive && <TabsTrigger value='podium'>Podium</TabsTrigger>}
-                  <TabsTrigger value='scoreboard'>Scoreboard</TabsTrigger>
-                  <TabsTrigger value='chart'>Chart</TabsTrigger>
-                </TabsList>
-                {!isActive && (
-                  <TabsContent value='podium'>
-                    <Podium />
-                  </TabsContent>
-                )}
-                <TabsContent value='scoreboard'>
-                  <Scoreboard />
-                </TabsContent>
-                <TabsContent value='chart'>
-                  <Chart />
-                </TabsContent>
-              </Tabs>
-            </div>
+            <Scores isActive={isActive} />
             <ChangeCastaway />
             <Predictions />
             {seasonData && <LeagueTimeline seasonData={seasonData} />}

@@ -253,17 +253,17 @@ export default function EpisodeEvents(
     <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-var(--sidebar-width)-3rem)] lg:w-full bg-card rounded-lg gap-0'>
       <Table className='w-full'>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
-        <TableHeader className='sticky top-0'>
-          <TableRow className='bg-white hover:bg-white px-4 gap-4 rounded-md items-center text-nowrap'>
-            {edit && <TableHead className='w-0'>
+        <TableHeader className='sticky top-0 z-10'>
+          <TableRow className='bg-primary/5 border-b-2 border-primary/20 hover:bg-primary/5 px-4 gap-4 rounded-md items-center text-nowrap'>
+            {edit && <TableHead className='w-0 font-bold uppercase text-xs tracking-wider'>
               Edit
             </TableHead>}
-            <TableHead>Event</TableHead>
-            <TableHead className='text-center'>Points</TableHead>
-            <TableHead>{noTribes ? null : 'Tribes'}</TableHead>
-            <TableHead className='text-right'>Castaways</TableHead>
-            {!noMembers && <TableHead className='w-full'>Members</TableHead>}
-            <TableHead className='text-right'>Notes</TableHead>
+            <TableHead className='font-bold uppercase text-xs tracking-wider'>Event</TableHead>
+            <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>Points</TableHead>
+            <TableHead className='font-bold uppercase text-xs tracking-wider'>{noTribes ? null : 'Tribes'}</TableHead>
+            <TableHead className='text-right font-bold uppercase text-xs tracking-wider'>Castaways</TableHead>
+            {!noMembers && <TableHead className='w-full font-bold uppercase text-xs tracking-wider'>Members</TableHead>}
+            <TableHead className='text-right font-bold uppercase text-xs tracking-wider'>Notes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -272,8 +272,8 @@ export default function EpisodeEvents(
             .map((episode, index) => (
               <Fragment key={`timeline-${episode.episodeNumber}`}>
                 {episodeNumber === -1 &&
-                  <TableRow className='bg-secondary/50 hover:bg-secondary/25'>
-                    <TableCell colSpan={7} className='text-center font-bold text-secondary-foreground'>
+                  <TableRow className='bg-primary/10 border-t-2 border-primary/20 hover:bg-primary/10'>
+                    <TableCell colSpan={7} className='text-center font-black uppercase text-sm tracking-wider py-3'>
                       Episode {episode.episodeNumber}: {episode.title}
                     </TableCell>
                   </TableRow>}
@@ -291,7 +291,7 @@ export default function EpisodeEvents(
                   seasonData={seasonData} />
               </Fragment>
             ))}
-        </TableBody >
+        </TableBody>
       </Table>
       <ScrollBar hidden orientation='horizontal' />
     </ScrollArea>

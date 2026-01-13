@@ -43,7 +43,7 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
   }, [seasonData]);
 
   return (
-    <section className='w-full bg-card rounded-lg relative place-items-center'>
+    <section className='w-full bg-card rounded-lg relative place-items-center shadow-lg shadow-primary/10'>
       <TimelineFilters
         seasonData={seasonDataWithDates}
         leagueData={leagueData}
@@ -68,7 +68,8 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
             tribe: filterTribe,
             member: filterMember,
             event: filterEvent
-          }} />}
-    </section >
+          }} />
+      }
+    </section>
   );
 }
