@@ -10,7 +10,7 @@ import { BaseEventFullName } from '~/lib/events';
 import { useMemo } from 'react';
 import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { getContrastingColor } from '@uiw/color-convert';
 
 interface EventRowProps {

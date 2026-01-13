@@ -14,7 +14,7 @@ import { useMemo } from 'react';
 import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { useTribes } from '~/hooks/seasons/useTribes';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { getContrastingColor } from '@uiw/color-convert';
 
 interface MemberRowProps {

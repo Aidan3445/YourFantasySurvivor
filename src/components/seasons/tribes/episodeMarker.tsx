@@ -10,7 +10,7 @@ import {
   AccordionTrigger
 } from '~/components/common/accordion';
 import { getContrastingColor } from '@uiw/color-convert';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 
 interface EpisodeMarkerProps {
   episodeNumber: number;

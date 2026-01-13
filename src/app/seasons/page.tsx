@@ -33,11 +33,15 @@ export default function SeasonsPage() {
 
   return (
     <Tabs className='w-full' value={selectedTab} onValueChange={setSelectedTab}>
-      <div className='flex flex-col w-full h-40 justify-between bg-card'>
-        <div className='px-2 flex flex-col items-center justify-center h-full w-full'>
+      <div className='flex flex-col w-full justify-between bg-card shadow-lg shadow-primary/20'>
+        <div className='px-4 py-4 flex flex-col items-center justify-center w-full'>
           <div className='text-center'>
-            <h1 className='text-4xl font-bold'>Survivor Seasons</h1>
-            <p className='text-muted-foreground text-pretty text-sm md:text-base'>
+            <span className='flex items-center justify-center gap-3 mb-2'>
+              <span className='h-6 w-1 bg-primary rounded-full' />
+              <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight'>Survivor Seasons</h1>
+              <span className='h-6 w-1 bg-primary rounded-full' />
+            </span>
+            <p className='text-muted-foreground text-pretty text-sm md:text-base font-medium'>
               Explore castaways, tribe timelines, and events from every season
             </p>
           </div>
@@ -46,7 +50,7 @@ export default function SeasonsPage() {
             <Select
               value={selectedSeasonId?.toString() ?? ''}
               onValueChange={(value) => setSelectedSeasonId(Number(value))}>
-              <SelectTrigger className='max-w-lg'>
+              <SelectTrigger className='max-w-lg mt-3 border-2 border-primary/20 hover:border-primary/40 bg-primary/5 font-medium'>
                 <SelectValue placeholder='Select a season' />
               </SelectTrigger>
               <SelectContent>
@@ -67,7 +71,7 @@ export default function SeasonsPage() {
         </TabsList>
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-11rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-13.5rem)] h-[calc(100svh-12.5rem-var(--navbar-height))]'>
         {selectedSeasonId ? (
           season ? (
             <div className='pb-4'>

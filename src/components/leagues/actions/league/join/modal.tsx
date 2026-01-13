@@ -45,7 +45,7 @@ export default function JoinLeagueModal({ children }: JoinLeagueAlertDialogProps
           </Button>
         )}
       </AlertDialogTrigger>
-      <AlertDialogContent className='border-primary/30 shadow-lg shadow-primary/20'>
+      <AlertDialogContent className='border-primary/30 shadow-lg shadow-primary/20 animate-scale-in-fast'>
         <AlertDialogHeader>
           <span className='flex items-center gap-3 mb-2'>
             <span className='h-6 w-1 bg-primary rounded-full' />

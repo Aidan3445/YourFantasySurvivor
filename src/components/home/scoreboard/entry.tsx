@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/pop
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type Tribe } from '~/types/tribes';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { cn } from '~/lib/utils';
 
 interface CastawayRowProps {

@@ -5,7 +5,7 @@ import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn } from '~/lib/utils';
 import ColorRow from '~/components/shared/colorRow';
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
-import CastawayPopover from '~/components/seasons/shared/castawayPopover';
+import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 
 interface CastawayCardsProps {
   hash: string;

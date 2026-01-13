@@ -21,9 +21,12 @@ interface CastawayGridProps {
 export default function CastawayGrid({ castaways, tribesTimeline, tribes, leagueData }: CastawayGridProps) {
   const { selectionTimeline, leagueMembers } = leagueData ?? {};
   return (
-    <section className='w-full bg-card rounded-lg p-4'>
-      <h2 className='text-2xl font-semibold mb-4'>All Castaways</h2>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2'>
+    <section className='w-full bg-card rounded-lg p-4 shadow-lg shadow-primary/10'>
+      <span className='flex items-center gap-2 mb-4'>
+        <span className='h-5 w-0.5 bg-primary rounded-full' />
+        <h2 className='text-xl font-black uppercase tracking-tight'>All Castaways</h2>
+      </span>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3'>
         {castaways.map((castaway) => (
           <CastawayCard
             key={castaway.castawayId}

@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Trophy, ListPlus, Users } from 'lucide-react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
-import JoinLeagueModal from '~/components/home/quickActions/joinDialogue';
+import JoinLeagueModal from '~/components/leagues/actions/league/join/modal';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/common/button';
 
@@ -136,7 +136,7 @@ export function FloatingActionsWidget() {
           )}>
           <CreateLeagueModal>
             <Button
-              className='relative w-12 h-12 rounded-lg bg-primary/50 border-2 border-primary/40 flex items-center justify-center hover:bg-primary/30 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
+              className='relative w-12 h-12 rounded-lg bg-accent border-2 border-primary/40 flex items-center justify-center hover:bg-secondary/90 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
               onClick={() => setIsExpanded(false)}>
               <ListPlus className='w-5 h-5 text-primary' />
             </Button>
@@ -151,7 +151,7 @@ export function FloatingActionsWidget() {
           )}>
           <JoinLeagueModal>
             <Button
-              className='relative w-12 h-12 rounded-lg bg-primary/50 border-2 border-primary/40 flex items-center justify-center hover:bg-primary/30 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
+              className='relative w-12 h-12 rounded-lg bg-accent border-2 border-primary/40 flex items-center justify-center hover:bg-secondary/90 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
               onClick={() => setIsExpanded(false)}>
               <Users className='w-5 h-5 text-primary' />
             </Button>

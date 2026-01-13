@@ -2,12 +2,12 @@
 
 import { ListPlus, Users } from 'lucide-react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
+import JoinLeagueModal from '~/components/leagues/actions/league/join/modal';
 import { SignIn, SignedIn, SignedOut } from '@clerk/nextjs';
 import { Separator } from '~/components/common/separator';
 import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 import { useLeagues } from '~/hooks/user/useLeagues';
 import { useMemo } from 'react';
-import JoinLeagueModal from '~/components/home/quickActions/joinDialogue';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 export default function LeaguesPage() {
