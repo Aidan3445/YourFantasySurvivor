@@ -61,7 +61,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
       <div className='relative z-10'>
         {/* Header */}
         <div className='flex items-center justify-between mb-2'>
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center gap-3 h-8'>
             <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
             <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
               Draft Status
@@ -114,7 +114,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
           )}
           <Clock endDate={leagueSettings?.draftDate ?? null} replacedBy={
             <Button
-              className='w-full rounded-none font-black text-4xl uppercase tracking-wider shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]'
+              className='w-full rounded-none h-full font-black text-4xl uppercase tracking-wider shadow-lg hover:shadow-xl transition-all hover:scale-[1.01]'
               variant='default'
               disabled={!league || (leagueMembers?.loggedIn?.role !== 'Owner' && league?.status !== 'Draft')}
               onClick={onDraftJoin}>

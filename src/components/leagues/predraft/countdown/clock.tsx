@@ -33,7 +33,7 @@ export default function Clock({ endDate, replacedBy }: ClockProps) {
 
   return (
     !timer || timer > 0 ?
-      <div className='w-full py-6 px-1 md:px-4'>
+      <div className='w-full pt-6 pb-2 md:py-6 px-1 md:px-4'>
         <div className='grid grid-cols-7 md:gap-2 max-w-2xl mx-auto'>
           <ClockPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
           <div className='flex items-center justify-center'>
