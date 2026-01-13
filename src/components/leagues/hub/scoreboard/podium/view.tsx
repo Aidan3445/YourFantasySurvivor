@@ -25,13 +25,10 @@ export default function Podium({ overrideHash, className }: PodiumProps) {
 
   return (
     <div className={cn(
-      'w-full h-full text-center bg-card rounded-lg flex flex-col p-1 place-items-center',
+      'w-full h-full text-center bg-card rounded-lg flex flex-col p-4 place-items-center',
       className
     )}>
-      <h2 className='text-2xl font-bold text-primary'>
-        Winners&apos; Podium
-      </h2>
-      <div className='flex gap-4 mt-2 items-end justify-center w-full h-full grow'>
+      <div className='flex gap-4 items-end justify-center w-full h-full grow'>
         <Tier
           member={sortedMemberScores[1]?.member}
           points={sortedMemberScores[1]?.scores.slice().pop() ?? 0}

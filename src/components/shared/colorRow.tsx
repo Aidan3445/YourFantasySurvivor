@@ -17,7 +17,11 @@ export default function ColorRow({ color, loggedIn, className, children }: Color
         loggedIn && 'border-none ring-2 ring-white my-0.5',
         className
       )}
-      style={{ backgroundColor: color, color: color ? getContrastingColor(color) : '' }}>
+      style={{
+        backgroundColor: color,
+        color: color ? getContrastingColor(color) : '',
+        stroke: color ? getContrastingColor(color) : ''
+      }}>
       {children}
     </span>
   );

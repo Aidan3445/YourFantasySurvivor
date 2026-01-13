@@ -36,8 +36,8 @@ export default function Chart() {
 
   return (
     <div
-      className='w-full rounded-lg bg-card pl-1 pb-1'
-      style={{ height: `calc(2.45*${memberCount + 1}rem)` }}>
+      className='w-full rounded-lg bg-card p-3'
+      style={{ height: `calc(3.15*${memberCount + 1}rem + 4rem)` }}>
       <ResponsiveContainer>
         <LineChart
           id='score-chart'
@@ -47,9 +47,9 @@ export default function Chart() {
             right: 10,
             // add padding depending on the length of the highest score
             // we multiply by 0.6 to get the value near the label where numbers may overlap
-            left: highestScore < 100 && highestScore > 10 ? -10 :
-              Math.floor(highestScore * 0.6).toString().length * 10 - 30,
-            bottom: 12,
+            left: highestScore < 100 && highestScore > 10 ? -5 :
+              Math.floor(highestScore * 0.6).toString().length * 10 - 20,
+            bottom: 25,
           }}>
           <CartesianGrid stroke='#4D4D4D' />
           <XAxis

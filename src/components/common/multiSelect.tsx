@@ -211,6 +211,8 @@ export const MultiSelect = React.forwardRef<
       }
     };
 
+    const sliceAt = maxCount === 0 && selectedValues.length === 1 ? 1 : maxCount;
+
     return (
       <Popover
         open={isPopoverOpen}
@@ -230,7 +232,7 @@ export const MultiSelect = React.forwardRef<
             {selectedValues.length > 0 && !empty ? (
               <div className='flex justify-between items-center w-full'>
                 <div className='flex flex-wrap items-center'>
-                  {!empty && selectedValues.slice(0, maxCount).map((value) => {
+                  {!empty && selectedValues.slice(0, sliceAt).map((value) => {
                     const option = options.find((o) => o.value === value);
                     const IconComponent = option?.icon;
                     return (
@@ -256,7 +258,7 @@ export const MultiSelect = React.forwardRef<
                       </Badge>
                     );
                   })}
-                  {!empty && selectedValues.length > maxCount && (
+                  {!empty && selectedValues.length > sliceAt && (
                     <Badge
                       className={cn(
                         'bg-transparent text-primary border-primary/1 hover:bg-transparent',
@@ -265,7 +267,10 @@ export const MultiSelect = React.forwardRef<
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`+ ${selectedValues.length - maxCount} more`}
+                      {maxCount === 0
+                        ? `${selectedValues.length} selected`
+                        : `+ ${selectedValues.length - sliceAt} more`
+                      }
                       <XCircle
                         className='ml-2 h-4 w-4 cursor-pointer'
                         onClick={(event) => {
@@ -277,17 +282,20 @@ export const MultiSelect = React.forwardRef<
                   )}
                 </div>
                 <div className='flex items-center justify-between'>
-                  <XIcon
-                    className='h-4 mx-2 cursor-pointer text-muted-foreground'
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleClear();
-                    }}
-                  />
-                  <Separator
-                    orientation='vertical'
-                    className='flex min-h-6 h-full'
-                  />
+                  {maxCount > 0 && (
+                    <React.Fragment>
+                      <XIcon
+                        className='h-4 mx-2 cursor-pointer text-muted-foreground'
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleClear();
+                        }} />
+                      <Separator
+                        orientation='vertical'
+                        className='flex min-h-6 h-full'
+                      />
+                    </React.Fragment>
+                  )}
                   <ChevronDown className='h-4 mx-2 cursor-pointer text-muted-foreground' />
                 </div>
               </div>
@@ -304,7 +312,7 @@ export const MultiSelect = React.forwardRef<
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className='w-auto p-0 border-2 border-primary/30 shadow-lg shadow-primary/20'
+          className='w-auto p-0 border-none bg-transparent'
           align='start'
           onEscapeKeyDown={() => setIsPopoverOpen(false)}
         >
@@ -324,7 +332,7 @@ export const MultiSelect = React.forwardRef<
                   <div
                     className={cn(
                       'mr-2 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border-2 border-primary',
-                      selectedValues.length === options.length
+                      selectedValues.length === options.filter(o => o.value !== null).length
                         ? 'bg-primary text-primary-foreground'
                         : 'opacity-50 [&_svg]:invisible'
                     )}

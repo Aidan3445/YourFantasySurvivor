@@ -164,6 +164,7 @@ export default function TimelineFilters({
                 value={filterCastaway as unknown as string[]}
                 onValueChange={(value) => setFilterCastaway(value as number[])}
                 modalPopover
+                maxCount={0}
                 placeholder='All Castaways'
               />
             </div>}
@@ -181,6 +182,7 @@ export default function TimelineFilters({
                 value={filterTribe as unknown as string[]}
                 onValueChange={(value) => setFilterTribe(value as number[])}
                 modalPopover
+                maxCount={0}
                 placeholder='All Tribes'
               />
             </div>}
@@ -198,6 +200,7 @@ export default function TimelineFilters({
                 value={filterMember as unknown as string[]}
                 onValueChange={(value) => setFilterMember(value as number[])}
                 modalPopover
+                maxCount={0}
                 placeholder='All Members'
               />
             </div>}
@@ -227,6 +230,7 @@ export default function TimelineFilters({
               value={filterEvent}
               onValueChange={(value) => setFilterEvent(value as string[])}
               modalPopover
+              maxCount={0}
               placeholder='All Events'
             />
           </div>
