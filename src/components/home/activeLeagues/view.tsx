@@ -80,7 +80,7 @@ export function ActiveLeagues() {
 
   return (
     <div className={cn(
-      'relative transition-all cursor-ew-resize',
+      'relative transition-all',
       showLoadingScreen && 'h-96 overflow-hidden'
     )}>
       {showLoadingScreen ? (
@@ -96,12 +96,12 @@ export function ActiveLeagues() {
                 {/* Accent Glow */}
                 <div className='absolute top-0 left-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
 
-                <CardHeader className='space-y-4 relative z-10'>
+                <CardHeader className='relative z-10'>
                   {/* Section Header */}
                   <div className='flex items-end justify-between'>
                     <div className='flex items-center gap-3'>
-                      <div className='h-8 w-1 bg-primary rounded-full' />
-                      <h2 className='text-3xl md:text-4xl font-black tracking-tight uppercase'>
+                      <div className='h-6 md:h-8 w-1 bg-primary rounded-full' />
+                      <h2 className='text-xl md:text-4xl font-black tracking-tight uppercase'>
                         Your Leagues
                       </h2>
                     </div>
@@ -118,16 +118,16 @@ export function ActiveLeagues() {
                   <Separator className='bg-primary/20' />
                 </CardHeader>
 
-                <CardContent className='px-0 mb-8'>
+                <CardContent className='px-0 mb-8 max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3rem-var(--sidebar-width))]'>
                   <Carousel
                     opts={{
                       loop: true,
                       watchDrag: topLeagues.length > 1,
                       ignoreKeys: topLeagues.length > 1
                     }}
-                    plugins={[Autoplay({ delay: 8000, stopOnMouseEnter: true })]}
+                    plugins={[Autoplay({ delay: 8000, stopOnMouseEnter: true, stopOnInteraction: true, stopOnFocusIn: true })]}
                     setApi={setApi}>
-                    <CarouselContent>
+                    <CarouselContent className={cn('p-0', topLeagues.length > 1 && 'cursor-ew-resize')}>
                       {topLeagues.map(({ league }) => (
                         <CarouselItem key={league.hash}>
                           <ActiveLeague league={league} />

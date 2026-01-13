@@ -19,7 +19,7 @@ import updateDraftOrder from '~/actions/updateDraftOrder';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Badge } from '~/components/common/badge';
 
-const SUFFLE_DURATION = 500;
+const SHUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
 
 interface DraftOrderProps {
@@ -58,19 +58,30 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
   if (!leagueMembers) return null;
 
   const shuffleOrderWithAnimation = () => {
-    // shuffle order by swapping items one by one
-    let i = 0;
+    const swaps: { from: number; to: number }[] = [];
+    const tempOrder = [...order];
+
+    for (let loop = 0; loop < SHUFFLE_LOOPS; loop++) {
+      for (let i = tempOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        swaps.push({ from: i, to: j });
+      }
+    }
+
+    // Animate swaps one by one
+    let swapIndex = 0;
     const interval = setInterval(() => {
-      if (++i < order.length * SHUFFLE_LOOPS) {
-        const randomIndex = Math.floor(2 * order.length);
-        setOrder((items) => {
-          return arrayMove(items, i % order.length, randomIndex)
-            .map((item, index) => ({ ...item, index }));
-        });
+      if (swapIndex < swaps.length) {
+        const { from, to } = swaps[swapIndex]!;
+        setOrder((items) =>
+          arrayMove(items, from, to)
+            .map((item, index) => ({ ...item, index }))
+        );
+        swapIndex++;
       } else {
         clearInterval(interval);
       }
-    }, SUFFLE_DURATION / (order.length * SHUFFLE_LOOPS));
+    }, SHUFFLE_DURATION / swaps.length);
   };
 
   const orderLocked = locked || league?.status !== 'Predraft';
@@ -191,7 +202,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                         {/* Drag Handle */}
                         {!orderLocked && (
                           <GripVertical
-                            className='ml-auto cursor-row-resize opacity-50 group-hover:opacity-100 transition-opacity shrink-0'
+                            className='ml-auto cursor-grab active:cursor-grabbing opacity-50 group-hover:opacity-100 transition-opacity shrink-0'
                             color={getContrastingColor(member.color)}
                           />
                         )}

@@ -1,6 +1,7 @@
 'use client';
 
 import { type ReactNode, useEffect, useState } from 'react';
+import { useIsMobile } from '~/hooks/ui/useMobile';
 
 interface ClockProps {
   endDate: Date | null;
@@ -32,8 +33,8 @@ export default function Clock({ endDate, replacedBy }: ClockProps) {
 
   return (
     !timer || timer > 0 ?
-      <div className='w-full py-6 px-4'>
-        <div className='grid grid-cols-7 gap-2 max-w-2xl mx-auto'>
+      <div className='w-full py-6 px-1 md:px-4'>
+        <div className='grid grid-cols-7 md:gap-2 max-w-2xl mx-auto'>
           <ClockPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
           <div className='flex items-center justify-center'>
             <span className='text-3xl md:text-4xl font-black text-primary'>:</span>
@@ -60,13 +61,15 @@ interface ClockPlaceProps {
 }
 
 function ClockPlace({ value, label }: ClockPlaceProps) {
+  const isMobile = useIsMobile();
+
   return (
-    <div className='flex flex-col items-center justify-center bg-primary/5 border border-primary/20 rounded-lg p-2'>
+    <div className='flex flex-col items-center justify-center bg-primary/5 border border-primary/20 rounded-lg md:p-2'>
       <span className='text-3xl md:text-4xl font-black text-primary tabular-nums'>
         {value.toString().padStart(2, '0')}
       </span>
       <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1'>
-        {label}
+        {isMobile ? label.charAt(0) : label}
       </span>
     </div>
   );

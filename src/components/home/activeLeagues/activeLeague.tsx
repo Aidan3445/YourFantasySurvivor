@@ -13,30 +13,30 @@ interface ActiveLeagueProps {
 
 export default function ActiveLeague({ league }: ActiveLeagueProps) {
   const statusConfig = {
-    Active: { label: 'LIVE', color: 'bg-green-500/20 text-green-600 border-green-500/40', icon: Trophy },
-    Draft: { label: 'DRAFT', color: 'bg-blue-500/20 text-blue-600 border-blue-500/40', icon: Clock },
-    Predraft: { label: 'UPCOMING', color: 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40', icon: Clock },
-    Inactive: { label: 'ENDED', color: 'bg-gray-500/20 text-gray-600 border-gray-500/40', icon: Trophy },
+    Active: { label: 'LIVE', color: 'bg-green-500/20 text-green-600 stroke-green-600 border-green-500/40', icon: Trophy },
+    Draft: { label: 'DRAFT', color: 'bg-blue-500/20 text-blue-600 stroke-blue-600 border-blue-500/40', icon: Clock },
+    Predraft: { label: 'UPCOMING', color: 'bg-yellow-500/20 text-yellow-600 stroke-yellow-600 border-yellow-500/40', icon: Clock },
+    Inactive: { label: 'ENDED', color: 'bg-gray-500/20 text-gray-600 stroke-gray-600 border-gray-500/40', icon: Trophy },
   };
 
   const status = statusConfig[league.status] || statusConfig.Inactive;
   const StatusIcon = status.icon;
 
   return (
-    <div className='space-y-6 px-8 mt-2'>
+    <div className='space-y-4 px-2 mt-2'>
       <Link
         key={league.hash}
         href={`/leagues/${league.hash}`}
         className='group block'>
         <div className='relative bg-primary/5 border-2 border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/30 transition-all'>
           {/* Status Badge */}
-          <Badge className={cn('absolute top-4 right-4 flex items-center gap-1.5 rounded-md border-2 text-xs font-black tracking-wider pointer-events-none', status.color)}>
-            <StatusIcon className='w-3 h-3' />
+          <Badge className={cn('absolute top-0 right-0 flex items-center gap-1.5 rounded-md border-2 text-xs font-black tracking-wider pointer-events-none p-0', status.color)}>
+            <StatusIcon className='w-3 h-3 stroke-inherit' />
             {status.label}
           </Badge>
 
-          <div className=''>
-            <h3 className='text-2xl md:text-3xl font-black leading-tight group-hover:text-primary transition-colors'>
+          <div>
+            <h3 className='text-lg md:text-3xl font-black leading-tight group-hover:text-primary transition-colors'>
               {league.name}
             </h3>
             <Badge variant='outline' className='border-primary/40 text-primary font-bold text-xs'>
@@ -47,7 +47,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
           {/* Arrow Icon */}
           <SquareArrowOutUpRight
             size={20}
-            className='absolute bottom-4 right-4 text-primary opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
+            className='hidden sm:block absolute bottom-4 right-4 text-primary opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all' />
         </div>
       </Link>
 

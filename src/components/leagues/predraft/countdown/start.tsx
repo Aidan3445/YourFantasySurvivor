@@ -17,8 +17,8 @@ export default function StartDraft({ startDraft }: StartDraftProps) {
         <Button
           variant='default'
           size='sm'
-          className='font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'>
-          <Zap className='w-3.5 h-3.5 mr-1 stroke-primary-foreground' />
+          className='h-min p-1 gap-1 leading-none md:font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'>
+          <Zap className='w-3 h-3 stroke-primary-foreground' />
           Start Now
         </Button>
       </AlertDialogTrigger>

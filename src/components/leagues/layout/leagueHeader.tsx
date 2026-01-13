@@ -57,9 +57,8 @@ export default function LeagueHeader() {
 
           {needsMarquee ? (
             <Marquee
-              className=''
               pauseOnHover
-              speed={200}
+              speed={20}
               play={needsMarquee && animating}
               gradient={false}
               onCycleComplete={() => setAnimating(false)}>

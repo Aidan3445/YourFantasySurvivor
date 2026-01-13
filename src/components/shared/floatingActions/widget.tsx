@@ -116,7 +116,9 @@ export function FloatingActionsWidget() {
 
   return (
     <div
-      className='absolute md:bottom-4.5 md:right-4.5 bottom-[calc(.75rem+var(--navbar-height))] right-2.5 z-50 pl-14 pt-14 rounded-tl-[50%]'
+      className={cn('absolute md:bottom-4.5 md:right-4.5 bottom-[calc(.75rem+var(--navbar-height))] right-2.5 z-50',
+        isExpanded && 'pl-14 pt-14 rounded-tl-[50%]'
+      )}
       style={{
         transform: isDragging
           ? `translate(${dragOffset.x}px, ${dragOffset.y}px)`
