@@ -59,36 +59,36 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
     )}>
       <Table>
         <TableCaption className='sr-only'>Member Predictions</TableCaption>
-        <TableHeader className='sticky top-0 z-10 bg-white'>
-          <TableRow className='px-4 pointer-events-none h-8'>
-            <TableHead className='text-center h-min'>Event</TableHead>
-            <TableHead className='text-center h-min'>Points</TableHead>
-            {hasBets && <TableHead className='text-center h-min'>Bet</TableHead>}
-            <TableHead className='text-center h-min'>Prediction</TableHead>
-            <TableHead className='text-center pr-4 h-min'>Results</TableHead>
+        <TableHeader className='sticky top-0 z-10 bg-accent'>
+          <TableRow className='px-4 h-10 border-b-2 border-primary/20 hover:bg-primary/10 transition-colors'>
+            <TableHead className='text-center h-min font-bold uppercase text-xs tracking-wider'>Event</TableHead>
+            <TableHead className='text-center h-min font-bold uppercase text-xs tracking-wider'>Points</TableHead>
+            {hasBets && <TableHead className='text-center h-min w-22 font-bold uppercase text-xs tracking-wider'>Bet</TableHead>}
+            <TableHead className='text-center h-min font-bold uppercase text-xs tracking-wider'>Prediction</TableHead>
+            <TableHead className='text-center pr-4 h-min font-bold uppercase text-xs tracking-wider'>Results</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {predictions.sort((a) => a.timing.some((t) => t.startsWith('Weekly')) ? 1 : -1)
             .map((pred, index) => {
               return (
-                <TableRow key={index} className='bg-b3'>
+                <TableRow key={index} className='border-b border-primary/10 bg-secondary hover:bg-primary/5 transition-colors'>
                   <TableCell>
-                    <div className='flex text-nowrap gap-2'>
+                    <div className='flex text-nowrap gap-2 items-center font-medium'>
                       <TimingPopover timing={pred.timing} />
                       {BaseEventFullName[pred.eventName as BaseEventName] ?? pred.eventName}
                       {pred.eventEpisodeNumber !== pred.predictionEpisodeNumber &&
                         <Popover modal hover>
-                          <PopoverTrigger className='text-muted-foreground text-xs -ml-2 -mt-2'>
+                          <PopoverTrigger className='bg-primary/30 rounded-md hover:bg-primary/40 transition-colors p-0.5 place-items-center text-primary text-xs font-semibold'>
                             ({pred.eventEpisodeNumber})
                           </PopoverTrigger>
-                          <PopoverContent className='w-min'>
+                          <PopoverContent className='w-min border-2 border-primary/30'>
                             <PopoverArrow />
-                            <p className='text-xs italic text-nowrap'>
+                            <p className='text-xs font-medium text-nowrap'>
                               Predicted episode {pred.predictionEpisodeNumber}
                             </p>
-                            <Separator className='my-1 w-4/5 mx-auto' />
-                            <p className='text-xs italic text-nowrap'>
+                            <Separator className='my-1 w-4/5 mx-auto bg-primary/20' />
+                            <p className='text-xs font-medium text-nowrap'>
                               Resolved episode {pred.eventEpisodeNumber}
                             </p>
                           </PopoverContent>
@@ -97,44 +97,43 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                     </div>
                   </TableCell>
                   <TableCell className='text-nowrap'>
-                    <span className={cn('text-sm text-center',
+                    <span className={cn('text-sm text-center font-bold',
                       pred.hit ?
-                        pred.points > 0 ? 'text-green-800' : 'text-red-800' :
+                        pred.points > 0 ? 'text-green-700' : 'text-red-700' :
                         'text-muted-foreground')}>
                       {pred.points > 0 && pred.hit ? `+${pred.points}` : pred.points}
                       <Flame className={cn(
-                        'inline align-top w-4 h-min',
+                        'inline align-top w-4 h-min ml-0.5',
                         pred.hit ?
-                          pred.points > 0 ? 'stroke-green-800' : 'stroke-red-800' :
+                          pred.points > 0 ? 'stroke-green-700' : 'stroke-red-700' :
                           'stroke-muted-foreground'
                       )} />
                     </span>
                   </TableCell>
-                  {
-                    hasBets &&
+                  {hasBets &&
                     <TableCell className='text-nowrap'>
                       {pred.bet && pred.bet > 0 ? (
-                        <span className={cn('text-sm text-center', {
-                          'text-green-800': pred.hit,
-                          'text-red-800': !pred.hit,
+                        <span className={cn('text-sm text-center font-bold', {
+                          'text-green-700': pred.hit,
+                          'text-red-700': !pred.hit,
                           'text-muted-foreground': !pred.eventId,
                         })}>
                           {pred.eventId && (pred.hit ? '+' : '-')} {pred.bet}
-                          <Flame className={cn('inline align-top w-4 h-min', {
-                            'stroke-green-800': pred.hit,
-                            'stroke-red-800': !pred.hit,
+                          <Flame className={cn('inline align-top w-4 h-min ml-0.5', {
+                            'stroke-green-700': pred.hit,
+                            'stroke-red-700': !pred.hit,
                             'stroke-muted-foreground': !pred.eventId,
                           })} />
                         </span>
-                      ) : <span className='text-sm text-center text-muted-foreground'>-</span>}
+                      ) : <span className='text-sm text-center text-muted-foreground font-medium'>-</span>}
                     </TableCell>
                   }
-                  <TableCell>
+                  <TableCell className='font-medium'>
                     {findReferenceNames([{ type: pred.referenceType, id: pred.referenceId }])
                       .map((res) => isMobile ? res.short : res.full)
                       .join(', ')}
                   </TableCell>
-                  <TableCell className='pr-4'>
+                  <TableCell className='pr-4 font-medium'>
                     {pred.timing.every((t) => t.includes('Weekly')) &&
                       (keyEpisodes?.previousEpisode?.episodeNumber ?? 0) >= pred.predictionEpisodeNumber &&
                       !pred.event
