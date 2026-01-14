@@ -8,6 +8,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { metadata } from '~/app/layout';
 import getPublicLeague from '~/services/leagues/query/public';
+import LeagueHeader from '~/components/leagues/layout/leagueHeader';
 
 interface JoinPageProps extends LeaguePageProps {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -16,16 +17,22 @@ interface JoinPageProps extends LeaguePageProps {
 export async function generateMetadata(
   { params }: JoinPageProps,
 ): Promise<Metadata> {
-  // read route params
   const { hash } = await params;
-  const { name } = await getPublicLeague(hash) ?? { name: 'a league' };
+  const league = await getPublicLeague(hash);
 
+  if (!league) {
+    return {
+      ...metadata,
+      title: 'League Not Found | YFS',
+    };
+  }
 
   return {
     ...metadata,
+    title: `Join ${league.name} | YFS`,
     openGraph: {
-      title: `Join ${name} on YFS`,
-      description: 'You\'ve bee invited to join a league on Your Fantasy Survivor!',
+      title: `Join ${league.name} on YFS`,
+      description: `You've been invited to join ${league.name} (${league.season}) on Your Fantasy Survivor!`,
       images: ['https://i.imgur.com/xS6JQdr.png'],
     }
   };
@@ -34,16 +41,25 @@ export async function generateMetadata(
 export default async function LeagueJoinPage({ searchParams, params }: JoinPageProps) {
   const [{ hash }, query] = await Promise.all([params, searchParams]);
   const { userId, memberId } = await leagueMemberAuth(hash);
-  const { name, status, season, usedColors, isProtected } = await getPublicLeague(hash) ?? {};
+  const league = await getPublicLeague(hash);
+  const { status, usedColors, isProtected } = league ?? {};
 
   if (!userId) {
     return (
-      <main className='w-full flex justify-center mt-2'>
-        {query?.signUp ?
-          <SignUp forceRedirectUrl={`/i/${hash}`} signInUrl={`/i/${hash}`} /> :
-          <SignIn forceRedirectUrl={`/i/${hash}`} signUpUrl={`/i/${hash}?signUp=true`} />
-        }
-      </main>
+      <div className='h-[calc(100svh-1rem)]'>
+        <LeagueHeader league={league} joinMode={{ isProtected: league?.isProtected ?? false }} />
+        <div className='flex flex-col items-center justify-center gap-4 p-8'>
+          <div className='bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20 p-6 max-w-md text-center space-y-4'>
+            <p className='text-muted-foreground text-base'>
+              Sign in or create an account to join this league
+            </p>
+            {query?.signUp ?
+              <SignUp forceRedirectUrl={`/i/${hash}`} signInUrl={`/i/${hash}`} /> :
+              <SignIn forceRedirectUrl={`/i/${hash}`} signUpUrl={`/i/${hash}?signUp=true`} />
+            }
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -51,34 +67,55 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
     redirect(`/leagues/${hash}`);
   }
 
-  if (!name || !status || !season || !usedColors || isProtected === undefined) {
+  if (!league) {
     return (
-      <main className='w-full flex flex-col items-center justify-center mt-2'>
-        <h1 className='text-3xl'>League Not Found</h1>
-        <p>{'The league you are trying to join does not exist. Please check the link and try again.'}</p>
-        <Link href='/'>
-          <Button>Back to Home</Button>
-        </Link>
-      </main>
+      <div className='h-[calc(100svh-1rem)]'>
+        <div className='sticky z-50 flex flex-col w-full justify-center bg-card shadow-lg shadow-primary/20 px-4 py-4 items-center border-b-2 border-primary/20'>
+          <span className='flex items-center justify-center gap-3'>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight text-center'>League Not Found</h1>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+          </span>
+        </div>
+        <div className='flex flex-col items-center justify-center gap-4 p-8'>
+          <div className='bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20 p-6 max-w-md text-center space-y-4'>
+            <p className='text-muted-foreground text-base'>
+              The league you are trying to join does not exist. Please check the link and try again.
+            </p>
+            <Link href='/'>
+              <Button className='w-full'>Back to Home</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (status !== 'Predraft') {
     return (
-      <main className='w-full flex justify-center mt-2'>
-        <h1 className='text-3xl'>Sorry, {name} is no longer accepting members!</h1>
-        <p>{'You can\'t join this league because it has already started.'}</p>
-        <Link href='/'>
-          <Button>Back to Home</Button>
-        </Link>
-      </main>
+      <div className='h-[calc(100svh-1rem)]'>
+        <LeagueHeader league={league} />
+        <div className='flex flex-col items-center justify-center gap-4 p-8'>
+          <div className='bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20 p-6 max-w-md text-center space-y-4'>
+            <h2 className='text-xl font-bold'>Sorry, this league is no longer accepting members!</h2>
+            <p className='text-muted-foreground text-base'>
+              You can&apos;t join this league because it has already started.
+            </p>
+            <Link href='/'>
+              <Button className='w-full'>Back to Home</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <main className='w-full flex flex-col items-center justify-center mt-2'>
-      <h1 className='text-3xl'>Join {name}</h1>
-      <JoinLeagueForm hash={hash} colors={usedColors} isProtected={isProtected} />
-    </main>
+    <div className='h-[calc(100svh-1rem)]'>
+      <LeagueHeader league={league} joinMode={{ isProtected: isProtected ?? false }} />
+      <div className='flex flex-col items-center justify-center gap-4 p-4 md:p-8'>
+        <JoinLeagueForm hash={hash} colors={usedColors ?? []} isProtected={isProtected ?? false} />
+      </div>
+    </div>
   );
 }

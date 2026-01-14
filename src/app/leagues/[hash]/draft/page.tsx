@@ -19,7 +19,7 @@ export default function DraftPage() {
         <TabsTrigger className='flex-1' value='draft'>Draft</TabsTrigger>
         <TabsTrigger className='flex-1' value='castaways'>Castaways</TabsTrigger>
       </TabsList>
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-7.5rem)] h-[calc(100svh-6.5rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>
           <TabsContent value='draft'>
             <DraftTracker hash={hash} />

@@ -12,6 +12,7 @@ import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails'
 import { useMemo } from 'react';
 import SkipMember from '~/components/leagues/draft/skipMember';
 import { useIsMobile } from '~/hooks/ui/useMobile';
+import { Card, CardContent, CardHeader } from '~/components/common/card';
 
 interface DraftTrackerProps {
   hash: string;
@@ -41,18 +42,18 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
 
 
   return (
-    <section className='w-full space-y-4 overflow-x-hidden'>
-      <article className='flex flex-col w-full p-4 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 relative'>
+    <section className='w-full space-y-4'>
+      <Card className='flex flex-col border-2 border-primary/20 relative'>
         {/* Accent Elements */}
         <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
 
-        <div className='flex items-center gap-3 mb-2'>
+        <CardHeader className='flex items-center gap-3 mb-2'>
           <div className='h-6 w-1 bg-primary rounded-full' />
           <h2 className='text-2xl font-black uppercase tracking-wider text-card-foreground relative z-10'>
             Draft Order
           </h2>
-        </div>
-        <div className='grid grid-cols-1 gap-2 relative z-10'>
+        </CardHeader>
+        <CardContent className='grid grid-cols-1 gap-2 relative z-10'>
           {leagueMembers?.members.map((pick, index) => (
             <ColorRow
               key={pick.memberId}
@@ -94,8 +95,8 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
               )}
             </ColorRow>
           ))}
-        </div>
-      </article>
+        </CardContent>
+      </Card>
       {(!!onDeck?.loggedIn || !!onTheClock?.loggedIn) &&
         <ChooseCastaway draftDetails={actionDetails} onDeck={!!onDeck?.loggedIn} />}
       <MakePredictions

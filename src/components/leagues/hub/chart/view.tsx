@@ -31,7 +31,7 @@ export default function Chart() {
         yAxis={[{
           label: 'Points',
         }]}
-        margin={{ top: 0, right: 0, bottom: 0, left: 24 }}
+        margin={{ top: 0, right: 24, bottom: 0, left: 24 }}
         series={series}
         grid={{ horizontal: true }}
         slots={{
@@ -47,9 +47,6 @@ export default function Chart() {
             strokeWidth: 5,
             strokeLinecap: 'round',
             strokeOpacity: 0.7,
-          },
-          '& .MuiMarkElement-root': {
-            display: 'none',
           },
           '& .MuiChartsGrid-line': {
             stroke: '#4D4D4D',

@@ -141,14 +141,14 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
                     <TableHead>Points</TableHead>
                   </>
                 )}
-                <TableHead>Castaway</TableHead>
+                <TableHead className='w-1/2'>Castaway</TableHead>
                 {!allZero && (
                   <>
                     <TableHead>Place</TableHead>
                     <TableHead>Points</TableHead>
                   </>
                 )}
-                <TableHead>Castaway</TableHead>
+                <TableHead className='w-1/2'>Castaway</TableHead>
               </TableRow>
             </TableHeader>
             <ScorboardBody

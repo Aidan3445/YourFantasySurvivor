@@ -20,6 +20,7 @@ import chooseCastaway from '~/actions/chooseCastaway';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
 import { getAirStatus } from '~/lib/episodes';
+import { Card } from '~/components/common/card';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
@@ -113,7 +114,7 @@ export default function ChangeCastaway() {
   if (keyEpisodes?.previousEpisode && pickPriority.length > 0 && !dialogOpen
     && Date.now() - keyEpisodes.previousEpisode.airDate.getTime() < 1000 * 60 * 60 * 48) {
     return (
-      <div className='w-full text-center bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex flex-col p-4 gap-2 place-items-center'>
+      <Card className='w-[calc(100svw-2rem)] md:w-[calc(100svw-3.25rem-var(--sidebar-width))] p-0 pb-0 bg-card rounded-lg border-2 border-primary/20'>
         <h1 className='text-xl font-bold uppercase tracking-wider'>Wait to Swap your Survivor Pick</h1>
         <h3 className='text-sm text-muted-foreground'>Recently Eliminated members have{' '}
           {Math.floor((1000 * 60 * 60 * 48 - (Date.now() - keyEpisodes.previousEpisode.airDate.getTime())) / 1000 / 60 / 60)}
@@ -130,7 +131,7 @@ export default function ChangeCastaway() {
             </span>
           ))
         }
-      </div >
+      </Card >
     );
   }
 
@@ -142,79 +143,81 @@ export default function ChangeCastaway() {
 
   return (
     <Form {...reactForm}>
-      <form className='w-full text-center bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex flex-col p-3 gap-2' action={() => handleSubmit()}>
-        <div className='flex items-center gap-2 w-full justify-start'>
-          <span className='h-4 w-0.5 bg-primary rounded-full' />
-          <h1 className='text-base font-bold uppercase tracking-wider'>Swap your Survivor Pick</h1>
-        </div>
-        <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center mt-auto'>
-          <FormField
-            name='castawayId'
-            render={({ field }) => (
-              <FormItem className='w-full'>
-                <FormControl>
-                  <Select
-                    defaultValue={selected}
-                    value={selected}
-                    onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select castaway' />
-                    </SelectTrigger>
-                    <SelectContent className='z-50'>
-                      <SelectGroup>
-                        {availableCastaways.map((castaway) => {
-                          return ((castaway.pickedBy ?? castaway.eliminatedEpisode) ?
-                            <SelectLabel
-                              key={castaway.castawayId}
-                              className='cursor-not-allowed'
-                              style={{ backgroundColor: castaway.pickedBy?.color ?? '#6b7280' }}>
-                              <span
-                                className='flex items-center gap-1'
-                                style={{ color: getContrastingColor(castaway.pickedBy?.color ?? '#6b7280') }}>
-                                {castaway.tribe &&
-                                  <ColorRow
-                                    className='w-20 px-0 justify-center leading-tight font-normal'
-                                    color={castaway.tribe.color}>
-                                    {castaway.tribe.name}
-                                  </ColorRow>
-                                }
-                                {castaway.fullName} {castaway.pickedBy && `(${castaway.pickedBy.displayName})`}
-                              </span>
-                            </SelectLabel> :
-                            <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                              <span className='flex items-center gap-1'>
-                                {castaway.tribe &&
-                                  <ColorRow
-                                    className='w-20 px-0 justify-center leading-tight'
-                                    color={castaway.tribe.color}>
-                                    {castaway.tribe.name}
-                                    {castaway.pickedBy}
-                                  </ColorRow>}
-                                {castaway.fullName}
-                              </span>
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-              </FormItem>
-            )} />
-          <Button
-            className='lg:w-26 w-full font-bold uppercase text-xs tracking-wider'
-            disabled={
-              !formSchema.safeParse(reactForm.watch())?.success
-              || reactForm.formState.isSubmitting
-              || (!!keyEpisodes?.previousEpisode
-                && getAirStatus(
-                  keyEpisodes.previousEpisode.airDate,
-                  keyEpisodes.previousEpisode.runtime) === 'Airing')}
-            type='submit'>
-            {keyEpisodes?.previousEpisode && getAirStatus(keyEpisodes.previousEpisode.airDate, keyEpisodes.previousEpisode.runtime) === 'Airing' ? 'Episode Airing' : 'Submit'}
-          </Button>
-        </span>
-      </form>
+      <Card className='w-full bg-card rounded-lg border-2 border-primary/20  flex flex-col p-3 gap-2'>
+        <form action={() => handleSubmit()}>
+          <div className='flex items-center gap-2 w-full justify-start'>
+            <span className='h-4 w-0.5 bg-primary rounded-full' />
+            <h1 className='text-base font-bold uppercase tracking-wider'>Swap your Survivor Pick</h1>
+          </div>
+          <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center mt-auto'>
+            <FormField
+              name='castawayId'
+              render={({ field }) => (
+                <FormItem className='w-full'>
+                  <FormControl>
+                    <Select
+                      defaultValue={selected}
+                      value={selected}
+                      onValueChange={(value) => { setSelected(value); field.onChange(value); }}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='Select castaway' />
+                      </SelectTrigger>
+                      <SelectContent className='z-50'>
+                        <SelectGroup>
+                          {availableCastaways.map((castaway) => {
+                            return ((castaway.pickedBy ?? castaway.eliminatedEpisode) ?
+                              <SelectLabel
+                                key={castaway.castawayId}
+                                className='cursor-not-allowed'
+                                style={{ backgroundColor: castaway.pickedBy?.color ?? '#6b7280' }}>
+                                <span
+                                  className='flex items-center gap-1'
+                                  style={{ color: getContrastingColor(castaway.pickedBy?.color ?? '#6b7280') }}>
+                                  {castaway.tribe &&
+                                    <ColorRow
+                                      className='w-20 px-0 justify-center leading-tight font-normal'
+                                      color={castaway.tribe.color}>
+                                      {castaway.tribe.name}
+                                    </ColorRow>
+                                  }
+                                  {castaway.fullName} {castaway.pickedBy && `(${castaway.pickedBy.displayName})`}
+                                </span>
+                              </SelectLabel> :
+                              <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
+                                <span className='flex items-center gap-1'>
+                                  {castaway.tribe &&
+                                    <ColorRow
+                                      className='w-20 px-0 justify-center leading-tight'
+                                      color={castaway.tribe.color}>
+                                      {castaway.tribe.name}
+                                      {castaway.pickedBy}
+                                    </ColorRow>}
+                                  {castaway.fullName}
+                                </span>
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </FormItem>
+              )} />
+            <Button
+              className='lg:w-26 w-full font-bold uppercase text-xs tracking-wider'
+              disabled={
+                !formSchema.safeParse(reactForm.watch())?.success
+                || reactForm.formState.isSubmitting
+                || (!!keyEpisodes?.previousEpisode
+                  && getAirStatus(
+                    keyEpisodes.previousEpisode.airDate,
+                    keyEpisodes.previousEpisode.runtime) === 'Airing')}
+              type='submit'>
+              {keyEpisodes?.previousEpisode && getAirStatus(keyEpisodes.previousEpisode.airDate, keyEpisodes.previousEpisode.runtime) === 'Airing' ? 'Episode Airing' : 'Submit'}
+            </Button>
+          </span>
+        </form>
+      </Card>
       <AlertDialog open={dialogOpen && !closedDialog} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -127,7 +127,7 @@ export function BaseSubmissionCard({
   return (
     <Form {...reactForm}>
       <form action={() => handleSubmit()}>
-        <span className='grid grid-cols-[min-content_1fr] items-center pl-2 bg-b2 rounded-b-lg'>
+        <span className='grid grid-cols-[min-content_1fr] items-center pl-2 bg-b2'>
           <RotateCcw
             className={cn('cursor-pointer hover:text-primary transition-all',
               !reactForm.formState.isDirty && 'opacity-50 cursor-not-allowed')}

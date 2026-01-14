@@ -43,7 +43,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         {isActive && userId && <TabsTrigger value='Base'>Base</TabsTrigger>}
         <TabsTrigger value='settings'>Settings</TabsTrigger>
       </TabsList>
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-7.5rem)] h-[calc(100svh-6.5rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>
           <TabsContent className='space-y-4' value='scores'>
             <Scores isActive={isActive} />
