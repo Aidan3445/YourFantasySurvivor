@@ -200,7 +200,7 @@ export const MultiSelect = React.forwardRef<
     };
 
     const toggleAll = () => {
-      if (selectedValues.length === options.length) {
+      if (selectedValues.length === options.filter(o => o.value !== null).length) {
         handleClear();
       } else {
         const allValues = options
