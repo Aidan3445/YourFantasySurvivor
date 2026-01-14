@@ -148,7 +148,7 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
             })}
         </TableBody>
       </Table>
-      <ScrollBar orientation='vertical' className='mt-8 h-[calc(100%-32px)]' />
+      <ScrollBar orientation='vertical' className='mt-10 h-[calc(100%-2.5rem)]' />
       <ScrollBar orientation='horizontal' hidden />
     </ScrollArea>
   );
