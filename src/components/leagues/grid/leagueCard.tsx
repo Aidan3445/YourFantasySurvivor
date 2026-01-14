@@ -25,7 +25,7 @@ export default function LeagueCard({ league, member, currentSelection, refresh, 
         className
       )}>
         <div className='flex items-start justify-between gap-2'>
-          <h3 className='text-lg font-bold leading-tight'>{league.name}</h3>
+          <h3 className='text-lg font-bold leading-tight text-left'>{league.name}</h3>
           <ChevronRight className='w-5 h-5 shrink-0 text-primary opacity-0 group-hover:opacity-100 transition-opacity' />
         </div>
 
@@ -37,7 +37,7 @@ export default function LeagueCard({ league, member, currentSelection, refresh, 
               {currentSelection.isEliminated && <FlameKindling className='inline w-4 h-4 shrink-0 text-destructive' />}
             </div>
           ) : (
-            <p className='text-sm'>
+            <p className='text-sm text-left'>
               <span className='font-bold text-muted-foreground'>Draft:</span> <span className='italic'>Yet to draft</span>
             </p>
           )}

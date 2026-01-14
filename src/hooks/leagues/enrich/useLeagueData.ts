@@ -31,6 +31,7 @@ export function useLeagueData(overrideHash?: string) {
   const membersArray = useMemo(() => leagueMembers?.members ?? [], [leagueMembers?.members]);
 
   const scoreData = useMemo(() => {
+    console.time(`Score Compilation ${league?.hash ?? overrideHash ?? ''}`);
     if (!league || !membersArray.length || !seasonData || !selectionTimeline ||
       !basePredictions || !leagueRules || !leagueSettings) {
       return {
@@ -69,6 +70,7 @@ export function useLeagueData(overrideHash?: string) {
 
     const loggedInIndex = sortedMemberScores.findIndex(({ member }) => member?.loggedIn);
 
+    console.timeEnd(`Score Compilation ${league?.hash ?? overrideHash ?? ''}`);
     return {
       scores,
       currentStreaks,
