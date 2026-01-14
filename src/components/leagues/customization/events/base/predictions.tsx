@@ -76,7 +76,7 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
                         onValueChange={timingField.onChange}
                         defaultValue={timingField.value as string[]}
                         value={timingField.value as string[]}
-                        maxCount={1}
+                        maxCount={0}
                         disabled={disabled}
                         empty={disabled}
                         modalPopover

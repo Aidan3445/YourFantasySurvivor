@@ -18,7 +18,6 @@ import createBaseEvent from '~/actions/createBaseEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
 import { cn } from '~/lib/utils';
-import { getAirStatus } from '~/lib/episodes';
 import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 
 export default function CreateBaseEvent() {
@@ -30,8 +29,8 @@ export default function CreateBaseEvent() {
 
   const reactForm = useForm<BaseEventInsert>({
     defaultValues: {
-      episodeId: episodes?.find(episode => getAirStatus(episode.airDate, episode.runtime) === 'Airing')?.episodeId ??
-        episodes?.findLast(episode => getAirStatus(episode.airDate, episode.runtime) === 'Aired')?.episodeId ??
+      episodeId: episodes?.find(episode => episode.airStatus === 'Airing')?.episodeId ??
+        episodes?.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
         episodes?.[0]?.episodeId,
       notes: null,
     },

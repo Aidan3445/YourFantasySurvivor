@@ -22,6 +22,31 @@ export function getAirStatus(airDate: Date, runtime: number): AirStatus {
 }
 
 /**
+ * Calculate key episodes (previous, next, merge) from an episodes array
+ * This function is used by both frontend (dev tools) and backend to ensure consistency
+ * @param episodes Array of episodes to process
+ * @returns KeyEpisodes object with previous, next, and merge episodes
+ */
+export function calculateKeyEpisodes(episodes: { airStatus: AirStatus; isMerge: boolean }[]): { previousEpisode: typeof episodes[0] | null; nextEpisode: typeof episodes[0] | null; mergeEpisode: typeof episodes[0] | null } {
+  return episodes.reduce((acc, episode) => {
+    if (episode.airStatus === 'Aired' || episode.airStatus === 'Airing') {
+      acc.previousEpisode = episode;
+    }
+    if (episode.airStatus === 'Upcoming' && !acc.nextEpisode) {
+      acc.nextEpisode = episode;
+    }
+    if (episode.isMerge) {
+      acc.mergeEpisode = episode;
+    }
+    return acc;
+  }, {
+    previousEpisode: null,
+    nextEpisode: null,
+    mergeEpisode: null,
+  } as { previousEpisode: typeof episodes[0] | null; nextEpisode: typeof episodes[0] | null; mergeEpisode: typeof episodes[0] | null });
+}
+
+/**
  * Calculate the optimal polling interval based on when the next air status change will occur.
  * Returns the time in milliseconds until we should check again.
  * Formula: poll at 1/2 the time remaining until next status change, with a minimum of 15 seconds.

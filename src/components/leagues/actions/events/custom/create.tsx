@@ -17,7 +17,6 @@ import { useLeagueRules } from '~/hooks/leagues/useRules';
 import createCustomEvent from '~/actions/createCustomEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
-import { getAirStatus } from '~/lib/episodes';
 import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 
 export default function CreateCustomEvent() {
@@ -30,8 +29,8 @@ export default function CreateCustomEvent() {
 
   const reactForm = useForm<CustomEventInsert>({
     defaultValues: {
-      episodeId: episodes?.find(episode => getAirStatus(episode.airDate, episode.runtime) === 'Airing')?.episodeId ??
-        episodes?.findLast(episode => getAirStatus(episode.airDate, episode.runtime) === 'Aired')?.episodeId ??
+      episodeId: episodes?.find(episode => episode.airStatus === 'Airing')?.episodeId ??
+        episodes?.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
         episodes?.[0]?.episodeId,
       notes: null,
     },

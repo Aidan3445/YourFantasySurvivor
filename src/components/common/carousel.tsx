@@ -331,7 +331,7 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                   {`Slide ${index + 1} of ${items.length}`}
                 </TableCaption>
                 <TableHeader>
-                  <TableRow className='bg-transparent hover:bg-transparent border-none px-0'>
+                  <TableRow className='bg-accent/50 hover:bg-accent/50 border-none px-0'>
                     <TableHead className='text-center w-1/7 px-0'>
                       <Button
                         variant={'outline'}

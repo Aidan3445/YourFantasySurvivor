@@ -19,7 +19,6 @@ import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails'
 import chooseCastaway from '~/actions/chooseCastaway';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
-import { getAirStatus } from '~/lib/episodes';
 import { Card } from '~/components/common/card';
 
 const formSchema = z.object({
@@ -208,12 +207,9 @@ export default function ChangeCastaway() {
               disabled={
                 !formSchema.safeParse(reactForm.watch())?.success
                 || reactForm.formState.isSubmitting
-                || (!!keyEpisodes?.previousEpisode
-                  && getAirStatus(
-                    keyEpisodes.previousEpisode.airDate,
-                    keyEpisodes.previousEpisode.runtime) === 'Airing')}
+                || keyEpisodes?.previousEpisode?.airStatus === 'Airing'}
               type='submit'>
-              {keyEpisodes?.previousEpisode && getAirStatus(keyEpisodes.previousEpisode.airDate, keyEpisodes.previousEpisode.runtime) === 'Airing' ? 'Episode Airing' : 'Submit'}
+              {keyEpisodes?.previousEpisode?.airStatus === 'Airing' ? 'Episode Airing' : 'Submit'}
             </Button>
           </span>
         </form>

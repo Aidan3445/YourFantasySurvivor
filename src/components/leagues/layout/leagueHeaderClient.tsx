@@ -76,7 +76,7 @@ export default function LeagueHeaderClient({ name, season, status, joinMode }: L
             play={needsMarquee && animating}
             gradient={false}
             onCycleComplete={() => setAnimating(false)}>
-            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight leading-tight whitespace-nowrap ml-16'>
+            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight leading-tight whitespace-nowrap mr-16'>
               {joinMode ? `Join ${name}` : name}
             </h1>
           </Marquee>

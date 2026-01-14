@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { SidebarMenuButton, SidebarSeparator } from '~/components/common/sidebar';
 import { Switch } from '~/components/common/switch';
 import SideNavLink from '~/components/nav/side/link';
+import DevEpisodeOverride from '~/components/nav/side/devEpisodeOverride';
 
 interface SysAdminNavProps {
   userId: string | null;
@@ -43,6 +44,7 @@ export default function SysAdminNav({ userId, noRedirects }: SysAdminNavProps) {
           <Switch checked={noRedirectsState} onCheckedChange={toggleRedirects} className='ml-auto' />
         </div>
       </SidebarMenuButton>
+      <DevEpisodeOverride />
     </>
   );
 }

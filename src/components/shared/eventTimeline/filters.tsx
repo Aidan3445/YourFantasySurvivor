@@ -9,7 +9,7 @@ import { MultiSelect } from '~/components/common/multiSelect';
 import { useEffect, useState, useMemo } from 'react';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { BaseEventFullName } from '~/lib/events';
-import { getAirStatus, getAirStatusPollingInterval } from '~/lib/episodes';
+import { getAirStatusPollingInterval } from '~/lib/episodes';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import { cn } from '~/lib/utils';
 import { type SelectionTimelines, type League, type LeagueRules } from '~/types/leagues';
@@ -73,8 +73,8 @@ export default function TimelineFilters({
   useEffect(() => {
     if (selectedEpisode !== undefined || !episodes) return;
 
-    const latestEpisode = episodes.find((episode) => getAirStatus(episode.airDate, episode.runtime) === 'Airing') ??
-      episodes.findLast((episode) => getAirStatus(episode.airDate, episode.runtime) === 'Aired') ??
+    const latestEpisode = episodes.find((episode) => episode.airStatus === 'Airing') ??
+      episodes.findLast((episode) => episode.airStatus === 'Aired') ??
       episodes[0];
 
     setSelectedEpisode(latestEpisode?.episodeNumber);
@@ -118,7 +118,7 @@ export default function TimelineFilters({
                       <div className='inline ml-1'>
                         <AirStatus
                           airDate={selectedEpisodeData.airDate}
-                          airStatus={getAirStatus(selectedEpisodeData.airDate, selectedEpisodeData.runtime)}
+                          airStatus={selectedEpisodeData.airStatus}
                           showTime={false}
                           showDate={!isMobile} />
                       </div>
@@ -136,7 +136,7 @@ export default function TimelineFilters({
                     <div className='inline ml-1'>
                       <AirStatus
                         airDate={episode.airDate}
-                        airStatus={getAirStatus(episode.airDate, episode.runtime)}
+                        airStatus={episode.airStatus}
                         showTime={false}
                         showDate={!isMobile} />
                     </div>

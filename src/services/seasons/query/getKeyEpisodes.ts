@@ -1,5 +1,6 @@
 import getEpisodes from '~/services/seasons/query/episodes';
 import type { KeyEpisodes } from '~/types/episodes';
+import { calculateKeyEpisodes } from '~/lib/episodes';
 
 /**
   * Get the previous, next, and merge episodes for a season
@@ -11,23 +12,6 @@ import type { KeyEpisodes } from '~/types/episodes';
   */
 
 export default async function getKeyEpisodes(seasonId: number) {
-  // Get previous episode status
   const episodes = await getEpisodes(seasonId);
-
-  return episodes.reduce((acc, episode) => {
-    if (episode.airStatus === 'Aired' || episode.airStatus === 'Airing') {
-      acc.previousEpisode = episode;
-    }
-
-    if (episode.airStatus === 'Upcoming' && !acc.nextEpisode) {
-      acc.nextEpisode = episode;
-    } else if (episode.isMerge) {
-      acc.mergeEpisode = episode;
-    }
-    return acc;
-  }, {
-    previousEpisode: null,
-    nextEpisode: null,
-    mergeEpisode: null,
-  } as KeyEpisodes);
+  return calculateKeyEpisodes(episodes) as KeyEpisodes;
 }

@@ -49,7 +49,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
             <Scores isActive={isActive} />
             <ChangeCastaway />
             <Predictions />
-            {seasonData && <LeagueTimeline seasonData={seasonData} />}
+            {seasonData && <LeagueTimeline initialSeasonData={seasonData} />}
           </TabsContent>
           <TabsContent value='events'>
             <CreateCustomEvent />

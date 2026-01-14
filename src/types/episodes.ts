@@ -38,3 +38,12 @@ export type KeyEpisodes = {
   nextEpisode: Episode | null;
   mergeEpisode: Episode | null;
 };
+
+export type EpisodeOverrideConfig = {
+  seasonId: number;
+  previousEpisodeId: number | null;
+  nextEpisodeId: number | null;
+  mergeEpisodeId: number | null;
+  previousAirStatus: 'Aired' | 'Airing';
+  enabled: boolean;
+};

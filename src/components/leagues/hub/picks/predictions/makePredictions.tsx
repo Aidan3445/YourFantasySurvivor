@@ -15,6 +15,8 @@ export default function MakePredictions() {
   const { actionDetails, predictionRuleCount, keyEpisodes, predictionsMade, rules } = useLeagueActionDetails();
   const { basePredictionsMade } = usePredictionsMade();
 
+  console.log('K', keyEpisodes);
+
   const castaways = useMemo(() =>
     Object.values(actionDetails ?? {})
       .flatMap(({ castaways }) => castaways.map(c => c.castaway)), [actionDetails]);
@@ -40,10 +42,10 @@ export default function MakePredictions() {
   if (predictionRuleCount === 0 || !keyEpisodes?.nextEpisode) return null;
 
   return (
-    <Card className='p-0 pt-4 border-2 border-primary/20 w-full relative overflow-clip'>
+    <Card className='p-0 pt-4 border-2 border-primary/20 w-full relative overflow-clip rounded-lg'>
       <CardHeader className='px-4!'>
         {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
-          <div className='absolute top-0 right-2 text-sm italic text-muted-foreground text-right'>
+          <div className='absolute top-1 right-2 text-sm italic text-muted-foreground text-right'>
             Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
             {formBetTotal !== submittedBetTotal && (
               <>
