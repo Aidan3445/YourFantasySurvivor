@@ -122,17 +122,20 @@ export default function SetSurvivalCap() {
                     name='preserveStreak'
                     render={({ field: preserveField }) => (
                       <FormItem className={valueField.value === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}>
-                        <FormLabel className='inline-flex gap-2 items-center'>Preserve Streak
-                          {locked &&
-                            <h2 className={cn('text-lg font-bold text-card-foreground',
-                              preserveField.value ? 'text-green-600' : 'text-destructive')}>
-                              {preserveField.value ? 'On' : 'Off'}
-                            </h2>}
-                        </FormLabel>
-                        <FormControl>
-                          {!locked &&
-                            <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
-                        </FormControl>
+                        <div className='flex items-center gap-1'>
+                          <FormLabel className='inline-flex gap-2 items-baseline'>
+                            Preserve Streak
+                            {locked &&
+                              <h2 className={cn('text-lg font-bold text-card-foreground',
+                                preserveField.value ? 'text-green-600' : 'text-destructive')}>
+                                {preserveField.value ? 'On' : 'Off'}
+                              </h2>}
+                          </FormLabel>
+                          <FormControl>
+                            {!locked &&
+                              <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
+                          </FormControl>
+                        </div>
                         <FormDescription>
                           Should streaks be <i className='text-muted-foreground'>preserved</i> if a
                           player switches their pick voluntarily, or reset to zero?

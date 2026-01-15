@@ -20,12 +20,13 @@ export default async function getLeagueSettings(auth: VerifiedLeagueMemberAuth) 
       isProtected: leagueSettingsSchema.isProtected,
       draftDate: leagueSettingsSchema.draftDate,
       survivalCap: leagueSettingsSchema.survivalCap,
-      preserveStreak: leagueSettingsSchema.preserveStreak
+      preserveStreak: leagueSettingsSchema.preserveStreak,
+      secondaryPickEnabled: leagueSettingsSchema.secondaryPickEnabled,
     })
     .from(leagueSettingsSchema)
     .where(eq(leagueSettingsSchema.leagueId, auth.leagueId))
     .then((leagues) => ({
       ...leagues[0],
-      draftDate: leagues[0]?.draftDate ? new Date(`${leagues[0]?.draftDate} Z`) : null
+      draftDate: leagues[0]?.draftDate ? new Date(`${leagues[0]?.draftDate} Z`) : null,
     } as LeagueSettings));
 }

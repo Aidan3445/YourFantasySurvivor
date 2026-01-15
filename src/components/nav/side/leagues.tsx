@@ -30,9 +30,11 @@ export default function SideNavLeagues() {
     }
   };
 
+  const leaguePath = pathname.startsWith('/leagues');
+
   if (leaguesData?.length === 0) {
     return (
-      <SideNavLink href='/leagues' icon={<Trophy className='stroke-primary' />} label='Leagues' />
+      <SideNavLink href='/leagues' icon={Trophy} label='Leagues' />
     );
   }
 
@@ -48,9 +50,9 @@ export default function SideNavLeagues() {
           <AccordionTrigger className='hover:no-underline font-normal data-[state=open]:mb-0 transition-all stroke-primary'>
             <span className={cn(
               'w-full flex gap-5 items-center text-primary transition-all',
-              !open && (pathname.startsWith('/leagues') ? 'font-semibold' : '')
+              !open && leaguePath ? 'font-semibold' : ''
             )}>
-              <Trophy className='stroke-primary' size={24} />
+              <Trophy size={26} className='stroke-primary' />
               Leagues
             </span>
           </AccordionTrigger>

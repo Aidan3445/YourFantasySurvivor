@@ -44,6 +44,7 @@ yarn-error.log*
 
 # claude
 /.claude
+/*Plan.md
 
 /old
 

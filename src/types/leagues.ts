@@ -1,6 +1,6 @@
 import z from 'zod';
 import { EventTypes, PredictionTimings, ReferenceTypes, ScoringBaseEventNames } from '~/lib/events';
-import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, MAX_SURVIVAL_CAP, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings, type LeagueStatuses } from '~/lib/leagues';
+import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, MAX_SURVIVAL_CAP, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings, type LeagueStatuses, MAX_SECONDARY_PICK_LOCKOUT_PERIOD } from '~/lib/leagues';
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
@@ -51,12 +51,21 @@ export const LeagueInsertZod = z.object({
 });
 export type LeagueInsert = z.infer<typeof LeagueInsertZod>;
 
+export type SecondaryPickSettings = {
+  enabled: boolean;
+  canPickOwnSurvivor: boolean;
+  lockoutPeriod: number; // 0-14, where 14 means never repeat
+  publicPicks: boolean;
+  multiplier: 0.25 | 0.5 | 0.75 | 1;
+};
+
 export type LeagueSettings = {
   leagueId: number;
   isProtected: boolean;
   draftDate: Date | null;
   survivalCap: number;
   preserveStreak: boolean;
+  secondaryPickEnabled: boolean;
 };
 
 export type LeagueSettingsUpdate = {
@@ -82,6 +91,20 @@ export const LeagueSurvivalUpdateZod = z.object({
   preserveStreak: z.boolean(),
 });
 export type LeagueSurvivalUpdate = z.infer<typeof LeagueSurvivalUpdateZod>;
+
+export const SecondaryPickSettingsZod = z.object({
+  enabled: z.boolean(),
+  canPickOwnSurvivor: z.boolean(),
+  lockoutPeriod: z.coerce.number().int().min(0).max(MAX_SECONDARY_PICK_LOCKOUT_PERIOD),
+  publicPicks: z.boolean(),
+  multiplier: z.union([
+    z.literal(0.25),
+    z.literal(0.5),
+    z.literal(0.75),
+    z.literal(1)
+  ]),
+});
+export type SecondaryPickSettingsUpdate = z.infer<typeof SecondaryPickSettingsZod>;
 
 export const EventPointsZod = z.coerce.number().int()
   .gte(-ABS_MAX_EVENT_POINTS, { message: `Points must be between -${ABS_MAX_EVENT_POINTS} and ${ABS_MAX_EVENT_POINTS}` })
@@ -208,6 +231,7 @@ export type LeagueRules = {
   basePrediction: BaseEventPredictionRules | null;
   shauhinMode: ShauhinModeSettings | null;
   custom: CustomEventRule[];
+  secondaryPick: SecondaryPickSettings | null;
 };
 
 export const CustomEventRuleInsertZod = z.object({
@@ -226,6 +250,7 @@ export type CustomEventRuleInsert = z.infer<typeof CustomEventRuleInsertZod>;
   * Record<castawayId | memberId, (castawayId | null)[] | (memberId | null)[]>
   */
 export type SelectionTimeline = Record<number, (number | null)[]>;
+
 /**
   * Selection timelines for both member->castaway and castaway->member selections.
   * The keys are member IDs or castaway IDs, and the values are arrays of selected IDs with index
@@ -240,7 +265,8 @@ export type SelectionTimeline = Record<number, (number | null)[]>;
   */
 export type SelectionTimelines = {
   memberCastaways: SelectionTimeline,
-  castawayMembers: SelectionTimeline
+  castawayMembers: SelectionTimeline,
+  secondaryPicks?: SelectionTimeline,
 };
 
 /**

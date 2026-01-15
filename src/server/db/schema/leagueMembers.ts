@@ -51,3 +51,24 @@ export const selectionUpdateSchema = createTable(
 );
 export type SelectionUpdate = typeof selectionUpdateSchema.$inferSelect;
 
+export const secondaryPickSchema = createTable(
+  'secondary_pick',
+  {
+    memberId: integer('member_id')
+      .references(() => leagueMemberSchema.memberId, { onDelete: 'cascade' })
+      .notNull(),
+    episodeId: integer('episode_id')
+      .references(() => episodeSchema.episodeId, { onDelete: 'cascade' })
+      .notNull(),
+    castawayId: integer('castaway_id')
+      .references(() => castawaySchema.castawayId, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.memberId, table.episodeId] }),
+    index('secondary_pick_member_idx').on(table.memberId),
+    index('secondary_pick_episode_idx').on(table.episodeId),
+  ]
+);
+export type SecondaryPick = typeof secondaryPickSchema.$inferSelect;
+

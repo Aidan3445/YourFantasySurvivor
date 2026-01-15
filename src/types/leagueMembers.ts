@@ -52,3 +52,19 @@ export type CurrentSelection = {
   fullName: string;
   isEliminated: boolean;
 } | null;
+
+export type SecondaryPickSelection = {
+  memberId: number;
+  episodeId: number;
+  castawayId: number;
+};
+
+export type SecondaryPickHistory = {
+  memberId: number;
+  selections: {
+    episodeNumber: number;
+    castawayId: number;
+    castawayName: string;
+    points: number;
+  }[];
+};

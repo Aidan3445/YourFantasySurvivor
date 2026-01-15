@@ -39,7 +39,8 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
         base: overrideBaseRules,
         basePrediction: null,
         custom: [],
-        shauhinMode: null
+        shauhinMode: null,
+        secondaryPick: null
       } : null
     ).scores;
 

@@ -100,10 +100,19 @@ export function compileScores(
           (selectionTimelines.castawayMembers[castaway]?.length ?? 0) - 1);
         const leagueMember = selectionTimelines.castawayMembers[castaway]?.[cmIndex];
         // if the castaway was not selected at this episode, don't score the member
-        if (!leagueMember) return;
-        scores.Member[leagueMember] ??= [];
-        scores.Member[leagueMember][episodeNum] ??= 0;
-        scores.Member[leagueMember][episodeNum] += points;
+        if (leagueMember) {
+          scores.Member[leagueMember] ??= [];
+          scores.Member[leagueMember][episodeNum] ??= 0;
+          scores.Member[leagueMember][episodeNum] += points;
+        }
+        // score secondary pick if applicable
+        if (!rules?.secondaryPick?.enabled || !selectionTimelines.secondaryPicks) return;
+        const secondaryPickMember = selectionTimelines.secondaryPicks[castaway]?.[cmIndex];
+        if (secondaryPickMember) {
+          scores.Member[secondaryPickMember] ??= [];
+          scores.Member[secondaryPickMember][episodeNum] ??= 0;
+          scores.Member[secondaryPickMember][episodeNum] += points;
+        }
       });
     });
   });
@@ -173,10 +182,20 @@ export function compileScores(
               (selectionTimelines.castawayMembers[castaway]?.length ?? 0) - 1);
             const leagueMember = selectionTimelines.castawayMembers[castaway]?.[cmIndex];
             // if the castaway was not selected at this episode, don't score the member
-            if (!leagueMember) return;
-            scores.Member[leagueMember] ??= [];
-            scores.Member[leagueMember][episodeNum] ??= 0;
-            scores.Member[leagueMember][episodeNum] += points;
+            // if the castaway was not selected at this episode, don't score the member
+            if (leagueMember) {
+              scores.Member[leagueMember] ??= [];
+              scores.Member[leagueMember][episodeNum] ??= 0;
+              scores.Member[leagueMember][episodeNum] += points;
+            }
+            // score secondary pick if applicable
+            if (!rules?.secondaryPick?.enabled || !selectionTimelines.secondaryPicks) return;
+            const secondaryPickMember = selectionTimelines.secondaryPicks[castaway]?.[cmIndex];
+            if (secondaryPickMember) {
+              scores.Member[secondaryPickMember] ??= [];
+              scores.Member[secondaryPickMember][episodeNum] ??= 0;
+              scores.Member[secondaryPickMember][episodeNum] += points;
+            }
           });
         }
         // score members if this is a castaway event
@@ -185,10 +204,20 @@ export function compileScores(
             (selectionTimelines.castawayMembers[reference.id]?.length ?? 0) - 1);
           const leagueMember = selectionTimelines.castawayMembers[reference.id]?.[cmIndex];
           // if the castaway was not selected at this episode, don't score the member
-          if (!leagueMember) return;
-          scores.Member[leagueMember] ??= [];
-          scores.Member[leagueMember][episodeNum] ??= 0;
-          scores.Member[leagueMember][episodeNum] += points;
+          // if the castaway was not selected at this episode, don't score the member
+          if (leagueMember) {
+            scores.Member[leagueMember] ??= [];
+            scores.Member[leagueMember][episodeNum] ??= 0;
+            scores.Member[leagueMember][episodeNum] += points;
+          }
+          // score secondary pick if applicable
+          if (!rules?.secondaryPick?.enabled || !selectionTimelines.secondaryPicks) return;
+          const secondaryPickMember = selectionTimelines.secondaryPicks[reference.id]?.[cmIndex];
+          if (secondaryPickMember) {
+            scores.Member[secondaryPickMember] ??= [];
+            scores.Member[secondaryPickMember][episodeNum] ??= 0;
+            scores.Member[secondaryPickMember][episodeNum] += points;
+          }
         }
       });
     });

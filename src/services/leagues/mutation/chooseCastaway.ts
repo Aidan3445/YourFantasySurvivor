@@ -30,7 +30,7 @@ export default async function chooseCastawayLogic(
     const now = new Date();
     const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
-    const eliminatedSelection = await db
+    const eliminatedSelection = await trx
       .select({
         memberId: selectionUpdateSchema.memberId,
         castawayId: selectionUpdateSchema.castawayId,
@@ -51,7 +51,7 @@ export default async function chooseCastawayLogic(
       .where(gte(episodeSchema.airDate, fortyEightHoursAgo));
 
     // Then check if they have made a new selection
-    const allMadeNewSelection = await db
+    const allMadeNewSelection = await trx
       .select({ memberId: selectionUpdateSchema.memberId })
       .from(selectionUpdateSchema)
       .where(and(
@@ -83,7 +83,7 @@ export default async function chooseCastawayLogic(
     if (league.status === 'Inactive') throw new Error('League is inactive');
 
     // Get next episode
-    const { nextEpisode } = await getKeyEpisodes(league.seasonId);
+    const { nextEpisode } = await getKeyEpisodes(league.seasonId, trx);
     if (!nextEpisode) throw new Error('No upcoming episode found');
 
     // Check if castaway is eliminated

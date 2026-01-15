@@ -6,13 +6,21 @@ import { type NavLinkProps } from '~/components/nav/navSelector';
 import { cn } from '~/lib/utils';
 import { usePathname } from 'next/navigation';
 
-export default function SideNavLink({ href, icon, label, pathnameMatch, className }: NavLinkProps) {
+export default function SideNavLink({
+  href,
+  icon,
+  label,
+  pathnameMatch,
+  className,
+  children
+}: NavLinkProps) {
   const pathname = usePathname();
 
   const active = pathnameMatch
     ? pathname.includes(pathnameMatch)
     : pathname === href;
 
+  const Icon = icon;
   return (
     <SidebarMenuButton className='h-10!' asChild size='lg'>
       <Link
@@ -21,7 +29,11 @@ export default function SideNavLink({ href, icon, label, pathnameMatch, classNam
           active && 'font-semibold',
           className)}
         href={href}>
-        {icon}
+        {Icon ? (
+          <Icon size={26} className='stroke-primary' />
+        ) : (
+          children
+        )}
         {label}
       </Link>
     </SidebarMenuButton>
