@@ -253,12 +253,14 @@ export type SelectionTimeline = Record<number, (number | null)[]>;
 
 /**
   * Selection timelines for both member->castaway and castaway->member selections.
+  * As well as secondary picks which are also optional member->castaway selections.
   * The keys are member IDs or castaway IDs, and the values are arrays of selected IDs with index
   * representing the episode number.
   * ---
   * For example:
   * [memberCastaways][[memberId]][[3]] gives the [castawayId] selected by [memberId] in episode [3]
   * [castawayMembers][[castawayId]][[5]] gives the [memberId] who selected [castawayId] in episode [5]
+  * [secondaryPicks][[memberId]][[2]] gives the [castawayId] selected as secondary pick by [memberId] in episode [2]
   * ---
   * If a castaway is available (not selected) in an episode, the value is [null].
   * When a member has no selection in an episode, the value is [null].

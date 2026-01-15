@@ -110,12 +110,10 @@ async function checkLockoutPeriod(
     const previousPick = await trx
       .select()
       .from(secondaryPickSchema)
-      .where(
-        and(
-          eq(secondaryPickSchema.memberId, memberId),
-          eq(secondaryPickSchema.castawayId, castawayId)
-        )
-      )
+      .where(and(
+        eq(secondaryPickSchema.memberId, memberId),
+        eq(secondaryPickSchema.castawayId, castawayId)
+      ))
       .then(rows => rows[0]);
 
     return previousPick ? 999 : 0; // Return large number if locked out forever
@@ -126,12 +124,10 @@ async function checkLockoutPeriod(
     .select({ episodeNumber: episodeSchema.episodeNumber })
     .from(secondaryPickSchema)
     .innerJoin(episodeSchema, eq(episodeSchema.episodeId, secondaryPickSchema.episodeId))
-    .where(
-      and(
-        eq(secondaryPickSchema.memberId, memberId),
-        eq(secondaryPickSchema.castawayId, castawayId)
-      )
-    )
+    .where(and(
+      eq(secondaryPickSchema.memberId, memberId),
+      eq(secondaryPickSchema.castawayId, castawayId)
+    ))
     .orderBy(episodeSchema.episodeNumber);
 
   const lastPickEpisode = recentPicks[recentPicks.length - 1]?.episodeNumber;
