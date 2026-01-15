@@ -132,7 +132,7 @@ export default function MemberRow({
                   className='cursor-pointer stroke-muted-foreground hover:stroke-primary transition-colors' />
               </PopoverTrigger>
               <PopoverContent
-                className='p-3 space-y-2 border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card'
+                className='p-3 space-y-2 border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card w-full'
                 align='end'>
                 <div className='text-sm font-bold uppercase tracking-wider text-center'>Selection History</div>
                 <Separator className='bg-primary/20' />

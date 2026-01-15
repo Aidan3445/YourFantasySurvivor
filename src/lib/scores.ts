@@ -227,8 +227,6 @@ export function compileScores(
         // Apply multiplier
         const secondaryPoints = Math.floor(castawayPoints * rules.secondaryPick!.multiplier);
 
-        console.log(`Member ${mid} secondary pick Castaway ${castawayId} Episode ${episodeNum} base points: ${castawayPoints}, secondary points: ${secondaryPoints}`);
-
         if (secondaryPoints !== 0) {
           scores.Member[mid] ??= [];
           scores.Member[mid][episodeNum] ??= 0;

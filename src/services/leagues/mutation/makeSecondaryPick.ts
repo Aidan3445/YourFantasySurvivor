@@ -8,6 +8,7 @@ import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { type DBTransaction } from '~/types/server';
 import getLeagueRules from '~/services/leagues/query/rules';
+import { MAX_SEASON_LENGTH } from '~/lib/leagues';
 
 /**
   * Make or update a secondary pick for a league member
@@ -32,10 +33,18 @@ export default async function makeSecondaryPick(
   }
 
   return await db.transaction(async (trx) => {
-    const { previousEpisode, nextEpisode } = await getKeyEpisodes(auth.leagueId, trx);
+    const { previousEpisode, nextEpisode } = await getKeyEpisodes(auth.seasonId, trx);
 
-    if (previousEpisode?.airStatus !== 'Aired') {
+    if (previousEpisode?.airStatus === 'Airing') {
       throw new Error('Cannot make secondary pick while an episode is airing');
+    }
+
+    if (!nextEpisode) {
+      console.error('No upcoming episode found for secondary pick', {
+        previousEpisode,
+        nextEpisode,
+      });
+      throw new Error('No upcoming episode found to make a secondary pick for');
     }
 
     if (!settings.canPickOwnSurvivor) {
@@ -54,7 +63,11 @@ export default async function makeSecondaryPick(
     );
 
     if (lockoutViolation > 0) {
-      throw new Error(`This castaway is locked out for ${lockoutViolation} more episode${lockoutViolation > 1 ? 's' : ''}`);
+      if (settings.lockoutPeriod === MAX_SEASON_LENGTH) {
+        throw new Error('You have already selected this castaway as a secondary pick and cannot select them again this season');
+      }
+
+      throw new Error(`You must wait ${lockoutViolation} more episode(s) before selecting this castaway again as a secondary pick this season`);
     }
 
     await db
@@ -105,7 +118,7 @@ async function checkLockoutPeriod(
 ): Promise<number> {
   if (lockoutPeriod === 0) return 0;
 
-  if (lockoutPeriod === 14) {
+  if (lockoutPeriod === MAX_SEASON_LENGTH) {
     // Never repeat - check if ever selected
     const previousPick = await trx
       .select()
