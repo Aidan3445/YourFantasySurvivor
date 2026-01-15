@@ -1,6 +1,6 @@
 import z from 'zod';
 import { EventTypes, PredictionTimings, ReferenceTypes, ScoringBaseEventNames } from '~/lib/events';
-import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, MAX_SURVIVAL_CAP, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings, type LeagueStatuses, MAX_SECONDARY_PICK_LOCKOUT_PERIOD } from '~/lib/leagues';
+import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings, type LeagueStatuses, MAX_SEASON_LENGTH } from '~/lib/leagues';
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
@@ -83,8 +83,8 @@ export const LeagueDetailsUpdateZod = z.object({
 export type LeagueDetailsUpdate = z.infer<typeof LeagueDetailsUpdateZod>;
 
 export const SurvivalCapZod = z.coerce.number().int()
-  .gte(0, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SURVIVAL_CAP}` })
-  .lte(MAX_SURVIVAL_CAP, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SURVIVAL_CAP}` });
+  .gte(0, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SEASON_LENGTH}` })
+  .lte(MAX_SEASON_LENGTH, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SEASON_LENGTH}` });
 
 export const LeagueSurvivalUpdateZod = z.object({
   survivalCap: SurvivalCapZod,
@@ -95,7 +95,7 @@ export type LeagueSurvivalUpdate = z.infer<typeof LeagueSurvivalUpdateZod>;
 export const SecondaryPickSettingsZod = z.object({
   enabled: z.boolean(),
   canPickOwnSurvivor: z.boolean(),
-  lockoutPeriod: z.coerce.number().int().min(0).max(MAX_SECONDARY_PICK_LOCKOUT_PERIOD),
+  lockoutPeriod: z.coerce.number().int().min(0).max(MAX_SEASON_LENGTH),
   publicPicks: z.boolean(),
   multiplier: z.union([
     z.literal(0.25),
@@ -104,7 +104,6 @@ export const SecondaryPickSettingsZod = z.object({
     z.literal(1)
   ]),
 });
-export type SecondaryPickSettingsUpdate = z.infer<typeof SecondaryPickSettingsZod>;
 
 export const EventPointsZod = z.coerce.number().int()
   .gte(-ABS_MAX_EVENT_POINTS, { message: `Points must be between -${ABS_MAX_EVENT_POINTS} and ${ABS_MAX_EVENT_POINTS}` })

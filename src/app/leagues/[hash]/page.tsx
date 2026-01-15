@@ -12,6 +12,7 @@ import Predictions from '~/components/leagues/hub/picks/predictions/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
+import SecondaryPickSettings from '~/components/leagues/customization/settings/secondaryPick/view';
 import getLeague from '~/services/leagues/query/legaue';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
@@ -76,6 +77,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
               </div>
             </>}
             <SetSurvivalCap />
+            <SecondaryPickSettings />
             <LeagueScoring />
             <ShauhinMode />
             <CustomEvents />
