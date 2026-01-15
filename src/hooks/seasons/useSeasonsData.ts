@@ -42,9 +42,8 @@ export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
       // Check if there's an active dev override
       const overrideConfig = loadOverrideConfig();
 
-      if (!overrideConfig?.enabled) {
-        return data;
-      }
+      if (!overrideConfig?.enabled) return data;
+      
 
       // Apply override to matching season data
       return data.map(seasonData => {

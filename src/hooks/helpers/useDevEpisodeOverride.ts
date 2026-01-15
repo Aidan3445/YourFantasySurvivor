@@ -19,6 +19,8 @@ const formSchema = z.object({
   nextEpisodeId: z.number().nullable(),
   mergeEpisodeId: z.number().nullable(),
   previousAirStatus: z.enum(['Aired', 'Airing']),
+  leagueStatus: z.enum(['Predraft', 'Draft', 'Active', 'Inactive']),
+  startWeek: z.number(),
 }).refine((data) => {
   // If both previous and next are set, validate that previous < next
   if (data.previousEpisodeId === null || data.nextEpisodeId === null) {
@@ -47,6 +49,8 @@ export function useDevEpisodeOverride() {
       nextEpisodeId: null,
       mergeEpisodeId: null,
       previousAirStatus: 'Aired',
+      leagueStatus: 'Active',
+      startWeek: 1,
     },
   });
 
@@ -144,6 +148,8 @@ export function useDevEpisodeOverride() {
       form.setValue('nextEpisodeId', config.nextEpisodeId);
       form.setValue('mergeEpisodeId', config.mergeEpisodeId);
       form.setValue('previousAirStatus', config.previousAirStatus);
+      form.setValue('leagueStatus', config.leagueStatus);
+      form.setValue('startWeek', config.startWeek);
     }
   }, [form]);
 

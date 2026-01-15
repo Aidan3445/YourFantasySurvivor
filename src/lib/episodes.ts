@@ -1,3 +1,7 @@
+import { type KeyEpisodes } from '~/types/episodes';
+import { type PredictionTiming } from '~/types/events';
+import { type LeagueStatus } from '~/types/leagues';
+
 export const AirStatuses = ['Aired', 'Upcoming', 'Airing'] as const;
 
 export type AirStatus = (typeof AirStatuses)[number];
@@ -94,3 +98,56 @@ export function getAirStatusPollingInterval(episodes: { airDate: Date; runtime: 
 
   return Math.floor(interval);
 }
+
+
+/**
+  * Get the active prediction timings for a league based on key episodes and league status
+  * @param keyEpisodes The key episodes for the league's season
+  * @param leagueStatus The current status of the league
+  * @param startWeek The league's start week
+  * @returns Array of active prediction timings
+  */
+export function getActiveTimings({
+  keyEpisodes,
+  leagueStatus,
+  startWeek,
+}: {
+  keyEpisodes: KeyEpisodes
+  leagueStatus: LeagueStatus,
+  startWeek: number | null,
+}) {
+  const { previousEpisode, nextEpisode, mergeEpisode } = keyEpisodes;
+
+  const timings: PredictionTiming[] = ['Weekly'];
+  // Draft takes precedence if included in the list: 
+  // - if the league is in draft status
+  // - if there are no previous episodes
+  // - if the draft date is after the last aired episode
+  if (leagueStatus === 'Draft' || !previousEpisode || startWeek === nextEpisode?.episodeNumber) {
+    timings.push('Draft');
+  }
+
+  // Weekly premerge only if included in the list and no merge episode
+  if (!mergeEpisode) {
+    timings.push('Weekly (Premerge only)');
+  }
+
+  // Weekly postmerge only if included in the list and merge episode exists
+  if (mergeEpisode) {
+    timings.push('Weekly (Postmerge only)');
+  }
+
+  // After merge only if included in the list and merge episode is last aired
+  if (previousEpisode?.isMerge) {
+    timings.push('After Merge');
+  }
+
+  // Before finale only if included in the list and next episode is the finale
+  if (nextEpisode?.isFinale) {
+    timings.push('Before Finale');
+  }
+
+  return timings;
+}
+
+

@@ -258,6 +258,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
     predictionRuleCount,
     settings,
     predictionsMade,
+    basePredictionsMade,
     selectionTimeline,
     keyEpisodes,
     dialogOpen,

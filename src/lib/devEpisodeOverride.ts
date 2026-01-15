@@ -19,7 +19,9 @@ export function loadOverrideConfig(): EpisodeOverrideConfig | null {
     if (
       typeof config.seasonId !== 'number' ||
       typeof config.enabled !== 'boolean' ||
-      !['Aired', 'Airing'].includes(config.previousAirStatus)
+      !['Aired', 'Airing'].includes(config.previousAirStatus) ||
+      !['Predraft', 'Draft', 'Active', 'Inactive'].includes(config.leagueStatus) ||
+      typeof config.startWeek !== 'number'
     ) {
       console.warn('Invalid override config found, clearing...');
       clearOverrideConfig();

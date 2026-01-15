@@ -2,6 +2,7 @@
 
 import { Button } from '~/components/common/button';
 import { Switch } from '~/components/common/switch';
+import { Input } from '~/components/common/input';
 import { SidebarMenuButton } from '~/components/common/sidebar';
 import {
   AlertDialog,
@@ -224,6 +225,56 @@ export default function DevEpisodeOverride() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* League Status */}
+              <FormField
+                control={form.control}
+                name='leagueStatus'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>
+                      League Status
+                    </FormLabel>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}>
+                      <FormControl>
+                        <SelectTrigger className='border-2 border-primary/20'>
+                          <SelectValue placeholder='Select league status' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value='Predraft'>Predraft</SelectItem>
+                        <SelectItem value='Draft'>Draft</SelectItem>
+                        <SelectItem value='Active'>Active</SelectItem>
+                        <SelectItem value='Inactive'>Inactive</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
+              {/* Start Week */}
+              <FormField
+                control={form.control}
+                name='startWeek'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>
+                      Start Week
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        min='1'
+                        className='border-2 border-primary/20'
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
                   </FormItem>
                 )}
               />

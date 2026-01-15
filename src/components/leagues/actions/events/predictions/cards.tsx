@@ -10,6 +10,7 @@ import { type MakePredictionsProps } from '~/components/leagues/actions/events/p
 import { type ScoringBaseEventName, type ReferenceType, type MakePrediction } from '~/types/events';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useShauhinActive } from '~/hooks/leagues/enrich/useShauhinActive';
+import { loadOverrideConfig } from '~/lib/devEpisodeOverride';
 
 export default function PredictionCards({
   rules,
@@ -21,6 +22,7 @@ export default function PredictionCards({
   setBetTotal,
   className
 }: MakePredictionsProps) {
+  const { enabled: devConfig } = loadOverrideConfig() ?? {};
   const shauhinActive = useShauhinActive();
 
   const enabledBasePredictions = useMemo(() =>
@@ -78,7 +80,7 @@ export default function PredictionCards({
       'Castaway' : 'Direct Castaway';
 
     castaways.forEach((castaway) => {
-      if (castaway.eliminatedEpisode) return;
+      if (!devConfig && castaway.eliminatedEpisode) return;
       const tribe = castaway.tribe;
       options[castawayKey][castaway.fullName] = {
         id: castaway.castawayId,
@@ -96,7 +98,7 @@ export default function PredictionCards({
       });
     }
     return options;
-  }, [castaways, tribes]);
+  }, [castaways, tribes, devConfig]);
 
   const [formBetValues, setFormBetValues] = useState<Record<string, number>>({});
   const updateFormBetValue = useCallback((eventName: string, bet: number) => {

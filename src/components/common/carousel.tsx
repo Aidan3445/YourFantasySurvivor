@@ -307,7 +307,7 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                 'will-change-transform transform-gpu',
                 'z-10 transition-all duration-400 drop-shadow-md bg-secondary rounded-md',
                 'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
-                'basis-[90%] lg:basis-1/2',
+                'basis-[90%] lg:basis-2/3 xl:basis-1/2',
                 {
                   'pointer-events-none': offset !== 0,
 

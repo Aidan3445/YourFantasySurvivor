@@ -7,15 +7,18 @@ import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails'
 import { useMemo, useState } from 'react';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { cn } from '~/lib/utils';
-import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
 import { Card, CardContent, CardHeader } from '~/components/common/card';
 
 export default function MakePredictions() {
   const { scores, leagueMembers } = useLeagueData();
-  const { actionDetails, predictionRuleCount, keyEpisodes, predictionsMade, rules } = useLeagueActionDetails();
-  const { basePredictionsMade } = usePredictionsMade();
-
-  console.log('K', keyEpisodes);
+  const {
+    actionDetails,
+    predictionRuleCount,
+    keyEpisodes,
+    predictionsMade,
+    basePredictionsMade,
+    rules
+  } = useLeagueActionDetails();
 
   const castaways = useMemo(() =>
     Object.values(actionDetails ?? {})
