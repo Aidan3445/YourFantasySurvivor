@@ -124,7 +124,6 @@ export default function ChangeCastaway() {
       .find(mwp => mwp.member.memberId === memberId && !mwp.out);
 
     if (currentPick?.secondary) {
-      console.log('Setting initial secondary pick to', currentPick.secondary);
       const secondaryId = `${currentPick.secondary.castawayId}`;
       setSecondarySelected(secondaryId);
       setInitialSecondaryPick(secondaryId);

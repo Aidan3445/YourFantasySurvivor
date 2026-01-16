@@ -230,10 +230,7 @@ export function compileScores(
         // Apply multiplier
         const secondaryPoints = castawayPoints * rules.secondaryPick!.multiplier;
 
-        console.log({ castawayPoints, secondaryPoints, multiplier: rules.secondaryPick!.multiplier });
         if (secondaryPoints !== 0) {
-          console.log(`Member ${mid} earns ${secondaryPoints} secondary points for Castaway ${castawayId} in Episode ${episodeNum}`);
-
           scores.Member[mid] ??= [];
           scores.Member[mid][episodeNum] ??= 0;
           scores.Member[mid][episodeNum] += secondaryPoints;

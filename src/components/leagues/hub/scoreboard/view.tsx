@@ -24,8 +24,11 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
     selectionTimeline,
     castaways,
     currentStreaks,
-    leagueRules
+    leagueRules,
+    keyEpisodes
   } = useLeagueData(overrideHash);
+
+  const episodeNum = keyEpisodes?.nextEpisode?.episodeNumber ?? 0;
 
   return (
     <div className='w-full'>
@@ -60,16 +63,16 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
                 loggedInIndex >= maxRows ? index >= maxRows - 1 : index >= maxRows
               )) return null;
 
-              const castawayId = selectionTimeline?.memberCastaways?.[member.memberId]?.slice()
-                .pop();
+              const castawayId = selectionTimeline?.memberCastaways?.[member.memberId]?.
+                slice(0, episodeNum + 1).pop();
+              console.log('member', { episodeNum, memberId: member.memberId, castawayId, sel: selectionTimeline?.memberCastaways?.[member.memberId] });
               const castaway = castawayId !== undefined ?
                 (castaways?.find((c) => c.castawayId === castawayId)) : undefined;
               const selectionList = selectionTimeline?.memberCastaways?.[member.memberId]?.map(
                 (id) => castaways?.find((c) => c.castawayId === id) ?? null) ?? [];
               let secondaryPick: EnrichedCastaway | null | undefined = undefined;
               const findSecondaryPick = castaways?.find((c) =>
-                c.castawayId === selectionTimeline?.secondaryPicks?.[member.memberId]?.[scores.length]
-              );
+                c.castawayId === selectionTimeline?.secondaryPicks?.[member.memberId]?.[episodeNum]);
               if (findSecondaryPick) {
                 secondaryPick = findSecondaryPick;
               } else if (!leagueRules?.secondaryPick?.publicPicks && loggedInIndex !== index) {

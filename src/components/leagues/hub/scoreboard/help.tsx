@@ -41,10 +41,13 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
               <div className='font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1'>
                 Secondary Column
               </div>
-              <div className='flex items-center gap-2 mb-2'>
+              <div className='flex items-center gap-2'>
                 <span className='font-medium'>Rob Cesternino</span>
                 <span className='text-muted-foreground text-xs'>Your current secondary pick</span>
               </div>
+              <span className='text-muted-foreground text-xs'>
+                Other member&apos;s secondaries may be hidden between episodes based on league settings
+              </span>
             </div>
           )}
 
@@ -98,7 +101,7 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
             <div className='grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-xs'>
               <ColorRow
                 className='px-2 justify-center font-medium text-xs'
-                color='#3ADA00'>
+                color='#FF90CC'>
                 First Pick
               </ColorRow>
               <div className='flex gap-1 items-center text-nowrap font-medium'>
@@ -108,7 +111,7 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
               </div>
               <ColorRow
                 className='px-2 justify-center font-medium text-xs'
-                color='#FF90CC'>
+                color='#3ADA00'>
                 Current Pick
               </ColorRow>
               <div className='flex gap-1 items-center text-nowrap font-medium'>

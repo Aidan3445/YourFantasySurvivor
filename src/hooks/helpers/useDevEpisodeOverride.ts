@@ -269,6 +269,7 @@ export function useDevEpisodeOverride() {
       void queryClient.invalidateQueries({ queryKey: ['episodes', config.seasonId] });
       void queryClient.invalidateQueries({ queryKey: ['episodes', config.seasonId, 'key'] });
       void queryClient.invalidateQueries({ queryKey: ['seasons'] });
+      void queryClient.invalidateQueries({ queryKey: ['league', hash] });
     }
 
     alert('Episode override cleared');
@@ -290,6 +291,7 @@ export function useDevEpisodeOverride() {
       void queryClient.invalidateQueries({ queryKey: ['episodes', config.seasonId] });
       void queryClient.invalidateQueries({ queryKey: ['episodes', config.seasonId, 'key'] });
       void queryClient.invalidateQueries({ queryKey: ['seasons'] });
+      void queryClient.invalidateQueries({ queryKey: ['league', hash] });
     }
   };
 
