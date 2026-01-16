@@ -122,7 +122,7 @@ export default function MemberRow({
           </span>
         </CastawayPopover>
       </TableCell>
-      {leagueSettings?.secondaryPickEnabled && secondaryPick ? (
+      {leagueSettings?.secondaryPickEnabled && (secondaryPick ? (
         <TableCell className='text-nowrap px-3 py-3 w-0'>
           <CastawayPopover castaway={secondaryPick}>
             <span
@@ -138,7 +138,7 @@ export default function MemberRow({
         <TableCell className='px-3 py-3 w-0 text-left text-muted-foreground italic'>
           {secondaryPick === null ? 'Hidden' : 'Pending'}...
         </TableCell>
-      )}
+      ))}
       <TableCell className='w-0'>
         <div className='flex gap-1 items-center justify-end'>
           <TribeHistoryCircles

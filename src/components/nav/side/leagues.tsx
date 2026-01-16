@@ -47,10 +47,10 @@ export default function SideNavLeagues() {
       onValueChange={() => toggleOpen()}>
       <AccordionItem value='leagues'>
         <SidebarMenuButton className='h-10!' asChild size='lg'>
-          <AccordionTrigger className='hover:no-underline font-normal data-[state=open]:mb-0 transition-all stroke-primary'>
+          <AccordionTrigger className='hover:no-underline font-normal mb-1 data-[state=open]:mb-0 transition-all stroke-primary'>
             <span className={cn(
               'w-full flex gap-5 items-center text-primary transition-all',
-              !open && leaguePath ? 'font-semibold' : ''
+              !open && leaguePath && 'font-semibold'
             )}>
               <Trophy size={26} className='stroke-primary' />
               Leagues

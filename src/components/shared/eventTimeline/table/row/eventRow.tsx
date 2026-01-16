@@ -12,6 +12,7 @@ import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { getContrastingColor } from '@uiw/color-convert';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 
 interface EventRowProps {
   className?: string;
@@ -85,18 +86,46 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
           'flex flex-col text-xs h-full gap-0.5',
           event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.member)) && 'justify-center')}>
           {event.referenceMap?.map(({ pairs }, index) =>
-            pairs.map(({ castaway, member }) =>
-              member ?
-                <ColorRow
-                  key={member.memberId}
-                  className='leading-tight px-1 w-min'
-                  color={member.color}>
-                  {member.displayName}
-                </ColorRow> :
-                <ColorRow className='invisible leading-tight px-1 w-min' key={`${castaway.castawayId}-${index}`}>
-                  None
-                </ColorRow>
-            )
+            pairs.map(({ castaway, member }) => (
+              <div key={`${castaway.castawayId}-${index}`} className='flex gap-1 items-start'>
+                {member ? (
+                  <ColorRow
+                    className='leading-tight px-1 w-min h-min'
+                    color={member.color}>
+                    {member.displayName}
+                  </ColorRow>
+                ) : (
+                  <ColorRow className='invisible leading-tight px-1 w-min' key={`${castaway.castawayId}-${index}`}>
+                    None
+                  </ColorRow>
+                )}
+                <Accordion type='single' collapsible>
+                  <AccordionItem value='secondaries' className='border-none'>
+                    <AccordionTrigger className='p-0 text-xs leading-tight text-muted-foreground stroke-muted-foreground'>
+                      secondaries
+                    </AccordionTrigger>
+                    <AccordionContent className='p-0'>
+                      <div className='flex flex-col gap-0.5'>
+                        <span className='text-xs flex gap-1 items-center opacity-60'>
+                          <ColorRow
+                            className='leading-tight px-1 w-min'
+                            color={'#A769A2'}>
+                            Member 1
+                          </ColorRow>
+                        </span>
+                        <span className='text-xs flex gap-1 items-center opacity-60'>
+                          <ColorRow
+                            className='leading-tight px-1 w-min'
+                            color={'#0769A2'}>
+                            Member 2
+                          </ColorRow>
+                        </span>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            ))
           )}
         </div>
       </TableCell>}

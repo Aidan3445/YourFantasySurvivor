@@ -28,7 +28,7 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
     keyEpisodes
   } = useLeagueData(overrideHash);
 
-  const episodeNum = keyEpisodes?.nextEpisode?.episodeNumber ?? 0;
+  const episodeNum = keyEpisodes?.nextEpisode?.episodeNumber ?? Infinity;
 
   return (
     <div className='w-full'>
@@ -65,7 +65,6 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
 
               const castawayId = selectionTimeline?.memberCastaways?.[member.memberId]?.
                 slice(0, episodeNum + 1).pop();
-              console.log('member', { episodeNum, memberId: member.memberId, castawayId, sel: selectionTimeline?.memberCastaways?.[member.memberId] });
               const castaway = castawayId !== undefined ?
                 (castaways?.find((c) => c.castawayId === castawayId)) : undefined;
               const selectionList = selectionTimeline?.memberCastaways?.[member.memberId]?.map(
