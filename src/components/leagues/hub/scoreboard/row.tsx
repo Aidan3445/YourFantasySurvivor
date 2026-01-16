@@ -188,7 +188,7 @@ export default function MemberRow({
                         </ColorRow>
                         <div className='flex gap-1 items-center text-nowrap font-medium'>
                           <MoveRight className='w-4 h-4 shrink-0' />
-                          {index}
+                          {index + 1}
                         </div>
                       </span>
                     ))}

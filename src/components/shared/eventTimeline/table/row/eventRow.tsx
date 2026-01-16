@@ -12,7 +12,9 @@ import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { getContrastingColor } from '@uiw/color-convert';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
+import { PopoverArrow } from '@radix-ui/react-popover';
+import { Button } from '~/components/common/button';
 
 interface EventRowProps {
   className?: string;
@@ -86,44 +88,48 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
           'flex flex-col text-xs h-full gap-0.5',
           event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.member)) && 'justify-center')}>
           {event.referenceMap?.map(({ pairs }, index) =>
-            pairs.map(({ castaway, member }) => (
-              <div key={`${castaway.castawayId}-${index}`} className='flex gap-1 items-start'>
+            pairs.map(({ castaway, member, secondaries }) => (
+              <div key={`${castaway.castawayId}-${index}`} className='flex gap-1 items-center'>
                 {member ? (
                   <ColorRow
-                    className='leading-tight px-1 w-min h-min'
+                    className='leading-tight px-1 w-min'
                     color={member.color}>
                     {member.displayName}
                   </ColorRow>
                 ) : (
-                  <ColorRow className='invisible leading-tight px-1 w-min' key={`${castaway.castawayId}-${index}`}>
+                  <ColorRow className={cn(
+                    'leading-tight px-1 w-min text-muted-foreground border-dashed',
+                    secondaries?.length === 0 && 'invisible'
+                  )}>
                     None
                   </ColorRow>
                 )}
-                <Accordion type='single' collapsible>
-                  <AccordionItem value='secondaries' className='border-none'>
-                    <AccordionTrigger className='p-0 text-xs leading-tight text-muted-foreground stroke-muted-foreground'>
-                      secondaries
-                    </AccordionTrigger>
-                    <AccordionContent className='p-0'>
-                      <div className='flex flex-col gap-0.5'>
-                        <span className='text-xs flex gap-1 items-center opacity-60'>
+                {secondaries && secondaries.length > 0 && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='p-0 gap-0 py-0! h-min items-start rounded border-primary/20 text-muted-foreground'>
+                        2<span className='text-[0.6rem] text-inherit font-normal'>nd</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2' side='left' sideOffset={-3}>
+                      <PopoverArrow className='fill-primary' />
+                      <div className='text-sm font-semibold uppercase tracking-wide text-center'>Secondaries</div>
+                      <div className='flex flex-col gap-1 text-xs'>
+                        {secondaries.map((secMember) => (
                           <ColorRow
+                            key={`secondary-${secMember.memberId}`}
                             className='leading-tight px-1 w-min'
-                            color={'#A769A2'}>
-                            Member 1
+                            color={secMember.color}>
+                            {secMember.displayName}
                           </ColorRow>
-                        </span>
-                        <span className='text-xs flex gap-1 items-center opacity-60'>
-                          <ColorRow
-                            className='leading-tight px-1 w-min'
-                            color={'#0769A2'}>
-                            Member 2
-                          </ColorRow>
-                        </span>
+                        ))}
                       </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
+                    </PopoverContent>
+                  </Popover>
+                )}
               </div>
             ))
           )}

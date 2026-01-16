@@ -128,15 +128,28 @@ export function useEnrichEvents(
 
           const eliminatedEpisode = lookupMaps.eliminationEpisodes.get(castawayId) ?? null;
 
+          const secondaries = Object.entries(selectionTimeline?.secondaryPicks ?? {})
+            .filter(([, picks]) => {
+              const pick = picks[episodeNumber];
+              return pick === castawayId;
+            })
+            .map(([memberIdStr]) => {
+              const member = lookupMaps.membersById.get(parseInt(memberIdStr));
+              return member;
+            })
+            .filter((m): m is LeagueMember => m !== undefined);
+
           const castawayWithTribe: EnrichedCastaway = {
             ...castaway,
-            tribe: tribe ? { name: tribe.tribeName, color: tribe.tribeColor } : createTribeFinder(castawayId, episodeNumber),
+            tribe: tribe
+              ? { name: tribe.tribeName, color: tribe.tribeColor }
+              : createTribeFinder(castawayId, episodeNumber),
             eliminatedEpisode
           };
 
-          return { castaway: castawayWithTribe, member };
+          return { castaway: castawayWithTribe, member, secondaries };
         })
-        .filter((pair): pair is NonNullable<typeof pair> => pair !== null);
+        .filter(pair => pair !== null);
     };
 
     return events
@@ -186,6 +199,6 @@ export function useEnrichEvents(
           referenceMap,
         } as EnrichedEvent;
       })
-      .filter((event): event is EnrichedEvent => event !== null);
+      .filter(event => event !== null);
   }, [events, tribesTimeline, selectionTimeline, lookupMaps, createTribeFinder, pointsLookup, eliminations]);
 }
