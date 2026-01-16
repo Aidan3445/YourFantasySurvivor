@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
+import { loadOverrideConfig } from '~/lib/devEpisodeOverride';
 import { type League } from '~/types/leagues';
 
 /**
@@ -22,6 +23,25 @@ export function useLeague(overrideHash?: string) {
         throw new Error('Failed to fetch league');
       }
       return response.json() as Promise<League>;
+    },
+    select: (data) => {
+      // Check if there's an active dev override
+      const overrideConfig = loadOverrideConfig();
+
+      if (!overrideConfig?.enabled) return data;
+
+      // Apply override to matching league
+      if (data.seasonId !== overrideConfig.seasonId) {
+        return data;
+      }
+
+      const overriddenLeague = {
+        ...data,
+        status: overrideConfig.leagueStatus,
+        startWeek: overrideConfig.startWeek,
+      };
+
+      return overriddenLeague;
     },
     enabled: !!hash,
     staleTime: (query) => {

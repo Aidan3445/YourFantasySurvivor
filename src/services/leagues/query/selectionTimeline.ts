@@ -7,6 +7,7 @@ import { leagueMemberSchema, selectionUpdateSchema, secondaryPickSchema } from '
 import { type SelectionUpdate } from '~/types/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type SelectionTimeline, type SelectionTimelines } from '~/types/leagues';
+import { leagueSettingsSchema } from '~/server/db/schema/leagues';
 
 /**
   * Get the selection timeline for a league
@@ -41,13 +42,15 @@ export default async function getSelectionTimeline(auth: VerifiedLeagueMemberAut
     .from(secondaryPickSchema)
     .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, secondaryPickSchema.memberId))
     .innerJoin(episodeSchema, eq(episodeSchema.episodeId, secondaryPickSchema.episodeId))
+    .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueMemberSchema.leagueId))
     .where(and(
       eq(leagueMemberSchema.leagueId, auth.leagueId),
+      eq(leagueSettingsSchema.secondaryPickEnabled, true),
       or(
         lte(episodeSchema.airDate, new Date().toISOString()), // only past episodes
-        eq(secondaryPickSchema.memberId, auth.memberId) // or picks by the requesting member
-      )
-    ));
+        eq(secondaryPickSchema.memberId, auth.memberId), // or picks by the requesting member
+        eq(leagueSettingsSchema.secondaryPickPublicPicks, true)
+      )));
 
   const secondarySelections = processSecondaryPickTimeline(secondaryPicks);
 

@@ -20,48 +20,67 @@ export default function Chart() {
     startWeek: league?.startWeek ?? 1
   }), [data, league?.startWeek]);
 
+  const maxY = useMemo(() => {
+    let max = 0;
+    data.forEach(({ episodeScores }) => {
+      episodeScores.forEach((score) => {
+        if (score > max) {
+          max = score;
+        }
+      });
+    });
+    return max;
+  }, [data]);
+
   return (
     <div className='w-full h-full rounded-lg bg-card'>
-      <LineChart
-        xAxis={[{
-          data: xAxisData,
-          label: 'Episode',
-          scaleType: 'point',
-        }]}
-        yAxis={[{
-          label: 'Points',
-        }]}
-        margin={{ top: 0, right: 24, bottom: 0, left: 24 }}
-        series={series}
-        grid={{ horizontal: true }}
-        slots={{
-          tooltip: CustomTooltip,
-        }}
-        slotProps={{
-          legend: {
-            position: { horizontal: 'center' },
-          },
-        }}
-        sx={{
-          '& .MuiLineElement-root': {
-            strokeWidth: 5,
-            strokeLinecap: 'round',
-            strokeOpacity: 0.7,
-          },
-          '& .MuiChartsGrid-line': {
-            stroke: '#4D4D4D',
-          },
-          '& .MuiChartsAxis-line': {
-            stroke: 'black',
-          },
-          '& .MuiChartsAxis-tick': {
-            stroke: 'black',
-          },
-          '& .MuiChartsAxis-tickLabel': {
-            fill: 'currentColor',
-          },
-        }}
-      />
+      {sortedMemberScores[0]?.scores?.[league?.startWeek ?? 1] === undefined ? (
+        <div className='w-full h-64 flex items-center justify-center text-muted-foreground'>
+          No scores available to display the chart.
+        </div>
+      ) : (
+        <LineChart
+          xAxis={[{
+            data: xAxisData,
+            label: 'Episode',
+            scaleType: 'point',
+          }]}
+          yAxis={[{
+            label: 'Points',
+            max: maxY * 1.1,
+          }]}
+          margin={{ top: 0, right: 24, bottom: 0, left: 12 }}
+          series={series}
+          grid={{ horizontal: true }}
+          slots={{
+            tooltip: CustomTooltip,
+          }}
+          slotProps={{
+            legend: {
+              position: { horizontal: 'center' },
+            },
+          }}
+          sx={{
+            '& .MuiLineElement-root': {
+              strokeWidth: 5,
+              strokeLinecap: 'round',
+              strokeOpacity: 0.7,
+            },
+            '& .MuiChartsGrid-line': {
+              stroke: '#4D4D4D',
+            },
+            '& .MuiChartsAxis-line': {
+              stroke: 'black',
+            },
+            '& .MuiChartsAxis-tick': {
+              stroke: 'black',
+            },
+            '& .MuiChartsAxis-tickLabel': {
+              fill: 'currentColor',
+            },
+          }}
+        />
+      )}
     </div >
   );
 }

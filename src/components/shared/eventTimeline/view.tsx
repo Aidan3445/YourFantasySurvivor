@@ -64,7 +64,7 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
           hideMemberFilter={hideMemberFilter} />
       </CardHeader>
 
-      <CardContent className='relative z-10 px-0'>
+      <CardContent className='relative z-10 p-0'>
         {selectedEpisode &&
           <EpisodeEvents
             episodeNumber={selectedEpisode}

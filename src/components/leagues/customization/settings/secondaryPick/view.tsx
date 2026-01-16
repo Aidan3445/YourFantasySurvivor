@@ -71,6 +71,13 @@ export default function SecondaryPickSettings() {
       <p className='text-sm mr-12 max-w-4xl'>
         The <i>Secondary Pick</i> allows members to choose an additional castaway between episodes to earn bonus points.
         Unlike the main draft, multiple members can select the same secondary for a given episode.
+        <br />
+        <span className='text-xs text-muted-foreground'>
+          <b className='text-inherit'>Note:</b> Your secondary
+          pick <b className='text-inherit'>does not</b> earn you survival points for staying in the game
+          <br /> and you <b className='text-inherit'>can</b> still make a secondary pick even if
+          your main survivor has been eliminated.
+        </span>
       </p>
       <br />
 

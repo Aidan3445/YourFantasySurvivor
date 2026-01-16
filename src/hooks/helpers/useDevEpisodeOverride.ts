@@ -12,6 +12,8 @@ import {
   saveOverrideConfig,
   clearOverrideConfig,
 } from '~/lib/devEpisodeOverride';
+import { useParams } from 'next/navigation';
+import { type League } from '~/types/leagues';
 
 const formSchema = z.object({
   seasonId: z.number(),
@@ -33,6 +35,9 @@ const formSchema = z.object({
 });
 
 export function useDevEpisodeOverride() {
+  const params = useParams();
+  const hash = params.hash as string;
+
   const [open, setOpen] = useState(false);
   const [overrideEnabled, setOverrideEnabled] = useState(false);
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
@@ -59,82 +64,95 @@ export function useDevEpisodeOverride() {
 
   const applyOverride = useCallback((config: EpisodeOverrideConfig) => {
     const episodesData = queryClient.getQueryData<Episode[]>(['episodes', config.seasonId]);
-    if (!episodesData) return;
+    if (episodesData) {
+      // Special case: if next is null, simulate empty episodes response
+      if (config.nextEpisodeId === null) {
+        queryClient.setQueryData(['episodes', config.seasonId], []);
+        queryClient.setQueryData(['episodes', config.seasonId, 'key'], {
+          previousEpisode: null,
+          nextEpisode: null,
+          mergeEpisode: null,
+        } as KeyEpisodes);
+        return;
+      }
 
-    // Special case: if next is null, simulate empty episodes response
-    if (config.nextEpisodeId === null) {
-      queryClient.setQueryData(['episodes', config.seasonId], []);
-      queryClient.setQueryData(['episodes', config.seasonId, 'key'], {
-        previousEpisode: null,
-        nextEpisode: null,
-        mergeEpisode: null,
-      } as KeyEpisodes);
-      return;
+      // Find episodes for comparisons
+      const previousEp = config.previousEpisodeId
+        ? episodesData.find(e => e.episodeId === config.previousEpisodeId)
+        : null;
+      const nextEp = config.nextEpisodeId
+        ? episodesData.find(e => e.episodeId === config.nextEpisodeId)
+        : null;
+      const mergeEp = config.mergeEpisodeId
+        ? episodesData.find(e => e.episodeId === config.mergeEpisodeId)
+        : null;
+
+      // Update all episodes
+      const updatedEpisodes = episodesData.map(ep => {
+        const updated = { ...ep };
+
+        // Update air status based on position
+        if (previousEp && ep.episodeId === config.previousEpisodeId) {
+          updated.airStatus = config.previousAirStatus;
+        } else if (nextEp && ep.episodeId === config.nextEpisodeId) {
+          updated.airStatus = 'Upcoming';
+        } else if (previousEp && ep.episodeNumber < previousEp.episodeNumber) {
+          updated.airStatus = 'Aired';
+        } else if (nextEp && ep.episodeNumber > nextEp.episodeNumber) {
+          updated.airStatus = 'Upcoming';
+        } else if (previousEp && nextEp && ep.episodeNumber > previousEp.episodeNumber && ep.episodeNumber < nextEp.episodeNumber) {
+          updated.airStatus = 'Upcoming';
+        }
+
+        // Update merge flag (only one episode can be merge)
+        if (mergeEp) {
+          updated.isMerge = ep.episodeId === config.mergeEpisodeId;
+          // If episode is now merge, turn off finale flag
+          if (updated.isMerge && updated.isFinale) {
+            updated.isFinale = false;
+          }
+        } else {
+          // If merge is null, no episode has merge flag
+          updated.isMerge = false;
+        }
+
+        return updated;
+      });
+
+      // Cancel any in-flight queries to prevent them from overwriting our override
+      void queryClient.cancelQueries({ queryKey: ['episodes', config.seasonId] });
+      void queryClient.cancelQueries({ queryKey: ['episodes', config.seasonId, 'key'] });
+      // Update episodes cache
+      queryClient.setQueryData(['episodes', config.seasonId], updatedEpisodes);
+      // Recalculate and update key episodes using shared lib function
+      const keyEpisodes = calculateKeyEpisodes(updatedEpisodes) as KeyEpisodes;
+      queryClient.setQueryData(['episodes', config.seasonId, 'key'], keyEpisodes);
+      // Invalidate and refetch to ensure all observers get updated
+      void queryClient.invalidateQueries({
+        queryKey: ['episodes', config.seasonId, 'key'],
+        refetchType: 'active' // Refetch active queries to trigger re-render
+      });
+      // Invalidate the seasons query to trigger useSeasonsData to refetch/reselect
+      void queryClient.invalidateQueries({ queryKey: ['seasons'] });
     }
 
-    // Find episodes for comparisons
-    const previousEp = config.previousEpisodeId
-      ? episodesData.find(e => e.episodeId === config.previousEpisodeId)
-      : null;
-    const nextEp = config.nextEpisodeId
-      ? episodesData.find(e => e.episodeId === config.nextEpisodeId)
-      : null;
-    const mergeEp = config.mergeEpisodeId
-      ? episodesData.find(e => e.episodeId === config.mergeEpisodeId)
-      : null;
+    // League override
+    const league = queryClient.getQueryData<League>(['league', hash]);
+    if (league?.seasonId === config.seasonId) {
+      const updatedLeague = {
+        ...league,
+        status: config.leagueStatus,
+        startWeek: config.startWeek,
+      };
+      // Cancel any in-flight league queries
+      void queryClient.cancelQueries({ queryKey: ['league', hash] });
+      // Update league cache
+      queryClient.setQueryData(['league', hash], updatedLeague);
+      // Invalidate to refetch
+      void queryClient.invalidateQueries({ queryKey: ['league', hash] });
+    }
 
-    // Update all episodes
-    const updatedEpisodes = episodesData.map(ep => {
-      const updated = { ...ep };
-
-      // Update air status based on position
-      if (previousEp && ep.episodeId === config.previousEpisodeId) {
-        updated.airStatus = config.previousAirStatus;
-      } else if (nextEp && ep.episodeId === config.nextEpisodeId) {
-        updated.airStatus = 'Upcoming';
-      } else if (previousEp && ep.episodeNumber < previousEp.episodeNumber) {
-        updated.airStatus = 'Aired';
-      } else if (nextEp && ep.episodeNumber > nextEp.episodeNumber) {
-        updated.airStatus = 'Upcoming';
-      } else if (previousEp && nextEp && ep.episodeNumber > previousEp.episodeNumber && ep.episodeNumber < nextEp.episodeNumber) {
-        updated.airStatus = 'Upcoming';
-      }
-
-      // Update merge flag (only one episode can be merge)
-      if (mergeEp) {
-        updated.isMerge = ep.episodeId === config.mergeEpisodeId;
-        // If episode is now merge, turn off finale flag
-        if (updated.isMerge && updated.isFinale) {
-          updated.isFinale = false;
-        }
-      } else {
-        // If merge is null, no episode has merge flag
-        updated.isMerge = false;
-      }
-
-      return updated;
-    });
-
-    // Cancel any in-flight queries to prevent them from overwriting our override
-    void queryClient.cancelQueries({ queryKey: ['episodes', config.seasonId] });
-    void queryClient.cancelQueries({ queryKey: ['episodes', config.seasonId, 'key'] });
-
-    // Update episodes cache
-    queryClient.setQueryData(['episodes', config.seasonId], updatedEpisodes);
-
-    // Recalculate and update key episodes using shared lib function
-    const keyEpisodes = calculateKeyEpisodes(updatedEpisodes) as KeyEpisodes;
-    queryClient.setQueryData(['episodes', config.seasonId, 'key'], keyEpisodes);
-
-    // Invalidate and refetch to ensure all observers get updated
-    void queryClient.invalidateQueries({
-      queryKey: ['episodes', config.seasonId, 'key'],
-      refetchType: 'active' // Refetch active queries to trigger re-render
-    });
-
-    // Invalidate the seasons query to trigger useSeasonsData to refetch/reselect
-    void queryClient.invalidateQueries({ queryKey: ['seasons'] });
-  }, [queryClient]);
+  }, [hash, queryClient]);
 
 
   // Load override config from localStorage on mount

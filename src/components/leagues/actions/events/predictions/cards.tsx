@@ -117,7 +117,7 @@ export default function PredictionCards({
     const prediction = enabledBasePredictions[0] ?? customPredictions[0]!;
     return (
       <article className={cn(
-        'flex flex-col mx-2 text-center bg-accent/50 rounded-lg overflow-clip min-w-96 mb-2 border-2 border-primary/20 relative z-10 mt-4',
+        'flex flex-col mx-2 text-center bg-accent/50 rounded-lg overflow-clip mb-2 border-2 border-primary/20 relative z-10 mt-4',
         className
       )}>
         <span className='flex gap-2 items-center justify-center'>
