@@ -115,107 +115,109 @@ export function FloatingActionsWidget() {
   const dismissProgress = Math.min(dragDistance / DRAG_THRESHOLD, 1);
 
   return (
-    <div
-      className={cn('absolute md:bottom-4.5 md:right-4.5 bottom-[calc(.75rem+var(--navbar-height))] right-2.5 z-50',
-        isExpanded && 'pl-14 pt-14 rounded-tl-[50%]'
-      )}
-      style={{
-        transform: isDragging
-          ? `translate(${dragOffset.x}px, ${dragOffset.y}px)`
-          : undefined,
-        transition: isDragging ? 'none' : 'transform 0.3s ease-out',
-      }}
-      onMouseEnter={() => !isDragging && setIsExpanded(true)}
-      onMouseLeave={() => !isDragging && setIsExpanded(false)}>
-      <div className='relative'>
-        {/* Expanded action buttons */}
-        <div
-          className={cn(
-            'absolute transition-all duration-300 ease-out left-1/2 -translate-x-1/2',
-            isExpanded && !isDragging
-              ? 'opacity-100 pointer-events-auto -top-14 -translate-x-10'
-              : 'opacity-0 pointer-events-none top-0'
-          )}>
-          <CreateLeagueModal>
-            <Button
-              className='relative w-12 h-12 rounded-lg bg-accent border-2 border-primary/40 flex items-center justify-center hover:bg-secondary/90 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
-              onClick={() => setIsExpanded(false)}>
-              <ListPlus className='w-5 h-5 text-primary' />
-            </Button>
-          </CreateLeagueModal>
-        </div>
-        <div
-          className={cn(
-            'absolute transition-all duration-300 ease-out top-1/2 -translate-y-1/2',
-            isExpanded && !isDragging
-              ? 'opacity-100 pointer-events-auto -left-14 -translate-y-10'
-              : 'opacity-0 pointer-events-none left-0'
-          )}>
-          <JoinLeagueModal>
-            <Button
-              className='relative w-12 h-12 rounded-lg bg-accent border-2 border-primary/40 flex items-center justify-center hover:bg-secondary/90 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
-              onClick={() => setIsExpanded(false)}>
-              <Users className='w-5 h-5 text-primary' />
-            </Button>
-          </JoinLeagueModal>
-        </div>
-
-        {/* Main toggle button */}
-        <button
-          ref={buttonRef}
-          onMouseDown={handleMouseDown}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onClick={() => !isDragging && setIsExpanded(!isExpanded)}
-          className={cn(
-            'relative w-16 h-16 rounded-xl bg-linear-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30 transition-all hover:scale-110 hover:shadow-primary/40 select-none touch-none overflow-hidden',
-            isExpanded && !isDragging && 'scale-110 rotate-12',
-            isDragging && 'cursor-grabbing scale-105'
-          )}
-          style={{
-            opacity: isDragging ? 1 - dismissProgress * 0.5 : 1,
-            background: isDragging && dismissProgress > 0.5
-              ? 'linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38))'
-              : undefined,
-          }}>
-          {/* Shine Effect */}
-          <div className='absolute inset-0 bg-linear-to-br from-white/30 via-transparent to-transparent opacity-50' />
-
-          <div>
-            {isDragging && dismissProgress > 0.5 ? (
-              <svg
-                className='w-8 h-8 text-white z-10'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 24 24'
-                stroke='white'>
-                <path
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth={3}
-                  d='M6 18L18 6M6 6l12 12' />
-              </svg>
-            ) : (
-              <Trophy className='w-8 h-8 stroke-primary-foreground z-10' />
-            )}
-          </div>
-        </button>
-
-        {/* Dismiss indicator */}
-        {isDragging && (
-          <div
-            className='absolute inset-0 flex items-center justify-center pointer-events-none'
-            style={{ opacity: dismissProgress }}>
-            <div
-              className='absolute w-20 h-20 rounded-full border-2 border-dashed border-red-500'
-              style={{
-                transform: `scale(${1 + dismissProgress * 0.5})`,
-                opacity: dismissProgress
-              }}
-            />
-          </div>
+    <div className='fixed inset-0 pointer-events-none overflow-hidden z-50'>
+      <div
+        className={cn(
+          'pointer-events-auto absolute md:bottom-4.5 md:right-4.5 bottom-[calc(.75rem+var(--navbar-height))] right-2.5',
+          isExpanded && 'pl-14 pt-14 rounded-tl-[50%]'
         )}
+        style={{
+          transform: isDragging
+            ? `translate(${dragOffset.x}px, ${dragOffset.y}px)`
+            : undefined,
+          transition: isDragging ? 'none' : 'transform 0.3s ease-out',
+        }}
+        onMouseEnter={() => !isDragging && setIsExpanded(true)}
+        onMouseLeave={() => !isDragging && setIsExpanded(false)}>
+        <div className='relative'>
+          {/* Expanded action buttons */}
+          <div
+            className={cn(
+              'absolute transition-all duration-300 ease-out left-1/2 -translate-x-1/2',
+              isExpanded && !isDragging
+                ? 'opacity-100 pointer-events-auto -top-14 -translate-x-10'
+                : 'opacity-0 pointer-events-none top-0'
+            )}>
+            <CreateLeagueModal>
+              <Button
+                className='relative w-12 h-12 rounded-lg bg-accent border-2 border-primary/40 flex items-center justify-center hover:bg-secondary/90 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
+                onClick={() => setIsExpanded(false)}>
+                <ListPlus className='w-5 h-5 text-primary' />
+              </Button>
+            </CreateLeagueModal>
+          </div>
+          <div
+            className={cn(
+              'absolute transition-all duration-300 ease-out top-1/2 -translate-y-1/2',
+              isExpanded && !isDragging
+                ? 'opacity-100 pointer-events-auto -left-14 -translate-y-10'
+                : 'opacity-0 pointer-events-none left-0'
+            )}>
+            <JoinLeagueModal>
+              <Button
+                className='relative w-12 h-12 rounded-lg bg-accent border-2 border-primary/40 flex items-center justify-center hover:bg-secondary/90 hover:border-primary/60 hover:scale-110 transition-all shadow-lg shadow-primary/20 p-0'
+                onClick={() => setIsExpanded(false)}>
+                <Users className='w-5 h-5 text-primary' />
+              </Button>
+            </JoinLeagueModal>
+          </div>
+
+          {/* Main toggle button */}
+          <button
+            ref={buttonRef}
+            onMouseDown={handleMouseDown}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onClick={() => !isDragging && setIsExpanded(!isExpanded)}
+            className={cn(
+              'relative w-16 h-16 rounded-xl bg-linear-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30 transition-all hover:scale-110 hover:shadow-primary/40 select-none touch-none overflow-hidden',
+              isExpanded && !isDragging && 'scale-110 rotate-12',
+              isDragging && 'cursor-grabbing scale-105'
+            )}
+            style={{
+              opacity: isDragging ? 1 - dismissProgress * 0.5 : 1,
+              background: isDragging && dismissProgress > 0.5
+                ? 'linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38))'
+                : undefined,
+            }}>
+            {/* Shine Effect */}
+            <div className='absolute inset-0 bg-linear-to-br from-white/30 via-transparent to-transparent opacity-50' />
+
+            <div>
+              {isDragging && dismissProgress > 0.5 ? (
+                <svg
+                  className='w-8 h-8 text-white z-10'
+                  xmlns='http://www.w3.org/2000/svg'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='white'>
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={3}
+                    d='M6 18L18 6M6 6l12 12' />
+                </svg>
+              ) : (
+                <Trophy className='w-8 h-8 stroke-primary-foreground z-10' />
+              )}
+            </div>
+          </button>
+
+          {/* Dismiss indicator */}
+          {isDragging && (
+            <div
+              className='absolute inset-0 flex items-center justify-center pointer-events-none'
+              style={{ opacity: dismissProgress }}>
+              <div
+                className='absolute w-20 h-20 rounded-full border-2 border-dashed border-red-500'
+                style={{
+                  transform: `scale(${1 + dismissProgress * 0.5})`,
+                  opacity: dismissProgress
+                }} />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
