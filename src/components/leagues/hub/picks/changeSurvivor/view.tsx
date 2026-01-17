@@ -14,15 +14,14 @@ import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import ColorRow from '~/components/shared/colorRow';
 import { useQueryClient } from '@tanstack/react-query';
-import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
 import chooseCastaway from '~/actions/chooseCastaway';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
 import { Card } from '~/components/common/card';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
 import makeSecondaryPick from '~/actions/makeSecondaryPick';
 import { Separator } from '~/components/common/separator';
+import { MAX_SEASON_LENGTH } from '~/lib/leagues';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
@@ -31,9 +30,15 @@ const formSchema = z.object({
 
 export default function ChangeCastaway() {
   const queryClient = useQueryClient();
-  const { data: league } = useLeague();
-  const { data: rules } = useLeagueRules();
-  const { actionDetails, keyEpisodes, leagueMembers, membersWithPicks } = useLeagueActionDetails();
+  const {
+    league,
+    rules,
+    actionDetails,
+    keyEpisodes,
+    leagueMembers,
+    membersWithPicks,
+    selectionTimeline
+  } = useLeagueActionDetails();
   const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
   const reactForm = useForm<z.infer<typeof formSchema>>({
@@ -113,6 +118,44 @@ export default function ChangeCastaway() {
       Date.now() - JSON.parse(localStorage.getItem('closedDialog')!) < 1000 * 60 * 10 : false);
   }, [elim, leagueMembers]);
 
+
+  // Calculate lockout status for each castaway
+  const castawayLockoutStatus = useMemo(() => {
+    if (!secondaryPickSettings?.enabled || !leagueMembers?.loggedIn || !selectionTimeline?.secondaryPicks || !keyEpisodes?.previousEpisode) {
+      return new Map<number, { isLockedOut: boolean; episodePicked?: number; episodesRemaining?: number }>();
+    }
+
+    const memberId = leagueMembers.loggedIn.memberId;
+    const lockoutPeriod = secondaryPickSettings.lockoutPeriod;
+    const previousEpisode = keyEpisodes.previousEpisode.episodeNumber;
+    const secondaryPicks = selectionTimeline.secondaryPicks[memberId] ?? [];
+
+    const lockoutMap = new Map<number, { isLockedOut: boolean; episodePicked?: number; episodesRemaining?: number }>();
+
+    // Check each castaway's selection history
+    secondaryPicks.forEach((castawayId, episodeIndex) => {
+      if (castawayId !== null && castawayId !== undefined) {
+        const episodeNumber = episodeIndex;
+        const episodesSinceLastPick = previousEpisode - episodeNumber;
+
+        // Check if this castaway is locked out
+        if (lockoutPeriod === 0 || episodesSinceLastPick < lockoutPeriod) {
+          // Only keep the most recent pick for each castaway
+          if (!lockoutMap.has(castawayId) || (lockoutMap.get(castawayId)?.episodePicked ?? 0) < episodeNumber) {
+            lockoutMap.set(castawayId, {
+              isLockedOut: true,
+              episodePicked: episodeNumber,
+              episodesRemaining: lockoutPeriod === MAX_SEASON_LENGTH
+                ? undefined
+                : Math.max(0, lockoutPeriod - episodesSinceLastPick)
+            });
+          }
+        }
+      }
+    });
+
+    return lockoutMap;
+  }, [secondaryPickSettings, leagueMembers, selectionTimeline, keyEpisodes]);
 
   // Set initial secondary pick if found
   useEffect(() => {
@@ -227,11 +270,30 @@ export default function ChangeCastaway() {
                               {availableCastaways
                                 .filter((castaway) => !castaway.eliminatedEpisode)
                                 .map((castaway) => {
+                                  // Check if castaway is locked out due to recent selection
+                                  const lockoutInfo = castawayLockoutStatus.get(castaway.castawayId);
+                                  const isLockedOut = lockoutInfo?.isLockedOut ?? false;
+
                                   // Disable if it's the user's own survivor and canPickOwnSurvivor is false
                                   const isOwnSurvivor = !secondaryPickSettings.canPickOwnSurvivor &&
                                     castaway.pickedBy?.memberId === leagueMembers?.loggedIn?.memberId;
 
-                                  if (isOwnSurvivor || castaway.eliminatedEpisode) {
+                                  if (isOwnSurvivor || castaway.eliminatedEpisode || isLockedOut) {
+                                    // Build the disabled label text
+                                    let disabledText = castaway.fullName;
+                                    if (isOwnSurvivor) {
+                                      disabledText += ' (Your Survivor)';
+                                    } else if (isLockedOut && lockoutInfo) {
+                                      const episodePicked = lockoutInfo.episodePicked;
+                                      const episodesRemaining = lockoutInfo.episodesRemaining;
+
+                                      if (episodesRemaining !== undefined && episodesRemaining > 0) {
+                                        disabledText += ` (Picked Ep ${episodePicked} - ${episodesRemaining} more ${episodesRemaining === 1 ? 'episode' : 'episodes'})`;
+                                      } else {
+                                        disabledText += ` (Picked Ep ${episodePicked})`;
+                                      }
+                                    }
+
                                     return (
                                       <SelectLabel
                                         key={castaway.castawayId}
@@ -244,7 +306,7 @@ export default function ChangeCastaway() {
                                               {castaway.tribe.name}
                                             </ColorRow>
                                           }
-                                          {castaway.fullName} {isOwnSurvivor && '(Your Survivor)'}
+                                          {disabledText}
                                         </span>
                                       </SelectLabel>
                                     );
