@@ -1,3 +1,5 @@
+// @vitest-environment happy-dom
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';

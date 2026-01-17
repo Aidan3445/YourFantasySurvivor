@@ -6,11 +6,16 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'node',
-    environmentMatchGlobs: [
-      // Use happy-dom for React hook tests
-      ['src/hooks/**/*.test.ts', 'happy-dom'],
-      ['src/hooks/**/*.test.tsx', 'happy-dom'],
-    ],
+    environmentOptions: {
+      happyDOM: {
+        height: 800,
+        width: 1200,
+        url: 'http://localhost:1234/',
+      },
+      jsdom: {
+        url: 'http://localhost:1234/',
+      },
+    },
     globals: true,
     setupFiles: ['./vitest.setup.ts'],
     coverage: {
