@@ -54,7 +54,7 @@ export type LeagueInsert = z.infer<typeof LeagueInsertZod>;
 export type SecondaryPickSettings = {
   enabled: boolean;
   canPickOwnSurvivor: boolean;
-  lockoutPeriod: number; // 0-14, where 14 means never repeat
+  lockoutPeriod: number; // 0-MAX_SEASON_LENGTH, max is lock out
   publicPicks: boolean;
   multiplier: 0.25 | 0.5 | 0.75 | 1;
 };
@@ -74,6 +74,11 @@ export type LeagueSettingsUpdate = {
   draftDate?: Date | null | string;
   survivalCap?: number;
   preserveStreak?: boolean;
+  secondaryPickEnabled?: boolean;
+  secondaryPickCanPickOwn?: boolean;
+  secondaryPickLockoutPeriod?: number;
+  secondaryPickPublicPicks?: boolean;
+  secondaryPickMultiplier?: 0.25 | 0.5 | 0.75 | 1;
 }
 
 export const LeagueDetailsUpdateZod = z.object({

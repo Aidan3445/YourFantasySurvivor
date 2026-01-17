@@ -49,7 +49,6 @@ export const selectionUpdateSchema = createTable(
     index('selection_member_idx').on(table.memberId),
   ]
 );
-export type SelectionUpdate = typeof selectionUpdateSchema.$inferSelect;
 
 export const secondaryPickSchema = createTable(
   'secondary_pick',
@@ -70,5 +69,3 @@ export const secondaryPickSchema = createTable(
     index('secondary_pick_episode_idx').on(table.episodeId),
   ]
 );
-export type SecondaryPick = typeof secondaryPickSchema.$inferSelect;
-

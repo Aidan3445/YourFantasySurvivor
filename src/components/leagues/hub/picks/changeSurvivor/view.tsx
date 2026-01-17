@@ -73,7 +73,7 @@ export default function ChangeCastaway() {
     if (!league || !keyEpisodes?.nextEpisode || !secondarySelected) return;
 
     try {
-      await makeSecondaryPick(league.hash, parseInt(secondarySelected), keyEpisodes.nextEpisode.episodeId);
+      await makeSecondaryPick(league.hash, parseInt(secondarySelected));
       await queryClient.invalidateQueries({ queryKey: ['selectionTimeline', league.hash] });
       // Update initial pick to the new selection
       setInitialSecondaryPick(secondarySelected);

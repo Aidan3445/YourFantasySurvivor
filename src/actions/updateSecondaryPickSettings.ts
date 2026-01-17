@@ -1,31 +1,41 @@
 'use server';
 
-import { leagueMemberAuth } from '~/lib/auth';
-import { db } from '~/server/db';
-import { eq } from 'drizzle-orm';
-import { leagueSettingsSchema } from '~/server/db/schema/leagues';
-import { type SecondaryPickSettings } from '~/types/leagues';
+import { requireLeagueMemberAuth } from '~/lib/auth';
+import { type LeagueSettingsUpdate, type SecondaryPickSettings } from '~/types/leagues';
+import updateLeagueSettingsLogic from '~/services/leagues/mutation/updateLeagueSettings';
 
+/**
+  * Update secondary pick settings
+  * @param hash The hash of the league
+  * @param settings The secondary pick settings
+  * @throws an error if the settings cannot be updated
+  * @throws an error if the user is not in the league
+  * @returns an object indicating success
+  * @returnObj `{ success }`
+  */
 export default async function updateSecondaryPickSettings(
-  leagueHash: string,
-  settings: SecondaryPickSettings
+  hash: string,
+  settings: SecondaryPickSettings,
 ) {
-  const auth = await leagueMemberAuth(leagueHash);
-
-  if (auth.role !== 'Owner') {
-    throw new Error('Only league owner can update settings');
-  }
-
-  await db
-    .update(leagueSettingsSchema)
-    .set({
+  try {
+    const settingsUpdate: Partial<LeagueSettingsUpdate> = {
       secondaryPickEnabled: settings.enabled,
       secondaryPickCanPickOwn: settings.canPickOwnSurvivor,
       secondaryPickLockoutPeriod: settings.lockoutPeriod,
       secondaryPickPublicPicks: settings.publicPicks,
-      secondaryPickMultiplier: Math.round(settings.multiplier * 100), // Convert to percentage
-    })
-    .where(eq(leagueSettingsSchema.leagueId, auth.leagueId));
+      secondaryPickMultiplier: settings.multiplier,
+    };
 
-  return { success: true };
+
+    return await requireLeagueMemberAuth(updateLeagueSettingsLogic)(hash, settingsUpdate);
+  } catch (e) {
+    let message: string;
+    if (e instanceof Error) message = e.message;
+    else message = String(e);
+
+    if (message.includes('User not') || message.includes('Not a league member')) throw e;
+
+    console.error('Failed to update secondary pick settings', e);
+    throw new Error('An error occurred while updating the secondary pick settings.');
+  }
 }

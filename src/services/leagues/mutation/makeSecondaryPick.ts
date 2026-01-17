@@ -22,7 +22,6 @@ import { MAX_SEASON_LENGTH } from '~/lib/leagues';
 export default async function makeSecondaryPick(
   auth: VerifiedLeagueMemberAuth,
   castawayId: number,
-  episodeId: number
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
 
@@ -48,7 +47,11 @@ export default async function makeSecondaryPick(
     }
 
     if (!settings.canPickOwnSurvivor) {
-      const currentSelection = await getCurrentSurvivorSelection(auth.memberId, episodeId, trx);
+      const currentSelection = await getCurrentSurvivorSelection(
+        auth.memberId,
+        nextEpisode.episodeId,
+        trx
+      );
       if (currentSelection === castawayId) {
         throw new Error('Cannot select your current survivor as secondary pick');
       }
@@ -74,7 +77,7 @@ export default async function makeSecondaryPick(
       .insert(secondaryPickSchema)
       .values({
         memberId: auth.memberId,
-        episodeId,
+        episodeId: nextEpisode.episodeId,
         castawayId,
       })
       .onConflictDoUpdate({

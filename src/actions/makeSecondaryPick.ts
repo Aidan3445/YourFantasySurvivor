@@ -1,19 +1,31 @@
 'use server';
 
-import { leagueMemberAuth } from '~/lib/auth';
-import makeSecondaryPickService from '~/services/leagues/mutation/makeSecondaryPick';
-import { type VerifiedLeagueMemberAuth } from '~/types/api';
+import { requireLeagueMemberAuth } from '~/lib/auth';
+import makeSecondaryPick from '~/services/leagues/mutation/makeSecondaryPick';
 
-export default async function makeSecondaryPick(
-  leagueHash: string,
+/**
+  * Choose a secondary pick castaway
+  * @param hash The hash of the league
+  * @param castawayId The id of the castaway
+  * @throws an error if the castaway cannot be chosen
+  * @throws an error if the user is not in the league
+  * @returns an object indicating success
+  * @returnObj `{ success }`
+  */
+export default async function chooseSecondary(
+  hash: string,
   castawayId: number,
-  episodeId: number
 ) {
-  const auth = await leagueMemberAuth(leagueHash);
+  try {
+    return await requireLeagueMemberAuth(makeSecondaryPick)(hash, castawayId);
+  } catch (e) {
+    let message: string;
+    if (e instanceof Error) message = e.message;
+    else message = String(e);
 
-  if (!auth.memberId) {
-    throw new Error('Unauthorized');
+    if (message.includes('User not') || message.includes('Not a league member')) throw e;
+
+    console.error('Failed to choose secondary pick castaway', e);
+    throw new Error('An error occurred while choosing the secondary pick castaway.');
   }
-
-  return await makeSecondaryPickService(auth as VerifiedLeagueMemberAuth, castawayId, episodeId);
 }

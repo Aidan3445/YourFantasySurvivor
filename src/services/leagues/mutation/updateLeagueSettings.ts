@@ -43,7 +43,12 @@ export default async function updateLeagueSettingsLogic(
     await trx
       .update(leagueSettingsSchema)
       // we need the date === null because we want to allow setting it to null
-      .set({ ...update, draftDate: safeDraftDate === null ? null : safeDraftDate?.toUTCString() })
+      .set({
+        ...update,
+        draftDate: safeDraftDate === null
+          ? null
+          : safeDraftDate?.toUTCString()
+      })
       .from(leagueSchema)
       .where(eq(leagueSettingsSchema.leagueId, auth.leagueId));
 
