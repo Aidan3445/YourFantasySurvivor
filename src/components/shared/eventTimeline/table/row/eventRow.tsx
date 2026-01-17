@@ -86,7 +86,10 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
       {!noMembers && <TableCell>
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5',
-          event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.member)) && 'justify-center')}>
+          event.referenceMap.some((ref) =>
+            ref.pairs.some((pair) => pair.member !== null
+              || (pair.secondaries && pair.secondaries.length > 0
+              ))) && 'justify-center')}>
           {event.referenceMap?.map(({ pairs }, index) =>
             pairs.map(({ castaway, member, secondaries }) => (
               <div key={`${castaway.castawayId}-${index}`} className='flex gap-1 items-center'>
@@ -99,12 +102,12 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
                 ) : (
                   <ColorRow className={cn(
                     'leading-tight px-1 w-min text-muted-foreground border-dashed',
-                    secondaries?.length === 0 && 'invisible'
+                    (secondaries?.length === 0 || !event.points) && 'invisible'
                   )}>
                     None
                   </ColorRow>
                 )}
-                {secondaries && secondaries.length > 0 && (
+                {secondaries && secondaries.length > 0 && !!event.points && (
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -114,9 +117,9 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
                         2<span className='text-[0.6rem] text-inherit font-normal'>nd</span>
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2' side='left' sideOffset={-3}>
+                    <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2' side='right' sideOffset={-2}>
                       <PopoverArrow className='fill-primary' />
-                      <div className='text-sm font-semibold uppercase tracking-wide text-center'>Secondaries</div>
+                      <div className='text-sm font-semibold uppercase tracking-wide text-center'>Secondary Points</div>
                       <div className='flex flex-col gap-1 text-xs'>
                         {secondaries.map((secMember) => (
                           <ColorRow

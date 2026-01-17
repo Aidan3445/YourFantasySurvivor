@@ -43,6 +43,7 @@ export default function SecondaryPickSettings() {
     try {
       await updateSecondaryPickSettings(league.hash, data);
       await queryClient.invalidateQueries({ queryKey: ['rules', league.hash] });
+      await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
       setLocked(true);
       alert('Secondary Pick settings saved successfully!');
     } catch (error) {

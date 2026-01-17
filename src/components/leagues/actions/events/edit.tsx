@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
-import { BaseEventInsertZod, CustomEventInsertZod, type EventReference, type BaseEventInsert, type CustomEventInsert, type EnrichedEvent } from '~/types/events';
+import { BaseEventInsertZod, CustomEventInsertZod, type EventReference, type BaseEventInsert, type CustomEventInsert, type EnrichedEvent, type BaseEventName } from '~/types/events';
 import z from 'zod';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
@@ -32,8 +32,12 @@ export default function EditEvent({ event }: EditEventProps) {
   const { data: league } = useLeague();
   const reactForm = useForm<BaseEventInsert | CustomEventInsert>({
     defaultValues: {
-      ...event,
-      references: event.references
+      label: event.label ?? '',
+      notes: event.notes ?? [],
+      references: event.references,
+      customEventRuleId: event.customEventRuleId,
+      episodeId: event.episodeId,
+      eventName: event.eventName as BaseEventName
     },
     resolver: zodResolver(z.union([BaseEventInsertZod, CustomEventInsertZod]))
   });
@@ -136,11 +140,11 @@ export default function EditEvent({ event }: EditEventProps) {
                 <FormItem>
                   <FormControl>
                     <MultiSelect
+                      className='[&_[role=dialog]]:z-[100]'
                       options={combinedReferenceOptions}
                       onValueChange={(value) =>
                         reactForm.setValue('references', handleCombinedReferenceSelection(value))}
                       defaultValue={getDefaultStringValues(field.value as EventReference[])}
-                      modalPopover
                       clear={eventClearer}
                       placeholder={'Select References'} />
                   </FormControl>

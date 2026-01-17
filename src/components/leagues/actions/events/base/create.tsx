@@ -234,7 +234,7 @@ export default function CreateBaseEvent() {
                       <FormControl>
                         <Textarea
                           disabled={!selectedReferences || selectedReferences.length === 0}
-                          className='w-full h-full'
+                          className='w-full'
                           value={(field.value as string[])?.join('\n')}
                           onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
                           placeholder='Notes' />
