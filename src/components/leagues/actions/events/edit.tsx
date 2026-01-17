@@ -111,7 +111,7 @@ export default function EditEvent({ event }: EditEventProps) {
         <AlertDialogTrigger>
           <Pencil size={20} />
         </AlertDialogTrigger>
-        <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max'>
+        <AlertDialogContent className='bg-card rounded-lg overflow-y-auto min-w-max' customOverlay>
           <AlertDialogHeader>
             <AlertDialogTitle>
               Edit {event.eventName}
@@ -140,7 +140,6 @@ export default function EditEvent({ event }: EditEventProps) {
                 <FormItem>
                   <FormControl>
                     <MultiSelect
-                      className='[&_[role=dialog]]:z-[100]'
                       options={combinedReferenceOptions}
                       onValueChange={(value) =>
                         reactForm.setValue('references', handleCombinedReferenceSelection(value))}
