@@ -1,12 +1,13 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { eq } from 'drizzle-orm';
+import { and, eq, lte, or } from 'drizzle-orm';
 import { episodeSchema } from '~/server/db/schema/episodes';
-import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
+import { leagueMemberSchema, selectionUpdateSchema, secondaryPickSchema } from '~/server/db/schema/leagueMembers';
 import { type SelectionUpdate } from '~/types/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
-import { type SelectionTimelines } from '~/types/leagues';
+import { type SelectionTimeline, type SelectionTimelines } from '~/types/leagues';
+import { leagueSettingsSchema } from '~/server/db/schema/leagues';
 
 /**
   * Get the selection timeline for a league
@@ -17,7 +18,7 @@ import { type SelectionTimelines } from '~/types/leagues';
   * @returnObj `memberCastaways: SelectionTimeline
   * castawayMembers: SelectionTimeline`
   */
-export default async function getSelectionTimeline(auth: VerifiedLeagueMemberAuth) {
+export default async function getSelectionTimeline(auth: VerifiedLeagueMemberAuth): Promise<SelectionTimelines> {
   const selectionUpdates = await db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
@@ -31,7 +32,32 @@ export default async function getSelectionTimeline(auth: VerifiedLeagueMemberAut
     .orderBy(episodeSchema.episodeNumber)
     .where(eq(leagueMemberSchema.leagueId, auth.leagueId)) as SelectionUpdate[];
 
-  return processSelectionTimeline(selectionUpdates);
+  // Fetch secondary picks for this league
+  const secondaryPicks = await db
+    .select({
+      episodeNumber: episodeSchema.episodeNumber,
+      memberId: secondaryPickSchema.memberId,
+      castawayId: secondaryPickSchema.castawayId,
+    })
+    .from(secondaryPickSchema)
+    .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, secondaryPickSchema.memberId))
+    .innerJoin(episodeSchema, eq(episodeSchema.episodeId, secondaryPickSchema.episodeId))
+    .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueMemberSchema.leagueId))
+    .where(and(
+      eq(leagueMemberSchema.leagueId, auth.leagueId),
+      eq(leagueSettingsSchema.secondaryPickEnabled, true),
+      or(
+        lte(episodeSchema.airDate, new Date().toISOString()), // only past episodes
+        eq(secondaryPickSchema.memberId, auth.memberId), // or picks by the requesting member
+        eq(leagueSettingsSchema.secondaryPickPublicPicks, true)
+      )));
+
+  const secondarySelections = processSecondaryPickTimeline(secondaryPicks);
+
+  return {
+    ...processSelectionTimeline(selectionUpdates),
+    secondaryPicks: secondarySelections,
+  };
 }
 
 /**
@@ -94,4 +120,17 @@ function processSelectionTimeline(selectionUpdates: SelectionUpdate[]) {
     castawayMembers: {}
   } as SelectionTimelines
   );
+}
+
+/**
+ * Process secondary pick timeline into memberId -> episodeNumber -> castawayId structure
+ * @param picks Array of secondary picks from the database
+ * @returns Record mapping member IDs to episode numbers to castaway IDs
+ */
+function processSecondaryPickTimeline(picks: Array<{ episodeNumber: number, memberId: number, castawayId: number }>) {
+  return picks.reduce((acc, pick) => {
+    acc[pick.memberId] ??= [];
+    acc[pick.memberId]![pick.episodeNumber] = pick.castawayId;
+    return acc;
+  }, {} as SelectionTimeline);
 }

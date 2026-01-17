@@ -96,14 +96,14 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                       }
                     </div>
                   </TableCell>
-                  <TableCell className='text-nowrap'>
-                    <span className={cn('text-sm text-center font-bold',
+                  <TableCell>
+                    <span className={cn('text-nowrap text-sm text-center font-bold flex items-center justify-center flex-nowrap',
                       pred.hit ?
                         pred.points > 0 ? 'text-green-700' : 'text-red-700' :
                         'text-muted-foreground')}>
                       {pred.points > 0 && pred.hit ? `+${pred.points}` : pred.points}
                       <Flame className={cn(
-                        'inline align-top w-4 h-min ml-0.5',
+                        'inline align-top w-4 h-4 -mt-0.5',
                         pred.hit ?
                           pred.points > 0 ? 'stroke-green-700' : 'stroke-red-700' :
                           'stroke-muted-foreground'
@@ -111,24 +111,25 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                     </span>
                   </TableCell>
                   {hasBets &&
-                    <TableCell className='text-nowrap'>
+                    <TableCell>
                       {pred.bet && pred.bet > 0 ? (
-                        <span className={cn('text-sm text-center font-bold', {
+                        <span className={cn('text-nowrap text-sm text-center font-bold flex items-center justify-center flex-nowrap', {
                           'text-green-700': pred.hit,
                           'text-red-700': !pred.hit,
                           'text-muted-foreground': !pred.eventId,
                         })}>
                           {pred.eventId && (pred.hit ? '+' : '-')} {pred.bet}
-                          <Flame className={cn('inline align-top w-4 h-min ml-0.5', {
-                            'stroke-green-700': pred.hit,
-                            'stroke-red-700': !pred.hit,
-                            'stroke-muted-foreground': !pred.eventId,
-                          })} />
+                          <Flame className={cn('inline align-top w-4 h-4 -mt-0.5',
+                            {
+                              'stroke-green-700': pred.hit,
+                              'stroke-red-700': !pred.hit,
+                              'stroke-muted-foreground': !pred.eventId,
+                            })} />
                         </span>
                       ) : <span className='text-sm text-center text-muted-foreground font-medium'>-</span>}
                     </TableCell>
                   }
-                  <TableCell className='font-medium'>
+                  <TableCell className='font-medium text-nowrap'>
                     {findReferenceNames([{ type: pred.referenceType, id: pred.referenceId }])
                       .map((res) => isMobile ? res.short : res.full)
                       .join(', ')}
@@ -137,11 +138,15 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                     {pred.timing.every((t) => t.includes('Weekly')) &&
                       (keyEpisodes?.previousEpisode?.episodeNumber ?? 0) >= pred.predictionEpisodeNumber &&
                       !pred.event
-                      ? (<span className='text-muted-foreground'>--</span>)
-                      : (findReferenceNames(pred.event?.references)
-                        .map((res) => isMobile ? res.short : res.full)
-                        .join(', ')
-                      )}
+                      ? (
+                        <span className='text-muted-foreground'>--</span>
+                      ) : (
+                        findReferenceNames(pred.event?.references).map((res) => (
+                          <span key={res.full} className='inline-block mr-1 text-nowrap'>
+                            {isMobile ? res.short : res.full}
+                          </span>
+                        )))
+                    }
                   </TableCell>
                 </TableRow>
               );

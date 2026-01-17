@@ -1,17 +1,25 @@
-import { type BaseEventPredictionRules, type BaseEventRules, type ShauhinModeSettings, type CustomEventRuleInsert } from '~/types/leagues';
+import { type BaseEventPredictionRules, type BaseEventRules, type ShauhinModeSettings, type CustomEventRuleInsert, type SecondaryPickSettings } from '~/types/leagues';
 
 export const LeagueStatuses = ['Predraft', 'Draft', 'Active', 'Inactive'] as const;
 export const LeagueMemberRoles = ['Owner', 'Admin', 'Member'] as const;
 export const ShauhinModeTimings = ['After Premiere', 'After Merge', 'Before Finale', 'Custom'] as const;
 
+export const MAX_SEASON_LENGTH = 15;
+
 export const LEAGUE_NAME_MIN_LENGTH = 3;
 export const LEAGUE_NAME_MAX_LENGTH = 64;
 export const DEFAULT_SURVIVAL_CAP = 5;
-export const MAX_SURVIVAL_CAP = 15;
 export const DISPLAY_NAME_MIN_LENGTH = 2;
 export const DISPLAY_NAME_MAX_LENGTH = 32;
 export const ABS_MAX_EVENT_POINTS = 100;
 export const SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK = 10;
+
+// Secondary Pick defaults
+export const DEFAULT_SECONDARY_PICK_ENABLED = false;
+export const DEFAULT_SECONDARY_PICK_CAN_PICK_OWN = false;
+export const DEFAULT_SECONDARY_PICK_LOCKOUT_PERIOD = 3;
+export const DEFAULT_SECONDARY_PICK_PUBLIC_PICKS = false;
+export const DEFAULT_SECONDARY_PICK_MULTIPLIER = 1;
 
 export const defaultBaseRules: BaseEventRules = {
   advFound: 5,
@@ -105,6 +113,7 @@ export const defaultBasePredictionRules: BaseEventPredictionRules = {
     timing: ['Weekly']
   },
 };
+
 export const defaultShauhinModeSettings: ShauhinModeSettings = {
   enabled: false,
   maxBet: ABS_MAX_EVENT_POINTS,
@@ -117,4 +126,12 @@ export const defaultShauhinModeSettings: ShauhinModeSettings = {
     'fireWin',
     'soleSurvivor'
   ],
+};
+
+export const defaultSecondaryPickSettings: SecondaryPickSettings = {
+  enabled: DEFAULT_SECONDARY_PICK_ENABLED,
+  canPickOwnSurvivor: DEFAULT_SECONDARY_PICK_CAN_PICK_OWN,
+  lockoutPeriod: DEFAULT_SECONDARY_PICK_LOCKOUT_PERIOD,
+  publicPicks: DEFAULT_SECONDARY_PICK_PUBLIC_PICKS,
+  multiplier: DEFAULT_SECONDARY_PICK_MULTIPLIER,
 };

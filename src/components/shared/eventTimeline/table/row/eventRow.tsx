@@ -12,6 +12,9 @@ import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { getContrastingColor } from '@uiw/color-convert';
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
+import { PopoverArrow } from '@radix-ui/react-popover';
+import { Button } from '~/components/common/button';
 
 interface EventRowProps {
   className?: string;
@@ -83,20 +86,55 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
       {!noMembers && <TableCell>
         <div className={cn(
           'flex flex-col text-xs h-full gap-0.5',
-          event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.member)) && 'justify-center')}>
+          event.referenceMap.some((ref) =>
+            ref.pairs.some((pair) => pair.member !== null
+              || (pair.secondaries && pair.secondaries.length > 0
+              ))) && 'justify-center')}>
           {event.referenceMap?.map(({ pairs }, index) =>
-            pairs.map(({ castaway, member }) =>
-              member ?
-                <ColorRow
-                  key={member.memberId}
-                  className='leading-tight px-1 w-min'
-                  color={member.color}>
-                  {member.displayName}
-                </ColorRow> :
-                <ColorRow className='invisible leading-tight px-1 w-min' key={`${castaway.castawayId}-${index}`}>
-                  None
-                </ColorRow>
-            )
+            pairs.map(({ castaway, member, secondaries }) => (
+              <div key={`${castaway.castawayId}-${index}`} className='flex gap-1 items-center'>
+                {member ? (
+                  <ColorRow
+                    className='leading-tight px-1 w-min'
+                    color={member.color}>
+                    {member.displayName}
+                  </ColorRow>
+                ) : (
+                  <ColorRow className={cn(
+                    'leading-tight px-1 w-min text-muted-foreground border-dashed',
+                    (secondaries?.length === 0 || !event.points) && 'invisible'
+                  )}>
+                    None
+                  </ColorRow>
+                )}
+                {secondaries && secondaries.length > 0 && !!event.points && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='p-0 gap-0 py-0! h-min items-start rounded border-primary/20 text-muted-foreground'>
+                        2<span className='text-[0.6rem] text-inherit font-normal'>nd</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2' side='right' sideOffset={-2}>
+                      <PopoverArrow className='fill-primary' />
+                      <div className='text-sm font-semibold uppercase tracking-wide text-center'>Secondary Points</div>
+                      <div className='flex flex-col gap-1 text-xs'>
+                        {secondaries.map((secMember) => (
+                          <ColorRow
+                            key={`secondary-${secMember.memberId}`}
+                            className='leading-tight px-1 w-min'
+                            color={secMember.color}>
+                            {secMember.displayName}
+                          </ColorRow>
+                        ))}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                )}
+              </div>
+            ))
           )}
         </div>
       </TableCell>}

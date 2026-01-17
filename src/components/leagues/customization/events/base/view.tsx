@@ -104,7 +104,7 @@ export default function LeagueScoring() {
             <ChallengeScoreSettings disabled={disabled || locked} />
             <AdvantageScoreSettings disabled={disabled || locked}>
               {!(disabled || locked) && (
-                <span className='w-fit ml-auto grid grid-cols-2 gap-2 mt-4'>
+                <span className='w-fit ml-auto md:grid grid-cols-2 gap-2 mt-4 hidden'>
                   <Button
                     type='button'
                     variant='destructive'
@@ -120,6 +120,21 @@ export default function LeagueScoring() {
             </AdvantageScoreSettings>
             <OtherScoreSettings disabled={disabled || locked} />
           </span>
+          {!(disabled || locked) && (
+            <span className='w-full ml-auto grid grid-cols-2 gap-2 mt-4 md:hidden'>
+              <Button
+                type='button'
+                variant='destructive'
+                onClick={() => { setLocked(true); reactForm.reset(); }}>
+                Cancel
+              </Button>
+              <Button
+                disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
+                type='submit'>
+                Save
+              </Button>
+            </span>)}
+
         </form>
       </Form>
     </article>

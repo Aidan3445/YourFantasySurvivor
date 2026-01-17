@@ -10,28 +10,27 @@ import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Button } from '~/components/common/button';
 import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
-import { useLeague } from '~/hooks/leagues/useLeague';
 import { CustomEventInsertZod, type EventWithReferences, type CustomEventInsert } from '~/types/events';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 import createCustomEvent from '~/actions/createCustomEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
-import { getAirStatus } from '~/lib/episodes';
 import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
+import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 export default function CreateCustomEvent() {
   const queryClient = useQueryClient();
-  const { data: league } = useLeague();
+  const leagueData = useLeagueData();
   const { data: rules } = useLeagueRules();
-  const { data: episodes } = useEpisodes(league?.seasonId ?? null);
-  const { data: seasonData } = useSeasonsData(true, league?.seasonId ?? undefined);
+  const { data: episodes } = useEpisodes(leagueData?.league?.seasonId ?? null);
+  const { data: seasonData } = useSeasonsData(true, leagueData?.league?.seasonId ?? undefined);
   const season = seasonData?.[0];
 
   const reactForm = useForm<CustomEventInsert>({
     defaultValues: {
-      episodeId: episodes?.find(episode => getAirStatus(episode.airDate, episode.runtime) === 'Airing')?.episodeId ??
-        episodes?.findLast(episode => getAirStatus(episode.airDate, episode.runtime) === 'Aired')?.episodeId ??
+      episodeId: episodes?.find(episode => episode.airStatus === 'Airing')?.episodeId ??
+        episodes?.findLast(episode => episode.airStatus === 'Aired')?.episodeId ??
         episodes?.[0]?.episodeId,
       notes: null,
     },
@@ -50,7 +49,10 @@ export default function CreateCustomEvent() {
   const setLabel = reactForm.watch('label');
   const setNotes = reactForm.watch('notes');
 
-  const { combinedReferenceOptions, handleCombinedReferenceSelection } = useEventOptions(league?.seasonId ?? null, selectedEpisode ?? 1);
+  const { combinedReferenceOptions, handleCombinedReferenceSelection } = useEventOptions(
+    leagueData?.league?.seasonId ?? null,
+    selectedEpisode ?? 1
+  );
 
   const mockEvent = useMemo(() => {
     if (!selectedEvent) return null;
@@ -79,7 +81,7 @@ export default function CreateCustomEvent() {
   };
 
   if (!rules?.custom || rules.custom.length === 0) return (
-    <div className='px-4 w-full md:pb-14 text-center'>
+    <div className='w-full text-center'>
       <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 p-4 w-full'>
         <h2 className='text-xl font-bold uppercase tracking-wider text-muted-foreground'>No Custom Events</h2>
         <p className='text-sm text-muted-foreground'>You can create a custom event in the <span className='font-bold'>Settings</span> tab.</p>
@@ -88,16 +90,16 @@ export default function CreateCustomEvent() {
   );
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
-    if (!league) return;
+    if (!leagueData?.league) return;
     try {
-      await createCustomEvent(league.hash, data);
+      await createCustomEvent(leagueData.league.hash, data);
       alert('Custom event created successfully');
       clearReferences();
       reactForm.reset({
         episodeId: data.episodeId,
         notes: null,
       });
-      await queryClient.invalidateQueries({ queryKey: ['customEvents', league.hash] });
+      await queryClient.invalidateQueries({ queryKey: ['customEvents', leagueData.league.hash] });
     } catch (e) {
       alert('Failed to create custom event');
       console.error('Failed to create custom event', e);
@@ -105,7 +107,7 @@ export default function CreateCustomEvent() {
   });
 
   return (
-    <div className='w-full px-4 md:pb-14'>
+    <div className='w-full'>
       <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 p-3'>
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
@@ -205,7 +207,7 @@ export default function CreateCustomEvent() {
                       <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
-                          className='h-full rounded-xl pt-1'
+                          className='h-full rounded-xl pt-1 z-50'
                           disabled={!selectedEvent}
                           options={combinedReferenceOptions}
                           onValueChange={(value) =>
@@ -225,7 +227,7 @@ export default function CreateCustomEvent() {
                       <FormControl>
                         <Textarea
                           disabled={!selectedReferences || selectedReferences.length === 0}
-                          className='w-full h-full'
+                          className='w-full'
                           value={(field.value as string[])?.join('\n')}
                           onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
                           placeholder='Notes' />
@@ -249,6 +251,7 @@ export default function CreateCustomEvent() {
             <EpisodeEvents
               episodeNumber={selectedEpisode ?? 1}
               seasonData={season!}
+              leagueData={leagueData}
               mockEvents={mockEvent ? [mockEvent] : []}
               edit
               filters={{
@@ -256,8 +259,7 @@ export default function CreateCustomEvent() {
                 tribe: [],
                 member: [],
                 event: []
-              }}
-            />
+              }} />
           </span>
         </Form>
       </section>

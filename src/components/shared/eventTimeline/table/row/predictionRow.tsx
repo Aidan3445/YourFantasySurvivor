@@ -135,18 +135,22 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                             </ColorRow>
                           </>
                         }
-                        {(miss.bet ?? 0) > 0 && <p className='text-xs text-red-600'>
-                          -{miss.bet}
-                          <Flame className='inline align-top w-3.5 h-min stroke-red-600' />
-                        </p>}
+                        {(miss.bet ?? 0) > 0 && (
+                          <p className='text-xs text-red-600'>
+                            -{miss.bet}
+                            <Flame className='inline align-top w-3.5 h-min stroke-red-600' />
+                          </p>
+                        )}
                       </span>
                     ))}
                   </div>
                 </AccordionContent>
               </AccordionItem>
-            </Accordion>}
+            </Accordion>
+          }
         </div>
-      </TableCell>}
+      </TableCell>
+      }
       <TableCell />
     </TableRow>
   );

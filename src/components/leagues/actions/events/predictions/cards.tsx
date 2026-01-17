@@ -10,6 +10,7 @@ import { type MakePredictionsProps } from '~/components/leagues/actions/events/p
 import { type ScoringBaseEventName, type ReferenceType, type MakePrediction } from '~/types/events';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useShauhinActive } from '~/hooks/leagues/enrich/useShauhinActive';
+import { loadOverrideConfig } from '~/lib/devEpisodeOverride';
 
 export default function PredictionCards({
   rules,
@@ -21,6 +22,7 @@ export default function PredictionCards({
   setBetTotal,
   className
 }: MakePredictionsProps) {
+  const { enabled: devConfig } = loadOverrideConfig() ?? {};
   const shauhinActive = useShauhinActive();
 
   const enabledBasePredictions = useMemo(() =>
@@ -78,7 +80,7 @@ export default function PredictionCards({
       'Castaway' : 'Direct Castaway';
 
     castaways.forEach((castaway) => {
-      if (castaway.eliminatedEpisode) return;
+      if (!devConfig && castaway.eliminatedEpisode) return;
       const tribe = castaway.tribe;
       options[castawayKey][castaway.fullName] = {
         id: castaway.castawayId,
@@ -96,7 +98,7 @@ export default function PredictionCards({
       });
     }
     return options;
-  }, [castaways, tribes]);
+  }, [castaways, tribes, devConfig]);
 
   const [formBetValues, setFormBetValues] = useState<Record<string, number>>({});
   const updateFormBetValue = useCallback((eventName: string, bet: number) => {
@@ -114,9 +116,11 @@ export default function PredictionCards({
   if (enabledBasePredictions.length + customPredictions.length === 1) {
     const prediction = enabledBasePredictions[0] ?? customPredictions[0]!;
     return (
-      <article
-        className={cn('flex flex-col mx-2 text-center bg-accent/50 rounded-lg min-w-96 mb-2 border-2 border-primary/20 relative z-10 mt-4', className)}>
-        <span className='flex gap-2 items-center justify-cente'>
+      <article className={cn(
+        'flex flex-col mx-2 text-center bg-accent/50 rounded-lg overflow-clip mb-2 border-2 border-primary/20 relative z-10 mt-4',
+        className
+      )}>
+        <span className='flex gap-2 items-center justify-center'>
           <h3 className='text-lg text-nowrap font-bold uppercase tracking-wider text-card-foreground'>
             {prediction.label}
           </h3>
@@ -125,6 +129,10 @@ export default function PredictionCards({
             <Flame size={16} className='stroke-primary' />
           </div>
         </span>
+        <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mb-1'>
+          {prediction.timing.join(' - ')}
+          <PredictionTimingHelp />
+        </div>
         <p className='text-sm px-2 py-2 bg-secondary font-medium'>{prediction.description}</p>
         <BaseSubmissionCard
           prediction={prediction}
@@ -137,67 +145,40 @@ export default function PredictionCards({
     );
   }
 
-  const customPredictionItems = customPredictions.map((prediction) => ({
-    header: (
-      <div>
-        <h3 className='text-lg text-nowrap font-bold uppercase tracking-wider text-card-foreground'>
-          {prediction.label ?? prediction.eventName}
-          <span className='ml-2 inline-flex items-center'>
-            <p className='text-sm font-bold'>{prediction.points}</p>
-            <Flame size={16} className='stroke-primary' />
-          </span>
-        </h3>
-        <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mt-1'>
-          {prediction.timing.join(' - ')}
-          <PredictionTimingHelp />
+  const predictionItems = [...enabledBasePredictions, ...customPredictions]
+    .map((prediction) => ({
+      header: (
+        <div>
+          <h3 className='text-lg text-nowrap font-bold uppercase tracking-wider text-card-foreground'>
+            {prediction.label ?? prediction.eventName}
+            <span className='ml-2 inline-flex items-center'>
+              <p className='text-sm font-bold'>{prediction.points}</p>
+              <Flame size={16} className='stroke-primary' />
+            </span>
+          </h3>
+          <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mb-1'>
+            {prediction.timing.join(' - ')}
+            <PredictionTimingHelp />
+          </div>
         </div>
-      </div>
-    ),
-    content: (<p className='text-sm bg-secondary py-2 px-2 font-medium'>{prediction.description}</p>),
-    footer: (
-      <SubmissionCard
-        prediction={prediction}
-        options={getOptions(prediction.referenceTypes)}
-        wallet={wallet}
-        updateBetTotal={updateFormBetValue}
-        totalBet={totalBet}
-        maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
-    ),
-  }));
-
-  const basePredictionItems = enabledBasePredictions.map((prediction) => ({
-    header: (
-      <div>
-        <h3 className='text-lg text-nowrap font-bold uppercase tracking-wider text-card-foreground'>
-          {prediction.label ?? prediction.eventName}
-          <span className='ml-2 inline-flex items-center'>
-            <p className='text-sm font-bold'>{prediction.points}</p>
-            <Flame size={16} className='stroke-primary' />
-          </span>
-        </h3>
-        <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mt-1'>
-          {prediction.timing.join(' - ')}
-          <PredictionTimingHelp />
-        </div>
-      </div>
-    ),
-    content: (
-      <p className='text-sm bg-secondary py-2 px-2 font-medium'>{prediction.description}</p>
-    ),
-    footer: (
-      <SubmissionCard
-        prediction={prediction}
-        options={getOptions(prediction.referenceTypes)}
-        wallet={wallet}
-        updateBetTotal={updateFormBetValue}
-        totalBet={totalBet}
-        maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
-    ),
-  }));
+      ),
+      content: (
+        <p className='text-sm bg-secondary py-2 px-2 font-medium'>{prediction.description}</p>
+      ),
+      footer: (
+        <SubmissionCard
+          prediction={prediction}
+          options={getOptions(prediction.referenceTypes)}
+          wallet={wallet}
+          updateBetTotal={updateFormBetValue}
+          totalBet={totalBet}
+          maxBet={rules?.shauhinMode?.enabled ? rules.shauhinMode.maxBet : undefined} />
+      ),
+    }));
 
   return (
     <span className={cn('w-full', className)}>
-      <CoverCarousel items={[...basePredictionItems, ...customPredictionItems]} />
+      <CoverCarousel items={predictionItems} />
     </span>
   );
 }

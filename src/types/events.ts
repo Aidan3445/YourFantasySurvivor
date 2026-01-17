@@ -39,6 +39,7 @@ export type EnrichedEvent = EventWithReferences & {
     pairs: {
       castaway: EnrichedCastaway;
       member: LeagueMember | null;
+      secondaries?: LeagueMember[];
     }[];
   }[];
 };

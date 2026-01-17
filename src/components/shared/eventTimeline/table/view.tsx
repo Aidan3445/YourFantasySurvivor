@@ -40,10 +40,9 @@ export type PredictionAndPredOnly = Prediction & {
   predOnly?: boolean;
 };
 
-export default function EpisodeEvents(
-  { episodeNumber, seasonData, leagueData, mockEvents, edit, filters }: EpisodeEventsProps
-) {
-
+export default function EpisodeEvents({
+  episodeNumber, seasonData, leagueData, mockEvents, edit, filters
+}: EpisodeEventsProps) {
   const { league, selectionTimeline, customEvents, basePredictions } = leagueData ?? {};
 
   const { baseEvents, episodes, tribesTimeline, eliminations } = useMemo(() =>
@@ -188,6 +187,14 @@ export default function EpisodeEvents(
               });
           })
           : [];
+        Object.entries(selectionTimeline?.secondaryPicks ?? {}).forEach(([memberId, picks]) => {
+          if (event.references.some((ref) =>
+            ref.type === 'Castaway' && picks[numKey] === ref.id)) {
+            eventMembers.push(Number(memberId));
+          }
+        });
+
+
 
         const castawayMatch = filters.castaway.length === 0 || event.references.some((ref) =>
           ref.type === 'Castaway' && filters.castaway.includes(ref.id));
@@ -222,6 +229,7 @@ export default function EpisodeEvents(
     filters.tribe,
     league?.startWeek,
     selectionTimeline?.castawayMembers,
+    selectionTimeline?.secondaryPicks,
     tribesTimeline
   ]);
 
@@ -250,11 +258,11 @@ export default function EpisodeEvents(
   const noMembers = useMemo(() => !selectionTimeline || !league, [selectionTimeline, league]);
 
   return (
-    <ScrollArea className='w-[calc(100svw-2.5rem)] md:w-[calc(100svw-var(--sidebar-width)-3rem)] lg:w-full bg-card gap-0'>
+    <ScrollArea className='bg-card gap-0'>
       <Table className='w-full'>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader>
-          <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-primary/5 px-4 gap-4 items-center text-nowrap'>
+          <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-white/80 px-4 gap-4 items-center text-nowrap'>
             {edit && <TableHead className='w-0 font-bold uppercase text-xs tracking-wider'>
               Edit
             </TableHead>}
@@ -272,7 +280,7 @@ export default function EpisodeEvents(
             .map((episode, index) => (
               <Fragment key={`timeline-${episode.episodeNumber}`}>
                 {episodeNumber === -1 &&
-                  <TableRow className='bg-primary/10 border-t-2 border-primary/20 hover:bg-primary/10'>
+                  <TableRow className='bg-primary/10 border-t-2 border-primary/20 hover:bg-primary/5'>
                     <TableCell colSpan={7} className='text-center font-black uppercase text-sm tracking-wider py-3'>
                       Episode {episode.episodeNumber}: {episode.title}
                     </TableCell>

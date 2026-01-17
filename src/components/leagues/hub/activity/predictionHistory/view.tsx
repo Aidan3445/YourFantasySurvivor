@@ -135,7 +135,7 @@ export default function PredictionHistory() {
 
     const [episode, preds] = prediction;
     return (
-      <Card className='w-full p-0 bg-card rounded-lg border-2 border-primary/20'>
+      <Card className='w-full p-0 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10'>
         {/* Accent Elements */}
         <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
         <CardHeader>

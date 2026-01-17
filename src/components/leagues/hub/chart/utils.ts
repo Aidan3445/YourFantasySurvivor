@@ -1,3 +1,6 @@
+import { type CurveType } from '@mui/x-charts';
+import { type ChartsLabelMarkType } from '@mui/x-charts/internals';
+
 type FormattedData = {
   episode: string | number;
   [key: string]: number | string;
@@ -58,9 +61,11 @@ export function formatDataForMui({ data, startWeek }: ScoreChartProps) {
 
     return {
       label: member.name,
+      curve: 'natural' as CurveType,
       data: seriesData,
       color: member.color,
-      curve: 'linear' as const,
+      labelMarkType: 'circle' as ChartsLabelMarkType,
+      showMark: ({ index }: { index: number }) => index === seriesData.length - 1,
     };
   });
 

@@ -39,9 +39,9 @@ export default function CastawayEntry({ place, castaway, points, tribeTimeline, 
             </div>
           </TableCell>
           <TableCell>
-            <div className='flex justify-center items-center'>
-              <h3 className='leading-none font-black text-lg tabular-nums text-primary ml-auto'>{points}</h3>
-              <Flame className='inline w-5 h-5 stroke-muted-foreground -mt-0.5' />
+            <div className='flex justify-center items-center pl-1'>
+              <h3 className='leading-none font-black text-lg tabular-nums text-primary'>{points}</h3>
+              <Flame className='inline w-5 h-5 stroke-muted-foreground -mt-0.5 mr-auto' />
             </div>
           </TableCell>
         </>

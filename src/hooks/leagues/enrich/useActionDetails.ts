@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePredictionTiming } from '~/hooks/leagues/usePredictionTiming';
 import { useSelectionTimeline } from '~/hooks/leagues/useSelectionTimeline';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
-import { type EnrichedCastaway } from '~/types/castaways';
+import { type Castaway, type EnrichedCastaway } from '~/types/castaways';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
 import { useRouter } from 'next/navigation';
@@ -64,22 +64,12 @@ export function useLeagueActionDetails(overrideHash?: string) {
       member: LeagueMember;
       castawayFullName: string;
       castawayId: number;
+      secondary?: {
+        castawayFullName: string;
+        castawayId: number;
+      };
       out: boolean
     }[] = [];
-
-    /*
-    Object.values(tribeMembers).forEach(({ castaways }) => {
-      castaways.forEach(castaway => {
-        const selection = selectionTimeline.castawayMembers[castaway.castawayId]?.[nextEpisode];
-        if (selection) {
-          const member = leagueMembers.members.find(m => m.memberId === selection);
-          if (member) {
-            picks.push({ member, castawayFullName: castaway.fullName, castawayId: castaway.castawayId });
-          }
-        }
-      });
-    });
-    */
 
     leagueMembers.members.forEach(member => {
       const selections = selectionTimeline.memberCastaways[member.memberId] ?? [];
@@ -97,16 +87,37 @@ export function useLeagueActionDetails(overrideHash?: string) {
       }
 
       const castaway = castaways?.find(c => c.castawayId === selectionId);
+
+      let secondaryCastaway: Castaway | undefined = undefined;
+
+      if (settings?.secondaryPickEnabled) {
+        const secondarySelections = selectionTimeline.secondaryPicks?.[member.memberId] ?? [];
+        const secondarySelectionId = secondarySelections[nextEpisode];
+
+        secondaryCastaway = castaways?.find(c => c.castawayId === secondarySelectionId);
+      }
+
       picks.push({
         member,
         castawayFullName: castaway ? castaway.fullName : 'No Pick',
         castawayId: castaway ? castaway.castawayId : -1,
+        secondary: secondaryCastaway ? {
+          castawayFullName: secondaryCastaway.fullName,
+          castawayId: secondaryCastaway.castawayId
+        } : undefined,
         out: false
       });
     });
 
     return picks;
-  }, [nextEpisode, tribeMembers, leagueMembers, selectionTimeline, castaways]);
+  }, [
+    nextEpisode,
+    tribeMembers,
+    leagueMembers,
+    selectionTimeline,
+    castaways,
+    settings?.secondaryPickEnabled
+  ]);
 
   const actionDetails = useMemo(() => {
     if (!league || !rules || !selectionTimeline || !nextEpisode ||
@@ -258,6 +269,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
     predictionRuleCount,
     settings,
     predictionsMade,
+    basePredictionsMade,
     selectionTimeline,
     keyEpisodes,
     dialogOpen,

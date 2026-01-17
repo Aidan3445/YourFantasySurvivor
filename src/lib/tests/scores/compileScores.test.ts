@@ -225,6 +225,7 @@ describe('compileScores', () => {
           enabledBets: []
         },
         custom: [],
+        secondaryPick: null
       };
 
       const { scores } = compileScores(
@@ -453,6 +454,7 @@ describe('compileScores', () => {
         },
         shauhinMode: { enabled: false, maxBet: 102, maxBetsPerWeek: 5, startWeek: 'After Merge', customStartWeek: 8, enabledBets: [] },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -523,6 +525,7 @@ describe('compileScores', () => {
         },
         shauhinMode: { enabled: false, maxBet: 102, maxBetsPerWeek: 5, startWeek: 'After Merge', customStartWeek: 8, enabledBets: [] },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -591,6 +594,7 @@ describe('compileScores', () => {
         },
         shauhinMode: { enabled: false, maxBet: 102, maxBetsPerWeek: 5, startWeek: 'After Merge', customStartWeek: 8, enabledBets: [] },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -750,6 +754,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound', 'indivWin'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -831,6 +836,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -920,6 +926,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound', 'indivWin'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1019,6 +1026,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound', 'indivWin'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1118,6 +1126,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound', 'indivWin'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1198,6 +1207,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1280,6 +1290,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound', 'indivWin'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1369,6 +1380,7 @@ describe('compileScores', () => {
           enabledBets: ['advFound', 'indivWin'],
         },
         custom: [],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1475,6 +1487,7 @@ describe('compileScores', () => {
             timing: ['Weekly'],
           },
         ],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1637,6 +1650,7 @@ describe('compileScores', () => {
             timing: ['Weekly'],
           },
         ],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1651,9 +1665,9 @@ describe('compileScores', () => {
       );
 
       // When only prediction type custom events exist (which are skipped), no tribes/castaways get scored
-      // The tribeUpdate event initializes tribes and castaways but doesn't score them
+      // The tribeUpdate event initializes tribes and castaways but doesn't score them.
       // Since the custom event is type Prediction, it's skipped in the events section
-      // Therefore tribes and castaways should be initialized and have running totals
+      // Therefore tribes and castaways should be initialized and have running totals.
       expect(scores.Tribe[3]).toBeDefined();
       expect(scores.Tribe[4]).toBeDefined();
       expect(scores.Castaway[1]).toBeDefined();
@@ -1717,6 +1731,7 @@ describe('compileScores', () => {
             timing: ['Weekly'],
           },
         ],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1800,6 +1815,7 @@ describe('compileScores', () => {
             timing: ['Weekly'],
           },
         ],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1950,6 +1966,7 @@ describe('compileScores', () => {
             timing: ['Weekly'],
           },
         ],
+        secondaryPick: null,
       };
 
       const { scores } = compileScores(
@@ -1972,6 +1989,738 @@ describe('compileScores', () => {
 
       // Other members should have 0 points
       expect(scores.Member[20]?.[4]).toBe(0);
+    });
+  });
+
+  describe('Secondary Pick Scoring', () => {
+    it('should score secondary picks with full multiplier', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        3: {
+          10: {
+            eventId: 10,
+            eventName: 'advFound',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10], // Member 10 has castaway 3 as main selection
+          4: [null, 20], // Member 20 has castaway 4 as main selection
+        },
+        memberCastaways: {
+          10: [null, 3], // Member 10's main selections
+          20: [null, 4], // Member 20's main selections
+        },
+        secondaryPicks: {
+          20: [null, null, null, 3], // Member 20 picks castaway 3 as secondary in episode 3
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1, // Full points
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have 5 points from their main selection (castaway 3)
+      expect(scores.Member[10]?.[3]).toBe(5);
+
+      // Member 20 should have 5 points from their secondary pick (castaway 3)
+      expect(scores.Member[20]?.[3]).toBe(5);
+    });
+
+    it('should not score secondary picks when feature is disabled', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        3: {
+          10: {
+            eventId: 10,
+            eventName: 'advFound',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10], // Member 10 has castaway 3 as main selection
+        },
+        memberCastaways: {
+          10: [null, 3],
+        },
+        secondaryPicks: {
+          20: [null, null, null, 3], // Member 20 picks castaway 3 as secondary in episode 3
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: false, // Feature disabled
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have 5 points from their main selection
+      expect(scores.Member[10]?.[3]).toBe(5);
+
+      // Member 20 will not be initialized since secondary picks are
+      // disabled and no events scored for their main selection
+      expect(scores.Member[20]?.[3]).toBeUndefined();
+    });
+
+    it('should score secondary picks when secondaryPick is null', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        3: {
+          10: {
+            eventId: 10,
+            eventName: 'advFound',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10],
+        },
+        memberCastaways: {
+          10: [null, 3],
+        },
+        secondaryPicks: {
+          3: [null, null, null, 20],
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: null, // Feature not configured
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have 5 points from their main selection
+      expect(scores.Member[10]?.[3]).toBe(5);
+
+      // Member 20 should not be initialized since no secondary pick was made
+      // and no events scored for their main selection
+      expect(scores.Member[20]?.[3]).toBeUndefined();
+    });
+
+    it('should score both main and secondary picks for the same member', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        3: {
+          10: {
+            eventId: 10,
+            eventName: 'advFound',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+          11: {
+            eventId: 11,
+            eventName: 'indivWin',
+            references: [{ type: 'Castaway', id: 4 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10], // Member 10 has castaway 3 as main selection
+          4: [null, 20], // Member 20 has castaway 4 as main selection
+        },
+        memberCastaways: {
+          10: [null, 3],
+          20: [null, 4],
+        },
+        secondaryPicks: {
+          20: [null, null, null, 3], // Member 20 picks castaway 3 as secondary in episode 3
+          10: [null, null, null, 4], // Member 10 picks castaway 4 as secondary in episode 3
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have 5 (main: castaway 3 advFound) + 10 (secondary: castaway 4 indivWin) = 15
+      expect(scores.Member[10]?.[3]).toBe(15);
+
+      // Member 20 should have 10 (main: castaway 4 indivWin) + 5 (secondary: castaway 3 advFound) = 15
+      expect(scores.Member[20]?.[3]).toBe(15);
+    });
+
+    it('should score secondary picks for tribe events', () => {
+      const baseEvents: Events = {
+        1: {
+          ...initialTribesEvents,
+          2: {
+            eventId: 2,
+            eventName: 'tribe1st',
+            references: [{ type: 'Tribe', id: 4 }],
+            eventSource: 'Base',
+            episodeId: 10,
+            episodeNumber: 1,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          1: [null, 10], // Member 10 has castaway 1 as main selection
+        },
+        memberCastaways: {
+          10: [null, 1],
+        },
+        secondaryPicks: {
+          20: [null, 3], // Member 20 picks castaway 3 as secondary in episode 1
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have 2 points (castaway 1 in tribe 4 which got tribe1st)
+      expect(scores.Member[10]?.[1]).toBe(2);
+
+      // Member 20 should have 2 points (castaway 3 in tribe 4 which got tribe1st)
+      expect(scores.Member[20]?.[1]).toBe(2);
+    });
+
+    it('should score secondary picks for custom events', () => {
+      const baseEvents: Events = { 1: initialTribesEvents };
+      const customEvents: CustomEvents = {
+        events: {
+          3: {
+            20: {
+              eventId: 20,
+              eventName: 'customEvent1',
+              references: [{ type: 'Castaway', id: 3 }],
+              eventSource: 'Custom',
+              episodeId: 12,
+              episodeNumber: 3,
+              eventType: 'Direct',
+              label: null,
+              notes: null,
+            },
+          },
+        },
+        predictions: {},
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10],
+        },
+        memberCastaways: {
+          10: [null, 3],
+        },
+        secondaryPicks: {
+          20: [null, null, null, 3], // Member 20 picks castaway 3 as secondary in episode 3
+        },
+      };
+
+      const customRules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [
+          {
+            eventName: 'customEvent1',
+            customEventRuleId: 1,
+            points: 15,
+            description: 'Custom Event 1 Points',
+            eventType: 'Direct',
+            referenceTypes: ['Castaway'],
+            timing: ['Weekly'],
+          },
+        ],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        customEvents,
+        {},
+        customRules
+      );
+
+      // Member 10 should have 15 points from their main selection
+      expect(scores.Member[10]?.[3]).toBe(15);
+
+      // Member 20 should have 15 points from their secondary pick
+      expect(scores.Member[20]?.[3]).toBe(15);
+    });
+
+    it('should handle null secondary picks gracefully', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        3: {
+          10: {
+            eventId: 10,
+            eventName: 'advFound',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10],
+        },
+        memberCastaways: {
+          10: [null, 3],
+        },
+        secondaryPicks: {
+          3: [null, null, null, null], // No secondary pick in episode 3
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have 5 points from their main selection
+      expect(scores.Member[10]?.[3]).toBe(5);
+
+      // No other members should be scored
+      expect(Object.keys(scores.Member).length).toBe(1);
+    });
+
+    it('should not score secondary picks when secondaryPicks timeline is not provided', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        3: {
+          10: {
+            eventId: 10,
+            eventName: 'advFound',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10],
+        },
+        memberCastaways: {
+          10: [null, 3],
+        },
+        // No secondaryPicks provided
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have 5 points from their main selection
+      expect(scores.Member[10]?.[3]).toBe(5);
+
+      // No other members should be scored
+      expect(Object.keys(scores.Member).length).toBe(1);
+    });
+
+    it('should score secondary picks across multiple episodes', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        2: {
+          10: {
+            eventId: 10,
+            eventName: 'advFound',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 7,
+            episodeNumber: 2,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+        3: {
+          11: {
+            eventId: 11,
+            eventName: 'indivWin',
+            references: [{ type: 'Castaway', id: 4 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10],
+          4: [null, 10],
+        },
+        memberCastaways: {
+          10: [null, 3],
+        },
+        secondaryPicks: {
+          20: [null, null, 3, 4], // Member 20 picks castaway 3 in episode 2 and castaway 4 in episode 3
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 20 should have 5 points from episode 2 (castaway 3 advFound)
+      expect(scores.Member[20]?.[2]).toBe(5);
+
+      // Member 20 should have 5 + 10 = 15 points total (episode 2 + episode 3 indivWin)
+      expect(scores.Member[20]?.[3]).toBe(15);
+
+      // Member 10 should have 5 + 10 = 15 points from their main selections
+      expect(scores.Member[10]?.[3]).toBe(15);
+    });
+
+    it('should score secondary picks with negative points', () => {
+      const baseEvents: Events = {
+        1: initialTribesEvents,
+        3: {
+          10: {
+            eventId: 10,
+            eventName: 'badAdvPlay',
+            references: [{ type: 'Castaway', id: 3 }],
+            eventSource: 'Base',
+            episodeId: 8,
+            episodeNumber: 3,
+            eventType: 'Direct',
+            label: null,
+            notes: null,
+          },
+        },
+      };
+
+      const selectionTimelines: SelectionTimelines = {
+        castawayMembers: {
+          3: [null, 10],
+        },
+        memberCastaways: {
+          10: [null, 3],
+        },
+        secondaryPicks: {
+          20: [null, null, null, 3],
+        },
+      };
+
+      const rules: LeagueRules = {
+        base: defaultBaseRules,
+        basePrediction: defaultBasePredictionRules,
+        shauhinMode: {
+          enabled: false,
+          maxBet: 0,
+          maxBetsPerWeek: 0,
+          startWeek: 'After Merge',
+          customStartWeek: null,
+          enabledBets: [],
+        },
+        custom: [],
+        secondaryPick: {
+          enabled: true,
+          canPickOwnSurvivor: false,
+          lockoutPeriod: 3,
+          publicPicks: false,
+          multiplier: 1,
+        },
+      };
+
+      const { scores } = compileScores(
+        baseEvents,
+        basicEliminations,
+        basicTribesTimeline,
+        basicKeyEpisodes,
+        selectionTimelines,
+        { events: [], predictions: [] },
+        {},
+        rules
+      );
+
+      // Member 10 should have -5 points (badAdvPlay default)
+      expect(scores.Member[10]?.[3]).toBe(-5);
+
+      // Member 20 should have -5 points from their secondary pick
+      expect(scores.Member[20]?.[3]).toBe(-5);
     });
   });
 });

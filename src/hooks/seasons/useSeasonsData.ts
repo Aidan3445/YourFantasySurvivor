@@ -1,7 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type SeasonsDataQuery } from '~/types/seasons';
+import { type Episode, type KeyEpisodes } from '~/types/episodes';
 import { useRefreshConfig } from '~/hooks/helpers/useRefreshConfig';
 import { useIsEpisodeAiringForSeason } from '~/hooks/helpers/useIsEpisodeAiring';
+import { loadOverrideConfig } from '~/lib/devEpisodeOverride';
 
 /**
   * Fetches seasons data from the API.
@@ -12,6 +14,7 @@ import { useIsEpisodeAiringForSeason } from '~/hooks/helpers/useIsEpisodeAiring'
 export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
   const isEpisodeAiring = useIsEpisodeAiringForSeason(seasonId ?? null);
   const refreshConfig = useRefreshConfig(isEpisodeAiring);
+  const queryClient = useQueryClient();
 
   return useQuery<SeasonsDataQuery[]>({
     queryKey: ['seasons', seasonId, includeInactive],
@@ -34,6 +37,30 @@ export function useSeasonsData(includeInactive: boolean, seasonId?: number) {
           airDate: new Date(episode.airDate),
         })),
       }));
+    },
+    select: (data) => {
+      // Check if there's an active dev override
+      const overrideConfig = loadOverrideConfig();
+
+      if (!overrideConfig?.enabled) return data;
+      
+
+      // Apply override to matching season data
+      return data.map(seasonData => {
+        if (seasonData.season.seasonId !== overrideConfig.seasonId) {
+          return seasonData;
+        }
+
+        // Get overridden episodes and keyEpisodes from cache
+        const overriddenEpisodes = queryClient.getQueryData<Episode[]>(['episodes', overrideConfig.seasonId]);
+        const overriddenKeyEpisodes = queryClient.getQueryData<KeyEpisodes>(['episodes', overrideConfig.seasonId, 'key']);
+
+        return {
+          ...seasonData,
+          episodes: overriddenEpisodes ?? seasonData.episodes,
+          keyEpisodes: overriddenKeyEpisodes ?? seasonData.keyEpisodes,
+        };
+      });
     },
     enabled: true,
     ...refreshConfig

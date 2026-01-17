@@ -39,7 +39,8 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
         base: overrideBaseRules,
         basePrediction: null,
         custom: [],
-        shauhinMode: null
+        shauhinMode: null,
+        secondaryPick: null
       } : null
     ).scores;
 
@@ -141,14 +142,14 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
                     <TableHead>Points</TableHead>
                   </>
                 )}
-                <TableHead>Castaway</TableHead>
+                <TableHead className='w-1/2'>Castaway</TableHead>
                 {!allZero && (
                   <>
                     <TableHead>Place</TableHead>
                     <TableHead>Points</TableHead>
                   </>
                 )}
-                <TableHead>Castaway</TableHead>
+                <TableHead className='w-1/2'>Castaway</TableHead>
               </TableRow>
             </TableHeader>
             <ScorboardBody

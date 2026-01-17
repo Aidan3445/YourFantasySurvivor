@@ -1,6 +1,6 @@
 import z from 'zod';
 import { EventTypes, PredictionTimings, ReferenceTypes, ScoringBaseEventNames } from '~/lib/events';
-import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, MAX_SURVIVAL_CAP, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings, type LeagueStatuses } from '~/lib/leagues';
+import { ABS_MAX_EVENT_POINTS, LEAGUE_NAME_MAX_LENGTH, LEAGUE_NAME_MIN_LENGTH, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings, type LeagueStatuses, MAX_SEASON_LENGTH } from '~/lib/leagues';
 import { type EventType, type ReferenceType, type PredictionTiming, type ScoringBaseEventName } from '~/types/events';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
@@ -51,12 +51,21 @@ export const LeagueInsertZod = z.object({
 });
 export type LeagueInsert = z.infer<typeof LeagueInsertZod>;
 
+export type SecondaryPickSettings = {
+  enabled: boolean;
+  canPickOwnSurvivor: boolean;
+  lockoutPeriod: number; // 0-MAX_SEASON_LENGTH, max is lock out
+  publicPicks: boolean;
+  multiplier: 0.25 | 0.5 | 0.75 | 1;
+};
+
 export type LeagueSettings = {
   leagueId: number;
   isProtected: boolean;
   draftDate: Date | null;
   survivalCap: number;
   preserveStreak: boolean;
+  secondaryPickEnabled: boolean;
 };
 
 export type LeagueSettingsUpdate = {
@@ -65,6 +74,11 @@ export type LeagueSettingsUpdate = {
   draftDate?: Date | null | string;
   survivalCap?: number;
   preserveStreak?: boolean;
+  secondaryPickEnabled?: boolean;
+  secondaryPickCanPickOwn?: boolean;
+  secondaryPickLockoutPeriod?: number;
+  secondaryPickPublicPicks?: boolean;
+  secondaryPickMultiplier?: 0.25 | 0.5 | 0.75 | 1;
 }
 
 export const LeagueDetailsUpdateZod = z.object({
@@ -74,14 +88,27 @@ export const LeagueDetailsUpdateZod = z.object({
 export type LeagueDetailsUpdate = z.infer<typeof LeagueDetailsUpdateZod>;
 
 export const SurvivalCapZod = z.coerce.number().int()
-  .gte(0, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SURVIVAL_CAP}` })
-  .lte(MAX_SURVIVAL_CAP, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SURVIVAL_CAP}` });
+  .gte(0, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SEASON_LENGTH}` })
+  .lte(MAX_SEASON_LENGTH, { message: `Survival cap must be either 0 (no cap) or less than ${MAX_SEASON_LENGTH}` });
 
 export const LeagueSurvivalUpdateZod = z.object({
   survivalCap: SurvivalCapZod,
   preserveStreak: z.boolean(),
 });
 export type LeagueSurvivalUpdate = z.infer<typeof LeagueSurvivalUpdateZod>;
+
+export const SecondaryPickSettingsZod = z.object({
+  enabled: z.boolean(),
+  canPickOwnSurvivor: z.boolean(),
+  lockoutPeriod: z.coerce.number().int().min(0).max(MAX_SEASON_LENGTH),
+  publicPicks: z.boolean(),
+  multiplier: z.union([
+    z.literal(0.25),
+    z.literal(0.5),
+    z.literal(0.75),
+    z.literal(1)
+  ]),
+});
 
 export const EventPointsZod = z.coerce.number().int()
   .gte(-ABS_MAX_EVENT_POINTS, { message: `Points must be between -${ABS_MAX_EVENT_POINTS} and ${ABS_MAX_EVENT_POINTS}` })
@@ -208,6 +235,7 @@ export type LeagueRules = {
   basePrediction: BaseEventPredictionRules | null;
   shauhinMode: ShauhinModeSettings | null;
   custom: CustomEventRule[];
+  secondaryPick: SecondaryPickSettings | null;
 };
 
 export const CustomEventRuleInsertZod = z.object({
@@ -226,21 +254,25 @@ export type CustomEventRuleInsert = z.infer<typeof CustomEventRuleInsertZod>;
   * Record<castawayId | memberId, (castawayId | null)[] | (memberId | null)[]>
   */
 export type SelectionTimeline = Record<number, (number | null)[]>;
+
 /**
   * Selection timelines for both member->castaway and castaway->member selections.
+  * As well as secondary picks which are also optional member->castaway selections.
   * The keys are member IDs or castaway IDs, and the values are arrays of selected IDs with index
   * representing the episode number.
   * ---
   * For example:
   * [memberCastaways][[memberId]][[3]] gives the [castawayId] selected by [memberId] in episode [3]
   * [castawayMembers][[castawayId]][[5]] gives the [memberId] who selected [castawayId] in episode [5]
+  * [secondaryPicks][[memberId]][[2]] gives the [castawayId] selected as secondary pick by [memberId] in episode [2]
   * ---
   * If a castaway is available (not selected) in an episode, the value is [null].
   * When a member has no selection in an episode, the value is [null].
   */
 export type SelectionTimelines = {
   memberCastaways: SelectionTimeline,
-  castawayMembers: SelectionTimeline
+  castawayMembers: SelectionTimeline,
+  secondaryPicks?: SelectionTimeline,
 };
 
 /**

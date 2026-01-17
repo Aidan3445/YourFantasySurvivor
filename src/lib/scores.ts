@@ -154,6 +154,7 @@ export function compileScores(
       // skip prediction events here, they are handled below
       if (event.eventType === 'Prediction') return;
 
+
       const points = customEventRules.find((r) => r.eventName === event.eventName)?.points;
       if (!points) return;
 
@@ -172,6 +173,8 @@ export function compileScores(
             const cmIndex = Math.min(episodeNum,
               (selectionTimelines.castawayMembers[castaway]?.length ?? 0) - 1);
             const leagueMember = selectionTimelines.castawayMembers[castaway]?.[cmIndex];
+
+
             // if the castaway was not selected at this episode, don't score the member
             if (!leagueMember) return;
             scores.Member[leagueMember] ??= [];
@@ -181,7 +184,7 @@ export function compileScores(
         }
         // score members if this is a castaway event
         if (reference.type === 'Castaway') {
-          const cmIndex = Math.min(episodeNum - 1,
+          const cmIndex = Math.min(episodeNum,
             (selectionTimelines.castawayMembers[reference.id]?.length ?? 0) - 1);
           const leagueMember = selectionTimelines.castawayMembers[reference.id]?.[cmIndex];
           // if the castaway was not selected at this episode, don't score the member
@@ -209,6 +212,32 @@ export function compileScores(
       scores.Member[prediction.predictionMakerId]![episodeNum]! += points;
     });
   });
+
+  // score secondary picks
+  if (rules?.secondaryPick?.enabled
+    && rules?.secondaryPick.multiplier > 0
+    && selectionTimelines.secondaryPicks) {
+    Object.entries(selectionTimelines.secondaryPicks).forEach(([memberId, episodeSelections]) => {
+      const mid = parseInt(memberId, 10);
+
+      Object.entries(episodeSelections).forEach(([episodeNumber, castawayId]) => {
+        if (!castawayId) return;
+        const episodeNum = parseInt(episodeNumber, 10);
+
+        // Get the base points earned by this castaway in this episode
+        const castawayPoints = scores.Castaway[castawayId]?.[episodeNum] ?? 0;
+
+        // Apply multiplier
+        const secondaryPoints = castawayPoints * rules.secondaryPick!.multiplier;
+
+        if (secondaryPoints !== 0) {
+          scores.Member[mid] ??= [];
+          scores.Member[mid][episodeNum] ??= 0;
+          scores.Member[mid][episodeNum] += secondaryPoints;
+        }
+      });
+    });
+  }
 
   // survival streak bonus
   // after each episode the castaway survives, they earn a bonus point

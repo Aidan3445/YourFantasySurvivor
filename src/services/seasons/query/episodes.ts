@@ -6,16 +6,21 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { type Episode } from '~/types/episodes';
 import { unstable_cache } from 'next/cache';
 import { getAirStatus } from '~/lib/episodes';
+import { type DBTransaction } from '~/types/server';
 
 /**
   * Get the episodes for a season and caches the result
   * @param seasonId The season id
+  * @param transactionOverride Optional transaction override
   * @returns the episodes starting from the next episode to air sorted by air date in descending order
   * @returnsObj `Episode[]`
   */
-export default async function getEpisodes(seasonId: number) {
+export default async function getEpisodes(
+  seasonId: number,
+  transactionOverride?: DBTransaction
+) {
   return unstable_cache(
-    async (seasonId: number) => fetchEpisodes(seasonId),
+    async (seasonId: number) => fetchEpisodes(seasonId, transactionOverride),
     ['episodes', seasonId.toString()],
     {
       revalidate: 60, // 1 minute
@@ -24,8 +29,8 @@ export default async function getEpisodes(seasonId: number) {
   )(seasonId);
 }
 
-async function fetchEpisodes(seasonId: number) {
-  const episodes = await db
+async function fetchEpisodes(seasonId: number, transactionOverride?: DBTransaction) {
+  const episodes = await (transactionOverride ?? db)
     .select()
     .from(episodeSchema)
     .where(eq(episodeSchema.seasonId, seasonId))

@@ -10,9 +10,10 @@ import { useBasePredictions } from '~/hooks/leagues/useBasePredictions';
 import { useLeagueRules } from '~/hooks/leagues/useRules';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import type { LeagueData } from '~/components/shared/eventTimeline/filters';
+import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 
 interface LeagueTimelineProps {
-  seasonData: SeasonsDataQuery;
+  initialSeasonData: SeasonsDataQuery;
   hideMemberFilter?: boolean;
 }
 
@@ -21,7 +22,7 @@ interface LeagueTimelineProps {
  * Use this component on league routes where league context is available.
  * For non-league contexts (like seasons page), use EventTimeline directly.
  */
-export default function LeagueTimeline({ seasonData, hideMemberFilter = false }: LeagueTimelineProps) {
+export default function LeagueTimeline({ initialSeasonData, hideMemberFilter = false }: LeagueTimelineProps) {
   // Fetch all league data at this level to avoid nested delays
   const { data: league } = useLeague();
   const { data: selectionTimeline } = useSelectionTimeline();
@@ -29,6 +30,7 @@ export default function LeagueTimeline({ seasonData, hideMemberFilter = false }:
   const { data: basePredictions } = useBasePredictions();
   const { data: leagueRules } = useLeagueRules();
   const { data: leagueMembers } = useLeagueMembers();
+  const { data: fetchedSeasonData } = useSeasonsData(true, league?.seasonId);
 
   const leagueData: LeagueData = useMemo(() => ({
     league,
@@ -38,6 +40,11 @@ export default function LeagueTimeline({ seasonData, hideMemberFilter = false }:
     leagueRules,
     leagueMembers
   }), [league, selectionTimeline, customEvents, basePredictions, leagueRules, leagueMembers]);
+
+
+  const seasonData = useMemo(() => {
+    return fetchedSeasonData?.[0] ?? initialSeasonData;
+  }, [fetchedSeasonData, initialSeasonData]);
 
   return (
     <EventTimeline

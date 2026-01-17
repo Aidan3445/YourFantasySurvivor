@@ -61,13 +61,20 @@ export default function JoinLeagueForm({ hash, isProtected, colors }: JoinLeague
 
   return (
     <Form {...reactForm}>
-      <form className='p-2 gap-2 bg-card rounded-lg w-96' action={() => handleSubmit()}>
+      <form className='p-6 gap-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20 w-full max-w-lg' action={() => handleSubmit()}>
+        <div className='w-full flex items-center gap-2 justify-center mb-4'>
+          <span className='h-5 w-0.5 bg-primary rounded-full' />
+          <h2 className='text-2xl font-black uppercase tracking-tight text-center'>
+            Customize Your Profile
+          </h2>
+          <span className='h-5 w-0.5 bg-primary rounded-full' />
+        </div>
         <LeagueMemberFields memberColors={colors} />
         <Button
-          className='w-full'
+          className='w-full mt-4'
           type='submit'
           disabled={!reactForm.formState.isValid}>
-          {isProtected && 'Request to'} Join League
+          {isProtected ? 'Request to Join League' : 'Join League'}
         </Button>
       </form>
     </Form>

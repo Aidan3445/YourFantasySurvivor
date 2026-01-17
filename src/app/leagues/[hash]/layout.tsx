@@ -2,11 +2,52 @@ import { SignIn } from '@clerk/nextjs';
 import { type ReactNode } from 'react';
 import LeagueHeader from '~/components/leagues/layout/leagueHeader';
 import { leagueMemberAuth } from '~/lib/auth';
+import getPublicLeague from '~/services/leagues/query/public';
+import type { Metadata } from 'next';
+import { metadata as baseMetadata } from '~/app/layout';
 
 export interface LeaguePageProps {
   params: Promise<{
     hash: string;
   }>;
+}
+
+export async function generateMetadata(
+  { params }: LeaguePageProps,
+): Promise<Metadata> {
+  const { hash } = await params;
+  const league = await getPublicLeague(hash);
+
+  if (!league) {
+    return {
+      ...baseMetadata,
+      title: 'League Not Found | YFS',
+    };
+  }
+
+  const getStatusMessage = () => {
+    switch (league.status) {
+      case 'Draft':
+        return 'DRAFT IS LIVE';
+      case 'Inactive':
+        return 'SEASON ENDED';
+      case 'Predraft':
+      case 'Active':
+        return '';
+      default:
+        return league.status;
+    }
+  };
+
+  return {
+    ...baseMetadata,
+    title: `${league.name} | YFS`,
+    openGraph: {
+      title: `${league.name} - ${getStatusMessage()}`,
+      description: `${league.season} | Join the competition on Your Fantasy Survivor!`,
+      images: ['https://i.imgur.com/xS6JQdr.png'],
+    }
+  };
 }
 
 export interface LeagueLayoutProps extends LeaguePageProps {
@@ -16,6 +57,7 @@ export interface LeagueLayoutProps extends LeaguePageProps {
 export default async function LeagueLayout({ children, params }: LeagueLayoutProps) {
   const { hash } = await params;
   const { memberId } = await leagueMemberAuth(hash);
+  const league = await getPublicLeague(hash);
 
   if (!memberId) {
     return (
@@ -36,7 +78,7 @@ export default async function LeagueLayout({ children, params }: LeagueLayoutPro
 
   return (
     <>
-      <LeagueHeader />
+      <LeagueHeader league={league} />
       {children}
     </>
   );

@@ -307,7 +307,7 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                 'will-change-transform transform-gpu',
                 'z-10 transition-all duration-400 drop-shadow-md bg-secondary rounded-md',
                 'overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip',
-                'basis-[90%] lg:basis-1/2',
+                'basis-[90%] lg:basis-2/3 xl:basis-1/2',
                 {
                   'pointer-events-none': offset !== 0,
 
@@ -331,13 +331,13 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                   {`Slide ${index + 1} of ${items.length}`}
                 </TableCaption>
                 <TableHeader>
-                  <TableRow className='bg-transparent hover:bg-transparent border-none px-0'>
-                    <TableHead className='text-center w-1/7 px-0'>
+                  <TableRow className='bg-accent/50 hover:bg-accent/50 border-none px-0'>
+                    <TableHead className='text-center w-1/7 px-0 align-bottom sm:align-middle pb-1'>
                       <Button
                         variant={'outline'}
                         type='button'
                         className={cn(
-                          'rounded-full z-10',
+                          'rounded-full z-10 w-min h-min p-1',
                           index === 0 && 'invisible',
                         )}
                         disabled={!api?.canScrollPrev() || index !== current - 1}
@@ -349,12 +349,12 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                     <TableHead className='place-items-center text-center font-normal text-nowrap w-5/7 px-0'>
                       {item.header}
                     </TableHead>
-                    <TableHead className='text-center w-1/7 px-0'>
+                    <TableHead className='text-center w-1/7 px-0 align-bottom sm:align-middle pb-1'>
                       <Button
                         variant={'outline'}
                         type='button'
                         className={cn(
-                          'rounded-full z-10',
+                          'rounded-full z-10 w-min h-min p-1',
                           index === items.length - 1 && 'invisible',
                         )}
                         disabled={!api?.canScrollNext() || index !== current - 1}
@@ -364,7 +364,7 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                       </Button>
                     </TableHead>
                   </TableRow>
-                </TableHeader >
+                </TableHeader>
                 <TableBody>
                   <TableRow className='bg-transparent hover:bg-transparent border-none'>
                     <TableCell colSpan={3} className={cn(
@@ -374,17 +374,15 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                     </TableCell>
                   </TableRow>
                 </TableBody>
-                {
-                  item.footer && (
-                    <TableFooter className='border-none'>
-                      <TableRow className='bg-b2 hover:bg-b2 border-none'>
-                        <TableCell colSpan={3} className='p-0 will-change-transform transform-gpu'>
-                          {item.footer}
-                        </TableCell>
-                      </TableRow>
-                    </TableFooter>
-                  )
-                }
+                {item.footer && (
+                  <TableFooter className='border-none'>
+                    <TableRow className='bg-b2 hover:bg-b2 border-none'>
+                      <TableCell colSpan={3} className='p-0 will-change-transform transform-gpu'>
+                        {item.footer}
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                )}
               </Table>
             </CarouselItem>
           );

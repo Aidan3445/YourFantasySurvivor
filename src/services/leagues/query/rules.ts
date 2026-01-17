@@ -7,6 +7,10 @@ import { baseEventPredictionRulesSchema, baseEventRulesSchema, shauhinModeSettin
 import { customEventRuleSchema } from '~/server/db/schema/customEvents';
 import { basePredictionRulesSchemaToObject } from '~/lib/utils';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
+import { leagueSettingsSchema } from '~/server/db/schema/leagues';
+import { DEFAULT_SECONDARY_PICK_MULTIPLIER } from '~/lib/leagues';
+
+const DEFAULT_PICK_MULTIPLIER_PERCENTAGE = 100 * DEFAULT_SECONDARY_PICK_MULTIPLIER;
 
 /**
    * Get a league rules by its hash
@@ -20,13 +24,27 @@ export default async function getLeagueRules(auth: VerifiedLeagueMemberAuth) {
     .select({
       base: baseEventRulesSchema,
       basePrediction: baseEventPredictionRulesSchema,
-      shauhinMode: shauhinModeSettingsSchema
+      shauhinMode: shauhinModeSettingsSchema,
+      secondaryPick: {
+        enabled: leagueSettingsSchema.secondaryPickEnabled,
+        canPickOwnSurvivor: leagueSettingsSchema.secondaryPickCanPickOwn,
+        lockoutPeriod: leagueSettingsSchema.secondaryPickLockoutPeriod,
+        publicPicks: leagueSettingsSchema.secondaryPickPublicPicks,
+        multiplier: leagueSettingsSchema.secondaryPickMultiplier,
+      },
     })
     .from(baseEventRulesSchema)
+    .leftJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, baseEventRulesSchema.leagueId))
     .leftJoin(baseEventPredictionRulesSchema, eq(baseEventPredictionRulesSchema.leagueId, baseEventRulesSchema.leagueId))
     .leftJoin(shauhinModeSettingsSchema, eq(shauhinModeSettingsSchema.leagueId, baseEventRulesSchema.leagueId))
     .where(eq(baseEventRulesSchema.leagueId, auth.leagueId))
-    .then((rules) => rules[0]);
+    .then((rules) => ({
+      ...rules[0],
+      secondaryPick: {
+        ...rules[0]?.secondaryPick,
+        multiplier: (rules[0]?.secondaryPick?.multiplier ?? DEFAULT_PICK_MULTIPLIER_PERCENTAGE) / 100,
+      },
+    }));
 
   const customReq = db
     .select({
@@ -40,8 +58,11 @@ export default async function getLeagueRules(auth: VerifiedLeagueMemberAuth) {
 
   return {
     base: base?.base ?? null,
-    basePrediction: base ? basePredictionRulesSchemaToObject(base.basePrediction) : null,
+    basePrediction: base?.basePrediction
+      ? basePredictionRulesSchemaToObject(base.basePrediction)
+      : null,
     shauhinMode: base?.shauhinMode ?? null,
-    custom
+    custom,
+    secondaryPick: base?.secondaryPick ?? null,
   } as LeagueRules;
 }

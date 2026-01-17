@@ -8,14 +8,14 @@ import { Button } from '~/components/common/button';
 import { Flame, Lock, LockOpen } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '~/lib/utils';
-import SurvivalCapSlider from '~/components/leagues/customization/settings/cap/slider';
 import { type LeagueSurvivalUpdate, LeagueSurvivalUpdateZod } from '~/types/leagues';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
-import { DEFAULT_SURVIVAL_CAP, MAX_SURVIVAL_CAP } from '~/lib/leagues';
+import { DEFAULT_SURVIVAL_CAP, MAX_SEASON_LENGTH } from '~/lib/leagues';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
+import SeasonLengthSlider from '~/components/leagues/customization/settings/shared/slider';
 
 
 export default function SetSurvivalCap() {
@@ -94,11 +94,11 @@ export default function SetSurvivalCap() {
                         valueField.value > 0 ? 'text-green-600' : 'text-destructive')}>
                         {valueField.value === 0
                           ? 'Off'
-                          : valueField.value === MAX_SURVIVAL_CAP
+                          : valueField.value === MAX_SEASON_LENGTH
                             ? 'Unlimited'
                             : valueField.value}
                       </h2>
-                      {valueField.value > 0 && valueField.value < MAX_SURVIVAL_CAP &&
+                      {valueField.value > 0 && valueField.value < MAX_SEASON_LENGTH &&
                         <Flame size={20} className={cn('inline align-top',
                           valueField.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
                         )} />}
@@ -106,7 +106,7 @@ export default function SetSurvivalCap() {
                   </FormLabel>
                   <FormControl>
                     {!locked &&
-                      <SurvivalCapSlider value={valueField.value as number} onChange={valueField.onChange} />}
+                      <SeasonLengthSlider value={valueField.value as number} onChange={valueField.onChange} />}
                   </FormControl>
                   <FormDescription>
                     Set a cap on the maximum points a player can earn from their streak.
@@ -122,17 +122,20 @@ export default function SetSurvivalCap() {
                     name='preserveStreak'
                     render={({ field: preserveField }) => (
                       <FormItem className={valueField.value === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}>
-                        <FormLabel className='inline-flex gap-2 items-center'>Preserve Streak
-                          {locked &&
-                            <h2 className={cn('text-lg font-bold text-card-foreground',
-                              preserveField.value ? 'text-green-600' : 'text-destructive')}>
-                              {preserveField.value ? 'On' : 'Off'}
-                            </h2>}
-                        </FormLabel>
-                        <FormControl>
-                          {!locked &&
-                            <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
-                        </FormControl>
+                        <div className='flex items-center gap-1'>
+                          <FormLabel className='inline-flex gap-2 items-baseline'>
+                            Preserve Streak
+                            {locked &&
+                              <h2 className={cn('text-lg font-bold text-card-foreground',
+                                preserveField.value ? 'text-green-600' : 'text-destructive')}>
+                                {preserveField.value ? 'On' : 'Off'}
+                              </h2>}
+                          </FormLabel>
+                          <FormControl>
+                            {!locked &&
+                              <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
+                          </FormControl>
+                        </div>
                         <FormDescription>
                           Should streaks be <i className='text-muted-foreground'>preserved</i> if a
                           player switches their pick voluntarily, or reset to zero?
