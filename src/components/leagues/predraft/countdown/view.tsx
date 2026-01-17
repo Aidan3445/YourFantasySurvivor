@@ -10,9 +10,9 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { cn } from '~/lib/utils';
 import { Calendar, Clock as ClockIcon, Zap } from 'lucide-react';
 import { Badge } from '~/components/common/badge';
+import { Card, CardContent, CardHeader } from '~/components/common/card';
 
 interface DraftCountdownProps {
   overrideHash?: string;
@@ -52,7 +52,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
   const isScheduled = leagueSettings?.draftDate && leagueSettings.draftDate.getTime() > Date.now();
 
   return (
-    <article className={cn('relative overflow-hidden rounded-lg border-2 border-primary/20 bg-primary/5 p-3 transition-all', className)}>
+    <Card className={className}>
       {/* Accent glow for live draft */}
       {isDraftLive && (
         <div className='absolute top-0 right-0 w-32 h-32 bg-green-500/20 rounded-full blur-3xl' />
@@ -60,7 +60,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
 
       <div className='relative z-10'>
         {/* Header */}
-        <div className='flex items-center justify-between mb-2'>
+        <CardHeader className='flex items-center justify-between mb-2 px-0'>
           <div className='flex items-center gap-3 h-8'>
             <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
             <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
@@ -97,10 +97,10 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
               <StartDraft startDraft={onDraftJoin} />}
             {editable && <SetDraftDate overrideHash={overrideHash} />}
           </div>
-        </div>
+        </CardHeader>
 
         {/* Countdown / Action */}
-        <div className='bg-accent border-2 border-primary/30 rounded-lg overflow-hidden'>
+        <CardContent className='bg-accent border-2 border-primary/30 rounded-lg overflow-hidden px-0'>
           {leagueSettings?.draftDate && (
             <div className='pl-1.5 text-sm font-medium text-muted-foreground h-0'>
               {isScheduled ? (
@@ -127,8 +127,8 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
               }
             </Button>
           } />
-        </div>
+        </CardContent>
       </div>
-    </article>
+    </Card>
   );
 }

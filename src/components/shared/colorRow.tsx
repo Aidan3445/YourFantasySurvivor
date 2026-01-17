@@ -14,7 +14,7 @@ export default function ColorRow({ color, loggedIn, className, children }: Color
     <span
       className={cn(
         'px-4 gap-4 rounded border border-black flex items-center text-nowrap',
-        loggedIn && 'border-none ring-2 ring-white my-0.5',
+        loggedIn && 'ring-white ring-2',
         className
       )}
       style={{
