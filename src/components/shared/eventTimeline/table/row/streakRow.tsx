@@ -12,7 +12,7 @@ import { ShieldCheck, ShieldAlert } from 'lucide-react';
 interface StreakRowProps {
   streakPointValue: number;
   members: LeagueMember[];
-  streaksMap: Record<number, number[]>;
+  streaksMap: Record<number, Record<number, number>>; // memberId -> episodeNumber -> streakCount
   episodeNumber: number;
   shotInTheDarkStatus?: Record<number, { episodeNumber: number, status: 'pending' | 'saved' | 'wasted' } | null>;
 }
@@ -44,16 +44,10 @@ export default function StreakRow({
                       {member.displayName}
                     </ColorRow>
                     {shotUsedThisEpisode && shotStatus.status === 'saved' && (
-                      <ShieldCheck
-                        className='w-4 h-4 stroke-green-600'
-                        title='Shot in the Dark - Saved!'
-                      />
+                      <ShieldCheck className='w-4 h-4 stroke-green-600' />
                     )}
                     {shotUsedThisEpisode && shotStatus.status === 'wasted' && (
-                      <ShieldAlert
-                        className='w-4 h-4 stroke-destructive'
-                        title='Shot in the Dark - Wasted'
-                      />
+                      <ShieldAlert className='w-4 h-4 stroke-destructive' />
                     )}
                   </div>
                 </PopoverTrigger>

@@ -179,7 +179,7 @@ export default function EpisodeEventsTableBody({
                 members={members}
                 streaksMap={leagueData!.streaks!}
                 episodeNumber={episodeNumber}
-                shotInTheDarkStatus={leagueData!.shotInTheDarkStatus} />
+                shotInTheDarkStatus={leagueData?.shotInTheDarkStatus} />
             ))}
         </>
       )}

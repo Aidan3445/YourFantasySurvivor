@@ -28,6 +28,11 @@ export interface LeagueData {
   } | undefined;
   streaks?: Record<number, Record<number, number>>;
   leagueSettings?: LeagueSettings;
+  shotInTheDarkStatus: Record<number, {
+    episodeNumber: number;
+    status: 'pending' | 'saved' | 'wasted';
+  } | null>
+
 }
 
 export interface TimelineFiltersProps {
