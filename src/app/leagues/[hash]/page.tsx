@@ -10,7 +10,7 @@ import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
 import Predictions from '~/components/leagues/hub/picks/predictions/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
+import SurvivalSettings from '~/components/leagues/customization/settings/survival/view';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 import SecondaryPickSettings from '~/components/leagues/customization/settings/secondaryPick/view';
 import getLeague from '~/services/leagues/query/legaue';
@@ -80,7 +80,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
                 </div>
               </>
             )}
-            <SetSurvivalCap />
+            <SurvivalSettings />
             <SecondaryPickSettings />
             <LeagueScoring />
             <ShauhinMode />
@@ -89,6 +89,6 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         </div>
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea >
-    </Tabs >
+    </Tabs>
   );
 }

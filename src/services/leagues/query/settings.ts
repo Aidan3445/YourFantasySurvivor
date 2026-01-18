@@ -22,6 +22,7 @@ export default async function getLeagueSettings(auth: VerifiedLeagueMemberAuth) 
       survivalCap: leagueSettingsSchema.survivalCap,
       preserveStreak: leagueSettingsSchema.preserveStreak,
       secondaryPickEnabled: leagueSettingsSchema.secondaryPickEnabled,
+      shotInTheDarkEnabled: leagueSettingsSchema.shotInTheDarkEnabled,
     })
     .from(leagueSettingsSchema)
     .where(eq(leagueSettingsSchema.leagueId, auth.leagueId))

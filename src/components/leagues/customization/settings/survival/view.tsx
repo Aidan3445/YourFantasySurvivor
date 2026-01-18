@@ -18,7 +18,7 @@ import updateLeagueSettings from '~/actions/updateLeagueSettings';
 import SeasonLengthSlider from '~/components/leagues/customization/settings/shared/slider';
 
 
-export default function SetSurvivalCap() {
+export default function SurvivalSettings() {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
   const { data: leagueMembers } = useLeagueMembers();
@@ -27,7 +27,8 @@ export default function SetSurvivalCap() {
   const reactForm = useForm<LeagueSurvivalUpdate>({
     defaultValues: {
       survivalCap: settings?.survivalCap ?? DEFAULT_SURVIVAL_CAP,
-      preserveStreak: settings?.preserveStreak ?? true
+      preserveStreak: settings?.preserveStreak ?? true,
+      shotInTheDarkEnabled: settings?.shotInTheDarkEnabled ?? false
     },
     resolver: zodResolver(LeagueSurvivalUpdateZod)
   });
@@ -38,6 +39,7 @@ export default function SetSurvivalCap() {
 
     reactForm.setValue('survivalCap', settings.survivalCap);
     reactForm.setValue('preserveStreak', settings.preserveStreak);
+    reactForm.setValue('shotInTheDarkEnabled', settings.shotInTheDarkEnabled);
   }, [settings, reactForm]);
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
@@ -82,7 +84,7 @@ export default function SetSurvivalCap() {
         If your pick is eliminated, you must choose a new unclaimed castaway, and your streak resets.
       </div>
       <Form {...reactForm}>
-        <form className='flex flex-wrap gap-x-12' action={() => handleSubmit()}>
+        <form className='flex flex-wrap gap-2' action={() => handleSubmit()}>
           <FormField
             name='survivalCap'
             render={({ field: valueField }) => (
@@ -117,46 +119,77 @@ export default function SetSurvivalCap() {
                     heavily favor the player who drafts the winner.
                   </FormDescription>
                 </FormItem>
-                <span className='flex justify-between w-full items-end'>
-                  <FormField
-                    name='preserveStreak'
-                    render={({ field: preserveField }) => (
-                      <FormItem className={valueField.value === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}>
-                        <div className='flex items-center gap-1'>
-                          <FormLabel className='inline-flex gap-2 items-baseline'>
-                            Preserve Streak
-                            {locked &&
-                              <h2 className={cn('text-lg font-bold text-card-foreground',
-                                preserveField.value ? 'text-green-600' : 'text-destructive')}>
-                                {preserveField.value ? 'On' : 'Off'}
-                              </h2>}
-                          </FormLabel>
-                          <FormControl>
-                            {!locked &&
-                              <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
-                          </FormControl>
-                        </div>
-                        <FormDescription>
-                          Should streaks be <i className='text-muted-foreground'>preserved</i> if a
-                          player switches their pick voluntarily, or reset to zero?
-                        </FormDescription>
-                      </FormItem>
-                    )} />
-                  {!locked &&
-                    <span className='grid grid-cols-2 gap-2'>
-                      <Button
-                        type='button'
-                        variant='destructive'
-                        onClick={() => { setLocked(true); reactForm.reset(); }}>
-                        Cancel
-                      </Button>
-                      <Button
-                        disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
-                        type='submit'>
-                        Save
-                      </Button>
-                    </span>}
-                </span>
+                <FormField
+                  name='preserveStreak'
+                  render={({ field: preserveField }) => (
+                    <FormItem className={valueField.value === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}>
+                      <div className='flex items-center gap-1'>
+                        <FormLabel className='inline-flex gap-2 items-baseline'>
+                          Preserve Streak
+                          {locked &&
+                            <h2 className={cn('text-lg font-bold text-card-foreground',
+                              preserveField.value ? 'text-green-600' : 'text-destructive')}>
+                              {preserveField.value ? 'On' : 'Off'}
+                            </h2>}
+                        </FormLabel>
+                        <FormControl>
+                          {!locked &&
+                            <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
+                        </FormControl>
+                      </div>
+                      <FormDescription>
+                        Should streaks be <i className='text-muted-foreground'>preserved</i> if a
+                        player switches their pick voluntarily, or reset to zero?
+                      </FormDescription>
+                    </FormItem>
+                  )} />
+                <FormField
+                  name='shotInTheDarkEnabled'
+                  render={({ field: shotField }) => (
+                    <FormItem className={valueField.value === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''}>
+                      <div className='flex items-center gap-1'>
+                        <FormLabel className='inline-flex gap-2 items-baseline'>
+                          Shot in the Dark
+                          {locked &&
+                            <h2 className={cn('text-lg font-bold text-card-foreground',
+                              shotField.value ? 'text-green-600' : 'text-destructive')}>
+                              {shotField.value ? 'On' : 'Off'}
+                            </h2>}
+                        </FormLabel>
+                        <FormControl>
+                          {!locked &&
+                            <Switch
+                              checked={shotField.value as boolean}
+                              onCheckedChange={shotField.onChange}
+                              disabled={valueField.value === 0}
+                            />}
+                        </FormControl>
+                      </div>
+                      <FormDescription>
+                        Members get one chance per season to protect their streak when their castaway is eliminated.
+                        Must be activated before the episode airs.
+                        {valueField.value === 0 && (
+                          <p className='text-xs text-muted-foreground italic mt-1'>
+                            This feature requires survival streaks to be enabled.
+                          </p>
+                        )}
+                      </FormDescription>
+                    </FormItem>
+                  )} />
+                {!locked &&
+                  <div className='grid grid-cols-2 gap-2 mt-4'>
+                    <Button
+                      type='button'
+                      variant='destructive'
+                      onClick={() => { setLocked(true); reactForm.reset(); }}>
+                      Cancel
+                    </Button>
+                    <Button
+                      disabled={!reactForm.formState.isDirty || reactForm.formState.isSubmitting}
+                      type='submit'>
+                      Save
+                    </Button>
+                  </div>}
               </>
             )} />
         </form>
