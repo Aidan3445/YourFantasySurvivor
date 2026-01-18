@@ -224,9 +224,9 @@ export default function MemberRow({
                   {castaway?.eliminatedEpisode ? (
                     (shotInTheDarkStatus?.status === 'saved' && shotInTheDarkStatus.episodeNumber === castaway.eliminatedEpisode
                       ? (
-                        <ShieldCheck className='w-5 h-5 stroke-green-600' />
+                        <ShieldCheck className='w-5 h-5 stroke-green-600 hover:stroke-green-700 transition-colors' />
                       ) : (
-                        <Skull size={18} className='stroke-muted-foreground' />
+                        <Skull size={18} className='stroke-muted-foreground hover:stroke-destructive transition-colors' />
                       ))
                   ) : (
                     Math.min(currentStreak ?? Infinity, leagueSettings.survivalCap)

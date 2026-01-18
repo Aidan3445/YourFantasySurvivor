@@ -53,8 +53,9 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
               )}
               <TableHead className='w-0'>
                 <ScoreboardHelp
-                  hasSurvivalCap={leagueSettings?.survivalCap !== undefined}
-                  secondaryPicks={leagueSettings?.secondaryPickEnabled} />
+                  survivalCap={leagueSettings?.survivalCap !== 0}
+                  secondaryPicks={leagueSettings?.secondaryPickEnabled}
+                  shotInTheDark={leagueSettings?.shotInTheDarkEnabled} />
               </TableHead>
             </TableRow>
           </TableHeader>
