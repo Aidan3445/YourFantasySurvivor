@@ -21,6 +21,9 @@ export const DEFAULT_SECONDARY_PICK_LOCKOUT_PERIOD = 3;
 export const DEFAULT_SECONDARY_PICK_PUBLIC_PICKS = false;
 export const DEFAULT_SECONDARY_PICK_MULTIPLIER = 1;
 
+// Shot in the Dark defaults
+export const DEFAULT_SHOT_IN_THE_DARK_ENABLED = false;
+
 export const defaultBaseRules: BaseEventRules = {
   advFound: 5,
   advPlay: 10,

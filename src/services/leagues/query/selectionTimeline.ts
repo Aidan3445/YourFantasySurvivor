@@ -3,7 +3,7 @@ import 'server-only';
 import { db } from '~/server/db';
 import { and, eq, lte, or } from 'drizzle-orm';
 import { episodeSchema } from '~/server/db/schema/episodes';
-import { leagueMemberSchema, selectionUpdateSchema, secondaryPickSchema } from '~/server/db/schema/leagueMembers';
+import { leagueMemberSchema, selectionUpdateSchema, secondaryPickSchema, shotInTheDarkSchema } from '~/server/db/schema/leagueMembers';
 import { type SelectionUpdate } from '~/types/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type SelectionTimeline, type SelectionTimelines } from '~/types/leagues';
@@ -54,9 +54,26 @@ export default async function getSelectionTimeline(auth: VerifiedLeagueMemberAut
 
   const secondarySelections = processSecondaryPickTimeline(secondaryPicks);
 
+  // Fetch shot in the dark activations for this league
+  const shotInTheDarkActivations = await db
+    .select({
+      memberId: shotInTheDarkSchema.memberId,
+      episodeNumber: episodeSchema.episodeNumber,
+    })
+    .from(shotInTheDarkSchema)
+    .innerJoin(leagueMemberSchema, eq(leagueMemberSchema.memberId, shotInTheDarkSchema.memberId))
+    .innerJoin(episodeSchema, eq(episodeSchema.episodeId, shotInTheDarkSchema.episodeId))
+    .where(eq(leagueMemberSchema.leagueId, auth.leagueId));
+
+  const shotInTheDarkMap = shotInTheDarkActivations.reduce((acc, row) => {
+    acc[row.memberId] = { episodeNumber: row.episodeNumber };
+    return acc;
+  }, {} as Record<number, { episodeNumber: number }>);
+
   return {
     ...processSelectionTimeline(selectionUpdates),
     secondaryPicks: secondarySelections,
+    shotInTheDark: shotInTheDarkMap,
   };
 }
 
