@@ -8,6 +8,8 @@ import { useEnrichPredictions } from '~/hooks/seasons/enrich/useEnrichPrediction
 import PredictionRow from '~/components/shared/eventTimeline/table/row/predictionRow';
 import EventRow from '~/components/shared/eventTimeline/table/row/eventRow';
 import { useMemo } from 'react';
+import { type LeagueMember } from '~/types/leagueMembers';
+import StreakRow from '~/components/shared/eventTimeline/table/row/streakRow';
 
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
@@ -78,6 +80,21 @@ export default function EpisodeEventsTableBody({
     );
   }
 
+  // Group members by their streak value for this episode
+  const streakGroups = Object.entries(leagueData?.streaks ?? {}).reduce((acc, [memberId, episodeStreaks]) => {
+    const streakValue = episodeStreaks[episodeNumber] ?? 0;
+    if (streakValue > 0) {
+      const mid = Number(memberId);
+      const member = leagueData?.leagueMembers?.members.find(m => m.memberId === mid);
+      if (member) {
+        const streakPointValue = Math.min(streakValue, leagueData?.leagueSettings?.survivalCap ?? streakValue);
+        acc[streakPointValue] ??= [];
+        acc[streakPointValue].push(member);
+      }
+    }
+    return acc;
+  }, {} as Record<number, LeagueMember[]>);
+
   return (
     <>
       {enrichedMockEvents.map((mock, index) =>
@@ -145,6 +162,25 @@ export default function EpisodeEventsTableBody({
               || (miss.reference?.type === 'Tribe' && filters.tribe.includes(miss.reference.id))
             )
           } />
+      )}
+      {!edit && Object.keys(streakGroups).length > 0 && (
+        <>
+          <TableRow className='bg-gray-100 hover:bg-gray-200'>
+            <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+              Survival Streaks
+            </TableCell>
+          </TableRow>
+          {Object.entries(streakGroups)
+            .sort(([a], [b]) => Number(b) - Number(a))
+            .map(([streakPointValue, members]) => (
+              <StreakRow
+                key={streakPointValue}
+                streakPointValue={Number(streakPointValue)}
+                members={members}
+                streaksMap={leagueData!.streaks!}
+                episodeNumber={episodeNumber} />
+            ))}
+        </>
       )}
     </>
   );

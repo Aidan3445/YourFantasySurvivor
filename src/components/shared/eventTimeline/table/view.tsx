@@ -303,6 +303,6 @@ export default function EpisodeEvents({
         </TableBody>
       </Table>
       <ScrollBar hidden orientation='horizontal' />
-    </ScrollArea >
+    </ScrollArea>
   );
 }

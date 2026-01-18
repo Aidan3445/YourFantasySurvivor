@@ -12,7 +12,7 @@ import { BaseEventFullName } from '~/lib/events';
 import { getAirStatusPollingInterval } from '~/lib/episodes';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import { cn } from '~/lib/utils';
-import { type SelectionTimelines, type League, type LeagueRules } from '~/types/leagues';
+import { type SelectionTimelines, type League, type LeagueRules, type LeagueSettings } from '~/types/leagues';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { type CustomEvents, type Predictions } from '~/types/events';
 
@@ -26,6 +26,8 @@ export interface LeagueData {
     loggedIn?: LeagueMember;
     members: LeagueMember[];
   } | undefined;
+  streaks?: Record<number, Record<number, number>>;
+  leagueSettings?: LeagueSettings;
 }
 
 export interface TimelineFiltersProps {

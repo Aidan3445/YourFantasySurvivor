@@ -100,16 +100,12 @@ export default function MemberRow({
         </div>
       </TableCell>
       <TableCell className='text-nowrap px-3 py-3 w-0'>
-        <div className='flex items-center gap-2'>
-          <div className='w-1 h-8 rounded-full shrink-0' style={{ backgroundColor: color }} />
-          <span
-            className={cn(
-              'text-base md:text-lg font-bold transition-all',
-              member.loggedIn && 'text-primary'
-            )}>
-            {member.displayName}
-          </span>
-        </div>
+        <ColorRow
+          className='text-base md:text-lg font-bold transition-all'
+          loggedIn={member.loggedIn}
+          color={color}>
+          {member.displayName}
+        </ColorRow>
       </TableCell>
       <TableCell className='text-nowrap px-3 py-3 w-0'>
         <CastawayPopover castaway={castaway}>

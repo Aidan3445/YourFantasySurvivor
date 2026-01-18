@@ -7,8 +7,6 @@ import { type SeasonsDataQuery } from '~/types/seasons';
 import type { LeagueData } from '~/components/shared/eventTimeline/filters';
 import { Card, CardContent, CardHeader } from '~/components/common/card';
 
-// TODO: add survivor streak to event timeline
-
 interface EventTimelineProps {
   seasonData: SeasonsDataQuery;
   leagueData?: LeagueData;
@@ -27,7 +25,7 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
   const seasonDataWithDates = useMemo(() => {
     // Convert date strings back to Date objects after crossing server/client boundary
     // if dates are already Date objects, return as is. One date check is sufficient
-    if (seasonData.episodes[0]?.airDate instanceof Date) return seasonData;
+    if (seasonData.episodes?.[0]?.airDate instanceof Date) return seasonData;
 
     return {
       ...seasonData,
