@@ -30,18 +30,51 @@ export function useLeagueData(overrideHash?: string) {
 
   const membersArray = useMemo(() => leagueMembers?.members ?? [], [leagueMembers?.members]);
 
+  const shotInTheDarkStatus = useMemo(() => {
+    if (!selectionTimeline?.shotInTheDark || !seasonData) return {};
+
+    return Object.entries(selectionTimeline.shotInTheDark).reduce((acc, [memberId, data]) => {
+      const mid = Number(memberId);
+      const episode = seasonData.episodes[data.episodeNumber];
+
+      if (!episode) {
+        acc[mid] = null;
+        return acc;
+      }
+
+      if (episode.airStatus !== 'Aired') {
+        acc[mid] = { episodeNumber: episode.episodeNumber, status: 'pending' as const };
+        return acc;
+      }
+
+      // Check if member's castaway was eliminated that episode
+      const memberCastaway = selectionTimeline.memberCastaways[mid]?.[episode.episodeNumber];
+      const wasEliminated = seasonData.eliminations[episode.episodeNumber]?.some(
+        elim => elim?.castawayId === memberCastaway
+      );
+
+      acc[mid] = {
+        episodeNumber: episode.episodeNumber,
+        status: wasEliminated ? 'saved' : 'wasted'
+      };
+
+      return acc;
+    }, {} as Record<number, { episodeNumber: number, status: 'pending' | 'saved' | 'wasted' } | null>);
+  }, [selectionTimeline, seasonData]);
+
   const scoreData = useMemo(() => {
     if (!league || !membersArray.length || !seasonData || !selectionTimeline ||
       !basePredictions || !leagueRules || !leagueSettings) {
       return {
         scores: { Castaway: {}, Tribe: {}, Member: {} },
         currentStreaks: {},
+        streaks: {},
         sortedMemberScores: [],
         loggedInIndex: -1,
       };
     }
 
-    const { scores, currentStreaks } = compileScores(
+    const { scores, currentStreaks, streaks } = compileScores(
       seasonData.baseEvents,
       seasonData.eliminations,
       seasonData.tribesTimeline,
@@ -72,6 +105,7 @@ export function useLeagueData(overrideHash?: string) {
     return {
       scores,
       currentStreaks,
+      streaks,
       sortedMemberScores,
       loggedInIndex,
     };
@@ -86,6 +120,7 @@ export function useLeagueData(overrideHash?: string) {
     league,
     leagueMembers,
     selectionTimeline,
+    shotInTheDarkStatus,
     customEvents,
     basePredictions,
     leagueRules,
@@ -96,6 +131,7 @@ export function useLeagueData(overrideHash?: string) {
     league,
     leagueMembers,
     selectionTimeline,
+    shotInTheDarkStatus,
     customEvents,
     basePredictions,
     leagueRules,
