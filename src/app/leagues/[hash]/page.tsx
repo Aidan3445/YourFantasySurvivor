@@ -38,11 +38,15 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
 
   return (
     <Tabs className='w-full' defaultValue='scores'>
-      <TabsList className='sticky flex w-full px-10 rounded-none z-50 *:flex-1 [&>*:last-child]:flex-none [&>*:last-child]:w-fit bg-accent'>
-        <TabsTrigger value='scores'>Scores</TabsTrigger>
-        {isActive && auth.role !== 'Member' && <TabsTrigger value='events'>Commish</TabsTrigger>}
-        {isActive && userId && <TabsTrigger value='Base'>Base</TabsTrigger>}
-        <TabsTrigger value='settings'>Settings</TabsTrigger>
+      <TabsList className='sticky flex w-full px-10 rounded-none z-50 bg-accent'>
+        <TabsTrigger className='flex-1' value='scores'>Scores</TabsTrigger>
+        {isActive && auth.role !== 'Member' && (
+          <TabsTrigger className='flex-1' value='events'>Commish</TabsTrigger>
+        )}
+        {isActive && userId && (
+          <TabsTrigger className='flex-1' value='Base'>Base</TabsTrigger>
+        )}
+        <TabsTrigger className='flex-none w-fit' value='settings'>Settings</TabsTrigger>
       </TabsList>
       <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>
@@ -52,12 +56,16 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
             <Predictions />
             {seasonData && <LeagueTimeline initialSeasonData={seasonData} />}
           </TabsContent>
-          <TabsContent value='events'>
-            <CreateCustomEvent />
-          </TabsContent>
-          <TabsContent value='Base'>
-            <CreateBaseEvent />
-          </TabsContent>
+          {isActive && auth.role !== 'Member' && (
+            <TabsContent value='events'>
+              <CreateCustomEvent />
+            </TabsContent>
+          )}
+          {userId && (
+            <TabsContent value='Base'>
+              <CreateBaseEvent />
+            </TabsContent>
+          )}
           <TabsContent value='settings' className='space-y-4'>
             {league?.status !== 'Inactive' && (
               <>
