@@ -152,12 +152,11 @@ export default function ShotInTheDark({ className }: ShotInTheDarkProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Play Shot in the Dark?</AlertDialogTitle>
             <AlertDialogDescription className='space-y-2'>
-              <p>
-                This will protect your survival streak if your castaway is eliminated in the next episode.
-              </p>
-              <p className='text-destructive font-semibold'>
+              This will protect your survival streak if your castaway is eliminated in the next episode.
+              <br />
+              <span className='text-destructive font-semibold'>
                 This is a one-time use and cannot be undone once the episode starts airing!
-              </p>
+              </span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
