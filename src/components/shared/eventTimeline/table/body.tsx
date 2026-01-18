@@ -131,7 +131,7 @@ export default function EpisodeEventsTableBody({
         ))}
       {customEvents.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
-          <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center'>
             Custom Events
           </TableCell>
         </TableRow>}
@@ -142,7 +142,7 @@ export default function EpisodeEventsTableBody({
         ))}
       {enrichedPredictions.length + enrichedMockPredictions.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
-          <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center'>
             Predictions
           </TableCell>
         </TableRow>}
@@ -166,7 +166,7 @@ export default function EpisodeEventsTableBody({
       {!edit && Object.keys(streakGroups).length > 0 && (
         <>
           <TableRow className='bg-gray-100 hover:bg-gray-200'>
-            <TableCell colSpan={7} className='text-xs text-muted-foreground'>
+            <TableCell colSpan={7} className='text-xs text-muted-foreground text-center'>
               Survival Streaks
             </TableCell>
           </TableRow>

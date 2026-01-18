@@ -61,7 +61,7 @@ export default function StreakRow({
                   {shotUsedThisEpisode && (
                     <>
                       <Separator className='my-2 bg-primary/20' />
-                      <div className='text-xs text-muted-foreground flex items-center gap-1'>
+                      <div className='text-xs flex items-center gap-1'>
                         {shotStatus.status === 'saved' ? (
                           <>
                             <ShieldCheck className='w-3 h-3 stroke-green-600' />
