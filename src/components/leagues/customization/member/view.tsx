@@ -44,7 +44,7 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
       alert('Successfully updated member details');
     } catch (error) {
       console.error(error);
-      alert('Failed to join league');
+      alert('Failed to update member details. Please try again.');
     }
   });
 
