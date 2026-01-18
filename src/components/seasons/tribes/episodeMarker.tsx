@@ -9,7 +9,6 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '~/components/common/accordion';
-import { getContrastingColor } from '@uiw/color-convert';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import { Badge } from '~/components/common/badge';
 
@@ -77,11 +76,7 @@ export default function EpisodeMarker({
                         className='gap-2 px-2 py-1 h-8 border-2 font-medium'
                         color={tribe.tribeColor}>
                         <CastawayPopover castaway={castaway}>
-                          <span
-                            className='leading-none text-sm cursor-pointer'
-                            style={{
-                              color: getContrastingColor(tribe.tribeColor)
-                            }}>
+                          <span className='leading-none text-sm cursor-pointer'>
                             {castaway.fullName}
                           </span>
                         </CastawayPopover>

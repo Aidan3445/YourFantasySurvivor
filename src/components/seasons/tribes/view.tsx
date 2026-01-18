@@ -72,8 +72,7 @@ export default function TribesTimeline({ seasonData }: TimelineViewProps) {
                 tribes={episodeTribes}
                 castawaysByTribe={castawaysByTribe}
                 isKeyEpisode={!!keyLabel}
-                keyEpisodeLabel={keyLabel}
-              />
+                keyEpisodeLabel={keyLabel} />
             );
           })}
         </div>
