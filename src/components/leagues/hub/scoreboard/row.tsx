@@ -2,7 +2,7 @@
 
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import { MoveRight, Flame, History, Skull } from 'lucide-react';
+import { MoveRight, Flame, History, Skull, Dices } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn, getTribeTimeline } from '~/lib/utils';
@@ -16,6 +16,7 @@ import { useTribes } from '~/hooks/seasons/useTribes';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 import TribeHistoryCircles from '~/components/shared/castaways/tribeHistoryCircles';
 import EliminationIndicator from '~/components/shared/castaways/eliminationIndicator';
+import { PopoverArrow } from '@radix-ui/react-popover';
 
 interface MemberRowProps {
   place: number;
@@ -29,6 +30,7 @@ interface MemberRowProps {
   color: string;
   overrideHash?: string;
   doubleBelow?: boolean;
+  shotInTheDarkStatus?: { episodeNumber: number, status: 'pending' | 'saved' | 'wasted' } | null;
 }
 
 export default function MemberRow({
@@ -42,7 +44,8 @@ export default function MemberRow({
   points,
   color,
   doubleBelow,
-  overrideHash
+  overrideHash,
+  shotInTheDarkStatus
 }: MemberRowProps) {
   const { data: tribesTimeline } = useTribesTimeline(castaway?.seasonId ?? null);
   const { data: tribes } = useTribes(castaway?.seasonId ?? null);
@@ -100,12 +103,33 @@ export default function MemberRow({
         </div>
       </TableCell>
       <TableCell className='text-nowrap px-3 py-3 w-0'>
-        <ColorRow
-          className='text-base md:text-lg font-bold transition-all'
-          loggedIn={member.loggedIn}
-          color={color}>
-          {member.displayName}
-        </ColorRow>
+        <div className='flex items-center gap-2'>
+          <ColorRow
+            className='text-base md:text-lg font-bold transition-all'
+            loggedIn={member.loggedIn}
+            color={color}>
+            {member.displayName}
+            {shotInTheDarkStatus?.status === 'pending' && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Dices className={cn(
+                    'w-5 h-5 cursor-pointer hover:stroke-primary/70 transition-colors',
+                    member.loggedIn && 'stroke-primary'
+                  )} />
+                </PopoverTrigger>
+                <PopoverContent className='border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-3'>
+                  <PopoverArrow className='fill-primary' />
+                  <div className='text-sm font-bold uppercase tracking-wider text-center'>Shot in the Dark Active</div>
+                  <Separator className='my-2 bg-primary/20' />
+                  <p className='text-xs text-muted-foreground'>
+                    {member.loggedIn ? 'You have' : 'This member has'} activated Shot in the Dark
+                    for the upcoming episode to protect their survival streak.
+                  </p>
+                </PopoverContent>
+              </Popover>
+            )}
+          </ColorRow>
+        </div>
       </TableCell>
       <TableCell className='text-nowrap px-3 py-3 w-0'>
         <CastawayPopover castaway={castaway}>

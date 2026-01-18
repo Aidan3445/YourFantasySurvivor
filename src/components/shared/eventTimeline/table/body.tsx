@@ -178,7 +178,8 @@ export default function EpisodeEventsTableBody({
                 streakPointValue={Number(streakPointValue)}
                 members={members}
                 streaksMap={leagueData!.streaks!}
-                episodeNumber={episodeNumber} />
+                episodeNumber={episodeNumber}
+                shotInTheDarkStatus={leagueData!.shotInTheDarkStatus} />
             ))}
         </>
       )}

@@ -13,8 +13,13 @@ import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import playShotInTheDarkAction from '~/actions/playShotInTheDark';
 import cancelShotInTheDarkAction from '~/actions/cancelShotInTheDark';
 import { Dices, ShieldCheck } from 'lucide-react';
+import { cn } from '~/lib/utils';
 
-export default function ShotInTheDark() {
+interface ShotInTheDarkProps {
+  className?: string;
+}
+
+export default function ShotInTheDark({ className }: ShotInTheDarkProps) {
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
   const leagueData = useLeagueData();
@@ -22,7 +27,11 @@ export default function ShotInTheDark() {
   const [showAnimation, setShowAnimation] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  if (!league || !leagueData.leagueSettings?.shotInTheDarkEnabled || !leagueData.leagueMembers?.loggedIn) {
+  if (!league
+    || !leagueData.leagueSettings?.shotInTheDarkEnabled
+    || leagueData.leagueSettings.survivalCap === 0
+    || !leagueData.leagueMembers?.loggedIn
+  ) {
     return null;
   }
 
@@ -39,7 +48,7 @@ export default function ShotInTheDark() {
   // If already used and not pending, show used message
   if (hasUsedThisSeason && !isPending) {
     return (
-      <Card className='p-4 opacity-50 border-2'>
+      <Card className={cn('p-4 opacity-50 border-2 rounded-md', className)}>
         <div className='flex items-center gap-2 mb-2'>
           <ShieldCheck className='w-5 h-5 stroke-muted-foreground' />
           <h3 className='font-bold text-muted-foreground'>Shot in the Dark</h3>
@@ -56,7 +65,7 @@ export default function ShotInTheDark() {
     return null;
   }
 
-  const handleActivate = async () => {
+  const handlePlay = async () => {
     if (!league) return;
 
     setShowConfirmation(false);
@@ -73,7 +82,7 @@ export default function ShotInTheDark() {
         setIsSubmitting(false);
       }, 2000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to activate';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to play';
       alert(errorMessage);
       setShowAnimation(false);
       setIsSubmitting(false);
@@ -97,7 +106,7 @@ export default function ShotInTheDark() {
 
   return (
     <>
-      <Card className='p-4 border-2 border-primary'>
+      <Card className={cn('p-4 border-2 border-primary rounded-md', className)}>
         <div className='flex items-center gap-2 mb-2'>
           <Dices className='w-5 h-5 stroke-primary' />
           <h3 className='font-bold'>Shot in the Dark</h3>
@@ -106,17 +115,16 @@ export default function ShotInTheDark() {
         {!isPending ? (
           <>
             <p className='text-sm mb-4'>
-              You have <strong>1 Shot in the Dark</strong> remaining this season.
-              Activate it to protect your streak if your castaway is eliminated this episode.
+              You still have your <strong>Shot in the Dark</strong> this season.
+              Play it to protect your streak if your <b>survivor</b> is eliminated this episode.
             </p>
 
             <Button
               onClick={() => setShowConfirmation(true)}
               disabled={isSubmitting}
-              className='w-full'
-            >
-              <Dices className='w-4 h-4 mr-2' />
-              Activate Protection
+              className='w-full'>
+              <Dices className='w-4 h-4 mr-2 stroke-primary-foreground' />
+              Play Protection
             </Button>
           </>
         ) : (
@@ -128,11 +136,10 @@ export default function ShotInTheDark() {
               Your streak will be protected if your castaway is eliminated.
             </p>
             <Button
-              variant='outline'
+              variant='secondary'
               onClick={handleCancel}
               disabled={isSubmitting}
-              className='w-full'
-            >
+              className='w-full'>
               Cancel Protection
             </Button>
           </div>
@@ -143,7 +150,7 @@ export default function ShotInTheDark() {
       <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Activate Shot in the Dark?</AlertDialogTitle>
+            <AlertDialogTitle>Play Shot in the Dark?</AlertDialogTitle>
             <AlertDialogDescription className='space-y-2'>
               <p>
                 This will protect your survival streak if your castaway is eliminated in the next episode.
@@ -155,7 +162,7 @@ export default function ShotInTheDark() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleActivate} disabled={isSubmitting}>
+            <AlertDialogAction onClick={handlePlay} disabled={isSubmitting}>
               Confirm Activation
             </AlertDialogAction>
           </AlertDialogFooter>

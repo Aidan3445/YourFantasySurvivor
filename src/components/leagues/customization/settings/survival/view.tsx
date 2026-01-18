@@ -134,12 +134,21 @@ export default function SurvivalSettings() {
                         </FormLabel>
                         <FormControl>
                           {!locked &&
-                            <Switch checked={preserveField.value as boolean} onCheckedChange={preserveField.onChange} />}
+                            <Switch
+                              checked={preserveField.value as boolean}
+                              onCheckedChange={preserveField.onChange}
+                              disabled={valueField.value === 0} />
+                          }
                         </FormControl>
                       </div>
                       <FormDescription>
                         Should streaks be <i className='text-muted-foreground'>preserved</i> if a
                         player switches their pick voluntarily, or reset to zero?
+                        {valueField.value === 0 && (
+                          <span className='text-xs text-muted-foreground italic mt-1'>
+                            This feature requires survival streaks to be enabled.
+                          </span>
+                        )}
                       </FormDescription>
                     </FormItem>
                   )} />
@@ -162,16 +171,17 @@ export default function SurvivalSettings() {
                               checked={shotField.value as boolean}
                               onCheckedChange={shotField.onChange}
                               disabled={valueField.value === 0}
-                            />}
+                            />
+                          }
                         </FormControl>
                       </div>
                       <FormDescription>
                         Members get one chance per season to protect their streak when their castaway is eliminated.
                         Must be activated before the episode airs.
                         {valueField.value === 0 && (
-                          <p className='text-xs text-muted-foreground italic mt-1'>
+                          <span className='text-xs text-muted-foreground italic mt-1'>
                             This feature requires survival streaks to be enabled.
-                          </p>
+                          </span>
                         )}
                       </FormDescription>
                     </FormItem>

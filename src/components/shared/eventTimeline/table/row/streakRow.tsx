@@ -7,19 +7,22 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/pop
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Separator } from '~/components/common/separator';
 import { type LeagueMember } from '~/types/leagueMembers';
+import { ShieldCheck, ShieldAlert } from 'lucide-react';
 
 interface StreakRowProps {
   streakPointValue: number;
   members: LeagueMember[];
-  streaksMap: Record<number, Record<number, number>>;
+  streaksMap: Record<number, number[]>;
   episodeNumber: number;
+  shotInTheDarkStatus?: Record<number, { episodeNumber: number, status: 'pending' | 'saved' | 'wasted' } | null>;
 }
 
 export default function StreakRow({
   streakPointValue,
   members,
   streaksMap,
-  episodeNumber
+  episodeNumber,
+  shotInTheDarkStatus
 }: StreakRowProps) {
   return (
     <TableRow>
@@ -27,27 +30,64 @@ export default function StreakRow({
       <PointsCell points={Number(streakPointValue)} />
       <TableCell colSpan={4}>
         <div className='flex flex-wrap gap-2'>
-          {members.map(member => (
-            <Popover key={member.memberId}>
-              <PopoverTrigger>
-                <ColorRow
-                  className='w-fit text-sm font-medium leading-none'
-                  color={member.color}>
-                  {member.displayName}
-                </ColorRow>
-              </PopoverTrigger>
-              <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2'>
-                <PopoverArrow className='fill-primary' />
-                <div className='text-sm font-semibold uppercase tracking-wide text-center'>
-                  Survival Streak
-                </div>
-                <Separator className='mb-2 bg-primary/20' />
-                <div className='text-sm'>
-                  Total streak: {streaksMap[member.memberId]?.[episodeNumber] ?? 0}
-                </div>
-              </PopoverContent>
-            </Popover>
-          ))}
+          {members.map(member => {
+            const shotStatus = shotInTheDarkStatus?.[member.memberId];
+            const shotUsedThisEpisode = shotStatus?.episodeNumber === episodeNumber;
+
+            return (
+              <Popover key={member.memberId}>
+                <PopoverTrigger>
+                  <div className='inline-flex items-center gap-1.5'>
+                    <ColorRow
+                      className='w-fit text-sm font-medium leading-none'
+                      color={member.color}>
+                      {member.displayName}
+                    </ColorRow>
+                    {shotUsedThisEpisode && shotStatus.status === 'saved' && (
+                      <ShieldCheck
+                        className='w-4 h-4 stroke-green-600'
+                        title='Shot in the Dark - Saved!'
+                      />
+                    )}
+                    {shotUsedThisEpisode && shotStatus.status === 'wasted' && (
+                      <ShieldAlert
+                        className='w-4 h-4 stroke-destructive'
+                        title='Shot in the Dark - Wasted'
+                      />
+                    )}
+                  </div>
+                </PopoverTrigger>
+                <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2'>
+                  <PopoverArrow className='fill-primary' />
+                  <div className='text-sm font-semibold uppercase tracking-wide text-center'>
+                    Survival Streak
+                  </div>
+                  <Separator className='mb-2 bg-primary/20' />
+                  <div className='text-sm'>
+                    Total streak: {streaksMap[member.memberId]?.[episodeNumber] ?? 0}
+                  </div>
+                  {shotUsedThisEpisode && (
+                    <>
+                      <Separator className='my-2 bg-primary/20' />
+                      <div className='text-xs text-muted-foreground flex items-center gap-1'>
+                        {shotStatus.status === 'saved' ? (
+                          <>
+                            <ShieldCheck className='w-3 h-3 stroke-green-600' />
+                            <span className='text-green-600 font-semibold'>Shot in the Dark saved their streak</span>
+                          </>
+                        ) : (
+                          <>
+                            <ShieldAlert className='w-3 h-3 stroke-destructive' />
+                            <span>Shot in the Dark was wasted</span>
+                          </>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </PopoverContent>
+              </Popover>
+            );
+          })}
         </div>
       </TableCell>
     </TableRow>

@@ -25,7 +25,8 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
     castaways,
     currentStreaks,
     leagueRules,
-    keyEpisodes
+    keyEpisodes,
+    shotInTheDarkStatus
   } = useLeagueData(overrideHash);
 
   const episodeNum = keyEpisodes?.nextEpisode?.episodeNumber ?? Infinity;
@@ -98,7 +99,8 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
                   points={scores.slice().pop() ?? 0}
                   color={member.color}
                   doubleBelow={!!maxRows && maxRows <= loggedInIndex && maxRows - 2 === index}
-                  overrideHash={overrideHash} />
+                  overrideHash={overrideHash}
+                  shotInTheDarkStatus={shotInTheDarkStatus?.[member.memberId]} />
               );
             })}
           </TableBody>

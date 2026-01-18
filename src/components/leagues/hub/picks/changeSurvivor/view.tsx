@@ -18,10 +18,10 @@ import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails'
 import chooseCastaway from '~/actions/chooseCastaway';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
-import { Card } from '~/components/common/card';
+import { Card, CardContent } from '~/components/common/card';
 import makeSecondaryPick from '~/actions/makeSecondaryPick';
-import { Separator } from '~/components/common/separator';
 import { MAX_SEASON_LENGTH } from '~/lib/leagues';
+import ShotInTheDark from '~/components/leagues/hub/picks/shotInTheDark/view';
 
 const formSchema = z.object({
   castawayId: z.coerce.number({ required_error: 'Please select a castaway' }),
@@ -243,76 +243,53 @@ export default function ChangeCastaway() {
 
   return (
     <Form {...reactForm}>
-      <Card className='w-full bg-card rounded-lg border-2 border-primary/20  flex flex-col p-3 gap-2'>
+      <Card className='w-full bg-card rounded-lg border-2 border-primary/20 p-3'>
         <form action={() => handleSubmit()}>
-          {/* Secondary Pick Section */}
-          {secondaryPickSettings?.enabled && keyEpisodes?.nextEpisode && (
-            <>
+          <CardContent className='p-0 flex flex-col gap-4'>
+            {/* Main Survivor Section */}
+            <div>
               <div className='flex items-center gap-2 w-full justify-start'>
                 <span className='h-4 w-0.5 bg-primary rounded-full' />
-                <h1 className='text-base font-bold uppercase tracking-wider'>Secondary Pick</h1>
+                <h1 className='text-base font-bold uppercase tracking-wider'>
+                  Swap your Survivor Pick
+                </h1>
               </div>
-              <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center mt-auto'>
+              <span className='w-full flex flex-col lg:flex-row justify-center gap-x-4 gap-y-1 items-center mt-auto'>
                 <FormField
-                  name='secondaryCastawayId'
+                  name='castawayId'
                   render={() => (
                     <FormItem className='w-full'>
                       <FormControl>
                         <Select
-                          key={secondarySelected || 'no-selection'}
-                          value={secondarySelected}
-                          onValueChange={handleSelectionChange.bind(null, 'secondary')}>
+                          defaultValue={selected}
+                          value={selected}
+                          onValueChange={handleSelectionChange.bind(null, 'survivor')}>
                           <SelectTrigger>
-                            <SelectValue placeholder='Select secondary pick' />
+                            <SelectValue placeholder='Select new survivor' />
                           </SelectTrigger>
                           <SelectContent className='z-50'>
                             <SelectGroup>
-                              {availableCastaways
-                                .filter((castaway) => !castaway.eliminatedEpisode)
-                                .map((castaway) => {
-                                  // Check if castaway is locked out due to recent selection
-                                  const lockoutInfo = castawayLockoutStatus.get(castaway.castawayId);
-                                  const isLockedOut = lockoutInfo?.isLockedOut ?? false;
-
-                                  // Disable if it's the user's own survivor and canPickOwnSurvivor is false
-                                  const isOwnSurvivor = !secondaryPickSettings.canPickOwnSurvivor &&
-                                    castaway.pickedBy?.memberId === leagueMembers?.loggedIn?.memberId;
-
-                                  if (isOwnSurvivor || castaway.eliminatedEpisode || isLockedOut) {
-                                    // Build the disabled label text
-                                    let disabledText = castaway.fullName;
-                                    if (isOwnSurvivor) {
-                                      disabledText += ' (Your Survivor)';
-                                    } else if (isLockedOut && lockoutInfo) {
-                                      const episodePicked = lockoutInfo.episodePicked;
-                                      const episodesRemaining = lockoutInfo.episodesRemaining;
-
-                                      if (episodesRemaining !== undefined && episodesRemaining > 0) {
-                                        disabledText += ` (Picked Ep ${episodePicked} - ${episodesRemaining} more ${episodesRemaining === 1 ? 'episode' : 'episodes'})`;
-                                      } else {
-                                        disabledText += ` (Picked Ep ${episodePicked})`;
-                                      }
-                                    }
-
-                                    return (
-                                      <SelectLabel
-                                        key={castaway.castawayId}
-                                        className='cursor-not-allowed opacity-50'>
-                                        <span className='flex items-center gap-1'>
-                                          {castaway.tribe &&
-                                            <ColorRow
-                                              className='w-20 px-0 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
-                                              color={castaway.tribe.color}>
-                                              {castaway.tribe.name}
-                                            </ColorRow>
-                                          }
-                                          {disabledText}
-                                        </span>
-                                      </SelectLabel>
-                                    );
-                                  }
-
-                                  return (
+                              {availableCastaways.map((castaway) => {
+                                return ((castaway.pickedBy ?? castaway.eliminatedEpisode)
+                                  ? (
+                                    <SelectLabel
+                                      key={castaway.castawayId}
+                                      className='cursor-not-allowed'
+                                      style={{ backgroundColor: castaway.pickedBy?.color ?? '#6b7280' }}>
+                                      <span
+                                        className='flex items-center gap-1'
+                                        style={{ color: getContrastingColor(castaway.pickedBy?.color ?? '#6b7280') }}>
+                                        {castaway.tribe &&
+                                          <ColorRow
+                                            className='w-20 px-0 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
+                                            color={castaway.tribe.color}>
+                                            {castaway.tribe.name}
+                                          </ColorRow>
+                                        }
+                                        {castaway.fullName} {castaway.pickedBy && `(${castaway.pickedBy.displayName})`}
+                                      </span>
+                                    </SelectLabel>
+                                  ) : (
                                     <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
                                       <span className='flex items-center gap-1'>
                                         {castaway.tribe &&
@@ -320,12 +297,13 @@ export default function ChangeCastaway() {
                                             className='w-20 px-0 justify-center leading-tight'
                                             color={castaway.tribe.color}>
                                             {castaway.tribe.name}
+                                            {castaway.pickedBy}
                                           </ColorRow>}
                                         {castaway.fullName}
                                       </span>
                                     </SelectItem>
-                                  );
-                                })}
+                                  ));
+                              })}
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -335,91 +313,118 @@ export default function ChangeCastaway() {
                 <Button
                   className='lg:w-26 w-full font-bold uppercase text-xs tracking-wider'
                   disabled={
-                    !secondarySelected
-                    || secondarySelected === initialSecondaryPick
+                    !formSchema.safeParse(reactForm.watch())?.success
+                    || reactForm.formState.isSubmitting
                     || keyEpisodes?.previousEpisode?.airStatus === 'Airing'}
-                  type='button'
-                  onClick={handleSecondarySubmit}>
+                  type='submit'>
                   {keyEpisodes?.previousEpisode?.airStatus === 'Airing' ? 'Episode Airing' : 'Submit'}
                 </Button>
               </span>
-            </>
-          )}
+            </div>
 
-          <Separator className='my-4 w-11/12 mx-auto' />
-          {/* Main Survivor Section */}
-          <div className='flex items-center gap-2 w-full justify-start'>
-            <span className='h-4 w-0.5 bg-primary rounded-full' />
-            <h1 className='text-base font-bold uppercase tracking-wider'>
-              Swap your Survivor Pick
-            </h1>
-          </div>
-          <span className='w-full flex flex-col lg:flex-row justify-center gap-4 items-center mt-auto'>
-            <FormField
-              name='castawayId'
-              render={() => (
-                <FormItem className='w-full'>
-                  <FormControl>
-                    <Select
-                      defaultValue={selected}
-                      value={selected}
-                      onValueChange={handleSelectionChange.bind(null, 'survivor')}>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select new survivor' />
-                      </SelectTrigger>
-                      <SelectContent className='z-50'>
-                        <SelectGroup>
-                          {availableCastaways.map((castaway) => {
-                            return ((castaway.pickedBy ?? castaway.eliminatedEpisode)
-                              ? (
-                                <SelectLabel
-                                  key={castaway.castawayId}
-                                  className='cursor-not-allowed'
-                                  style={{ backgroundColor: castaway.pickedBy?.color ?? '#6b7280' }}>
-                                  <span
-                                    className='flex items-center gap-1'
-                                    style={{ color: getContrastingColor(castaway.pickedBy?.color ?? '#6b7280') }}>
-                                    {castaway.tribe &&
-                                      <ColorRow
-                                        className='w-20 px-0 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
-                                        color={castaway.tribe.color}>
-                                        {castaway.tribe.name}
-                                      </ColorRow>
+            {/* Secondary Pick Section */}
+            {secondaryPickSettings?.enabled && keyEpisodes?.nextEpisode && (
+              <div>
+                <div className='flex items-center gap-2 w-full justify-start'>
+                  <span className='h-4 w-0.5 bg-primary rounded-full' />
+                  <h1 className='text-base font-bold uppercase tracking-wider'>Secondary Pick</h1>
+                </div>
+                <span className='w-full flex flex-col lg:flex-row justify-center gap-x-4 gap-y-1 items-center mt-auto'>
+                  <FormField
+                    name='secondaryCastawayId'
+                    render={() => (
+                      <FormItem className='w-full'>
+                        <FormControl>
+                          <Select
+                            key={secondarySelected || 'no-selection'}
+                            value={secondarySelected}
+                            onValueChange={handleSelectionChange.bind(null, 'secondary')}>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Select secondary pick' />
+                            </SelectTrigger>
+                            <SelectContent className='z-50'>
+                              <SelectGroup>
+                                {availableCastaways
+                                  .filter((castaway) => !castaway.eliminatedEpisode)
+                                  .map((castaway) => {
+                                    // Check if castaway is locked out due to recent selection
+                                    const lockoutInfo = castawayLockoutStatus.get(castaway.castawayId);
+                                    const isLockedOut = lockoutInfo?.isLockedOut ?? false;
+
+                                    // Disable if it's the user's own survivor and canPickOwnSurvivor is false
+                                    const isOwnSurvivor = !secondaryPickSettings.canPickOwnSurvivor &&
+                                      castaway.pickedBy?.memberId === leagueMembers?.loggedIn?.memberId;
+
+                                    if (isOwnSurvivor || castaway.eliminatedEpisode || isLockedOut) {
+                                      // Build the disabled label text
+                                      let disabledText = castaway.fullName;
+                                      if (isOwnSurvivor) {
+                                        disabledText += ' (Your Survivor)';
+                                      } else if (isLockedOut && lockoutInfo) {
+                                        const episodePicked = lockoutInfo.episodePicked;
+                                        const episodesRemaining = lockoutInfo.episodesRemaining;
+
+                                        if (episodesRemaining !== undefined && episodesRemaining > 0) {
+                                          disabledText += ` (Picked Ep ${episodePicked} - ${episodesRemaining} more ${episodesRemaining === 1 ? 'episode' : 'episodes'})`;
+                                        } else {
+                                          disabledText += ` (Picked Ep ${episodePicked})`;
+                                        }
+                                      }
+
+                                      return (
+                                        <SelectLabel
+                                          key={castaway.castawayId}
+                                          className='cursor-not-allowed opacity-50'>
+                                          <span className='flex items-center gap-1'>
+                                            {castaway.tribe &&
+                                              <ColorRow
+                                                className='w-20 px-0 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
+                                                color={castaway.tribe.color}>
+                                                {castaway.tribe.name}
+                                              </ColorRow>
+                                            }
+                                            {disabledText}
+                                          </span>
+                                        </SelectLabel>
+                                      );
                                     }
-                                    {castaway.fullName} {castaway.pickedBy && `(${castaway.pickedBy.displayName})`}
-                                  </span>
-                                </SelectLabel>
-                              ) : (
-                                <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                                  <span className='flex items-center gap-1'>
-                                    {castaway.tribe &&
-                                      <ColorRow
-                                        className='w-20 px-0 justify-center leading-tight'
-                                        color={castaway.tribe.color}>
-                                        {castaway.tribe.name}
-                                        {castaway.pickedBy}
-                                      </ColorRow>}
-                                    {castaway.fullName}
-                                  </span>
-                                </SelectItem>
-                              ));
-                          })}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                </FormItem>
-              )} />
-            <Button
-              className='lg:w-26 w-full font-bold uppercase text-xs tracking-wider'
-              disabled={
-                !formSchema.safeParse(reactForm.watch())?.success
-                || reactForm.formState.isSubmitting
-                || keyEpisodes?.previousEpisode?.airStatus === 'Airing'}
-              type='submit'>
-              {keyEpisodes?.previousEpisode?.airStatus === 'Airing' ? 'Episode Airing' : 'Submit'}
-            </Button>
-          </span>
+
+                                    return (
+                                      <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
+                                        <span className='flex items-center gap-1'>
+                                          {castaway.tribe &&
+                                            <ColorRow
+                                              className='w-20 px-0 justify-center leading-tight'
+                                              color={castaway.tribe.color}>
+                                              {castaway.tribe.name}
+                                            </ColorRow>}
+                                          {castaway.fullName}
+                                        </span>
+                                      </SelectItem>
+                                    );
+                                  })}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItem>
+                    )} />
+                  <Button
+                    className='lg:w-26 w-full font-bold uppercase text-xs tracking-wider'
+                    disabled={
+                      !secondarySelected
+                      || secondarySelected === initialSecondaryPick
+                      || keyEpisodes?.previousEpisode?.airStatus === 'Airing'}
+                    type='button'
+                    onClick={handleSecondarySubmit}>
+                    {keyEpisodes?.previousEpisode?.airStatus === 'Airing' ? 'Episode Airing' : 'Submit'}
+                  </Button>
+                </span>
+              </div>
+            )}
+
+            <ShotInTheDark />
+          </CardContent>
         </form>
       </Card>
       <AlertDialog open={dialogOpen && !closedDialog} onOpenChange={setDialogOpen}>
