@@ -257,18 +257,19 @@ export default function CreateBaseEvent() {
                 Create
               </Button>
             </form>
-            <EpisodeEvents
-              episodeNumber={selectedEpisode ?? 1}
-              seasonData={season!}
-              mockEvents={mockEvent ? [mockEvent] : []}
-              edit
-              filters={{
-                castaway: [],
-                tribe: [],
-                member: [],
-                event: []
-              }}
-            />
+            <div className='w-full'>
+              <EpisodeEvents
+                episodeNumber={selectedEpisode ?? 1}
+                seasonData={season!}
+                mockEvents={mockEvent ? [mockEvent] : []}
+                edit
+                filters={{
+                  castaway: [],
+                  tribe: [],
+                  member: [],
+                  event: []
+                }} />
+            </div>
           </span>
         </Form>
       </section >
