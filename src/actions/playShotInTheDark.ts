@@ -10,7 +10,7 @@ import useShotInTheDarkMutation from '~/services/leagues/mutation/useShotInTheDa
   * @returns Success status of the activation
   * @returnObj `{ success }`
   */
-export default async function useShotInTheDark(hash: string) {
+export default async function playShotInTheDark(hash: string) {
   try {
     return await requireLeagueMemberAuth(useShotInTheDarkMutation)(hash);
   } catch (e) {
