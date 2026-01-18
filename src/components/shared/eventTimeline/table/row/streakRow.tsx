@@ -37,19 +37,17 @@ export default function StreakRow({
             return (
               <Popover key={member.memberId}>
                 <PopoverTrigger>
-                  <div className='inline-flex items-center gap-1.5'>
-                    <ColorRow
-                      className='w-fit text-sm font-medium leading-none'
-                      color={member.color}>
-                      {member.displayName}
-                    </ColorRow>
+                  <ColorRow
+                    className='w-fit text-sm font-medium leading-none px-1 gap-1'
+                    color={member.color}>
+                    {member.displayName}
                     {shotUsedThisEpisode && shotStatus.status === 'saved' && (
                       <ShieldCheck className='w-4 h-4 stroke-green-600' />
                     )}
                     {shotUsedThisEpisode && shotStatus.status === 'wasted' && (
                       <ShieldAlert className='w-4 h-4 stroke-destructive' />
                     )}
-                  </div>
+                  </ColorRow>
                 </PopoverTrigger>
                 <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2'>
                   <PopoverArrow className='fill-primary' />
@@ -72,7 +70,7 @@ export default function StreakRow({
                         ) : (
                           <>
                             <ShieldAlert className='w-3 h-3 stroke-destructive' />
-                            <span>Shot in the Dark was wasted</span>
+                            <span className='text-destructive font-semibold'>Shot in the Dark was wasted</span>
                           </>
                         )}
                       </div>

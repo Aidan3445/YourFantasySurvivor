@@ -35,7 +35,7 @@ export function useLeagueData(overrideHash?: string) {
 
     return Object.entries(selectionTimeline.shotInTheDark).reduce((acc, [memberId, data]) => {
       const mid = Number(memberId);
-      const episode = seasonData.episodes[data.episodeNumber];
+      const episode = seasonData.episodes[data.episodeNumber - 1];
 
       if (!episode) {
         acc[mid] = null;
