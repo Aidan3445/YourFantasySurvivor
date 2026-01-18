@@ -30,9 +30,11 @@ export default function InviteLink() {
 
   return (
     <article className='p-3 bg-card rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10'>
-      <div className='flex items-center gap-2 mb-1'>
-        <span className='h-4 w-0.5 bg-primary rounded-full' />
-        <h2 className='text-base font-bold uppercase tracking-wider'>Invite Friends</h2>
+      <div className='flex items-center gap-3 h-8'>
+        <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+        <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+          Invite Friends
+        </h2>
       </div>
       <p className='text-sm text-muted-foreground mb-2'>Copy the link and share with your friends</p>
       <div

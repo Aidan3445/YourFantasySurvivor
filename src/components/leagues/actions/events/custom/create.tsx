@@ -114,9 +114,11 @@ export default function CreateCustomEvent() {
             <form
               className='flex flex-col gap-2 px-2 max-md:w-full grow'
               action={() => handleSubmit()}>
-              <div className='flex items-center gap-2 w-full justify-start mb-1'>
-                <span className='h-4 w-0.5 bg-primary rounded-full' />
-                <h2 className='text-base font-bold uppercase tracking-wider'>Create Custom Event</h2>
+              <div className='flex items-center gap-3 h-8'>
+                <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+                <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+                  Create Custom Event
+                </h2>
               </div>
               <FormField
                 name='episodeId'

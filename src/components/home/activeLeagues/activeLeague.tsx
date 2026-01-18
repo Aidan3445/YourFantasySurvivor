@@ -59,8 +59,8 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
           </Card>
         ) : (
           <div className='space-y-4'>
-            <DraftCountdown overrideHash={league.hash} className='bg-primary/5 border border-primary/20 p-4 pt-1' />
-            <DraftOrder overrideHash={league.hash} className='bg-primary/5 border border-primary/20 mb-4' scrollHeight='max-h-36 h-36' />
+            <DraftCountdown overrideHash={league.hash} className='bg-primary/5 border border-primary/20 p-4 pt-1 shadow-none' />
+            <DraftOrder overrideHash={league.hash} className='bg-primary/5 border border-primary/20 mb-4 pt-1 pb-0 shadow-none' scrollHeight='max-h-36 h-36' />
           </div>
         )}
     </div>

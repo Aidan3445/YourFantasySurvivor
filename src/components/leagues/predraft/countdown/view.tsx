@@ -13,6 +13,7 @@ import { useMemo } from 'react';
 import { Calendar, Clock as ClockIcon, Zap } from 'lucide-react';
 import { Badge } from '~/components/common/badge';
 import { Card, CardContent, CardHeader } from '~/components/common/card';
+import { cn } from '~/lib/utils';
 
 interface DraftCountdownProps {
   overrideHash?: string;
@@ -52,7 +53,10 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
   const isScheduled = leagueSettings?.draftDate && leagueSettings.draftDate.getTime() > Date.now();
 
   return (
-    <Card className={className}>
+    <Card className={cn(
+      'border-2 border-primary/20 shadow-lg shadow-primary/10',
+      className
+    )}>
       {/* Accent glow for live draft */}
       {isDraftLive && (
         <div className='absolute top-0 right-0 w-32 h-32 bg-green-500/20 rounded-full blur-3xl' />

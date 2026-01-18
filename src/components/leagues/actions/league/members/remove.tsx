@@ -1,6 +1,5 @@
 'use client';
 import { Ban } from 'lucide-react';
-import { getContrastingColor } from '@uiw/color-convert';
 import { type CurrentMemberProps } from '~/components/leagues/actions/league/members/current';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from '~/components/common/alertDialog';
 import ColorRow from '~/components/shared/colorRow';
@@ -9,7 +8,6 @@ import { useParams } from 'next/navigation';
 import { Button } from '~/components/common/button';
 import { useState } from 'react';
 import deleteMember from '~/actions/deleteMember';
-import { cn } from '~/lib/utils';
 
 export default function RemoveMember({ member, loggedInMember }: CurrentMemberProps) {
   const { hash } = useParams();
@@ -41,10 +39,7 @@ export default function RemoveMember({ member, loggedInMember }: CurrentMemberPr
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger disabled={!enabled}>
-        <Ban
-          className={cn('my-auto ml-4', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
-          color={getContrastingColor(member.color)}
-          size={18} />
+        <Ban size={18} />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>Remove Member</AlertDialogTitle>

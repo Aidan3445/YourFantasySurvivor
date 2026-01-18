@@ -1,7 +1,6 @@
 import CustomEvents from '~/components/leagues/customization/events/custom/view';
 import LeagueSettings from '~/components/leagues/customization/settings/league/view';
 import MemberEditForm from '~/components/leagues/customization/member/view';
-import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
 import { DraftCountdown } from '~/components/leagues/predraft/countdown/view';
 import DraftOrder from '~/components/leagues/predraft/order/view';
 import InviteLink from '~/components/leagues/predraft/inviteLink/view';
@@ -11,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/ta
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
+import SurvivalSettings from '~/components/leagues/customization/settings/survival/view';
 
 export default async function PredraftPage() {
 
@@ -24,8 +24,8 @@ export default async function PredraftPage() {
         <div className='pb-4'>
           <TabsContent value='draft' className='space-y-4'>
             <InviteLink />
-            <DraftCountdown className='w-full bg-card' />
-            <DraftOrder className='w-full bg-card' />
+            <DraftCountdown className='p-4 pt-2' />
+            <DraftOrder className='' />
             <div className='w-full flex items-center gap-2 justify-center p-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20'>
               <span className='h-5 w-0.5 bg-primary rounded-full' />
               <h2 className='text-2xl font-black uppercase tracking-tight text-center'>
@@ -33,13 +33,13 @@ export default async function PredraftPage() {
               </h2>
               <span className='h-5 w-0.5 bg-primary rounded-full' />
             </div>
-            <SetSurvivalCap />
+            <SurvivalSettings />
             <LeagueScoring />
             <ShauhinMode />
             <CustomEvents />
           </TabsContent>
           <TabsContent value='settings' className='space-y-4'>
-            <MemberEditForm className='w-full' />
+            <MemberEditForm />
             <div className='w-full flex flex-wrap gap-4 justify-center'>
               <div className='flex flex-col gap-4 w-full'>
                 <LeagueSettings />

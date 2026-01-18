@@ -243,16 +243,16 @@ export default function ChangeCastaway() {
 
   return (
     <Form {...reactForm}>
-      <Card className='w-full bg-card rounded-lg border-2 border-primary/20 p-3'>
+      <Card className='w-full bg-card rounded-lg border-2 border-primary/20 p-4'>
         <form action={() => handleSubmit()}>
           <CardContent className='p-0 flex flex-col gap-4'>
             {/* Main Survivor Section */}
             <div>
-              <div className='flex items-center gap-2 w-full justify-start'>
-                <span className='h-4 w-0.5 bg-primary rounded-full' />
-                <h1 className='text-base font-bold uppercase tracking-wider'>
+              <div className='flex items-center gap-3 h-8'>
+                <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+                <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
                   Swap your Survivor Pick
-                </h1>
+                </h2>
               </div>
               <span className='w-full flex flex-col lg:flex-row justify-center gap-x-4 gap-y-1 items-center mt-auto'>
                 <FormField
@@ -325,9 +325,11 @@ export default function ChangeCastaway() {
             {/* Secondary Pick Section */}
             {secondaryPickSettings?.enabled && keyEpisodes?.nextEpisode && (
               <div>
-                <div className='flex items-center gap-2 w-full justify-start'>
-                  <span className='h-4 w-0.5 bg-primary rounded-full' />
-                  <h1 className='text-base font-bold uppercase tracking-wider'>Secondary Pick</h1>
+                <div className='flex items-center gap-3 h-8'>
+                  <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+                  <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+                    Secondary Pick
+                  </h2>
                 </div>
                 <span className='w-full flex flex-col lg:flex-row justify-center gap-x-4 gap-y-1 items-center mt-auto'>
                   <FormField

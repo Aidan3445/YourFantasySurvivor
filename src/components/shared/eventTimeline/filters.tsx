@@ -102,10 +102,12 @@ export default function TimelineFilters({
   return (
     <Accordion type='single' collapsible className='w-full'>
       <AccordionItem value='filter' className='border-none'>
-        <div className='w-full flex flex-wrap gap-x-4 md:items-baseline justify-between'>
-          <div className='flex items-center gap-3 my-2 self-center'>
-            <div className='h-6 w-1 bg-primary rounded-full' />
-            <h2 className='text-xl font-black uppercase tracking-tight'>Activity</h2>
+        <div className='w-full flex flex-wrap gap-x-4 items-center justify-between'>
+          <div className='flex items-center gap-3 h-8'>
+            <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+            <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+              Activity
+            </h2>
           </div>
           <span className='flex flex-wrap gap-x-4 items-center justify-center'>
             <Select
