@@ -10,7 +10,6 @@ import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { Flame, MoveRight } from 'lucide-react';
-import { getContrastingColor } from '@uiw/color-convert';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 
 interface PredictionRowProps {
@@ -62,11 +61,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                 className='leading-tight px-1 w-min'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
                 <CastawayPopover castaway={castaway}>
-                  <span
-                    className='text-nowrap'
-                    style={{
-                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
-                    }}>
+                  <span className='text-nowrap'>
                     {castaway.fullName}
                   </span>
                 </CastawayPopover>

@@ -173,22 +173,19 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                       color={member.color}
                       loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}
                       className='rounded-lg border-2 transition-all hover:border-primary/40'>
-                      <span className='flex items-center gap-3 w-full'>
-                        {/* Rank Badge */}
+                      <span className='flex items-center gap-3 w-full text-inherit'>
+                        {/* Order Badge */}
                         <span
                           className='inline-flex items-center justify-center w-8 h-8 rounded-md font-black text-sm shrink-0'
                           style={{
                             backgroundColor: `${member.color}40`,
-                            color: getContrastingColor(member.color),
                             border: `2px solid ${member.color}66`
                           }}>
                           {index + 1}
                         </span>
 
                         {/* Name */}
-                        <span
-                          className='text-xl font-bold'
-                          style={{ color: getContrastingColor(member.color) }}>
+                        <span className='text-xl font-bold text-inherit'>
                           {member.displayName}
                         </span>
 

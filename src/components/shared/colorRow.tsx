@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react';
 import { cn } from '~/lib/utils';
-import { getContrastingColor } from '@uiw/color-convert';
 
 export interface ColorRowProps {
   color?: string;
@@ -13,15 +12,11 @@ export default function ColorRow({ color, loggedIn, className, children }: Color
   return (
     <span
       className={cn(
-        'px-4 gap-4 rounded border border-black flex items-center text-nowrap',
-        loggedIn && 'ring-white ring-2',
+        'w-full inline-flex px-4 py-0.5 gap-4 text-nowrap items-center rounded-md border-t border-b border-r border-transparent',
+        loggedIn && 'text-primary',
         className
       )}
-      style={{
-        backgroundColor: color,
-        color: color ? getContrastingColor(color) : '',
-        stroke: color ? getContrastingColor(color) : ''
-      }}>
+      style={{ backgroundColor: `${color}20`, borderLeft: `0.25rem solid ${color ?? '#000'}` }}>
       {children}
     </span>
   );

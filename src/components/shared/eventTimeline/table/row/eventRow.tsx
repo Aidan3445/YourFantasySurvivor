@@ -11,7 +11,6 @@ import { useMemo } from 'react';
 import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
-import { getContrastingColor } from '@uiw/color-convert';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Button } from '~/components/common/button';
@@ -70,11 +69,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
                 className='leading-tight px-1 w-min'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
                 <CastawayPopover castaway={castaway}>
-                  <span
-                    className='text-nowrap'
-                    style={{
-                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
-                    }}>
+                  <span className='text-nowrap'>
                     {castaway.fullName}
                   </span>
                 </CastawayPopover>
