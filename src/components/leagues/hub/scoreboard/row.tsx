@@ -2,7 +2,7 @@
 
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import { MoveRight, Flame, History, Skull, Dices } from 'lucide-react';
+import { MoveRight, Flame, History, Skull, Dices, ShieldCheck } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn, getTribeTimeline } from '~/lib/utils';
@@ -221,9 +221,16 @@ export default function MemberRow({
             <Popover>
               <PopoverTrigger>
                 <div className='ml-1 w-5 h-5 flex items-center justify-center text-sm font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer'>
-                  {castaway?.eliminatedEpisode
-                    ? <Skull size={18} className='stroke-muted-foreground' />
-                    : Math.min(currentStreak ?? Infinity, leagueSettings.survivalCap)}
+                  {castaway?.eliminatedEpisode ? (
+                    (shotInTheDarkStatus?.status === 'saved' && shotInTheDarkStatus.episodeNumber === castaway.eliminatedEpisode
+                      ? (
+                        <ShieldCheck className='w-5 h-5 stroke-green-600' />
+                      ) : (
+                        <Skull size={18} className='stroke-muted-foreground' />
+                      ))
+                  ) : (
+                    Math.min(currentStreak ?? Infinity, leagueSettings.survivalCap)
+                  )}
                 </div>
               </PopoverTrigger>
               <PopoverContent
@@ -238,6 +245,17 @@ export default function MemberRow({
                     <Flame className='inline w-4 h-4 stroke-muted-foreground align-text-top' />
                   </div>
                 </div>
+                {shotInTheDarkStatus?.status === 'saved' && (
+                  <>
+                    <Separator className='my-2 bg-primary/20' />
+                    <div className='text-xs flex items-center gap-1'>
+                      <ShieldCheck className='w-3 h-3 stroke-green-600' />
+                      <span className='text-nowrap text-green-600 font-semibold'>
+                        Shot in the Dark saved their streak in episode {shotInTheDarkStatus.episodeNumber}
+                      </span>
+                    </div>
+                  </>
+                )}
               </PopoverContent>
             </Popover>
           )}

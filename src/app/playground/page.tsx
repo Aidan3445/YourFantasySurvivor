@@ -57,7 +57,7 @@ export default function PlaygroundPage() {
             <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight'>Scoring Playground</h1>
             <span className='h-6 w-1 bg-primary rounded-full' />
           </span>
-          <p className='text-muted-foreground text-pretty text-sm md:text-base font-medium'>
+          <p className='text-muted-foreground text-pretty text-sm md:text-base font-medium h-10'>
             Test out different scoring configurations and see how they impact the castaways scores!
           </p>
         </div>
@@ -80,8 +80,8 @@ export default function PlaygroundPage() {
         )}
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-10.5rem-var(--navbar-height))]'>
-        <div className='flex flex-col gap-4 my-2'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-11.5rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
+        <div className='flex flex-col gap-4 mt-2 mb-4'>
           <Form {...reactForm}>
             <form className='p-4 bg-card rounded-lg shadow-lg shadow-primary/10'>
               <span className='grid lg:grid-cols-3 gap-2'>

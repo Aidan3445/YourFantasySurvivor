@@ -71,7 +71,7 @@ export default function SeasonsPage() {
         </TabsList>
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-13.5rem)] h-[calc(100svh-12.5rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-13.5rem)] h-[calc(100svh-12rem-var(--navbar-height))]'>
         {selectedSeasonId ? (
           season ? (
             <div className='pb-4'>
