@@ -139,7 +139,7 @@ export default function ChangeCastaway() {
         const episodesSinceLastPick = previousEpisode - episodeNumber;
 
         // Check if this castaway is locked out
-        if (lockoutPeriod === 0 || episodesSinceLastPick < lockoutPeriod) {
+        if ((lockoutPeriod === 0 || episodesSinceLastPick < lockoutPeriod) && episodeNumber <= previousEpisode) {
           // Only keep the most recent pick for each castaway
           if (!lockoutMap.has(castawayId) || (lockoutMap.get(castawayId)?.episodePicked ?? 0) < episodeNumber) {
             lockoutMap.set(castawayId, {
