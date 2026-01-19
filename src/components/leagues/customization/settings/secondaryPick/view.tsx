@@ -64,9 +64,11 @@ export default function SecondaryPickSettings() {
           className='absolute top-3 right-3 w-8 h-8 shrink-0 cursor-pointer stroke-primary hover:stroke-primary/70 active:stroke-primary/50 transition-all'
           onClick={() => { setLocked(true); reactForm.reset(); }} />)}
 
-      <div className='flex items-center gap-2 mb-1'>
-        <span className='h-4 w-0.5 bg-primary rounded-full' />
-        <h2 className='text-base font-bold uppercase tracking-wider'>Secondary Pick</h2>
+      <div className='flex items-center gap-3 h-8'>
+        <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+        <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+          Secondary Pick
+        </h2>
       </div>
 
       <p className='text-sm mr-12 max-w-4xl'>

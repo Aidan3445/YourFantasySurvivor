@@ -1,7 +1,6 @@
 'use client';
 
 import { Shield } from 'lucide-react';
-import { getContrastingColor } from '@uiw/color-convert';
 import { type CurrentMemberProps } from '~/components/leagues/actions/league/members/current';
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from '~/components/common/alertDialog';
 import ColorRow from '~/components/shared/colorRow';
@@ -47,8 +46,7 @@ export default function AdminToggle({ member, loggedInMember }: CurrentMemberPro
       <AlertDialogTrigger disabled={!enabled}>
         <Shield
           className={cn('my-auto', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
-          color={getContrastingColor(member.color)}
-          fill={member.role === 'Admin' ? getContrastingColor(member.color) : 'none'}
+          fill={member.role === 'Admin' ? '#000' : 'none'}
           size={18} />
       </AlertDialogTrigger>
       <AlertDialogContent>

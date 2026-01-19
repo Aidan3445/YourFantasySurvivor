@@ -16,11 +16,11 @@ export function useLeagues() {
       const { leagues } = await response.json() as { leagues: LeagueDetails[] };
       return leagues;
     },
-    staleTime: Infinity,
+    staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
     enabled: true
   });
 }

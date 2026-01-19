@@ -3,15 +3,14 @@
 import { cn } from '~/lib/utils';
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
-import NotesCell from '~/components/shared/eventTimeline/table/notesCell';
+import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
+import NotesCell from '~/components/shared/eventTimeline/table/row/notesCell';
 import { type EnrichedEvent, type BaseEventName } from '~/types/events';
 import { BaseEventFullName } from '~/lib/events';
 import { useMemo } from 'react';
 import EditEvent from '~/components/leagues/actions/events/edit';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
-import { getContrastingColor } from '@uiw/color-convert';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Button } from '~/components/common/button';
@@ -52,7 +51,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
             tribe &&
             <ColorRow
               key={index}
-              className='leading-tight px-1 w-min'
+              className='leading-tight px-1'
               color={tribe.tribeColor}>
               {tribe.tribeName}
             </ColorRow>
@@ -67,14 +66,10 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
             pairs.map(({ castaway }) =>
               <ColorRow
                 key={castaway.castawayId}
-                className='leading-tight px-1 w-min'
+                className='leading-tight px-1'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
                 <CastawayPopover castaway={castaway}>
-                  <span
-                    className='text-nowrap'
-                    style={{
-                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
-                    }}>
+                  <span className='text-nowrap'>
                     {castaway.fullName}
                   </span>
                 </CastawayPopover>
@@ -100,10 +95,11 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
                     {member.displayName}
                   </ColorRow>
                 ) : (
-                  <ColorRow className={cn(
-                    'leading-tight px-1 w-min text-muted-foreground border-dashed',
-                    (secondaries?.length === 0 || !event.points) && 'invisible'
-                  )}>
+                  <ColorRow
+                    className={cn(
+                      'leading-tight px-1 text-muted-foreground',
+                      (secondaries?.length === 0 || !event.points) && 'invisible'
+                    )}>
                     None
                   </ColorRow>
                 )}

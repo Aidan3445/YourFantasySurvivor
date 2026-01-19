@@ -29,17 +29,17 @@ export default function ManageMembers() {
 
   return (
     <div className='flex flex-col gap-4 bg-card justify-between rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex-1 sm:min-w-sm min-h-0 overflow-hidden'>
-      <div className='flex items-center gap-2 w-full justify-start px-3 pt-3'>
-        <span className='h-4 w-0.5 bg-primary rounded-full' />
-        <h3 className='text-base font-bold uppercase tracking-wider text-center cursor-default'>
+      <div className='flex items-center gap-3 h-8 px-4 mt-4'>
+        <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+        <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
           Manage Members
-        </h3>
+        </h2>
       </div>
       <Tabs
         className='h-full rounded-lg flex flex-col'
         value={tab}
         onValueChange={setTab as (_value: string) => void}>
-        <TabsList className='grid grid-flow-col auto-cols-fr px-2 mx-3 z-50 bg-accent border-none'>
+        <TabsList className='grid grid-flow-col auto-cols-fr px-2 mx-4 z-50 bg-accent border-none'>
           <TabsTrigger value='current'>Current</TabsTrigger>
           <TabsTrigger value='pending' disabled={!leagueSettings?.isProtected}>
             Pending

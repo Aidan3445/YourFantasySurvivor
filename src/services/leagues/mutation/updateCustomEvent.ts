@@ -25,7 +25,6 @@ export default async function updateCustomEventLogic(
   if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Transaction to update the event
   return await db.transaction(async (trx) => {
-    console.log('Updating custom event', JSON.stringify({ customEventId, customEvent }, null, 2));
     // Get league information
     const league = await trx
       .select({

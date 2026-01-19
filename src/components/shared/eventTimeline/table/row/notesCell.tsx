@@ -24,9 +24,11 @@ export default function NotesCell({ notes }: NotesCellProps) {
         <PopoverTrigger className='ml-auto flex justify-end hover:opacity-70 active:opacity-50 transition-opacity'>
           <ScrollText className='w-8 h-8 shrink-0 stroke-primary' />
         </PopoverTrigger>
-        <PopoverContent className='w-max max-w-[40svw] border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card' side='left'>
+        <PopoverContent
+          className='w-max max-w-[40svw] border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card pl-8'
+          side='left'>
           <PopoverArrow className='fill-primary/30' />
-          <ul className='list-disc list-inside'>
+          <ul className='list-disc'>
             {filteredNotes.map((note, index) => (
               <li className='text-sm' key={index}>
                 {note.startsWith('https://')
@@ -51,4 +53,3 @@ export default function NotesCell({ notes }: NotesCellProps) {
 
   );
 }
-

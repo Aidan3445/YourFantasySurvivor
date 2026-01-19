@@ -11,7 +11,8 @@ import {
   DEFAULT_SECONDARY_PICK_CAN_PICK_OWN,
   DEFAULT_SECONDARY_PICK_LOCKOUT_PERIOD,
   DEFAULT_SECONDARY_PICK_PUBLIC_PICKS,
-  DEFAULT_SECONDARY_PICK_MULTIPLIER
+  DEFAULT_SECONDARY_PICK_MULTIPLIER,
+  DEFAULT_SHOT_IN_THE_DARK_ENABLED
 } from '~/lib/leagues';
 
 export const leagueStatus = pgEnum('league_status', LeagueStatuses);
@@ -44,5 +45,6 @@ export const leagueSettingsSchema = createTable(
     secondaryPickLockoutPeriod: integer('secondary_pick_lockout_period').notNull().default(DEFAULT_SECONDARY_PICK_LOCKOUT_PERIOD),
     secondaryPickPublicPicks: boolean('secondary_pick_public_picks').notNull().default(DEFAULT_SECONDARY_PICK_PUBLIC_PICKS),
     secondaryPickMultiplier: integer('secondary_pick_multiplier').notNull().default(DEFAULT_SECONDARY_PICK_MULTIPLIER * 100), // stored as percentage: 25, 50, 75, 100
+    shotInTheDarkEnabled: boolean('shot_in_the_dark_enabled').notNull().default(DEFAULT_SHOT_IN_THE_DARK_ENABLED),
   }
 );

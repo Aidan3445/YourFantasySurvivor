@@ -101,16 +101,18 @@ export default function CreateBaseEvent() {
   });
 
   return (
-    <div className='w-full px-4 md:pb-14'>
+    <div className='w-full'>
       <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 p-3'>
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
             <form
               className='flex flex-col gap-2 px-2 max-md:w-full grow'
               action={() => handleSubmit()}>
-              <div className='flex items-center gap-2 w-full justify-start mb-1'>
-                <span className='h-4 w-0.5 bg-primary rounded-full' />
-                <h2 className='text-base font-bold uppercase tracking-wider'>Score Base Event</h2>
+              <div className='flex items-center gap-3 h-8'>
+                <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+                <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+                  Score Base Event
+                </h2>
               </div>
               <FormField
                 name='episodeId'
@@ -255,18 +257,19 @@ export default function CreateBaseEvent() {
                 Create
               </Button>
             </form>
-            <EpisodeEvents
-              episodeNumber={selectedEpisode ?? 1}
-              seasonData={season!}
-              mockEvents={mockEvent ? [mockEvent] : []}
-              edit
-              filters={{
-                castaway: [],
-                tribe: [],
-                member: [],
-                event: []
-              }}
-            />
+            <div className='w-full'>
+              <EpisodeEvents
+                episodeNumber={selectedEpisode ?? 1}
+                seasonData={season!}
+                mockEvents={mockEvent ? [mockEvent] : []}
+                edit
+                filters={{
+                  castaway: [],
+                  tribe: [],
+                  member: [],
+                  event: []
+                }} />
+            </div>
           </span>
         </Form>
       </section >

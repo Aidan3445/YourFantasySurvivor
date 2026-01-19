@@ -6,7 +6,6 @@ import { type Tribe } from '~/types/tribes';
 import { cn, getTribeTimeline } from '~/lib/utils';
 import { type TribesTimeline } from '~/types/tribes';
 import { useMemo } from 'react';
-import { getContrastingColor } from '@uiw/color-convert';
 import Link from 'next/link';
 import Image from 'next/image';
 import { type LeagueMember } from '~/types/leagueMembers';
@@ -30,34 +29,18 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes, member 
   return (
     <div className='bg-primary/5 flex flex-col gap-2 border-2 border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all'>
       <ColorRow
-        className='relative justify-start gap-2 px-2 py-2 h-16 border-2'
+        className='relative justify-start gap-2 px-2 py-2 h-16'
         color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color}>
-        <div
-          className='leading-none flex items-center gap-2'
-          style={{
-            color: getContrastingColor(castaway?.eliminatedEpisode
-              ? '#AAAAAA'
-              : castaway?.tribe?.color ?? '#AAAAAA')
-          }}>
+        <div className='leading-none flex items-center gap-2'>
           <Image
             src={castaway.imageUrl}
             alt={castaway.fullName}
             width={50}
             height={50}
-            className={cn('rounded-full border-2',
-              (!!member || !!castaway.eliminatedEpisode) && 'grayscale')}
-            style={{
-              borderColor: getContrastingColor(castaway?.eliminatedEpisode
-                ? '#AAAAAA'
-                : castaway?.tribe?.color ?? '#AAAAAA')
-            }} />
-          <span
-            className='font-bold'
-            style={{
-              color: getContrastingColor(castaway?.eliminatedEpisode
-                ? '#AAAAAA'
-                : castaway?.tribe?.color ?? '#AAAAAA')
-            }}>
+            className={cn(
+              'rounded-full border-2',
+              (!!member || !!castaway.eliminatedEpisode) && 'grayscale')} />
+          <span className='font-bold'>
             {castaway.fullName}
           </span>
           {member && (

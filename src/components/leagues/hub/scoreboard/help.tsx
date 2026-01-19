@@ -1,18 +1,19 @@
 'use client';
 
 import ColorRow from '~/components/shared/colorRow';
-import { MoveRight, Circle, History, CircleHelp, Skull } from 'lucide-react';
+import { MoveRight, Circle, History, CircleHelp, Skull, ShieldCheck } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { Separator } from '~/components/common/separator';
 import { PopoverArrow } from '@radix-ui/react-popover';
 
 
 interface ScoreboardHelpProps {
-  hasSurvivalCap?: boolean;
+  survivalCap?: boolean;
   secondaryPicks?: boolean;
+  shotInTheDark?: boolean;
 }
 
-export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: ScoreboardHelpProps) {
+export default function ScoreboardHelp({ survivalCap, secondaryPicks, shotInTheDark }: ScoreboardHelpProps) {
   return (
     <Popover>
       <PopoverTrigger className='absolute top-3 right-3 z-50 pointer-events-auto'>
@@ -52,15 +53,15 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
           )}
 
           {/* Tribe History */}
-          <div>
-            <div className='font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1'>
+          <div className='space-y-1'>
+            <div className='font-bold text-xs uppercase tracking-wider text-muted-foreground'>
               Tribe History
             </div>
-            <div className='flex items-center gap-2 mb-1'>
+            <div className='flex items-center gap-2'>
               <Circle size={16} fill='#FF90CC' className='shrink-0' />
               <span className='text-xs'>Original tribe</span>
             </div>
-            <div className='flex items-center gap-2 mb-1'>
+            <div className='flex items-center gap-2'>
               <Circle size={16} fill='#3ADA00' className='shrink-0' />
               <span className='text-xs'>After tribe swap</span>
             </div>
@@ -75,22 +76,30 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
             <div className='font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1'>
               Icons
             </div>
-            <div className='flex items-center gap-2 mb-1'>
-              <History size={16} className='shrink-0 stroke-muted-foreground' />
-              <span className='text-xs'>View selection history</span>
+            <div className='space-y-1'>
+              <div className='flex items-center gap-2'>
+                <History size={16} className='shrink-0 stroke-muted-foreground' />
+                <span className='text-xs'>View selection history</span>
+              </div>
+              {survivalCap && (
+                <>
+                  <div className='flex items-center gap-2'>
+                    <div className='w-4 text-center text-xs font-bold'>2</div>
+                    <span className='text-xs'>Survival streak points available</span>
+                  </div>
+                  <div className='flex items-center gap-2'>
+                    <Skull size={16} className='shrink-0 stroke-muted-foreground' />
+                    <span className='text-xs'>Survivor eliminated</span>
+                  </div>
+                  {shotInTheDark && (
+                    <div className='flex items-center gap-2'>
+                      <ShieldCheck size={16} className='shrink-0 stroke-muted-foreground' />
+                      <span className='text-xs'>Shot in the Dark used successfully</span>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
-            {hasSurvivalCap && (
-              <>
-                <div className='flex items-center gap-2 mb-1'>
-                  <div className='w-4 text-center text-xs font-bold'>2</div>
-                  <span className='text-xs'>Survival streak points available</span>
-                </div>
-                <div className='flex items-center gap-2'>
-                  <Skull size={16} className='shrink-0 stroke-muted-foreground' />
-                  <span className='text-xs'>Survivor eliminated</span>
-                </div>
-              </>
-            )}
           </div>
 
           {/* Example */}
@@ -99,9 +108,7 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
               Example Selection History
             </div>
             <div className='grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-xs'>
-              <ColorRow
-                className='px-2 justify-center font-medium text-xs'
-                color='#FF90CC'>
+              <ColorRow color='#FF90CC'>
                 First Pick
               </ColorRow>
               <div className='flex gap-1 items-center text-nowrap font-medium'>
@@ -109,9 +116,7 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
                 <MoveRight className='w-3 h-3 shrink-0' />
                 Episode 4
               </div>
-              <ColorRow
-                className='px-2 justify-center font-medium text-xs'
-                color='#3ADA00'>
+              <ColorRow color='#3ADA00'>
                 Current Pick
               </ColorRow>
               <div className='flex gap-1 items-center text-nowrap font-medium'>
@@ -128,36 +133,31 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
                 </div>
                 <div className='grid grid-cols-[max-content_1fr] gap-x-1 gap-y-1 text-xs'>
                   <span className='grid col-span-2 grid-cols-subgrid'>
-                    <ColorRow
-                      className='px-2 justify-center font-medium text-xs'
-                      color={'#FEF340'}>
-                      Ep 1 Secondary
+                    <ColorRow color={'#FEF340'}>
+                      John Cochran
                     </ColorRow>
-                    <div className='flex gap-1 items-center text-nowrap font-medium'>
+                    <div className='flex gap-1 items-center text-nowrap font-medium tabular-nums'>
                       <MoveRight className='w-3 h-3 shrink-0' />
-                      1
+                      1 <i className='text-nowrap ml-4'>(Secondary pick for episode 1)</i>
+                    </div>
+                  </span>
+                  <span className='grid col-span-2 grid-cols-subgrid items-center'>
+                    <ColorRow color={'#AAAAAA'}>
+                      No Pick
+                    </ColorRow>
+                    <div className='flex gap-1 items-center text-nowrap font-medium tabular-nums'>
+                      <MoveRight className='w-3 h-3 shrink-0' />
+                      2 <i className='text-nowrap ml-4'>(No secondary pick for episode 2,
+                        <br /> how could you forget!?)</i>
                     </div>
                   </span>
                   <span className='grid col-span-2 grid-cols-subgrid'>
-                    <ColorRow
-                      className='px-2 justify-center font-medium text-xs'
-                      color={'#AAAAAA'}>
-                      No Pick (Forgot...)
+                    <ColorRow color={'#FF90CC'}>
+                      Genevieve Mushaluk
                     </ColorRow>
-                    <div className='flex gap-1 items-center text-nowrap font-medium'>
+                    <div className='flex gap-1 items-center text-nowrap font-medium tabular-nums'>
                       <MoveRight className='w-3 h-3 shrink-0' />
-                      2
-                    </div>
-                  </span>
-                  <span className='grid col-span-2 grid-cols-subgrid'>
-                    <ColorRow
-                      className='px-2 justify-center font-medium text-xs'
-                      color={'#FF90CC'}>
-                      Ep 3 Secondary
-                    </ColorRow>
-                    <div className='flex gap-1 items-center text-nowrap font-medium'>
-                      <MoveRight className='w-3 h-3 shrink-0' />
-                      1
+                      3 <i className='text-nowrap ml-4'>(Secondary pick for episode 3)</i>
                     </div>
                   </span>
                 </div>
@@ -165,7 +165,7 @@ export default function ScoreboardHelp({ hasSurvivalCap, secondaryPicks }: Score
             )}
           </div>
 
-          {hasSurvivalCap && (
+          {survivalCap && (
             <div>
               <div className='font-bold text-xs uppercase tracking-wider text-muted-foreground mb-1'>
                 Survival Cap

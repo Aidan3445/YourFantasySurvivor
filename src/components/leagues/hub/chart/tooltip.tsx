@@ -73,7 +73,7 @@ export default function CustomTooltip() {
         <div className='flex gap-4'>
           <div className='grid grid-cols-[1fr_auto_auto] gap-x-3 gap-y-1'>
             <ColorRow
-              className='col-span-3 grid grid-cols-subgrid text-lg font-medium'
+              className='col-span-3 grid grid-cols-subgrid text-lg font-medium bg-white!'
               color='#FFFFFF'>
               <p className='text-start text-inherit'>Name</p>
               <p className='text-center text-inherit'>Total</p>

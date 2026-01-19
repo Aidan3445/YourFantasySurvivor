@@ -130,16 +130,16 @@
   }
   @keyframes shimmer3 {
     0% {
-      transform: translateX(57.5%) skewX(-45deg);
+      transform: translateX(52.5%) skewX(-45deg);
     }
     12% {
-      transform: translateX(-157.5%) skewX(-45deg);
+      transform: translateX(-300%) skewX(-45deg);
     }
     75% {
-      transform: translateX(-157.5%) skewX(-45deg);
+      transform: translateX(-300%) skewX(-45deg);
     }
     100% {
-      transform: translateX(57.5%) skewX(-45deg);
+      transform: translateX(52.5%) skewX(-45deg);
     }
   }
   @keyframes shimmerfast {
