@@ -97,7 +97,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
                 ) : (
                   <ColorRow
                     className={cn(
-                      'leading-tight px-1 text-muted-foreground',
+                      'leading-tight px-1 text-muted-foreground w-min',
                       (secondaries?.length === 0 || !event.points) && 'invisible'
                     )}>
                     None
