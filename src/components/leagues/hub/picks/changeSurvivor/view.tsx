@@ -264,7 +264,7 @@ export default function ChangeCastaway() {
                           defaultValue={selected}
                           value={selected}
                           onValueChange={handleSelectionChange.bind(null, 'survivor')}>
-                          <SelectTrigger>
+                          <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
                             <SelectValue placeholder='Select new survivor' />
                           </SelectTrigger>
                           <SelectContent className='z-50'>
@@ -277,7 +277,7 @@ export default function ChangeCastaway() {
                                       className='cursor-not-allowed'
                                       style={{ backgroundColor: castaway.pickedBy?.color ?? '#6b7280' }}>
                                       <span
-                                        className='flex items-center gap-1'
+                                        className='flex items-center gap-1 w-full text-nowrap'
                                         style={{ color: getContrastingColor(castaway.pickedBy?.color ?? '#6b7280') }}>
                                         {castaway.tribe &&
                                           <ColorRow
@@ -291,13 +291,12 @@ export default function ChangeCastaway() {
                                     </SelectLabel>
                                   ) : (
                                     <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                                      <span className='flex items-center gap-1'>
+                                      <span className='flex items-center gap-1 w-full text-nowrap'>
                                         {castaway.tribe &&
                                           <ColorRow
                                             className='w-20 px-0 justify-center leading-tight'
                                             color={castaway.tribe.color}>
                                             {castaway.tribe.name}
-                                            {castaway.pickedBy}
                                           </ColorRow>}
                                         {castaway.fullName}
                                       </span>
@@ -341,7 +340,7 @@ export default function ChangeCastaway() {
                             key={secondarySelected || 'no-selection'}
                             value={secondarySelected}
                             onValueChange={handleSelectionChange.bind(null, 'secondary')}>
-                            <SelectTrigger>
+                            <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
                               <SelectValue placeholder='Select secondary pick' />
                             </SelectTrigger>
                             <SelectContent className='z-50'>
@@ -377,7 +376,7 @@ export default function ChangeCastaway() {
                                         <SelectLabel
                                           key={castaway.castawayId}
                                           className='cursor-not-allowed opacity-50'>
-                                          <span className='flex items-center gap-1'>
+                                          <span className='flex items-center gap-1 w-full text-nowrap'>
                                             {castaway.tribe &&
                                               <ColorRow
                                                 className='w-20 px-0 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
@@ -393,7 +392,7 @@ export default function ChangeCastaway() {
 
                                     return (
                                       <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                                        <span className='flex items-center gap-1'>
+                                        <span className='flex items-center gap-1 w-full text-nowrap'>
                                           {castaway.tribe &&
                                             <ColorRow
                                               className='w-20 px-0 justify-center leading-tight'

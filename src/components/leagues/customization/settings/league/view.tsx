@@ -67,7 +67,7 @@ export default function LeagueSettings() {
           action={() => handleSubmit()}>
           <div className='flex w-full items-center justify-start gap-3 h-8'>
             <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
-            <FormLabel className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+            <FormLabel className='text-base md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
               Edit League Details
             </FormLabel>
           </div>

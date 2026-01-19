@@ -38,10 +38,11 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
           </TableCell>) :
         null}
       <TableCell className='text-nowrap text-start'>
-        {isBaseEvent &&
-          <p className='text-xs text-muted-foreground'>
+        {isBaseEvent && (
+          <p className='text-xs text-muted-foreground text-nowrap'>
             {BaseEventFullName[event.eventName as BaseEventName]}
-          </p>}
+          </p>
+        )}
         {label}
       </TableCell>
       <PointsCell points={event.points} />
@@ -60,7 +61,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
       </TableCell>
       <TableCell className='text-right'>
         <div className={cn(
-          'text-xs flex flex-col h-full gap-0.5 items-end',
+          'text-sm flex flex-col h-full gap-0.5 items-end',
           event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.castaway)) && 'justify-center')}>
           {event.referenceMap?.map(({ pairs }) => (
             pairs.map(({ castaway }) =>
@@ -80,7 +81,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
       </TableCell>
       {!noMembers && <TableCell>
         <div className={cn(
-          'flex flex-col text-xs h-full gap-0.5',
+          'flex flex-col text-sm h-full gap-0.5',
           event.referenceMap.some((ref) =>
             ref.pairs.some((pair) => pair.member !== null
               || (pair.secondaries && pair.secondaries.length > 0
@@ -116,7 +117,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
                     <PopoverContent className='w-max border-2 border-primary/30 shadow-lg shadow-primary/20 bg-card p-2' side='right' sideOffset={-2}>
                       <PopoverArrow className='fill-primary' />
                       <div className='text-sm font-semibold uppercase tracking-wide text-center'>Secondary Points</div>
-                      <div className='flex flex-col gap-1 text-xs'>
+                      <div className='flex flex-col gap-1 text-sm'>
                         {secondaries.map((secMember) => (
                           <ColorRow
                             key={`secondary-${secMember.memberId}`}

@@ -108,11 +108,11 @@ export default function CreateCustomEvent() {
 
   return (
     <div className='w-full'>
-      <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 p-3'>
+      <section className='bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10'>
         <Form {...reactForm}>
           <span className='flex gap-8 flex-wrap justify-evenly'>
             <form
-              className='flex flex-col gap-2 px-2 max-md:w-full grow'
+              className='flex flex-col gap-2 px-4 py-2 max-md:w-full grow'
               action={() => handleSubmit()}>
               <div className='flex items-center gap-3 h-8'>
                 <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
@@ -250,7 +250,7 @@ export default function CreateCustomEvent() {
                 Create
               </Button>
             </form>
-            <div className='w-full'>
+            <div className='w-[calc(100svw-2rem)] md:w-[calc(100svw-3.25rem-var(--sidebar-width))]'>
               <EpisodeEvents
                 episodeNumber={selectedEpisode ?? 1}
                 seasonData={season!}

@@ -80,9 +80,9 @@ export default function MemberRow({
     [selectionList]);
 
   const isTopThree = place <= 3;
-  const rankBadgeColor = place === 1 ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40'
-    : place === 2 ? 'bg-gray-400/20 text-gray-600 border-gray-400/40'
-      : place === 3 ? 'bg-amber-700/20 text-amber-700 border-amber-700/40'
+  const rankBadgeColor = place === 1 ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40 shadow-yellow-500/40'
+    : place === 2 ? 'bg-gray-400/20 text-gray-600 border-gray-400/40 shadow-gray-400/40'
+      : place === 3 ? 'bg-amber-700/20 text-amber-700 border-amber-700/40 shadow-amber-700/40'
         : 'bg-primary/10 text-primary border-primary/30';
 
   return (
@@ -105,7 +105,7 @@ export default function MemberRow({
       <TableCell className='text-nowrap px-3 py-3 w-0'>
         <div className='flex items-center gap-2'>
           <ColorRow
-            className='text-base md:text-lg font-bold transition-all'
+            className='text-base md:text-lg font-bold transition-all px-1'
             loggedIn={member.loggedIn}
             color={color}>
             {member.displayName}

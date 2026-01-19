@@ -22,22 +22,21 @@ export default function SideNavLink({
 
   const Icon = icon;
   return (
-    <SidebarMenuButton className='h-10!' asChild size='lg'>
+    <SidebarMenuButton className='h-10! pr-0' asChild size='lg'>
       <Link
         className={cn(
           'w-full flex gap-5 items-center transition-all h-min text-primary hover:text-primary!',
           active && 'font-semibold',
           className
         )}
-        href={href}
-      >
+        href={href}>
         {Icon ? (
           <Icon size={26} className='stroke-primary shrink-0' />
         ) : (
           children
         )}
 
-        <span className='truncate text-inherit'>
+        <span className='text-inherit'>
           {label}
         </span>
       </Link>

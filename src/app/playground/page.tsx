@@ -43,8 +43,8 @@ export default function PlaygroundPage() {
 
   // Auto-select most recent season on mount
   useEffect(() => {
-    if (!selectedSeasonId && seasons && seasons.length > 0) {
-      setSelectedSeasonId(seasons[0]!.seasonId);
+    if (!selectedSeasonId && seasons && seasons.length > 1) {
+      setSelectedSeasonId(seasons[1]!.seasonId);
     }
   }, [seasons, selectedSeasonId]);
 
@@ -52,14 +52,16 @@ export default function PlaygroundPage() {
     <div>
       <div className='sticky z-50 flex flex-col w-full justify-center bg-card shadow-lg shadow-primary/20 px-4 py-4 items-center border-b-2 border-primary/20'>
         <div className='text-center'>
-          <span className='flex items-center justify-center gap-3 mb-2'>
-            <span className='h-6 w-1 bg-primary rounded-full' />
-            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight'>Scoring Playground</h1>
-            <span className='h-6 w-1 bg-primary rounded-full' />
-          </span>
-          <p className='text-muted-foreground text-pretty text-sm md:text-base font-medium h-10'>
-            Test out different scoring configurations and see how they impact the castaways scores!
-          </p>
+          <div className='flex items-center justify-center gap-3 mb-2'>
+            <div className='h-6 w-1 bg-primary rounded-full' />
+            <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight text-nowrap'>Scoring Playground</h1>
+            <div className='h-6 w-1 bg-primary rounded-full' />
+          </div>
+          <div className='h-10'>
+            <p className='text-muted-foreground text-pretty text-sm md:text-base font-medium'>
+              Test out different scoring configurations and see how they impact the castaways scores!
+            </p>
+          </div>
         </div>
 
         {seasons && seasons.length > 0 && (
@@ -80,10 +82,10 @@ export default function PlaygroundPage() {
         )}
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-11.5rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-1 md:h-[calc(100svh-11.5rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
         <div className='flex flex-col gap-4 mt-2 mb-4'>
           <Form {...reactForm}>
-            <form className='p-4 bg-card rounded-lg shadow-lg shadow-primary/10'>
+            <form className='p-4 bg-card rounded-lg shadow-lg shadow-primary/10 border-2 border-primary/20'>
               <span className='grid lg:grid-cols-3 gap-2'>
                 <ChallengeScoreSettings hidePredictions />
                 <AdvantageScoreSettings hidePredictions>

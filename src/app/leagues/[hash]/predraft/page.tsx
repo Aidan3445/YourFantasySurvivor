@@ -15,12 +15,12 @@ import SurvivalSettings from '~/components/leagues/customization/settings/surviv
 export default async function PredraftPage() {
 
   return (
-    <Tabs className='w-full' defaultValue='draft'>
+    <Tabs className='w-full overflow-hidden' defaultValue='draft'>
       <TabsList className='sticky flex w-full px-10 rounded-none z-50 bg-accent'>
         <TabsTrigger className='flex-1' value='draft'>League</TabsTrigger>
         <TabsTrigger className='flex-none w-fit' value='settings'>Settings</TabsTrigger>
       </TabsList>
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
+      <ScrollArea className='px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>
           <TabsContent value='draft' className='space-y-4'>
             <InviteLink />

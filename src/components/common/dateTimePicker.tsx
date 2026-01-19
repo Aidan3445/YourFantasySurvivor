@@ -15,7 +15,7 @@ import {
 
 interface DateTimePickerProps {
   value?: Date;
-  onChange?: (date: Date) => void;
+  onChange?: (_date: Date) => void;
   rangeStart?: Date;
   rangeEnd?: Date;
 }
@@ -33,15 +33,14 @@ export function DateTimePicker({ value, onChange, rangeStart, rangeEnd }: DateTi
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
-              variant='outline'
+              variant='accent'
               id='date-picker'
-              className='w-32 justify-between font-normal'
-            >
+              className='w-32 justify-between font-normal'>
               {date ? date.toLocaleDateString() : 'Select date'}
               <ChevronDownIcon />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className='w-auto overflow-hidden p-0' align='start'>
+          <PopoverContent className='w-auto overflow-hidden p-0 z-51' align='start'>
             <Calendar
               mode='single'
               selected={date}
@@ -73,7 +72,7 @@ export function DateTimePicker({ value, onChange, rangeStart, rangeEnd }: DateTi
           id='time-picker'
           step='1'
           value={date ? date.toTimeString().split(' ')[0] : ''}
-          className='bg-background appearance-none rounded-md [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
+          className='appearance-none rounded-md [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
           onChange={(e) => {
             if (date) {
               const [hours, minutes, seconds] = e.target.value.split(':').map(Number);

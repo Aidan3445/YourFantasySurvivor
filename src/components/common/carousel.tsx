@@ -311,15 +311,15 @@ function CoverCarousel({ items, reset, setReset }: CoverCarouselProps) {
                 {
                   'pointer-events-none': offset !== 0,
 
-                  'scale-50 translate-y-2 -z-10 md:blur-[1px] duration-300': absOffset === 1,
+                  'scale-50 translate-y-2 -z-10 duration-300': absOffset === 1,
                   'translate-x-1/3': offset === -1,
                   '-translate-x-1/3': offset === 1,
 
-                  'scale-[25%] translate-y-4 -z-20 md:blur-[2px] duration-200': absOffset === 2,
+                  'scale-[25%] translate-y-4 -z-20 duration-200': absOffset === 2,
                   'translate-x-full': offset === -2,
                   '-translate-x-full': offset === 2,
 
-                  'scale-[12.5%] translate-y-6 -z-30 md:blur-[3px] duration-100': absOffset === 3,
+                  'scale-[12.5%] translate-y-6 -z-30 duration-100': absOffset === 3,
                   'translate-x-[185%]': offset <= -3,
                   '-translate-x-[185%]': offset >= 3,
 

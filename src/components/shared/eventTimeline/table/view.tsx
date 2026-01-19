@@ -268,8 +268,9 @@ export default function EpisodeEvents({
                 Edit
               </TableHead>
             )}
-            <TableHead className='font-bold uppercase text-xs tracking-wider'>
-              Event</TableHead>
+            <TableHead className='font-bold uppercase text-xs tracking-wider w-0'>
+              Event
+            </TableHead>
             <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>
               Points
             </TableHead>

@@ -1,6 +1,5 @@
 'use client';
 
-import { Flame } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 import {
   Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow,
@@ -18,6 +17,7 @@ import { Popover, PopoverTrigger, PopoverContent } from '~/components/common/pop
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Separator } from '~/components/common/separator';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
 
 interface PredictionTableProps {
   predictions: PredictionWithEvent[];
@@ -72,7 +72,7 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
           {predictions.sort((a) => a.timing.some((t) => t.startsWith('Weekly')) ? 1 : -1)
             .map((pred, index) => {
               return (
-                <TableRow key={index} className='border-b border-primary/10 bg-secondary hover:bg-primary/5 transition-colors'>
+                <TableRow key={index} className='border-b border-primary/10 bg-b3 hover:bg-b2 transition-colors'>
                   <TableCell>
                     <div className='flex text-nowrap gap-2 items-center font-medium'>
                       <TimingPopover timing={pred.timing} />
@@ -96,39 +96,15 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                       }
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <span className={cn('text-nowrap text-sm text-center font-bold flex items-center justify-center flex-nowrap',
-                      pred.hit ?
-                        pred.points > 0 ? 'text-green-700' : 'text-red-700' :
-                        'text-muted-foreground')}>
-                      {pred.points > 0 && pred.hit ? `+${pred.points}` : pred.points}
-                      <Flame className={cn(
-                        'inline align-top w-4 h-4 -mt-0.5',
-                        pred.hit ?
-                          pred.points > 0 ? 'stroke-green-700' : 'stroke-red-700' :
-                          'stroke-muted-foreground'
-                      )} />
-                    </span>
-                  </TableCell>
+                  <PointsCell points={pred.points} neutral={!pred.hit} />
                   {hasBets &&
-                    <TableCell>
-                      {pred.bet && pred.bet > 0 ? (
-                        <span className={cn('text-nowrap text-sm text-center font-bold flex items-center justify-center flex-nowrap', {
-                          'text-green-700': pred.hit,
-                          'text-red-700': !pred.hit,
-                          'text-muted-foreground': !pred.eventId,
-                        })}>
-                          {pred.eventId && (pred.hit ? '+' : '-')} {pred.bet}
-                          <Flame className={cn('inline align-top w-4 h-4 -mt-0.5',
-                            {
-                              'stroke-green-700': pred.hit,
-                              'stroke-red-700': !pred.hit,
-                              'stroke-muted-foreground': !pred.eventId,
-                            })} />
-                        </span>
-                      ) : <span className='text-sm text-center text-muted-foreground font-medium'>-</span>}
-                    </TableCell>
-                  }
+                    (pred.bet && pred.bet > 0 ? (
+                      <PointsCell points={pred.bet * (pred.hit ? 1 : -1)} neutral={!pred.eventId} />
+                    ) : (
+                      <TableCell className='text-sm text-center text-muted-foreground font-medium'>
+                        -
+                      </TableCell>
+                    ))}
                   <TableCell className='font-medium text-nowrap'>
                     {findReferenceNames([{ type: pred.referenceType, id: pred.referenceId }])
                       .map((res) => isMobile ? res.short : res.full)

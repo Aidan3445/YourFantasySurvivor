@@ -6,7 +6,7 @@ import { PopoverArrow } from '@radix-ui/react-popover';
 export default function PredictionTimingHelp() {
   return (
     <Popover modal hover>
-      <PopoverTrigger className='bg-primary/30 rounded-md hover:bg-primary/40 transition-colors w-5 h-5 place-items-center'>
+      <PopoverTrigger className='bg-primary/30 rounded-md hover:bg-primary/40 transition-colors w-5 h-5 flex items-center justify-center'>
         <HelpCircle className='stroke-primary w-4 h-4' />
       </PopoverTrigger>
       <PopoverContent className='w-80 md:w-full border-2 border-primary/30 bg-card shadow-lg shadow-primary/20'>

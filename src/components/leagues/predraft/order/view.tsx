@@ -18,6 +18,7 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateDraftOrder from '~/actions/updateDraftOrder';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Card, CardHeader } from '~/components/common/card';
+import { Separator } from '~/components/common/separator';
 
 const SHUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -157,6 +158,12 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
         </span>
       </CardHeader>
 
+      {scrollHeight && (
+        <div className='px-4'>
+          <Separator />
+        </div>
+      )}
+
       {/* Order List */}
       <DndContext
         sensors={sensors}
@@ -206,7 +213,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                 );
               })}
             </div>
-            <ScrollBar className='pb-2 pt-1' />
+            <ScrollBar className='pb-2 pt-1' forceMount />
           </ScrollArea>
         </SortableContext>
       </DndContext>

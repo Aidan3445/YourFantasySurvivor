@@ -37,7 +37,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
   }
 
   return (
-    <Tabs className='w-full' defaultValue='scores'>
+    <Tabs className='w-full overflow-hidden' defaultValue='scores'>
       <TabsList className='sticky flex w-full px-10 rounded-none z-50 bg-accent'>
         <TabsTrigger className='flex-1' value='scores'>Scores</TabsTrigger>
         {isActive && auth.role !== 'Member' && (
@@ -48,8 +48,8 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         )}
         <TabsTrigger className='flex-none w-fit' value='settings'>Settings</TabsTrigger>
       </TabsList>
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
-        <div className='pb-4'>
+      <ScrollArea className='px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
+        <div className='pb-4 overflow-hidden'>
           <TabsContent className='space-y-4' value='scores'>
             <Scores isActive={isActive} />
             <ChangeCastaway />

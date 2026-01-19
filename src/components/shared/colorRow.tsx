@@ -16,7 +16,10 @@ export default function ColorRow({ color, loggedIn, className, children }: Color
         loggedIn && 'text-primary',
         className
       )}
-      style={{ backgroundColor: `${color ?? '#AAAAAA'}20`, borderLeft: `0.25rem solid ${color ?? '#000000'}` }}>
+      style={{
+        backgroundColor: `${color ?? '#AAAAAA'}20`,
+        borderLeft: `0.25rem solid ${color ?? '#000000'}`,
+      }}>
       {children}
     </span>
   );
