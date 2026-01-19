@@ -17,8 +17,8 @@ export default function BottomNav() {
         <BottomNavLink href='/'>
           <div
             className={cn(
-              'size-7 transition-colors bg-[#674428] hover:bg-[#BCA46F] active:bg-[#99A275]',
-              isHome && 'bg-[#B58553]'
+              'size-7 transition-colors bg-primary hover:bg-secondary/75 active:bg-primary/50',
+              isHome && 'bg-secondary',
             )}
             style={{
               maskImage: 'url(\'/Icon.ico\')',
