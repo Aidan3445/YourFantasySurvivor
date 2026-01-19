@@ -13,7 +13,7 @@ import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
   * @returns an object indicating success
   * @returnObj `{ success: boolean }`
   */
-export default async function cancelShotInTheDark(
+export default async function cancelShotInTheDarkLogic(
   auth: VerifiedLeagueMemberAuth,
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');

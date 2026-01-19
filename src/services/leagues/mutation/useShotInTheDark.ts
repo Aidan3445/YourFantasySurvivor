@@ -14,7 +14,7 @@ import getLeagueSettings from '~/services/leagues/query/settings';
   * @returns an object indicating success
   * @returnObj `{ success: boolean }`
   */
-export default async function useShotInTheDark(
+export default async function playShotInTheDarkLogic(
   auth: VerifiedLeagueMemberAuth,
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');

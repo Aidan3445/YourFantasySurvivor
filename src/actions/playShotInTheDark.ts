@@ -1,7 +1,7 @@
 'use server';
 
 import { requireLeagueMemberAuth } from '~/lib/auth';
-import useShotInTheDarkMutation from '~/services/leagues/mutation/useShotInTheDark';
+import playShotInTheDarkLogic from '~/services/leagues/mutation/useShotInTheDark';
 
 /**
   * Activate shot in the dark for the upcoming episode
@@ -12,7 +12,7 @@ import useShotInTheDarkMutation from '~/services/leagues/mutation/useShotInTheDa
   */
 export default async function playShotInTheDark(hash: string) {
   try {
-    return await requireLeagueMemberAuth(useShotInTheDarkMutation)(hash);
+    return await requireLeagueMemberAuth(playShotInTheDarkLogic)(hash);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

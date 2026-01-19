@@ -1,7 +1,7 @@
 'use server';
 
 import { requireLeagueMemberAuth } from '~/lib/auth';
-import cancelShotInTheDarkMutation from '~/services/leagues/mutation/cancelShotInTheDark';
+import cancelShotInTheDarkLogic from '~/services/leagues/mutation/cancelShotInTheDark';
 
 /**
   * Cancel shot in the dark activation
@@ -12,7 +12,7 @@ import cancelShotInTheDarkMutation from '~/services/leagues/mutation/cancelShotI
   */
 export default async function cancelShotInTheDark(hash: string) {
   try {
-    return await requireLeagueMemberAuth(cancelShotInTheDarkMutation)(hash);
+    return await requireLeagueMemberAuth(cancelShotInTheDarkLogic)(hash);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

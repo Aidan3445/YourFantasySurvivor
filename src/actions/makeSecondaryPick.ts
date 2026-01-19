@@ -1,7 +1,7 @@
 'use server';
 
 import { requireLeagueMemberAuth } from '~/lib/auth';
-import makeSecondaryPick from '~/services/leagues/mutation/makeSecondaryPick';
+import makeSecondaryPickLogic from '~/services/leagues/mutation/makeSecondaryPick';
 
 /**
   * Choose a secondary pick castaway
@@ -17,7 +17,7 @@ export default async function chooseSecondary(
   castawayId: number,
 ) {
   try {
-    return await requireLeagueMemberAuth(makeSecondaryPick)(hash, castawayId);
+    return await requireLeagueMemberAuth(makeSecondaryPickLogic)(hash, castawayId);
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;

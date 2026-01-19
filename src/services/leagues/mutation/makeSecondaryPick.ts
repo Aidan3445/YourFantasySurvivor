@@ -19,7 +19,7 @@ import { MAX_SEASON_LENGTH } from '~/lib/leagues';
   * @returns an object indicating success
   * @returnObj `{ success: boolean }`
   */
-export default async function makeSecondaryPick(
+export default async function makeSecondaryPickLogic(
   auth: VerifiedLeagueMemberAuth,
   castawayId: number,
 ) {
