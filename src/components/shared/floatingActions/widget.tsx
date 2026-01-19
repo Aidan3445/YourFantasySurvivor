@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Trophy, ListPlus, Users } from 'lucide-react';
+import { Trophy, ListPlus, Users, X } from 'lucide-react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import JoinLeagueModal from '~/components/leagues/actions/league/join/modal';
 import { cn } from '~/lib/utils';
@@ -8,13 +8,18 @@ import { Button } from '~/components/common/button';
 
 const DISMISS_STORAGE_KEY = 'floating-actions-dismissed-until';
 const DISMISS_DURATION_MS = 5 * 60 * 1000; // 5 minutes
-const DRAG_THRESHOLD = 100; // pixels
+
+const DISMISS_ZONE = {
+  width: 120,
+  height: 120,
+};
 
 export function FloatingActionsWidget() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isDismissed, setIsDismissed] = useState(true); // Start hidden to prevent flash
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [isOverDismissZone, setIsOverDismissZone] = useState(false);
 
   const dragStartPos = useRef({ x: 0, y: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -40,6 +45,23 @@ export function FloatingActionsWidget() {
     setIsDismissed(true);
   };
 
+  const checkIfOverDismissZone = useCallback((clientX: number, clientY: number) => {
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    const zoneLeft = centerX - DISMISS_ZONE.width / 2;
+    const zoneRight = centerX + DISMISS_ZONE.width / 2;
+    const zoneTop = centerY - DISMISS_ZONE.height / 2;
+    const zoneBottom = centerY + DISMISS_ZONE.height / 2;
+
+    return (
+      clientX >= zoneLeft &&
+      clientX <= zoneRight &&
+      clientY >= zoneTop &&
+      clientY <= zoneBottom
+    );
+  }, []);
+
   const handleDragStart = (clientX?: number, clientY?: number) => {
     if (clientX === undefined || clientY === undefined) return;
     setIsDragging(true);
@@ -53,20 +75,21 @@ export function FloatingActionsWidget() {
     const offsetX = clientX - dragStartPos.current.x;
     const offsetY = clientY - dragStartPos.current.y;
     setDragOffset({ x: offsetX, y: offsetY });
-  }, [isDragging]);
+
+    setIsOverDismissZone(checkIfOverDismissZone(clientX, clientY));
+  }, [isDragging, checkIfOverDismissZone]);
 
   const handleDragEnd = useCallback(() => {
     if (!isDragging) return;
 
-    const distance = Math.sqrt(dragOffset.x ** 2 + dragOffset.y ** 2);
-
-    if (distance >= DRAG_THRESHOLD) {
+    if (isOverDismissZone) {
       dismissWidget();
     }
 
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
-  }, [isDragging, dragOffset]);
+    setIsOverDismissZone(false);
+  }, [isDragging, isOverDismissZone]);
 
   // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -92,7 +115,7 @@ export function FloatingActionsWidget() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging, dragOffset, handleDragMove, handleDragEnd]);
+  }, [isDragging, handleDragMove, handleDragEnd]);
 
   // Touch events
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -111,11 +134,39 @@ export function FloatingActionsWidget() {
 
   if (isDismissed) return null;
 
-  const dragDistance = Math.sqrt(dragOffset.x ** 2 + dragOffset.y ** 2);
-  const dismissProgress = Math.min(dragDistance / DRAG_THRESHOLD, 1);
-
   return (
     <div className='fixed inset-0 pointer-events-none overflow-hidden z-50'>
+      {/* Dismiss zone - appears when dragging */}
+      {isDragging && (
+        <div className='absolute inset-0 flex items-center justify-center'>
+          <div
+            className={cn(
+              'flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed transition-all duration-200',
+              isOverDismissZone
+                ? 'bg-red-500/30 border-red-500 scale-110'
+                : 'bg-muted/50 border-muted-foreground/30'
+            )}
+            style={{
+              width: DISMISS_ZONE.width,
+              height: DISMISS_ZONE.height,
+            }}>
+            <X
+              className={cn(
+                'w-8 h-8 transition-colors',
+                isOverDismissZone ? 'text-red-500' : 'text-muted-foreground/50'
+              )}
+            />
+            <span
+              className={cn(
+                'text-xs font-medium transition-colors',
+                isOverDismissZone ? 'text-red-500' : 'text-muted-foreground/50'
+              )}>
+              Release to hide
+            </span>
+          </div>
+        </div>
+      )}
+
       <div
         className={cn(
           'pointer-events-auto absolute md:bottom-4.5 md:right-4.5 bottom-[calc(.75rem+var(--navbar-height))] right-2.5',
@@ -173,11 +224,11 @@ export function FloatingActionsWidget() {
             className={cn(
               'relative w-16 h-16 rounded-xl bg-linear-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30 transition-all hover:scale-110 hover:shadow-primary/40 select-none touch-none overflow-hidden',
               isExpanded && !isDragging && 'scale-110 rotate-12',
-              isDragging && 'cursor-grabbing scale-105'
+              isDragging && 'cursor-grabbing scale-105',
+              isOverDismissZone && 'scale-90 opacity-50'
             )}
             style={{
-              opacity: isDragging ? 1 - dismissProgress * 0.5 : 1,
-              background: isDragging && dismissProgress > 0.5
+              background: isOverDismissZone
                 ? 'linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38))'
                 : undefined,
             }}>
@@ -185,38 +236,13 @@ export function FloatingActionsWidget() {
             <div className='absolute inset-0 bg-linear-to-br from-white/30 via-transparent to-transparent opacity-50' />
 
             <div>
-              {isDragging && dismissProgress > 0.5 ? (
-                <svg
-                  className='w-8 h-8 text-white z-10'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  stroke='white'>
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={3}
-                    d='M6 18L18 6M6 6l12 12' />
-                </svg>
+              {isOverDismissZone ? (
+                <X className='w-8 h-8 text-white z-10' />
               ) : (
                 <Trophy className='w-8 h-8 stroke-primary-foreground z-10' />
               )}
             </div>
           </button>
-
-          {/* Dismiss indicator */}
-          {isDragging && (
-            <div
-              className='absolute inset-0 flex items-center justify-center pointer-events-none'
-              style={{ opacity: dismissProgress }}>
-              <div
-                className='absolute w-20 h-20 rounded-full border-2 border-dashed border-red-500'
-                style={{
-                  transform: `scale(${1 + dismissProgress * 0.5})`,
-                  opacity: dismissProgress
-                }} />
-            </div>
-          )}
         </div>
       </div>
     </div>

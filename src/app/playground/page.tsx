@@ -82,7 +82,7 @@ export default function PlaygroundPage() {
         )}
       </div>
 
-      <ScrollArea className='overflow-y-visible px-1 md:h-[calc(100svh-11.5rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-11.5rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
         <div className='flex flex-col gap-4 mt-2 mb-4'>
           <Form {...reactForm}>
             <form className='p-4 bg-card rounded-lg shadow-lg shadow-primary/10 border-2 border-primary/20'>
