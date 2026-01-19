@@ -3,8 +3,8 @@
 import { cn } from '~/lib/utils';
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
-import NotesCell from '~/components/shared/eventTimeline/table/notesCell';
+import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
+import NotesCell from '~/components/shared/eventTimeline/table/row/notesCell';
 import { type EnrichedEvent, type BaseEventName } from '~/types/events';
 import { BaseEventFullName } from '~/lib/events';
 import { useMemo } from 'react';

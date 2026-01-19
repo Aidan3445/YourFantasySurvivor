@@ -5,7 +5,7 @@ import { TableCell, TableRow } from '~/components/common/table';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import { BaseEventFullName } from '~/lib/events';
 import { type BaseEventName, type EnrichedPrediction } from '~/types/events';
-import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
+import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
@@ -70,7 +70,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
           ))}
         </div>
       </TableCell>
-      {!noMembers && <TableCell className='text-xs text-nowrap'>
+      {!noMembers && <TableCell colSpan={2} className='text-xs text-nowrap'>
         <div className='flex flex-col text-xs h-full gap-0.5 relative justify-center'>
           {prediction.hits.length > 0 &&
             prediction.hits.map((hit, index) =>
@@ -88,7 +88,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                   <>
                     <MoveRight size={12} stroke='#000000' />
                     <ColorRow
-                      className='leading-tight px-1'
+                      className='leading-tight px-1 w-min'
                       color={hit.reference.color}>
                       {hit.reference.name}
                     </ColorRow>
@@ -140,7 +140,6 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
         </div>
       </TableCell>
       }
-      <TableCell />
     </TableRow>
   );
 }

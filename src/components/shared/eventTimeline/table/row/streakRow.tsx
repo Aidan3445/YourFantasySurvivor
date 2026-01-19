@@ -2,7 +2,7 @@
 
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
+import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { PopoverArrow } from '@radix-ui/react-popover';
 import { Separator } from '~/components/common/separator';
