@@ -65,9 +65,9 @@ export default function SeasonsPage() {
         </div>
 
         <TabsList className='sticky grid grid-flow-col auto-cols-fr w-full px-10 rounded-none z-50'>
-          <TabsTrigger value='castaways'>Castaways</TabsTrigger>
-          <TabsTrigger value='timeline'>Tribes</TabsTrigger>
           <TabsTrigger value='events'>Events</TabsTrigger>
+          <TabsTrigger value='castaways'>Castaways</TabsTrigger>
+          <TabsTrigger value='tribes'>Tribes</TabsTrigger>
         </TabsList>
       </div>
 
@@ -75,16 +75,16 @@ export default function SeasonsPage() {
         {selectedSeasonId ? (
           season ? (
             <div className='pb-4'>
+              <TabsContent value='events'>
+                <EventTimeline seasonData={season} hideMemberFilter />
+              </TabsContent>
+
               <TabsContent value='castaways'>
                 <CastawaysView seasonData={season} />
               </TabsContent>
 
-              <TabsContent value='timeline'>
+              <TabsContent value='tribes'>
                 <TribesTimeline seasonData={season} />
-              </TabsContent>
-
-              <TabsContent value='events'>
-                <EventTimeline seasonData={season} hideMemberFilter />
               </TabsContent>
             </div>
           ) : (
