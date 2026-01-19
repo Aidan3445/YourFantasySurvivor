@@ -66,6 +66,7 @@ export type LeagueSettings = {
   survivalCap: number;
   preserveStreak: boolean;
   secondaryPickEnabled: boolean;
+  shotInTheDarkEnabled: boolean;
 };
 
 export type LeagueSettingsUpdate = {
@@ -79,6 +80,7 @@ export type LeagueSettingsUpdate = {
   secondaryPickLockoutPeriod?: number;
   secondaryPickPublicPicks?: boolean;
   secondaryPickMultiplier?: 0.25 | 0.5 | 0.75 | 1;
+  shotInTheDarkEnabled?: boolean;
 }
 
 export const LeagueDetailsUpdateZod = z.object({
@@ -94,6 +96,7 @@ export const SurvivalCapZod = z.coerce.number().int()
 export const LeagueSurvivalUpdateZod = z.object({
   survivalCap: SurvivalCapZod,
   preserveStreak: z.boolean(),
+  shotInTheDarkEnabled: z.boolean(),
 });
 export type LeagueSurvivalUpdate = z.infer<typeof LeagueSurvivalUpdateZod>;
 
@@ -265,6 +268,7 @@ export type SelectionTimeline = Record<number, (number | null)[]>;
   * [memberCastaways][[memberId]][[3]] gives the [castawayId] selected by [memberId] in episode [3]
   * [castawayMembers][[castawayId]][[5]] gives the [memberId] who selected [castawayId] in episode [5]
   * [secondaryPicks][[memberId]][[2]] gives the [castawayId] selected as secondary pick by [memberId] in episode [2]
+  * [shotInTheDark][[memberId]] gives the [episodeNumber] that [memberId] activated shot in the dark for
   * ---
   * If a castaway is available (not selected) in an episode, the value is [null].
   * When a member has no selection in an episode, the value is [null].
@@ -273,6 +277,7 @@ export type SelectionTimelines = {
   memberCastaways: SelectionTimeline,
   castawayMembers: SelectionTimeline,
   secondaryPicks?: SelectionTimeline,
+  shotInTheDark?: Record<number, { episodeNumber: number }>, // memberId -> episodeNumber
 };
 
 /**

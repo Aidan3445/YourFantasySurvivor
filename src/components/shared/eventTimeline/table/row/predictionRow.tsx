@@ -5,12 +5,11 @@ import { TableCell, TableRow } from '~/components/common/table';
 import { useEventLabel } from '~/hooks/helpers/useEventLabel';
 import { BaseEventFullName } from '~/lib/events';
 import { type BaseEventName, type EnrichedPrediction } from '~/types/events';
-import PointsCell from '~/components/shared/eventTimeline/table/pointsCell';
+import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { Flame, MoveRight } from 'lucide-react';
-import { getContrastingColor } from '@uiw/color-convert';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
 
 interface PredictionRowProps {
@@ -59,14 +58,10 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
             pairs.map(({ castaway }) =>
               <ColorRow
                 key={castaway.castawayId}
-                className='leading-tight px-1 w-min'
+                className='leading-tight px-1'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
                 <CastawayPopover castaway={castaway}>
-                  <span
-                    className='text-nowrap'
-                    style={{
-                      color: getContrastingColor(castaway.tribe?.color ?? '#AAAAAA')
-                    }}>
+                  <span className='text-nowrap'>
                     {castaway.fullName}
                   </span>
                 </CastawayPopover>
@@ -75,17 +70,19 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
           ))}
         </div>
       </TableCell>
-      {!noMembers && <TableCell className='text-xs text-nowrap'>
-        <div className={cn(
-          'flex flex-col text-xs h-full gap-0.5 relative',
-          prediction.hits.length === 1 && 'justify-center')}>
-          {prediction.hits.length > 0 ?
+      {!noMembers && <TableCell colSpan={2} className='text-xs text-nowrap'>
+        <div className='flex flex-col text-xs h-full gap-0.5 relative justify-center'>
+          {prediction.hits.length > 0 &&
             prediction.hits.map((hit, index) =>
               <span key={index} className='flex gap-1 items-center'>
                 <ColorRow
                   className='leading-tight px-1 w-min'
                   color={hit.member.color}>
                   {hit.member.displayName}
+                  {(hit.bet ?? 0) > 0 && <p className='text-xs text-green-600 text-nowrap'>
+                    +{hit.bet}
+                    <Flame className='inline align-top w-3.5 h-min stroke-green-600' />
+                  </p>}
                 </ColorRow>
                 {event.references.length > 1 && hit.reference &&
                   <>
@@ -97,15 +94,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                     </ColorRow>
                   </>
                 }
-                {(hit.bet ?? 0) > 0 && <p className='text-xs text-green-600'>
-                  +{hit.bet}
-                  <Flame className='inline align-top w-3.5 h-min stroke-green-600' />
-                </p>}
               </span>
-            ) : (
-              <ColorRow className='invisible leading-tight px-1 w-min'>
-                None
-              </ColorRow>
             )}
           {prediction.misses.length > 0 &&
             <Accordion
@@ -113,7 +102,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
               collapsible
               value={defaultOpenMisses ? 'misses' : undefined}>
               <AccordionItem value='misses' className='border-none'>
-                <AccordionTrigger className='p-0 text-xs leading-tight text-muted-foreground stroke-muted-foreground'>
+                <AccordionTrigger className='p-0 text-xs leading-tight text-nowrap text-muted-foreground stroke-muted-foreground'>
                   Missed Predictions
                 </AccordionTrigger>
                 <AccordionContent className='p-0'>
@@ -124,6 +113,12 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                           className='leading-tight px-1 w-min'
                           color={miss.member.color}>
                           {miss.member.displayName}
+                          {(miss.bet ?? 0) > 0 && (
+                            <p className='text-xs text-red-600 text-nowrap'>
+                              -{miss.bet}
+                              <Flame className='inline align-top w-3.5 h-min stroke-red-600' />
+                            </p>
+                          )}
                         </ColorRow>
                         {miss.reference &&
                           <>
@@ -135,12 +130,6 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                             </ColorRow>
                           </>
                         }
-                        {(miss.bet ?? 0) > 0 && (
-                          <p className='text-xs text-red-600'>
-                            -{miss.bet}
-                            <Flame className='inline align-top w-3.5 h-min stroke-red-600' />
-                          </p>
-                        )}
                       </span>
                     ))}
                   </div>
@@ -151,7 +140,6 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
         </div>
       </TableCell>
       }
-      <TableCell />
     </TableRow>
   );
 }

@@ -25,19 +25,21 @@ export default function Podium({ overrideHash, className }: PodiumProps) {
 
   return (
     <div className={cn(
-      'w-full h-full text-center bg-card rounded-lg flex flex-col p-4 place-items-center',
+      'w-full h-full text-center bg-card rounded-lg flex flex-col place-items-center px-1',
       className
     )}>
-      <div className='flex gap-4 items-end justify-center w-full h-full grow'>
+      <div className='flex items-end justify-center w-full h-full grow'>
         <Tier
           member={sortedMemberScores[1]?.member}
           points={sortedMemberScores[1]?.scores.slice().pop() ?? 0}
           place={tieBetweenFirstAndSecond ? 'Gold' : 'Silver'}
+          position='left'
           className='shimmer-1' />
         <Tier
           member={sortedMemberScores[0]?.member}
           points={sortedMemberScores[0]?.scores.slice().pop() ?? 0}
           place='Gold'
+          position='center'
           className='shimmer-2' />
         <Tier
           member={sortedMemberScores[2]?.member}
@@ -45,6 +47,7 @@ export default function Podium({ overrideHash, className }: PodiumProps) {
           place={tieBetweenSecondAndThird
             ? (tieBetweenFirstAndSecond ? 'Gold' : 'Silver')
             : 'Bronze'}
+          position='right'
           className='shimmer-3' />
       </div>
     </div>

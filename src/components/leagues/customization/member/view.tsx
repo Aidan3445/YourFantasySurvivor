@@ -12,6 +12,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateMemberDetails from '~/actions/updateMemberDetails';
+import { Card } from '~/components/common/card';
 
 interface MemberEditFormProps {
   className?: string;
@@ -44,30 +45,34 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
       alert('Successfully updated member details');
     } catch (error) {
       console.error(error);
-      alert('Failed to join league');
+      alert('Failed to update member details. Please try again.');
     }
   });
 
   return (
-    <Form {...reactForm}>
-      <form className={cn(
-        'flex flex-col p-3 gap-3 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 w-full items-center',
-        className
-      )} action={() => handleSubmit()}>
-        <div className='flex items-center gap-2 w-full justify-start'>
-          <span className='h-4 w-0.5 bg-primary rounded-full' />
-          <FormLabel className='text-base font-bold uppercase tracking-wider text-center'>Edit Member Details</FormLabel>
-        </div>
-        <LeagueMemberFields
-          memberColors={leagueMembers?.members.map(m => m.color) ?? []}
-          currentColor={leagueMembers?.loggedIn?.color} />
-        <Button
-          disabled={!reactForm.formState.isDirty}
-          type='submit'
-          className='w-full font-bold uppercase text-xs tracking-wider'>
-          Save
-        </Button>
-      </form>
-    </Form>
+    <Card className={cn(
+      'flex flex-col gap-3 p-4 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 w-full items-center',
+      className
+    )}>
+      <Form {...reactForm}>
+        <form action={() => handleSubmit()}>
+          <div className='flex w-full items-center justify-start gap-3 h-8'>
+            <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+            <FormLabel className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+              Edit Member Details
+            </FormLabel>
+          </div>
+          <LeagueMemberFields
+            memberColors={leagueMembers?.members.map(m => m.color) ?? []}
+            currentColor={leagueMembers?.loggedIn?.color} />
+          <Button
+            disabled={!reactForm.formState.isDirty}
+            type='submit'
+            className='w-full font-bold uppercase text-xs tracking-wider'>
+            Save
+          </Button>
+        </form>
+      </Form>
+    </Card>
   );
 }

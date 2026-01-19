@@ -15,9 +15,9 @@ export default function DraftPage() {
 
   return (
     <Tabs className='w-full' defaultValue='draft'>
-      <TabsList className='sticky flex w-full px-10 rounded-none z-50 *:flex-1 [&>*:last-child]:flex-none [&>*:last-child]:w-fit bg-accent'>
+      <TabsList className='sticky flex w-full px-10 rounded-none z-50 bg-accent'>
         <TabsTrigger className='flex-1' value='draft'>Draft</TabsTrigger>
-        <TabsTrigger className='flex-1' value='castaways'>Castaways</TabsTrigger>
+        <TabsTrigger className='flex-none w-fit' value='castaways'>Castaways</TabsTrigger>
       </TabsList>
       <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>

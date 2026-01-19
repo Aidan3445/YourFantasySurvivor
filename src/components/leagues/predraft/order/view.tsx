@@ -17,6 +17,7 @@ import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateDraftOrder from '~/actions/updateDraftOrder';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { Card, CardHeader } from '~/components/common/card';
 
 const SHUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -100,15 +101,18 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
   };
 
   return (
-    <article className={cn('relative overflow-hidden rounded-lg border-2 border-primary/20', className)}>
+    <Card className={cn(
+      'border-2 border-primary/20 shadow-lg shadow-primary/10',
+      className
+    )}>
       {/* Header */}
-      <div className='flex items-center justify-between px-4 py-1 border-b-2 border-primary/20 bg-primary/5'>
-        <span className='flex items-center gap-3 h-8'>
+      <CardHeader className='flex items-center justify-between mb-2 px-4'>
+        <div className='flex items-center gap-3 h-8'>
           <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
           <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
             Draft Order
           </h2>
-        </span>
+        </div>
 
         <span className='flex items-center gap-2'>
           {!orderLocked && (
@@ -151,7 +155,7 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
             )
           )}
         </span>
-      </div>
+      </CardHeader>
 
       {/* Order List */}
       <DndContext
@@ -173,22 +177,19 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
                       color={member.color}
                       loggedIn={leagueMembers.loggedIn?.memberId === member.memberId}
                       className='rounded-lg border-2 transition-all hover:border-primary/40'>
-                      <span className='flex items-center gap-3 w-full'>
-                        {/* Rank Badge */}
+                      <span className='flex items-center gap-3 w-full text-inherit'>
+                        {/* Order Badge */}
                         <span
                           className='inline-flex items-center justify-center w-8 h-8 rounded-md font-black text-sm shrink-0'
                           style={{
                             backgroundColor: `${member.color}40`,
-                            color: getContrastingColor(member.color),
                             border: `2px solid ${member.color}66`
                           }}>
                           {index + 1}
                         </span>
 
                         {/* Name */}
-                        <span
-                          className='text-xl font-bold'
-                          style={{ color: getContrastingColor(member.color) }}>
+                        <span className='text-xl font-bold text-inherit'>
                           {member.displayName}
                         </span>
 
@@ -209,6 +210,6 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
           </ScrollArea>
         </SortableContext>
       </DndContext>
-    </article>
+    </Card >
   );
 }

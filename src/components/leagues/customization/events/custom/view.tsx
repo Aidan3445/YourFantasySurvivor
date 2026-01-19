@@ -51,7 +51,7 @@ export default function CustomEvents() {
   const disabled = (!!leagueMembers?.loggedIn && leagueMembers.loggedIn.role !== 'Owner') || league?.status === 'Inactive';
 
   return (
-    <article className='bg-card p-3 rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10 relative space-y-2'>
+    <article className='bg-card p-4 rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10 relative space-y-2'>
       {!disabled && (locked ?
         <Lock
           className='absolute top-3 right-3 w-8 h-8 shrink-0 cursor-pointer stroke-primary hover:stroke-primary/70 active:stroke-primary/50 transition-all'
@@ -60,9 +60,11 @@ export default function CustomEvents() {
           className='absolute top-3 right-3 w-8 h-8 shrink-0 cursor-pointer stroke-primary hover:stroke-primary/70 active:stroke-primary/50 transition-all'
           onClick={() => { setLocked(true); reactForm.reset(); }} />)}
       <div>
-        <div className='flex items-center gap-2 mb-1'>
-          <span className='h-4 w-0.5 bg-primary rounded-full' />
-          <h2 className='text-base font-bold uppercase tracking-wider'>Custom Events</h2>
+        <div className='flex items-center gap-3 h-8'>
+          <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+          <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+            Custom Events
+          </h2>
         </div>
         <div className='flex flex-col gap-2'>
           <p className='text-sm mr-12 max-w-4xl'>

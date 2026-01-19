@@ -69,3 +69,20 @@ export const secondaryPickSchema = createTable(
     index('secondary_pick_episode_idx').on(table.episodeId),
   ]
 );
+
+export const shotInTheDarkSchema = createTable(
+  'shot_in_the_dark',
+  {
+    memberId: integer('member_id')
+      .references(() => leagueMemberSchema.memberId, { onDelete: 'cascade' })
+      .notNull(),
+    episodeId: integer('episode_id')
+      .references(() => episodeSchema.episodeId, { onDelete: 'cascade' })
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.memberId, table.episodeId] }),
+    index('shot_in_the_dark_member_idx').on(table.memberId),
+    index('shot_in_the_dark_episode_idx').on(table.episodeId),
+  ]
+);

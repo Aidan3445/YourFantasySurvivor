@@ -135,7 +135,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
           <Table>
             <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
             <TableHeader>
-              <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-primary/5 px-4 gap-4 rounded-md items-center text-nowrap'>
+              <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-white/80! px-4 gap-4 rounded-md items-center text-nowrap'>
                 {!allZero && (
                   <>
                     <TableHead>Place</TableHead>

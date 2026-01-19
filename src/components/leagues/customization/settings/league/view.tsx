@@ -55,15 +55,21 @@ export default function LeagueSettings() {
 
   const editable = (!!leagueMembers && leagueMembers.loggedIn?.role === 'Owner') && league?.status !== 'Inactive';
 
+  if (leagueMembers?.loggedIn?.role !== 'Owner') {
+    return null;
+  }
+
   return (
     <div className={editable ? '' : 'pointer-events-none opacity-50'}>
       <Form {...reactForm}>
         <form
-          className='flex flex-col p-3 gap-3 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 items-center sm:min-w-sm'
+          className='flex flex-col p-4 gap-3 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 items-center sm:min-w-sm'
           action={() => handleSubmit()}>
-          <div className='flex items-center gap-2 w-full justify-start'>
-            <span className='h-4 w-0.5 bg-primary rounded-full' />
-            <FormLabel className='text-base font-bold uppercase tracking-wider text-center'>Edit League Details</FormLabel>
+          <div className='flex w-full items-center justify-start gap-3 h-8'>
+            <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+            <FormLabel className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+              Edit League Details
+            </FormLabel>
           </div>
           <FormField
             name='name'

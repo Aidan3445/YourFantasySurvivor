@@ -63,14 +63,14 @@ export default function MakePredictions() {
             )}
           </div>
         }
-        <div className='flex items-center gap-2 w-full justify-start'>
-          <span className='h-4 w-0.5 bg-primary rounded-full' />
-          {keyEpisodes.previousEpisode?.airStatus === 'Airing' ?
-            <h1 className='text-base font-bold uppercase tracking-wider'>
-              Predictions are locked until the episode ends.
-            </h1> :
-            <h1 className='text-base font-bold uppercase tracking-wider'>{'This Week\'s Prediction'}{predictionRuleCount > 1 ? 's' : ''}</h1>
-          }
+        <div className='flex items-center gap-3 h-8'>
+          <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
+          <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+            {keyEpisodes.previousEpisode?.airStatus === 'Airing'
+              ? 'Predictions are locked until the episode ends.'
+              : (`This Week's Prediction${predictionRuleCount > 1 ? 's' : ''}`)
+            }
+          </h2>
         </div>
         <span className='flex flex-wrap justify-center items-center gap-x-4 text-muted-foreground text-sm pb-1' >
           <span className='text-nowrap'>

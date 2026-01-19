@@ -56,12 +56,12 @@ export default function DeleteLeague() {
       <Form {...reactForm}>
         <form
           action={() => handleSubmit()}
-          className='w-full flex flex-col gap-4 h-full bg-card p-3 justify-between rounded-lg border-2 border-destructive/20 shadow-lg shadow-destructive/10 sm:min-w-sm'>
-          <div className='flex items-center gap-2 w-full justify-start'>
-            <span className='h-4 w-0.5 bg-destructive rounded-full' />
-            <h3 className='text-base font-bold uppercase tracking-wider text-center cursor-default text-destructive'>
+          className='w-full flex flex-col gap-4 h-full bg-card p-4 justify-between rounded-lg border-2 border-destructive/20 shadow-lg shadow-destructive/10 sm:min-w-sm'>
+          <div className='flex items-center gap-3 h-8'>
+            <span className='h-4 md:h-6 w-1 bg-destructive rounded-full' />
+            <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap text-destructive'>
               Delete League
-            </h3>
+            </h2>
           </div>
           <p className='text-sm text-muted-foreground'>
             Deleting a league is permanent and cannot be undone. All data associated with the league will be lost.

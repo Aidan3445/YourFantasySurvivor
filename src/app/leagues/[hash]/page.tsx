@@ -10,7 +10,7 @@ import LeagueScoring from '~/components/leagues/customization/events/base/view';
 import CreateCustomEvent from '~/components/leagues/actions/events/custom/create';
 import Predictions from '~/components/leagues/hub/picks/predictions/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
-import SetSurvivalCap from '~/components/leagues/customization/settings/cap/view';
+import SurvivalSettings from '~/components/leagues/customization/settings/survival/view';
 import ShauhinMode from '~/components/leagues/customization/settings/shauhin/view';
 import SecondaryPickSettings from '~/components/leagues/customization/settings/secondaryPick/view';
 import getLeague from '~/services/leagues/query/legaue';
@@ -38,11 +38,15 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
 
   return (
     <Tabs className='w-full' defaultValue='scores'>
-      <TabsList className='sticky flex w-full px-10 rounded-none z-50 *:flex-1 [&>*:last-child]:flex-none [&>*:last-child]:w-fit bg-accent'>
-        <TabsTrigger value='scores'>Scores</TabsTrigger>
-        {isActive && auth.role !== 'Member' && <TabsTrigger value='events'>Commish</TabsTrigger>}
-        {isActive && userId && <TabsTrigger value='Base'>Base</TabsTrigger>}
-        <TabsTrigger value='settings'>Settings</TabsTrigger>
+      <TabsList className='sticky flex w-full px-10 rounded-none z-50 bg-accent'>
+        <TabsTrigger className='flex-1' value='scores'>Scores</TabsTrigger>
+        {isActive && auth.role !== 'Member' && (
+          <TabsTrigger className='flex-1' value='events'>Commish</TabsTrigger>
+        )}
+        {isActive && userId && (
+          <TabsTrigger className='flex-1' value='Base'>Base</TabsTrigger>
+        )}
+        <TabsTrigger className='flex-none w-fit' value='settings'>Settings</TabsTrigger>
       </TabsList>
       <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>
@@ -52,25 +56,27 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
             <Predictions />
             {seasonData && <LeagueTimeline initialSeasonData={seasonData} />}
           </TabsContent>
-          <TabsContent value='events'>
-            <CreateCustomEvent />
-          </TabsContent>
-          <TabsContent value='Base'>
-            <CreateBaseEvent />
-          </TabsContent>
+          {isActive && auth.role !== 'Member' && (
+            <TabsContent value='events'>
+              <CreateCustomEvent />
+            </TabsContent>
+          )}
+          {userId && (
+            <TabsContent value='Base'>
+              <CreateBaseEvent />
+            </TabsContent>
+          )}
           <TabsContent value='settings' className='space-y-4'>
             {league?.status !== 'Inactive' && (
               <>
                 <MemberEditForm className='flex-1' />
-                {auth.role !== 'Member' && (
-                  <div className='w-full flex flex-wrap gap-4 justify-center'>
-                    <div className='flex flex-col gap-4 w-full lg:w-1/2 lg:max-w-lg'>
-                      <LeagueSettings />
-                      <DeleteLeague />
-                    </div>
-                    <ManageMembers />
+                <div className='w-full flex flex-wrap gap-4 justify-center'>
+                  <div className='flex flex-col gap-4 w-full lg:w-1/2 lg:max-w-lg'>
+                    <LeagueSettings />
+                    <DeleteLeague />
                   </div>
-                )}
+                  <ManageMembers />
+                </div>
                 <div className='w-full flex items-center gap-2 justify-center p-2 bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20'>
                   <span className='h-5 w-0.5 bg-primary rounded-full' />
                   <h2 className='text-2xl font-black uppercase tracking-tight text-center'>
@@ -80,7 +86,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
                 </div>
               </>
             )}
-            <SetSurvivalCap />
+            <SurvivalSettings />
             <SecondaryPickSettings />
             <LeagueScoring />
             <ShauhinMode />
@@ -89,6 +95,6 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
         </div>
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea >
-    </Tabs >
+    </Tabs>
   );
 }

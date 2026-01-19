@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq, or } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
@@ -19,15 +19,14 @@ export default async function updateMemberDetailsLogic(
   member: LeagueMemberInsert
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
-  // Error can be ignored, the where clause is not understood by the type system
+
   const update = await db
     .update(leagueMemberSchema)
-    .set(member)
-    .where(or(
-      eq(leagueMemberSchema.memberId, auth.memberId),
-      and(
-        eq(leagueMemberSchema.leagueId, auth.leagueId),
-        eq(leagueMemberSchema.role, 'Owner'))))
+    .set({
+      displayName: member.displayName,
+      color: member.color,
+    })
+    .where(eq(leagueMemberSchema.memberId, auth.memberId))
     .returning({
       memberId: leagueMemberSchema.memberId,
     });

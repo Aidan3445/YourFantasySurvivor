@@ -6,6 +6,7 @@ import { type League } from '~/types/leagues';
 import DraftOrder from '~/components/leagues/predraft/order/view';
 import { Badge } from '~/components/common/badge';
 import { cn } from '~/lib/utils';
+import { Card } from '~/components/common/card';
 
 interface ActiveLeagueProps {
   league: League;
@@ -52,12 +53,16 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
       </Link>
 
       {league.status === 'Active'
-        ? <Scoreboard overrideHash={league.hash} maxRows={5} className='bg-transparent' />
-        : <div className='space-y-4'>
-          <DraftCountdown overrideHash={league.hash} className='bg-primary/5 border border-primary/20 p-4 pt-1' />
-          <DraftOrder overrideHash={league.hash} className='bg-primary/5 border border-primary/20 mb-4' scrollHeight='max-h-36 h-36' />
-        </div>
-      }
+        ? (
+          <Card className='bg-primary/5 border border-primary/20 p-0'>
+            <Scoreboard overrideHash={league.hash} maxRows={6} className='bg-transparent' />
+          </Card>
+        ) : (
+          <div className='space-y-4'>
+            <DraftCountdown overrideHash={league.hash} className='bg-primary/5 border border-primary/20 p-4 pt-1 shadow-none' />
+            <DraftOrder overrideHash={league.hash} className='bg-primary/5 border border-primary/20 mb-4 pt-1 pb-0 shadow-none' scrollHeight='max-h-36 h-36' />
+          </div>
+        )}
     </div>
   );
 }

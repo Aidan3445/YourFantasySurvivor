@@ -244,28 +244,40 @@ export function compileScores(
   // then they earn two points for the next episode, then three, etc.
   // the bonus is capped at the survival cap set by the league
   const currentStreaks: Streaks = {};
+  const streaks: Record<number, number[]> = {};
   Object.entries(selectionTimelines.memberCastaways).forEach(([memberId, castaways]) => {
     const mid = parseInt(memberId, 10);
     // get the episode of the first pick, this will be the same for all members for now
     // but doing it this way allows for the possibility of members joining late
     const firstPickEpisode = castaways.findIndex((c) => c);
-    // ensure at least zero entry exists for the member
-    scores.Member[mid] ??= [0];
     // iterate to add the streak bonus
     let streak = 0;
+    // ensure at least zero entry exists for the member
+    scores.Member[mid] ??= [streak];
+    // initialize streak history for this member
+    streaks[mid] = [streak];
 
     for (let episodeNumber = firstPickEpisode; episodeNumber < eliminations.length; episodeNumber++) {
       // get the castaways who were eliminated at any point before this episode
       const eliminated = eliminations.slice(0, episodeNumber + 1).flat();
       // get the castaways who were selected by this member at this episode
       const mcIndex = Math.min(episodeNumber, castaways.length - 1);
+
+      // check conditions for streak reset
+      const isEliminated = eliminated.some((e) => e?.castawayId === castaways[mcIndex]);
+      const voluntarySwitch = !preserveStreak && castaways[episodeNumber - 1] &&
+        castaways[episodeNumber - 1] !== castaways[mcIndex];
+
+      // check if shot in the dark is active for this episode
+      const shotActive = selectionTimelines?.shotInTheDark?.[mid]?.episodeNumber === episodeNumber;
+
       // if the castaway selected has been eliminated set the streak to 0
+      // UNLESS shot in the dark is active, which protects the streak.
       // note this has the side effect of ensuring that streaks end when
-      // a member is out of castaways to select
-      if (eliminated.some((e) => e?.castawayId === castaways[mcIndex]) ||
-        (!preserveStreak && castaways[episodeNumber - 1] &&
-          castaways[episodeNumber - 1] !== castaways[mcIndex])) {
+      // a member is out of castaways to select.
+      if ((isEliminated && !shotActive) || voluntarySwitch) {
         streak = 0;
+        streaks[mid][episodeNumber] = 0;
         continue;
       }
       // increment the streak and add the bonus to the member's score
@@ -274,6 +286,8 @@ export function compileScores(
       scores.Member[mid] ??= [];
       scores.Member[mid][episodeNumber] ??= 0;
       scores.Member[mid][episodeNumber]! += bonus;
+      // store the streak bonus for this episode
+      streaks[mid][episodeNumber] = streak;
     }
 
     currentStreaks[mid] = streak;
@@ -296,7 +310,7 @@ export function compileScores(
     }
   }
 
-  return { scores, currentStreaks };
+  return { scores, currentStreaks, streaks };
 }
 
 

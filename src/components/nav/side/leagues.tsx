@@ -83,7 +83,7 @@ export default function SideNavLeagues() {
           </SidebarMenuSub>
         </AccordionContent>
       </AccordionItem>
-    </Accordion >
+    </Accordion>
   );
 }
 

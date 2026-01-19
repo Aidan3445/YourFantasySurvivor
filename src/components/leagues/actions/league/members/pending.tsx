@@ -2,7 +2,6 @@
 
 import { UserCheck } from 'lucide-react';
 import ColorRow from '~/components/shared/colorRow';
-import { getContrastingColor } from '@uiw/color-convert';
 import { type PendingLeagueMember, type LeagueMember } from '~/types/leagueMembers';
 import { cn } from '~/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
@@ -37,20 +36,14 @@ export default function PendingMember({ member, loggedInMember }: PendingMemberP
   return (
     <ColorRow className='w-full mb-1' color={member.color}>
       <span className='w-full grid grid-cols-2'>
-        <p
-          className='text-sm'
-          style={{ color: getContrastingColor(member.color) }}>
-          {member.displayName}
-        </p>
+        <p className='text-sm'>{member.displayName}</p>
         <form className='justify-self-end flex gap-2' action={() => handleAdmitMember()}>
           <button
             className='bg-transparent border-0 p-0 cursor-pointer disabled:cursor-not-allowed'
             disabled={!enabled}>
             <UserCheck
               className={cn('my-auto', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
-              color={enabled ? getContrastingColor(member.color) : undefined}
-              size={18}
-            />
+              size={18} />
           </button>
         </form>
       </span>

@@ -260,6 +260,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
   }, [rules, predictionTiming]);
 
   return {
+    league,
     actionDetails,
     membersWithPicks,
     onTheClock,
