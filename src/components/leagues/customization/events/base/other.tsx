@@ -39,7 +39,8 @@ export default function OtherScoreSettings({ disabled, hidePredictions }: BaseEv
                       {...field} />
                   </FormControl>}
                 <FormDescription className='max-w-72 lg:max-w-none text-wrap text-sm'>
-                  {BaseEventDescriptions.main.elim}
+                  {BaseEventDescriptions.main.elim} <i className='text-xs text-muted-foreground'>
+                    {BaseEventDescriptions.italics.elim}</i>
                 </FormDescription>
               </div>
               {!hidePredictions && <BasePredictionFormField eventName={'elim'} disabled={disabled} />}

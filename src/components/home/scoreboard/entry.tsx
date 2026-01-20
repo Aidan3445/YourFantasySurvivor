@@ -20,9 +20,12 @@ interface CastawayRowProps {
 
 export default function CastawayEntry({ place, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
   const isTopThree = place <= 3 && !allZero;
-  const rankBadgeColor = place === 1 ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40'
-    : place === 2 ? 'bg-gray-400/20 text-gray-600 border-gray-400/40'
-      : place === 3 ? 'bg-amber-700/20 text-amber-700 border-amber-700/40'
+  const rankBadgeColor = place === 1
+    ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40 shadow-yellow-500/40'
+    : place === 2
+      ? 'bg-gray-400/20 text-gray-600 border-gray-400/40 shadow-gray-400/40'
+      : place === 3
+        ? 'bg-amber-700/20 text-amber-700 border-amber-700/40 shadow-amber-700/40'
         : 'bg-primary/10 text-primary border-primary/30';
 
   return (

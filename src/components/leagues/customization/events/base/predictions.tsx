@@ -23,8 +23,8 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
       name={`basePredictionRules.${eventName}.enabled`}
       render={({ field: enabledField }) => (
         <>
-          <span className='pl-4 inline-flex flex-wrap gap-1 items-start font-normal text-xs'>
-            <FormItem className='flex gap-2 mb-2 items-center'>
+          <span className='inline-flex flex-wrap gap-1 items-start font-normal text-xs'>
+            <FormItem className='flex gap-2 items-center'>
               <FormLabel>
                 Prediction:
               </FormLabel>
@@ -64,9 +64,9 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
             <FormField
               name={`basePredictionRules.${eventName}.timing`}
               render={({ field: timingField }) => (
-                <FormItem>
+                <FormItem className='mb-0'>
                   {disabled &&
-                    <div className='italic -mt-2 ml-4 text-muted-foreground text-xs'>{(timingField.value as string[]).join(', ')}</div>
+                    <div className='italic text-muted-foreground text-xs'>{(timingField.value as string[]).join(', ')}</div>
                   }
                   {!disabled &&
                     <FormControl className='animate-scale-in-fast mb-2'>
@@ -87,7 +87,8 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
               )} />
           )}
         </>
-      )} />
+      )
+      } />
   );
 }
 

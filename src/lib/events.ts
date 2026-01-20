@@ -87,19 +87,19 @@ export const BaseEventDescriptions: {
   italics: Partial<Record<ScoringBaseEventName, string>>
 } = {
   main: {
-    indivWin: 'Points if your castaway wins an individual immunity challenge',
-    indivReward: 'Points if your castaway wins an individual reward challenge',
-    tribe1st: 'Points if your castaway’s tribe/team wins a challenge',
-    tribe2nd: 'Points if your castaway’s tribe/team comes second in a challenge',
-    advFound: 'Points if your castaway finds or earns an advantage',
-    advPlay: 'Points if your castaway plays an advantage effectively',
-    badAdvPlay: 'Points if your castaway plays an advantage poorly or unnecessarily',
-    advElim: 'Points if your castaway is eliminated with an advantage in their pocket',
-    spokeEpTitle: 'Points if your castaway is quoted in the episode title',
-    finalists: 'Points if your castaway makes it to the final tribal council',
-    fireWin: 'Points if your castaway wins the fire-making challenge',
-    soleSurvivor: 'Points if your castaway wins the season',
-    elim: 'Points if your castaway is eliminated at tribal council',
+    indivWin: 'Points if your survivor wins an individual immunity challenge',
+    indivReward: 'Points if your survivor wins an individual reward challenge',
+    tribe1st: 'Points if your survivor’s tribe/team wins a challenge',
+    tribe2nd: 'Points if your survivor’s tribe/team comes second in a challenge',
+    advFound: 'Points if your survivor finds or earns an advantage',
+    advPlay: 'Points if your survivor plays an advantage effectively',
+    badAdvPlay: 'Points if your survivor plays an advantage poorly or unnecessarily',
+    advElim: 'Points if your survivor is eliminated with an advantage in their pocket',
+    spokeEpTitle: 'Points if your survivor is quoted in the episode title',
+    finalists: 'Points if your survivor makes it to the final tribal council',
+    fireWin: 'Points if your survivor wins the fire-making challenge',
+    soleSurvivor: 'Points if your survivor wins the season',
+    elim: 'Points if your survivor is eliminated at tribal council',
   },
   prediction: {
     indivWin: 'Predict which castaway will win an individual immunity challenge',
@@ -120,6 +120,7 @@ export const BaseEventDescriptions: {
     tribe2nd: '(only applies for challenges with 3+ tribes/teams)',
     badAdvPlay: '(usually negative)',
     advElim: '(usually negative)',
+    elim: '(includes med evacs, quits, and removals)',
   },
 };
 
