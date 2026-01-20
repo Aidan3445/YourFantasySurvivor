@@ -38,11 +38,15 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
           <TableCaption className='sr-only'>League Member Scoreboard</TableCaption>
           <TableHeader>
             <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-white/80'>
-              <TableHead className='text-left w-0 font-bold uppercase tracking-wider text-xs px-3'>Place</TableHead>
+              <TableHead className='text-left w-0 font-bold uppercase tracking-wider text-xs px-3'>
+                Place
+              </TableHead>
               <TableHead className='text-left w-0 text-nowrap font-bold uppercase tracking-wider text-xs px-3'>
                 Points
               </TableHead>
-              <TableHead className='text-left font-bold uppercase tracking-wider text-xs px-3'>Member</TableHead>
+              <TableHead className='text-left font-bold uppercase tracking-wider text-xs px-4'>
+                Member
+              </TableHead>
               <TableHead className='text-left w-0 relative pr-8 font-bold uppercase tracking-wider text-xs px-3'>
                 Survivor
               </TableHead>

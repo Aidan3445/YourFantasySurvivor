@@ -265,7 +265,7 @@ export type SelectionTimeline = Record<number, (number | null)[]>;
   * representing the episode number.
   * ---
   * For example:
-  * [memberCastaways][[memberId]][[3]] gives the [castawayId] selected by [memberId] in episode [3]
+  * [memberCastaways][[memberId]][[3]] gives the [castawayId] selected by [memberId] in episode [3].
   * [castawayMembers][[castawayId]][[5]] gives the [memberId] who selected [castawayId] in episode [5]
   * [secondaryPicks][[memberId]][[2]] gives the [castawayId] selected as secondary pick by [memberId] in episode [2]
   * [shotInTheDark][[memberId]] gives the [episodeNumber] that [memberId] activated shot in the dark for
