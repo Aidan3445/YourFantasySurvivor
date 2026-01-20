@@ -58,9 +58,7 @@ export default function CastawayEntry({ place, castaway, points, tribeTimeline, 
             </span>
           </CastawayPopover>
           <div className='ml-auto flex gap-1 items-center'>
-            <TribeHistoryCircles
-              tribeTimeline={tribeTimeline ?? []}
-              showAll={castaway?.eliminatedEpisode !== null} />
+            <TribeHistoryCircles tribeTimeline={tribeTimeline ?? []} />
             {castaway?.eliminatedEpisode && (
               <EliminationIndicator episode={castaway.eliminatedEpisode} />
             )}

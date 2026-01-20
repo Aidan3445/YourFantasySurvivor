@@ -6,7 +6,7 @@ import {
 import { cn } from '~/lib/utils';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import MemberRow from '~/components/leagues/hub/scoreboard/row';
-import ScoreboardHelp from '~/components/leagues/hub/scoreboard/help';
+import ScoreboardHelp from '~/components/leagues/hub/scoreboard/popover/help';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { type EnrichedCastaway } from '~/types/castaways';
 

@@ -15,7 +15,6 @@ export default async function getTribeMembers(seasonId: number, episodeNumber: n
   const eliminationsReq = getEliminations(seasonId);
 
   const [tribesTimeline, eliminations] = await Promise.all([tribesTimelineReq, eliminationsReq]);
-  console.log('Tribes Timeline', JSON.stringify(tribesTimeline, null, 2));
 
   const currentTribes: Record<number, number[]> = {};
   const eliminatedCastaways = new Set<number>();
@@ -64,13 +63,5 @@ export default async function getTribeMembers(seasonId: number, episodeNumber: n
       delete currentTribes[tid];
     }
   });
-
-  console.log('Current', JSON.stringify({
-    currentTribes,
-    eliminatedCastaways,
-    tribesTimeline,
-    eliminations,
-  }, null, 2));
-
   return currentTribes;
 }

@@ -5,13 +5,11 @@ import { type Tribe } from '~/types/tribes';
 
 interface TribeHistoryCirclesProps {
   tribeTimeline: Array<{ episode: number; tribe: Tribe | null }>;
-  showAll?: boolean;
 }
 
-export default function TribeHistoryCircles({ tribeTimeline, showAll }: TribeHistoryCirclesProps) {
-  const shouldShow = tribeTimeline.length > 1 || showAll;
+export default function TribeHistoryCircles({ tribeTimeline }: TribeHistoryCirclesProps) {
 
-  if (!shouldShow) return null;
+  if (tribeTimeline.length <= 1) return null;
 
   return (
     <div className='ml-auto flex gap-0.5'>
