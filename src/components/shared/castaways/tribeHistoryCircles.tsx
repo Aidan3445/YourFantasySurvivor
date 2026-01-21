@@ -8,9 +8,6 @@ interface TribeHistoryCirclesProps {
 }
 
 export default function TribeHistoryCircles({ tribeTimeline }: TribeHistoryCirclesProps) {
-
-  if (tribeTimeline.length <= 1) return null;
-
   return (
     <div className='ml-auto flex gap-0.5'>
       {tribeTimeline.map(({ episode, tribe }) => (
