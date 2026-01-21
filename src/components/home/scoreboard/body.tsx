@@ -1,7 +1,7 @@
 'use client';
 
 import { TableBody, TableRow } from '~/components/common/table';
-import CastawayEntry from '~/components/home/scoreboard/entry';
+import CastawayRow from '~/components/home/scoreboard/row';
 import { getTribeTimeline } from '~/lib/utils';
 import { type SeasonsDataQuery } from '~/types/seasons';
 
@@ -39,14 +39,14 @@ export default function ScorboardBody({
           <TableRow
             key={`${castawayId}-${secondCastawayId ?? 'empty'}`}
             className='border-b border-primary/10 hover:bg-primary/5 hover:border-primary/20 transition-all group'>
-            <CastawayEntry
+            <CastawayRow
               allZero={allZero}
               place={index + 1}
               castaway={castaway}
               points={totalPoints}
               tribeTimeline={tribeTimeline} />
             {secondCastawayId && secondScores && (
-              <CastawayEntry
+              <CastawayRow
                 allZero={allZero}
                 place={index + 1 + castawaySplitIndex}
                 castaway={secondCastaway}

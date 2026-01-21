@@ -18,7 +18,7 @@ interface CastawayRowProps {
   allZero?: boolean;
 }
 
-export default function CastawayEntry({ place, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
+export default function CastawayRow({ place, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
   const isTopThree = place <= 3 && !allZero;
   const rankBadgeColor = place === 1
     ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40 shadow-yellow-500/40'
