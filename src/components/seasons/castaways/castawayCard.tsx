@@ -53,9 +53,7 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes, member 
         </div>
 
         {tribeTimeline && (
-          <TribeHistoryCircles
-            tribeTimeline={tribeTimeline}
-            showAll={!!castaway.eliminatedEpisode} />
+          <TribeHistoryCircles tribeTimeline={tribeTimeline} />
         )}
         {castaway.eliminatedEpisode && (
           <EliminationIndicator episode={castaway.eliminatedEpisode} />
