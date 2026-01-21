@@ -33,8 +33,8 @@ export default function Clock({ endDate, replacedBy }: ClockProps) {
 
   return (
     !timer || timer > 0 ?
-      <div className='w-full pt-6 pb-2 md:py-6 px-1 md:px-4'>
-        <div className='grid grid-cols-7 md:gap-2 max-w-2xl mx-auto'>
+      <div className='w-full pt-6 pb-2 md:py-4 px-1 md:px-4 flex justify-center'>
+        <div className='flex items-center justify-evenly gap-3 md:gap-4 w-2/3'>
           <ClockPlace value={days.toString()} label={days === 1 ? 'Day' : 'Days'} />
           <div className='flex items-center justify-center'>
             <span className='text-3xl md:text-4xl font-black text-primary'>:</span>
@@ -64,8 +64,8 @@ function ClockPlace({ value, label }: ClockPlaceProps) {
   const isMobile = useIsMobile();
 
   return (
-    <div className='flex flex-col items-center justify-center bg-primary/5 border border-primary/20 rounded-lg md:p-2'>
-      <span className='text-xl md:text-4xl font-black text-primary tabular-nums'>
+    <div className='w-full flex flex-col items-center justify-center bg-primary/5 border border-primary/20 rounded-lg md:p-2'>
+      <span className='text-xl md:text-4xl font-black text-primary tabular-nums sm:w-14'>
         {value.toString().padStart(2, '0')}
       </span>
       <span className='text-[10px] font-bold uppercase tracking-wider text-muted-foreground mt-1'>

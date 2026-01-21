@@ -109,8 +109,16 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
             <div className='pl-1.5 text-sm font-medium text-muted-foreground h-0'>
               {isScheduled ? (
                 <div className='flex items-center gap-2 pt-1'>
-                  <Calendar className='w-4 h-4 shrink-0 text-primary' />
-                  <span>Starts: {leagueSettings.draftDate.toLocaleString()}</span>
+                  <Calendar className='w-4 h-4 shrink-0 stroke-primary' />
+                  <span className='text-primary'>
+                    Starts: {leagueSettings.draftDate.toLocaleString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })}
+                  </span>
                 </div>
               ) : null
               }
@@ -132,7 +140,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
             </Button>
           } />
         </CardContent>
-      </div>
-    </Card>
+      </div >
+    </Card >
   );
 }
