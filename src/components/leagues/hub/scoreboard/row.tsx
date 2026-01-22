@@ -128,9 +128,7 @@ export default function MemberRow({
       <TableCell className='w-0'>
         <div className='flex gap-1 items-center justify-end'>
           <TribeHistoryCircles tribeTimeline={tribeTimeline ?? []} />
-          {castaway?.eliminatedEpisode && (
-            <EliminationIndicator episode={castaway.eliminatedEpisode} />
-          )}
+          <EliminationIndicator episode={castaway?.eliminatedEpisode} />
           <SelectionHistory selectionList={selectionList} secondaryPickList={secondaryPickList} />
           {leagueSettings && leagueSettings.survivalCap > 0 && (
             <SurvivalStreaks

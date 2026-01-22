@@ -3,14 +3,18 @@ import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/pop
 import { PopoverArrow } from '@radix-ui/react-popover';
 
 interface EliminationIndicatorProps {
-  episode: number;
+  episode?: number | null;
 }
 
 export default function EliminationIndicator({ episode }: EliminationIndicatorProps) {
+  if (!episode) {
+    return (<div className='w-5' />);
+  }
+
   return (
     <Popover>
       <PopoverTrigger>
-        <div className='p-1 bg-destructive/20 rounded hover:bg-destructive/30 transition-colors cursor-pointer'>
+        <div className='w-5 h-5 flex justify-center items-center bg-destructive/20 rounded hover:bg-destructive/30 transition-colors cursor-pointer'>
           <FlameKindling className='w-3.5 h-3.5 text-destructive' />
         </div>
       </PopoverTrigger>

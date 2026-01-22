@@ -52,12 +52,12 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes, member 
           )}
         </div>
 
-        {tribeTimeline && (
+        {tribeTimeline.length > 1 || castaway.eliminatedEpisode ? (
           <TribeHistoryCircles tribeTimeline={tribeTimeline} />
+        ) : (
+          <div className='ml-auto' />
         )}
-        {castaway.eliminatedEpisode && (
-          <EliminationIndicator episode={castaway.eliminatedEpisode} />
-        )}
+        <EliminationIndicator episode={castaway.eliminatedEpisode} />
       </ColorRow>
 
       <div className='space-y-1 text-sm'>

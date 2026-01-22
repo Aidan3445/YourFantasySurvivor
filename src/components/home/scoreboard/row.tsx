@@ -62,9 +62,7 @@ export default function CastawayRow({ place, castaway, points, tribeTimeline, al
           </CastawayPopover>
           <div className='ml-auto flex gap-1 items-center'>
             <TribeHistoryCircles tribeTimeline={tribeTimeline ?? []} />
-            {castaway?.eliminatedEpisode && (
-              <EliminationIndicator episode={castaway.eliminatedEpisode} />
-            )}
+            <EliminationIndicator episode={castaway?.eliminatedEpisode} />
           </div>
         </div>
       </TableCell>
