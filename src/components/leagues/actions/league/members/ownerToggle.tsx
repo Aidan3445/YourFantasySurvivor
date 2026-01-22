@@ -48,7 +48,7 @@ export default function OwnerToggle({ member, loggedInMember }: CurrentMemberPro
       <AlertDialogTrigger disabled={!enabled}>
         <Crown
           className={cn('my-auto', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
-          fill={member.role === 'Admin' ? '#000' : 'none'}
+          fill={member.role === 'Owner' ? '#000' : 'none'}
           size={18} />
       </AlertDialogTrigger>
       <AlertDialogContent>
