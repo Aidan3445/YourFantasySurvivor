@@ -49,7 +49,7 @@ export default function ManageMembers() {
             )}
           </TabsTrigger>
         </TabsList>
-        <TabsContent value='current' className='flex-1 min-h-0 pb-0! mb-0! px-4'>
+        <TabsContent value='current' className='flex-1 min-h-0 pb-0! mb-0!'>
           <div className='flex flex-col w-full'>
             <div className='px-4'>
               <p className='text-sm text-muted-foreground'>
@@ -78,18 +78,20 @@ export default function ManageMembers() {
                 </li>
               </ul>
             </div>
-            <Separator className='bg-primary/20' />
             <ScrollArea className='flex-1 min-h-0 max-h-74'>
-              <div className='py-2 flex flex-col gap-1'>
-                {leagueMembers?.members
-                  .map(member => (
-                    <CurrentMember
-                      key={member.memberId}
-                      member={member}
-                      loggedInMember={leagueMembers.loggedIn} />
-                  ))}
+              <div className='px-4'>
+                <Separator className='bg-primary/20' />
+                <div className='py-2 flex flex-col gap-1'>
+                  {leagueMembers?.members
+                    .map(member => (
+                      <CurrentMember
+                        key={member.memberId}
+                        member={member}
+                        loggedInMember={leagueMembers.loggedIn} />
+                    ))}
+                </div>
+                <ScrollBar orientation='vertical' />
               </div>
-              <ScrollBar orientation='vertical' />
             </ScrollArea>
           </div>
         </TabsContent>
@@ -125,6 +127,6 @@ export default function ManageMembers() {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </div >
   );
 }
