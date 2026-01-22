@@ -18,7 +18,7 @@ interface CastawayRowProps {
   allZero?: boolean;
 }
 
-export default function CastawayEntry({ place, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
+export default function CastawayRow({ place, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
   const isTopThree = place <= 3 && !allZero;
   const rankBadgeColor = place === 1
     ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40 shadow-yellow-500/40'
@@ -62,9 +62,7 @@ export default function CastawayEntry({ place, castaway, points, tribeTimeline, 
           </CastawayPopover>
           <div className='ml-auto flex gap-1 items-center'>
             <TribeHistoryCircles tribeTimeline={tribeTimeline ?? []} />
-            {castaway?.eliminatedEpisode && (
-              <EliminationIndicator episode={castaway.eliminatedEpisode} />
-            )}
+            <EliminationIndicator episode={castaway?.eliminatedEpisode} />
           </div>
         </div>
       </TableCell>
