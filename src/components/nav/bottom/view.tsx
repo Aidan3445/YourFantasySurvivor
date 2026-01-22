@@ -31,7 +31,7 @@ export default function BottomNav() {
         </BottomNavLink>
         <BottomNavLink href='/seasons' icon={BookUser} />
         <BottomNavLink href='/playground' icon={Flame} />
-        <BottomNavLink href='/leagues' icon={Trophy} />
+        <BottomNavLink href='/leagues' icon={Trophy} pathnameMatch='/leagues' />
         <BottomNavUser />
       </span>
     </div>
