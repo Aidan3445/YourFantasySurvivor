@@ -52,7 +52,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
             tribe &&
             <ColorRow
               key={index}
-              className='leading-tight px-1'
+              className='leading-tight'
               color={tribe.tribeColor}>
               {tribe.tribeName}
             </ColorRow>
@@ -67,7 +67,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
             pairs.map(({ castaway }) =>
               <ColorRow
                 key={castaway.castawayId}
-                className='leading-tight px-1'
+                className='leading-tight'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
                 <CastawayPopover castaway={castaway}>
                   <span className='text-nowrap'>

@@ -73,7 +73,7 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
                                     className='flex items-center gap-1 font-bold'
                                     style={{ color: getContrastingColor(member.color) }}>
                                     <ColorRow
-                                      className='min-w-12 px-1 justify-center leading-tight font-normal'
+                                      className='min-w-12 w-fit justify-center leading-tight font-normal'
                                       color={tribe.tribeColor}>
                                       {tribe.tribeName}
                                     </ColorRow>
@@ -83,7 +83,7 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
                                 <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
                                   <span className='flex items-center gap-1 font-medium'>
                                     <ColorRow
-                                      className='min-w-12 px-1 justify-center leading-tight'
+                                      className='min-w-12 w-fit justify-center leading-tight'
                                       color={tribe.tribeColor}>
                                       {tribe.tribeName}
                                     </ColorRow>

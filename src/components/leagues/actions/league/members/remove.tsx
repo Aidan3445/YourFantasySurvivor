@@ -46,7 +46,7 @@ export default function RemoveMember({ member, loggedInMember }: CurrentMemberPr
         <AlertDialogDescription className='my-4'>
           Are you sure you want to remove{' '}
           <ColorRow
-            className='inline w-min px-1 leading-tight my-auto'
+            className='inline w-min leading-tight my-auto'
             color={member.color}>
             {member.displayName}
           </ColorRow>{' '}

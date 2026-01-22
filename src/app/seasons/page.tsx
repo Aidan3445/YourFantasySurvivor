@@ -19,7 +19,7 @@ import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 export default function SeasonsPage() {
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
-  const [selectedTab, setSelectedTab] = useState('castaways');
+  const [selectedTab, setSelectedTab] = useState('events');
   const { data: seasons } = useSeasons(true);
   const { data: seasonData } = useSeasonsData(true, selectedSeasonId ?? undefined);
   const season = seasonData?.[0];

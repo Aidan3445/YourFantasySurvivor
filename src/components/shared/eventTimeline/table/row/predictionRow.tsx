@@ -43,7 +43,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
             tribe &&
             <ColorRow
               key={index}
-              className='leading-tight px-1 w-min'
+              className='leading-tight w-min'
               color={tribe.tribeColor}>
               {tribe.tribeName}
             </ColorRow>
@@ -58,7 +58,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
             pairs.map(({ castaway }) =>
               <ColorRow
                 key={castaway.castawayId}
-                className='leading-tight px-1'
+                className='leading-tight'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
                 <CastawayPopover castaway={castaway}>
                   <span className='text-nowrap'>
@@ -76,7 +76,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
             prediction.hits.map((hit, index) =>
               <span key={index} className='flex gap-1 items-center'>
                 <ColorRow
-                  className='leading-tight px-1 w-min'
+                  className='leading-tight w-min'
                   color={hit.member.color}>
                   {hit.member.displayName}
                   {(hit.bet ?? 0) > 0 && (
@@ -109,7 +109,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                     {prediction.misses.map((miss, index) => (
                       <span key={index} className='text-sm flex gap-1 items-center opacity-60'>
                         <ColorRow
-                          className='leading-tight px-1 w-min'
+                          className='leading-tight w-min'
                           color={miss.member.color}>
                           {miss.member.displayName}
                           {(miss.bet ?? 0) > 0 && (
@@ -120,7 +120,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                           <>
                             <MoveRight size={12} stroke='#000000' />
                             <ColorRow
-                              className='leading-tight px-1 w-min'
+                              className='leading-tight w-min'
                               color={miss.reference.color}>
                               {miss.reference.name}
                             </ColorRow>

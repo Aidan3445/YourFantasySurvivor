@@ -281,7 +281,7 @@ export default function ChangeCastaway() {
                                         style={{ color: getContrastingColor(castaway.pickedBy?.color ?? '#6b7280') }}>
                                         {castaway.tribe &&
                                           <ColorRow
-                                            className='w-20 px-0 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
+                                            className='w-20 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
                                             color={castaway.tribe.color}>
                                             {castaway.tribe.name}
                                           </ColorRow>
@@ -294,7 +294,7 @@ export default function ChangeCastaway() {
                                       <span className='flex items-center gap-1 w-full text-nowrap'>
                                         {castaway.tribe &&
                                           <ColorRow
-                                            className='w-20 px-0 justify-center leading-tight'
+                                            className='w-20 justify-center leading-tight'
                                             color={castaway.tribe.color}>
                                             {castaway.tribe.name}
                                           </ColorRow>}
@@ -379,7 +379,7 @@ export default function ChangeCastaway() {
                                           <span className='flex items-center gap-1 w-full text-nowrap'>
                                             {castaway.tribe &&
                                               <ColorRow
-                                                className='w-20 px-0 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
+                                                className='w-20 justify-center leading-tight font-medium! tracking-normal! normal-case! text-sm'
                                                 color={castaway.tribe.color}>
                                                 {castaway.tribe.name}
                                               </ColorRow>
@@ -395,7 +395,7 @@ export default function ChangeCastaway() {
                                         <span className='flex items-center gap-1 w-full text-nowrap'>
                                           {castaway.tribe &&
                                             <ColorRow
-                                              className='w-20 px-0 justify-center leading-tight'
+                                              className='w-20 justify-center leading-tight'
                                               color={castaway.tribe.color}>
                                               {castaway.tribe.name}
                                             </ColorRow>}
