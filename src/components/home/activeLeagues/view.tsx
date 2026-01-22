@@ -118,12 +118,12 @@ export function ActiveLeagues() {
                   <Separator className='bg-primary/20' />
                 </CardHeader>
 
-                <CardContent className='px-0 mb-8 max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3rem-var(--sidebar-width))]'>
+                <CardContent className='max-w-[calc(100vw-2.25rem)] md:max-w-[calc(100vw-3.35rem-var(--sidebar-width))] p-0 mb-8'>
                   <Carousel
                     opts={{
                       loop: true,
                       watchDrag: topLeagues.length > 1,
-                      ignoreKeys: topLeagues.length > 1
+                      ignoreKeys: topLeagues.length > 1,
                     }}
                     plugins={[Autoplay({
                       delay: 8000,
@@ -140,13 +140,14 @@ export function ActiveLeagues() {
                         </CarouselItem>
                       ))}
                     </CarouselContent>
-                    {(topLeagues.length + inactiveLeagues.length) > 1 && (
-                      <>
-                        <CarouselPrevious className='absolute left-10 -bottom-14 top-auto' />
-                        <CarouselProgress className='rounded-none' current={current} count={topLeagues.length} />
-                        <CarouselNext className='absolute right-10 -bottom-14 top-auto' />
-                      </>
-                    )}
+                    {(topLeagues.length > 1
+                      || (inactiveLeagues.length > 1 && topLeagues.length === 0)) && (
+                        <>
+                          <CarouselPrevious className='absolute left-10 -bottom-14 top-auto' />
+                          <CarouselProgress className='rounded-none' current={current} count={topLeagues.length} />
+                          <CarouselNext className='absolute right-10 -bottom-14 top-auto' />
+                        </>
+                      )}
                   </Carousel>
                 </CardContent>
               </Card>

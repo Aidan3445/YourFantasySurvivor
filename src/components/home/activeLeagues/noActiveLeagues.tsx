@@ -44,7 +44,7 @@ export default function NoActiveLeagues({ inactiveLeagues }: NoActiveLeaguesProp
         <Separator className='bg-primary/20' />
       </CardHeader>
 
-      <CardContent className='px-0 mb-8 max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3rem-var(--sidebar-width))]'>
+      <CardContent className='px-0 mb-8 max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3.35rem-var(--sidebar-width))]'>
         {inactiveLeagues.length === 0 ? (
           <div className='text-center py-12'>
             <div className='inline-flex p-6 bg-primary/10 rounded-2xl mb-6'>
