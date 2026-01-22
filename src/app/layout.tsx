@@ -1,5 +1,6 @@
 import '~/styles/globals.css';
 
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
 import { type ReactNode, StrictMode } from 'react';
@@ -29,6 +30,7 @@ interface RootLayoutProps {
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <StrictMode>
+      <SpeedInsights />
       <QueryClientContextProvider>
         <ClerkProvider
           appearance={{
