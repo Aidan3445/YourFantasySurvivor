@@ -12,7 +12,7 @@ export default function ColorRow({ color, loggedIn, className, children }: Color
   return (
     <span
       className={cn(
-        'w-full inline-flex px-4 py-0.5 gap-4 text-nowrap items-center rounded-md border-t border-b border-r border-transparent',
+        'w-full inline-flex px-0.5 py-0.5 gap-4 text-nowrap items-center rounded-md border-t border-b border-r border-transparent',
         loggedIn && 'text-primary',
         className
       )}
