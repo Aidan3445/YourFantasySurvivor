@@ -21,9 +21,10 @@ interface EventRowProps {
   editCol?: boolean;
   isMock?: boolean;
   noMembers?: boolean;
+  noPoints?: boolean;
 }
 
-export default function EventRow({ className, event, editCol: edit, isMock, noMembers }: EventRowProps) {
+export default function EventRow({ className, event, editCol: edit, isMock, noMembers, noPoints }: EventRowProps) {
   const isBaseEvent = useMemo(() => event.eventSource === 'Base', [event.eventSource]);
 
   const label = useEventLabel(event.eventName, isBaseEvent, event.label);
@@ -45,7 +46,9 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
         )}
         {label}
       </TableCell>
-      <PointsCell points={event.points} />
+      {!noPoints && (
+        <PointsCell points={event.points} />
+      )}
       <TableCell className='text-center' style={{ height: 'inherit' }}>
         <div className='h-full grid auto-rows-fr items-center'>
           {event.referenceMap?.map(({ tribe }, index) => (
@@ -91,14 +94,14 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
               <div key={`${castaway.castawayId}-${index}`} className='flex gap-1 items-center'>
                 {member ? (
                   <ColorRow
-                    className='leading-tight px-1 w-min'
+                    className='leading-tight w-min'
                     color={member.color}>
                     {member.displayName}
                   </ColorRow>
                 ) : (
                   <ColorRow
                     className={cn(
-                      'leading-tight px-1 text-muted-foreground w-min',
+                      'leading-tight text-muted-foreground w-min',
                       (secondaries?.length === 0 || !event.points) && 'invisible'
                     )}>
                     None
@@ -121,7 +124,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
                         {secondaries.map((secMember) => (
                           <ColorRow
                             key={`secondary-${secMember.memberId}`}
-                            className='leading-tight px-1 w-min'
+                            className='leading-tight w-min'
                             color={secMember.color}>
                             {secMember.displayName}
                           </ColorRow>

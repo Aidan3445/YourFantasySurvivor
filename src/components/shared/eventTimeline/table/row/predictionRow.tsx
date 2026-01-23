@@ -87,7 +87,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                   <>
                     <MoveRight size={12} stroke='#000000' />
                     <ColorRow
-                      className='leading-tight px-1 w-min'
+                      className='leading-tight w-min'
                       color={hit.reference.color}>
                       {hit.reference.name}
                     </ColorRow>
