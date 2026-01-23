@@ -312,6 +312,7 @@ export default function EpisodeEvents({
                   filteredPredictions={filteredPredictionsWithPredOnly[episode.episodeNumber] ?? []}
                   predictionEnrichmentEvents={enrichmentOnlyEvents}
                   edit={edit}
+                  noTribes={noTribes}
                   filters={filters}
                   noMembers={noMembers}
                   seasonData={seasonData}
