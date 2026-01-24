@@ -11,10 +11,11 @@ interface LeagueCardProps {
   member: LeagueMember;
   currentSelection: CurrentSelection;
   refresh?: boolean;
+  seasonName?: string;
   className?: string;
 }
 
-export default function LeagueCard({ league, member, currentSelection, refresh, className }: LeagueCardProps) {
+export default function LeagueCard({ league, member, currentSelection, refresh, seasonName, className }: LeagueCardProps) {
   return (
     <Link
       key={league.hash}
@@ -39,6 +40,11 @@ export default function LeagueCard({ league, member, currentSelection, refresh, 
           ) : (
             <p className='text-sm text-left'>
               <span className='font-bold text-muted-foreground'>Draft:</span> <span className='italic'>Yet to draft</span>
+            </p>
+          )}
+          {seasonName && (
+            <p className='text-sm text-left'>
+              <span className='font-bold text-muted-foreground italic'>{seasonName}</span>
             </p>
           )}
           <ColorRow className='justify-center font-bold border-2' color={member.color}>

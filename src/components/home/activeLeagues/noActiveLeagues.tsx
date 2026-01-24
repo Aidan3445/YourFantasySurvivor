@@ -83,8 +83,8 @@ export default function NoActiveLeagues({ inactiveLeagues }: NoActiveLeaguesProp
                           member={leagueDetails.member}
                           currentSelection={leagueDetails.currentSelection}
                           refresh
-                          className='bg-secondary/50 hover:bg-secondary/80'
-                        />
+                          seasonName={leagueDetails.league.season}
+                          className='bg-secondary/50 hover:bg-secondary/80' />
                       </CarouselItem>
                     ))
                   }
