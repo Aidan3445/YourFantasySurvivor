@@ -60,9 +60,11 @@ export default async function joinLeagueLogic(
         role: leagueMemberSchema.role,
         leagueId: leagueMemberSchema.leagueId
       })
+      .onConflictDoNothing()
       .then((res) => res[0]);
 
-    if (!member?.memberId) throw new Error('Failed to add user as a member');
+    // If no member was added, the user is already a member
+    if (!member?.memberId) return { success: false, admitted: true };
 
     if (!league.isProtected) {
       const auth: VerifiedLeagueMemberAuth = {

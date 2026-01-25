@@ -7,7 +7,7 @@ import { type LeagueMemberInsert } from '~/types/leagueMembers';
 export async function GET(request: NextRequest) {
   return await withAuth(async () => {
     const hashParam = request.nextUrl.searchParams.get('hash');
-    const hash = hashParam ? hashParam : undefined;
+    const hash = hashParam ?? undefined;
 
     if (!hash) {
       return NextResponse.json({ error: 'Missing or invalid hash parameter' }, { status: 400 });
@@ -38,9 +38,17 @@ export async function POST(request: NextRequest) {
 
       const success = await joinLeagueLogic(userId, body.hash, body.newMember);
 
+      if (!success.success && success.admitted) {
+        return NextResponse.json(
+          { error: 'You are already a member of this league.' },
+          { status: 409 }
+        );
+      }
+
       return NextResponse.json(success, { status: 201 });
     } catch (error) {
       console.error('Failed to join league', error);
+
       return NextResponse.json({ error: 'An error occurred while joining the league.' }, { status: 500 });
     }
   })();

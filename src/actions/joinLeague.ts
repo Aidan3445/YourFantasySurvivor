@@ -21,13 +21,18 @@ export default async function joinLeague(
   newMember: LeagueMemberInsert
 ) {
   try {
-    return await requireAuth(joinLeagueLogic)(hash, newMember);
+    const success = await requireAuth(joinLeagueLogic)(hash, newMember);
+    if (!success.success && success.admitted) {
+      throw new Error('You are already a member of this league.');
+    }
+    return success;
   } catch (e) {
     let message: string;
     if (e instanceof Error) message = e.message;
     else message = String(e);
 
     if (message.includes('User not authenticated')) throw e;
+    if (message.includes('You are already a member of this league.')) throw e;
 
     console.error('Failed to join league', e);
     throw new Error('An error occurred while joining the league.');
