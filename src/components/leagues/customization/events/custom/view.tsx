@@ -48,7 +48,8 @@ export default function CustomEvents() {
     }
   });
 
-  const disabled = (!!leagueMembers?.loggedIn && leagueMembers.loggedIn.role !== 'Owner') || league?.status === 'Inactive';
+  const disabled = (!!leagueMembers?.loggedIn && leagueMembers.loggedIn.role !== 'Owner')
+    || league?.status === 'Inactive';
 
   return (
     <article className='bg-card p-4 rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10 relative space-y-2'>
@@ -62,8 +63,9 @@ export default function CustomEvents() {
       <div>
         <div className='flex items-center gap-3 h-8'>
           <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
-          <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
+          <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap items-center flex gap-1'>
             Custom Events
+            <span className='text-sm font-medium text-muted-foreground'>({rules?.custom?.length ?? 0}/6)</span>
           </h2>
         </div>
         <div className='flex flex-col gap-2'>
@@ -95,7 +97,11 @@ export default function CustomEvents() {
           <Form {...reactForm}>
             <form action={() => handleSubmit()}>
               <AlertDialogTrigger asChild>
-                <Button className='font-bold uppercase text-xs tracking-wider'>Create Custom Event</Button>
+                <Button
+                  disabled={(rules?.custom?.length ?? 0) >= 6}
+                  className='font-bold uppercase text-xs tracking-wider'>
+                  {(rules?.custom?.length ?? 0) >= 6 ? 'Custom Event Limit Reached' : 'Create New Custom Event'}
+                </Button>
               </AlertDialogTrigger>
               <AlertDialogContent className='border-2 border-primary/30 shadow-lg shadow-primary/20'>
                 <AlertDialogHeader>
@@ -117,7 +123,7 @@ export default function CustomEvents() {
                   <Button
                     type='submit'
                     className='font-bold uppercase text-xs tracking-wider'
-                    disabled={!reactForm.formState.isValid}
+                    disabled={!reactForm.formState.isValid || (rules?.custom?.length ?? 0) >= 6}
                     onClick={() => handleSubmit()}>
                     Create Event
                   </Button>
