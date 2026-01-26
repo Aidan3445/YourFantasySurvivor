@@ -22,12 +22,14 @@ import updateCustomEvent from '~/actions/updateCustomEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import deleteBaseEvent from '~/actions/deleteBaseEvent';
 import deleteCustomEvent from '~/actions/deleteCustomEvent';
+import { useSysAdmin } from '~/hooks/user/useSysAdmin';
 
 interface EditEventProps {
   event: EnrichedEvent;
 }
 
 export default function EditEvent({ event }: EditEventProps) {
+  const userId = useSysAdmin();
   const queryClient = useQueryClient();
   const { data: league } = useLeague();
   const reactForm = useForm<BaseEventInsert | CustomEventInsert>({
@@ -55,6 +57,8 @@ export default function EditEvent({ event }: EditEventProps) {
 
   const [modalsOpen, setModalsOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  if (!userId && event.eventSource === 'Base') return null;
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     // determine if base or custom event
