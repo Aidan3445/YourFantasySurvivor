@@ -216,7 +216,7 @@ export default function CreateBaseEvent() {
                       <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
-                          className='h-full rounded-xl pt-1'
+                          className='h-full pt-1'
                           maxCount={7}
                           disabled={eventSubtype === ''}
                           options={combinedReferenceOptions}

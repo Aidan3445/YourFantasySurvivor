@@ -209,7 +209,7 @@ export default function CreateCustomEvent() {
                       <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
-                          className='h-full rounded-xl pt-1 z-50'
+                          className='h-full pt-1 z-50'
                           disabled={!selectedEvent}
                           options={combinedReferenceOptions}
                           onValueChange={(value) =>
