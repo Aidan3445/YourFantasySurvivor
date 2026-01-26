@@ -132,18 +132,17 @@ export default function CustomEvents() {
             </form>
           </Form>
         </AlertDialog>}
-      {
-        rules?.custom?.length ?
-          <article className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
-            {rules?.custom.map((rule) => (
-              <LeagueEventCard key={rule.customEventRuleId} rule={rule} locked={disabled || locked} />
-            ))}
-          </article>
-          :
-          <h3 className='text-base w-full text-center font-bold uppercase tracking-wider text-muted-foreground px-2 pb-2'>
-            No custom events created yet
-          </h3>
+      {rules?.custom?.length ?
+        <article className='grid grid-cols-1 lg:grid-cols-2 gap-3'>
+          {rules?.custom.map((rule) => (
+            <LeagueEventCard key={rule.customEventRuleId} rule={rule} locked={disabled || locked} />
+          ))}
+        </article>
+        :
+        <h3 className='text-base w-full text-center font-bold uppercase tracking-wider text-muted-foreground px-2 pb-2'>
+          No custom events created yet
+        </h3>
       }
-    </article >
+    </article>
   );
 }

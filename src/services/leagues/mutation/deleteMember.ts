@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq, isNotNull } from 'drizzle-orm';
+import { and, eq, gt, isNotNull } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
@@ -47,6 +47,27 @@ export default async function deleteMemberLogic(
         eq(leagueMemberSchema.leagueId, auth.leagueId),
         eq(leagueMemberSchema.memberId, memberId)
       ));
+
+    // If the draft order is not null, we need to increment the draft positions of members below the deleted member
+    if (memberToDelete[0]!.draftOrder !== null) {
+      const laterMembers = await trx
+        .select()
+        .from(leagueMemberSchema)
+        .where(and(
+          eq(leagueMemberSchema.leagueId, auth.leagueId),
+          gt(leagueMemberSchema.draftOrder, memberToDelete[0]!.draftOrder)
+        ));
+
+      await Promise.all(laterMembers.map(async (member) => {
+        await trx
+          .update(leagueMemberSchema)
+          .set({ draftOrder: member.draftOrder! - 1 })
+          .where(and(
+            eq(leagueMemberSchema.leagueId, auth.leagueId),
+            eq(leagueMemberSchema.memberId, member.memberId)
+          ));
+      }));
+    }
   });
 
   return { success: true };

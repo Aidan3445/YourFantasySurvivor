@@ -24,7 +24,7 @@ export default function CurrentMember({ member, loggedInMember }: CurrentMemberP
           <RemoveMember member={member} loggedInMember={loggedInMember} />
         </span>
       </span>
-    </ColorRow >
+    </ColorRow>
   );
 }
 
