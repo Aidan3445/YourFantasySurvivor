@@ -6,6 +6,7 @@ import { withLeagueMemberAuth } from '~/lib/apiMiddleware';
 import getLeagueMembers from '~/services/leagues/query/members';
 import updateMemberDetailsLogic from '~/services/leagues/mutation/updateMemberDetails';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
+import deleteMemberLogic from '~/services/leagues/mutation/deleteMember';
 
 export async function GET(_: NextRequest, context: LeagueRouteParams) {
   return withLeagueMemberAuth(async (auth) => {
@@ -38,6 +39,26 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     } catch (e) {
       console.error('Failed to update member details', e);
       return NextResponse.json({ error: 'An error occurred while updating the member details.' }, { status: 500 });
+    }
+  })(context);
+}
+
+export async function DELETE(request: NextRequest, context: LeagueRouteParams) {
+  return withLeagueMemberAuth(async (auth) => {
+    const body = await request.json() as {
+      memberId: number
+    };
+
+    if (!body.memberId) {
+      return NextResponse.json({ error: 'Missing memberId in request body' }, { status: 400 });
+    }
+
+    try {
+      const success = await deleteMemberLogic(auth, body.memberId);
+      return NextResponse.json(success, { status: 200 });
+    } catch (e) {
+      console.error('Failed to delete member', e);
+      return NextResponse.json({ error: 'An error occurred while deleting the member.' }, { status: 500 });
     }
   })(context);
 }

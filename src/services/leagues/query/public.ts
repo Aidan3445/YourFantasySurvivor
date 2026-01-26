@@ -21,6 +21,8 @@ export default async function getPublicLeague(hash: string) {
       status: leagueSchema.status,
       season: seasonSchema.name,
       isProtected: leagueSettingsSchema.isProtected,
+      hash: leagueSchema.hash,
+      seasonId: leagueSchema.seasonId,
     })
     .from(leagueSchema)
     .innerJoin(seasonSchema, eq(leagueSchema.seasonId, seasonSchema.seasonId))

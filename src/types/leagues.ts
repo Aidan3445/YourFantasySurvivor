@@ -24,6 +24,8 @@ export type PublicLeague = {
   season: string;
   usedColors: string[];
   isProtected: boolean;
+  hash: string;
+  seasonId: number;
 };
 
 export type LeagueDetails = {
