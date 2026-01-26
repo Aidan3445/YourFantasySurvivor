@@ -57,14 +57,17 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
 export async function DELETE(request: NextRequest, context: LeagueRouteParams) {
   return withLeagueAdminAuth(async (auth) => {
     try {
-      const { searchParams } = new URL(request.url);
-      const eventIdParam = searchParams.get('eventId');
+      const body = await request.json() as {
+        eventId: number;
+      };
+      const eventId = body.eventId;
 
-      if (!eventIdParam) {
+      console.log('Deleting custom event with ID:', eventId);
+
+      if (!eventId) {
         return NextResponse.json({ error: 'Missing eventId parameter' }, { status: 400 });
       }
 
-      const eventId = parseInt(eventIdParam, 10);
       if (isNaN(eventId)) {
         return NextResponse.json({ error: 'Invalid eventId parameter' }, { status: 400 });
       }
