@@ -12,7 +12,7 @@ import { Button } from '~/components/common/button';
 import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
 import { CustomEventInsertZod, type EventWithReferences, type CustomEventInsert } from '~/types/events';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import createCustomEvent from '~/actions/createCustomEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';

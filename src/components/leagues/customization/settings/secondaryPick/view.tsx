@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { cn } from '~/lib/utils';
 import { type SecondaryPickSettings as SecondaryPickSettingsType, SecondaryPickSettingsZod } from '~/types/leagues';
 import { useLeague } from '~/hooks/leagues/useLeague';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useQueryClient } from '@tanstack/react-query';
 import updateSecondaryPickSettings from '~/actions/updateSecondaryPickSettings';

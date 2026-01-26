@@ -11,7 +11,7 @@ import ChallengeScoreSettings from '~/components/leagues/customization/events/ba
 import AdvantageScoreSettings from '~/components/leagues/customization/events/base/advantages';
 import OtherScoreSettings from '~/components/leagues/customization/events/base/other';
 import { BaseEventRulesZod, BasePredictionRulesZod } from '~/types/leagues';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { defaultBaseRules, defaultBasePredictionRules } from '~/lib/leagues';
 import updateBaseEventRules from '~/actions/updateBaseEventRules';
 import { useLeague } from '~/hooks/leagues/useLeague';

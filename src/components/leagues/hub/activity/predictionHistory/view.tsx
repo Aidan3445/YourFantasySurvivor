@@ -10,7 +10,7 @@ import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
 import { useCustomEvents } from '~/hooks/leagues/useCustomEvents';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useBaseEvents } from '~/hooks/seasons/useBaseEvents';
 import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
 import { type ScoringBaseEventName, type PredictionWithEvent } from '~/types/events';

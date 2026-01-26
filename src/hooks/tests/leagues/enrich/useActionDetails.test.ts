@@ -58,7 +58,7 @@ vi.mock('~/hooks/seasons/useCastaways', () => ({
 }));
 
 import { useEnrichedTribeMembers } from '~/hooks/seasons/enrich/useEnrichedTribeMembers';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
 import { usePredictionTiming } from '~/hooks/leagues/usePredictionTiming';

@@ -18,7 +18,7 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { type CustomEventRuleInsert, CustomEventRuleInsertZod } from '~/types/leagues';
 import { defaultNewCustomRule } from '~/lib/leagues';
 import createCustomEventRule from '~/actions/createCustomEventRule';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 
 export default function CustomEvents() {
   const queryClient = useQueryClient();
