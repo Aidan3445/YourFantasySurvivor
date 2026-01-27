@@ -11,6 +11,7 @@ import ShauhinMode from '~/components/leagues/customization/settings/shauhin/vie
 import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
 import SurvivalSettings from '~/components/leagues/customization/settings/survival/view';
+import SecondaryPickSettings from '~/components/leagues/customization/settings/secondaryPick/view';
 
 export default async function PredraftPage() {
 
@@ -34,6 +35,7 @@ export default async function PredraftPage() {
               <span className='h-5 w-0.5 bg-primary rounded-full' />
             </div>
             <SurvivalSettings />
+            <SecondaryPickSettings />
             <LeagueScoring />
             <ShauhinMode />
             <CustomEvents />
