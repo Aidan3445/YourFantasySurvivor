@@ -182,7 +182,8 @@ export default function SecondaryPickSettings() {
                       );
                     }} />
                   <FormDescription>
-                    Episodes before a castaway can be selected again (0-{MAX_SEASON_LENGTH}). Set to {MAX_SEASON_LENGTH} to never allow repeats.
+                    Episodes before a castaway can be selected again as a secondary pick.
+                    For an extra challenge, max this out and never allow repeats!
                   </FormDescription>
                 </div>
 

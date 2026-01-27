@@ -45,6 +45,9 @@ export default async function updateLeagueSettingsLogic(
       // we need the date === null because we want to allow setting it to null
       .set({
         ...update,
+        secondaryPickMultiplier: update.secondaryPickMultiplier
+          ? update.secondaryPickMultiplier * 100
+          : undefined,
         draftDate: safeDraftDate === null
           ? null
           : safeDraftDate?.toUTCString()
