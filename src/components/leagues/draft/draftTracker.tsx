@@ -9,17 +9,21 @@ import {
 } from '~/components/common/alertDialog';
 import MakePredictions from '~/components/leagues/actions/events/predictions/view';
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import SkipMember from '~/components/leagues/draft/skipMember';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Card, CardContent, CardHeader } from '~/components/common/card';
+import { useRouter } from 'next/navigation';
 
 interface DraftTrackerProps {
   hash: string;
 }
 
 export default function DraftTracker({ hash }: DraftTrackerProps) {
+  const router = useRouter();
   const {
+    league,
+    onTheClockIndex,
     actionDetails,
     membersWithPicks,
     onTheClock,
@@ -40,6 +44,11 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
   const tribes = useMemo(() =>
     Object.values(actionDetails ?? {}).map(({ tribe }) => tribe), [actionDetails]);
 
+  useEffect(() => {
+    if (league && onTheClockIndex !== null && (onTheClockIndex === -1 || league.status !== 'Draft')) {
+      router.push(`/leagues/${league.hash}`);
+    }
+  }, [onTheClockIndex, league?.status, league?.hash, router, league]);
 
   return (
     <section className='w-full space-y-4'>
