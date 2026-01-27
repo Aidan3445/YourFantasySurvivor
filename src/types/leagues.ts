@@ -58,7 +58,7 @@ export type SecondaryPickSettings = {
   canPickOwnSurvivor: boolean;
   lockoutPeriod: number; // 0-MAX_SEASON_LENGTH, max is lock out
   publicPicks: boolean;
-  multiplier: 0.25 | 0.5 | 0.75 | 1;
+  multiplier: 0.5 | 1;
 };
 
 export type LeagueSettings = {
@@ -81,7 +81,7 @@ export type LeagueSettingsUpdate = {
   secondaryPickCanPickOwn?: boolean;
   secondaryPickLockoutPeriod?: number;
   secondaryPickPublicPicks?: boolean;
-  secondaryPickMultiplier?: 0.25 | 0.5 | 0.75 | 1;
+  secondaryPickMultiplier?: 0.5 | 1;
   shotInTheDarkEnabled?: boolean;
 }
 

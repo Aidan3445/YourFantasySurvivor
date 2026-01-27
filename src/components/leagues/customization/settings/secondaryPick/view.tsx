@@ -237,9 +237,7 @@ export default function SecondaryPickSettings() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value='0.25'>1/4 (25%)</SelectItem>
                                 <SelectItem value='0.5'>1/2 (50%)</SelectItem>
-                                <SelectItem value='0.75'>3/4 (75%)</SelectItem>
                                 <SelectItem value='1'>Full (100%)</SelectItem>
                               </SelectContent>
                             </Select>
