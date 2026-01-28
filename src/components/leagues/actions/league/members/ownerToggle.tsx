@@ -77,14 +77,16 @@ export default function OwnerToggle({ member, loggedInMember }: CurrentMemberPro
           </label>
         </span>
         <AlertDialogFooter>
-          <form action={() => handleToggleOwner()}>
-            <Button type='submit' disabled={!iUnderstand}>
-              Yes, {member.role === 'Owner' ? 'demote' : 'promote'}
-            </Button>
-          </form>
-          <AlertDialogCancel>
-            No, cancel
-          </AlertDialogCancel>
+          <div className='grid grid-cols-2 gap-2'>
+            <form action={() => handleToggleOwner()}>
+              <Button className='w-full' type='submit' disabled={!iUnderstand}>
+                Yes, {member.role === 'Owner' ? 'demote' : 'promote'}
+              </Button>
+            </form>
+            <AlertDialogCancel className='m-0'>
+              No, cancel
+            </AlertDialogCancel>
+          </div>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
