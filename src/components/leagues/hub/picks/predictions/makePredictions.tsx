@@ -3,7 +3,7 @@
 import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
 import { Flame } from 'lucide-react';
-import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useLeagueActionDetails';
 import { useMemo, useState } from 'react';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { cn } from '~/lib/utils';

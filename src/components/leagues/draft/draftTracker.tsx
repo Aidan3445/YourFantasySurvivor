@@ -8,7 +8,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/common/alertDialog';
 import MakePredictions from '~/components/leagues/actions/events/predictions/view';
-import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useLeagueActionDetails';
 import { useEffect, useMemo } from 'react';
 import SkipMember from '~/components/leagues/draft/skipMember';
 import { useIsMobile } from '~/hooks/ui/useMobile';

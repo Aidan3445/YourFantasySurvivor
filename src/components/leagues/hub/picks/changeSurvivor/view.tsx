@@ -14,7 +14,7 @@ import { getContrastingColor } from '@uiw/color-convert';
 import { useEffect, useMemo, useState } from 'react';
 import ColorRow from '~/components/shared/colorRow';
 import { useQueryClient } from '@tanstack/react-query';
-import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useLeagueActionDetails';
 import chooseCastaway from '~/actions/chooseCastaway';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';

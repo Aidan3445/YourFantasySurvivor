@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useLeagueActionDetails';
 import type { Castaway } from '~/types/castaways';
 import type { Tribe } from '~/types/tribes';
 import type { LeagueMember } from '~/types/leagueMembers';
