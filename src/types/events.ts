@@ -88,6 +88,7 @@ export type EnrichedPrediction = {
       type: ReferenceType;
       id: number;
       name: string;
+      shortName: string;
       color: string;
     };
   }[];
@@ -97,6 +98,7 @@ export type EnrichedPrediction = {
       type: ReferenceType;
       id: number;
       name: string;
+      shortName: string;
       color: string;
     } | null;
     hit: boolean;
