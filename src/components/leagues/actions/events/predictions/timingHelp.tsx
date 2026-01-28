@@ -19,7 +19,7 @@ export default function PredictionTimingHelp() {
         </p>
         <div className='bg-accent/50 rounded-md border-2 border-primary/20'>
           <ScrollArea className='md:max-h-42 h-42'>
-            <ul className='list-disc pl-4 text-sm font-medium space-y-1 pr-10'>
+            <ul className='pl-4 text-sm font-medium space-y-1 pr-10'>
               <li><b className='font-bold'>Draft</b> – Predictions are locked in when players draft their teams, before the league starts.</li>
               <li><b className='font-bold'>Weekly</b> – Predictions are made each week. Can apply to:
                 <ul className='list-[revert] pl-4 mt-1 space-y-1'>
