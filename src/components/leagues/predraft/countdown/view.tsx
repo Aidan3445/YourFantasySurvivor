@@ -29,8 +29,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
   const router = useRouter();
 
   const editable = useMemo(() =>
-    leagueMembers?.loggedIn?.role === 'Owner' && leagueSettings &&
-    (leagueSettings.draftDate === null || Date.now() < leagueSettings.draftDate.getTime()),
+    leagueMembers?.loggedIn?.role === 'Owner' && leagueSettings,
     [leagueMembers, leagueSettings]);
 
   const onDraftJoin = async () => {
