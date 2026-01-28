@@ -149,7 +149,8 @@ export function BaseSubmissionCard({
                       value={field.value ?
                         String(field.value) :
                         prediction.predictionMade ? String(prediction.predictionMade.referenceId) : ''}>
-                      <SelectTrigger className={cn(reactForm.formState.isDirty &&
+                      <SelectTrigger className={cn('py-0 [&>span]:line-clamp-none',
+                        reactForm.formState.isDirty &&
                         field.value !== prediction?.predictionMade?.referenceId &&
                         'bg-amber-400')}>
                         <SelectValue placeholder='Select prediction' />
