@@ -56,8 +56,8 @@ export interface LeagueLayoutProps extends LeaguePageProps {
 
 export default async function LeagueLayout({ children, params }: LeagueLayoutProps) {
   const { hash } = await params;
-  const { memberId } = await leagueMemberAuth(hash);
-  const league = await getPublicLeague(hash);
+  const { memberId, userId } = await leagueMemberAuth(hash);
+  const league = await getPublicLeague(hash, userId);
 
   if (!memberId) {
     return (

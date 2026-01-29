@@ -5,7 +5,7 @@ import getPublicLeague from '~/services/leagues/query/public';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
 
 export async function GET(request: NextRequest) {
-  return await withAuth(async () => {
+  return await withAuth(async (userId) => {
     const hashParam = request.nextUrl.searchParams.get('hash');
     const hash = hashParam ?? undefined;
 
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      const publicLeagueData = await getPublicLeague(hash);
+      const publicLeagueData = await getPublicLeague(hash, userId);
       if (!publicLeagueData) {
         return NextResponse.json({ error: 'League not found' }, { status: 404 });
       }
