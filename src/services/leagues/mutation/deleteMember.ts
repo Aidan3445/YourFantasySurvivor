@@ -19,7 +19,7 @@ export default async function deleteMemberLogic(
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
   if (auth.role === 'Member') throw new Error('Only league owners and admins can delete members');
-  if (auth.memberId === memberId) throw new Error('Members cannot delete themselves');
+  if (auth.memberId === memberId && auth.role === 'Owner') throw new Error('Owners cannot delete themselves');
 
   await db.transaction(async (trx) => {
     // confirm member to delete is not owner or admin if auth is admin

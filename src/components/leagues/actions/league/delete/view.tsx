@@ -82,8 +82,7 @@ export default function DeleteLeague() {
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+              )} />
             <Button
               type='submit'
               className='mt-auto font-bold uppercase text-xs tracking-wider'
