@@ -45,11 +45,12 @@ export default function JoinLeagueForm({ hash, isProtected, colors }: JoinLeague
       };
 
       const result = await joinLeague(hash, member);
-      await queryClient.invalidateQueries({ queryKey: ['leagues'] });
       if (result.admitted) {
+        await queryClient.invalidateQueries({ queryKey: ['leagues'] });
         alert('Successfully joined league');
         router.push(`/leagues/${hash}`);
       } else {
+        await queryClient.invalidateQueries({ queryKey: ['pending-leagues'] });
         alert('Join request submitted and is pending approval');
         router.push('/');
       }

@@ -16,7 +16,6 @@ import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
   * @returnObj `PublicLeague | null`
   */
 export default async function getPublicLeague(hash: string, userId?: string | null) {
-  console.log(`Fetching public data for league with hash: ${hash}`, userId ? `for user: ${userId}` : 'for anonymous user');
   const colorsReq = getUsedColors(hash);
   const leagueReq = db
     .select({

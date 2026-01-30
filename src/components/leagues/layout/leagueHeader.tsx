@@ -3,12 +3,13 @@ import { type PublicLeague } from '~/types/leagues';
 
 interface LeagueHeaderProps {
   league: PublicLeague | null;
-  joinMode?: {
-    isProtected: boolean;
+  mode?: {
+    isProtected?: boolean;
+    isPending?: boolean;
   };
 }
 
-export default function LeagueHeader({ league, joinMode }: LeagueHeaderProps) {
+export default function LeagueHeader({ league, mode }: LeagueHeaderProps) {
   if (!league) {
     return null;
   }
@@ -18,6 +19,6 @@ export default function LeagueHeader({ league, joinMode }: LeagueHeaderProps) {
       name={league.name}
       season={league.season}
       status={league.status}
-      joinMode={joinMode} />
+      mode={mode} />
   );
 }
