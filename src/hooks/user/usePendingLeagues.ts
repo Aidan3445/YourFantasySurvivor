@@ -4,7 +4,7 @@ import { type PublicLeague } from '~/types/leagues';
 /**
   * Fetches the leagues for the current user.
   */
-export function useLeagues() {
+export function usePendingLeagues() {
 
   return useQuery<PublicLeague[]>({
     queryKey: ['pending-leagues'],

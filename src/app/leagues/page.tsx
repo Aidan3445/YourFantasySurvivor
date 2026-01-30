@@ -9,9 +9,12 @@ import LeagueGrid from '~/components/leagues/grid/leagueGrid';
 import { useLeagues } from '~/hooks/user/useLeagues';
 import { useMemo } from 'react';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { usePendingLeagues } from '~/hooks/user/usePendingLeagues';
+import PendingLeagues from '~/components/leagues/grid/pendingLeagues';
 
 export default function LeaguesPage() {
   const { data: leagues } = useLeagues();
+  const { data: pendingLeagues } = usePendingLeagues();
 
   const { currentLeagues, inactiveLeagues } = useMemo(() => leagues?.reduce((acc, league) => {
     if (league.league.status === 'Inactive') {
@@ -42,7 +45,7 @@ export default function LeaguesPage() {
         </div>
 
         <SignedIn>
-          <div className='flex gap-3 mt-3'>
+          <div className='grid gap-3 grid-rows-1 grid-flow-col'>
             <CreateLeagueModal>
               <section className='flex gap-2 items-center px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all cursor-pointer'>
                 <ListPlus size={20} className='stroke-primary-foreground shrink-0' />
@@ -55,6 +58,9 @@ export default function LeaguesPage() {
                 <h3 className='text-sm font-bold uppercase tracking-wider text-white'>Join League</h3>
               </section>
             </JoinLeagueModal>
+            {pendingLeagues && pendingLeagues.length > 0 && (
+              <PendingLeagues pendingLeagues={pendingLeagues} />
+            )}
           </div>
         </SignedIn>
       </div>
