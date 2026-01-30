@@ -11,6 +11,7 @@ import { useMemo } from 'react';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { usePendingLeagues } from '~/hooks/user/usePendingLeagues';
 import PendingLeagues from '~/components/leagues/grid/pendingLeagues';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 export default function LeaguesPage() {
   const { data: leagues } = useLeagues();
@@ -92,6 +93,7 @@ export default function LeaguesPage() {
           {inactiveLeagues.length > 0 && <Separator className='my-6 bg-primary' />}
           <LeagueGrid leagues={inactiveLeagues} isInactive />
         </div>
+        <Spacer />
         <ScrollBar className='pt-2 pb-4' />
       </ScrollArea>
     </div>

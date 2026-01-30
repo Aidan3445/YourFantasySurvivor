@@ -20,6 +20,7 @@ import ManageMembers from '~/components/leagues/actions/league/members/view';
 import { getSeasonData } from '~/services/seasons/query/seasonsData';
 import LeagueTimeline from '~/components/leagues/hub/activity/leagueTimeline/view';
 import Scores from '~/components/leagues/hub/shared/scores/view';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 export default async function LeaguePage({ params }: LeaguePageProps) {
   const { hash } = await params;
@@ -93,8 +94,9 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
             <CustomEvents />
           </TabsContent>
         </div>
+        <Spacer />
         <ScrollBar className='pb-4 pt-2' />
-      </ScrollArea >
+      </ScrollArea>
     </Tabs>
   );
 }

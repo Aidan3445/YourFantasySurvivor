@@ -3,6 +3,7 @@ import { HeroSection } from '~/components/home/hero/view';
 import { ActiveLeagues } from '~/components/home/activeLeagues/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { CastawayScoreboard } from '~/components/home/scoreboard/view';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 export default async function HomePage() {
   return (
@@ -19,6 +20,7 @@ export default async function HomePage() {
 
           <CastawayScoreboard />
         </div>
+        <Spacer />
         <ScrollBar className='py-4' />
       </ScrollArea>
     </div>

@@ -23,6 +23,7 @@ import {
 } from '~/components/common/select';
 import { useSeasons } from '~/hooks/seasons/useSeasons';
 import { RotateCcw } from 'lucide-react';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 const formSchema = z.object({
   baseEventRules: BaseEventRulesZod,
@@ -114,6 +115,7 @@ export default function PlaygroundPage() {
             scoreData={[season!]}
             overrideBaseRules={BaseEventRulesZod.parse(reactForm.watch('baseEventRules'))} />
         </div>
+        <Spacer />
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea>
     </div>

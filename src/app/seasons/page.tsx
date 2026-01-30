@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '~/components/common/select';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 export default function SeasonsPage() {
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
@@ -103,6 +104,7 @@ export default function SeasonsPage() {
             <p className='text-muted-foreground'>Select a season to get started</p>
           </div>
         )}
+        <Spacer />
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea>
     </Tabs>

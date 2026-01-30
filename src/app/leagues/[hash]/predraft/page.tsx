@@ -12,6 +12,7 @@ import DeleteLeague from '~/components/leagues/actions/league/delete/view';
 import ManageMembers from '~/components/leagues/actions/league/members/view';
 import SurvivalSettings from '~/components/leagues/customization/settings/survival/view';
 import SecondaryPickSettings from '~/components/leagues/customization/settings/secondaryPick/view';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 export default async function PredraftPage() {
 
@@ -51,6 +52,7 @@ export default async function PredraftPage() {
             </div>
           </TabsContent>
         </div>
+        <Spacer />
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea>
     </Tabs>
