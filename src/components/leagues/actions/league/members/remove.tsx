@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { Button } from '~/components/common/button';
 import { useState } from 'react';
 import deleteMember from '~/actions/deleteMember';
+import { cn } from '~/lib/utils';
 
 export default function RemoveMember({ member, loggedInMember }: CurrentMemberProps) {
   const { hash } = useParams();
@@ -39,7 +40,9 @@ export default function RemoveMember({ member, loggedInMember }: CurrentMemberPr
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger disabled={!enabled}>
-        <Ban size={18} />
+        <Ban
+          className={cn('my-auto', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
+          size={18} />
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogTitle>Remove Member</AlertDialogTitle>

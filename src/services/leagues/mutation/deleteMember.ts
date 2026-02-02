@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq, gt, isNotNull } from 'drizzle-orm';
+import { and, eq, gt, isNull, not, or } from 'drizzle-orm';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 
@@ -18,21 +18,37 @@ export default async function deleteMemberLogic(
   memberId: number,
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
-  if (auth.role === 'Member') throw new Error('Only league owners and admins can delete members');
+  if (auth.memberId !== memberId && auth.role === 'Member') throw new Error('Only league owners and admins can delete other members');
   if (auth.memberId === memberId && auth.role === 'Owner') throw new Error('Owners cannot delete themselves');
 
   await db.transaction(async (trx) => {
     // confirm member to delete is not owner or admin if auth is admin
+    // or confirm member is removing themselves
+    const roleCondition =
+      auth.role === 'Owner'
+        ? not(eq(leagueMemberSchema.memberId, auth.memberId))
+        : auth.role === 'Admin'
+          ? eq(leagueMemberSchema.role, 'Member')
+          : isNull(leagueMemberSchema.memberId); // Members cannot remove others
+
     const memberToDelete = await trx
       .select()
       .from(leagueMemberSchema)
-      .where(and(
-        eq(leagueMemberSchema.leagueId, auth.leagueId),
-        eq(leagueMemberSchema.memberId, memberId),
-        auth.role === 'Admin'
-          ? eq(leagueMemberSchema.role, 'Member')
-          : isNotNull(leagueMemberSchema.memberId)
-      ));
+      .where(
+        and(
+          eq(leagueMemberSchema.leagueId, auth.leagueId),
+          eq(leagueMemberSchema.memberId, memberId),
+          or(
+            // self-removal (admin/member only)
+            and(
+              eq(leagueMemberSchema.memberId, auth.memberId),
+              not(eq(leagueMemberSchema.role, 'Owner'))
+            ),
+            // owner/admin removal of others
+            roleCondition
+          )
+        )
+      );
     if (memberToDelete.length === 0) {
       throw new Error('Not a league member or insufficient permissions to delete');
     }

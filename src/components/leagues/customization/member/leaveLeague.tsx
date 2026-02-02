@@ -14,13 +14,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { Button } from '~/components/common/button';
 import { useState } from 'react';
-import deleteMember from '~/actions/deleteMember';
+import { useRouter } from 'next/navigation';
+import leaveLeague from '~/actions/leaveLeague';
 
 interface LeaveLeagueProps {
   member?: LeagueMember;
 }
 
 export default function LeaveLeague({ member }: LeaveLeagueProps) {
+  const router = useRouter();
   const { hash } = useParams();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
@@ -32,9 +34,10 @@ export default function LeaveLeague({ member }: LeaveLeagueProps) {
   async function handleLeaveLeague() {
     if (!member || isOwner) return;
     try {
-      await deleteMember(String(hash), member.memberId);
+      await leaveLeague(String(hash), member.memberId);
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
       setOpen(false);
+      router.push('/leagues');
       alert('You have left the league.');
     } catch (error) {
       console.error('Error leaving league:', error);
@@ -52,7 +55,7 @@ export default function LeaveLeague({ member }: LeaveLeagueProps) {
           Leave League
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className='z-100'>
         <AlertDialogTitle>Leave League</AlertDialogTitle>
         <AlertDialogDescription className='my-4'>
           {isOwner ? (
@@ -62,18 +65,22 @@ export default function LeaveLeague({ member }: LeaveLeagueProps) {
           )}
         </AlertDialogDescription>
         <AlertDialogFooter>
-          {isOwner ? (
-            <AlertDialogCancel variant='secondary'>OK</AlertDialogCancel>
-          ) : (
-            <>
-              <form action={() => handleLeaveLeague()}>
-                <Button type='submit' variant='destructive'>
-                  Yes, leave
-                </Button>
-              </form>
-              <AlertDialogCancel variant='secondary'>No, cancel</AlertDialogCancel>
-            </>
-          )}
+          <div className='grid grid-cols-2 gap-2 self-end'>
+            {isOwner ? (
+              <AlertDialogCancel variant='secondary'>OK</AlertDialogCancel>
+            ) : (
+              <>
+                <form action={() => handleLeaveLeague()}>
+                  <Button className='w-full' type='submit'>
+                    Yes, leave
+                  </Button>
+                </form>
+                <AlertDialogCancel className='m-0'>
+                  No, cancel
+                </AlertDialogCancel>
+              </>
+            )}
+          </div>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

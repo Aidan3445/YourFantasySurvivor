@@ -62,8 +62,6 @@ export async function DELETE(request: NextRequest, context: LeagueRouteParams) {
       };
       const eventId = body.eventId;
 
-      console.log('Deleting custom event with ID:', eventId);
-
       if (!eventId) {
         return NextResponse.json({ error: 'Missing eventId parameter' }, { status: 400 });
       }

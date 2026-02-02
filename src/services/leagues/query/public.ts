@@ -44,10 +44,6 @@ export default async function getPublicLeague(hash: string, userId?: string | nu
   if (!league[0]) return null;
 
   const row = league[0];
-  console.log(`Fetched public data for league: ${row.name} (Hash: ${row.hash})`, {
-    row,
-    colors
-  });
 
   const isPending = row.draftOrder === null && !!row.userId && row.isProtected;
   const isMember = !!row.userId && !isPending;
