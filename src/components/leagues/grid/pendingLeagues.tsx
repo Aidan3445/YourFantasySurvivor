@@ -5,6 +5,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import { cn } from '~/lib/utils';
 import { type PublicLeague } from '~/types/leagues';
 
 interface PendingLeaguesProps {
@@ -38,7 +39,7 @@ export default function PendingLeagues({ pendingLeagues }: PendingLeaguesProps) 
           </AlertDialogDescription>
         </AlertDialogHeader>
         <ScrollArea className='h-40'>
-          <div className='space-y-2 pr-4'>
+          <div className={cn('space-y-2', pendingLeagues.length > 3 && 'pr-4')}>
             {pendingLeagues.length > 0 ? (
               pendingLeagues.map((league) => (
                 <div
