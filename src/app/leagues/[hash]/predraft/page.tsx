@@ -57,7 +57,7 @@ export default function PredraftPage() {
             );
           });
         });
-      }, 1000);
+      }, 3000);
     }
   }, []);
 

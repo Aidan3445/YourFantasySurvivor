@@ -139,7 +139,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
             </Button>
           } />
         </CardContent>
-      </div >
-    </Card >
+      </div>
+    </Card>
   );
 }

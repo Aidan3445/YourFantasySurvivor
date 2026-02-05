@@ -36,6 +36,7 @@ export default function LeaveLeague({ member }: LeaveLeagueProps) {
     try {
       await leaveLeague(String(hash), member.memberId);
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
+      queryClient.removeQueries({ queryKey: ['league', hash] });
       setOpen(false);
       router.push('/leagues');
       alert('You have left the league.');

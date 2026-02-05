@@ -2,7 +2,7 @@ import 'server-only';
 
 import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
-import { withLeagueMemberAuth } from '~/lib/apiMiddleware';
+import { withLeagueAdminAuth, withLeagueMemberAuth } from '~/lib/apiMiddleware';
 import getLeagueMembers from '~/services/leagues/query/members';
 import updateMemberDetailsLogic from '~/services/leagues/mutation/updateMemberDetails';
 import { type LeagueMemberInsert } from '~/types/leagueMembers';
@@ -44,7 +44,7 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
 }
 
 export async function DELETE(request: NextRequest, context: LeagueRouteParams) {
-  return withLeagueMemberAuth(async (auth) => {
+  return withLeagueAdminAuth(async (auth) => {
     const body = await request.json() as {
       memberId: number
     };

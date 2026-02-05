@@ -67,7 +67,7 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
             <ColorRow
               key={pick.memberId}
               className={onTheClock?.memberId === pick.memberId ?
-                'animate-pulse border-2 border-primary/40 shadow-md shadow-primary/20' : 'border-2 border-transparent'}
+                'animate-pulse border-2 border-primary/10' : 'border-2 border-transparent'}
               color={pick.color}
               loggedIn={leagueMembers.loggedIn?.displayName === pick.displayName}>
               <h3
