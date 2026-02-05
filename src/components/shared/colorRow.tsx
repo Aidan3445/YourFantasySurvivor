@@ -4,11 +4,12 @@ import { cn } from '~/lib/utils';
 export interface ColorRowProps {
   color?: string;
   loggedIn?: boolean;
+  opaque?: boolean;
   className?: string;
   children: ReactNode;
 }
 
-export default function ColorRow({ color, loggedIn, className, children }: ColorRowProps) {
+export default function ColorRow({ color, loggedIn, opaque, className, children }: ColorRowProps) {
   return (
     <span
       className={cn(
@@ -17,7 +18,7 @@ export default function ColorRow({ color, loggedIn, className, children }: Color
         className
       )}
       style={{
-        backgroundColor: `${color ?? '#AAAAAA'}20`,
+        backgroundColor: `${color ?? '#AAAAAA'}${opaque ? '80' : '20'}`,
         borderLeft: `0.25rem solid ${color ?? '#000000'}`,
       }}>
       {children}

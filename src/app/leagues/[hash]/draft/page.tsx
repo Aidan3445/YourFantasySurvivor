@@ -26,9 +26,7 @@ export default function DraftPage() {
             <DraftTracker hash={hash} />
           </TabsContent>
           <TabsContent value='castaways'>
-            <CastawaysView
-              seasonData={data as SeasonsDataQuery}
-              leagueData={data} />
+            <CastawaysView seasonData={data as SeasonsDataQuery} leagueData={data} />
           </TabsContent>
         </div>
         <Spacer />
