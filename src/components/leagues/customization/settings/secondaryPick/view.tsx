@@ -33,7 +33,10 @@ export default function SecondaryPickSettings() {
 
   useEffect(() => {
     if (rules?.secondaryPick) {
-      reactForm.reset(rules.secondaryPick);
+      reactForm.reset({
+        ...defaultSecondaryPickSettings,
+        ...rules.secondaryPick,
+      });
     }
   }, [rules?.secondaryPick, reactForm]);
 
