@@ -36,7 +36,10 @@ export default function DraftOrder({ overrideHash, scrollHeight, goToSettings, c
   const queryClient = useQueryClient();
   const { data: league } = useLeague(overrideHash);
   const { data: leagueMembers } = useLeagueMembers(overrideHash);
-  const { data: pendingMembers } = usePendingMembers(overrideHash);
+  const { data: pendingMembers } = usePendingMembers(
+    overrideHash,
+    leagueMembers?.loggedIn?.role !== 'Admin' && leagueMembers?.loggedIn?.role !== 'Owner'
+  );
 
   const router = useRouter();
   const sensors = useSensors(useSensor(PointerSensor));
