@@ -37,6 +37,10 @@ export default function LeagueCard({ league, member, currentSelection, refresh, 
               <span className='italic'>{currentSelection.fullName}</span>
               {currentSelection.isEliminated && <FlameKindling className='inline w-4 h-4 shrink-0 text-destructive' />}
             </div>
+          ) : league.status === 'Draft' ? (
+            <p className='text-sm text-left'>
+              <span className='font-bold text-muted-foreground'>Draft in progress</span>
+            </p>
           ) : (
             <p className='text-sm text-left'>
               <span className='font-bold text-muted-foreground'>Draft:</span> <span className='italic'>Yet to draft</span>

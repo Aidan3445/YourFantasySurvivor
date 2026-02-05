@@ -11,6 +11,8 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
       draftOrder: number[]
     };
 
+    console.log('Received draft order update request:', body);
+
     if (!body.draftOrder) {
       return NextResponse.json({ error: 'Missing draftOrder in request body' }, { status: 400 });
     }
