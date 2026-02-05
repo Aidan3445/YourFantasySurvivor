@@ -96,8 +96,11 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
 
           {/* Action Buttons */}
           <div className='flex gap-2 items-center'>
-            {editable && leagueMembers && leagueMembers.members.length > 1 && league?.status === 'Predraft' &&
-              <StartDraft startDraft={onDraftJoin} />}
+            {editable && leagueMembers && leagueMembers.members.length > 1
+              && league?.status === 'Predraft' && leagueSettings?.draftDate &&
+              leagueSettings.draftDate.getTime() > Date.now() && (
+                <StartDraft startDraft={onDraftJoin} />
+              )}
             {editable && <SetDraftDate overrideHash={overrideHash} />}
           </div>
         </CardHeader>
