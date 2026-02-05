@@ -7,7 +7,7 @@ import { baseEventPredictionRulesSchema, baseEventRulesSchema, shauhinModeSettin
 import { customEventRuleSchema } from '~/server/db/schema/customEvents';
 import { basePredictionRulesSchemaToObject } from '~/lib/utils';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
-import { leagueSettingsSchema } from '~/server/db/schema/leagues';
+import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { DEFAULT_SECONDARY_PICK_MULTIPLIER } from '~/lib/leagues';
 
 const DEFAULT_PICK_MULTIPLIER_PERCENTAGE = 100 * DEFAULT_SECONDARY_PICK_MULTIPLIER;
@@ -33,11 +33,12 @@ export default async function getLeagueRules(auth: VerifiedLeagueMemberAuth) {
         multiplier: leagueSettingsSchema.secondaryPickMultiplier,
       },
     })
-    .from(baseEventRulesSchema)
-    .leftJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, baseEventRulesSchema.leagueId))
-    .leftJoin(baseEventPredictionRulesSchema, eq(baseEventPredictionRulesSchema.leagueId, baseEventRulesSchema.leagueId))
-    .leftJoin(shauhinModeSettingsSchema, eq(shauhinModeSettingsSchema.leagueId, baseEventRulesSchema.leagueId))
-    .where(eq(baseEventRulesSchema.leagueId, auth.leagueId))
+    .from(leagueSchema)
+    .leftJoin(baseEventRulesSchema, eq(baseEventRulesSchema.leagueId, leagueSchema.leagueId))
+    .leftJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))
+    .leftJoin(baseEventPredictionRulesSchema, eq(baseEventPredictionRulesSchema.leagueId, leagueSchema.leagueId))
+    .leftJoin(shauhinModeSettingsSchema, eq(shauhinModeSettingsSchema.leagueId, leagueSchema.leagueId))
+    .where(eq(leagueSchema.leagueId, auth.leagueId))
     .then((rules) => ({
       ...rules[0],
       secondaryPick: {
