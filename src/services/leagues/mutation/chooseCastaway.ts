@@ -156,7 +156,6 @@ export default async function chooseCastawayLogic(
           eq(secondaryPickSchema.castawayId, castawayId),
           eq(secondaryPickSchema.episodeId, nextEpisode.episodeId)
         ));
-      console.log('Cleared secondary pick for member', auth.memberId, 'as it matched primary pick and canPickOwnSurvivor is false');
     }
 
     // Check if draft is complete
