@@ -24,7 +24,6 @@ export function usePendingMembers(overrideHash?: string, blockRequest?: boolean)
 
       const res = await fetch(`/api/leagues/${hash}/members/pending`);
       if (!res.ok) {
-        console.log('Failed to fetch pending members:', res.status, res.statusText);
         throw new Error('Failed to fetch leagueMembers data');
       }
       const { leagueMembers } = await res.json() as { leagueMembers: PendingLeagueMember[] };

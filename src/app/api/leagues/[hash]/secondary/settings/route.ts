@@ -8,7 +8,6 @@ import updateLeagueSettingsLogic from '~/services/leagues/mutation/updateLeagueS
 
 export async function PUT(request: NextRequest, context: LeagueRouteParams) {
   return withLeagueOwnerAuth(async (auth) => {
-    console.log('Updating secondary pick settings for league');
     const body = await request.json() as SecondaryPickSettings;
 
     if (!body) {
