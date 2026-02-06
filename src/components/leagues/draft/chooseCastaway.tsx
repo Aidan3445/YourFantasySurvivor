@@ -7,7 +7,6 @@ import { Form, FormControl, FormField, FormItem } from '~/components/common/form
 import { Button } from '~/components/common/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '~/components/common/select';
 import ColorRow from '~/components/shared/colorRow';
-import { getContrastingColor } from '@uiw/color-convert';
 import { type DraftDetails } from '~/types/leagues';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import chooseCastaway from '~/actions/chooseCastaway';
@@ -56,7 +55,7 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
               <FormItem className='w-full'>
                 <FormControl>
                   <Select onValueChange={field.onChange}>
-                    <SelectTrigger>
+                    <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
                       <SelectValue placeholder='Select castaway' />
                     </SelectTrigger>
                     <SelectContent className='z-50'>
@@ -69,21 +68,17 @@ export default function ChooseCastaway({ draftDetails, onDeck }: ChooseCastawayP
                                   key={castaway.castawayId}
                                   className='cursor-not-allowed'
                                   style={{ backgroundColor: member.color }}>
-                                  <span
-                                    className='flex items-center gap-1 font-bold'
-                                    style={{ color: getContrastingColor(member.color) }}>
-                                    <ColorRow
-                                      className='min-w-12 px-1 justify-center leading-tight font-normal'
-                                      color={tribe.tribeColor}>
-                                      {tribe.tribeName}
-                                    </ColorRow>
-                                    {castaway.fullName} ({member.displayName})
-                                  </span>
+                                  <ColorRow
+                                    className='min-w-20 w-fit justify-center leading-tight'
+                                    color={tribe.tribeColor}>
+                                    {tribe.tribeName}
+                                  </ColorRow>
+                                  {castaway.fullName} ({member.displayName})
                                 </SelectLabel> :
                                 <SelectItem key={castaway.fullName} value={`${castaway.castawayId}`}>
-                                  <span className='flex items-center gap-1 font-medium'>
+                                  <span className='flex items-center gap-1'>
                                     <ColorRow
-                                      className='min-w-12 px-1 justify-center leading-tight'
+                                      className='min-w-20 w-fit justify-center leading-tight'
                                       color={tribe.tribeColor}>
                                       {tribe.tribeName}
                                     </ColorRow>

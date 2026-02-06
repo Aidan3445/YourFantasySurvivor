@@ -12,7 +12,7 @@ import { Button } from '~/components/common/button';
 import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
 import { CustomEventInsertZod, type EventWithReferences, type CustomEventInsert } from '~/types/events';
 import { useEpisodes } from '~/hooks/seasons/useEpisodes';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import createCustomEvent from '~/actions/createCustomEvent';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEventOptions } from '~/hooks/seasons/enrich/useEventOptions';
@@ -209,7 +209,7 @@ export default function CreateCustomEvent() {
                       <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>References</FormLabel>
                       <FormControl>
                         <MultiSelect
-                          className='h-full rounded-xl pt-1 z-50'
+                          className='h-full pt-1 z-50'
                           disabled={!selectedEvent}
                           options={combinedReferenceOptions}
                           onValueChange={(value) =>

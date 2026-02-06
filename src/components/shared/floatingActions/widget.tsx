@@ -1,49 +1,27 @@
 'use client';
+
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Trophy, ListPlus, Users, X } from 'lucide-react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import JoinLeagueModal from '~/components/leagues/actions/league/join/modal';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/common/button';
-
-const DISMISS_STORAGE_KEY = 'floating-actions-dismissed-until';
-const DISMISS_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+import { useFloatingActionWidget } from '~/hooks/ui/useFloatingActionWidget';
 
 const DISMISS_ZONE = {
   width: 120,
   height: 120,
 };
 
-export function FloatingActionsWidget() {
+export default function FloatingActionsWidget() {
+  const { isVisible, dismiss } = useFloatingActionWidget();
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(true); // Start hidden to prevent flash
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isOverDismissZone, setIsOverDismissZone] = useState(false);
 
   const dragStartPos = useRef({ x: 0, y: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
-
-  // Check dismissal status on mount
-  useEffect(() => {
-    const dismissedUntil = localStorage.getItem(DISMISS_STORAGE_KEY);
-    if (dismissedUntil) {
-      const dismissedUntilTime = parseInt(dismissedUntil, 10);
-      if (Date.now() < dismissedUntilTime) {
-        setIsDismissed(true);
-        return;
-      } else {
-        localStorage.removeItem(DISMISS_STORAGE_KEY);
-      }
-    }
-    setIsDismissed(false);
-  }, []);
-
-  const dismissWidget = () => {
-    const dismissUntil = Date.now() + DISMISS_DURATION_MS;
-    localStorage.setItem(DISMISS_STORAGE_KEY, dismissUntil.toString());
-    setIsDismissed(true);
-  };
 
   const checkIfOverDismissZone = useCallback((clientX: number, clientY: number) => {
     const centerX = window.innerWidth / 2;
@@ -83,13 +61,13 @@ export function FloatingActionsWidget() {
     if (!isDragging) return;
 
     if (isOverDismissZone) {
-      dismissWidget();
+      dismiss();
     }
 
     setIsDragging(false);
     setDragOffset({ x: 0, y: 0 });
     setIsOverDismissZone(false);
-  }, [isDragging, isOverDismissZone]);
+  }, [isDragging, isOverDismissZone, dismiss]);
 
   // Mouse events
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -132,7 +110,7 @@ export function FloatingActionsWidget() {
     handleDragEnd();
   };
 
-  if (isDismissed) return null;
+  if (!isVisible) return null;
 
   return (
     <div className='fixed inset-0 pointer-events-none overflow-hidden z-50'>

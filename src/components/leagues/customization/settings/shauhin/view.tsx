@@ -15,7 +15,7 @@ import { Lock, LockOpen } from 'lucide-react';
 import { cn } from '~/lib/utils';
 import { type ShauhinModeSettings, ShauhinModeSettingsZod } from '~/types/leagues';
 import { ABS_MAX_EVENT_POINTS, defaultShauhinModeSettings, SHAUHIN_MODE_MAX_MAX_BETS_PER_WEEK, ShauhinModeTimings } from '~/lib/leagues';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
@@ -91,7 +91,7 @@ export default function ShauhinMode() {
           rel='noopener noreferrer'>
           video
         </a> that
-        <ColorRow color='#d05dbd' className='inline w-min px-0.5 ml-1 text-white!'>
+        <ColorRow color='#d05dbd' className='inline w-min ml-1'>
           Shauhin Davari
         </ColorRow>,
         from Survivor 48, posted, this twist allows you to bet points {'you\'ve'} earned

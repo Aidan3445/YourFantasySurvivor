@@ -19,6 +19,8 @@ import updateDraftOrder from '~/actions/updateDraftOrder';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { Card, CardHeader } from '~/components/common/card';
 import { Separator } from '~/components/common/separator';
+import { usePendingMembers } from '~/hooks/leagues/usePendingMembers';
+import Link from 'next/link';
 
 const SHUFFLE_DURATION = 500;
 const SHUFFLE_LOOPS = 4;
@@ -26,13 +28,18 @@ const SHUFFLE_LOOPS = 4;
 interface DraftOrderProps {
   overrideHash?: string;
   scrollHeight?: string;
+  goToSettings?: () => void;
   className?: string;
 }
 
-export default function DraftOrder({ overrideHash, scrollHeight, className }: DraftOrderProps) {
+export default function DraftOrder({ overrideHash, scrollHeight, goToSettings, className }: DraftOrderProps) {
   const queryClient = useQueryClient();
   const { data: league } = useLeague(overrideHash);
   const { data: leagueMembers } = useLeagueMembers(overrideHash);
+  const { data: pendingMembers } = usePendingMembers(
+    overrideHash,
+    leagueMembers?.loggedIn?.role !== 'Admin' && leagueMembers?.loggedIn?.role !== 'Owner'
+  );
 
   const router = useRouter();
   const sensors = useSensors(useSensor(PointerSensor));
@@ -173,6 +180,31 @@ export default function DraftOrder({ overrideHash, scrollHeight, className }: Dr
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <ScrollArea className={cn('flex flex-col', scrollHeight && `overflow-y-auto ${scrollHeight}`)}>
             <div className='py-1 px-4 pb-4 space-y-2'>
+              {leagueMembers.loggedIn?.role !== 'Member' && pendingMembers && pendingMembers.members.length > 0 && (
+                <ColorRow
+                  color='#D4AC2B'
+                  className='rounded-lg border-2 border-dashed'>
+                  <span className='flex items-center gap-3 w-full text-inherit'>
+                    <span
+                      className='inline-flex items-center justify-center w-8 h-8 rounded-md font-black text-sm shrink-0'
+                      style={{
+                        backgroundColor: '#D4AC2B40',
+                        border: '2px solid #D4AC2B66'
+                      }}>
+                      !
+                    </span>
+                    <span className='text-xl font-bold text-inherit'>
+                      {pendingMembers.members.length} Pending
+                    </span>
+                    <Link
+                      href={league ? `/leagues/${league.hash}/predraft#manage-members` : '#'}
+                      onClick={goToSettings}
+                      className='ml-auto hover:underline font-medium text-inherit hover:text-primary'>
+                      Go to league settings to manage
+                    </Link>
+                  </span>
+                </ColorRow>
+              )}
               {order.map((member, index) => {
                 return (
                   <SortableItem

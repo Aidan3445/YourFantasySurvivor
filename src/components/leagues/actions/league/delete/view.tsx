@@ -36,8 +36,8 @@ export default function DeleteLeague() {
         alert('Failed to delete league. Please try again later.');
         return;
       }
-      await queryClient.invalidateQueries({ queryKey: ['league', league.hash] });
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
+      queryClient.removeQueries({ queryKey: ['league', league.hash] });
       router.push('/leagues');
       alert(`League ${league.name} has been deleted.`);
     }
@@ -82,8 +82,7 @@ export default function DeleteLeague() {
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+              )} />
             <Button
               type='submit'
               className='mt-auto font-bold uppercase text-xs tracking-wider'

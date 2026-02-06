@@ -131,7 +131,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
         </CardHeader>
 
         {/* Scoreboard List */}
-        <ScrollArea className='max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3rem-var(--sidebar-width))]'>
+        <ScrollArea className='max-w-[calc(100vw-2.25rem)] md:max-w-[calc(100vw-3.35rem-var(--sidebar-width))]'>
           <Table>
             <TableCaption className='sr-only'>Castaway Scoreboard Table</TableCaption>
             <TableHeader>

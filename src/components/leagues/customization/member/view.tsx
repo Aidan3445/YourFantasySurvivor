@@ -13,6 +13,7 @@ import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateMemberDetails from '~/actions/updateMemberDetails';
 import { Card } from '~/components/common/card';
+import LeaveLeague from '~/components/leagues/customization/member/leaveLeague';
 
 interface MemberEditFormProps {
   className?: string;
@@ -65,12 +66,17 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
           <LeagueMemberFields
             memberColors={leagueMembers?.members.map(m => m.color) ?? []}
             currentColor={leagueMembers?.loggedIn?.color} />
-          <Button
-            disabled={!reactForm.formState.isDirty}
-            type='submit'
-            className='w-full font-bold uppercase text-xs tracking-wider'>
-            Save
-          </Button>
+          <div className='flex gap-4'>
+            <Button
+              disabled={!reactForm.formState.isDirty}
+              type='submit'
+              className='flex-1 font-bold uppercase text-xs tracking-wider'>
+              Save
+            </Button>
+            {league?.status !== 'Inactive' && (
+              <LeaveLeague member={leagueMembers?.loggedIn} />
+            )}
+          </div>
         </form>
       </Form>
     </Card>

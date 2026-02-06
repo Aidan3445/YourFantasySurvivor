@@ -7,6 +7,7 @@ import CastawaysView from '~/components/seasons/castaways/view';
 import { useParams } from 'next/navigation';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { type SeasonsDataQuery } from '~/types/seasons';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 export default function DraftPage() {
   const params = useParams();
@@ -25,11 +26,10 @@ export default function DraftPage() {
             <DraftTracker hash={hash} />
           </TabsContent>
           <TabsContent value='castaways'>
-            <CastawaysView
-              seasonData={data as SeasonsDataQuery}
-              leagueData={data} />
+            <CastawaysView seasonData={data as SeasonsDataQuery} leagueData={data} />
           </TabsContent>
         </div>
+        <Spacer />
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea>
     </Tabs>

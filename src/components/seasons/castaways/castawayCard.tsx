@@ -45,7 +45,8 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes, member 
           </span>
           {member && (
             <ColorRow
-              className='absolute -right-1 top-1 rotate-30 text-xs font-bold leading-tight p-0 px-1.5 z-50 border-2'
+              className='absolute -right-1 top-1 rotate-30 text-xs font-bold leading-tight z-50 border-2 w-min'
+              opaque
               color={member.color}>
               {member.displayName}
             </ColorRow>

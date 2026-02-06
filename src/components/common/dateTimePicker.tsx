@@ -46,9 +46,18 @@ export function DateTimePicker({ value, onChange, rangeStart, rangeEnd }: DateTi
               selected={date}
               captionLayout='dropdown'
               onSelect={(date) => {
-                setDate(date);
-                if (date && onChange) onChange(date);
-                setOpen(false);
+                // set date, preserve time or set to noon if no time
+                if (date) {
+                  const newDate = new Date(date);
+                  if (value) {
+                    newDate.setHours(value.getHours(), value.getMinutes(), value.getSeconds());
+                  } else {
+                    newDate.setHours(12, 0, 0);
+                  }
+                  setDate(newDate);
+                  if (onChange) onChange(newDate);
+                  setOpen(false);
+                }
               }}
               disabled={(checkDate) => {
                 if (rangeStart && checkDate < rangeStart) {

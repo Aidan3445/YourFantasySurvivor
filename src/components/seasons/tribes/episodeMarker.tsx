@@ -73,7 +73,7 @@ export default function EpisodeMarker({
                     {tribesMembers.map(castaway => (
                       <ColorRow
                         key={castaway.castawayId}
-                        className='gap-2 px-2 py-1 h-8 border-2 font-medium'
+                        className='gap-2 min-h-8 border-2 font-medium'
                         color={tribe.tribeColor}>
                         <CastawayPopover castaway={castaway}>
                           <span className='leading-none text-sm cursor-pointer'>

@@ -148,6 +148,7 @@ export function useEnrichPredictions(
           type: prediction.referenceType,
           id: prediction.referenceId,
           name: '',
+          shortName: '',
           color: ''
         }
       };
@@ -170,6 +171,7 @@ export function useEnrichPredictions(
         entry.reference = {
           ...entry.reference,
           name: castaway.fullName,
+          shortName: castaway.shortName,
           color: castawayWithTribe.tribe?.color ?? '#AAAAAA'
         };
 
@@ -180,6 +182,7 @@ export function useEnrichPredictions(
         entry.reference = {
           ...entry.reference,
           name: tribe.tribeName,
+          shortName: tribe.tribeName,
           color: tribe.tribeColor
         };
       }
@@ -196,3 +199,4 @@ export function useEnrichPredictions(
 
   return enrichedPredictions;
 }
+

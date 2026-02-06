@@ -56,7 +56,8 @@ export default function SurvivalSettings() {
     }
   });
 
-  const disabled = (!!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner') || league?.status === 'Inactive';
+  const disabled = (!!leagueMembers && leagueMembers.loggedIn?.role !== 'Owner')
+    || league?.status === 'Inactive';
 
   return (
     <article className='p-3 bg-card rounded-lg w-full border-2 border-primary/20 shadow-lg shadow-primary/10 relative'>

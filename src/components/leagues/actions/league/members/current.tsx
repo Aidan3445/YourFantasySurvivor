@@ -14,7 +14,7 @@ export interface CurrentMemberProps {
 export default function CurrentMember({ member, loggedInMember }: CurrentMemberProps) {
   return (
     <ColorRow
-      className='w-full mb-1'
+      className='w-full'
       color={member.color}>
       <span className='w-full grid grid-cols-2'>
         <p className='text-sm'>{member.displayName}</p>
@@ -24,7 +24,7 @@ export default function CurrentMember({ member, loggedInMember }: CurrentMemberP
           <RemoveMember member={member} loggedInMember={loggedInMember} />
         </span>
       </span>
-    </ColorRow >
+    </ColorRow>
   );
 }
 

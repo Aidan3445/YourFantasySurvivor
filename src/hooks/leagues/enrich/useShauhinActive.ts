@@ -1,6 +1,6 @@
 import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
 import { useLeague } from '~/hooks/leagues/useLeague';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useMemo } from 'react';
 
 /**

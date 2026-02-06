@@ -35,7 +35,7 @@ export default function SkipMember({ hash, member, leagueMembers }: SkipMemberPr
       await updateDraftOrder(hash, draftOrder.map(m => m.memberId));
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
       alert('Successfully skipped member');
-    } catch (error) {
+    } catch {
       alert('Failed to skip member');
     }
   };
@@ -51,7 +51,7 @@ export default function SkipMember({ hash, member, leagueMembers }: SkipMemberPr
       await updateDraftOrder(hash, draftOrder.map(m => m.memberId));
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', hash] });
       alert('Successfully sent member to back of the draft order');
-    } catch (error) {
+    } catch {
       alert('Failed to send member to back of the draft order');
     }
   };
@@ -59,12 +59,12 @@ export default function SkipMember({ hash, member, leagueMembers }: SkipMemberPr
   return (
     <span className='flex items-center gap-2 flex-wrap py-1 justify-end'>
       <form action={handleSkip}>
-        <Button type='submit' variant='secondary' size='sm' className='w-full font-bold uppercase tracking-wider text-xs'>
+        <Button type='submit' variant='secondary' size='sm' className='w-full font-bold uppercase tracking-wider text-xs h-min p-1'>
           SKIP
         </Button>
       </form>
       <form action={handleSendToBack}>
-        <Button type='submit' variant='destructive' size='sm' className='font-bold uppercase tracking-wider text-xs'>
+        <Button type='submit' variant='destructive' size='sm' className='font-bold uppercase tracking-wider text-xs h-min p-1'>
           SEND TO BACK
         </Button>
       </form>

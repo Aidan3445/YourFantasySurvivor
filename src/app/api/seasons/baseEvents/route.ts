@@ -26,14 +26,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(request: NextRequest) {
   return await withSystemAdminAuth(async () => {
-    const baseEvent = await request.json() as BaseEventInsert;
+    const { event } = await request.json() as { event: BaseEventInsert };
 
-    if (!baseEvent) {
+    if (!event) {
       return NextResponse.json({ error: 'Missing baseEvent in request body' }, { status: 400 });
     }
 
     try {
-      const newEventId = await createBaseEventLogic(baseEvent);
+      const newEventId = await createBaseEventLogic(event);
       return NextResponse.json({ newEventId }, { status: 201 });
     } catch (error) {
       console.error('Failed to create base event', error);
@@ -64,8 +64,8 @@ export async function PUT(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    const { baseEventId } = await request.json() as { baseEventId: number };
-    const success = await requireSystemAdminAuth(deleteBaseEventLogic)(baseEventId);
+    const { eventId } = await request.json() as { eventId: number };
+    const success = await requireSystemAdminAuth(deleteBaseEventLogic)(eventId);
     return NextResponse.json(success, { status: 200 });
   } catch (error) {
     let message: string;

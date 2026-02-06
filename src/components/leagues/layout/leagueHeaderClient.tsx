@@ -10,12 +10,13 @@ interface LeagueHeaderClientProps {
   name: string;
   season: string;
   status: LeagueStatus;
-  joinMode?: {
-    isProtected: boolean;
+  mode?: {
+    isProtected?: boolean;
+    isPending?: boolean;
   };
 }
 
-export default function LeagueHeaderClient({ name, season, status, joinMode }: LeagueHeaderClientProps) {
+export default function LeagueHeaderClient({ name, season, status, mode }: LeagueHeaderClientProps) {
   const measureRef = useRef<HTMLHeadingElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -46,8 +47,12 @@ export default function LeagueHeaderClient({ name, season, status, joinMode }: L
   }, [animating]);
 
   const getSubtext = () => {
-    if (joinMode) {
-      return joinMode.isProtected
+    if (mode) {
+      if (mode.isPending) {
+        return 'Your request to join this league is pending approval';
+      }
+
+      return mode.isProtected
         ? 'Request to join this league by customizing your profile below'
         : 'Join this league by customizing your profile below';
     }
@@ -66,7 +71,7 @@ export default function LeagueHeaderClient({ name, season, status, joinMode }: L
         <h1
           ref={measureRef}
           className='absolute invisible whitespace-nowrap text-3xl md:text-4xl font-black uppercase tracking-tight mx-2'>
-          {joinMode ? `Join ${name}` : name}
+          {mode && !mode.isPending ? `Join ${name}` : name}
         </h1>
 
         {needsMarquee ? (
@@ -77,12 +82,12 @@ export default function LeagueHeaderClient({ name, season, status, joinMode }: L
             gradient={false}
             onCycleComplete={() => setAnimating(false)}>
             <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight leading-tight whitespace-nowrap mr-16'>
-              {joinMode ? `Join ${name}` : name}
+              {mode && !mode.isPending ? `Join ${name}` : name}
             </h1>
           </Marquee>
         ) : (
           <h1 className='text-3xl md:text-4xl font-black uppercase tracking-tight text-center leading-tight whitespace-nowrap mx-2'>
-            {joinMode ? `Join ${name}` : name}
+            {mode && !mode.isPending ? `Join ${name}` : name}
           </h1>
         )}
 
@@ -95,7 +100,7 @@ export default function LeagueHeaderClient({ name, season, status, joinMode }: L
             {season}
           </h3>
         </Link>
-        {!joinMode && status && (
+        {!mode && status && (
           <>
             <span className='text-muted-foreground'>•</span>
             <span className='text-nowrap leading-none text-sm font-bold uppercase tracking-wider text-muted-foreground'>

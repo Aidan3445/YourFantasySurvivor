@@ -40,11 +40,15 @@ export default async function updateLeagueSettingsLogic(
 
   // Transaction to update the league settings
   return await db.transaction(async (trx) => {
+    const {secondaryPickMultiplier, ...rest} = update;
     await trx
       .update(leagueSettingsSchema)
       // we need the date === null because we want to allow setting it to null
       .set({
-        ...update,
+        ...rest,
+        secondaryPickMultiplier: secondaryPickMultiplier
+          ? secondaryPickMultiplier * 100
+          : undefined,
         draftDate: safeDraftDate === null
           ? null
           : safeDraftDate?.toUTCString()

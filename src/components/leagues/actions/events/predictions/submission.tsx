@@ -149,7 +149,8 @@ export function BaseSubmissionCard({
                       value={field.value ?
                         String(field.value) :
                         prediction.predictionMade ? String(prediction.predictionMade.referenceId) : ''}>
-                      <SelectTrigger className={cn(reactForm.formState.isDirty &&
+                      <SelectTrigger className={cn('py-0 [&>span]:line-clamp-none',
+                        reactForm.formState.isDirty &&
                         field.value !== prediction?.predictionMade?.referenceId &&
                         'bg-amber-400')}>
                         <SelectValue placeholder='Select prediction' />
@@ -167,7 +168,7 @@ export function BaseSubmissionCard({
                                   referenceType === 'Tribe' ?
                                     <SelectItem key={vals.id} value={`${vals.id}`}>
                                       <ColorRow
-                                        className='w-20 px-0 justify-center leading-tight'
+                                        className='min-w-20 w-fit justify-center leading-tight'
                                         color={vals.color}>
                                         {name}
                                       </ColorRow>
@@ -175,7 +176,7 @@ export function BaseSubmissionCard({
                                     <SelectItem key={vals.id} value={`${vals.id}`}>
                                       <span className='flex items-center gap-1'>
                                         <ColorRow
-                                          className='w-20 px-0 justify-center leading-tight'
+                                          className='min-w-20 w-fit justify-center leading-tight'
                                           color={vals.color}>
                                           {vals.tribeName}
                                         </ColorRow>

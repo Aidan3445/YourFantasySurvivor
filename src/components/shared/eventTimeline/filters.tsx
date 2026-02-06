@@ -1,8 +1,7 @@
 'use client';
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
-import { Select } from '@radix-ui/react-select';
-import { SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Label } from '~/components/common/label';
 import { MultiSelect } from '~/components/common/multiSelect';

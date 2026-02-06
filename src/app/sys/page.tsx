@@ -18,8 +18,7 @@ export default async function SystemPage() {
           'use server';
           // Call server action to reset cache
           await resetServersideCache();
-        }}
-      >
+        }}>
         Reset Cache
       </Button>
     </main>

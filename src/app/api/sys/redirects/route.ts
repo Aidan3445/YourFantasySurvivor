@@ -2,6 +2,13 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { withSystemAdminAuth } from '~/lib/apiMiddleware';
 import { toggleSysAdminRedirectsLogic } from '~/services/users/mutation/sysAdminRedirects';
 
+export async function GET(_: NextRequest) {
+  return await withSystemAdminAuth(async (userId) => {
+    // Acting as an API route to get sys admin status
+    return NextResponse.json({ userId }, { status: 200 });
+  })();
+}
+
 export async function POST(req: NextRequest) {
   return await withSystemAdminAuth(async (userId) => {
     try {
