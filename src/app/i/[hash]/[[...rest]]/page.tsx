@@ -41,13 +41,13 @@ export async function generateMetadata(
 export default async function LeagueJoinPage({ searchParams, params }: JoinPageProps) {
   const [{ hash }, query] = await Promise.all([params, searchParams]);
   const { userId, memberId } = await leagueMemberAuth(hash);
-  const league = await getPublicLeague(hash);
+  const league = await getPublicLeague(hash, userId);
   const { status, usedColors, isProtected } = league ?? {};
 
   if (!userId) {
     return (
       <div className='h-[calc(100svh-1rem)]'>
-        <LeagueHeader league={league} joinMode={{ isProtected: league?.isProtected ?? false }} />
+        <LeagueHeader league={league} mode={{ isProtected: league?.isProtected ?? false }} />
         <div className='flex flex-col items-center justify-center gap-4 p-8'>
           <div className='bg-card rounded-lg shadow-md shadow-primary/10 border-2 border-primary/20 p-6 max-w-md text-center space-y-4'>
             <p className='text-muted-foreground text-base'>
@@ -63,7 +63,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
     );
   }
 
-  if (memberId) {
+  if (memberId || league?.isPending) {
     redirect(`/leagues/${hash}`);
   }
 
@@ -112,7 +112,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
 
   return (
     <div className='h-[calc(100svh-1rem)]'>
-      <LeagueHeader league={league} joinMode={{ isProtected: isProtected ?? false }} />
+      <LeagueHeader league={league} mode={{ isProtected: isProtected ?? false }} />
       <div className='flex flex-col items-center justify-center gap-4 p-4 md:p-8'>
         <JoinLeagueForm hash={hash} colors={usedColors ?? []} isProtected={isProtected ?? false} />
       </div>

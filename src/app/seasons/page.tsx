@@ -16,10 +16,11 @@ import {
   SelectValue,
 } from '~/components/common/select';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 export default function SeasonsPage() {
   const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
-  const [selectedTab, setSelectedTab] = useState('castaways');
+  const [selectedTab, setSelectedTab] = useState('events');
   const { data: seasons } = useSeasons(true);
   const { data: seasonData } = useSeasonsData(true, selectedSeasonId ?? undefined);
   const season = seasonData?.[0];
@@ -71,7 +72,7 @@ export default function SeasonsPage() {
         </TabsList>
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-13.5rem)] h-[calc(100svh-20rem-var(--navbar-height))]'>
+      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-13.5rem)] h-[calc(100svh-12rem-var(--navbar-height))]'>
         {selectedSeasonId ? (
           season ? (
             <div className='pb-4'>
@@ -103,6 +104,7 @@ export default function SeasonsPage() {
             <p className='text-muted-foreground'>Select a season to get started</p>
           </div>
         )}
+        <Spacer />
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea>
     </Tabs>

@@ -1,5 +1,5 @@
 import { useEnrichedTribeMembers } from '~/hooks/seasons/enrich/useEnrichedTribeMembers';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
 import { useEffect, useMemo, useState } from 'react';
@@ -9,7 +9,6 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { type Castaway, type EnrichedCastaway } from '~/types/castaways';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
-import { useRouter } from 'next/navigation';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { type DraftDetails } from '~/types/leagues';
 import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
@@ -157,7 +156,6 @@ export function useLeagueActionDetails(overrideHash?: string) {
     return details;
   }, [league, rules, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminationLookup]);
 
-  const router = useRouter();
   const [dialogOpen, setDialogOpen] = useState<boolean>();
 
   const { onTheClock, onDeck, onTheClockIndex } = useMemo(() => {
@@ -200,12 +198,6 @@ export function useLeagueActionDetails(overrideHash?: string) {
   useEffect(() => {
     setDialogOpen(undefined);
   }, [leagueMembers?.loggedIn?.draftOrder]);
-
-  useEffect(() => {
-    if (league && onTheClockIndex !== null && (onTheClockIndex === -1 || league.status !== 'Draft')) {
-      router.push(`/leagues/${league.hash}`);
-    }
-  }, [onTheClockIndex, league?.status, league?.hash, router, league]);
 
   const predictionRuleCount = useMemo(() => {
     if (!rules) return 0;
@@ -264,6 +256,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
     actionDetails,
     membersWithPicks,
     onTheClock,
+    onTheClockIndex,
     onDeck,
     leagueMembers,
     rules: rulesBasedOnTiming,

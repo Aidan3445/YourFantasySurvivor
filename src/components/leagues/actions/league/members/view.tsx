@@ -8,9 +8,10 @@ import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { usePendingMembers } from '~/hooks/leagues/usePendingMembers';
 import PendingMember from '~/components/leagues/actions/league/members/pending';
 import { Circle } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
+import { Separator } from '~/components/common/separator';
 
-export default function ManageMembers() {
+const ManageMembers = forwardRef<HTMLDivElement>(function ManageMembers(_props, ref) {
   const { data: leagueMembers } = useLeagueMembers();
   const { data: pendingMembers } = usePendingMembers();
   const { data: leagueSettings } = useLeagueSettings();
@@ -28,7 +29,10 @@ export default function ManageMembers() {
   }
 
   return (
-    <div className='flex flex-col gap-4 bg-card justify-between rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex-1 sm:min-w-sm min-h-0 overflow-hidden'>
+    <div
+      id='manage-members'
+      ref={ref}
+      className='flex flex-col gap-4 bg-card justify-between rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10 flex-1 sm:min-w-sm min-h-0 overflow-hidden'>
       <div className='flex items-center gap-3 h-8 px-4 mt-4'>
         <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
         <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
@@ -78,16 +82,22 @@ export default function ManageMembers() {
               </ul>
             </div>
             <ScrollArea className='flex-1 min-h-0 max-h-74'>
-              <div className='p-4 pb-0'>
-                {leagueMembers?.members
-                  .map(member => (
-                    <CurrentMember
-                      key={member.memberId}
-                      member={member}
-                      loggedInMember={leagueMembers.loggedIn} />
-                  ))}
+              <div className='px-4'>
+                <Separator className='bg-primary/20' />
+                <div className='py-2 flex flex-col gap-1'>
+                  {leagueMembers?.members
+                    .map(member => (
+                      member.loggedIn
+                        ? null
+                        : (
+                          <CurrentMember
+                            key={member.memberId}
+                            member={member}
+                            loggedInMember={leagueMembers.loggedIn} />
+                        )))}
+                </div>
+                <ScrollBar orientation='vertical' />
               </div>
-              <ScrollBar orientation='vertical' />
             </ScrollArea>
           </div>
         </TabsContent>
@@ -125,4 +135,6 @@ export default function ManageMembers() {
       </Tabs>
     </div>
   );
-}
+});
+
+export default ManageMembers;

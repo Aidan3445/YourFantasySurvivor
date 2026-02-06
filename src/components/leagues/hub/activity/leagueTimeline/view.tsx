@@ -6,7 +6,6 @@ import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 interface LeagueTimelineProps {
   initialSeasonData: SeasonsDataQuery;
-  hideMemberFilter?: boolean;
 }
 
 /**
@@ -14,13 +13,12 @@ interface LeagueTimelineProps {
  * Use this component on league routes where league context is available.
  * For non-league contexts (like seasons page), use EventTimeline directly.
  */
-export default function LeagueTimeline({ initialSeasonData, hideMemberFilter = false }: LeagueTimelineProps) {
+export default function LeagueTimeline({ initialSeasonData }: LeagueTimelineProps) {
   const data = useLeagueData();
 
   return (
     <EventTimeline
       seasonData={(data?.episodes ? data : initialSeasonData) as SeasonsDataQuery}
-      leagueData={data}
-      hideMemberFilter={hideMemberFilter} />
+      leagueData={data} />
   );
 }

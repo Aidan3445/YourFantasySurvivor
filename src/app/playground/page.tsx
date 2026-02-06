@@ -23,6 +23,7 @@ import {
 } from '~/components/common/select';
 import { useSeasons } from '~/hooks/seasons/useSeasons';
 import { RotateCcw } from 'lucide-react';
+import Spacer from '~/components/shared/floatingActions/spacer';
 
 const formSchema = z.object({
   baseEventRules: BaseEventRulesZod,
@@ -82,8 +83,8 @@ export default function PlaygroundPage() {
         )}
       </div>
 
-      <ScrollArea className='overflow-y-visible px-4 md:h-[calc(100svh-11.5rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
-        <div className='flex flex-col gap-4 mt-2 mb-4'>
+      <ScrollArea className='overflow-y-visible md:h-[calc(100svh-11.5rem)] h-[calc(100svh-10rem-var(--navbar-height))]'>
+        <div className='p-4 space-y-4'>
           <Form {...reactForm}>
             <form className='p-4 bg-card rounded-lg shadow-lg shadow-primary/10 border-2 border-primary/20'>
               <span className='grid lg:grid-cols-3 gap-2'>
@@ -114,6 +115,7 @@ export default function PlaygroundPage() {
             scoreData={[season!]}
             overrideBaseRules={BaseEventRulesZod.parse(reactForm.watch('baseEventRules'))} />
         </div>
+        <Spacer />
         <ScrollBar className='pb-4 pt-2' />
       </ScrollArea>
     </div>

@@ -32,5 +32,5 @@ async function fetchTribes(seasonId: number) {
     .where(or(
       eq(tribeSchema.seasonId, seasonId),
       isNull(tribeSchema.seasonId)))
-    .orderBy(asc(tribeSchema.tribeName)) as Promise<Tribe[]>;
+    .orderBy(asc(tribeSchema.created_at)) as Promise<Tribe[]>;
 }

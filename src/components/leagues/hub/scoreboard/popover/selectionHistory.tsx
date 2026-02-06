@@ -48,7 +48,7 @@ export default function SelectionHistory({ selectionList, secondaryPickList }: S
           {condensedTimeline.map(({ castaway, start, end }, index) => (
             <span key={index} className='grid col-span-2 grid-cols-subgrid'>
               <ColorRow
-                className='px-2 justify-center font-medium text-sm'
+                className='justify-center font-medium text-sm'
                 color={castaway.tribe?.color ?? '#AAAAAA'}>
                 {castaway.fullName}
               </ColorRow>
@@ -68,7 +68,7 @@ export default function SelectionHistory({ selectionList, secondaryPickList }: S
               {secondaryPickList.slice(1).map((castaway, index) => (
                 <span key={index} className='grid col-span-2 grid-cols-subgrid'>
                   <ColorRow
-                    className='px-2 justify-center font-medium text-sm'
+                    className='justify-center font-medium text-sm'
                     color={castaway?.tribe?.color ?? '#AAAAAA'}>
                     {castaway?.fullName ?? 'No Pick'}
                   </ColorRow>

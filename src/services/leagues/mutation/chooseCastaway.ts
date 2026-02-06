@@ -2,8 +2,8 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { and, eq, inArray, count, gte, gt, not } from 'drizzle-orm';
-import { leagueSchema } from '~/server/db/schema/leagues';
-import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
+import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
+import { leagueMemberSchema, secondaryPickSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
@@ -22,7 +22,9 @@ export default async function chooseCastawayLogic(
   auth: VerifiedLeagueMemberAuth,
   castawayId: number,
 ) {
-  if (auth.status === 'Inactive') throw new Error('League is inactive');
+  if (auth.status === 'Inactive' || auth.status === 'Predraft') {
+    throw new Error('League is not active');
+  }
 
   return await db.transaction(async (trx) => {
     // Validate that we are not within the 48 hour priority window, with league members eliminated
@@ -39,7 +41,7 @@ export default async function chooseCastawayLogic(
       .from(baseEventReferenceSchema)
       .innerJoin(baseEventSchema, and(
         eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
-        inArray(baseEventSchema.eventName, EliminationEventNames)
+        inArray(baseEventSchema.eventName, [...EliminationEventNames])
       ))
       .innerJoin(episodeSchema, eq(baseEventSchema.episodeId, episodeSchema.episodeId))
       .innerJoin(selectionUpdateSchema, eq(selectionUpdateSchema.castawayId, baseEventReferenceSchema.referenceId))
@@ -74,8 +76,10 @@ export default async function chooseCastawayLogic(
       .select({
         status: leagueSchema.status,
         seasonId: leagueSchema.seasonId,
+        canPickOwnSurvivor: leagueSettingsSchema.secondaryPickCanPickOwn,
       })
       .from(leagueSchema)
+      .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))
       .where(eq(leagueSchema.leagueId, auth.leagueId))
       .then(res => res[0]);
 
@@ -92,7 +96,7 @@ export default async function chooseCastawayLogic(
       .from(baseEventReferenceSchema)
       .innerJoin(baseEventSchema, and(
         eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
-        inArray(baseEventSchema.eventName, EliminationEventNames)
+        inArray(baseEventSchema.eventName, [...EliminationEventNames])
       ))
       .where(and(
         eq(baseEventReferenceSchema.referenceId, castawayId),
@@ -141,6 +145,18 @@ export default async function chooseCastawayLogic(
         target: [selectionUpdateSchema.memberId, selectionUpdateSchema.episodeId],
         set: { castawayId },
       });
+
+    // Secondary pick must be cleared if they are the same as primary
+    // and canPickOwnSurvivor is false
+    if (!league.canPickOwnSurvivor) {
+      await trx
+        .delete(secondaryPickSchema)
+        .where(and(
+          eq(secondaryPickSchema.memberId, auth.memberId),
+          eq(secondaryPickSchema.castawayId, castawayId),
+          eq(secondaryPickSchema.episodeId, nextEpisode.episodeId)
+        ));
+    }
 
     // Check if draft is complete
     if (isDraft) {

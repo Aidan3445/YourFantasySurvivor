@@ -6,7 +6,7 @@ import { withLeagueAdminAuth } from '~/lib/apiMiddleware';
 import getPendingMembers from '~/services/leagues/query/pendingMembers';
 import admitMemberLogic from '~/services/leagues/mutation/admitMember';
 
-export async function GET(_: NextRequest, context: LeagueRouteParams) {
+export async function GET(r: NextRequest, context: LeagueRouteParams) {
   return withLeagueAdminAuth(async (auth) => {
     try {
       const pendingMembers = await getPendingMembers(auth);

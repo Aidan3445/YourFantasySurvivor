@@ -44,7 +44,7 @@ export default function NoActiveLeagues({ inactiveLeagues }: NoActiveLeaguesProp
         <Separator className='bg-primary/20' />
       </CardHeader>
 
-      <CardContent className='px-0 mb-8 max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3rem-var(--sidebar-width))]'>
+      <CardContent className='px-0 mb-8 max-w-[calc(100vw-2rem)] md:max-w-[calc(100vw-3.35rem-var(--sidebar-width))]'>
         {inactiveLeagues.length === 0 ? (
           <div className='text-center py-12'>
             <div className='inline-flex p-6 bg-primary/10 rounded-2xl mb-6'>
@@ -83,8 +83,8 @@ export default function NoActiveLeagues({ inactiveLeagues }: NoActiveLeaguesProp
                           member={leagueDetails.member}
                           currentSelection={leagueDetails.currentSelection}
                           refresh
-                          className='bg-secondary/50 hover:bg-secondary/80'
-                        />
+                          seasonName={leagueDetails.league.season}
+                          className='bg-secondary/50 hover:bg-secondary/80' />
                       </CarouselItem>
                     ))
                   }

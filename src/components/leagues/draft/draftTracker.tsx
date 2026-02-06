@@ -8,18 +8,21 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle
 } from '~/components/common/alertDialog';
 import MakePredictions from '~/components/leagues/actions/events/predictions/view';
-import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
-import { useMemo } from 'react';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useLeagueActionDetails';
+import { useEffect, useMemo } from 'react';
 import SkipMember from '~/components/leagues/draft/skipMember';
-import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Card, CardContent, CardHeader } from '~/components/common/card';
+import { useRouter } from 'next/navigation';
 
 interface DraftTrackerProps {
   hash: string;
 }
 
 export default function DraftTracker({ hash }: DraftTrackerProps) {
+  const router = useRouter();
   const {
+    league,
+    onTheClockIndex,
     actionDetails,
     membersWithPicks,
     onTheClock,
@@ -32,7 +35,6 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
     dialogOpen,
     setDialogOpen,
   } = useLeagueActionDetails(hash);
-  const isMobile = useIsMobile();
 
   const castaways = useMemo(() =>
     Object.values(actionDetails ?? {})
@@ -40,6 +42,11 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
   const tribes = useMemo(() =>
     Object.values(actionDetails ?? {}).map(({ tribe }) => tribe), [actionDetails]);
 
+  useEffect(() => {
+    if (league && onTheClockIndex !== null && (onTheClockIndex === -1 || league.status !== 'Draft')) {
+      router.push(`/leagues/${league.hash}`);
+    }
+  }, [onTheClockIndex, league?.status, league?.hash, router, league]);
 
   return (
     <section className='w-full space-y-4'>
@@ -58,41 +65,48 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
             <ColorRow
               key={pick.memberId}
               className={onTheClock?.memberId === pick.memberId ?
-                'animate-pulse border-2 border-primary/40 shadow-md shadow-primary/20' : 'border-2 border-transparent'}
+                'border-2 border-primary/10' : 'border-2 border-transparent'}
               color={pick.color}
               loggedIn={leagueMembers.loggedIn?.displayName === pick.displayName}>
-              <h3
-                className='text-lg w-6 font-bold'
-                style={{ color: getContrastingColor(pick.color) }}>
-                {index + 1}
-              </h3>
-              <h2
-                className='text-3xl font-black text-nowrap'
-                style={{ color: getContrastingColor(pick.color) }}>
-                {pick.displayName}
-              </h2>
-              {onTheClock?.memberId === pick.memberId && (
-                <>
-                  {!isMobile && (
-                    <h3
-                      className='ml-auto inline-flex text-lg self-end animate-bounce font-bold uppercase tracking-wider'
-                      style={{ color: getContrastingColor(pick.color) }}>
-                      Picking...
-                    </h3>
-                  )}
-                  {leagueMembers.loggedIn?.role !== 'Member' &&
-                    pick.draftOrder < leagueMembers.members.length && (
-                      <SkipMember hash={hash} member={pick} leagueMembers={leagueMembers.members} />
+              <span className='flex items-center gap-3 w-full text-inherit'>
+                {/* Order Badge */}
+                <span
+                  className='inline-flex items-center justify-center w-8 h-8 rounded-md font-black text-sm shrink-0'
+                  style={{
+                    backgroundColor: `${pick.color}40`,
+                    border: `2px solid ${pick.color}66`
+                  }}>
+                  {index + 1}
+                </span>
+
+                {/* Name */}
+                <span className='text-xl font-bold text-inherit'>
+                  {pick.displayName}
+                </span>
+
+                {onTheClock?.memberId === pick.memberId ? (
+                  <>
+                    {leagueMembers.loggedIn?.role !== 'Member' &&
+                      pick.draftOrder < leagueMembers.members.length && (
+                        <SkipMember hash={hash} member={pick} leagueMembers={leagueMembers.members} />
+                      )}
+                    {(
+                      <h3
+                        className='ml-auto inline-flex text-lg self-end animate-bounce font-bold uppercase tracking-wider mr-2'
+                        style={{ color: getContrastingColor(pick.color) }}>
+                        Picking...
+                      </h3>
                     )}
-                </>
-              )}
-              {membersWithPicks?.find(m => m.member.memberId === pick.memberId) && (
-                <h3
-                  className='ml-auto text-lg text-wrap font-medium'
-                  style={{ color: getContrastingColor(pick.color) }}>
-                  {membersWithPicks.find(m => m.member.memberId === pick.memberId)?.castawayFullName}
-                </h3>
-              )}
+                  </>
+                ) : (
+                  membersWithPicks?.find(m => m.member.memberId === pick.memberId) && (
+                    <h3
+                      className='ml-auto text-lg text-wrap font-medium mr-2'
+                      style={{ color: getContrastingColor(pick.color) }}>
+                      {membersWithPicks.find(m => m.member.memberId === pick.memberId)?.castawayFullName}
+                    </h3>
+                  ))}
+              </span>
             </ColorRow>
           ))}
         </CardContent>

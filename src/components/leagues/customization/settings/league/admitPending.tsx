@@ -56,10 +56,13 @@ export default function ManagePendingMembers({ hash, open }: ManagePendingMember
       <AlertDialogPortal>
         <AlertDialogContent
           className='sm:w-160 w-96 flex flex-col animate-scale-in-fast'>
-          <AlertDialogTitle className='text-2xl'>
-            Manage Pending Members
-          </AlertDialogTitle>
-          <AlertDialogDescription>
+          <span className='flex items-center gap-3 mb-2'>
+            <span className='h-6 w-1 bg-primary rounded-full' />
+            <AlertDialogTitle className='text-2xl font-black uppercase tracking-tight'>
+              Manage Pending Members
+            </AlertDialogTitle>
+          </span>
+          <AlertDialogDescription className='text-base text-left'>
             Select which pending members to admit to the league:
           </AlertDialogDescription>
           <form className='space-y-2' action={() => handleSubmit()}>
@@ -87,11 +90,6 @@ export default function ManagePendingMembers({ hash, open }: ManagePendingMember
                 </label>
               </ColorRow>
             ))}
-            <p className='mr-auto text-xs text-muted-foreground'>
-              The default draft order will start from the losers of the previous season.
-              <br />
-              You can change this later.
-            </p>
             <div className='flex justify-end space-x-2'>
               <Button
                 variant='outline'

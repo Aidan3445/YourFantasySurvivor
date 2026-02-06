@@ -56,7 +56,7 @@ export default function AdminToggle({ member, loggedInMember }: CurrentMemberPro
         <AlertDialogDescription className='my-4'>
           Are you sure you want to {member.role === 'Admin' ? 'demote ' : 'promote '}
           <ColorRow
-            className='inline w-min px-1 leading-tight my-auto'
+            className='inline w-min leading-tight my-auto'
             color={member.color}>
             {member.displayName}
           </ColorRow>{' '}

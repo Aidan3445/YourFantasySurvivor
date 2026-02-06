@@ -21,7 +21,8 @@ export default function JoinLeagueModal({ children }: JoinLeagueAlertDialogProps
     // if the join code is in the URL, cut out everything but the code
     // http://localhost:1234/i/-rfJ3Ju9uNAsPBOy --> -rfJ3Ju9uNAsPBOy
     const urlMaybe = joinCode;
-    const match = /\/i\/([a-zA-Z0-9-_]+)/.exec(urlMaybe);
+    const match = /(?:\?hash=|\/i\/)([A-Za-z0-9-_]+)/.exec(urlMaybe);
+
     if (match) {
       setJoinCode(match[1] ?? joinCode);
     }
@@ -30,6 +31,7 @@ export default function JoinLeagueModal({ children }: JoinLeagueAlertDialogProps
   const handleJoinLeague = () => {
     if (joinCode.trim()) {
       router.push(`/i/${joinCode.trim()}`);
+      setIsJoinAlertDialogOpen(false);
     }
   };
 

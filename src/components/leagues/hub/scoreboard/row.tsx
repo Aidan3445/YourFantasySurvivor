@@ -87,7 +87,7 @@ export default function MemberRow({
       <TableCell className='text-nowrap px-3 py-3 w-0'>
         <div className='flex items-center gap-2'>
           <ColorRow
-            className='text-base md:text-lg font-bold transition-all px-1'
+            className='text-base md:text-lg font-bold transition-all'
             loggedIn={member.loggedIn}
             color={color}>
             {member.displayName}

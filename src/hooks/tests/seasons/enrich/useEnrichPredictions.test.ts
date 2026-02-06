@@ -34,7 +34,7 @@ vi.mock('~/hooks/seasons/useEliminations', () => ({
   useEliminations: vi.fn(),
 }));
 
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
 import { useTribes } from '~/hooks/seasons/useTribes';
 import { useCastaways } from '~/hooks/seasons/useCastaways';

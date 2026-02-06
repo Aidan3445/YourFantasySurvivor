@@ -48,7 +48,7 @@ export default function OwnerToggle({ member, loggedInMember }: CurrentMemberPro
       <AlertDialogTrigger disabled={!enabled}>
         <Crown
           className={cn('my-auto', !enabled && 'opacity-75 cursor-not-allowed text-muted-foreground')}
-          fill={member.role === 'Admin' ? '#000' : 'none'}
+          fill={member.role === 'Owner' ? '#000' : 'none'}
           size={18} />
       </AlertDialogTrigger>
       <AlertDialogContent>
@@ -58,7 +58,7 @@ export default function OwnerToggle({ member, loggedInMember }: CurrentMemberPro
         <AlertDialogDescription className='my-4'>
           Are you sure you want to make{' '}
           <ColorRow
-            className='inline w-min px-1 leading-tight my-auto'
+            className='inline w-min leading-tight my-auto'
             color={member.color}>
             {member.displayName}
           </ColorRow>{' '}
@@ -77,14 +77,16 @@ export default function OwnerToggle({ member, loggedInMember }: CurrentMemberPro
           </label>
         </span>
         <AlertDialogFooter>
-          <form action={() => handleToggleOwner()}>
-            <Button type='submit' disabled={!iUnderstand}>
-              Yes, {member.role === 'Owner' ? 'demote' : 'promote'}
-            </Button>
-          </form>
-          <AlertDialogCancel>
-            No, cancel
-          </AlertDialogCancel>
+          <div className='grid grid-cols-2 gap-2'>
+            <form action={() => handleToggleOwner()}>
+              <Button className='w-full' type='submit' disabled={!iUnderstand}>
+                Yes, {member.role === 'Owner' ? 'demote' : 'promote'}
+              </Button>
+            </form>
+            <AlertDialogCancel className='m-0'>
+              No, cancel
+            </AlertDialogCancel>
+          </div>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

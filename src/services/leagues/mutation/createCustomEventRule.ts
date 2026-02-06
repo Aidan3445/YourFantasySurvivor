@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { eq } from 'drizzle-orm';
+import { count, eq } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { type CustomEventRuleInsert } from '~/types/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
@@ -27,14 +27,24 @@ export default async function createLeagueEventRuleLogic(
       .select({
         leagueId: leagueSchema.leagueId,
         leagueStatus: leagueSchema.status,
+        // number of rules already in the league
+        ruleCount: count(customEventRuleSchema.customEventRuleId)
       })
       .from(leagueSchema)
+      .leftJoin(
+        customEventRuleSchema,
+        eq(leagueSchema.leagueId, customEventRuleSchema.leagueId)
+      )
+      .groupBy(leagueSchema.leagueId, leagueSchema.status)
       .where(eq(leagueSchema.leagueId, auth.leagueId))
       .then((res) => res[0]);
     if (!league) throw new Error('League not found');
 
     if (league.leagueStatus === 'Inactive')
       throw new Error('League rules cannot be created while the league is inactive');
+
+    if (league.ruleCount >= 6)
+      throw new Error('League cannot have more than 6 custom event rules');
 
     const newRule = await trx
       .insert(customEventRuleSchema)

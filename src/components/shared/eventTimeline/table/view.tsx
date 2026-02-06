@@ -271,9 +271,11 @@ export default function EpisodeEvents({
             <TableHead className='font-bold uppercase text-xs tracking-wider w-0'>
               Event
             </TableHead>
-            <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>
-              Points
-            </TableHead>
+            {leagueData && (
+              <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>
+                Points
+              </TableHead>
+            )}
             <TableHead className='font-bold uppercase text-xs tracking-wider'>
               {noTribes ? null : 'Tribes'}
             </TableHead>
@@ -310,6 +312,7 @@ export default function EpisodeEvents({
                   filteredPredictions={filteredPredictionsWithPredOnly[episode.episodeNumber] ?? []}
                   predictionEnrichmentEvents={enrichmentOnlyEvents}
                   edit={edit}
+                  noTribes={noTribes}
                   filters={filters}
                   noMembers={noMembers}
                   seasonData={seasonData}

@@ -38,7 +38,7 @@ export default function StreakRow({
               <Popover key={member.memberId}>
                 <PopoverTrigger>
                   <ColorRow
-                    className='w-fit text-sm font-medium leading-none px-1 gap-1'
+                    className='w-fit text-sm leading-none gap-1'
                     color={member.color}>
                     {member.displayName}
                     {shotUsedThisEpisode && shotStatus.status === 'saved' && (

@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
-import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useActionDetails';
+import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useLeagueActionDetails';
 import type { Castaway } from '~/types/castaways';
 import type { Tribe } from '~/types/tribes';
 import type { LeagueMember } from '~/types/leagueMembers';
@@ -58,7 +58,7 @@ vi.mock('~/hooks/seasons/useCastaways', () => ({
 }));
 
 import { useEnrichedTribeMembers } from '~/hooks/seasons/enrich/useEnrichedTribeMembers';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useLeague } from '~/hooks/leagues/useLeague';
 import { useKeyEpisodes } from '~/hooks/seasons/useKeyEpisodes';
 import { usePredictionTiming } from '~/hooks/leagues/usePredictionTiming';

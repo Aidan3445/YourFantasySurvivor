@@ -29,8 +29,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
   const router = useRouter();
 
   const editable = useMemo(() =>
-    leagueMembers?.loggedIn?.role === 'Owner' && leagueSettings &&
-    (leagueSettings.draftDate === null || Date.now() < leagueSettings.draftDate.getTime()),
+    leagueMembers?.loggedIn?.role === 'Owner' && leagueSettings,
     [leagueMembers, leagueSettings]);
 
   const onDraftJoin = async () => {
@@ -97,8 +96,11 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
 
           {/* Action Buttons */}
           <div className='flex gap-2 items-center'>
-            {editable && leagueMembers && leagueMembers.members.length > 1 && league?.status === 'Predraft' &&
-              <StartDraft startDraft={onDraftJoin} />}
+            {editable && leagueMembers && leagueMembers.members.length > 1
+              && league?.status === 'Predraft' && (
+                !leagueSettings?.draftDate || leagueSettings.draftDate.getTime() > Date.now()) && (
+                <StartDraft startDraft={onDraftJoin} />
+              )}
             {editable && <SetDraftDate overrideHash={overrideHash} />}
           </div>
         </CardHeader>
@@ -140,7 +142,7 @@ export function DraftCountdown({ overrideHash, className }: DraftCountdownProps)
             </Button>
           } />
         </CardContent>
-      </div >
-    </Card >
+      </div>
+    </Card>
   );
 }

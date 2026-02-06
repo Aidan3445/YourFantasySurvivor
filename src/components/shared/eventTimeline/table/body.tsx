@@ -1,6 +1,6 @@
 'use client';
 
-import { TableCell, TableRow } from '~/components/common/table';
+import { TableCell, TableHead, TableRow } from '~/components/common/table';
 import { type EventWithReferencesAndPredOnly, type EpisodeEventsProps, type PredictionAndPredOnly } from '~/components/shared/eventTimeline/table/view';
 import { type EnrichedEvent } from '~/types/events';
 import { useEnrichEvents } from '~/hooks/seasons/enrich/useEnrichEvents';
@@ -18,6 +18,7 @@ interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   predictionEnrichmentEvents?: EventWithReferencesAndPredOnly[];
   index: number;
   noMembers: boolean;
+  noTribes?: boolean;
 }
 
 export default function EpisodeEventsTableBody({
@@ -31,7 +32,8 @@ export default function EpisodeEventsTableBody({
   edit,
   filters,
   index,
-  noMembers
+  noMembers,
+  noTribes
 }: EpisodeEventsTableBodyProps) {
   const enrichedEvents = useEnrichEvents(seasonData, filteredEvents, leagueData);
   const enrichedMockEvents = useEnrichEvents(seasonData, mockEvents ?? [], leagueData);
@@ -101,37 +103,44 @@ export default function EpisodeEventsTableBody({
         <EventRow key={index} className='bg-yellow-500' event={mock} editCol={edit} isMock noMembers={noMembers} />
       )}
       {index > 0 &&
-        <TableRow className='bg-gray-100 hover:bg-gray-200 text-xs text-muted-foreground'>
-          {edit && <TableCell className='w-0'>
-            Edit
-          </TableCell>}
-          <TableCell className='text-nowrap'>
-            Official Events
-          </TableCell>
-          <TableCell className='text-center'>
-            Points
-          </TableCell>
-          <TableCell className='text-left'>
-            Tribes
-          </TableCell>
-          <TableCell className='text-right'>
+        <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-white/80 px-4 gap-4 items-center text-nowrap'>
+          {edit && (
+            <TableHead className='w-0 font-bold uppercase text-xs tracking-wider'>
+              Edit
+            </TableHead>
+          )}
+          <TableHead className='font-bold uppercase text-xs tracking-wider w-0'>
+            Event
+          </TableHead>
+          {leagueData && (
+            <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>
+              Points
+            </TableHead>
+          )}
+          <TableHead className='font-bold uppercase text-xs tracking-wider'>
+            {noTribes ? null : 'Tribes'}
+          </TableHead>
+          <TableHead className='text-left font-bold uppercase text-xs tracking-wider'>
             Castaways
-          </TableCell>
-          {!noMembers && <TableCell className='text-left'>
-            Members
-          </TableCell>}
-          <TableCell className='text-right'>
+          </TableHead>
+          {!noMembers && (
+            <TableHead className='w-full font-bold uppercase text-xs tracking-wider'>
+              Members
+            </TableHead>
+          )}
+          <TableHead className='font-bold uppercase text-xs tracking-wider'>
             Notes
-          </TableCell>
-        </TableRow>}
+          </TableHead>
+        </TableRow>
+      }
       {baseEvents
         .filter(event => !filteredEvents.some(fe => fe.eventId === event.eventId && fe.predOnly))
         .map((event, index) => (
-          <EventRow key={index} event={event} editCol={edit} noMembers={noMembers} />
+          <EventRow key={index} event={event} editCol={edit} noMembers={noMembers} noPoints={!leagueData} />
         ))}
       {customEvents.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
-          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center'>
+          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center font-bold uppercases tracking-wider'>
             Custom Events
           </TableCell>
         </TableRow>}
@@ -142,7 +151,7 @@ export default function EpisodeEventsTableBody({
         ))}
       {enrichedPredictions.length + enrichedMockPredictions.length > 0 &&
         <TableRow className='bg-gray-100 hover:bg-gray-200'>
-          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center'>
+          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center font-bold uppercases tracking-wider'>
             Predictions
           </TableCell>
         </TableRow>}
@@ -166,7 +175,7 @@ export default function EpisodeEventsTableBody({
       {!edit && Object.keys(streakGroups).length > 0 && (
         <>
           <TableRow className='bg-gray-100 hover:bg-gray-200'>
-            <TableCell colSpan={7} className='text-xs text-muted-foreground text-center'>
+            <TableCell colSpan={7} className='text-xs text-muted-foreground text-center font-bold uppercases tracking-wider'>
               Survival Streaks
             </TableCell>
           </TableRow>

@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["YOURTEAMID.com.aidan3445.mobilefantasysurvivor"],
+        "paths": ["/i/*", "/leagues/join/*"]
+      }
+    ]
+  }
+}

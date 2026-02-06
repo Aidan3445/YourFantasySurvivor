@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { cn } from '~/lib/utils';
 import { type SecondaryPickSettings as SecondaryPickSettingsType, SecondaryPickSettingsZod } from '~/types/leagues';
 import { useLeague } from '~/hooks/leagues/useLeague';
-import { useLeagueRules } from '~/hooks/leagues/useRules';
+import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import { useQueryClient } from '@tanstack/react-query';
 import updateSecondaryPickSettings from '~/actions/updateSecondaryPickSettings';
@@ -33,7 +33,10 @@ export default function SecondaryPickSettings() {
 
   useEffect(() => {
     if (rules?.secondaryPick) {
-      reactForm.reset(rules.secondaryPick);
+      reactForm.reset({
+        ...defaultSecondaryPickSettings,
+        ...rules.secondaryPick,
+      });
     }
   }, [rules?.secondaryPick, reactForm]);
 
@@ -182,7 +185,8 @@ export default function SecondaryPickSettings() {
                       );
                     }} />
                   <FormDescription>
-                    Episodes before a castaway can be selected again (0-{MAX_SEASON_LENGTH}). Set to {MAX_SEASON_LENGTH} to never allow repeats.
+                    Episodes before a castaway can be selected again as a secondary pick.
+                    For an extra challenge, max this out and never allow repeats!
                   </FormDescription>
                 </div>
 
@@ -236,9 +240,7 @@ export default function SecondaryPickSettings() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value='0.25'>1/4 (25%)</SelectItem>
                                 <SelectItem value='0.5'>1/2 (50%)</SelectItem>
-                                <SelectItem value='0.75'>3/4 (75%)</SelectItem>
                                 <SelectItem value='1'>Full (100%)</SelectItem>
                               </SelectContent>
                             </Select>

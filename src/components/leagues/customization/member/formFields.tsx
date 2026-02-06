@@ -88,8 +88,7 @@ export default function LeagueMemberFields({ formPrefix, memberColors = [], curr
             </FormControl>
             <FormMessage />
           </FormItem>
-        )
-        } />
+        )} />
       <i className='text-xs text-muted-foreground w-full text-center mb-2'>
         {'Don\'t worry you can always change your name and color later!'}
         <br />

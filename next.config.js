@@ -1,7 +1,3 @@
-/**
- * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially useful
- * for Docker builds.
- */
 await import('./src/env.js');
 
 /** @type {import("next").NextConfig} */
@@ -10,6 +6,16 @@ const config = {
     ignoreBuildErrors: false,
   },
   crossOrigin: 'anonymous',
+  async headers() {
+    return [
+      {
+        source: '/.well-known/apple-app-site-association',
+        headers: [
+          { key: 'Content-Type', value: 'application/json' },
+        ],
+      },
+    ];
+  },
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [
@@ -84,7 +90,6 @@ const config = {
         hostname: 'img.buymeacoffee.com',
         port: '',
         pathname: '/**',
-
       }
     ],
   },

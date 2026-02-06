@@ -3,7 +3,7 @@
 import { LineChart } from '@mui/x-charts/LineChart';
 import { useMemo } from 'react';
 import CustomTooltip from '~/components/leagues/hub/chart/tooltip';
-import { formatDataForMui } from '~/components/leagues/hub/chart/utils';
+import { formatDataForMui } from '~/lib/chart';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 
 export default function Chart() {
