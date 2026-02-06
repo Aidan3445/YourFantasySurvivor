@@ -8,14 +8,10 @@ import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { usePendingMembers } from '~/hooks/leagues/usePendingMembers';
 import PendingMember from '~/components/leagues/actions/league/members/pending';
 import { Circle } from 'lucide-react';
-import { type Ref, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 import { Separator } from '~/components/common/separator';
 
-interface ManageMembersProps {
-  ref?: Ref<HTMLDivElement>;
-}
-
-export default function ManageMembers({ ref }: ManageMembersProps) {
+const ManageMembers = forwardRef<HTMLDivElement>(function ManageMembers(_props, ref) {
   const { data: leagueMembers } = useLeagueMembers();
   const { data: pendingMembers } = usePendingMembers();
   const { data: leagueSettings } = useLeagueSettings();
@@ -137,6 +133,8 @@ export default function ManageMembers({ ref }: ManageMembersProps) {
           )}
         </TabsContent>
       </Tabs>
-    </div >
+    </div>
   );
-}
+});
+
+export default ManageMembers;
