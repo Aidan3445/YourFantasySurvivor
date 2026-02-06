@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import getUsedColors from '~/services/leagues/query/colors';
@@ -35,7 +35,7 @@ export default async function getPublicLeague(hash: string, userId?: string | nu
       eq(leagueSchema.leagueId, leagueMemberSchema.leagueId),
       userId
         ? eq(leagueMemberSchema.userId, userId)
-        : eq(leagueMemberSchema.userId, '<NULL>')
+        : sql`1=0` // Don't join any rows if no userId is provided
     ))
     .where(eq(leagueSchema.hash, hash));
 
