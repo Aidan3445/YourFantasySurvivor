@@ -38,7 +38,7 @@ async function fetchEliminations(seasonId: number) {
     .from(episodeSchema)
     .innerJoin(baseEventSchema, and(
       eq(episodeSchema.episodeId, baseEventSchema.episodeId),
-      inArray(baseEventSchema.eventName, EliminationEventNames)))
+      inArray(baseEventSchema.eventName, [...EliminationEventNames])))
     .leftJoin(baseEventReferenceSchema, and(
       eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
       eq(baseEventReferenceSchema.referenceType, 'Castaway')))

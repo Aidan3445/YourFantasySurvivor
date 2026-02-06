@@ -52,7 +52,7 @@ export default async function getUserLeagues(userId: string) {
         .orderBy(desc(selectionUpdateSchema.episodeId))
         .limit(1)))
     .leftJoin(baseEventSchema, and(
-      inArray(baseEventSchema.eventName, EliminationEventNames),
+      inArray(baseEventSchema.eventName, [...EliminationEventNames]),
       inArray(baseEventSchema.baseEventId,
         db.select({ baseEventId: baseEventReferenceSchema.baseEventId })
           .from(baseEventReferenceSchema)
