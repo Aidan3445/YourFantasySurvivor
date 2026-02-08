@@ -3,10 +3,10 @@ import 'server-only';
 import { type NextRequest, NextResponse } from 'next/server';
 import type { LeagueRouteParams } from '~/types/api';
 import updateDraftOrderLogic from '~/services/leagues/mutation/updateDraftOrder';
-import { withLeagueOwnerAuth } from '~/lib/apiMiddleware';
+import { withLeagueAdminAuth } from '~/lib/apiMiddleware';
 
 export async function PUT(request: NextRequest, context: LeagueRouteParams) {
-  return await withLeagueOwnerAuth(async (auth) => {
+  return await withLeagueAdminAuth(async (auth) => {
     const body = await request.json() as {
       draftOrder: number[]
     };
