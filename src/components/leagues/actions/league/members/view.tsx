@@ -85,16 +85,12 @@ const ManageMembers = forwardRef<HTMLDivElement>(function ManageMembers(_props, 
               <div className='px-4'>
                 <Separator className='bg-primary/20' />
                 <div className='py-2 flex flex-col gap-1'>
-                  {leagueMembers?.members
-                    .map(member => (
-                      member.loggedIn
-                        ? null
-                        : (
-                          <CurrentMember
-                            key={member.memberId}
-                            member={member}
-                            loggedInMember={leagueMembers.loggedIn} />
-                        )))}
+                  {leagueMembers?.members.filter(member => !member.loggedIn).map(member => (
+                    <CurrentMember
+                      key={member.memberId}
+                      member={member}
+                      loggedInMember={leagueMembers.loggedIn} />
+                  ))}
                 </div>
                 <ScrollBar orientation='vertical' />
               </div>
