@@ -4,7 +4,9 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.aidan3445.mobilefantasysurvivor",
-      "sha256_cert_fingerprints": ["E6:3B:4F:EF:74:AF:AD:63:5D:51:45:4C:B5:B0:9D:24:D5:77:B2:A3:76:CE:27:A6:02:C6:24:E9:1B:B7:B3:B9"]
+      "sha256_cert_fingerprints": [
+        "E6:3B:4F:EF:74:AF:AD:63:5D:51:45:4C:B5:B0:9D:24:D5:77:B2:A3:76:CE:27:A6:02:C6:24:E9:1B:B7:B3:B9"
+      ]
     }
   }
 ]

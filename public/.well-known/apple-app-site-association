@@ -3,8 +3,8 @@
     "apps": [],
     "details": [
       {
-        "appIDs": ["YOURTEAMID.com.aidan3445.mobilefantasysurvivor"],
-        "paths": ["/i/*", "/leagues/join/*"]
+        "appIDs": ["AXZR9KKTUD.com.aidan3445.mobilefantasysurvivor"],
+        "paths": ["/i/*", "/leagues/*"]
       }
     ]
   }
