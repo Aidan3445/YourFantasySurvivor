@@ -75,6 +75,9 @@ export default function LeagueMemberFields({ formPrefix, memberColors = [], curr
                           !ensureNewColor(hexToHsva(props.color)) ? 'cursor-not-allowed!' : '')}
                         {...(props as React.HTMLAttributes<HTMLDivElement>)}>
                         <Point color={props.color} checked={props.checked} />
+                        {props.color === currentColor && !props.checked && (
+                          <Point color={props.color} checked={true} transparent={true} />
+                        )}
                       </div>
                     );
                   }}
@@ -101,13 +104,14 @@ export default function LeagueMemberFields({ formPrefix, memberColors = [], curr
 interface SwatchProps {
   color?: string;
   checked?: boolean;
+  transparent?: boolean;
 }
 
-function Point({ color, checked }: SwatchProps) {
+function Point({ color, checked, transparent }: SwatchProps) {
   if (!checked) return null;
 
   return (
-    <Check className='z-100' color={getContrastingColor(color!)} />
+    <Check className={cn('z-100', transparent && 'opacity-50')} color={getContrastingColor(color!)} />
   );
 }
 
