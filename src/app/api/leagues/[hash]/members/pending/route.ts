@@ -5,8 +5,9 @@ import type { LeagueRouteParams } from '~/types/api';
 import { withLeagueAdminAuth } from '~/lib/apiMiddleware';
 import getPendingMembers from '~/services/leagues/query/pendingMembers';
 import admitMemberLogic from '~/services/leagues/mutation/admitMember';
+import deleteMemberLogic from '~/services/leagues/mutation/deleteMember';
 
-export async function GET(r: NextRequest, context: LeagueRouteParams) {
+export async function GET(_: NextRequest, context: LeagueRouteParams) {
   return withLeagueAdminAuth(async (auth) => {
     try {
       const pendingMembers = await getPendingMembers(auth);
@@ -40,3 +41,24 @@ export async function PUT(request: NextRequest, context: LeagueRouteParams) {
     }
   })(context);
 }
+
+export async function DELETE(request: NextRequest, context: LeagueRouteParams) {
+  return withLeagueAdminAuth(async (auth) => {
+    const body = await request.json() as {
+      pendingMemberId: number;
+    };
+
+    if (!body.pendingMemberId) {
+      return NextResponse.json({ error: 'Missing member in request body' }, { status: 400 });
+    }
+
+    try {
+      const success = await deleteMemberLogic(auth, body.pendingMemberId);
+      return NextResponse.json(success, { status: 200 });
+    } catch (e) {
+      console.error('Failed to delete member', e);
+      return NextResponse.json({ error: 'An error occurred while deleting the member.' }, { status: 500 });
+    }
+  })(context);
+}
+
