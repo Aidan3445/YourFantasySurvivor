@@ -43,6 +43,7 @@ export default function MemberEditForm({ className }: MemberEditFormProps) {
     try {
       await updateMemberDetails(league.hash, data);
       await queryClient.invalidateQueries({ queryKey: ['leagueMembers', league.hash] });
+      reactForm.reset(data);
       alert('Successfully updated member details');
     } catch (error) {
       console.error(error);
