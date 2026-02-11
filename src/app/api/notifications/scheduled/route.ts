@@ -17,6 +17,7 @@ const receiver = new Receiver({
 });
 
 export async function POST(request: NextRequest) {
+
   const signature = request.headers.get('upstash-signature');
   if (!signature) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
