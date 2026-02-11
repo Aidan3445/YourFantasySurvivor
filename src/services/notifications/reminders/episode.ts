@@ -1,5 +1,5 @@
 import 'server-only';
-import { scheduleNotification } from '~/lib/qStash';
+import { scheduleEpisodeNotification } from '~/lib/qStash';
 import { type Episode } from '~/types/episodes';
 
 const HOUR = 60 * 60 * 1000;
@@ -21,20 +21,20 @@ export async function scheduleEpisodeNotifications(
   if (previousEpisodeAirDate) {
     const midpoint = previousEpisodeAirDate.getTime() +
       (airTime - previousEpisodeAirDate.getTime()) / 2;
-    await scheduleNotification('reminder_midweek', episode, new Date(midpoint));
+    await scheduleEpisodeNotification('reminder_midweek', episode, new Date(midpoint));
   } else {
-    await scheduleNotification('reminder_midweek', episode, new Date(airTime - 3 * 24 * HOUR));
+    await scheduleEpisodeNotification('reminder_midweek', episode, new Date(airTime - 3 * 24 * HOUR));
   }
 
   // 8 hours before
-  await scheduleNotification('reminder_8hr', episode, new Date(airTime - 8 * HOUR));
+  await scheduleEpisodeNotification('reminder_8hr', episode, new Date(airTime - 8 * HOUR));
 
   // 15 minutes before
-  await scheduleNotification('reminder_15min', episode, new Date(airTime - 15 * MINUTE));
+  await scheduleEpisodeNotification('reminder_15min', episode, new Date(airTime - 15 * MINUTE));
 
   // Episode starting (at air time)
-  await scheduleNotification('episode_starting', episode, new Date(airTime));
+  await scheduleEpisodeNotification('episode_starting', episode, new Date(airTime));
 
   // Episode finished (air time + runtime)
-  await scheduleNotification('episode_finished', episode, new Date(airTime + episode.runtime * MINUTE));
+  await scheduleEpisodeNotification('episode_finished', episode, new Date(airTime + episode.runtime * MINUTE));
 }

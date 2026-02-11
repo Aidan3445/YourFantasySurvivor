@@ -5,19 +5,21 @@ import { and, eq, inArray, count, gte, gt, not } from 'drizzle-orm';
 import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema, secondaryPickSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
+import { castawaySchema } from '~/server/db/schema/castaways';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { EliminationEventNames } from '~/lib/events';
 import { episodeSchema } from '~/server/db/schema/episodes';
+import { scheduleSelectionChangeNotification } from '~/lib/qStash';
 
 /**
-  * Choose a castaway, either in the draft or as a selection update
-  * @param auth The authenticated league member
-  * @param castawayId The id of the castaway
-  * @throws an error if the castaway cannot be chosen
-  * @returns an object indicating success and if the draft is complete
-  * @returnObj `{ success, draftComplete? }`
-  */
+ * Choose a castaway, either in the draft or as a selection update
+ * @param auth The authenticated league member
+ * @param castawayId The id of the castaway
+ * @throws an error if the castaway cannot be chosen
+ * @returns an object indicating success and if the draft is complete
+ * @returnObj `{ success, draftComplete? }`
+ */
 export default async function chooseCastawayLogic(
   auth: VerifiedLeagueMemberAuth,
   castawayId: number,
@@ -26,9 +28,8 @@ export default async function chooseCastawayLogic(
     throw new Error('League is not active');
   }
 
-  return await db.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     // Validate that we are not within the 48 hour priority window, with league members eliminated
-    // Any league member's current selection cannot have been eliminated in an episode that aired within the last 48 hours
     const now = new Date();
     const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
@@ -48,11 +49,10 @@ export default async function chooseCastawayLogic(
       .innerJoin(leagueMemberSchema, and(
         eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId),
         eq(leagueMemberSchema.leagueId, auth.leagueId),
-        not(eq(leagueMemberSchema.memberId, auth.memberId)) // Exclude the requesting member
+        not(eq(leagueMemberSchema.memberId, auth.memberId))
       ))
       .where(gte(episodeSchema.airDate, fortyEightHoursAgo));
 
-    // Then check if they have made a new selection
     const allMadeNewSelection = await trx
       .select({ memberId: selectionUpdateSchema.memberId })
       .from(selectionUpdateSchema)
@@ -71,11 +71,14 @@ export default async function chooseCastawayLogic(
       });
       throw new Error('Cannot choose castaway at this time.');
     }
+
     // Get league and validate
     const league = await trx
       .select({
         status: leagueSchema.status,
         seasonId: leagueSchema.seasonId,
+        name: leagueSchema.name,
+        hash: leagueSchema.hash,
         canPickOwnSurvivor: leagueSettingsSchema.secondaryPickCanPickOwn,
       })
       .from(leagueSchema)
@@ -147,7 +150,6 @@ export default async function chooseCastawayLogic(
       });
 
     // Secondary pick must be cleared if they are the same as primary
-    // and canPickOwnSurvivor is false
     if (!league.canPickOwnSurvivor) {
       await trx
         .delete(secondaryPickSchema)
@@ -184,8 +186,45 @@ export default async function chooseCastawayLogic(
 
         return { success: true, draftComplete: true };
       }
+
+      // Draft pick — no notification
+      return { success: true };
     }
 
-    return { success: true };
+    // Active season selection — gather notification data
+    const [castaway, member] = await Promise.all([
+      trx
+        .select({ name: castawaySchema.shortName })
+        .from(castawaySchema)
+        .where(eq(castawaySchema.castawayId, castawayId))
+        .then((res) => res[0]),
+      trx
+        .select({ displayName: leagueMemberSchema.displayName })
+        .from(leagueMemberSchema)
+        .where(eq(leagueMemberSchema.memberId, auth.memberId))
+        .then((res) => res[0]),
+    ]);
+
+    return {
+      success: true,
+      notify: {
+        leagueId: auth.leagueId,
+        leagueHash: league.hash,
+        leagueName: league.name,
+        userId: auth.userId,
+        memberId: auth.memberId,
+        memberName: member?.displayName ?? 'A member',
+        castawayId,
+        castawayName: castaway?.name ?? 'a castaway',
+        episodeId: nextEpisode.episodeId,
+      },
+    };
   });
+
+  // Schedule notification outside transaction (active season only)
+  if ('notify' in result && result.notify) {
+    void scheduleSelectionChangeNotification(result.notify);
+  }
+
+  return { success: result.success, draftComplete: 'draftComplete' in result ? result.draftComplete : undefined };
 }

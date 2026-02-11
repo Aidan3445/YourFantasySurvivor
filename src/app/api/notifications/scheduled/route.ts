@@ -9,6 +9,7 @@ import {
   sendReminderNotifications,
 } from '~/services/notifications/reminders/predictions';
 import { sendDraftDateNotification, sendDraftReminderNotification } from '~/services/notifications/reminders/draftDate';
+import { sendSelectionChangeNotification } from '~/services/notifications/reminders/selectionChange';
 
 const receiver = new Receiver({
   currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
@@ -39,6 +40,17 @@ export async function POST(request: NextRequest) {
       leagueName: string;
       draftDate: string | null;
     };
+    selection?: {
+      leagueId: number;
+      leagueHash: string;
+      leagueName: string;
+      userId: string;
+      memberId: number;
+      memberName: string;
+      castawayId: number;
+      castawayName: string;
+      episodeId: number;
+    };
   };
 
   try {
@@ -63,6 +75,9 @@ export async function POST(request: NextRequest) {
         break;
       case 'draft_reminder_1hr':
         await sendDraftReminderNotification(parsed.draft!);
+        break;
+      case 'selection_changed':
+        await sendSelectionChangeNotification(parsed.selection!);
         break;
       default:
         console.error('Unknown notification type:', parsed.type);

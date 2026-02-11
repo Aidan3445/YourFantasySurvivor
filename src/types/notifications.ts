@@ -35,7 +35,8 @@ export type NotificationType =
   | 'episode_starting'
   | 'episode_finished'
   | 'draft_date_changed'
-  | 'draft_reminder_1hr';
+  | 'draft_reminder_1hr'
+  | 'selection_changed'
 
 export type LiveScoringNotification = {
   episodeId: number;
@@ -43,4 +44,24 @@ export type LiveScoringNotification = {
   body: string;
   data: BaseEventInsert | CustomEventInsert;
   leagueId?: number; // If provided, only notify users in this league
+}
+
+export type ScheduledDraftData = {
+  leagueId: number;
+  leagueHash: string;
+  leagueName: string;
+  /** null means manual start */
+  draftDate: string | null;
+}
+
+export type ScheduledSelectionData = {
+  leagueId: number;
+  leagueHash: string;
+  leagueName: string;
+  userId: string;
+  memberId: number;
+  memberName: string;
+  castawayId: number;
+  castawayName: string;
+  episodeId: number;
 }

@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type LeagueSettingsUpdate } from '~/types/leagues';
-import { scheduleDraftDateNotification } from '~/services/notifications/reminders/draftDate';
+import { scheduleDraftDateNotification } from '~/lib/qStash';
 
 /**
  * Update the league settings

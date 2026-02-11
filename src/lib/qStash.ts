@@ -1,6 +1,6 @@
 import 'server-only';
 import { Client } from '@upstash/qstash';
-import { type NotificationType } from '~/types/notifications';
+import { type ScheduledSelectionData, type NotificationType, type ScheduledDraftData } from '~/types/notifications';
 import { type Episode } from '~/types/episodes';
 import { camelToTitle } from '~/lib/utils';
 
@@ -21,7 +21,7 @@ export const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
  * @param episode The episode data (validated at runtime against DB)
  * @param scheduledAt When to send the notification
  */
-export async function scheduleNotification(
+export async function scheduleEpisodeNotification(
   type: NotificationType,
   episode: Episode,
   scheduledAt: Date | number,
@@ -53,5 +53,69 @@ export async function scheduleNotification(
 export function formatEventTitle(eventName: string, label?: string | null): string {
   const formatted = camelToTitle(eventName);
   return label ? `${formatted}: ${label}` : formatted;
+}
+
+const DELAY_MINUTES = 5;
+
+/**
+ * Schedule a draft date notification with a short delay
+ * If the admin changes the date multiple times, only the one
+ * matching the current DB state will actually send
+ * @param data The league and draft date info
+ */
+export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
+  const scheduledAt = Math.floor(Date.now() / 1000) + DELAY_MINUTES * 60;
+
+  const result = await qstash.publishJSON({
+    url: `${BASE_URL}/api/notifications/scheduled`,
+    body: { type: 'draft_date_changed' as const, draft: data },
+    notBefore: scheduledAt,
+  });
+
+  console.log(
+    `Scheduled draft_date_changed for league ${data.leagueId} in ${DELAY_MINUTES} min`
+  );
+
+  // Schedule 1-hour reminder if draft has a specific date
+  if (data.draftDate) {
+    const draftTime = new Date(data.draftDate).getTime();
+    const reminderAt = new Date(draftTime - 60 * 60 * 1000);
+
+    const reminderTimestamp = Math.floor(reminderAt.getTime() / 1000);
+    await qstash.publishJSON({
+      url: `${BASE_URL}/api/notifications/scheduled`,
+      body: { type: 'draft_reminder_1hr' as const, draft: data },
+      notBefore: reminderTimestamp,
+      deduplicationId: `draft_reminder_1hr-${data.leagueId}-${reminderTimestamp}`,
+    });
+
+    console.log(
+      `Scheduled draft_reminder_1hr for league ${data.leagueId} at ${reminderAt.toISOString()}`
+    );
+  }
+
+  return result.messageId;
+}
+
+
+/**
+ * Schedule a selection change notification with a short delay
+ * If the user changes their pick multiple times, only the one
+ * matching the current DB state will actually send
+ */
+export async function scheduleSelectionChangeNotification(data: ScheduledSelectionData) {
+  const scheduledAt = Math.floor(Date.now() / 1000) + DELAY_MINUTES * 60;
+
+  const result = await qstash.publishJSON({
+    url: `${BASE_URL}/api/notifications/scheduled`,
+    body: { type: 'selection_changed' as const, selection: data },
+    notBefore: scheduledAt,
+    deduplicationId: `selection_changed-${data.memberId}-${data.episodeId}-${scheduledAt}`,
+  });
+
+  console.log(
+    `Scheduled selection_changed for member ${data.memberId} in ${DELAY_MINUTES} min`
+  );
+  return result.messageId;
 }
 
