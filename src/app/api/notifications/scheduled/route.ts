@@ -49,13 +49,13 @@ export async function POST(request: NextRequest) {
   try {
     switch (type) {
       case 'reminder_midweek':
-        await sendReminderNotifications(episodeId, 'midweek');
+        await sendReminderNotifications('midweek');
         break;
       case 'reminder_8hr':
-        await sendReminderNotifications(episodeId, '8hr');
+        await sendReminderNotifications('8hr');
         break;
       case 'reminder_15min':
-        await sendReminderNotifications(episodeId, '15min');
+        await sendReminderNotifications('15min');
         break;
       case 'episode_starting':
         await sendEpisodeStartingNotifications(episodeId);

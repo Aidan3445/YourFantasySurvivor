@@ -9,43 +9,59 @@ import { leagueSchema } from '~/server/db/schema/leagues';
 import getCurrentSeasons from '~/services/seasons/query/currentSeasons';
 import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { type ScoringBaseEventName, type PredictionTiming } from '~/types/events';
+import { type Episode } from '~/types/episodes';
 
 /**
   * Get users who need to be sent reminders for predictions
-  * @returns Array of user IDs needing reminders
+  * @returns Array of user IDs needing reminders per active season
   */
-export async function getUsersNeedingReminders(): Promise<string[]> {
+export async function getUsersNeedingReminders() {
   const currentSeasons = await getCurrentSeasons();
 
-  return await Promise.all(currentSeasons.map(async (season) => {
-    const keyEpisodes = await getKeyEpisodes(season.seasonId);
-    if (!keyEpisodes.nextEpisode) return [];
-    const activeTimings = getActiveTimings({
-      keyEpisodes,
-      leagueStatus: 'Active',
-      startWeek: null,
-    });
-    if (activeTimings.length === 0) return [];
+  const results = await Promise.all(
+    currentSeasons.map(async (season) => {
+      const keyEpisodes = await getKeyEpisodes(season.seasonId);
+      if (!keyEpisodes.nextEpisode) return null;
 
-    return db
-      .selectDistinct({
-        userId: leagueMemberSchema.userId,
-        displayName: leagueMemberSchema.displayName,
-        leagueName: leagueSchema.name,
-      })
-      .from(leagueMemberSchema)
-      .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
-      .where(and(
-        eq(leagueSchema.seasonId, season.seasonId),
-        eq(leagueSchema.status, 'Active'),
-        isNotNull(leagueMemberSchema.draftOrder),
-        or(
-          existsUnmadeBasePrediction(activeTimings, keyEpisodes.nextEpisode.episodeId),
-          existsUnmadeCustomPrediction(activeTimings)
-        ),
-      ))
-      .then((res) => res.map((r) => r.userId)); //+ '|' + r.displayName + '|' + r.leagueName
-  })).then((results) => results.flat());
+      const activeTimings = getActiveTimings({
+        keyEpisodes,
+        leagueStatus: 'Active',
+        startWeek: null,
+      });
+      if (activeTimings.length === 0) return null;
+
+      const userIds = await db
+        .selectDistinct({
+          userId: leagueMemberSchema.userId,
+        })
+        .from(leagueMemberSchema)
+        .innerJoin(
+          leagueSchema,
+          eq(leagueSchema.leagueId, leagueMemberSchema.leagueId),
+        )
+        .where(
+          and(
+            eq(leagueSchema.seasonId, season.seasonId),
+            eq(leagueSchema.status, 'Active'),
+            isNotNull(leagueMemberSchema.draftOrder),
+            or(
+              existsUnmadeBasePrediction(
+                activeTimings,
+                keyEpisodes.nextEpisode.episodeId,
+              ),
+              existsUnmadeCustomPrediction(activeTimings),
+            ),
+          ),
+        )
+        .then((res) => res.map((r) => r.userId));
+
+      if (userIds.length === 0) return null;
+
+      return [keyEpisodes.nextEpisode, userIds] as const;
+    }),
+  );
+
+  return results.filter((r): r is readonly [Episode, string[]] => r !== null);
 }
 
 

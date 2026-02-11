@@ -10,52 +10,39 @@ import { getUsersNeedingReminders } from '~/services/users/query/usersNeedingRem
 /**
  * Send reminder notifications to users who haven't made predictions
  */
-export async function sendReminderNotifications(
-  episodeId: number,
-  timing: 'midweek' | '8hr' | '15min',
-) {
-  // Get episode info
-  const episode = await db
-    .select({
-      episodeNumber: episodeSchema.episodeNumber,
-      episodeTitle: episodeSchema.title,
-      seasonId: episodeSchema.seasonId,
-    })
-    .from(episodeSchema)
-    .where(eq(episodeSchema.episodeId, episodeId))
-    .then((res) => res[0]);
-
-  if (!episode) {
-    console.error('Episode not found:', episodeId);
-    return;
-  }
+export async function sendReminderNotifications(timing: 'midweek' | '8hr' | '15min') {
 
   // Get users in active leagues for this season who haven't made predictions
   // and have reminders enabled
-  const userIds = await getUsersNeedingReminders();
-  if (userIds.length === 0) return;
+  const usersBySeason = await getUsersNeedingReminders();
+  if (usersBySeason.length === 0) {
+    return;
+  }
 
+  await Promise.all(usersBySeason.map(async ([episode, userIds]) => {
+    if (userIds.length === 0) return;
 
-  const messages = {
-    'midweek': {
-      title: 'Predictions Reminder',
-      body: `Don't forget to make your predictions for Episode ${episode.episodeNumber} - ${episode.episodeTitle}!`,
-    },
-    '8hr': {
-      title: 'Episode Tonight!',
-      body: `Episode ${episode.episodeNumber} - ${episode.episodeTitle} airs in 8 hours. Make your predictions!`,
-    },
-    '15min': {
-      title: 'Last Chance!',
-      body: `Episode ${episode.episodeNumber} - ${episode.episodeTitle} starts in 15 minutes. Lock in your predictions now!`,
-    },
-  };
+    const messages = {
+      'midweek': {
+        title: 'Predictions Reminder',
+        body: `Don't forget to make your predictions for Episode ${episode.episodeNumber} - ${episode.title}!`,
+      },
+      '8hr': {
+        title: 'Episode Tonight!',
+        body: `Episode ${episode.episodeNumber} - ${episode.title} airs in 8 hours. Make your predictions!`,
+      },
+      '15min': {
+        title: 'Last Chance!',
+        body: `Episode ${episode.episodeNumber} - ${episode.title} starts in 15 minutes. Lock in your predictions now!`,
+      },
+    };
 
-  await sendPushToUsers(
-    userIds,
-    { ...messages[timing], data: { type: 'reminder', episodeId } },
-    'reminders',
-  );
+    await sendPushToUsers(
+      userIds,
+      { ...messages[timing], data: { type: 'reminder', episodeId: episode.episodeId, timing } },
+      'reminders',
+    );
+  }));
 }
 
 /**
