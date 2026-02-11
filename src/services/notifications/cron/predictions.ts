@@ -11,7 +11,6 @@ import { getUsersNeedingReminders } from '~/services/users/query/usersNeedingRem
  * Send reminder notifications to users who haven't made predictions
  */
 export async function sendReminderNotifications(timing: 'midweek' | '8hr' | '15min') {
-
   // Get users in active leagues for this season who haven't made predictions
   // and have reminders enabled
   const usersBySeason = await getUsersNeedingReminders();
@@ -49,7 +48,6 @@ export async function sendReminderNotifications(timing: 'midweek' | '8hr' | '15m
  * Send "episode starting" notification for live scoring opt-in
  */
 export async function sendEpisodeStartingNotifications(episodeId: number) {
-  // Get episode info
   const episode = await db
     .select({
       episodeNumber: episodeSchema.episodeNumber,
@@ -64,7 +62,6 @@ export async function sendEpisodeStartingNotifications(episodeId: number) {
     console.error('Episode not found:', episodeId);
     return;
   }
-
 
   // Get users in active leagues with liveScoring enabled
   const users = await db
@@ -94,7 +91,6 @@ export async function sendEpisodeStartingNotifications(episodeId: number) {
  * Send ambiguous "episode finished" notification
  */
 export async function sendEpisodeFinishedNotifications(episodeId: number) {
-  // Get episode info
   const episode = await db
     .select({
       episodeNumber: episodeSchema.episodeNumber,

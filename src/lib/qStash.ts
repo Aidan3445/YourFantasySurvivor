@@ -1,3 +1,4 @@
+import 'server-only';
 import { Client } from '@upstash/qstash';
 import { type NotificationType } from '~/types/notifications';
 
@@ -13,8 +14,9 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://yourfantasysurvivo
 
 /**
  * Schedule a notification to be sent at a specific time
+ * Safe to call multiple times - deduplication prevents duplicates
  * @param type The type of notification
- * @param episodeId The episode this notification is for
+ * @param episodeId The episode this notification is for (used for deduplication, and passed to handler for episode-specific notifications)
  * @param scheduledAt When to send the notification (Date or Unix timestamp)
  */
 export async function scheduleNotification(
@@ -32,26 +34,18 @@ export async function scheduleNotification(
     return null;
   }
 
-  const messageId = await qstash.publishJSON({
+  // Only include episodeId in body for episode-specific notifications
+  const needsEpisodeId = type === 'episode_starting' || type === 'episode_finished';
+  const body = needsEpisodeId ? { type, episodeId } : { type };
+
+  const result = await qstash.publishJSON({
     url: `${BASE_URL}/api/notifications/scheduled`,
-    body: { type, episodeId },
+    body,
     notBefore: timestamp,
-    // Dedupe by type + episodeId so rescheduling replaces old
+    // Dedupe prevents scheduling the same notification twice
     deduplicationId: `${type}-${episodeId}`,
   });
 
   console.log(`Scheduled ${type} for episode ${episodeId} at ${new Date(timestamp * 1000).toISOString()}`);
-  return messageId;
-}
-
-/**
- * Cancel a scheduled notification
- */
-export async function cancelNotification(type: NotificationType, episodeId: number) {
-  try {
-    await qstash.messages.delete(`${type}-${episodeId}`);
-  } catch (error) {
-    // Message may not exist, that's fine
-    console.log(`Could not cancel ${type} for episode ${episodeId}:`, error);
-  }
+  return result.messageId;
 }

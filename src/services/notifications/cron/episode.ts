@@ -1,13 +1,13 @@
 import 'server-only';
-import { scheduleNotification, cancelNotification } from '~/lib/qStash';
-import { type NotificationType } from '~/types/notifications';
+import { scheduleNotification } from '~/lib/qStash';
 
 const HOUR = 60 * 60 * 1000;
 const MINUTE = 60 * 1000;
 
 /**
  * Schedule all notifications for an episode
- * @param episodeId The episode ID
+ * Safe to call multiple times - deduplication prevents duplicates
+ * @param episodeId The episode ID (used for deduplication and episode-specific notifications)
  * @param airDate When the episode airs
  * @param runtime The episode runtime in minutes
  * @param previousEpisodeAirDate When the previous episode aired (for mid-week reminder)
@@ -41,33 +41,4 @@ export async function scheduleEpisodeNotifications(
 
   // Episode finished (air time + episode duration)
   await scheduleNotification('episode_finished', episodeId, new Date(airTime + runtime * MINUTE));
-}
-
-/**
- * Cancel all scheduled notifications for an episode
- * @param episodeId The episode ID
- */
-export async function cancelEpisodeNotifications(episodeId: number) {
-  const types: NotificationType[] = [
-    'reminder_midweek',
-    'reminder_8hr',
-    'reminder_15min',
-    'episode_starting',
-    'episode_finished',
-  ];
-
-  await Promise.all(types.map((type) => cancelNotification(type, episodeId)));
-}
-
-/**
- * Reschedule notifications when an episode's air date changes
- */
-export async function rescheduleEpisodeNotifications(
-  episodeId: number,
-  newAirDate: Date,
-  runtime: number,
-  previousEpisodeAirDate?: Date,
-) {
-  await cancelEpisodeNotifications(episodeId);
-  await scheduleEpisodeNotifications(episodeId, newAirDate, runtime, previousEpisodeAirDate);
 }
