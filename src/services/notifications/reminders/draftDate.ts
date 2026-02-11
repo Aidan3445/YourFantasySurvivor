@@ -41,11 +41,12 @@ export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
     const draftTime = new Date(data.draftDate).getTime();
     const reminderAt = new Date(draftTime - HOUR);
 
+    const reminderTimestamp = Math.floor(reminderAt.getTime() / 1000);
     await qstash.publishJSON({
       url: `${BASE_URL}/api/notifications/scheduled`,
       body: { type: 'draft_reminder_1hr' as const, draft: data },
-      notBefore: Math.floor(reminderAt.getTime() / 1000),
-      deduplicationId: `draft_reminder_1hr-${data.leagueId}`,
+      notBefore: reminderTimestamp,
+      deduplicationId: `draft_reminder_1hr-${data.leagueId}-${reminderTimestamp}`,
     });
 
     console.log(
