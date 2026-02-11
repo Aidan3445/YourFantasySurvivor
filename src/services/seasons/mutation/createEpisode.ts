@@ -5,7 +5,7 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { type Episode, type EpisodeInsert } from '~/types/episodes';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { revalidateTag } from 'next/cache';
-import { scheduleEpisodeNotifications } from '~/services/notifications/cron/episode';
+import { scheduleEpisodeNotifications } from '~/services/notifications/reminders/episode';
 
 /**
   * Create a new episode

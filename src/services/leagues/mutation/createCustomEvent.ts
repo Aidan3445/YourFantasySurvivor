@@ -1,11 +1,12 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, count, eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { type CustomEventInsert } from '~/types/events';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { customEventReferenceSchema, customEventRuleSchema, customEventSchema } from '~/server/db/schema/customEvents';
+import { sendCustomEventNotification } from '~/services/notifications/events/customEvents';
 
 /**
  * Create a new custom/league event for the season
@@ -24,15 +25,14 @@ export default async function createCustomEventLogic(
   return db.transaction(async (trx) => {
     // ensure the rule is in the league
     const rule = await trx
-      .select({ count: count() })
+      .select({ eventName: customEventRuleSchema.eventName })
       .from(customEventRuleSchema)
       .innerJoin(leagueSchema, eq(leagueSchema.leagueId, customEventRuleSchema.leagueId))
       .where(and(
         eq(leagueSchema.leagueId, auth.leagueId),
         eq(customEventRuleSchema.customEventRuleId, customEvent.customEventRuleId)))
-      .then((result) => (result[0]?.count ?? 0) > 0);
-
-    if (!rule) throw new Error('Rule not found');
+      .then((result) => result[0]);
+    if (!rule) throw new Error('Custom event rule not found in league');
 
     // insert the league event
     const newEventId = await trx
@@ -55,6 +55,8 @@ export default async function createCustomEventLogic(
     await trx
       .insert(customEventReferenceSchema)
       .values(eventRefs);
+
+    void sendCustomEventNotification(customEvent, rule.eventName, auth.leagueId);
 
     return { newEventId };
   });

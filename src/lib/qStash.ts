@@ -2,6 +2,7 @@ import 'server-only';
 import { Client } from '@upstash/qstash';
 import { type NotificationType } from '~/types/notifications';
 import { type Episode } from '~/types/episodes';
+import { camelToTitle } from '~/lib/utils';
 
 if (!process.env.QSTASH_TOKEN) {
   throw new Error('QSTASH_TOKEN is not set');
@@ -12,6 +13,7 @@ export const qstash = new Client({
 });
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://yourfantasysurvivor.com';
+export const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 
 /**
  * Schedule a notification to be sent at a specific time
@@ -44,3 +46,12 @@ export async function scheduleNotification(
   console.log(`Scheduled ${type} for episode ${episode.episodeId} at ${new Date(timestamp * 1000).toISOString()}`);
   return result.messageId;
 }
+
+/**
+ * Format event name for notification title
+ */
+export function formatEventTitle(eventName: string, label?: string | null): string {
+  const formatted = camelToTitle(eventName);
+  return label ? `${formatted}: ${label}` : formatted;
+}
+

@@ -1,10 +1,10 @@
 import 'server-only';
-
 import { revalidateTag } from 'next/cache';
 import { EliminationEventNames } from '~/lib/events';
 import { db } from '~/server/db';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { type BaseEventInsert } from '~/types/events';
+import { sendBaseEventNotification } from '~/services/notifications/events/baseEvents';
 
 /**
   * Create a new base event for the season
@@ -15,7 +15,7 @@ import { type BaseEventInsert } from '~/types/events';
   */
 export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
   // create transaction for the event and reference insertions
-  return await db.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     // insert the base event
     const newEventId = await trx
       .insert(baseEventSchema)
@@ -42,12 +42,23 @@ export default async function createBaseEventLogic(baseEvent: BaseEventInsert) {
       .values(eventRefs);
 
     if ([...EliminationEventNames, 'tribeUpdate'].includes(baseEvent.eventName)) {
-      // Invalidate cache
       revalidateTag('tribe-members', 'max');
       revalidateTag('eliminations', 'max');
     }
+
     revalidateTag('base-events', 'max');
 
-    return { newEventId };
+    return {
+      newEventId,
+      episodeId: baseEvent.episodeId,
+      eventName: baseEvent.eventName,
+      label: baseEvent.label,
+      references: baseEvent.references,
+    };
   });
+
+  // Send live scoring notification outside transaction
+  void sendBaseEventNotification(baseEvent);
+
+  return { newEventId: result.newEventId };
 }

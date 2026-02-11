@@ -1,7 +1,8 @@
-import { boolean, index, jsonb, pgEnum, serial, varchar } from 'drizzle-orm/pg-core';
+import { boolean, index, integer, jsonb, pgEnum, primaryKey, serial, varchar } from 'drizzle-orm/pg-core';
 import 'server-only';
 
 import { createTable } from '~/server/db/schema/createTable';
+import { episodeSchema } from '~/server/db/schema/episodes';
 
 export const platform = pgEnum('platform', ['ios', 'android']);
 
@@ -25,3 +26,16 @@ export const pushTokens = createTable(
   ]
 );
 
+export const liveScoringSessionSchema = createTable(
+  'live_scoring_session',
+  {
+    episodeId: integer('episode_id')
+      .references(() => episodeSchema.episodeId, { onDelete: 'cascade' })
+      .notNull(),
+    userId: varchar('user_id', { length: 64 }).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.episodeId, table.userId] }),
+    index('live_scoring_episode_idx').on(table.episodeId),
+  ]
+);

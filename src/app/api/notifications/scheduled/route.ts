@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Receiver } from '@upstash/qstash';
 import { type NotificationType } from '~/types/notifications';
 import { type Episode } from '~/types/episodes';
-import { sendEpisodeFinishedNotifications, sendEpisodeStartingNotifications, sendReminderNotifications } from '~/services/notifications/cron/predictions';
+import { sendEpisodeFinishedNotifications, sendEpisodeStartingNotifications, sendReminderNotifications } from '~/services/notifications/reminders/predictions';
 
 const receiver = new Receiver({
   currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,

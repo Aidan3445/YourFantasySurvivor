@@ -1,3 +1,5 @@
+import { type BaseEventInsert, type CustomEventInsert } from '~/types/events';
+
 export type Notifications = {
   token: string;
   platform: 'ios' | 'android';
@@ -32,3 +34,12 @@ export type NotificationType =
   | 'reminder_15min'
   | 'episode_starting'
   | 'episode_finished';
+
+
+export type LiveScoringNotification = {
+  episodeId: number;
+  title: string;
+  body: string;
+  data: BaseEventInsert | CustomEventInsert;
+  leagueId?: number; // If provided, only notify users in this league
+}
