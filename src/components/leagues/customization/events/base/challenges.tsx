@@ -15,11 +15,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
           <FormItem className={cn(
             'rounded-lg px-3 py-2 h-full transition-all border-2',
             disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
-            <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
+            <FormLabel className='inline-flex gap-2 items-center justify-between w-full text-sm font-bold uppercase tracking-wider'>
               {BaseEventFullName.indivWin}
               {disabled &&
                 <h2 className={cn(
-                  'text-lg font-bold text-card-foreground',
+                  'text-lg font-bold text-card-foreground flex-nowrap flex',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
@@ -51,11 +51,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
         name='baseEventRules.indivReward'
         render={({ field }) => (
           <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
-            <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
+            <FormLabel className='inline-flex gap-2 items-center justify-between w-full text-sm font-bold uppercase tracking-wider'>
               {BaseEventFullName.indivReward}
               {disabled &&
                 <h2 className={cn(
-                  'text-lg font-bold text-card-foreground',
+                  'text-lg font-bold text-card-foreground flex-nowrap flex',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
@@ -87,11 +87,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
         name='baseEventRules.tribe1st'
         render={({ field }) => (
           <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
-            <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
+            <FormLabel className='inline-flex gap-2 items-center justify-between w-full text-sm font-bold uppercase tracking-wider'>
               {BaseEventFullName.tribe1st}
               {disabled &&
                 <h2 className={cn(
-                  'text-lg font-bold text-card-foreground',
+                  'text-lg font-bold text-card-foreground flex-nowrap flex',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
@@ -123,11 +123,11 @@ export default function ChallengeScoreSettings({ disabled, hidePredictions, chil
         name='baseEventRules.tribe2nd'
         render={({ field }) => (
           <FormItem className={cn('rounded-lg px-3 py-2 h-full transition-all border-2', disabled ? 'bg-accent border-primary/20' : 'bg-primary/5 border-primary/30')}>
-            <FormLabel className='inline-flex gap-2 items-center text-sm font-bold uppercase tracking-wider'>
+            <FormLabel className='inline-flex gap-2 items-center justify-between w-full text-sm font-bold uppercase tracking-wider'>
               {BaseEventFullName.tribe2nd}
               {disabled &&
                 <h2 className={cn(
-                  'text-lg font-bold text-card-foreground',
+                  'text-lg font-bold text-card-foreground flex-nowrap flex',
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
