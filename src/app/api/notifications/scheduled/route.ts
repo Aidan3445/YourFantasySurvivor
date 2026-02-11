@@ -29,10 +29,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
-  const { type, episodeId } = JSON.parse(body) as {
-    type: NotificationType;
-    episodeId: number;
-  };
+
+  let type: NotificationType;
+  let episodeId: number;
+
+  try {
+    const { type: parseType, episodeId: parseEpisodeId } = JSON.parse(body) as {
+      type: NotificationType;
+      episodeId: number;
+    };
+
+    type = parseType;
+    episodeId = parseEpisodeId;
+  } catch (error) {
+    console.error('Invalid request body:', error);
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
 
   try {
     switch (type) {
