@@ -1,11 +1,11 @@
 import 'server-only';
-
 import { db } from '~/server/db';
 import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { type DBTransaction } from '~/types/server';
+import { sendPushToUser } from '~/services/notifications/push';
 
 /**
   * Admit a member to the league by giving them a draft order
@@ -27,7 +27,7 @@ export default async function admitMemberLogic(
   if (auth.role === 'Member') throw new Error('Not authorized to admit members');
 
   // Transaction to join the league
-  return await (trxOverride ?? db)
+  const result = await (trxOverride ?? db)
     .transaction(async (trx) => {
       const draftOrder = await db
         .select({ draftOrder: sql`COALESCE(MAX(draft_order), 0) + 1` })
@@ -48,10 +48,36 @@ export default async function admitMemberLogic(
           eq(leagueMemberSchema.leagueId, auth.leagueId),
           eq(leagueMemberSchema.memberId, memberId),
           isNull(leagueMemberSchema.draftOrder)))
-        .returning({ memberId: leagueMemberSchema.memberId })
-        .then((res) => res[0]?.memberId);
+        .returning({
+          memberId: leagueMemberSchema.memberId,
+          userId: leagueMemberSchema.userId,
+        })
+        .then((res) => res[0]);
+
       if (!member) throw new Error('Failed to add user as a member');
 
-      return { success: true, admitted: true };
+      // Get league name for notification
+      const league = await trx
+        .select({ name: leagueSchema.name, hash: leagueSchema.hash })
+        .from(leagueSchema)
+        .where(eq(leagueSchema.leagueId, auth.leagueId))
+        .then((res) => res[0]);
+
+      return { success: true, admitted: true, userId: member.userId, league };
     });
+
+  // Send notification outside transaction
+  if (result.league) {
+    void sendPushToUser(
+      result.userId,
+      {
+        title: 'League Admission',
+        body: `You've been admitted to ${result.league.name}!`,
+        data: { type: 'league_admission', leagueHash: result.league.hash },
+      },
+      'leagueActivity'
+    );
+  }
+
+  return { success: true, admitted: true };
 }

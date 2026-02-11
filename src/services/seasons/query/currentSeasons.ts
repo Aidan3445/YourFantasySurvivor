@@ -24,12 +24,13 @@ export default async function getCurrentSeasons() {
 
 async function fetchCurrentSeasons() {
   const now = new Date().toISOString();
+  const threeMonthsFromNow = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
   return db
     .select()
     .from(seasonSchema)
     .where(and(
-      lte(seasonSchema.premiereDate, now),
+      lte(seasonSchema.premiereDate, threeMonthsFromNow),
       or(
         isNull(seasonSchema.finaleDate),
         gte(seasonSchema.finaleDate, now))))
