@@ -1,5 +1,5 @@
 import 'server-only';
-import { eq, and, lt } from 'drizzle-orm';
+import { eq, and, lt, desc } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { type Episode, type EpisodeInsert } from '~/types/episodes';
@@ -60,6 +60,7 @@ export async function createEpisodeLogic(
         {
           ...res[0],
           airDate: new Date(res[0]?.airDate ?? 0),
+          // air status isn't really used here so not calculating it perfectly
           airStatus: new Date(res[0]?.airDate ?? 0) > new Date() ? 'Upcoming' : 'Aired',
         } : null));
 
@@ -93,7 +94,7 @@ export async function createEpisodeLogic(
         eq(episodeSchema.seasonId, season.seasonId),
         lt(episodeSchema.episodeNumber, episode.episodeNumber)
       ))
-      .orderBy(episodeSchema.episodeNumber)
+      .orderBy(desc(episodeSchema.episodeNumber))
       .limit(1)
       .then((res) => res[0]);
 

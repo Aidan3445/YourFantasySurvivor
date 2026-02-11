@@ -11,9 +11,13 @@ import {
 import { sendDraftDateNotification, sendDraftReminderNotification } from '~/services/notifications/reminders/draftDate';
 import { sendSelectionChangeNotification } from '~/services/notifications/reminders/selectionChange';
 
+if (!process.env.QSTASH_CURRENT_SIGNING_KEY || !process.env.QSTASH_NEXT_SIGNING_KEY) {
+  throw new Error('QStash signing keys are not set in environment variables');
+}
+
 const receiver = new Receiver({
-  currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
-  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY!,
+  currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY,
+  nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY,
 });
 
 export async function POST(request: NextRequest) {

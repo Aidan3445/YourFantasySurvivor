@@ -22,7 +22,7 @@ export default async function createCustomEventLogic(
 ) {
   if (auth.status === 'Inactive') throw new Error('League is inactive');
   // Create custom event in transaction
-  return db.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     // ensure the rule is in the league
     const rule = await trx
       .select({ eventName: customEventRuleSchema.eventName })
@@ -56,8 +56,12 @@ export default async function createCustomEventLogic(
       .insert(customEventReferenceSchema)
       .values(eventRefs);
 
-    void sendCustomEventNotification(customEvent, rule.eventName, auth.leagueId);
 
-    return { newEventId };
+    return { newEventId, rule };
   });
+
+  // Sending notification outside of transaction
+  void sendCustomEventNotification(customEvent, result.rule.eventName, auth.leagueId);
+
+  return { newEventId: result.newEventId };
 }

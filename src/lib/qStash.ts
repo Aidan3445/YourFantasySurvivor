@@ -82,6 +82,14 @@ export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
     const reminderAt = new Date(draftTime - 60 * 60 * 1000);
 
     const reminderTimestamp = Math.floor(reminderAt.getTime() / 1000);
+    // Don't schedule if time has passed
+    if (reminderTimestamp <= Math.floor(Date.now() / 1000)) {
+      console.log(`Skipping draft_reminder_1hr for league ${data.leagueId} - time has passed`, {
+        reminderAt: reminderAt.toISOString(),
+      });
+      return null;
+    }
+
     await qstash.publishJSON({
       url: `${BASE_URL}/api/notifications/scheduled`,
       body: { type: 'draft_reminder_1hr' as const, draft: data },

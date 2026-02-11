@@ -6,6 +6,7 @@ import { leagueSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { sendPushToUsers } from '~/services/notifications/push';
 import { type Episode } from '~/types/episodes';
+import { getUsersNeedingReminders } from '~/services/users/query/usersNeedingReminders';
 
 /**
  * Validate that the scheduled episode data matches current DB state
@@ -58,23 +59,13 @@ async function validateEpisode(scheduled: Episode): Promise<boolean> {
  */
 export async function sendReminderNotifications(
   timing: 'midweek' | '8hr' | '15min',
-  episode: Episode
+  episode: Episode,
 ) {
   if (!await validateEpisode(episode)) return;
 
   // Get users in active leagues for this season
   // TODO: Filter by users who haven't made predictions for this episode
-  const users = await db
-    .selectDistinct({ userId: leagueMemberSchema.userId })
-    .from(leagueMemberSchema)
-    .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
-    .where(and(
-      eq(leagueSchema.seasonId, episode.seasonId),
-      eq(leagueSchema.status, 'Active'),
-      isNotNull(leagueMemberSchema.draftOrder),
-    ));
-
-  if (users.length === 0) return;
+  const users = await getUsersNeedingReminders(episode);
 
   const messages = {
     'midweek': {
@@ -92,7 +83,7 @@ export async function sendReminderNotifications(
   };
 
   await sendPushToUsers(
-    users.map((u) => u.userId),
+    users,
     { ...messages[timing], data: { type: 'reminder', episodeId: episode.episodeId, timing } },
     'reminders',
   );
