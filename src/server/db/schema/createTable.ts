@@ -21,8 +21,8 @@ export const defaultColumns = {
 // copied from def of pgTableCreator in drizzle-orm
 type PgTableFnM<TSchema extends string | undefined = undefined> = <
   TTableName extends string, TColumnsMap extends Record<string, PgColumnBuilderBase>
->(name: TTableName, columns: TColumnsMap, extraConfig?: (
-  self: BuildExtraConfigColumns<TTableName, TColumnsMap, 'pg'>
+>(_name: TTableName, _columns: TColumnsMap, _extraConfig?: (
+  _self: BuildExtraConfigColumns<TTableName, TColumnsMap, 'pg'>
 ) => PgTableExtraConfigValue[]) => PgTableWithColumns<{
   name: TTableName;
   schema: TSchema;
@@ -30,7 +30,6 @@ type PgTableFnM<TSchema extends string | undefined = undefined> = <
   dialect: 'pg';
 }>;
 
-//export const createTable = pgTableCreator((name) => `yfs_${name}`);
 export const createTable: PgTableFnM = (name, columns, extraConfig) => {
   return pgTableCreator((name) => `yfs_${name}`)(name, { ...columns, ...defaultColumns }, extraConfig);
 };
