@@ -3,7 +3,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { Receiver } from '@upstash/qstash';
 import { type NotificationType } from '~/types/notifications';
 import { type Episode } from '~/types/episodes';
-import { sendEpisodeFinishedNotifications, sendEpisodeStartingNotifications, sendReminderNotifications } from '~/services/notifications/reminders/predictions';
+import {
+  sendEpisodeFinishedNotifications,
+  sendEpisodeStartingNotifications,
+  sendReminderNotifications,
+} from '~/services/notifications/reminders/predictions';
+import { sendDraftDateNotification, sendDraftReminderNotification } from '~/services/notifications/reminders/draftDate';
 
 const receiver = new Receiver({
   currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
@@ -25,35 +30,47 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
-  const { type, episode } = JSON.parse(body) as {
+  const parsed = JSON.parse(body) as {
     type: NotificationType;
-    episode: Episode;
+    episode?: Episode;
+    draft?: {
+      leagueId: number;
+      leagueHash: string;
+      leagueName: string;
+      draftDate: string | null;
+    };
   };
 
   try {
-    switch (type) {
+    switch (parsed.type) {
       case 'reminder_midweek':
-        await sendReminderNotifications('midweek', episode);
+        await sendReminderNotifications('midweek', parsed.episode!);
         break;
       case 'reminder_8hr':
-        await sendReminderNotifications('8hr', episode);
+        await sendReminderNotifications('8hr', parsed.episode!);
         break;
       case 'reminder_15min':
-        await sendReminderNotifications('15min', episode);
+        await sendReminderNotifications('15min', parsed.episode!);
         break;
       case 'episode_starting':
-        await sendEpisodeStartingNotifications(episode);
+        await sendEpisodeStartingNotifications(parsed.episode!);
         break;
       case 'episode_finished':
-        await sendEpisodeFinishedNotifications(episode);
+        await sendEpisodeFinishedNotifications(parsed.episode!);
+        break;
+      case 'draft_date_changed':
+        await sendDraftDateNotification(parsed.draft!);
+        break;
+      case 'draft_reminder_1hr':
+        await sendDraftReminderNotification(parsed.draft!);
         break;
       default:
-        console.error('Unknown notification type:', type);
+        console.error('Unknown notification type:', parsed.type);
     }
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error(`Failed to send ${type} notification:`, error);
+    console.error(`Failed to send ${parsed.type} notification:`, error);
     return NextResponse.json({ error: 'Failed to send notification' }, { status: 500 });
   }
 }

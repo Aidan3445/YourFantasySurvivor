@@ -33,8 +33,9 @@ export type NotificationType =
   | 'reminder_8hr'
   | 'reminder_15min'
   | 'episode_starting'
-  | 'episode_finished';
-
+  | 'episode_finished'
+  | 'draft_date_changed'
+  | 'draft_reminder_1hr';
 
 export type LiveScoringNotification = {
   episodeId: number;
