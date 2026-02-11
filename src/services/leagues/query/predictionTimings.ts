@@ -1,8 +1,5 @@
 import 'server-only';
 
-import { db } from '~/server/db';
-import { eq } from 'drizzle-orm';
-import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import getKeyEpisodes from '~/services/seasons/query/getKeyEpisodes';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { getActiveTimings } from '~/lib/episodes';
@@ -14,28 +11,16 @@ import { getActiveTimings } from '~/lib/episodes';
    * @returnObj `PredictionTiming[]`
    */
 export default async function getPredictionTimings(auth: VerifiedLeagueMemberAuth) {
-  const league = await db
-    .select({
-      leagueStatus: leagueSchema.status,
-      draftDate: leagueSettingsSchema.draftDate,
-      startWeek: leagueSchema.startWeek,
-      seasonId: leagueSchema.seasonId
-    })
-    .from(leagueSchema)
-    .leftJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))
-    .where(eq(leagueSchema.leagueId, auth.leagueId))
-    .then((leagues) => leagues[0]);
+  if (auth.status === 'Inactive') return [];
 
-  if (!league || league.leagueStatus === 'Inactive') return [];
-
-  const keyEpisodes = await getKeyEpisodes(league.seasonId);
+  const keyEpisodes = await getKeyEpisodes(auth.seasonId);
 
   if (!keyEpisodes.nextEpisode) return [];
 
   return getActiveTimings({
     keyEpisodes,
-    leagueStatus: league.leagueStatus,
-    startWeek: league.startWeek,
+    leagueStatus: auth.status,
+    startWeek: auth.startWeek,
   });
 
 }
