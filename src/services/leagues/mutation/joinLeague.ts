@@ -36,7 +36,8 @@ export default async function joinLeagueLogic(
         status: leagueSchema.status,
         season: seasonSchema.name,
         isProtected: leagueSettingsSchema.isProtected,
-        seasonId: leagueSchema.seasonId
+        seasonId: leagueSchema.seasonId,
+        startWeek: leagueSchema.startWeek,
       })
       .from(leagueSchema)
       .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))
@@ -72,7 +73,8 @@ export default async function joinLeagueLogic(
         status: league.status,
         seasonId: league.seasonId,
         // override role for admittance
-        role: 'Admin'
+        role: 'Admin',
+        startWeek: league.startWeek,
       };
       return await admitMemberLogic(auth, member.memberId, trx);
     }
