@@ -34,7 +34,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
 
   const rulesObject = basePredictionRulesSchemaToObject(baseEventPredictionRules);
 
-  const t = await db.selectDistinct({
+  return db.selectDistinct({
     predictionId: baseEventPredictionSchema.baseEventPredictionId,
     predictionEpisodeNumber: episodeSchema.episodeNumber,
     eventEpisodeNumber: eventEpisodeAlias.episodeNumber,
@@ -93,9 +93,8 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
       bet: number | null;
       eventId: number | null;
       hit: boolean;
-    }[]) => {
-      console.log('Base prediction rows:', rows);
-      return rows.reduce((acc, row) => {
+    }[]) =>
+      rows.reduce((acc, row) => {
         const episodeKey = row.predictionEpisodeNumber;
         acc[episodeKey] ??= {};
         const predictions = acc[episodeKey];
@@ -126,10 +125,7 @@ export default async function getBasePredictions(auth: VerifiedLeagueMemberAuth)
           ...row,
         });
         return acc;
-      }, {} as Predictions);
-    });
-  console.log('Base predictions:', t);
-  return t;
+      }, {} as Predictions));
 }
 
 // Helper function - returns timing type for an event

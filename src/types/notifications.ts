@@ -25,3 +25,10 @@ export type ExpoPushMessage = {
   sound: 'default';
   data?: Record<string, unknown>;
 }
+
+export type NotificationType =
+  | 'reminder_midweek'
+  | 'reminder_8hr'
+  | 'reminder_15min'
+  | 'episode_starting'
+  | 'episode_finished';

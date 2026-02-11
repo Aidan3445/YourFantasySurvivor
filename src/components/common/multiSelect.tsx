@@ -231,7 +231,7 @@ export const MultiSelect = React.forwardRef<
           >
             {selectedValues.length > 0 && !empty ? (
               <div className='flex justify-between items-center w-full'>
-                <div className='flex flex-wrap items-center'>
+                <div className='flex flex-wrap items-center text-left'>
                   {!empty && selectedValues.slice(0, sliceAt).map((value) => {
                     const option = options.find((o) => o.value === value);
                     const IconComponent = option?.icon;
@@ -319,8 +319,7 @@ export const MultiSelect = React.forwardRef<
           <Command>
             <CommandInput
               placeholder='Search...'
-              onKeyDown={handleInputKeyDown}
-            />
+              onKeyDown={handleInputKeyDown} />
             <CommandList>
               <CommandEmpty>No results found.</CommandEmpty>
               <CommandGroup>

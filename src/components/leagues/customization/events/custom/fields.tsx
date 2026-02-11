@@ -89,7 +89,6 @@ export default function LeagueEventFields({ isPrediction, children }: LeagueEven
                   {...field}
                   onChange={(e) => {
                     const value = parseInt(e.target.value, 10);
-                    console.log('Parsed value:', value, isPrediction);
                     if (isNaN(value)) {
                       field.onChange('');
                     } else if (isPrediction && value <= 0) {

@@ -2,6 +2,8 @@ import { type KeyEpisodes } from '~/types/episodes';
 import { type PredictionTiming } from '~/types/events';
 import { type LeagueStatus } from '~/types/leagues';
 
+export const DEFAULT_EPISODE_RUNTIME = 90;
+
 export const AirStatuses = ['Aired', 'Upcoming', 'Airing'] as const;
 
 export type AirStatus = (typeof AirStatuses)[number];

@@ -4,8 +4,12 @@ import { ActiveLeagues } from '~/components/home/activeLeagues/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { CastawayScoreboard } from '~/components/home/scoreboard/view';
 import Spacer from '~/components/shared/floatingActions/spacer';
+import { getUsersNeedingReminders } from '~/services/users/query/usersNeedingReminders';
 
 export default async function HomePage() {
+  const users = await getUsersNeedingReminders();
+  console.log('Users needing reminders:', users);
+
   return (
     <div className='relative'>
       <ScrollArea className='overflow-y-visible md:h-[calc(100svh-1rem)] h-[calc(100svh-var(--navbar-height))]'>

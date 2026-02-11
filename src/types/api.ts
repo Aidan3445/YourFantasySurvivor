@@ -18,5 +18,6 @@ export type VerifiedLeagueMemberAuth = {
   role: LeagueMemberRole;
   leagueId: number;
   status: LeagueStatus;
+  startWeek: number | null;
   seasonId: number;
 }
