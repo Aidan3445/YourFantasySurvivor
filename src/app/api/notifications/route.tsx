@@ -32,6 +32,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Missing token' }, { status: 400 });
     }
 
+    if (!body.enabled && !body.preferences) {
+      return NextResponse.json({ error: 'No preferences to update' }, { status: 400 });
+    }
+
     try {
       const result = await updatePushPreferences(body, userId);
       return NextResponse.json(result, { status: 200 });
