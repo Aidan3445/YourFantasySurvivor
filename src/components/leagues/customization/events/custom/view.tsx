@@ -33,6 +33,8 @@ export default function CustomEvents() {
   const [locked, setLocked] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const isPrediction = reactForm.watch('eventType') === 'Prediction';
+
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     if (!league) return;
 
@@ -115,9 +117,12 @@ export default function CustomEvents() {
                     Create a custom event to score in your league.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <LeagueEventFields predictionDefault={reactForm.watch('eventType') === 'Prediction'} />
+                <LeagueEventFields isPrediction={isPrediction} />
                 <AlertDialogFooter className='grid grid-cols-2 gap-2 items-end'>
-                  <AlertDialogCancel variant='secondary' className='font-bold uppercase text-xs tracking-wider'>
+                  <AlertDialogCancel
+                    variant='secondary'
+                    className='font-bold uppercase text-xs tracking-wider'
+                    onClick={() => reactForm.reset()}>
                     Cancel
                   </AlertDialogCancel>
                   <Button
