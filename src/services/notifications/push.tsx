@@ -1,10 +1,9 @@
 import 'server-only';
 import { db } from '~/server/db';
-import { pushTokens } from '~/server/db/schema/pushTokens';
+import { pushTokens } from '~/server/db/schema/notifications';
 import { eq, and, inArray } from 'drizzle-orm';
 import { type ExpoPushMessage, type PushMessage } from '~/types/notifications';
-
-const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
+import { EXPO_PUSH_URL } from '~/lib/qStash';
 
 /**
  * Send a push notification to a single user (all their devices)

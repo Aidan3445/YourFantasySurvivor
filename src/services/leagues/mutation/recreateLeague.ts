@@ -9,6 +9,7 @@ import createNewLeagueLogic from '~/services/leagues/mutation/createNewLeague';
 import { type VerifiedLeagueMemberAuth } from '~/types/api';
 import { baseEventPredictionRulesSchema, baseEventRulesSchema, shauhinModeSettingsSchema } from '~/server/db/schema/baseEvents';
 import { customEventRuleSchema } from '~/server/db/schema/customEvents';
+import { sendPushToUsers } from '~/services/notifications/push';
 
 /**
  * Recreate a league by copying its settings and adding specified members
@@ -21,10 +22,10 @@ import { customEventRuleSchema } from '~/server/db/schema/customEvents';
  */
 export default async function recreateLeagueLogic(
   auth: VerifiedLeagueMemberAuth,
-  memberIds: number[]
+  memberIds: number[],
 ) {
   // Create the league in a transaction
-  return await db.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     // GATHER DATA
     // first get all the members of the original league
     const members = await trx
@@ -137,7 +138,26 @@ export default async function recreateLeagueLogic(
       .insert(customEventRuleSchema)
       .values(customEventRules.map((r) => ({ ...r, leagueId, customEventRuleId: undefined })));
 
-    return { newHash };
-  });
-}
+    // Collect non-owner user IDs for notification
+    const otherMemberUserIds = members
+      .filter((m) => m.userId !== auth.userId)
+      .map((m) => m.userId);
 
+    return { newHash, leagueName: originalLeague.league.name, otherMemberUserIds };
+  });
+
+  // Send notification outside transaction
+  if (result.otherMemberUserIds.length > 0) {
+    void sendPushToUsers(
+      result.otherMemberUserIds,
+      {
+        title: 'New Season, New League!',
+        body: `You've been added to ${result.leagueName} for the new season!`,
+        data: { type: 'league_recreated', leagueHash: result.newHash },
+      },
+      'leagueActivity',
+    );
+  }
+
+  return { newHash: result.newHash };
+}

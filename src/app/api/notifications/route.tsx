@@ -1,9 +1,9 @@
 import 'server-only';
 import { type NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '~/lib/apiMiddleware';
-import registerPushToken from '~/services/notifications/mutation/registerPushToken';
-import unregisterPushToken from '~/services/notifications/mutation/unregisterPushToken';
-import updatePushPreferences from '~/services/notifications/mutation/updatePushPreferences';
+import registerPushToken from '~/services/notifications/tokens/registerPushToken';
+import unregisterPushToken from '~/services/notifications/tokens/unregisterPushToken';
+import updatePushPreferences from '~/services/notifications/tokens/updatePushPreferences';
 import { type Notifications } from '~/types/notifications';
 
 export async function POST(request: NextRequest) {

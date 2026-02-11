@@ -1,6 +1,6 @@
 import 'server-only';
 import { db } from '~/server/db';
-import { pushTokens } from '~/server/db/schema/pushTokens';
+import { pushTokens } from '~/server/db/schema/notifications';
 import { eq, and } from 'drizzle-orm';
 
 /**
