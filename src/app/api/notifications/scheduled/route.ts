@@ -2,11 +2,8 @@ import 'server-only';
 import { type NextRequest, NextResponse } from 'next/server';
 import { Receiver } from '@upstash/qstash';
 import { type NotificationType } from '~/types/notifications';
-import {
-  sendReminderNotifications,
-  sendEpisodeStartingNotifications,
-  sendEpisodeFinishedNotifications
-} from '~/services/notifications/cron/predictions';
+import { type Episode } from '~/types/episodes';
+import { sendEpisodeFinishedNotifications, sendEpisodeStartingNotifications, sendReminderNotifications } from '~/services/notifications/cron/predictions';
 
 const receiver = new Receiver({
   currentSigningKey: process.env.QSTASH_CURRENT_SIGNING_KEY!,
@@ -14,7 +11,6 @@ const receiver = new Receiver({
 });
 
 export async function POST(request: NextRequest) {
-  // Verify request is from QStash
   const signature = request.headers.get('upstash-signature');
   if (!signature) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
@@ -29,29 +25,27 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
   }
 
-  const { type, episodeId } = JSON.parse(body) as {
+  const { type, episode } = JSON.parse(body) as {
     type: NotificationType;
-    episodeId?: number;
+    episode: Episode;
   };
 
   try {
     switch (type) {
       case 'reminder_midweek':
-        await sendReminderNotifications('midweek');
+        await sendReminderNotifications('midweek', episode);
         break;
       case 'reminder_8hr':
-        await sendReminderNotifications('8hr');
+        await sendReminderNotifications('8hr', episode);
         break;
       case 'reminder_15min':
-        await sendReminderNotifications('15min');
+        await sendReminderNotifications('15min', episode);
         break;
       case 'episode_starting':
-        if (!episodeId) throw new Error('episodeId required for episode_starting');
-        await sendEpisodeStartingNotifications(episodeId);
+        await sendEpisodeStartingNotifications(episode);
         break;
       case 'episode_finished':
-        if (!episodeId) throw new Error('episodeId required for episode_finished');
-        await sendEpisodeFinishedNotifications(episodeId);
+        await sendEpisodeFinishedNotifications(episode);
         break;
       default:
         console.error('Unknown notification type:', type);

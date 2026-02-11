@@ -4,6 +4,7 @@ import { ActiveLeagues } from '~/components/home/activeLeagues/view';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { CastawayScoreboard } from '~/components/home/scoreboard/view';
 import Spacer from '~/components/shared/floatingActions/spacer';
+import TestPushButton from '~/components/sys/testPushButton';
 
 export default async function HomePage() {
   return (
@@ -17,6 +18,8 @@ export default async function HomePage() {
           <SignedIn>
             <ActiveLeagues />
           </SignedIn>
+
+          <TestPushButton />
 
           <CastawayScoreboard />
         </div>
