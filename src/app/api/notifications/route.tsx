@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Missing token' }, { status: 400 });
     }
 
-    if (!body.enabled && !body.preferences) {
+    if (body.enabled === undefined && body.preferences === undefined) {
       return NextResponse.json({ error: 'No preferences to update' }, { status: 400 });
     }
 
