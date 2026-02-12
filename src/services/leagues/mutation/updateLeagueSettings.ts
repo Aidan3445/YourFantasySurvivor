@@ -59,7 +59,7 @@ export default async function updateLeagueSettingsLogic(
     if (name) {
       leagueName = await trx
         .update(leagueSchema)
-        .set({ name })
+        .set({ name: name.trim() })
         .where(eq(leagueSchema.leagueId, auth.leagueId))
         .returning({ name: leagueSchema.name })
         .then((res) => res[0]?.name);
