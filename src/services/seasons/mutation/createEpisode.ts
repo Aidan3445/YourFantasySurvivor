@@ -59,7 +59,7 @@ export async function createEpisodeLogic(
       .then((res) => (res[0] ?
         {
           ...res[0],
-          airDate: new Date(res[0]?.airDate ?? 0),
+          airDate: new Date(`${res[0]?.airDate ?? 0} Z`),
           // air status isn't really used here so not calculating it perfectly
           airStatus: new Date(res[0]?.airDate ?? 0) > new Date() ? 'Upcoming' : 'Aired',
         } : null));
@@ -106,7 +106,7 @@ export async function createEpisodeLogic(
       airDate: date,
       runtime: runtime ?? 90,
       previousEpisodeAirDate: previousEpisode?.airDate
-        ? new Date(previousEpisode.airDate)
+        ? new Date(`${previousEpisode.airDate} Z`)
         : undefined,
     };
   });
