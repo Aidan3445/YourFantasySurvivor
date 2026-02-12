@@ -66,40 +66,63 @@ const DELAY_MINUTES = 5;
 export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
   const scheduledAt = Math.floor(Date.now() / 1000) + DELAY_MINUTES * 60;
 
-  const result = await qstash.publishJSON({
-    url: `${BASE_URL}/api/notifications/scheduled`,
-    body: { type: 'draft_date_changed' as const, draft: data },
-    notBefore: scheduledAt,
-  });
-
-  console.log(
-    `Scheduled draft_date_changed for league ${data.leagueId} in ${DELAY_MINUTES} min`
-  );
+  let result;
+  try {
+    console.log(`Scheduling draft_date_changed for league ${data.leagueId} at ${new Date(scheduledAt * 1000).toISOString()}`, {
+      data,
+    });
+    result = await qstash.publishJSON({
+      url: `${BASE_URL}/api/notifications/scheduled`,
+      body: { type: 'draft_date_changed' as const, draft: data },
+      notBefore: scheduledAt,
+      deduplicationId: `draft_date_changed-${data.leagueId}`,
+    });
+    console.log(
+      `Scheduled draft_date_changed for league ${data.leagueId} in ${DELAY_MINUTES} min`
+    );
+  } catch {
+    console.error(`Failed to schedule draft_date_changed for league ${data.leagueId}`,
+      `Expected schedule time: ${new Date(scheduledAt * 1000).toISOString()}`,
+      `Draft date: ${data.draftDate ? new Date(data.draftDate).toISOString() : 'N/A'}`);
+    return null;
+  }
 
   // Schedule 1-hour reminder if draft has a specific date
   if (data.draftDate) {
     const draftTime = new Date(data.draftDate).getTime();
     const reminderAt = new Date(draftTime - 60 * 60 * 1000);
 
-    const reminderTimestamp = Math.floor(reminderAt.getTime() / 1000);
+    const reminderTimestamp = Math.max(
+      Math.floor(reminderAt.getTime() / 1000),
+      scheduledAt + 60, // at least 1 minute after the "rescheduled" notification
+    );
     // Don't schedule if time has passed
     if (reminderTimestamp <= Math.floor(Date.now() / 1000)) {
       console.log(`Skipping draft_reminder_1hr for league ${data.leagueId} - time has passed`, {
         reminderAt: reminderAt.toISOString(),
       });
-      return null;
+      return result.messageId;
     }
 
-    await qstash.publishJSON({
-      url: `${BASE_URL}/api/notifications/scheduled`,
-      body: { type: 'draft_reminder_1hr' as const, draft: data },
-      notBefore: reminderTimestamp,
-      deduplicationId: `draft_reminder_1hr-${data.leagueId}-${reminderTimestamp}`,
-    });
-
-    console.log(
-      `Scheduled draft_reminder_1hr for league ${data.leagueId} at ${reminderAt.toISOString()}`
-    );
+    try {
+      console.log(`Scheduling draft_reminder_1hr for league ${data.leagueId} at ${reminderAt.toISOString()}`, {
+        data,
+      });
+      await qstash.publishJSON({
+        url: `${BASE_URL}/api/notifications/scheduled`,
+        body: { type: 'draft_reminder_1hr' as const, draft: data },
+        notBefore: reminderTimestamp,
+        deduplicationId: `draft_reminder_1hr-${data.leagueId}-${reminderTimestamp}`,
+      });
+      console.log(
+        `Scheduled draft_reminder_1hr for league ${data.leagueId} at ${reminderAt.toISOString()}`
+      );
+    } catch {
+      console.error(`Failed to schedule draft_reminder_1hr for league ${data.leagueId}`,
+        `Expected schedule time: ${reminderAt.toISOString()}`,
+        `Draft date: ${data.draftDate ? new Date(data.draftDate).toISOString() : 'N/A'}`);
+      return result.messageId;
+    }
   }
 
   return result.messageId;

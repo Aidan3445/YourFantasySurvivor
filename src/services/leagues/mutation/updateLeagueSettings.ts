@@ -41,7 +41,7 @@ export default async function updateLeagueSettingsLogic(
   const result = await db.transaction(async (trx) => {
     const { secondaryPickMultiplier, ...rest } = update;
 
-    await trx
+    const updatedSettings: { draftDate: Date | null } | null = await trx
       .update(leagueSettingsSchema)
       .set({
         ...rest,
@@ -50,10 +50,16 @@ export default async function updateLeagueSettingsLogic(
           : undefined,
         draftDate: safeDraftDate === null
           ? null
-          : safeDraftDate?.toUTCString(),
+          : safeDraftDate?.toISOString(),
       })
       .from(leagueSchema)
-      .where(eq(leagueSettingsSchema.leagueId, auth.leagueId));
+      .where(eq(leagueSettingsSchema.leagueId, auth.leagueId))
+      .returning({
+        draftDate: leagueSettingsSchema.draftDate,
+      })
+      .then((res) => res[0] ? {
+        draftDate: res[0].draftDate ? new Date(`${res[0].draftDate} Z`) : null,
+      } : null);
 
     let leagueName: string | undefined;
     if (name) {
@@ -76,6 +82,7 @@ export default async function updateLeagueSettingsLogic(
       return {
         success: true,
         draftChanged: true,
+        draftDate: updatedSettings?.draftDate ?? null,
         leagueName: leagueName ?? league?.name ?? '',
         leagueHash: league?.hash ?? '',
       };
@@ -90,7 +97,7 @@ export default async function updateLeagueSettingsLogic(
       leagueId: auth.leagueId,
       leagueHash: result.leagueHash!,
       leagueName: result.leagueName!,
-      draftDate: safeDraftDate ? safeDraftDate.toISOString() : null,
+      draftDate: result.draftDate!.toISOString(),
     });
   }
 

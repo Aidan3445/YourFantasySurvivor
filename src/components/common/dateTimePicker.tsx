@@ -20,80 +20,110 @@ interface DateTimePickerProps {
   rangeEnd?: Date;
 }
 
-export function DateTimePicker({ value, onChange, rangeStart, rangeEnd }: DateTimePickerProps) {
+// helper: enforce your invariant in ONE place
+function withZeroSeconds(date: Date) {
+  const d = new Date(date);
+  d.setSeconds(0, 0);
+  return d;
+}
+
+export function DateTimePicker({
+  value,
+  onChange,
+  rangeStart,
+  rangeEnd,
+}: DateTimePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(value);
+  const [date, setDate] = React.useState<Date | undefined>(
+    value ? withZeroSeconds(value) : undefined
+  );
+
+  // keep internal state in sync with controlled value
+  React.useEffect(() => {
+    if (value) {
+      setDate(withZeroSeconds(value));
+    }
+  }, [value]);
 
   return (
     <div className='flex gap-4'>
+      {/* DATE */}
       <div className='flex flex-col gap-3'>
         <Label htmlFor='date-picker' className='px-1'>
           Date
         </Label>
+
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant='accent'
               id='date-picker'
-              className='w-32 justify-between font-normal'>
+              className='w-32 justify-between font-normal'
+            >
               {date ? date.toLocaleDateString() : 'Select date'}
               <ChevronDownIcon />
             </Button>
           </PopoverTrigger>
+
           <PopoverContent className='w-auto overflow-hidden p-0 z-51' align='start'>
             <Calendar
               mode='single'
               selected={date}
               captionLayout='dropdown'
-              onSelect={(date) => {
-                // set date, preserve time or set to noon if no time
-                if (date) {
-                  const newDate = new Date(date);
-                  if (value) {
-                    newDate.setHours(value.getHours(), value.getMinutes(), value.getSeconds());
-                  } else {
-                    newDate.setHours(12, 0, 0);
-                  }
-                  setDate(newDate);
-                  if (onChange) onChange(newDate);
-                  setOpen(false);
-                }
+              onSelect={(selectedDate) => {
+                if (!selectedDate) return;
+
+                const base = date ?? new Date();
+                const next = new Date(selectedDate);
+
+                next.setHours(
+                  base.getHours() || 12,
+                  base.getMinutes() || 0,
+                  0,
+                  0
+                );
+
+                const finalDate = withZeroSeconds(next);
+                setDate(finalDate);
+                onChange?.(finalDate);
+                setOpen(false);
               }}
               disabled={(checkDate) => {
-                if (rangeStart && checkDate < rangeStart) {
-                  return true;
-                }
-                if (rangeEnd && checkDate > rangeEnd) {
-                  return true;
-                }
+                if (rangeStart && checkDate < rangeStart) return true;
+                if (rangeEnd && checkDate > rangeEnd) return true;
                 return false;
               }}
             />
           </PopoverContent>
         </Popover>
       </div>
+
+      {/* TIME */}
       <div className='flex flex-col gap-3'>
         <Label htmlFor='time-picker' className='px-1'>
           Time
         </Label>
+
         <Input
           type='time'
           id='time-picker'
-          step='1'
-          value={date ? date.toTimeString().split(' ')[0] : ''}
+          step='60'
+          value={date ? date.toTimeString().slice(0, 5) : ''}
           className='appearance-none rounded-md [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none'
           onChange={(e) => {
-            if (date) {
-              const [hours, minutes, seconds] = e.target.value.split(':').map(Number);
-              const newDate = new Date(date);
-              newDate.setHours(hours!, minutes, seconds);
-              setDate(newDate);
-              if (onChange) onChange(newDate);
-            }
+            if (!date) return;
+
+            const [hours, minutes] = e.target.value.split(':').map(Number);
+            const next = new Date(date);
+
+            next.setHours(hours!, minutes, 0, 0);
+
+            const finalDate = withZeroSeconds(next);
+            setDate(finalDate);
+            onChange?.(finalDate);
           }}
         />
       </div>
     </div>
   );
 }
-
