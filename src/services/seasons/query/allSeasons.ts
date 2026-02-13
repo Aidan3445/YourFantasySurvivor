@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { desc } from 'drizzle-orm';
+import { desc, ne } from 'drizzle-orm';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type Season } from '~/types/seasons';
 import { unstable_cache } from 'next/cache';
@@ -26,6 +26,7 @@ async function fetchAllSeasons() {
   return db
     .select()
     .from(seasonSchema)
+    .where(ne(seasonSchema.seasonId, process.env.NODE_ENV === 'production' ? 0 : -1))
     .orderBy(desc(seasonSchema.premiereDate))
     .then(rows => rows.map(row => ({
       ...row,
