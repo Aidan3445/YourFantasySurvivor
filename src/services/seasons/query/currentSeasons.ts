@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, asc, gte, isNull, lte, or } from 'drizzle-orm';
+import { and, asc, gte, isNull, lte, ne, or } from 'drizzle-orm';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { type Season } from '~/types/seasons';
 import { unstable_cache } from 'next/cache';
@@ -24,12 +24,14 @@ export default async function getCurrentSeasons() {
 
 async function fetchCurrentSeasons() {
   const now = new Date().toISOString();
+  // We consider seasons starting within the next 3 months as current
   const threeMonthsFromNow = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString();
 
   return db
     .select()
     .from(seasonSchema)
     .where(and(
+      ne(seasonSchema.seasonId, process.env.NODE_ENV === 'production' ? 0 : -1),
       lte(seasonSchema.premiereDate, threeMonthsFromNow),
       or(
         isNull(seasonSchema.finaleDate),

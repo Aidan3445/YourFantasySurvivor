@@ -78,6 +78,9 @@ export async function POST(request: NextRequest) {
       case 'draft_date_changed':
         await sendDraftDateNotification(parsed.draft!);
         break;
+      case 'draft_date_changed_soon':
+        await sendDraftDateNotification(parsed.draft!, true);
+        break;
       case 'draft_reminder_1hr':
         await sendDraftReminderNotification(parsed.draft!);
         break;

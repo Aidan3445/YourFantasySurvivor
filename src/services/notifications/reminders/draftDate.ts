@@ -9,8 +9,10 @@ import { type ScheduledDraftData } from '~/types/notifications';
 /**
  * Validate that the draft date hasn't changed since scheduling,
  * then send notifications to league members
+ * @param draft The scheduled draft data
+ * @param startsSoon Whether the draft is starting within 1 hour
  */
-export async function sendDraftDateNotification(draft: ScheduledDraftData) {
+export async function sendDraftDateNotification(draft: ScheduledDraftData, within1Hour = false) {
   // Get all admitted members
   const members = await db
     .selectDistinct({ userId: leagueMemberSchema.userId })
@@ -23,7 +25,7 @@ export async function sendDraftDateNotification(draft: ScheduledDraftData) {
   if (members.length === 0) return;
 
   const body = draft.draftDate
-    ? `The draft for ${draft.leagueName} has been rescheduled`
+    ? `The draft for ${draft.leagueName} has been rescheduled${within1Hour ? ' and starts soon! Tap for details' : '.'}`
     : `The draft for ${draft.leagueName} has been set to start manually by the league admin.`;
 
   await sendPushToUsers(

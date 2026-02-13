@@ -36,6 +36,7 @@ export type NotificationType =
   | 'episode_finished'
   | 'draft_date_changed'
   | 'draft_reminder_1hr'
+  | 'draft_date_changed_soon'
   | 'selection_changed'
 
 export type LiveScoringNotification = {
