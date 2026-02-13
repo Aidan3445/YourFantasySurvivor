@@ -64,8 +64,8 @@ export async function sendReminderNotifications(
   if (!await validateEpisode(episode)) return;
 
   // Get users in active leagues for this season
-  // TODO: Filter by users who haven't made predictions for this episode
   const users = await getUsersNeedingReminders(episode);
+  console.log(`Sending ${timing} reminders for episode ${episode.episodeId} to ${users.length} users`, users);
 
   const messages = {
     'midweek': {

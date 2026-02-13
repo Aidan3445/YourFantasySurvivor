@@ -1,6 +1,5 @@
 'use client';
 
-import { getContrastingColor } from '@uiw/color-convert';
 import ChooseCastaway from '~/components/leagues/draft/chooseCastaway';
 import ColorRow from '~/components/shared/colorRow';
 import {
@@ -91,18 +90,14 @@ export default function DraftTracker({ hash }: DraftTrackerProps) {
                         <SkipMember hash={hash} member={pick} leagueMembers={leagueMembers.members} />
                       )}
                     {(
-                      <h3
-                        className='ml-auto inline-flex text-lg self-end animate-bounce font-bold uppercase tracking-wider mr-2'
-                        style={{ color: getContrastingColor(pick.color) }}>
+                      <h3 className='ml-auto inline-flex text-lg self-end animate-bounce font-bold uppercase tracking-wider mr-2'>
                         Picking...
                       </h3>
                     )}
                   </>
                 ) : (
                   membersWithPicks?.find(m => m.member.memberId === pick.memberId) && (
-                    <h3
-                      className='ml-auto text-lg text-wrap font-medium mr-2'
-                      style={{ color: getContrastingColor(pick.color) }}>
+                    <h3 className='ml-auto text-lg text-wrap font-medium mr-2'>
                       {membersWithPicks.find(m => m.member.memberId === pick.memberId)?.castawayFullName}
                     </h3>
                   ))}

@@ -174,11 +174,20 @@ export default async function getExternalData(seasonName: string) {
         const episodeNumber = +$e(columns[0]).text().trim();
         const title = $e(columns[1]).text().trim();
         const dateStr = $e(columns[2]).text().trim();
-        episodes.push({
-          episodeNumber,
-          title,
-          airDate: setToNY8PM(dateStr)
-        });
+
+        let airDate = setToNY8PM(dateStr);
+        if (!airDate) {
+          const prevEpisode = episodes[episodes.length - 1];
+          if (prevEpisode) {
+            const nextWeek = new Date(prevEpisode.airDate);
+            nextWeek.setDate(nextWeek.getDate() + 7);
+            airDate = nextWeek;
+          }
+        }
+
+        if (airDate) {
+          episodes.push({ episodeNumber, title, airDate });
+        }
       }
     });
 

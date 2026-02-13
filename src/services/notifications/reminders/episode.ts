@@ -18,23 +18,58 @@ export async function scheduleEpisodeNotifications(
 
   // Mid-week reminder: halfway between previous episode and this one
   // Or 3 days before if no previous episode
-  if (previousEpisodeAirDate) {
-    const midpoint = previousEpisodeAirDate.getTime() +
-      (airTime - previousEpisodeAirDate.getTime()) / 2;
-    await scheduleEpisodeNotification('reminder_midweek', episode, new Date(midpoint));
-  } else {
-    await scheduleEpisodeNotification('reminder_midweek', episode, new Date(airTime - 3 * 24 * HOUR));
+  try {
+    if (previousEpisodeAirDate) {
+      const midpoint = previousEpisodeAirDate.getTime() +
+        (airTime - previousEpisodeAirDate.getTime()) / 2;
+      await scheduleEpisodeNotification('reminder_midweek', episode, new Date(midpoint));
+    } else {
+      await scheduleEpisodeNotification('reminder_midweek', episode, new Date(airTime - 3 * 24 * HOUR));
+    }
+  } catch (e) {
+    console.error('Failed to schedule mid-week reminder', e,
+      `Expected schedule time: ${previousEpisodeAirDate ? new Date(previousEpisodeAirDate.getTime() + (airTime - previousEpisodeAirDate.getTime()) / 2).toISOString() : new Date(airTime - 3 * 24 * HOUR).toISOString()}`,
+      `Episode air time: ${new Date(airTime).toISOString()}`,
+      `Previous episode air time: ${previousEpisodeAirDate ? new Date(previousEpisodeAirDate.getTime()).toISOString() : 'N/A'}`);
   }
 
   // 8 hours before
-  await scheduleEpisodeNotification('reminder_8hr', episode, new Date(airTime - 8 * HOUR));
+  try {
+    await scheduleEpisodeNotification('reminder_8hr', episode, new Date(airTime - 8 * HOUR));
+  } catch (e) {
+    console.error('Failed to schedule 8hr reminder', e,
+      `Expected schedule time: ${new Date(airTime - 8 * HOUR).toISOString()}`,
+      `Episode air time: ${new Date(airTime).toISOString()}`,
+      `Previous episode air time: ${previousEpisodeAirDate ? new Date(previousEpisodeAirDate.getTime()).toISOString() : 'N/A'}`);
+  }
 
   // 15 minutes before
-  await scheduleEpisodeNotification('reminder_15min', episode, new Date(airTime - 15 * MINUTE));
+  try {
+    await scheduleEpisodeNotification('reminder_15min', episode, new Date(airTime - 15 * MINUTE));
+  } catch (e) {
+    console.error('Failed to schedule 15min reminder', e,
+      `Expected schedule time: ${new Date(airTime - 15 * MINUTE).toISOString()}`,
+      `Episode air time: ${new Date(airTime).toISOString()}`,
+      `Previous episode air time: ${previousEpisodeAirDate ? new Date(previousEpisodeAirDate.getTime()).toISOString() : 'N/A'}`);
+  }
 
   // Episode starting (at air time)
-  await scheduleEpisodeNotification('episode_starting', episode, new Date(airTime));
+  try {
+    await scheduleEpisodeNotification('episode_starting', episode, new Date(airTime));
+  } catch (e) {
+    console.error('Failed to schedule episode starting notification', e,
+      `Expected schedule time: ${new Date(airTime).toISOString()}`,
+      `Episode air time: ${new Date(airTime).toISOString()}`,
+      `Previous episode air time: ${previousEpisodeAirDate ? new Date(previousEpisodeAirDate.getTime()).toISOString() : 'N/A'}`);
+  }
 
   // Episode finished (air time + runtime)
-  await scheduleEpisodeNotification('episode_finished', episode, new Date(airTime + episode.runtime * MINUTE));
+  try {
+    await scheduleEpisodeNotification('episode_finished', episode, new Date(airTime + episode.runtime * MINUTE));
+  } catch (e) {
+    console.error('Failed to schedule episode finished notification', e,
+      `Expected schedule time: ${new Date(airTime + episode.runtime * MINUTE).toISOString()}`,
+      `Episode air time: ${new Date(airTime).toISOString()}`,
+      `Previous episode air time: ${previousEpisodeAirDate ? new Date(previousEpisodeAirDate.getTime()).toISOString() : 'N/A'}`);
+  }
 }

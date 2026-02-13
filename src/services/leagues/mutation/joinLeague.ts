@@ -53,7 +53,12 @@ export default async function joinLeagueLogic(
     // Try to add the member, if there is a conflict, the user is already a member
     const member = await trx
       .insert(leagueMemberSchema)
-      .values({ leagueId: league.leagueId, userId: userId, ...newMember })
+      .values({
+        leagueId: league.leagueId,
+        userId: userId,
+        ...newMember,
+        displayName: newMember.displayName.trim(),
+      })
       .returning({
         userId: leagueMemberSchema.userId,
         memberId: leagueMemberSchema.memberId,

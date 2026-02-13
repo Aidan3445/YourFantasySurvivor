@@ -59,9 +59,9 @@ export async function createEpisodeLogic(
       .then((res) => (res[0] ?
         {
           ...res[0],
-          airDate: new Date(res[0]?.airDate ?? 0),
+          airDate: res[0]?.airDate ? new Date(`${res[0].airDate} Z`) : date,
           // air status isn't really used here so not calculating it perfectly
-          airStatus: new Date(res[0]?.airDate ?? 0) > new Date() ? 'Upcoming' : 'Aired',
+          airStatus: (res[0]?.airDate ? new Date(res[0].airDate) : date) > new Date() ? 'Upcoming' : 'Aired',
         } : null));
 
     if (!newEpisode) throw new Error('Failed to create episode');
@@ -106,7 +106,7 @@ export async function createEpisodeLogic(
       airDate: date,
       runtime: runtime ?? 90,
       previousEpisodeAirDate: previousEpisode?.airDate
-        ? new Date(previousEpisode.airDate)
+        ? new Date(`${previousEpisode.airDate} Z`)
         : undefined,
     };
   });

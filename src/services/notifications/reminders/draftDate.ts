@@ -11,33 +11,6 @@ import { type ScheduledDraftData } from '~/types/notifications';
  * then send notifications to league members
  */
 export async function sendDraftDateNotification(draft: ScheduledDraftData) {
-  // Validate current state matches what was scheduled
-  const current = await db
-    .select({ draftDate: leagueSettingsSchema.draftDate })
-    .from(leagueSettingsSchema)
-    .where(eq(leagueSettingsSchema.leagueId, draft.leagueId))
-    .then((res) => res[0]);
-
-  if (!current) {
-    console.log(`Skipping draft notification - league ${draft.leagueId} not found`);
-    return;
-  }
-
-  const currentDate = current.draftDate
-    ? new Date(current.draftDate).toISOString()
-    : null;
-  const scheduledDate = draft.draftDate
-    ? new Date(draft.draftDate).toISOString()
-    : null;
-
-  if (currentDate !== scheduledDate) {
-    console.log(
-      `Skipping draft notification - league ${draft.leagueId} draft date changed since scheduling`,
-      { scheduled: scheduledDate, current: currentDate }
-    );
-    return;
-  }
-
   // Get all admitted members
   const members = await db
     .selectDistinct({ userId: leagueMemberSchema.userId })
@@ -50,7 +23,7 @@ export async function sendDraftDateNotification(draft: ScheduledDraftData) {
   if (members.length === 0) return;
 
   const body = draft.draftDate
-    ? `The draft for ${draft.leagueName} has been scheduled for ${new Date(draft.draftDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}!`
+    ? `The draft for ${draft.leagueName} has been rescheduled`
     : `The draft for ${draft.leagueName} has been set to start manually by the league admin.`;
 
   await sendPushToUsers(
