@@ -61,6 +61,7 @@ export async function leagueMemberAuth(hash: string) {
       leagueId: leagueMemberSchema.leagueId,
       status: leagueSchema.status,
       seasonId: leagueSchema.seasonId,
+      startWeek: leagueSchema.startWeek,
     })
     .from(leagueMemberSchema)
     .innerJoin(leagueSchema, and(
@@ -84,6 +85,7 @@ export async function leagueMemberAuth(hash: string) {
         leagueId: leagueMemberSchema.leagueId,
         status: leagueSchema.status,
         seasonId: leagueSchema.seasonId,
+        startWeek: leagueSchema.startWeek,
       })
       .from(leagueMemberSchema)
       .innerJoin(leagueSchema, and(
@@ -99,6 +101,7 @@ export async function leagueMemberAuth(hash: string) {
       leagueId: owner.leagueId,
       status: owner.status,
       seasonId: owner.seasonId,
+      startWeek: owner.startWeek,
     } as LeagueMemberAuth;
   }
 

@@ -51,7 +51,7 @@ export default async function createNewLeagueLogic(
 
       const insertedLeague = await trx
         .insert(leagueSchema)
-        .values({ name: leagueName, seasonId })
+        .values({ name: leagueName.trim(), seasonId })
         .returning({
           leagueId: leagueSchema.leagueId,
           hash: leagueSchema.hash,
@@ -72,6 +72,7 @@ export default async function createNewLeagueLogic(
         .insert(leagueMemberSchema)
         .values({
           ...newMember,
+          displayName: newMember.displayName.trim(),
           userId: userId,
           leagueId,
           role: 'Owner',

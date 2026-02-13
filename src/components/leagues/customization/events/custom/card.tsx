@@ -36,6 +36,8 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
     resolver: zodResolver(CustomEventRuleInsertZod),
   });
 
+  const isPrediction = reactForm.watch('eventType') === 'Prediction';
+
   const handleSubmit = reactForm.handleSubmit(async (data) => {
     if (!league) return;
 
@@ -111,7 +113,7 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
                     Edit the event details or delete the event.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <LeagueEventFields predictionDefault={rule.eventType === 'Prediction'} />
+                <LeagueEventFields isPrediction={isPrediction} />
                 <AlertDialogFooter className='grid grid-cols-2 gap-2'>
                   <AlertDialogCancel variant='secondary' className='font-bold uppercase text-xs tracking-wider'>
                     Cancel

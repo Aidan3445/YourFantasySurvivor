@@ -125,13 +125,12 @@ const fmt = new Intl.DateTimeFormat('en-US', {
   timeStyle: 'long'
 });
 
-export function setToNY8PM(dateStr: string) {
+export function setToNY8PM(dateStr: string): Date | null {
   try {
     const date = new Date(`${dateStr} 20:00:00 EST`);
+    if (isNaN(date.getTime())) return null;
     return new Date(fmt.format(date));
   } catch {
-    const today = new Date();
-    today.setDate(today.getDate() + 7);
-    return new Date(fmt.format(today));
+    return null;
   }
-};
+}

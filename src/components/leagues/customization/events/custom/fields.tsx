@@ -5,23 +5,17 @@ import { Input } from '~/components/common/input';
 import { Textarea } from '~/components/common/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/common/select';
 import { MultiSelect } from '~/components/common/multiSelect';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode } from 'react';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
 import { EventTypes, PredictionTimings, ReferenceTypes } from '~/lib/events';
 import { cn } from '~/lib/utils';
 
 interface LeagueEventFieldsProps {
-  predictionDefault?: boolean;
+  isPrediction: boolean;
   children?: ReactNode;
 }
 
-export default function LeagueEventFields({ predictionDefault, children }: LeagueEventFieldsProps) {
-  const [isPrediction, setIsPrediction] = useState(predictionDefault ?? false);
-
-  const onTypeChange = (type: string) => {
-    setIsPrediction(type === 'Prediction');
-    return type;
-  };
+export default function LeagueEventFields({ isPrediction, children }: LeagueEventFieldsProps) {
 
   return (
     <>
@@ -90,8 +84,19 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
                 <Input
                   type='number'
                   step={1}
+                  min={isPrediction ? 0 : undefined}
                   placeholder='Points'
-                  {...field} />
+                  {...field}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (isNaN(value)) {
+                      field.onChange('');
+                    } else if (isPrediction && value <= 0) {
+                      field.onChange(-1 * value);
+                    } else {
+                      field.onChange(value);
+                    }
+                  }} />
               </FormControl>
               <FormDescription className='sr-only'>
                 Points awarded for this event.
@@ -108,10 +113,7 @@ export default function LeagueEventFields({ predictionDefault, children }: Leagu
                 <Select
                   defaultValue={field.value as string}
                   value={field.value as string}
-                  onValueChange={(value) => {
-                    onTypeChange(value);
-                    field.onChange(value);
-                  }} >
+                  onValueChange={field.onChange}>
                   <SelectTrigger>
                     <SelectValue placeholder='Select event type' />
                   </SelectTrigger>

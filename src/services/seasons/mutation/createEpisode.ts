@@ -1,11 +1,11 @@
 import 'server-only';
-
-import { eq } from 'drizzle-orm';
+import { eq, and, lt, desc } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { episodeSchema } from '~/server/db/schema/episodes';
-import { type EpisodeInsert } from '~/types/episodes';
+import { type Episode, type EpisodeInsert } from '~/types/episodes';
 import { seasonSchema } from '~/server/db/schema/seasons';
 import { revalidateTag } from 'next/cache';
+import { scheduleEpisodeNotifications } from '~/services/notifications/reminders/episode';
 
 /**
   * Create a new episode
@@ -21,13 +21,14 @@ export async function createEpisodeLogic(
   episode: EpisodeInsert
 ) {
   // Transaction to create the episode
-  return await db.transaction(async (trx) => {
+  const result = await db.transaction(async (trx) => {
     // Get the season ID
     const season = await trx
       .select({ seasonId: seasonSchema.seasonId })
       .from(seasonSchema)
       .where(eq(seasonSchema.name, seasonName))
       .then((res) => res[0]);
+
     if (!season) throw new Error('Season not found');
 
     // Guess the runtime
@@ -39,7 +40,7 @@ export async function createEpisodeLogic(
     const date = episode.airDate;
 
     // Insert the episode
-    const newEpisodeId = await trx
+    const newEpisode: Episode | null = await trx
       .insert(episodeSchema)
       .values({
         ...episode,
@@ -54,9 +55,16 @@ export async function createEpisodeLogic(
           airDate: date.toISOString(),
         }
       })
-      .returning({ episodeId: episodeSchema.episodeId })
-      .then((res) => res[0]?.episodeId);
-    if (!newEpisodeId) throw new Error('Failed to create episode');
+      .returning()
+      .then((res) => (res[0] ?
+        {
+          ...res[0],
+          airDate: res[0]?.airDate ? new Date(`${res[0].airDate} Z`) : date,
+          // air status isn't really used here so not calculating it perfectly
+          airStatus: (res[0]?.airDate ? new Date(res[0].airDate) : date) > new Date() ? 'Upcoming' : 'Aired',
+        } : null));
+
+    if (!newEpisode) throw new Error('Failed to create episode');
 
     if (episode.episodeNumber === 1) {
       // Update the premiere date of the season
@@ -78,9 +86,36 @@ export async function createEpisodeLogic(
       revalidateTag('seasons', 'max');
     }
 
+    // Get previous episode's air date for mid-week reminder timing
+    const previousEpisode = await trx
+      .select({ airDate: episodeSchema.airDate })
+      .from(episodeSchema)
+      .where(and(
+        eq(episodeSchema.seasonId, season.seasonId),
+        lt(episodeSchema.episodeNumber, episode.episodeNumber)
+      ))
+      .orderBy(desc(episodeSchema.episodeNumber))
+      .limit(1)
+      .then((res) => res[0]);
+
     // Invalidate cache for the season's episodes
     revalidateTag(`episodes-${season.seasonId}`, 'max');
 
-    return { newEpisodeId };
+    return {
+      newEpisode,
+      airDate: date,
+      runtime: runtime ?? 90,
+      previousEpisodeAirDate: previousEpisode?.airDate
+        ? new Date(`${previousEpisode.airDate} Z`)
+        : undefined,
+    };
   });
+
+  // Schedule notifications outside transaction
+  void scheduleEpisodeNotifications(
+    result.newEpisode,
+    result.previousEpisodeAirDate,
+  );
+
+  return { newEpisodeId: result.newEpisode.episodeId };
 }

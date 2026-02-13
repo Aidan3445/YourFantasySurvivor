@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { requireSystemAdminAuth } from '~/lib/auth';
 import getBaseEvents from '~/services/seasons/query/baseEvents';
 import createBaseEventLogic from '~/services/seasons/mutation/createBaseEvent';
 import deleteBaseEventLogic from '~/services/seasons/mutation/deleteBaseEvent';
@@ -43,38 +42,40 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  try {
+  return await withSystemAdminAuth(async () => {
     const { baseEventId, baseEvent } = await request.json() as {
-      baseEventId: number,
-      baseEvent: BaseEventInsert
+      baseEventId: number;
+      baseEvent: BaseEventInsert;
     };
-    const success = await requireSystemAdminAuth(updateBaseEventLogic)(baseEventId, baseEvent);
-    return NextResponse.json(success, { status: 200 });
-  } catch (error) {
-    let message: string;
-    if (error instanceof Error) message = error.message;
-    else message = String(error);
 
-    if (message === 'User not authorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!baseEventId || !baseEvent) {
+      return NextResponse.json({ error: 'Missing baseEventId or baseEvent' }, { status: 400 });
     }
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
-  }
+
+    try {
+      const success = await updateBaseEventLogic(baseEventId, baseEvent);
+      return NextResponse.json(success, { status: 200 });
+    } catch (error) {
+      console.error('Failed to update base event', error);
+      return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    }
+  })();
 }
 
 export async function DELETE(request: NextRequest) {
-  try {
+  return await withSystemAdminAuth(async () => {
     const { eventId } = await request.json() as { eventId: number };
-    const success = await requireSystemAdminAuth(deleteBaseEventLogic)(eventId);
-    return NextResponse.json(success, { status: 200 });
-  } catch (error) {
-    let message: string;
-    if (error instanceof Error) message = error.message;
-    else message = String(error);
 
-    if (message === 'User not authorized') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!eventId) {
+      return NextResponse.json({ error: 'Missing eventId' }, { status: 400 });
     }
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
-  }
+
+    try {
+      const success = await deleteBaseEventLogic(eventId);
+      return NextResponse.json(success, { status: 200 });
+    } catch (error) {
+      console.error('Failed to delete base event', error);
+      return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    }
+  })();
 }

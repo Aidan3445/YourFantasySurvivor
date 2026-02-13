@@ -23,7 +23,7 @@ export default async function updateMemberDetailsLogic(
   const update = await db
     .update(leagueMemberSchema)
     .set({
-      displayName: member.displayName,
+      displayName: member.displayName.trim(),
       color: member.color,
     })
     .where(eq(leagueMemberSchema.memberId, auth.memberId))
