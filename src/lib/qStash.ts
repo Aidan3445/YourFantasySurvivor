@@ -80,8 +80,8 @@ export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
     console.log(
       `Scheduled draft_date_changed for league ${data.leagueId} in ${DELAY_MINUTES} min`
     );
-  } catch {
-    console.error(`Failed to schedule draft_date_changed for league ${data.leagueId}`,
+  } catch (e) {
+    console.error(`Failed to schedule draft_date_changed for league ${data.leagueId}`, e,
       `Expected schedule time: ${new Date(scheduledAt * 1000).toISOString()}`,
       `Draft date: ${data.draftDate ? new Date(data.draftDate).toISOString() : 'N/A'}`);
     return null;
@@ -117,8 +117,8 @@ export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
       console.log(
         `Scheduled draft_reminder_1hr for league ${data.leagueId} at ${reminderAt.toISOString()}`
       );
-    } catch {
-      console.error(`Failed to schedule draft_reminder_1hr for league ${data.leagueId}`,
+    } catch (e) {
+      console.error(`Failed to schedule draft_reminder_1hr for league ${data.leagueId}`, e,
         `Expected schedule time: ${reminderAt.toISOString()}`,
         `Draft date: ${data.draftDate ? new Date(data.draftDate).toISOString() : 'N/A'}`);
       return result.messageId;
@@ -137,16 +137,25 @@ export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
 export async function scheduleSelectionChangeNotification(data: ScheduledSelectionData) {
   const scheduledAt = Math.floor(Date.now() / 1000) + DELAY_MINUTES * 60;
 
-  const result = await qstash.publishJSON({
-    url: `${BASE_URL}/api/notifications/scheduled`,
-    body: { type: 'selection_changed' as const, selection: data },
-    notBefore: scheduledAt,
-    deduplicationId: `selection_changed-${data.memberId}-${data.episodeId}-${scheduledAt}`,
-  });
-
-  console.log(
-    `Scheduled selection_changed for member ${data.memberId} in ${DELAY_MINUTES} min`
-  );
-  return result.messageId;
+  try {
+    console.log(`Scheduling selection_changed for member ${data.memberId} at ${new Date(scheduledAt * 1000).toISOString()}`, {
+      data,
+    });
+    const result = await qstash.publishJSON({
+      url: `${BASE_URL}/api/notifications/scheduled`,
+      body: { type: 'selection_changed' as const, selection: data },
+      notBefore: scheduledAt,
+      deduplicationId: `selection_changed-${data.memberId}-${data.episodeId}-${scheduledAt}`,
+    });
+    console.log(
+      `Scheduled selection_changed for member ${data.memberId} in ${DELAY_MINUTES} min`
+    );
+    return result.messageId;
+  } catch (e) {
+    console.error(`Failed to schedule selection_changed for member ${data.memberId}`, e,
+      `Expected schedule time: ${new Date(scheduledAt * 1000).toISOString()}`,
+      `Selection data: ${JSON.stringify(data)}`);
+    return null;
+  }
 }
 
