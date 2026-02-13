@@ -38,6 +38,8 @@ export default function SideNavLeagues() {
     );
   }
 
+  const notInactiveLeagues = leaguesData?.filter(({ league }) => league.status !== 'Inactive') ?? [];
+
   return (
     <Accordion
       type='single'
@@ -59,7 +61,7 @@ export default function SideNavLeagues() {
         </SidebarMenuButton>
         <AccordionContent className='pb-1'>
           <SidebarMenuSub className='border-l-primary'>
-            {leaguesData?.filter(({ league }) => league.status !== 'Inactive')
+            {notInactiveLeagues
               .slice(0, 5)
               .map(({ league }) => (
                 <SideNavLink
@@ -68,6 +70,12 @@ export default function SideNavLeagues() {
                   label={league.name}
                   pathnameMatch={`/leagues/${league.hash}`} />
               ))}
+            {notInactiveLeagues.length > 5 && (
+              <SideNavLink
+                className='text-nowrap text-primary font-normal'
+                href='/leagues'
+                label={`+${notInactiveLeagues.length - 5} more active`} />
+            )}
             <Separator className='bg-primary' />
             {(leaguesData && (leaguesData.length > 5 || leaguesData.some(({ league }) => league.status === 'Inactive'))) && (
               <SideNavLink className='text-nowrap text-primary' href='/leagues' label='View All Leagues' />

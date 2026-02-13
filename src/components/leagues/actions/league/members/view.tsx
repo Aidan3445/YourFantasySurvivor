@@ -11,11 +11,15 @@ import { Circle } from 'lucide-react';
 import { forwardRef, useEffect, useState } from 'react';
 import { Separator } from '~/components/common/separator';
 
-const ManageMembers = forwardRef<HTMLDivElement>(function ManageMembers(_props, ref) {
+interface ManageMembersProps {
+  goToPending?: boolean;
+}
+
+const ManageMembers = forwardRef<HTMLDivElement, ManageMembersProps>(function ManageMembers({ goToPending }, ref) {
   const { data: leagueMembers } = useLeagueMembers();
   const { data: pendingMembers } = usePendingMembers();
   const { data: leagueSettings } = useLeagueSettings();
-  const [tab, setTab] = useState<'current' | 'pending'>('current');
+  const [tab, setTab] = useState<'current' | 'pending'>(goToPending ? 'pending' : 'current');
 
   useEffect(() => {
     if (!leagueSettings?.isProtected && tab === 'pending') {

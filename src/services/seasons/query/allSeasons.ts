@@ -26,7 +26,7 @@ async function fetchAllSeasons() {
   return db
     .select()
     .from(seasonSchema)
-    .where(ne(seasonSchema.seasonId, process.env.NODE_ENV === 'production' ? 0 : -1))
+    .where(ne(seasonSchema.seasonId, process.env.NODE_ENV === 'production' ? -1 : 0))
     .orderBy(desc(seasonSchema.premiereDate))
     .then(rows => rows.map(row => ({
       ...row,
