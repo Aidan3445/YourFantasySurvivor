@@ -31,7 +31,7 @@ async function fetchCurrentSeasons() {
     .select()
     .from(seasonSchema)
     .where(and(
-      ne(seasonSchema.seasonId, process.env.NODE_ENV === 'production' ? 0 : -1),
+      ne(seasonSchema.seasonId, process.env.NODE_ENV === 'production' ? -1 : 0),
       lte(seasonSchema.premiereDate, threeMonthsFromNow),
       or(
         isNull(seasonSchema.finaleDate),

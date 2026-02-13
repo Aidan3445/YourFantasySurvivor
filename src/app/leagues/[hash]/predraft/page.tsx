@@ -15,60 +15,38 @@ import ManageMembers from '~/components/leagues/actions/league/members/view';
 import SurvivalSettings from '~/components/leagues/customization/settings/survival/view';
 import SecondaryPickSettings from '~/components/leagues/customization/settings/secondaryPick/view';
 import Spacer from '~/components/shared/floatingActions/spacer';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function PredraftPage() {
   const [tab, setTab] = useState('league');
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const manageMembersRef = useRef<HTMLDivElement>(null);
-
-  const scrollToManageMembers = () => {
-    if (!scrollRef.current || !manageMembersRef.current) return;
-
-    const viewport = scrollRef.current;
-    const target = manageMembersRef.current;
-
-    viewport.scrollTo({
-      top: target.offsetTop - viewport.offsetTop,
-      behavior: 'smooth',
-    });
-  };
+  const [manageMembersFirst, setManageMembersFirst] = useState(false);
 
   const goToManageMembers = () => {
+    setManageMembersFirst(true);
     setTab('settings');
-    requestAnimationFrame(scrollToManageMembers);
   };
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
     if (window.location.hash === '#manage-members') {
-      setTab('settings');
-
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => {
-            scrollToManageMembers();
-
-            history.replaceState(
-              null,
-              '',
-              window.location.pathname + window.location.search
-            );
-          });
-        });
-      }, 3000);
+      goToManageMembers();
+      history.replaceState(null, '', window.location.pathname + window.location.search);
     }
   }, []);
 
+  // Reset when user manually switches tabs
+  const handleTabChange = (value: string) => {
+    setTab(value);
+    if (value !== 'settings') setManageMembersFirst(false);
+  };
+
   return (
-    <Tabs className='w-full overflow-hidden' value={tab} onValueChange={setTab}>
+    <Tabs className='w-full overflow-hidden' value={tab} onValueChange={handleTabChange}>
       <TabsList className='sticky flex w-full px-10 rounded-none z-50 bg-accent'>
         <TabsTrigger className='flex-1' value='league'>League</TabsTrigger>
         <TabsTrigger className='flex-none w-fit' value='settings'>Settings</TabsTrigger>
       </TabsList>
       <ScrollArea
-        viewportRef={scrollRef}
         className='px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>
           <TabsContent value='league' className='space-y-4'>
@@ -89,13 +67,18 @@ export default function PredraftPage() {
             <CustomEvents />
           </TabsContent>
           <TabsContent value='settings' className='space-y-4'>
+            {manageMembersFirst && (
+              <div className='w-full flex flex-wrap gap-4 justify-center'>
+                <ManageMembers goToPending />
+              </div>
+            )}
             <MemberEditForm />
             <div className='w-full flex flex-wrap gap-4 justify-center'>
               <div className='flex flex-col gap-4 w-full'>
                 <LeagueSettings />
                 <DeleteLeague />
               </div>
-              <ManageMembers ref={manageMembersRef} />
+              {!manageMembersFirst && <ManageMembers />}
             </div>
           </TabsContent>
         </div>
