@@ -97,7 +97,7 @@ export default async function updateLeagueSettingsLogic(
       leagueId: auth.leagueId,
       leagueHash: result.leagueHash!,
       leagueName: result.leagueName!,
-      draftDate: result.draftDate!.toISOString(),
+      draftDate: result.draftDate ? result.draftDate.toISOString() : null,
     });
   }
 
