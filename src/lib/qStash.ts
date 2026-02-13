@@ -65,21 +65,31 @@ const DELAY_MINUTES = 5;
  */
 export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
   const scheduledAt = Math.floor(Date.now() / 1000) + DELAY_MINUTES * 60;
+  const comboWindow = scheduledAt + 60 * 60; // delay + 1 hour
 
   let result;
   try {
+    const isCombo = data.draftDate &&
+      Math.floor(new Date(data.draftDate).getTime() / 1000) <= comboWindow;
+
     console.log(`Scheduling draft_date_changed for league ${data.leagueId} at ${new Date(scheduledAt * 1000).toISOString()}`, {
       data,
     });
     result = await qstash.publishJSON({
       url: `${BASE_URL}/api/notifications/scheduled`,
-      body: { type: 'draft_date_changed' as const, draft: data },
+      body: {
+        type: isCombo ? 'draft_date_changed_soon' as const : 'draft_date_changed' as const,
+        draft: data,
+      },
       notBefore: scheduledAt,
       deduplicationId: `draft_date_changed-${data.leagueId}`,
     });
     console.log(
-      `Scheduled draft_date_changed for league ${data.leagueId} in ${DELAY_MINUTES} min`
+      `Scheduled ${isCombo ? 'draft_date_changed_soon' : 'draft_date_changed'} for league ${data.leagueId} in ${DELAY_MINUTES} min`
     );
+
+    // If combo, skip separate reminder
+    if (isCombo) return result.messageId;
   } catch (e) {
     console.error(`Failed to schedule draft_date_changed for league ${data.leagueId}`, e,
       `Expected schedule time: ${new Date(scheduledAt * 1000).toISOString()}`,
@@ -91,19 +101,16 @@ export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
   if (data.draftDate) {
     const draftTime = new Date(data.draftDate).getTime();
     const reminderAt = new Date(draftTime - 60 * 60 * 1000);
-
     const reminderTimestamp = Math.max(
       Math.floor(reminderAt.getTime() / 1000),
-      scheduledAt + 60, // at least 1 minute after the "rescheduled" notification
+      scheduledAt + 60,
     );
-    // Don't schedule if time has passed
     if (reminderTimestamp <= Math.floor(Date.now() / 1000)) {
       console.log(`Skipping draft_reminder_1hr for league ${data.leagueId} - time has passed`, {
         reminderAt: reminderAt.toISOString(),
       });
       return result.messageId;
     }
-
     try {
       console.log(`Scheduling draft_reminder_1hr for league ${data.leagueId} at ${reminderAt.toISOString()}`, {
         data,
@@ -127,7 +134,6 @@ export async function scheduleDraftDateNotification(data: ScheduledDraftData) {
 
   return result.messageId;
 }
-
 
 /**
  * Schedule a selection change notification with a short delay

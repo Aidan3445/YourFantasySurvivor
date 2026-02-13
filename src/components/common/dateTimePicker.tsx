@@ -40,7 +40,7 @@ export function DateTimePicker({
 
   // keep internal state in sync with controlled value
   React.useEffect(() => {
-    if (value == null) {
+    if (!value) {
       setDate(undefined);
       return;
     }

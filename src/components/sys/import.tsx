@@ -135,6 +135,11 @@ function ImportEpisode({ seasonName: seasonId, episodeNumber, title, airDate }: 
         episodeNumber,
         title: title.replaceAll('"', ''),
         airDate: new Date(airDate),
+        /*
+          airDate: new Date(Date.now() + (1000 * 60 * 16)),
+        episodeNumber: 0,
+        title: 'TEST EPISODE',
+        */
         isMerge: isMerge,
         isFinale,
         runtime,
