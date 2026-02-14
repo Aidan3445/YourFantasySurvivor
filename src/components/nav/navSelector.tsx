@@ -1,12 +1,12 @@
-import { type LucideIcon } from 'lucide-react';
 import { type ReactNode } from 'react';
 import BottomNav from '~/components/nav/bottom/view';
 import SideNav from '~/components/nav/side/view';
 import { systemAdminAuth } from '~/lib/auth';
+import { type createIcon } from '~/components/common/customIcon';
 
 export interface NavLinkProps {
   href: string;
-  icon?: LucideIcon
+  icon?: ReturnType<typeof createIcon>
   label?: string;
   pathnameMatch?: string;
   className?: string;

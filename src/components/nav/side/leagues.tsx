@@ -52,10 +52,10 @@ export default function SideNavLeagues() {
         <SidebarMenuButton className='h-10!' asChild size='lg'>
           <AccordionTrigger className='hover:no-underline font-normal mb-1 data-[state=open]:mb-0 transition-all stroke-primary'>
             <span className={cn(
-              'w-full flex gap-5 items-center text-primary transition-all',
+              'w-full flex gap-2 items-center text-primary transition-all',
               !open && leaguePath && 'font-semibold'
             )}>
-              <LeaguesIcon size={26} className='fill-primary' />
+              <LeaguesIcon size={36} className='fill-primary' />
               Leagues
             </span>
           </AccordionTrigger>
@@ -83,7 +83,7 @@ export default function SideNavLeagues() {
             )}
             <CreateLeagueModal>
               <SidebarMenuButton asChild size='lg'>
-                <span className='w-full flex gap-5  items-center transition-all text-nowrap text-primary h-10!'>
+                <span className='w-full flex items-center transition-all text-nowrap text-primary h-10!'>
                   Create League
                   <ListPlus className='stroke-primary' size={24} />
                 </span>

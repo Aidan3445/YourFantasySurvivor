@@ -12,7 +12,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const ICONS_DIR = path.resolve('src/assets/icons');
+const ICONS_DIR = path.resolve('assets/icons');
 const OUTPUT_FILE = path.resolve('src/components/icons/generated.tsx');
 
 function toComponentName(filename: string): string {
