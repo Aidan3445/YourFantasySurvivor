@@ -1,11 +1,11 @@
 'use client';
 
-import { Flame, Trophy, BookUser } from 'lucide-react';
 import BottomNavUser from '~/components/nav/bottom/user';
 import BottomNavLink from '~/components/nav/bottom/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
 import { cn } from '~/lib/utils';
+import { LeaguesIcon, PlaygroundIcon, SeasonsIcon } from '~/components/icons/generated';
 
 export default function BottomNav() {
   const pathname = usePathname();
@@ -29,9 +29,9 @@ export default function BottomNav() {
               WebkitMaskRepeat: 'no-repeat',
             }} />
         </BottomNavLink>
-        <BottomNavLink href='/seasons' icon={BookUser} />
-        <BottomNavLink href='/playground' icon={Flame} />
-        <BottomNavLink href='/leagues' icon={Trophy} pathnameMatch='/leagues' />
+        <BottomNavLink href='/seasons' icon={SeasonsIcon} />
+        <BottomNavLink href='/playground' icon={PlaygroundIcon} />
+        <BottomNavLink href='/leagues' icon={LeaguesIcon} pathnameMatch='/leagues' />
         <BottomNavUser />
       </span>
     </div>

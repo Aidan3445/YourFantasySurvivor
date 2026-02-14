@@ -1,9 +1,9 @@
-import { Flame } from 'lucide-react';
 import { type ReactNode } from 'react';
 import { FormControl, FormField, FormItem, FormLabel } from '~/components/common/form';
 import { Input } from '~/components/common/input';
 import { MultiSelect } from '~/components/common/multiSelect';
 import { Switch } from '~/components/common/switch';
+import { PointsIcon } from '~/components/icons/generated';
 import { PredictionTimings } from '~/lib/events';
 import { type ScoringBaseEventName } from '~/types/events';
 
@@ -45,7 +45,7 @@ export function BasePredictionFormField({ disabled, eventName }: BasePredictionF
                     {disabled &&
                       <h2 className='font-bold text-nowrap text-green-600'>
                         {pointsField.value}
-                        <Flame size={14} className='inline align-text-bottom mb-0.5 stroke-green-600' />
+                        <PointsIcon size={14} className='inline align-text-bottom mb-0.5 fill-green-600' />
                       </h2>}
                     {!disabled &&
                       <FormControl className='animate-scale-in-fast'>

@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '~/components/common/form';
 import { Switch } from '~/components/common/switch';
 import { Button } from '~/components/common/button';
-import { Flame, Lock, LockOpen } from 'lucide-react';
+import { Lock, LockOpen } from 'lucide-react';
+import { PointsIcon } from '~/components/icons/generated';
 import { useEffect, useState } from 'react';
 import { cn } from '~/lib/utils';
 import { type LeagueSurvivalUpdate, LeagueSurvivalUpdateZod } from '~/types/leagues';
@@ -80,9 +81,9 @@ export default function SurvivalSettings() {
       <div className='text-sm'>
         Each episode your pick survives, their streak grows:
         <ul className='list-disc pl-4'>
-          <li><b>Episode 1</b>: Earn 1<Flame className='inline align-top w-4 h-4' /> point</li>
-          <li><b>Episode 2</b>: Earn 2<Flame className='inline align-top w-4 h-4' /> points</li>
-          <li><b>Episode 3</b>: Earn 3<Flame className='inline align-top w-4 h-4' /> points, and so on...</li>
+          <li><b>Episode 1</b>: Earn 1<PointsIcon size={15} className='inline align-top' /> point</li>
+          <li><b>Episode 2</b>: Earn 2<PointsIcon size={15} className='inline align-top' /> points</li>
+          <li><b>Episode 3</b>: Earn 3<PointsIcon size={15} className='inline align-top' /> points, and so on...</li>
         </ul>
         If your pick is eliminated, you must choose a new unclaimed castaway, and your streak resets.
       </div>
@@ -104,8 +105,8 @@ export default function SurvivalSettings() {
                             : valueField.value}
                       </h2>
                       {valueField.value > 0 && valueField.value < MAX_SEASON_LENGTH &&
-                        <Flame size={20} className={cn('inline align-top',
-                          valueField.value <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+                        <PointsIcon size={16} className={cn('inline align-top',
+                          valueField.value <= 0 ? 'fill-destructive' : 'fill-green-600'
                         )} />}
                     </>}
                   </FormLabel>

@@ -1,5 +1,5 @@
 'use client';
-import { Flame } from 'lucide-react';
+import { PointsIcon } from '~/components/icons/generated';
 import { cn } from '~/lib/utils';
 import { type LeagueMember } from '~/types/leagueMembers';
 
@@ -37,8 +37,8 @@ export default function Tier({ member, points, place, className }: TierProps) {
         },
         className
       )}>
-        <p className='text-lg font-bold text-black flex items-center gap-1 pb-4'>
-          <Flame className='w-6 h-6 shrink-0 stroke-black' />
+        <p className='text-3xl font-bold text-black flex items-center pb-4'>
+          <PointsIcon className='w-6 h-6 shrink-0 fill-black' />
           {points}
         </p>
       </div>

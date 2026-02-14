@@ -31,7 +31,7 @@ export default function SideNavLink({
         )}
         href={href}>
         {Icon ? (
-          <Icon size={26} className='stroke-primary shrink-0' />
+          <Icon size={26} className='fill-primary shrink-0' />
         ) : (
           children
         )}

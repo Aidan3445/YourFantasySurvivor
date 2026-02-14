@@ -2,7 +2,6 @@
 
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
-import { Flame } from 'lucide-react';
 import { useIsMobile } from '~/hooks/ui/useMobile';
 import { cn, getTribeTimeline } from '~/lib/utils';
 import { type LeagueMember } from '~/types/leagueMembers';
@@ -17,6 +16,8 @@ import EliminationIndicator from '~/components/shared/castaways/eliminationIndic
 import ShotInTheDarkPending from '~/components/leagues/hub/scoreboard/popover/shotInTheDarkPending';
 import SelectionHistory from '~/components/leagues/hub/scoreboard/popover/selectionHistory';
 import SurvivalStreaks from '~/components/leagues/hub/scoreboard/popover/survivalStreaks';
+import { PlaceIcon, PointsIcon } from '~/components/icons/generated';
+import { rankBadgeColor } from '~/lib/scores';
 
 interface MemberRowProps {
   place: number;
@@ -59,29 +60,27 @@ export default function MemberRow({
   ), [castaway?.castawayId, tribesTimeline, tribes]);
 
   const isTopThree = place <= 3;
-  const rankBadgeColor = place === 1
-    ? 'bg-yellow-500/20 text-yellow-600 border-yellow-500/40 shadow-yellow-500/40'
-    : place === 2
-      ? 'bg-gray-400/20 text-gray-600 border-gray-400/40 shadow-gray-400/40'
-      : place === 3
-        ? 'bg-amber-700/20 text-amber-700 border-amber-700/40 shadow-amber-700/40'
-        : 'bg-primary/10 text-primary border-primary/30';
-
   return (
     <TableRow className={cn('hover:bg-primary/5 transition-colors', doubleBelow && 'border-double border-b-3')}>
       <TableCell className='px-3 py-3 w-0 text-left'>
-        <div className={cn(
-          'inline-flex items-center justify-center w-8 h-8 rounded-md font-black text-sm border-2 transition-all',
-          rankBadgeColor,
-          isTopThree && 'shadow-md'
-        )}>
-          {place}
+        <div className='relative'>
+          <PlaceIcon
+            size={32}
+            className={rankBadgeColor(place)} />
+          <div className={cn(
+            'absolute top-1/2 transform -translate-y-1/2',
+            'flex items-center justify-center w-7.5 h-8 font-black rounded-full text-base tracking-tight',
+            rankBadgeColor(place),
+            isTopThree && 'shadow-md'
+          )}>
+            {place}
+          </div>
         </div>
       </TableCell>
       <TableCell>
         <div className='flex justify-center items-center pl-1'>
           <h3 className='leading-none font-black text-lg tabular-nums text-primary'>{points}</h3>
-          <Flame className='inline w-5 h-5 stroke-muted-foreground -mt-0.5 mr-auto' />
+          <PointsIcon className='inline w-4 h-4 fill-secondary -mt-0.5 mr-auto' />
         </div>
       </TableCell>
       <TableCell className='text-nowrap px-3 py-3 w-0'>

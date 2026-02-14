@@ -6,8 +6,8 @@ import Image from 'next/image';
 import SideNavFooter from '~/components/nav/side/footer';
 import SideNavLink from '~/components/nav/side/link';
 import SideNavLeagues from '~/components/nav/side/leagues';
-import { Flame, BookUser } from 'lucide-react';
 import SysAdminNav from '~/components/nav/side/sys';
+import { PlaygroundIcon, SeasonsIcon } from '~/components/icons/generated';
 
 interface SideNavProps {
   userId: string | null;
@@ -23,8 +23,8 @@ export default function SideNav({ userId, noRedirects }: SideNavProps) {
             <SideNavLink href='/' label='Your Fantasy Survivor'>
               <Image src='/Icon.ico' alt='Your Fantasy Survivor Logo' width={24} height={24} />
             </SideNavLink>
-            <SideNavLink href='/seasons' icon={BookUser} label='Seasons' />
-            <SideNavLink href='/playground' icon={Flame} label='Playground' />
+            <SideNavLink href='/seasons' icon={SeasonsIcon} label='Seasons' />
+            <SideNavLink href='/playground' icon={PlaygroundIcon} label='Playground' />
             <SignedIn>
               <SideNavLeagues />
             </SignedIn>

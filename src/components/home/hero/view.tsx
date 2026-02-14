@@ -1,7 +1,8 @@
 import { SignInButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import { Card, CardContent } from '~/components/common/card';
-import { Trophy, Zap, Target, TrendingUp } from 'lucide-react';
+import { Zap, Target, TrendingUp } from 'lucide-react';
+import { LeaguesIcon } from '~/components/icons/generated';
 
 export function HeroSection() {
   return (
@@ -47,7 +48,7 @@ export function HeroSection() {
             <button className='group relative px-8 py-3 bg-primary font-bold rounded-lg overflow-hidden shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all hover:scale-[1.02] active:scale-[0.98]'>
               <span className='relative z-10 flex items-end gap-2 text-primary-foreground'>
                 Survivors ready...GO!
-                <Trophy className='w-6 h-6 stroke-primary-foreground' />
+                <LeaguesIcon className='w-6 h-6 fill-primary-foreground' />
               </span>
               <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700' />
             </button>

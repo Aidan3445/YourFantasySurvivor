@@ -1,7 +1,7 @@
 'use client';
 
 import { SidebarMenuButton, SidebarMenuSub } from '~/components/common/sidebar';
-import { ListPlus, Trophy } from 'lucide-react';
+import { ListPlus } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/common/accordion';
 import { useEffect, useState } from 'react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
@@ -10,6 +10,7 @@ import SideNavLink from '~/components/nav/side/link';
 import { useLeagues } from '~/hooks/user/useLeagues';
 import { usePathname } from 'next/navigation';
 import { cn } from '~/lib/utils';
+import { LeaguesIcon } from '~/components/icons/generated';
 
 export default function SideNavLeagues() {
   const { data: leaguesData } = useLeagues();
@@ -34,7 +35,7 @@ export default function SideNavLeagues() {
 
   if (leaguesData?.length === 0) {
     return (
-      <SideNavLink href='/leagues' icon={Trophy} label='Leagues' />
+      <SideNavLink href='/leagues' icon={LeaguesIcon} label='Leagues' />
     );
   }
 
@@ -54,7 +55,7 @@ export default function SideNavLeagues() {
               'w-full flex gap-5 items-center text-primary transition-all',
               !open && leaguePath && 'font-semibold'
             )}>
-              <Trophy size={26} className='stroke-primary' />
+              <LeaguesIcon size={26} className='fill-primary' />
               Leagues
             </span>
           </AccordionTrigger>
