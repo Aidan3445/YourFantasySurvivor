@@ -1,5 +1,8 @@
+import { and, desc, eq, lt } from 'drizzle-orm';
 import 'server-only';
 import { scheduleEpisodeNotification } from '~/lib/qStash';
+import { db } from '~/server/db';
+import { episodeSchema } from '~/server/db/schema/episodes';
 import { type Episode } from '~/types/episodes';
 
 const HOUR = 60 * 60 * 1000;
@@ -8,12 +11,20 @@ const MINUTE = 60 * 1000;
 /**
  * Schedule all notifications for an episode
  * @param episode The episode data
- * @param previousEpisodeAirDate When the previous episode aired (for mid-week reminder)
  */
-export async function scheduleEpisodeNotifications(
-  episode: Episode,
-  previousEpisodeAirDate?: Date,
-) {
+export async function scheduleEpisodeNotifications(episode: Episode) {
+  // Get previous episode's air date for mid-week reminder timing
+  const previousEpisodeAirDate = await db
+    .select({ airDate: episodeSchema.airDate })
+    .from(episodeSchema)
+    .where(and(
+      eq(episodeSchema.seasonId, episode.seasonId),
+      lt(episodeSchema.episodeNumber, episode.episodeNumber)
+    ))
+    .orderBy(desc(episodeSchema.episodeNumber))
+    .limit(1)
+    .then((res) => res[0]?.airDate ? new Date(`${res[0].airDate} Z`) : undefined);
+
   const airTime = new Date(episode.airDate).getTime();
 
   // Mid-week reminder: halfway between previous episode and this one

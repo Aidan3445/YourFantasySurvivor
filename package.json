@@ -19,7 +19,8 @@
     "test:ui": "vitest --ui --config ./vitest.config.ts",
     "test:run": "vitest run --config ./vitest.config.ts",
     "test:coverage": "vitest run --coverage --config ./vitest.config.ts",
-    "test:watch": "vitest watch --config ./vitest.config.ts"
+    "test:watch": "vitest watch --config ./vitest.config.ts",
+    "qstash:cron": "node --env-file=.env ./scripts/setupCron.ts"
   },
   "dependencies": {
     "@ably/chat": "^0.8.0",

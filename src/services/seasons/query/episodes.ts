@@ -36,10 +36,6 @@ async function fetchEpisodes(seasonId: number, transactionOverride?: DBTransacti
     .where(eq(episodeSchema.seasonId, seasonId))
     .orderBy(asc(episodeSchema.airDate));
 
-  if (seasonId === 0) {
-    console.log('Fetched episodes for season 0:', episodes);
-  }
-
   const processedEpisodes = episodes.map(episode => {
     const airDate = new Date(`${episode.airDate} Z`);
     const airStatus = getAirStatus(airDate, episode.runtime);
