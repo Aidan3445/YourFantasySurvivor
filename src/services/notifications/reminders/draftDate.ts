@@ -1,7 +1,7 @@
 import 'server-only';
 import { db } from '~/server/db';
 import { eq, and, isNotNull } from 'drizzle-orm';
-import { leagueSettingsSchema } from '~/server/db/schema/leagues';
+import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
 import { sendPushToUsers } from '~/services/notifications/push';
 import { type ScheduledDraftData } from '~/types/notifications';
@@ -15,14 +15,16 @@ import { type ScheduledDraftData } from '~/types/notifications';
 export async function sendDraftDateNotification(draft: ScheduledDraftData, within1Hour = false) {
   // Get all admitted members
   const members = await db
-    .selectDistinct({ userId: leagueMemberSchema.userId })
+    .selectDistinct({ userId: leagueMemberSchema.userId, leagueStatus: leagueSchema.status })
     .from(leagueMemberSchema)
+    .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
     .where(and(
       eq(leagueMemberSchema.leagueId, draft.leagueId),
       isNotNull(leagueMemberSchema.draftOrder),
     ));
 
   if (members.length === 0) return;
+  if (members[0]!.leagueStatus !== 'Predraft') return;
 
   const body = draft.draftDate
     ? `The draft for ${draft.leagueName} has been rescheduled${within1Hour ? ' and starts soon! Tap for details' : '.'}`

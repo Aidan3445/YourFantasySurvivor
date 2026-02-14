@@ -32,6 +32,11 @@ export default function SideNav({ userId, noRedirects }: SideNavProps) {
           <SideNavFooter />
           <SysAdminNav userId={userId} noRedirects={noRedirects} />
         </SidebarGroup>
+        <div className='pointer-events-none absolute bottom-0 left-0 w-full text-center text-xs text-muted-foreground'>
+          &copy; {new Date().getFullYear()} Your Fantasy Survivor.
+          <br />
+          All rights reserved.
+        </div>
       </SidebarContent>
     </Sidebar>
   );
