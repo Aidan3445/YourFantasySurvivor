@@ -1,5 +1,5 @@
 import 'server-only';
-import { eq, and, lt, desc } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db } from '~/server/db';
 import { episodeSchema } from '~/server/db/schema/episodes';
 import { type Episode, type EpisodeInsert } from '~/types/episodes';
@@ -86,18 +86,6 @@ export async function createEpisodeLogic(
       revalidateTag('seasons', 'max');
     }
 
-    // Get previous episode's air date for mid-week reminder timing
-    const previousEpisode = await trx
-      .select({ airDate: episodeSchema.airDate })
-      .from(episodeSchema)
-      .where(and(
-        eq(episodeSchema.seasonId, season.seasonId),
-        lt(episodeSchema.episodeNumber, episode.episodeNumber)
-      ))
-      .orderBy(desc(episodeSchema.episodeNumber))
-      .limit(1)
-      .then((res) => res[0]);
-
     // Invalidate cache for the season's episodes
     revalidateTag(`episodes-${season.seasonId}`, 'max');
 
@@ -105,17 +93,16 @@ export async function createEpisodeLogic(
       newEpisode,
       airDate: date,
       runtime: runtime ?? 90,
-      previousEpisodeAirDate: previousEpisode?.airDate
-        ? new Date(`${previousEpisode.airDate} Z`)
-        : undefined,
     };
   });
 
-  // Schedule notifications outside transaction
-  void scheduleEpisodeNotifications(
-    result.newEpisode,
-    result.previousEpisodeAirDate,
-  );
+
+  const now = new Date();
+  const oneWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  if (result.newEpisode.airDate <= oneWeek) {
+    void scheduleEpisodeNotifications(result.newEpisode);
+  }
 
   return { newEpisodeId: result.newEpisode.episodeId };
 }

@@ -128,17 +128,17 @@ interface ImportEpisodeProps {
   seasonName: string;
 }
 
-function ImportEpisode({ seasonName: seasonId, episodeNumber, title, airDate }: ImportEpisodeProps) {
+function ImportEpisode({ seasonName, episodeNumber, title, airDate }: ImportEpisodeProps) {
   const handleSubmit = async () => {
     try {
-      await createEpisode(seasonId, {
+      await createEpisode(seasonName, {
         episodeNumber,
         title: title.replaceAll('"', ''),
         airDate: new Date(airDate),
         /*
-          airDate: new Date(Date.now() + (1000 * 60 * 16)),
-        episodeNumber: 0,
-        title: 'TEST EPISODE',
+        airDate: new Date(Date.now() + (1000 * 60 * 16)),
+        episodeNumber: 2,
+        title: 'TEST EPISODE 2',
         */
         isMerge: isMerge,
         isFinale,
