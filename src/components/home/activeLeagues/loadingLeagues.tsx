@@ -11,7 +11,7 @@ export default function LoadingLeagues() {
           Fetching your league data, please wait...
         </p>
         <Image
-          src='/Logo.png'
+          src='/LogoDisc.png'
           alt='Loading'
           width={150}
           height={150}

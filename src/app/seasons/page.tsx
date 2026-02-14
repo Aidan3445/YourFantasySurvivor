@@ -92,7 +92,7 @@ export default function SeasonsPage() {
             <div className='flex flex-col items-center justify-center gap-4 mt-16'>
               <p className='text-primary'>Loading season...</p>
               <Image
-                src='/Logo.png'
+                src='/LogoDisc.png'
                 alt='Loading'
                 width={150}
                 height={150}

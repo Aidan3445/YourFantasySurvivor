@@ -12,7 +12,7 @@ export const qstash = new Client({
   token: process.env.QSTASH_TOKEN,
 });
 
-export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://yourfantasysurvivor.com';
+export const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://trialbyfiresurvivor.com';
 export const EXPO_PUSH_URL = 'https://exp.host/--/api/v2/push/send';
 
 /**

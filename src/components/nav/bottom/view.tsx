@@ -5,6 +5,18 @@ import BottomNavLink from '~/components/nav/bottom/link';
 import { LeaguesIcon, PlaygroundIcon, SeasonsIcon, TorchIcon } from '~/components/icons/generated';
 
 export default function BottomNav() {
+  const isLocalStorageAvailable = typeof window !== 'undefined' && (() => {
+    try {
+      window.localStorage.getItem('__test');
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
+  if (!isLocalStorageAvailable) {
+    return null;
+  }
 
   return (
     <div className='fixed bottom-0 left-0 right-0 bg-sidebar shadow-md z-50 md:hidden h-(--navbar-height)'>

@@ -23,17 +23,17 @@ export async function generateMetadata(
   if (!league) {
     return {
       ...metadata,
-      title: 'League Not Found | YFS',
+      title: 'League Not Found | TBF',
     };
   }
 
   return {
     ...metadata,
-    title: `Join ${league.name} | YFS`,
+    title: `Join ${league.name} - Trial by Fire`,
     openGraph: {
-      title: `Join ${league.name} on YFS`,
-      description: `You've been invited to join ${league.name} (${league.season}) on Your Fantasy Survivor!`,
-      images: ['https://i.imgur.com/xS6JQdr.png'],
+      title: `Join ${league.name}! - Trial by Fire`,
+      description: `You've been invited to join ${league.name} (${league.season}) on Trial by Fire!`,
+      images: ['/LogoFullOpaque.png'],
     }
   };
 }
@@ -54,8 +54,8 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
               Sign in or create an account to join this league
             </p>
             {query?.signUp ?
-              <SignUp forceRedirectUrl={`/i/${hash}`} signInUrl={`/i/${hash}`} /> :
-              <SignIn forceRedirectUrl={`/i/${hash}`} signUpUrl={`/i/${hash}?signUp=true`} />
+              <SignUp forceRedirectUrl={`/ i / ${hash} `} signInUrl={` / i / ${hash} `} /> :
+              <SignIn forceRedirectUrl={`/ i / ${hash} `} signUpUrl={` / i / ${hash}?signUp = true`} />
             }
           </div>
         </div>
@@ -64,7 +64,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
   }
 
   if (memberId || league?.isPending) {
-    redirect(`/leagues/${hash}`);
+    redirect(`/ leagues / ${hash} `);
   }
 
   if (!league) {

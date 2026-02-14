@@ -14,12 +14,25 @@ interface SideNavProps {
 }
 
 export default function SideNav({ userId, noRedirects }: SideNavProps) {
+  const isLocalStorageAvailable = typeof window !== 'undefined' && (() => {
+    try {
+      window.localStorage.getItem('__test');
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
+  if (!isLocalStorageAvailable) {
+    return null;
+  }
+
   return (
     <Sidebar className='hidden md:block' variant='sidebar' collapsible='none'>
       <SidebarContent className='overflow-y-auto sticky top-0 h-full'>
         <SidebarGroup>
           <SidebarMenu>
-            <SideNavLink href='/' icon={TorchIcon} label='Your Fantasy Survivor' />
+            <SideNavLink href='/' icon={TorchIcon} label='Trial by Fire' />
             <SideNavLink href='/seasons' icon={SeasonsIcon} label='Seasons' />
             <SideNavLink href='/playground' icon={PlaygroundIcon} label='Playground' />
             <SignedIn>
@@ -32,7 +45,7 @@ export default function SideNav({ userId, noRedirects }: SideNavProps) {
           )}
         </SidebarGroup>
         <div className='pointer-events-none absolute bottom-2 left-0 w-full text-center text-xs text-muted-foreground'>
-          &copy; {new Date().getFullYear()} Your Fantasy Survivor.
+          &copy; {new Date().getFullYear()} Trial by Fire.
           <br />
           All rights reserved.
         </div>

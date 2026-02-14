@@ -22,7 +22,7 @@ export async function generateMetadata(
   if (!league) {
     return {
       ...baseMetadata,
-      title: 'League Not Found | YFS',
+      title: 'League Not Found | TBF',
     };
   }
 
@@ -34,7 +34,7 @@ export async function generateMetadata(
         return 'SEASON ENDED';
       case 'Predraft':
       case 'Active':
-        return '';
+        return 'Trial by Fire League';
       default:
         return league.status;
     }
@@ -42,11 +42,12 @@ export async function generateMetadata(
 
   return {
     ...baseMetadata,
-    title: `${league.name} | YFS`,
+    title: `${league.name} - Trial by Fire`,
+    description: `${league.season} - ${getStatusMessage()}`,
     openGraph: {
       title: `${league.name} - ${getStatusMessage()}`,
-      description: `${league.season} | Join the competition on Your Fantasy Survivor!`,
-      images: ['https://i.imgur.com/xS6JQdr.png'],
+      description: league.season,
+      images: ['/LogoFullOpaque.png'],
     }
   };
 }

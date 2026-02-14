@@ -16,9 +16,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Your Fantasy Survivor',
+  title: 'Trial by Fire',
   description: 'A fantasy league for the TV show Survivor',
-  icons: [{ rel: 'icon', url: '/Icon.ico' }],
+  openGraph: {
+    title: 'Trial by Fire - A Fantasy League for Survivor',
+    description: 'A fantasy league for the TV show Survivor',
+    images: ['/LogoFullOpaque.png'],
+  }
 };
 
 interface RootLayoutProps {
