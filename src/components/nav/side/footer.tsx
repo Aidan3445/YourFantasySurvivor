@@ -24,11 +24,11 @@ export default function SideNavFooter() {
   return (
     <SidebarMenu className='mt-2'>
       <TutorialModal>
-        <SidebarMenuButton asChild size='lg'>
-          <span className='w-full flex items-center transition-all text-nowrap text-primary h-10!'>
-            <HelpCircle size={32} className='stroke-primary' />
-            How to Play
-          </span>
+        <SidebarMenuButton size='lg' className='h-10!'>
+          <div className='w-full flex gap-2 items-center cursor-pointer'>
+            <HelpCircle size={36} strokeWidth={1.5} className='stroke-primary' />
+            <p className='text-primary'>How to Play</p>
+          </div>
         </SidebarMenuButton>
       </TutorialModal>
 
@@ -60,9 +60,9 @@ export default function SideNavFooter() {
         <SidebarMenuButton className='h-10!' size='lg' onClick={handleMenuButtonClick(logInButtonRef)}>
           <div className='flex w-full' ref={logInButtonRef}>
             <SignInButton mode='modal'>
-              <div className='w-full flex gap-3 items-center cursor-pointer'>
-                <LogIn size={32} className='stroke-primary' />
-                <p className='text-primary'> Sign In</p>
+              <div className='w-full flex gap-2 items-center cursor-pointer'>
+                <LogIn size={36} strokeWidth={1.5} className='stroke-primary' />
+                <p className='text-primary'>Sign In</p>
               </div>
             </SignInButton>
           </div>
