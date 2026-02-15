@@ -3,7 +3,7 @@ import '~/styles/globals.css';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
-import { type ReactNode, StrictMode } from 'react';
+import { type ReactNode, StrictMode, Suspense } from 'react';
 import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
 import { type Metadata } from 'next';
@@ -54,7 +54,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                   </div>
                 </main>
                 <FloatingActionsWidget />
-                <RebrandNotice />
+                <Suspense fallback={null}>
+                  <RebrandNotice />
+                </Suspense>
               </SidebarProvider>
             </body>
           </html>
