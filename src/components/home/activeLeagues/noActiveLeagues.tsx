@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader } from '~/components/common/card';
-import { Trophy } from 'lucide-react';
 import { type LeagueDetails } from '~/types/leagues';
 import LeagueCard from '~/components/leagues/grid/leagueCard';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '~/components/common/carousel';
@@ -9,6 +8,7 @@ import { useIsMobile } from '~/hooks/ui/useMobile';
 import { Button } from '~/components/common/button';
 import Link from 'next/link';
 import { Separator } from '~/components/common/separator';
+import { LeaguesIcon } from '~/components/icons/generated';
 
 interface NoActiveLeaguesProps {
   inactiveLeagues: LeagueDetails[];
@@ -48,7 +48,7 @@ export default function NoActiveLeagues({ inactiveLeagues }: NoActiveLeaguesProp
         {inactiveLeagues.length === 0 ? (
           <div className='text-center py-12'>
             <div className='inline-flex p-6 bg-primary/10 rounded-2xl mb-6'>
-              <Trophy className='w-16 h-16 text-primary' />
+              <LeaguesIcon className='w-16 h-16 fill-primary' />
             </div>
             <p className='text-lg font-medium max-w-md mx-auto'>
               You don&apos;t have any leagues yet. Create or join one to start competing!

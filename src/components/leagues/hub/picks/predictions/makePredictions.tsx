@@ -2,12 +2,12 @@
 
 import PredictionCards from '~/components/leagues/actions/events/predictions/cards';
 import AirStatus from '~/components/leagues/hub/shared/airStatus/view';
-import { Flame } from 'lucide-react';
 import { useLeagueActionDetails } from '~/hooks/leagues/enrich/useLeagueActionDetails';
 import { useMemo, useState } from 'react';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { cn } from '~/lib/utils';
 import { Card, CardContent, CardHeader } from '~/components/common/card';
+import { PointsIcon } from '~/components/icons/generated';
 
 export default function MakePredictions() {
   const { scores, leagueMembers } = useLeagueData();
@@ -49,7 +49,7 @@ export default function MakePredictions() {
       <CardHeader className='px-4!'>
         {rules?.shauhinMode?.enabled && rules.shauhinMode.enabledBets.length > 0 &&
           <div className='absolute top-1 right-2 text-sm italic text-muted-foreground text-right'>
-            Bet Balance: {balance}<Flame className='inline align-top w-4 h-min stroke-muted-foreground' />
+            Bet Balance: {balance}<PointsIcon className='inline align-top w-4 h-min fill-muted-foreground' />
             {formBetTotal !== submittedBetTotal && (
               <>
                 <br />
@@ -57,7 +57,7 @@ export default function MakePredictions() {
                   'bg-red-400': balance - formBetTotal < 0,
                   'bg-green-400': formBetTotal < submittedBetTotal
                 })}>
-                  Pending Balance: {balance - formBetTotal}<Flame className='inline mb-1 w-4 h-min stroke-muted-foreground' />
+                  Pending Balance: {balance - formBetTotal}<PointsIcon className='inline mb-1 w-4 h-min fill-muted-foreground' />
                 </span>
               </>
             )}

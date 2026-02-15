@@ -6,7 +6,6 @@ import { leagueMemberAuth } from '~/lib/auth';
 import { Button } from '~/components/common/button';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { metadata } from '~/app/layout';
 import getPublicLeague from '~/services/leagues/query/public';
 import LeagueHeader from '~/components/leagues/layout/leagueHeader';
 
@@ -22,19 +21,13 @@ export async function generateMetadata(
 
   if (!league) {
     return {
-      ...metadata,
-      title: 'League Not Found | YFS',
+      title: 'Invalid Invite - Trial by Fire',
     };
   }
 
   return {
-    ...metadata,
-    title: `Join ${league.name} | YFS`,
-    openGraph: {
-      title: `Join ${league.name} on YFS`,
-      description: `You've been invited to join ${league.name} (${league.season}) on Your Fantasy Survivor!`,
-      images: ['https://i.imgur.com/xS6JQdr.png'],
-    }
+    title: `Join ${league.name} - Trial by Fire`,
+    description: `You've been invited to join ${league.name} (${league.season}) on Trial by Fire!`,
   };
 }
 
@@ -55,7 +48,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
             </p>
             {query?.signUp ?
               <SignUp forceRedirectUrl={`/i/${hash}`} signInUrl={`/i/${hash}`} /> :
-              <SignIn forceRedirectUrl={`/i/${hash}`} signUpUrl={`/i/${hash}?signUp=true`} />
+              <SignIn forceRedirectUrl={`/i/${hash}`} signUpUrl={`/i/${hash}?signUp = true`} />
             }
           </div>
         </div>

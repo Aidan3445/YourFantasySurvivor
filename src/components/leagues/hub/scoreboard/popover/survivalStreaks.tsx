@@ -1,6 +1,7 @@
-import { Flame, Skull, ShieldCheck } from 'lucide-react';
+import { Skull, ShieldCheck } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/common/popover';
 import { Separator } from '~/components/common/separator';
+import { PointsIcon } from '~/components/icons/generated';
 import { type EnrichedCastaway } from '~/types/castaways';
 
 interface SurvivalStreaksProps {
@@ -42,7 +43,7 @@ export default function SurvivalStreaks({
           <div className='font-medium'>Current streak: {currentStreak ?? 0}</div>
           <div className='font-medium tablar-nums'>
             Point cap: {survivalCap}
-            <Flame className='inline w-4 h-4 stroke-muted-foreground align-text-top' />
+            <PointsIcon className='inline w-4 h-4 stroke-muted-foreground align-text-top' />
           </div>
         </div>
         {shotInTheDarkStatus?.status === 'saved' && (

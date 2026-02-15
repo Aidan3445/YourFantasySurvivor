@@ -25,13 +25,13 @@ export default function SideNavLink({
     <SidebarMenuButton className='h-10! pr-0' asChild size='lg'>
       <Link
         className={cn(
-          'w-full flex gap-5 items-center transition-all h-min text-primary hover:text-primary!',
+          'w-full flex gap-0 items-center transition-all h-min text-primary hover:text-primary!',
           active && 'font-semibold',
           className
         )}
         href={href}>
         {Icon ? (
-          <Icon size={26} className='stroke-primary shrink-0' />
+          <Icon size={36} className='fill-primary size-max!' />
         ) : (
           children
         )}

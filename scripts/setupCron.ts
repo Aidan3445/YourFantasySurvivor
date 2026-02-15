@@ -1,8 +1,8 @@
 import { Client } from '@upstash/qstash';
+import { BASE_URL } from '~/lib/qStash';
 
 console.log('Setting up cron schedule for episodes', process.env.QSTASH_TOKEN, process.env.QSTASH_CRON_SECRET_KEY);
 const qstash = new Client({ token: process.env.QSTASH_TOKEN! });
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://yourfantasysurvivor.com';
 
 await qstash.schedules.create({
   destination: `${BASE_URL}/api/notifications/episodes`,

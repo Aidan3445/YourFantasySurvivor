@@ -7,7 +7,21 @@ const DISMISS_EVENT = 'floating-actions-dismissed';
 export function useFloatingActionWidget() {
   const [isVisible, setIsVisible] = useState(false);
 
+  const isLocalStorageAvailable = typeof window !== 'undefined' && (() => {
+    try {
+      window.localStorage.getItem('__test');
+      return true;
+    } catch {
+      return false;
+    }
+  })();
+
   useEffect(() => {
+    if (!isLocalStorageAvailable) {
+      setIsVisible(false);
+      return;
+    }
+
     const checkVisibility = () => {
       const dismissedUntil = localStorage.getItem(DISMISS_STORAGE_KEY);
       if (dismissedUntil) {
@@ -30,14 +44,16 @@ export function useFloatingActionWidget() {
     return () => {
       window.removeEventListener(DISMISS_EVENT, handleDismiss);
     };
-  }, []);
+  }, [isLocalStorageAvailable]);
 
   const dismiss = useCallback(() => {
+    if (!isLocalStorageAvailable) return;
+
     const dismissUntil = Date.now() + DISMISS_DURATION_MS;
     localStorage.setItem(DISMISS_STORAGE_KEY, dismissUntil.toString());
     setIsVisible(false);
     window.dispatchEvent(new Event(DISMISS_EVENT));
-  }, []);
+  }, [isLocalStorageAvailable]);
 
   return { isVisible, dismiss };
 }

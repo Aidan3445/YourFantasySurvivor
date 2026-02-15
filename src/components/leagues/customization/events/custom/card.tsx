@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { Form } from '~/components/common/form';
 import { Button } from '~/components/common/button';
-import { Flame, Settings2 } from 'lucide-react';
+import { Settings2 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
@@ -18,6 +18,7 @@ import { useLeague } from '~/hooks/leagues/useLeague';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateCustomEventRule from '~/actions/updateCustomEventRule';
 import deleteCustomEventRule from '~/actions/deleteCustomEventRule';
+import { PointsIcon } from '~/components/icons/generated';
 
 interface LeagueEventCardProps {
   rule: CustomEventRule;
@@ -72,15 +73,15 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
       <span className='flex gap-2 items-center mr-10'>
         <h3 className='text-base font-bold uppercase tracking-wider text-nowrap'>{rule.eventName}</h3>
         <span className='text-muted-foreground'>•</span>
-        <div className='inline-flex items-center gap-0.5'>
+        <div className='inline-flex items-center'>
           <p className={cn(
             'text-sm font-bold',
-            rule.points <= 0 ? 'text-destructive' : 'text-green-600')}>
+            rule.points <= 0 ? 'text-destructive' : 'text-green-700')}>
             {rule.points}
           </p>
-          <Flame className={cn(
-            'w-4 h-4 shrink-0',
-            rule.points <= 0 ? 'stroke-destructive' : 'stroke-green-600'
+          <PointsIcon className={cn(
+            'w-3 h-3 shrink-0',
+            rule.points <= 0 ? 'fill-destructive' : 'fill-green-700'
           )} />
         </div>
       </span>

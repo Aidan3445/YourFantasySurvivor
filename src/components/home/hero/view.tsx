@@ -1,31 +1,26 @@
 import { SignInButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import { Card, CardContent } from '~/components/common/card';
-import { Trophy, Zap, Target, TrendingUp } from 'lucide-react';
+import { Zap, Target, TrendingUp } from 'lucide-react';
+import { LeaguesIcon } from '~/components/icons/generated';
 
 export function HeroSection() {
   return (
-    <Card className='relative overflow-hidden'>
+    <Card className='w-full bg-card rounded-lg border-2 border-primary/20 p-4'>
       {/* Accent Glow */}
       <div className='absolute -top-20 -right-20 w-60 h-60 bg-primary/20 rounded-full blur-3xl' />
       <div className='absolute -bottom-20 -left-20 w-60 h-60 bg-primary/10 rounded-full blur-3xl' />
 
       <CardContent className='relative z-10'>
-        {/* Logo - Top Right Corner */}
-        <div className='absolute top-0 right-2 opacity-50 hover:opacity-100 hover:rotate-360 transition-all'>
-          <Image src='/Logo.png' alt='YFS Logo' width={125} height={125} className='hidden md:block' />
-        </div>
-
         <div className='space-y-8'>
           {/* Hero Headline */}
           <div>
-            <h1 className='text-5xl md:text-6xl lg:text-7xl font-black tracking-tight leading-[0.95] text-foreground'>
-              YOUR FANTASY
-              <br />
-              <span className='bg-linear-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent'>
-                SURVIVOR
-              </span>
-            </h1>
+            <Image
+              src='/LogoFull.png'
+              alt='Trial by Fire Logo'
+              width={350}
+              height={100}
+              className='mb-4 mx-auto' />
             <div className='flex items-center gap-2 mt-4'>
               <div className='h-1 w-16 bg-primary rounded-full' />
               <div className='h-1 w-8 bg-primary/50 rounded-full' />
@@ -47,7 +42,7 @@ export function HeroSection() {
             <button className='group relative px-8 py-3 bg-primary font-bold rounded-lg overflow-hidden shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all hover:scale-[1.02] active:scale-[0.98]'>
               <span className='relative z-10 flex items-end gap-2 text-primary-foreground'>
                 Survivors ready...GO!
-                <Trophy className='w-6 h-6 stroke-primary-foreground' />
+                <LeaguesIcon className='w-6 h-6 fill-primary-foreground' />
               </span>
               <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700' />
             </button>

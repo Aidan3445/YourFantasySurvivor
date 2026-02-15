@@ -82,7 +82,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
       <div className='flex flex-col items-center justify-center gap-4'>
         <p className='text-primary'>Loading season...</p>
         <Image
-          src='/Logo.png'
+          src='/LogoDisc.png'
           alt='Loading'
           width={100}
           height={100}

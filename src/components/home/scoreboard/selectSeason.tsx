@@ -36,7 +36,7 @@ export default function SelectSeason({ seasons, value, setValue, someHidden }: C
           className='absolute top-1 right-3 h-5 w-5 cursor-pointer hover:stroke-primary active:stroke-secondary transition-colors'
           aria-expanded={open} />
       </PopoverTrigger>
-      <PopoverContent className='p-0'>
+      <PopoverContent className='p-0 border-none bg-transparent mr-8'>
         <Command>
           <CommandInput placeholder='Search seasons...' />
           <CommandList>

@@ -16,10 +16,10 @@ export default function BottomNavLink({ href, pathnameMatch, icon, children }: N
     <Link href={href}>
       {Icon && (
         <Icon
-          size={28}
+          size={32}
           className={cn(
-            'cursor-pointer stroke-primary hover:stroke-secondary/75 active:stroke-primary/50 transition-colors',
-            active && 'stroke-secondary'
+            'cursor-pointer fill-primary hover:fill-secondary/75 active:fill-primary/50 transition-colors',
+            active && 'fill-secondary'
           )} />
       )}
       {children}

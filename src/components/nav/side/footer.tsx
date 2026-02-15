@@ -49,8 +49,8 @@ export default function SideNavFooter() {
         <SidebarMenuButton className='h-10!' size='lg'>
           <SignInButton mode='modal'>
             <div>
-              <div className='w-full flex gap-5 items-center cursor-pointer'>
-                <LogIn size={24} className='stroke-primary' />
+              <div className='w-full flex gap-3 items-center cursor-pointer'>
+                <LogIn size={32} className='stroke-primary' />
                 <p className='text-primary'> Sign In</p>
               </div>
             </div>

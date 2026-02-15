@@ -3,7 +3,7 @@ import ColorRow from '~/components/shared/colorRow';
 import { ChartsTooltipContainer, useAxesTooltip } from '@mui/x-charts';
 import { useLeagueData } from '~/hooks/leagues/enrich/useLeagueData';
 import { useMemo } from 'react';
-import { Flame } from 'lucide-react';
+import { PointsIcon } from '~/components/icons/generated';
 
 export default function CustomTooltip() {
   const tooltipData = useAxesTooltip();
@@ -67,7 +67,7 @@ export default function CustomTooltip() {
       <div className='flex flex-col p-2 rounded-lg border-2 border-primary/30 bg-card shadow-lg shadow-primary/20 scale-75'>
         <div className='font-bold uppercase tracking-wider text-center'>
           Episode {axisValue as number}
-          <Flame className='inline w-5 h-5 stroke-primary align-text-top ml-1' />
+          <PointsIcon className='inline w-4 h-4 stroke-primary align-text-top' />
         </div>
         <Separator className='mb-1 bg-primary/20' />
         <div className='flex gap-4'>
