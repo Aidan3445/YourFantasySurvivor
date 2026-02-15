@@ -18,7 +18,8 @@ const SLIDES = [
   {
     icon: TorchIcon,
     accentIcon: HandMetal,
-    color: 'text-primary',
+    color: 'fill-primary',
+    stroke: 'stroke-primary',
     bgColor: 'bg-primary/10',
     borderColor: 'border-primary/20',
     badgeColor: 'bg-primary/15 text-primary border-primary/30',
@@ -30,7 +31,8 @@ const SLIDES = [
     icon: UserIcon,
     iconStrokeWidth: 0.5,
     accentIcon: MousePointerClick,
-    color: 'text-amber-500',
+    color: 'fill-amber-500 stroke-amber-500',
+    stroke: 'stroke-amber-500',
     bgColor: 'bg-amber-500/10',
     borderColor: 'border-amber-500/20',
     badgeColor: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
@@ -42,7 +44,8 @@ const SLIDES = [
   {
     icon: PointsIcon,
     accentIcon: TrendingUp,
-    color: 'text-emerald-500',
+    color: 'fill-emerald-500',
+    stroke: 'stroke-emerald-500',
     bgColor: 'bg-emerald-500/10',
     borderColor: 'border-emerald-500/20',
     badgeColor: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/30',
@@ -61,7 +64,8 @@ const SLIDES = [
   {
     icon: PlaygroundIcon,
     accentIcon: HelpCircle,
-    color: 'text-purple-500',
+    color: 'fill-purple-500',
+    stroke: 'stroke-purple-500',
     bgColor: 'bg-purple-500/10',
     borderColor: 'border-purple-500/20',
     badgeColor: 'bg-purple-500/15 text-purple-500 border-purple-500/30',
@@ -73,7 +77,8 @@ const SLIDES = [
   {
     icon: PointsIcon,
     accentIcon: Coins,
-    color: 'text-amber-500',
+    color: 'fill-amber-500',
+    stroke: 'stroke-amber-500',
     bgColor: 'bg-amber-500/10',
     borderColor: 'border-amber-500/20',
     badgeColor: 'bg-amber-500/15 text-amber-500 border-amber-500/30',
@@ -84,8 +89,10 @@ const SLIDES = [
   },
   {
     icon: UserIcon,
+    iconStrokeWidth: 0.5,
     accentIcon: Users,
-    color: 'text-blue-500',
+    color: 'fill-blue-500 stroke-blue-500',
+    stroke: 'stroke-blue-500',
     bgColor: 'bg-blue-500/10',
     borderColor: 'border-blue-500/20',
     badgeColor: 'bg-blue-500/15 text-blue-500 border-blue-500/30',
@@ -98,7 +105,8 @@ const SLIDES = [
   {
     icon: LeaguesIcon,
     accentIcon: Dices,
-    color: 'text-red-500',
+    color: 'fill-red-500',
+    stroke: 'stroke-red-500',
     bgColor: 'bg-red-500/10',
     borderColor: 'border-red-500/20',
     badgeColor: 'bg-red-500/15 text-red-500 border-red-500/30',
@@ -111,7 +119,8 @@ const SLIDES = [
   {
     icon: PlaygroundIcon,
     accentIcon: ArrowLeftRight,
-    color: 'text-cyan-500',
+    color: 'fill-cyan-500',
+    stroke: 'stroke-cyan-500',
     bgColor: 'bg-cyan-500/10',
     borderColor: 'border-cyan-500/20',
     badgeColor: 'bg-cyan-500/15 text-cyan-500 border-cyan-500/30',
@@ -123,7 +132,8 @@ const SLIDES = [
   {
     icon: TorchIcon,
     accentIcon: Rocket,
-    color: 'text-primary',
+    color: 'fill-primary',
+    stroke: 'stroke-primary',
     bgColor: 'bg-primary/10',
     borderColor: 'border-primary/20',
     badgeColor: 'bg-primary/15 text-primary border-primary/30',
@@ -180,7 +190,7 @@ export default function TutorialCarousel({ onComplete, showCustomization = true 
                     'w-7 h-7 rounded-full border-2 bg-card',
                     s.borderColor
                   )}>
-                    <SlideAccent className={cn('w-3.5 h-3.5', s.color)} />
+                    <SlideAccent className={cn('w-3.5 h-3.5', s.stroke)} />
                   </div>
                 </div>
 
@@ -215,7 +225,7 @@ export default function TutorialCarousel({ onComplete, showCustomization = true 
                     'flex items-start gap-2.5 w-full max-w-xs rounded-lg border-2 border-dashed p-3 text-left',
                     s.borderColor
                   )}>
-                    <Settings className={cn('w-4 h-4 shrink-0 mt-0.5', s.color)} />
+                    <Settings className={cn('w-4 h-4 shrink-0 mt-0.5', s.stroke)} />
                     <p className='text-sm text-muted-foreground leading-snug'>
                       {s.customizable}
                     </p>
