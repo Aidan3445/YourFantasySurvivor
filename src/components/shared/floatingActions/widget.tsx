@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Trophy, ListPlus, Users, X } from 'lucide-react';
+import { ListPlus, Users, X } from 'lucide-react';
 import CreateLeagueModal from '~/components/leagues/actions/league/create/modal';
 import JoinLeagueModal from '~/components/leagues/actions/league/join/modal';
 import { cn } from '~/lib/utils';
 import { Button } from '~/components/common/button';
 import { useFloatingActionWidget } from '~/hooks/ui/useFloatingActionWidget';
+import { LeaguesIcon } from '~/components/icons/generated';
 
 const DISMISS_ZONE = {
   width: 120,
@@ -217,7 +218,7 @@ export default function FloatingActionsWidget() {
               {isOverDismissZone ? (
                 <X className='w-8 h-8 text-white z-10' />
               ) : (
-                <Trophy className='w-8 h-8 stroke-primary-foreground z-10' />
+                <LeaguesIcon fill='white' className='w-12 h-12 stroke-primary-foreground z-10' />
               )}
             </div>
           </button>

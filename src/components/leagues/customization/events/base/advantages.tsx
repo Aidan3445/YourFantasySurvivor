@@ -1,10 +1,10 @@
-import { Flame } from 'lucide-react';
 import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '~/components/common/form';
 import { Input } from '~/components/common/input';
 import { cn } from '~/lib/utils';
 import { type BaseEventSettingsProps, BasePredictionFormField } from '~/components/leagues/customization/events/base/predictions';
 import { BaseEventDescriptions, BaseEventFullName } from '~/lib/events';
 import SettingsWrapper from '~/components/leagues/customization/events/base/settingsWrapper';
+import { PointsIcon } from '~/components/icons/generated';
 
 export default function AdvantageScoreSettings({ disabled, hidePredictions, children }: BaseEventSettingsProps) {
   return (
@@ -21,9 +21,9 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
-                  <Flame className={cn('inline align-top w-5 h-5 shrink-0',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
-                    field.value === 0 && 'stroke-muted-foreground'
+                  <PointsIcon className={cn('inline align-top w-5 h-5 shrink-0',
+                    field.value <= 0 ? 'fill-destructive' : 'fill-green-600',
+                    field.value === 0 && 'fill-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>
@@ -57,9 +57,9 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
-                  <Flame className={cn('inline align-top w-5 h-5 shrink-0',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
-                    field.value === 0 && 'stroke-muted-foreground'
+                  <PointsIcon className={cn('inline align-top w-5 h-5 shrink-0',
+                    field.value <= 0 ? 'fill-destructive' : 'fill-green-600',
+                    field.value === 0 && 'fill-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>
@@ -93,9 +93,9 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
-                  <Flame className={cn('inline align-top w-5 h-5 shrink-0',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
-                    field.value === 0 && 'stroke-muted-foreground'
+                  <PointsIcon className={cn('inline align-top w-5 h-5 shrink-0',
+                    field.value <= 0 ? 'fill-destructive' : 'fill-green-600',
+                    field.value === 0 && 'fill-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>
@@ -130,9 +130,9 @@ export default function AdvantageScoreSettings({ disabled, hidePredictions, chil
                   field.value <= 0 ? 'text-destructive' : 'text-green-600',
                   field.value === 0 && 'text-muted-foreground')}>
                   {field.value}
-                  <Flame className={cn('inline align-top w-5 h-5 shrink-0',
-                    field.value <= 0 ? 'stroke-destructive' : 'stroke-green-600',
-                    field.value === 0 && 'stroke-muted-foreground'
+                  <PointsIcon className={cn('inline align-top w-5 h-5 shrink-0',
+                    field.value <= 0 ? 'fill-destructive' : 'fill-green-600',
+                    field.value === 0 && 'fill-muted-foreground'
                   )} />
                 </h2>}
             </FormLabel>

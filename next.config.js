@@ -16,6 +16,16 @@ const config = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'yourfantasysurvivor.com' }],
+        destination: 'https://www.trialbyfiresurvivor.com/:path*?from=yfs',
+        permanent: true,
+      },
+    ];
+  },
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [

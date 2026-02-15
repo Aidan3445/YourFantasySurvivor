@@ -1,5 +1,5 @@
-import { Flame } from 'lucide-react';
 import { TableCell } from '~/components/common/table';
+import { PointsIcon } from '~/components/icons/generated';
 import { cn } from '~/lib/utils';
 
 interface PointsCellProps {
@@ -28,13 +28,13 @@ export function ColoredPoints({ points, neutral }: PointsCellProps) {
           : 'text-destructive')
     )}>
       {points < 0 || neutral ? points : `+${points}`}
-      <Flame className={cn(
-        'inline align-top w-4 h-4 -mt-0.5',
+      <PointsIcon className={cn(
+        'inline align-top w-3 h-3 -mt-0.5',
         neutral ?
-          'stroke-muted-foreground' :
+          'fill-muted-foreground' :
           (points > 0
-            ? 'stroke-green-700'
-            : 'stroke-destructive')
+            ? 'fill-green-700'
+            : 'fill-destructive')
       )} />
     </span>
   );

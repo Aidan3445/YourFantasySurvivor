@@ -264,6 +264,10 @@
     @apply h-svh;
   }
 
+  .cl-logoImage {
+    @apply w-[200%]! h-[200%]! max-w-none! max-h-none!;
+  }
+
   .cl-signUp-start,
   .cl-signIn-start {
     @apply pt-0;

@@ -3,12 +3,13 @@ import '~/styles/globals.css';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { Inter } from 'next/font/google';
 import { ClerkProvider } from '@clerk/nextjs';
-import { type ReactNode, StrictMode } from 'react';
+import { type ReactNode, StrictMode, Suspense } from 'react';
 import { SidebarProvider } from '~/components/common/sidebar';
 import Nav from '~/components/nav/navSelector';
 import { type Metadata } from 'next';
 import QueryClientContextProvider from '~/context/reactQueryContext';
 import FloatingActionsWidget from '~/components/shared/floatingActions/widget';
+import { RebrandNotice } from '~/components/sys/rebrand';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -16,9 +17,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Your Fantasy Survivor',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:1234'),
+  title: 'Trial by Fire - A Fantasy League for Survivor',
   description: 'A fantasy league for the TV show Survivor',
-  icons: [{ rel: 'icon', url: '/Icon.ico' }],
+  icons: [{ rel: 'icon', url: '/LogoDisc.png' }],
+  openGraph: {
+    images: ['/LogoFullOpaque.png'],
+  },
 };
 
 interface RootLayoutProps {
@@ -49,6 +54,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                   </div>
                 </main>
                 <FloatingActionsWidget />
+                <Suspense fallback={null}>
+                  <RebrandNotice />
+                </Suspense>
               </SidebarProvider>
             </body>
           </html>

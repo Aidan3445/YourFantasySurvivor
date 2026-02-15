@@ -14,7 +14,7 @@ export default function BottomNavUser() {
       </SignedIn >
       <SignedOut>
         <SignInButton mode='modal'>
-          <LogIn size={28} className='cursor-pointer stroke-primary hover:stroke-secondary/75 active:stroke-primary/50 transition-colors' />
+          <LogIn size={32} className='cursor-pointer stroke-primary hover:stroke-secondary/75 active:stroke-primary/50 transition-colors' />
         </SignInButton>
       </SignedOut>
     </ClerkLoaded>

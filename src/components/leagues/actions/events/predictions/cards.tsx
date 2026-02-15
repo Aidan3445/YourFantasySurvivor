@@ -1,7 +1,6 @@
 'use client';
 
 import { cn } from '~/lib/utils';
-import { Flame } from 'lucide-react';
 import { CoverCarousel } from '~/components/common/carousel';
 import PredictionTimingHelp from '~/components/leagues/actions/events/predictions/timingHelp';
 import SubmissionCard, { BaseSubmissionCard } from '~/components/leagues/actions/events/predictions/submission';
@@ -11,6 +10,7 @@ import { type ScoringBaseEventName, type ReferenceType, type MakePrediction } fr
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useShauhinActive } from '~/hooks/leagues/enrich/useShauhinActive';
 import { loadOverrideConfig } from '~/lib/devEpisodeOverride';
+import { PointsIcon } from '~/components/icons/generated';
 
 export default function PredictionCards({
   rules,
@@ -126,7 +126,7 @@ export default function PredictionCards({
           </h3>
           <div className='inline-flex items-center'>
             <p className='text-sm font-bold'>{prediction.points}</p>
-            <Flame size={16} className='stroke-primary' />
+            <PointsIcon size={16} className='fill-primary' />
           </div>
         </span>
         <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mb-1'>
@@ -153,7 +153,7 @@ export default function PredictionCards({
             {prediction.label ?? prediction.eventName}
             <span className='ml-2 inline-flex items-center'>
               <p className='text-sm font-bold'>{prediction.points}</p>
-              <Flame size={16} className='stroke-primary' />
+              <PointsIcon size={16} className='fill-primary' />
             </span>
           </h3>
           <div className='flex text-xs font-medium text-card-foreground justify-center items-center gap-1 mb-1'>
