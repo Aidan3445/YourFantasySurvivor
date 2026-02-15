@@ -58,12 +58,12 @@ export default function TutorialPrompt({ open, onDismiss, showCustomization = tr
             <div className='flex gap-2'>
               <Button
                 variant='outline'
-                className='flex-1 border-2 border-primary/20'
+                className='flex-1 border-2 border-primary/20 font-bold'
                 onClick={handleSkip}>
                 Skip
               </Button>
               <Button
-                className='flex-1 font-bold uppercase text-sm tracking-wider'
+                className='flex-2 font-bold uppercase text-sm tracking-wider'
                 onClick={() => setShowTutorial(true)}>
                 Show Me
               </Button>
