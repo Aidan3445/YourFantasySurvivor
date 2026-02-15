@@ -16,10 +16,14 @@ import SurvivalSettings from '~/components/leagues/customization/settings/surviv
 import SecondaryPickSettings from '~/components/leagues/customization/settings/secondaryPick/view';
 import Spacer from '~/components/shared/floatingActions/spacer';
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import TutorialPrompt from '~/components/shared/tutorial/prompt';
 
 export default function PredraftPage() {
+  const params = useSearchParams();
   const [tab, setTab] = useState('league');
   const [manageMembersFirst, setManageMembersFirst] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(params.has('new') || params.has('join'));
 
   const goToManageMembers = () => {
     setManageMembersFirst(true);
@@ -50,6 +54,10 @@ export default function PredraftPage() {
         className='px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4'>
           <TabsContent value='league' className='space-y-4'>
+            <TutorialPrompt
+              open={showPrompt}
+              onDismiss={() => setShowPrompt(false)}
+              showCustomization={params.has('new')} />
             <InviteLink />
             <DraftCountdown className='p-4 pt-2' />
             <DraftOrder goToSettings={goToManageMembers} />
