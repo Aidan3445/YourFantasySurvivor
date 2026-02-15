@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { Card, CardContent } from '~/components/common/card';
 import { Zap, Target, TrendingUp } from 'lucide-react';
 import { LeaguesIcon } from '~/components/icons/generated';
+import TutorialModal from '~/components/shared/tutorial/modal';
+import { Button } from '~/components/common/button';
 
 export function HeroSection() {
   return (
@@ -12,7 +14,7 @@ export function HeroSection() {
       <div className='absolute -bottom-20 -left-20 w-60 h-60 bg-primary/10 rounded-full blur-3xl' />
 
       <CardContent className='relative z-10'>
-        <div className='space-y-8'>
+        <div className='space-y-4'>
           {/* Hero Headline */}
           <div>
             <Image
@@ -20,8 +22,8 @@ export function HeroSection() {
               alt='Trial by Fire Logo'
               width={350}
               height={100}
-              className='mb-4 mx-auto' />
-            <div className='flex items-center gap-2 mt-4'>
+              className='mx-auto' />
+            <div className='flex items-center gap-2 mt-6 justify-center pr-56'>
               <div className='h-1 w-16 bg-primary rounded-full' />
               <div className='h-1 w-8 bg-primary/50 rounded-full' />
               <div className='h-1 w-4 bg-primary/25 rounded-full' />
@@ -29,7 +31,7 @@ export function HeroSection() {
           </div>
 
           {/* Subtext */}
-          <div className='max-w-2xl'>
+          <div className='max-w-2xl mx-auto text-center'>
             <p className='text-lg md:text-xl leading-relaxed text-muted-foreground font-medium text-pretty'>
               Draft castaways. Predict game events. Climb the leaderboard.
               <br />
@@ -39,14 +41,17 @@ export function HeroSection() {
 
           {/* CTA */}
           <SignInButton mode='modal'>
-            <button className='group relative px-8 py-3 bg-primary font-bold rounded-lg overflow-hidden shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all hover:scale-[1.02] active:scale-[0.98]'>
+            <Button size='lg' className='group relative px-8 py-3 bg-primary font-bold rounded-lg overflow-hidden shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/40 transition-all hover:scale-[1.02] active:scale-[0.98]'>
               <span className='relative z-10 flex items-end gap-2 text-primary-foreground'>
                 Survivors ready...GO!
                 <LeaguesIcon className='w-6 h-6 fill-primary-foreground' />
               </span>
               <div className='absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700' />
-            </button>
+            </Button>
           </SignInButton>
+          <TutorialModal>
+            <Button className='ml-10' size='lg' variant='outline'>How to Play</Button>
+          </TutorialModal>
 
           {/* Features - Game Stats Grid */}
           <div className='grid grid-cols-1 md:grid-cols-3 gap-4 pt-4'>
