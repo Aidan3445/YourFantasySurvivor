@@ -47,8 +47,8 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
               Sign in or create an account to join this league
             </p>
             {query?.signUp ?
-              <SignUp forceRedirectUrl={`/i/${hash} `} signInUrl={`/i/${hash}`} /> :
-              <SignIn forceRedirectUrl={`/i/${hash} `} signUpUrl={`/i/${hash}?signUp = true`} />
+              <SignUp forceRedirectUrl={`/i/${hash}`} signInUrl={`/i/${hash}`} /> :
+              <SignIn forceRedirectUrl={`/i/${hash}`} signUpUrl={`/i/${hash}?signUp = true`} />
             }
           </div>
         </div>
@@ -57,7 +57,7 @@ export default async function LeagueJoinPage({ searchParams, params }: JoinPageP
   }
 
   if (memberId || league?.isPending) {
-    redirect(`/ leagues / ${hash} `);
+    redirect(`/leagues/${hash}`);
   }
 
   if (!league) {
