@@ -53,7 +53,7 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
       await queryClient.invalidateQueries({ queryKey: ['leagues'] });
       alert(`League created called ${data.leagueName}`);
       onSubmit?.();
-      router.push(`/leagues/${newHash}/predraft`);
+      router.push(`/leagues/${newHash}/predraft?new`);
     } catch (error) {
       console.error(error);
       alert('Failed to create league');

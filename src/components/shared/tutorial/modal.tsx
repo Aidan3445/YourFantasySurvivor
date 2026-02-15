@@ -12,9 +12,10 @@ import TutorialCarousel from '~/components/shared/tutorial/carousel';
 interface TutorialModalProps {
   children: ReactNode;
   className?: string;
+  showCustomization?: boolean;
 }
 
-export default function TutorialModal({ children, className }: TutorialModalProps) {
+export default function TutorialModal({ children, className, showCustomization }: TutorialModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -33,7 +34,7 @@ export default function TutorialModal({ children, className }: TutorialModalProp
           <AlertDialogDescription className='sr-only'>
             Learn how Trial by Fire fantasy scoring works.
           </AlertDialogDescription>
-          <TutorialCarousel onComplete={() => setIsOpen(false)} />
+          <TutorialCarousel onComplete={() => setIsOpen(false)} showCustomization={showCustomization} />
         </AlertDialogHeader>
         <AlertDialogFooter className='absolute top-4 right-4'>
           <AlertDialogCancel className='h-auto w-auto p-2 bg-destructive/10 border-destructive/30 hover:bg-destructive/20'>

@@ -1,4 +1,3 @@
-// ~/components/tutorial/tutorialCarousel.tsx
 'use client';
 
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious } from '~/components/common/carousel';
@@ -137,9 +136,10 @@ const SLIDES = [
 
 interface TutorialCarouselProps {
   onComplete?: () => void;
+  showCustomization?: boolean;
 }
 
-export default function TutorialCarousel({ onComplete }: TutorialCarouselProps) {
+export default function TutorialCarousel({ onComplete, showCustomization = true }: TutorialCarouselProps) {
   const { api, setApi, current, count } = useCarouselProgress();
   const progress = count > 0 ? (current / (count - 1)) * 100 : 0;
   const isLast = current === count - 1;
@@ -210,7 +210,7 @@ export default function TutorialCarousel({ onComplete }: TutorialCarouselProps) 
                 </p>
 
                 {/* Customizable callout */}
-                {s.customizable && (
+                {showCustomization && s.customizable && (
                   <div className={cn(
                     'flex items-start gap-2.5 w-full max-w-xs rounded-lg border-2 border-dashed p-3 text-left',
                     s.borderColor
