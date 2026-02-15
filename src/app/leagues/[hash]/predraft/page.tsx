@@ -26,8 +26,8 @@ export default function PredraftPage() {
   const [showPrompt, setShowPrompt] = useState(params.has('new') || params.has('join'));
 
   const goToManageMembers = () => {
-    setManageMembersFirst(true);
     setTab('settings');
+    setManageMembersFirst(true);
   };
 
   useEffect(() => {
