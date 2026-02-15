@@ -15,6 +15,7 @@ export interface NavLinkProps {
 
 export default async function Nav() {
   const { userId, noRedirects } = await systemAdminAuth();
+
   return (
     <>
       <SideNav userId={userId} noRedirects={noRedirects} />

@@ -9,6 +9,7 @@ import Nav from '~/components/nav/navSelector';
 import { type Metadata } from 'next';
 import QueryClientContextProvider from '~/context/reactQueryContext';
 import FloatingActionsWidget from '~/components/shared/floatingActions/widget';
+import { RebrandNotice } from '~/components/sys/rebrand';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -16,13 +17,13 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Trial by Fire',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:1234'),
+  title: 'Trial by Fire - A Fantasy League for Survivor',
   description: 'A fantasy league for the TV show Survivor',
+  icons: [{ rel: 'icon', url: '/LogoDisc.png' }],
   openGraph: {
-    title: 'Trial by Fire - A Fantasy League for Survivor',
-    description: 'A fantasy league for the TV show Survivor',
     images: ['/LogoFullOpaque.png'],
-  }
+  },
 };
 
 interface RootLayoutProps {
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                   </div>
                 </main>
                 <FloatingActionsWidget />
+                <RebrandNotice />
               </SidebarProvider>
             </body>
           </html>

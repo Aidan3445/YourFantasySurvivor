@@ -6,7 +6,6 @@ import { leagueMemberAuth } from '~/lib/auth';
 import { Button } from '~/components/common/button';
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { metadata } from '~/app/layout';
 import getPublicLeague from '~/services/leagues/query/public';
 import LeagueHeader from '~/components/leagues/layout/leagueHeader';
 
@@ -22,19 +21,13 @@ export async function generateMetadata(
 
   if (!league) {
     return {
-      ...metadata,
-      title: 'League Not Found | TBF',
+      title: 'Invalid Invite - Trial by Fire',
     };
   }
 
   return {
-    ...metadata,
     title: `Join ${league.name} - Trial by Fire`,
-    openGraph: {
-      title: `Join ${league.name}! - Trial by Fire`,
-      description: `You've been invited to join ${league.name} (${league.season}) on Trial by Fire!`,
-      images: ['/LogoFullOpaque.png'],
-    }
+    description: `You've been invited to join ${league.name} (${league.season}) on Trial by Fire!`,
   };
 }
 

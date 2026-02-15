@@ -14,19 +14,6 @@ interface SideNavProps {
 }
 
 export default function SideNav({ userId, noRedirects }: SideNavProps) {
-  const isLocalStorageAvailable = typeof window !== 'undefined' && (() => {
-    try {
-      window.localStorage.getItem('__test');
-      return true;
-    } catch {
-      return false;
-    }
-  })();
-
-  if (!isLocalStorageAvailable) {
-    return null;
-  }
-
   return (
     <Sidebar className='hidden md:block' variant='sidebar' collapsible='none'>
       <SidebarContent className='overflow-y-auto sticky top-0 h-full'>

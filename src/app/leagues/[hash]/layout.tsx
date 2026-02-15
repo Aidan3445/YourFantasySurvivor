@@ -4,7 +4,6 @@ import LeagueHeader from '~/components/leagues/layout/leagueHeader';
 import { leagueMemberAuth } from '~/lib/auth';
 import getPublicLeague from '~/services/leagues/query/public';
 import type { Metadata } from 'next';
-import { metadata as baseMetadata } from '~/app/layout';
 import Link from 'next/link';
 
 export interface LeaguePageProps {
@@ -21,8 +20,7 @@ export async function generateMetadata(
 
   if (!league) {
     return {
-      ...baseMetadata,
-      title: 'League Not Found | TBF',
+      title: 'League Not Found - Trial by Fire',
     };
   }
 
@@ -41,14 +39,8 @@ export async function generateMetadata(
   };
 
   return {
-    ...baseMetadata,
-    title: `${league.name} - Trial by Fire`,
-    description: `${league.season} - ${getStatusMessage()}`,
-    openGraph: {
-      title: `${league.name} - ${getStatusMessage()}`,
-      description: league.season,
-      images: ['/LogoFullOpaque.png'],
-    }
+    title: `${league.name} - ${getStatusMessage()}`,
+    description: league.season,
   };
 }
 
