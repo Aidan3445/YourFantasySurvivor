@@ -112,7 +112,7 @@ const SLIDES = [
     badgeColor: 'bg-red-500/15 text-red-500 border-red-500/30',
     title: 'Shot in the Dark',
     subtitle: 'A last-ditch play to save your streak',
-    body: 'Think your survivor is going home? Play your Shot in the Dark before the episode airs. If they do get voted out, you keep your streak bonus when you pick a new player. You only get one per season, use it wisely.',
+    body: 'Think your survivor is going home? Play your Shot in the Dark before the episode airs. If they do get voted out, you keep your streak bonus when you pick a new player. You only get one per league, use it wisely.',
     customizable: 'Your league can enable or disable Shot in the Dark. It requires survival streaks to be active.',
     tag: 'NEW',
   },
@@ -137,7 +137,7 @@ const SLIDES = [
     bgColor: 'bg-primary/10',
     borderColor: 'border-primary/20',
     badgeColor: 'bg-primary/15 text-primary border-primary/30',
-    title: 'You\'re Ready',
+    title: 'Survivors Ready...',
     subtitle: 'Time to outwatch, outpredict, outscore',
     body: 'Join a league, draft your survivor, and start competing. May the best fantasy player win.',
     cta: true,
@@ -152,7 +152,6 @@ interface TutorialCarouselProps {
 export default function TutorialCarousel({ onComplete, showCustomization = true }: TutorialCarouselProps) {
   const { api, setApi, current, count } = useCarouselProgress();
   const progress = count > 0 ? (current / (count - 1)) * 100 : 0;
-  const isLast = current === count - 1;
 
   return (
     <Carousel setApi={setApi} opts={{ watchDrag: true }}>
@@ -222,7 +221,7 @@ export default function TutorialCarousel({ onComplete, showCustomization = true 
                 {/* Customizable callout */}
                 {showCustomization && s.customizable && (
                   <div className={cn(
-                    'flex items-start gap-2.5 w-full max-w-xs rounded-lg border-2 border-dashed p-3 text-left',
+                    'bg-accent/50 flex items-start gap-2.5 w-full rounded-lg border-2 border-dashed p-3 text-left',
                     s.borderColor
                   )}>
                     <Settings className={cn('w-4 h-4 shrink-0 mt-0.5', s.stroke)} />
@@ -246,15 +245,6 @@ export default function TutorialCarousel({ onComplete, showCustomization = true 
                     ))}
                   </div>
                 )}
-
-                {/* CTA on last slide */}
-                {s.cta && (
-                  <Button
-                    className='mt-2 w-full max-w-xs font-bold uppercase text-sm tracking-wider shadow-lg hover:shadow-xl transition-all'
-                    onClick={onComplete}>
-                    Get Started
-                  </Button>
-                )}
               </div>
             </CarouselItem>
           );
@@ -262,15 +252,22 @@ export default function TutorialCarousel({ onComplete, showCustomization = true 
       </CarouselContent>
 
       {/* Next button (not on last slide) */}
-      {!isLast && (
-        <div className='flex justify-center px-6 pb-2'>
+      <div className='flex justify-center px-6 pb-2'>
+        {/* CTA on last slide */}
+        {api?.canScrollNext() ? (
           <Button
             className='w-full max-w-xs font-bold uppercase text-sm tracking-wider'
-            onClick={() => api?.scrollNext()}>
+            onClick={() => api.scrollNext()}>
             Next
           </Button>
-        </div>
-      )}
+        ) : (
+          <Button
+            className='w-full max-w-xs font-bold uppercase text-sm tracking-wider'
+            onClick={onComplete}>
+            Go!
+          </Button>
+        )}
+      </div>
     </Carousel>
   );
 }
