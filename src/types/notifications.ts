@@ -1,4 +1,4 @@
-import { type BaseEventInsert, type CustomEventInsert } from '~/types/events';
+import { type LivePrediction, type BaseEventInsert, type CustomEventInsert } from '~/types/events';
 
 export type Notifications = {
   token: string;
@@ -43,7 +43,7 @@ export type LiveScoringNotification = {
   episodeId: number;
   title: string;
   body: string;
-  data: BaseEventInsert | CustomEventInsert;
+  data: BaseEventInsert | CustomEventInsert | LivePrediction;
   leagueId?: number; // If provided, only notify users in this league
 }
 

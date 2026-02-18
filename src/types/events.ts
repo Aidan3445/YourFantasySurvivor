@@ -1,11 +1,15 @@
 import z from 'zod';
 import {
   type PredictionTimings, ReferenceTypes, BaseEventNames,
-  type ScoringBaseEventNames, type EliminationEventNames, EventSources, type EventTypes
+  type ScoringBaseEventNames, type EliminationEventNames, EventSources, type EventTypes,
+  type LivePredictionStatuses,
+  type LivePredictionOptionTypes
 } from '~/lib/events';
 import { type Tribe } from '~/types/tribes';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { type LeagueMember } from '~/types/leagueMembers';
+import { type InferInsertModel, type InferSelectModel } from 'drizzle-orm';
+import { type livePredictionOptionSchema, type livePredictionResponseSchema, type livePredictionSchema } from '~/server/db/schema/livePredictions';
 
 export type EventSource = (typeof EventSources)[number];
 export type EventType = (typeof EventTypes)[number];
@@ -182,3 +186,53 @@ export type Scores = Record<ReferenceType | 'Member', Record<number, number[]>>;
   * Record<memberId, streakCount>
   */
 export type Streaks = Record<number, number>;
+
+
+export type LivePredictionStatus = (typeof LivePredictionStatuses)[number];
+
+export type LivePrediction = InferSelectModel<typeof livePredictionSchema>;
+export type LivePredictionInsert = InferInsertModel<typeof livePredictionSchema>;
+export type LivePredictionOption = InferSelectModel<typeof livePredictionOptionSchema>;
+export type LivePredictionOptionInsert = InferInsertModel<typeof livePredictionOptionSchema>;
+export type LivePredictionResponse = InferSelectModel<typeof livePredictionResponseSchema>;
+export type LivePredictionResponseInsert = InferInsertModel<typeof livePredictionResponseSchema>;
+
+export interface LivePredictionWithOptions extends LivePrediction {
+  options: LivePredictionOption[];
+  responses: LivePredictionResponse[];
+  userResponse?: LivePredictionResponse | null;
+}
+
+export interface LivePredictionResult {
+  livePredictionId: number;
+  title: string;
+  totalResponses: number;
+  correctResponses: number;
+  userCorrect: boolean | null;
+}
+
+export interface LivePredictionUserStats {
+  userId: string;
+  totalAnswered: number;
+  totalCorrect: number;
+  accuracy: number;
+  currentStreak: number;
+  bestStreak: number;
+}
+
+export interface LivePredictionOptionInput {
+  label: string;
+  referenceType?: ReferenceType;
+  referenceId?: number;
+}
+
+export type LivePredictionOptionType = (typeof LivePredictionOptionTypes)[number];
+
+export interface LivePredictionTemplate {
+  title: string;
+  description?: string;
+  optionType: LivePredictionOptionType;
+}
+
+
+

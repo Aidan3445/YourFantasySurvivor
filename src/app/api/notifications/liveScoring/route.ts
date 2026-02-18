@@ -1,9 +1,6 @@
-import 'server-only';
 import { type NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '~/lib/apiMiddleware';
-import { db } from '~/server/db';
-import { liveScoringSessionSchema } from '~/server/db/schema/notifications';
-import { eq, and } from 'drizzle-orm';
+import { toggleLiveScoringOptIn } from '~/services/notifications/events/liveScoringOptInOut';
 
 // Opt-in to live scoring for an episode
 export async function POST(request: NextRequest) {
@@ -18,10 +15,7 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      await db
-        .insert(liveScoringSessionSchema)
-        .values({ episodeId: body.episodeId, userId })
-        .onConflictDoNothing();
+      await toggleLiveScoringOptIn(userId, body.episodeId, true);
 
       return NextResponse.json({ success: true }, { status: 200 });
     } catch (e) {
@@ -44,12 +38,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     try {
-      await db
-        .delete(liveScoringSessionSchema)
-        .where(and(
-          eq(liveScoringSessionSchema.episodeId, body.episodeId),
-          eq(liveScoringSessionSchema.userId, userId)
-        ));
+      await toggleLiveScoringOptIn(userId, body.episodeId, false);
 
       return NextResponse.json({ success: true }, { status: 200 });
     } catch (e) {
