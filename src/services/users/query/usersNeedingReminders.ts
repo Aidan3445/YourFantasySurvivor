@@ -1,7 +1,7 @@
 import 'server-only';
 import { db } from '~/server/db';
 import { and, arrayOverlaps, eq, gt, or, exists, sql, isNotNull, not } from 'drizzle-orm';
-import { getActiveTimings } from '~/lib/episodes';
+import { calculateKeyEpisodes, getActiveTimings, getAirStatus } from '~/lib/episodes';
 import { baseEventPredictionRulesSchema, baseEventPredictionSchema } from '~/server/db/schema/baseEvents';
 import { customEventPredictionSchema, customEventRuleSchema } from '~/server/db/schema/customEvents';
 import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
@@ -16,20 +16,40 @@ import { episodeSchema } from '~/server/db/schema/episodes';
   * @returns Array of user IDs needing reminders per active season
   */
 export async function getUsersNeedingReminders(episode: Episode) {
-  const hasMerge = await db
-    .select({ mergeEpisode: sql`1` })
+  const narrowedEpisodes = await db
+    .select()
     .from(episodeSchema)
     .where(and(
       eq(episodeSchema.seasonId, episode.seasonId),
-      eq(episodeSchema.isMerge, true),
-      gt(episodeSchema.episodeNumber, episode.episodeNumber),
-    ))
-    .then(res => res[0] ? true : false);
+      or(
+        eq(episodeSchema.episodeNumber, episode.episodeNumber - 1),
+        eq(episodeSchema.isMerge, true),
+      )))
+    .orderBy(episodeSchema.episodeNumber)
+    .then((res) => ([
+      ...res.map(ep => {
+        const airDate = new Date(`${ep.airDate} Z`);
+        const airStatus = getAirStatus(airDate, ep.runtime);
+
+        return {
+          seasonId: ep.seasonId,
+          episodeId: ep.episodeId,
+          episodeNumber: ep.episodeNumber,
+          title: ep.title,
+          airDate,
+          runtime: ep.runtime,
+          airStatus,
+          isMerge: ep.isMerge,
+          isFinale: ep.isFinale,
+        } as Episode;
+      })
+    ]));
+
   const keyEpisodes = {
-    previousEpisode: null,
+    ...calculateKeyEpisodes(narrowedEpisodes),
     nextEpisode: episode,
-    mergeEpisode: hasMerge ? episode : null,
   };
+
   // This will ignore draft only predictions, including the first week when draft predictions
   // are still available, but given that this only goes out to active leagues, users should have
   // had the chance to make those predictions already.
@@ -59,7 +79,7 @@ export async function getUsersNeedingReminders(episode: Episode) {
             activeTimings,
             keyEpisodes.nextEpisode.episodeId,
           ),
-          existsUnmadeCustomPrediction(activeTimings),
+          existsUnmadeCustomPrediction(activeTimings, keyEpisodes.nextEpisode.episodeId)
         ),
       ),
     )
@@ -123,7 +143,7 @@ const existsUnmadeBasePrediction = (activeTimings: PredictionTiming[], episodeId
   );
 };
 
-const existsUnmadeCustomPrediction = (activeTimings: PredictionTiming[]) => {
+const existsUnmadeCustomPrediction = (activeTimings: PredictionTiming[], episodeId: number) => {
   return exists(
     db
       .select({ one: sql`1` })
@@ -141,6 +161,7 @@ const existsUnmadeCustomPrediction = (activeTimings: PredictionTiming[]) => {
                 .where(
                   and(
                     eq(customEventPredictionSchema.memberId, leagueMemberSchema.memberId),
+                    eq(customEventPredictionSchema.episodeId, episodeId),
                     eq(customEventPredictionSchema.customEventRuleId, customEventRuleSchema.customEventRuleId)
                   )
                 )

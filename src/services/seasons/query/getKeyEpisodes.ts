@@ -1,5 +1,4 @@
 import getEpisodes from '~/services/seasons/query/episodes';
-import type { KeyEpisodes } from '~/types/episodes';
 import { calculateKeyEpisodes } from '~/lib/episodes';
 import { type DBTransaction } from '~/types/server';
 
@@ -18,5 +17,5 @@ export default async function getKeyEpisodes(
   transactionOverride?: DBTransaction
 ) {
   const episodes = await getEpisodes(seasonId, transactionOverride);
-  return calculateKeyEpisodes(episodes) as KeyEpisodes;
+  return calculateKeyEpisodes(episodes);
 }
