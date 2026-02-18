@@ -2,8 +2,7 @@ import 'server-only';
 import { NextResponse } from 'next/server';
 import { scheduleUpcomingEpisodeNotifications } from '~/services/notifications/reminders/cron';
 
-// Verify the request is from QStash or your cron provider
-export async function GET(req: Request) {
+export async function POST(req: Request) {
   const authHeader = req.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.QSTASH_CRON_SECRET_KEY}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

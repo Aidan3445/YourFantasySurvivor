@@ -7,6 +7,7 @@ import SideNavLink from '~/components/nav/side/link';
 import SideNavLeagues from '~/components/nav/side/leagues';
 import SysAdminNav from '~/components/nav/side/sys';
 import { PlaygroundIcon, SeasonsIcon, TorchIcon } from '~/components/icons/generated';
+import { Separator } from '~/components/common/separator';
 
 interface SideNavProps {
   userId: string | null;
@@ -32,9 +33,22 @@ export default function SideNav({ userId, noRedirects }: SideNavProps) {
           )}
         </SidebarGroup>
         <div className='pointer-events-none absolute bottom-2 left-0 w-full text-center text-xs text-muted-foreground'>
-          &copy; {new Date().getFullYear()} Trial by Fire.
-          <br />
-          All rights reserved.
+          <div className='mb-2 select-none text-inherit'>
+            Logo & icon design by{' '}
+            <a
+              href='https://www.instagram.com/edensartstudio/'
+              target='_blank'
+              rel='noopener noreferrer'
+              className='pointer-events-auto underline underline-offset-2 transition-colors hover:text-primary/80 text-secondary'>
+              @edensartstudio
+            </a>
+          </div>
+          <Separator className='my-2' />
+          <div className='select-none text-inherit'>
+            &copy; {new Date().getFullYear()} Trial by Fire.
+            <br />
+            All rights reserved.
+          </div>
         </div>
       </SidebarContent>
     </Sidebar>

@@ -245,7 +245,7 @@
   }
 
   .cl-userButtonBox {
-    @apply flex-row-reverse! -ml-1;
+    @apply flex-row-reverse!;
   }
 
   .cl-userButtonAvatarBox {
