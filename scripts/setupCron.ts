@@ -9,4 +9,10 @@ await qstash.schedules.create({
   headers: { authorization: `Bearer ${process.env.QSTASH_CRON_SECRET_KEY}` },
 });
 
+await qstash.schedules.create({
+  destination: 'https://trialbyfiresurvivor.com/api/notifications/draft',
+  cron: '0 15 * * *', // daily at 15:00 UTC (10am ET)
+  headers: { authorization: `Bearer ${process.env.QSTASH_CRON_SECRET_KEY}` },
+});
+
 console.log('Cron schedule created');
