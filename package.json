@@ -20,7 +20,7 @@
     "test:run": "vitest run --config ./vitest.config.ts",
     "test:coverage": "vitest run --coverage --config ./vitest.config.ts",
     "test:watch": "vitest watch --config ./vitest.config.ts",
-    "qstash:cron": "node --env-file=.env ./scripts/setupCron.ts",
+    "qstash:cron": "tsx --env-file=.env ./scripts/setupCron.ts",
     "icons": "tsx scripts/generateIcons.ts"
   },
   "dependencies": {
