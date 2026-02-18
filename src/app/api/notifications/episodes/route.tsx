@@ -1,4 +1,3 @@
-import 'server-only';
 import { NextResponse } from 'next/server';
 import { scheduleUpcomingEpisodeNotifications } from '~/services/notifications/reminders/cron';
 
