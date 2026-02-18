@@ -2,6 +2,7 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { livePredictionSchema, livePredictionOptionSchema } from '~/server/db/schema/livePredictions';
+import { sendLivePredictionNotification } from '~/services/notifications/events/livePredictions';
 import { type LivePredictionOptionInput } from '~/types/events';
 
 
@@ -21,15 +22,15 @@ export async function createLivePrediction(
   description: string | null,
   options: LivePredictionOptionInput[],
 ) {
-  return await db.transaction(async (tx) => {
-    const [prediction] = await tx
+  const { prediction, insertedOptions } = await db.transaction(async (trx) => {
+    const [prediction] = await trx
       .insert(livePredictionSchema)
       .values({ seasonId, episodeId, title, description })
       .returning();
 
     if (!prediction) throw new Error('Failed to create live prediction');
 
-    const insertedOptions = await tx
+    const insertedOptions = await trx
       .insert(livePredictionOptionSchema)
       .values(options.map((opt) => ({
         livePredictionId: prediction.livePredictionId,
@@ -39,6 +40,9 @@ export async function createLivePrediction(
       })))
       .returning();
 
-    return { ...prediction, options: insertedOptions };
+    return { prediction, insertedOptions };
   });
+
+  void sendLivePredictionNotification(prediction);
+  return { ...prediction, options: insertedOptions };
 }

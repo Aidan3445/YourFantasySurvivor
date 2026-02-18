@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { type LivePredictionOptionInput } from '~/types/events';
 import { withAuth, withSystemAdminAuth } from '~/lib/apiMiddleware';
-import { getLivePredictionsForEpisode } from '~/services/notifications/livePredictions/query';
-import { createLivePrediction } from '~/services/notifications/livePredictions/create';
+import { getLivePredictionsForEpisode } from '~/services/livePredictions/query/getLivePredictions';
+import { createLivePrediction } from '~/services/livePredictions/mutation/create';
 
 export async function GET(req: NextRequest) {
   return await withAuth(async (userId) => {

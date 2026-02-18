@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { withAuth } from '~/lib/apiMiddleware';
-import { getLivePredictionUserStats } from '~/services/notifications/livePredictions/stats';
+import { getLivePredictionUserStats } from '~/services/livePredictions/query/getPredictionStats';
 
 export async function GET(req: NextRequest) {
   return await withAuth(async (userId) => {

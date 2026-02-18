@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { withAuth, withSystemAdminAuth } from '~/lib/apiMiddleware';
-import { closeLivePrediction } from '~/services/notifications/livePredictions/close';
-import { deleteLivePrediction } from '~/services/notifications/livePredictions/delete';
-import { resolveLivePrediction } from '~/services/notifications/livePredictions/resolve';
-import { respondToLivePrediction } from '~/services/notifications/livePredictions/respond';
-import { togglePauseLivePrediction } from '~/services/notifications/livePredictions/togglePause';
+import { closeLivePrediction } from '~/services/livePredictions/mutation/close';
+import { deleteLivePrediction } from '~/services/livePredictions/mutation/delete';
+import { resolveLivePrediction } from '~/services/livePredictions/mutation/resolve';
+import { respondToLivePrediction } from '~/services/livePredictions/mutation/respond';
+import { togglePauseLivePrediction } from '~/services/livePredictions/mutation/togglePause';
 
 interface RouteParams {
   params: Promise<{ id: string }>;

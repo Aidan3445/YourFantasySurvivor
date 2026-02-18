@@ -3,6 +3,7 @@ import 'server-only';
 
 import { db } from '~/server/db';
 import { livePredictionSchema, livePredictionOptionSchema } from '~/server/db/schema/livePredictions';
+import { sendLivePredictionResolvedNotification } from '~/services/notifications/events/livePredictions';
 
 /**
   * Resolves a live prediction by marking correct options and updating the prediction status to "Resolved"
@@ -14,10 +15,10 @@ export async function resolveLivePrediction(
   livePredictionId: number,
   correctOptionIds: number[],
 ) {
-  return await db.transaction(async (tx) => {
+  const { updated, correctOptions } = await db.transaction(async (trx) => {
     // Mark correct options
     if (correctOptionIds.length > 0) {
-      await tx
+      await trx
         .update(livePredictionOptionSchema)
         .set({ isCorrect: true })
         .where(and(
@@ -27,7 +28,7 @@ export async function resolveLivePrediction(
     }
 
     // Mark incorrect options
-    await tx
+    await trx
       .update(livePredictionOptionSchema)
       .set({ isCorrect: false })
       .where(and(
@@ -36,7 +37,7 @@ export async function resolveLivePrediction(
       ));
 
     // Update prediction status
-    const [updated] = await tx
+    const [updated] = await trx
       .update(livePredictionSchema)
       .set({
         status: 'Resolved',
@@ -46,6 +47,19 @@ export async function resolveLivePrediction(
       .returning();
 
     if (!updated) throw new Error('Prediction not found');
-    return updated;
+
+    const correctOptions = await trx
+      .select()
+      .from(livePredictionOptionSchema)
+      .where(and(
+        eq(livePredictionOptionSchema.livePredictionId, livePredictionId),
+        eq(livePredictionOptionSchema.isCorrect, true),
+      ))
+      .then((res) => res.map((opt) => opt.label));
+
+    return { updated, correctOptions };
   });
+
+  void sendLivePredictionResolvedNotification(updated, correctOptions);
+  return updated;
 }
