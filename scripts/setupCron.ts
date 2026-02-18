@@ -1,6 +1,6 @@
 import { Client } from '@upstash/qstash';
 
-console.log('Setting up cron schedule for episodes', process.env.QSTASH_TOKEN, process.env.QSTASH_CRON_SECRET_KEY);
+console.log('Setting up cron schedule for episodes');
 const qstash = new Client({ token: process.env.QSTASH_TOKEN! });
 
 await qstash.schedules.create({
