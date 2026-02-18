@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { scheduleUpcomingEpisodeNotifications } from '~/services/notifications/reminders/cron';
+import { scheduleUpcomingDraftNotifications } from '~/services/notifications/reminders/cron';
 
 export async function POST(req: Request) {
   const authHeader = req.headers.get('authorization');
@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await scheduleUpcomingEpisodeNotifications();
+    const result = await scheduleUpcomingDraftNotifications();
     return NextResponse.json(result, { status: 200 });
   } catch (e) {
     console.error('Failed to schedule episode notifications', e);

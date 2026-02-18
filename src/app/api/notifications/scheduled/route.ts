@@ -1,4 +1,3 @@
-import 'server-only';
 import { type NextRequest, NextResponse } from 'next/server';
 import { Receiver } from '@upstash/qstash';
 import { type NotificationType } from '~/types/notifications';

@@ -1,4 +1,4 @@
-import { type ScoringBaseEventName, type BaseEventName, type ReferenceType } from '~/types/events';
+import { type ScoringBaseEventName, type BaseEventName, type ReferenceType, type LivePredictionTemplate } from '~/types/events';
 
 export const EventSources = ['Base', 'Custom'] as const;
 export const EventTypes = ['Direct', 'Prediction'] as const;
@@ -139,3 +139,44 @@ export const BasePredictionReferenceTypes: Record<ScoringBaseEventName, Referenc
   soleSurvivor: ['Castaway'],
   elim: ['Castaway'],
 } as const;
+
+
+
+
+export const LivePredictionStatuses = ['Open', 'Closed', 'Resolved'] as const;
+
+export const LivePredictionOptionTypes = [...ReferenceTypes, 'Custom'] as const;
+
+export const LIVE_PREDICTION_TEMPLATES: LivePredictionTemplate[] = [
+  {
+    title: 'Who wins this challenge?',
+    description: 'Now that we’ve seen the challenge, predict the winner.',
+    optionType: 'Castaway',
+  },
+  {
+    title: 'Who gets voted out tonight?',
+    description: 'Predict who will be voted out at tribal council.',
+    optionType: 'Castaway',
+  },
+  {
+    title: 'Will they play an advantage?',
+    description: 'Predict whether or not an advantage will be played at tribal council.',
+    optionType: 'Custom',
+  },
+  {
+    title: 'Which tribe wins?',
+    description: 'Pick the winning tribe.',
+    optionType: 'Tribe',
+  },
+  {
+    title: 'Who plays their advantage?',
+    description: 'Predict who makes a move with their advantage.',
+    optionType: 'Castaway',
+  },
+  {
+    title: 'Who will win fire-making?',
+    description: 'Predict who will win the fire-making challenge.',
+    optionType: 'Castaway',
+  },
+];
+
