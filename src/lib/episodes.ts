@@ -33,7 +33,7 @@ export function getAirStatus(airDate: Date, runtime: number): AirStatus {
  * @param episodes Array of episodes to process
  * @returns KeyEpisodes object with previous, next, and merge episodes
  */
-export function calculateKeyEpisodes(episodes: { airStatus: AirStatus; isMerge: boolean }[]): { previousEpisode: typeof episodes[0] | null; nextEpisode: typeof episodes[0] | null; mergeEpisode: typeof episodes[0] | null } {
+export function calculateKeyEpisodes<T extends { airStatus: AirStatus; isMerge: boolean }>(episodes: T[]): { previousEpisode: T | null; nextEpisode: T | null; mergeEpisode: T | null } {
   return episodes.reduce((acc, episode) => {
     if (episode.airStatus === 'Aired' || episode.airStatus === 'Airing') {
       acc.previousEpisode = episode;
@@ -49,7 +49,7 @@ export function calculateKeyEpisodes(episodes: { airStatus: AirStatus; isMerge: 
     previousEpisode: null,
     nextEpisode: null,
     mergeEpisode: null,
-  } as { previousEpisode: typeof episodes[0] | null; nextEpisode: typeof episodes[0] | null; mergeEpisode: typeof episodes[0] | null });
+  } as { previousEpisode: T | null; nextEpisode: T | null; mergeEpisode: T | null });
 }
 
 /**
@@ -129,13 +129,13 @@ export function getActiveTimings({
     timings.push('Draft');
   }
 
-  // Weekly premerge only if included in the list and no merge episode
-  if (!mergeEpisode) {
+  // Weekly premerge only if included in the list and no merge episode has aired yet
+  if (!mergeEpisode || mergeEpisode.airStatus === 'Upcoming') {
     timings.push('Weekly (Premerge only)');
   }
 
-  // Weekly postmerge only if included in the list and merge episode exists
-  if (mergeEpisode) {
+  // Weekly postmerge only if included in the list and merge episode has aired
+  if (mergeEpisode && mergeEpisode.airStatus !== 'Upcoming') {
     timings.push('Weekly (Postmerge only)');
   }
 
