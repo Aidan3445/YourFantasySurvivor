@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 import 'server-only';
 
 import { db } from '~/server/db';
@@ -23,7 +23,7 @@ export async function resolveLivePrediction(
         .set({ isCorrect: true })
         .where(and(
           eq(livePredictionOptionSchema.livePredictionId, livePredictionId),
-          sql`${livePredictionOptionSchema.livePredictionOptionId} = ANY(${correctOptionIds})`,
+          inArray(livePredictionOptionSchema.livePredictionOptionId, correctOptionIds),
         ));
     }
 

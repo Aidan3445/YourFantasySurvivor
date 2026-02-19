@@ -23,9 +23,9 @@ export default function TutorialModal({ children, className, showCustomization }
       <AlertDialogTrigger className={className} asChild>
         {children}
       </AlertDialogTrigger>
-      <AlertDialogContent className='sm:w-160 w-96 flex flex-col animate-scale-in-fast border-primary/30 shadow-lg shadow-primary/20'>
+      <AlertDialogContent className='sm:w-160 px-0 w-96 flex flex-col animate-scale-in-fast border-primary/30 shadow-lg shadow-primary/20'>
         <AlertDialogHeader>
-          <span className='flex items-center gap-3 mb-2'>
+          <span className='flex items-center gap-3 mb-2 px-4'>
             <span className='h-6 w-1 bg-primary rounded-full' />
             <AlertDialogTitle className='text-2xl font-black uppercase tracking-tight'>
               How to Play

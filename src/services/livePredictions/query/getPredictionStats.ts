@@ -39,6 +39,7 @@ export async function getLivePredictionUserStats(
     .where(and(
       eq(livePredictionResponseSchema.userId, userId),
       eq(livePredictionSchema.status, 'Resolved'),
+      eq(livePredictionSchema.paused, false),
       seasonId ? eq(livePredictionSchema.seasonId, seasonId) : undefined,
     ))
     .orderBy(livePredictionSchema.resolvedAt);
