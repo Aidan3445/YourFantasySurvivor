@@ -33,6 +33,7 @@ export async function getLivePredictionLeaderboard(seasonId: number) {
     .where(and(
       eq(livePredictionSchema.seasonId, seasonId),
       eq(livePredictionSchema.status, 'Resolved'),
+      eq(livePredictionSchema.paused, false),
     ));
 
   // Aggregate per user
