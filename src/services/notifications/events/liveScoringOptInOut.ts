@@ -32,8 +32,8 @@ export async function toggleLiveScoringOptIn(
 
     if (result[0]) {
       // If this is a new opt-in, ensure a leaderboard user entry is created
-      await db.
-        insert(livePredictionLeaderboardUsernameSchema)
+      await db
+        .insert(livePredictionLeaderboardUsernameSchema)
         .values({
           userId,
           username: user.username

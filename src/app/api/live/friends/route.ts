@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
       const stats = await getLivePredictionFriendsLeaderboard(userId, Number(seasonId));
       return NextResponse.json(stats);
     } catch (e) {
-      console.error('Failed to get live prediction stats:', e);
+      console.error('Failed to get live prediction friends leaderboard:', e);
       return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
     }
   })();

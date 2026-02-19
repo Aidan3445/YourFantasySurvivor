@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
       const stats = await getLivePredictionLeaderboard(Number(seasonId));
       return NextResponse.json(stats);
     } catch (e) {
-      console.error('Failed to get live prediction stats:', e);
+      console.error('Failed to get live prediction leaderboard:', e);
       return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
     }
   })();
@@ -22,18 +22,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   return await withAuth(async (userId) => {
-    const encodedUsername = req.nextUrl.searchParams.get('username');
-    if (!encodedUsername) {
+    const { newUsername } = await req.json() as { newUsername: string };
+    if (!newUsername) {
       return NextResponse.json({ error: 'Missing username' }, { status: 400 });
     }
-
-    const newUsername = decodeURIComponent(encodedUsername);
 
     try {
       const stats = await changeLeaderboardUsername(userId, newUsername);
       return NextResponse.json(stats);
     } catch (e) {
-      console.error('Failed to get live prediction stats:', e);
+      console.error('Failed to change leaderboard username:', e);
       return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
     }
   })();
