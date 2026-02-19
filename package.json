@@ -17,12 +17,7 @@
     "start": "next start",
     "test": "vitest",
     "test:ui": "vitest --ui --config ./vitest.config.ts",
-    "test:run": " ?? uniqueNamesGenerator({
-            dictionaries: [adjectives, animals],
-            separator: ' ',
-            length: 2,
-          }),
-test run --config ./vitest.config.ts",
+    "test:run": "vitest run --config ./vitest.config.ts",
     "test:coverage": "vitest run --coverage --config ./vitest.config.ts",
     "test:watch": "vitest watch --config ./vitest.config.ts",
     "qstash:cron": "tsx --env-file=.env ./scripts/setupCron.ts",
