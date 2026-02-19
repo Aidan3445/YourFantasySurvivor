@@ -32,10 +32,6 @@ export async function getLivePredictionFriendsLeaderboard(userId: string, season
 
   if (friendUserIds.length === 0) return [];
 
-  console.log(`Found ${friendUserIds.length} friends for user ${userId} in season ${seasonId}`, {
-    friendUserIds,
-  });
-
   // Get resolved responses only for friends
   const responses = await db
     .select({
