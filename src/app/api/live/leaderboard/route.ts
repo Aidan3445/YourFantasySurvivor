@@ -23,10 +23,6 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   return await withAuth(async (userId) => {
     const { newUsername } = await req.json() as { newUsername: string };
-    if (!newUsername) {
-      return NextResponse.json({ error: 'Missing username' }, { status: 400 });
-    }
-
     try {
       const stats = await changeLeaderboardUsername(userId, newUsername);
       return NextResponse.json(stats);
