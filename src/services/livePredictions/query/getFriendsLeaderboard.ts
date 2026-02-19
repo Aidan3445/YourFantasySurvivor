@@ -55,6 +55,7 @@ export async function getLivePredictionFriendsLeaderboard(userId: string, season
     .where(and(
       eq(livePredictionSchema.seasonId, seasonId),
       eq(livePredictionSchema.status, 'Resolved'),
+      eq(livePredictionSchema.paused, false),
       inArray(livePredictionResponseSchema.userId, friendUserIds),
     ));
 
