@@ -5,7 +5,6 @@ import { liveScoringSessionSchema } from '~/server/db/schema/notifications';
 import { eq, and } from 'drizzle-orm';
 import { currentUser } from '@clerk/nextjs/server';
 import { livePredictionLeaderboardUsernameSchema } from '~/server/db/schema/livePredictions';
-import { uniqueNamesGenerator, adjectives, animals } from 'unique-names-generator';
 
 /**
  * Opts a user in or out of live scoring notifications for a specific episode
@@ -19,7 +18,7 @@ export async function toggleLiveScoringOptIn(
   optIn: boolean,
 ) {
   const user = await currentUser();
-  if (user?.id !== userId) {
+  if (user?.id !== userId || !user.username) {
     throw new Error('User not authenticated');
   }
 
@@ -37,11 +36,7 @@ export async function toggleLiveScoringOptIn(
         insert(livePredictionLeaderboardUsernameSchema)
         .values({
           userId,
-          username: user.username ?? uniqueNamesGenerator({
-            dictionaries: [adjectives, animals],
-            separator: ' ',
-            length: 2,
-          }),
+          username: user.username
         })
         .onConflictDoNothing();
     }
