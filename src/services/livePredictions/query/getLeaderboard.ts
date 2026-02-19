@@ -5,7 +5,8 @@ import { and, eq } from 'drizzle-orm';
 import {
   livePredictionSchema,
   livePredictionOptionSchema,
-  livePredictionResponseSchema
+  livePredictionResponseSchema,
+  livePredictionLeaderboardUsernameSchema
 } from '~/server/db/schema/livePredictions';
 
 export async function getLivePredictionLeaderboard(seasonId: number) {
@@ -13,6 +14,7 @@ export async function getLivePredictionLeaderboard(seasonId: number) {
   const responses = await db
     .select({
       userId: livePredictionResponseSchema.userId,
+      username: livePredictionLeaderboardUsernameSchema.username,
       isCorrect: livePredictionOptionSchema.isCorrect,
     })
     .from(livePredictionResponseSchema)
@@ -24,15 +26,19 @@ export async function getLivePredictionLeaderboard(seasonId: number) {
       livePredictionOptionSchema,
       eq(livePredictionOptionSchema.livePredictionOptionId, livePredictionResponseSchema.optionId),
     )
+    .innerJoin(
+      livePredictionLeaderboardUsernameSchema,
+      eq(livePredictionLeaderboardUsernameSchema.userId, livePredictionResponseSchema.userId),
+    )
     .where(and(
       eq(livePredictionSchema.seasonId, seasonId),
       eq(livePredictionSchema.status, 'Resolved'),
     ));
 
   // Aggregate per user
-  const userMap = new Map<string, { total: number; correct: number }>();
+  const userMap = new Map<string, { username: string, total: number; correct: number }>();
   for (const r of responses) {
-    const entry = userMap.get(r.userId) ?? { total: 0, correct: 0 };
+    const entry = userMap.get(r.userId) ?? { username: r.username, total: 0, correct: 0 };
     entry.total++;
     if (r.isCorrect) entry.correct++;
     userMap.set(r.userId, entry);
@@ -40,8 +46,9 @@ export async function getLivePredictionLeaderboard(seasonId: number) {
 
   // Sort by correct count desc, then accuracy desc
   return Array.from(userMap.entries())
-    .map(([userId, { total, correct }]) => ({
+    .map(([userId, { username, total, correct }]) => ({
       userId,
+      username,
       totalAnswered: total,
       totalCorrect: correct,
       accuracy: total > 0 ? correct / total : 0,
