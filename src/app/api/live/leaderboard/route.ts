@@ -22,10 +22,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   return await withAuth(async (userId) => {
-    const { newUsername } = await req.json() as { newUsername: string };
+    let newUsername: string | undefined;
     try {
-      const stats = await changeLeaderboardUsername(userId, newUsername);
-      return NextResponse.json(stats);
+      const body = await req.json() as { newUsername?: string };
+      newUsername = body.newUsername;
+    } catch {
+      console.log('Establishing default username for user');
+    }
+    try {
+      await changeLeaderboardUsername(userId, newUsername);
+      return NextResponse.json({ success: true }, { status: 200 });
     } catch (e) {
       console.error('Failed to change leaderboard username:', e);
       return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
