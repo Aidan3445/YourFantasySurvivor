@@ -17,6 +17,7 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     if (!livePredictionId) return NextResponse.json({ error: 'Invalid id' }, { status: 400 });
 
     const body = await req.json() as { optionId: number };
+    console.log('Responding to live prediction', { livePredictionId, userId, optionId: body });
     if (!body.optionId) return NextResponse.json({ error: 'Missing optionId' }, { status: 400 });
 
     try {
