@@ -96,7 +96,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",
-    "drizzle-kit": "^0.31.9",
+    "drizzle-kit": "^0.18.1",
     "drizzle-orm": "^0.38.0",
     "eslint": "^10.0.0",
     "eslint-config-next": "^0.2.4",
