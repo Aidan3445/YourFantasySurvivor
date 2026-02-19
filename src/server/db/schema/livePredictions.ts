@@ -64,3 +64,12 @@ export const livePredictionResponseSchema = createTable(
     unique('live_resp_prediction_user_unq').on(table.livePredictionId, table.userId),
   ]
 );
+
+// Live leaderboard username
+export const livePredictionLeaderboardUsernameSchema = createTable(
+  'live_prediction_leaderboard_username',
+  {
+    userId: varchar('user_id', { length: 64 }).notNull().primaryKey(),
+    username: varchar('username', { length: 64 }).notNull(),
+  }
+);

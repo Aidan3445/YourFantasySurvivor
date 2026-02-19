@@ -3,6 +3,7 @@ import { Client } from '@upstash/qstash';
 import { type ScheduledSelectionData, type NotificationType, type ScheduledDraftData } from '~/types/notifications';
 import { type Episode } from '~/types/episodes';
 import { camelToTitle } from '~/lib/utils';
+import { BaseEventFullName } from '~/lib/events';
 
 if (!process.env.QSTASH_TOKEN) {
   throw new Error('QSTASH_TOKEN is not set');
@@ -51,7 +52,13 @@ export async function scheduleEpisodeNotification(
  * Format event name for notification title
  */
 export function formatEventTitle(eventName: string, label?: string | null): string {
-  const formatted = camelToTitle(eventName);
+  const formatted = BaseEventFullName[eventName as keyof typeof BaseEventFullName] ?? camelToTitle(eventName);
+
+  // avoid redundancy
+  if (formatted === label) return formatted;
+  else if (label && formatted.includes(label)) return formatted;
+  else if (label?.includes(formatted)) return label;
+
   return label ? `${formatted}: ${label}` : formatted;
 }
 

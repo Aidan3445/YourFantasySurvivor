@@ -156,7 +156,7 @@ export default function TutorialCarousel({ onComplete, showCustomization = true 
   return (
     <Carousel setApi={setApi} opts={{ watchDrag: true }}>
       {/* Progress bar */}
-      <span className='flex w-full items-end gap-4 px-2 mb-1'>
+      <span className='flex w-full items-end gap-4 mb-1 px-4'>
         <CarouselPrevious className='static translate-y-0 border-2 border-primary/30 hover:bg-primary/10' />
         <div className='space-y-2 grow'>
           {count > 0 && (

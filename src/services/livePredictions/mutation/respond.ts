@@ -5,7 +5,7 @@ import { and, eq } from 'drizzle-orm';
 import {
   livePredictionSchema,
   livePredictionOptionSchema,
-  livePredictionResponseSchema
+  livePredictionResponseSchema,
 } from '~/server/db/schema/livePredictions';
 
 /**
