@@ -56,7 +56,7 @@ export function formatEventTitle(eventName: string, label?: string | null): stri
 
   // avoid redundancy
   if (formatted === label) return formatted;
-  else if (formatted.includes(label ?? '')) return formatted;
+  else if (label && formatted.includes(label)) return formatted;
   else if (label?.includes(formatted)) return label;
 
   return label ? `${formatted}: ${label}` : formatted;
