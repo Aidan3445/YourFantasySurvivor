@@ -60,5 +60,7 @@ export async function changeLeaderboardUsername(
       }
       return existingEntry;
     }
+
+    return updatedEntry;
   }
 }
