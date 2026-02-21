@@ -64,8 +64,8 @@ export async function scheduleUpcomingDraftNotifications() {
 
   const leagues = await db
     .select({
-      leagueId: leagueSchema.leagueId, 
-      leagueHash: leagueSchema.hash, 
+      leagueId: leagueSchema.leagueId,
+      leagueHash: leagueSchema.hash,
       leagueName: leagueSchema.name,
       draftDate: leagueSettingsSchema.draftDate,
     })
@@ -83,18 +83,20 @@ export async function scheduleUpcomingDraftNotifications() {
       draftDate: new Date(`${row.draftDate} Z`).toISOString(),
     })));
 
-    const scheduled: (string | null)[] = await Promise.all(leagues.map(async (league) => {
-      try {
-        const messageId = await scheduleDraftReminderNotification(league);
-        return messageId;
-      }
-      catch (e) {
-        console.error(`Failed to schedule notifications for league ${league.leagueId} - ${league.leagueName}`, e);
-        return null;
-      }
-    }));
+  const scheduled: (string | null)[] = await Promise.all(leagues.map(async (league) => {
+    try {
+      const messageId = await scheduleDraftReminderNotification(league);
+      return messageId;
+    }
+    catch (e) {
+      console.error(`Failed to schedule notifications for league ${league.leagueId} - ${league.leagueName}`, e);
+      return null;
+    }
+  }));
 
-    scheduled.filter(Boolean);
+  scheduled.filter(Boolean);
 
-    console.log(`Cron: scheduled ${scheduled.length} notifications for ${leagues.length} upcoming drafts`);
+  console.log(`Cron: scheduled ${scheduled.length} notifications for ${leagues.length} upcoming drafts`);
+
+  return { leagues: leagues.length, notifications: scheduled.length };
 }

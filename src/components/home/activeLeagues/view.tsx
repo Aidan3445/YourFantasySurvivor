@@ -133,7 +133,7 @@ export function ActiveLeagues() {
                       stopOnLastSnap: true
                     })]}
                     setApi={setApi}>
-                    <CarouselContent className={cn('p-0', topLeagues.length > 1 && 'cursor-ew-resize')}>
+                    <CarouselContent className={cn('p-0 pb-4', topLeagues.length > 1 && 'cursor-ew-resize')}>
                       {topLeagues.map(({ league }) => (
                         <CarouselItem key={league.hash}>
                           <ActiveLeague league={league} />
