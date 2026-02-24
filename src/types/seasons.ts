@@ -3,6 +3,12 @@ import { type TribesTimeline, type Tribe } from '~/types/tribes';
 import { type Eliminations, type Events } from '~/types/events';
 import { type KeyEpisodes, type Episode } from '~/types/episodes';
 
+export type SeasonInsert = {
+  name: string;
+  premiereDate: Date;
+  finaleDate: Date | null;
+}
+
 export type Season = {
   seasonId: number;
   name: string;

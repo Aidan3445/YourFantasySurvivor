@@ -6,39 +6,63 @@ import type { Element } from 'domhandler';
 import { type CastawayInsert } from '~/types/castaways';
 import { type TribeInsert } from '~/types/tribes';
 import { type EpisodeInsert } from '~/types/episodes';
+import { type SeasonInsert } from '~/types/seasons';
 import { setToNY8PM } from '~/lib/utils';
 
+const WIKI_API = 'https://survivor.fandom.com/api.php';
+
+async function wikiGet(params: Record<string, string | number>) {
+  const res = await axios.get(WIKI_API, {
+    params: { action: 'parse', format: 'json', ...params }
+  });
+  return res.data as {
+    parse: {
+      text: { '*': string };
+      sections: { index: string; line: string }[];
+    };
+  };
+}
+
 /**
-  * Fetch external data for a given season from Survivor Wiki
-  * @param seasonName The name of the season to fetch data for
-  * @throws an error if the fetch fails
-  * @returns An object containing castaways, tribes, episodes, and premiere info
-  * @returnObj `castaways: CastawayInsert[]
-  * tribes: TribeInsert[]
-  * episodes: Episode[]`
-  */
+ * Fetch external data for a given season from Survivor Wiki
+ * @param seasonName The name of the season to fetch data for
+ * @throws an error if the fetch fails
+ */
 export default async function getExternalData(seasonName: string) {
-  const url = 'https://survivor.fandom.com/api.php';
   const cleanSeason = seasonName.replace(' ', '_');
 
   try {
-    const sectionRes = await axios.get(url, {
-      params: {
-        action: 'parse',
-        page: cleanSeason,
-        format: 'json'
-      }
-    });
+    // Fetch page sections and season infobox
+    const [sectionData, seasonData] = await Promise.all([
+      wikiGet({ page: cleanSeason }),
+      wikiGet({ page: cleanSeason, section: 0 }),
+    ]);
 
-    const sectionData = sectionRes.data as {
-      parse: {
-        sections: {
-          index: string,
-          line: string,
-        }[]
-      }
+    const $s = cheerio.load(seasonData.parse.text['*']);
+
+    // ── Season dates ──
+    const airingInfo = $s('div[data-source=seasonrun] div').text().trim();
+    const [premiereStr, finaleStr] = airingInfo.split(' - ').map(s => s.trim());
+    const premiereDate = setToNY8PM(premiereStr!);
+    const finaleDate = finaleStr ? setToNY8PM(finaleStr) : null;
+
+    const season: SeasonInsert = {
+      name: seasonName,
+      premiereDate: premiereDate ?? new Date(),
+      finaleDate,
     };
 
+    // ── Tribes from infobox (comprehensive — includes merge tribes) ──
+    const tribes: Record<string, string> = {};
+    $s('div[data-source=tribes] div a font').each((_, el) => {
+      const tribeName = $s(el).text().trim();
+      const style = $s(el).attr('style') ?? '';
+      const colorMatch = /background:(#[0-9a-fA-F]{6})/.exec(style);
+      const tribeColor = colorMatch?.[1] ?? '';
+      if (tribeName) tribes[tribeName] = tribeColor;
+    });
+
+    // ── Find required sections ──
     const castawaysSection = sectionData.parse.sections
       .find(sec => sec.line.toLowerCase() === 'castaways')?.index;
     const episodesSection = sectionData.parse.sections
@@ -46,38 +70,18 @@ export default async function getExternalData(seasonName: string) {
 
     if (castawaysSection === undefined || episodesSection === undefined) {
       console.error(`Could not find required sections for season ${seasonName}`);
-      return { castaways: [], tribes: [] };
+      return { season, castaways: [], tribes: [], episodes: [] };
     }
 
-    const castawaysRes = await axios.get(url, {
-      params: {
-        action: 'parse',
-        page: cleanSeason,
-        section: castawaysSection,
-        format: 'json'
-      }
-    });
-    const episodeRes = await axios.get(url, {
-      params: {
-        action: 'parse',
-        page: cleanSeason,
-        section: episodesSection,
-        format: 'json'
-      }
-    });
+    // Fetch castaways and episodes in parallel
+    const [castawaysRes, episodeRes] = await Promise.all([
+      wikiGet({ page: cleanSeason, section: castawaysSection }),
+      wikiGet({ page: cleanSeason, section: episodesSection }),
+    ]);
 
-    const castawayData = castawaysRes.data as {
-      parse: {
-        text: {
-          '*': string
-        }
-      }
-    };
-
-    const catawaysHtml: string = castawayData.parse.text['*'];
-    const $c = cheerio.load(catawaysHtml);
+    // ── Castaways ──
+    const $c = cheerio.load(castawaysRes.parse.text['*']);
     const castaways: CastawayInsert[] = [];
-    const tribes: Record<string, string> = {};
 
     const rows: cheerio.Cheerio<Element>[] = [];
     $c('table.wikitable tbody tr').map((_, row) => {
@@ -96,38 +100,22 @@ export default async function getExternalData(seasonName: string) {
         const residenceEnd = (rest.indexOf(',') ?? -3) + 4;
         const residence = rest.substring(0, residenceEnd);
 
-        // if there are previous seasons they are links like the full name
-        // so we can compare the lengths to determine if there are previous seasons
-        // if there are previous seasons then the occupation will not be displayed
         let occupation = '';
         const links: string = $c(columns[1]).find('a').text().trim();
         const hasPreviousSeasons = links.length !== fullName.length;
         const previouslyOn: string[] = [];
         if (hasPreviousSeasons) {
-          const castaway = await axios.get(url, {
-            params: {
-              action: 'parse',
-              page: fullName.replace(' ', '_'),
-              section: 0,
-              format: 'json'
-            }
+          const castawayPage = await wikiGet({
+            page: fullName.replace(' ', '_'),
+            section: 0,
           });
-          const castawayData = castaway.data as {
-            parse: {
-              text: {
-                '*': string
-              }
-            }
-          };
-          const $ca = cheerio.load(castawayData.parse.text['*']);
-          const sectionText = $ca('div[data-source=occupation] div').text();
-          occupation = sectionText.trim();
+          const $ca = cheerio.load(castawayPage.parse.text['*']);
+          occupation = $ca('div[data-source=occupation] div').text().trim();
 
           const previousSeasons = rest.substring(residenceEnd).trim();
-          // split by commans and may have ", &" before last one
-          previousSeasons.split(',').forEach(season => {
-            const cleanSeason = season.replace('&', '').trim();
-            if (cleanSeason) previouslyOn.push(cleanSeason);
+          previousSeasons.split(',').forEach(s => {
+            const clean = s.replace('&', '').trim();
+            if (clean) previouslyOn.push(clean);
           });
         } else {
           occupation = rest.substring(residenceEnd).trim();
@@ -137,9 +125,12 @@ export default async function getExternalData(seasonName: string) {
         const backupUrl: string = $c(columns[0]).find('img').attr('data-src') ?? '';
         const chosenUrl = imageUrl.startsWith('data') ? backupUrl : imageUrl;
 
+        // Castaway table tribe — merge color into existing tribes map
         const tribeName = $c(columns[2]).text().trim();
         const tribeColor = $c(columns[2]).attr('style')?.substring(11, 18) ?? '';
-        tribes[tribeName] = tribeColor;
+        if (tribeName && !tribes[tribeName]) {
+          tribes[tribeName] = tribeColor;
+        }
 
         castaways.push({
           fullName,
@@ -149,7 +140,7 @@ export default async function getExternalData(seasonName: string) {
           occupation: occupation ?? 'Occupation N/A',
           imageUrl: chosenUrl.startsWith('//') ? `https:${chosenUrl}` : chosenUrl,
           tribe: tribeName,
-          previouslyOn: previouslyOn
+          previouslyOn,
         });
       }
     }
@@ -157,16 +148,8 @@ export default async function getExternalData(seasonName: string) {
     const tribeList: TribeInsert[] = Object.entries(tribes)
       .map(([tribeName, tribeColor]) => ({ tribeName, tribeColor }));
 
-    const episodeData = episodeRes.data as {
-      parse: {
-        text: {
-          '*': string
-        }
-      }
-    };
-
-    const episodesHtml: string = episodeData.parse.text['*'];
-    const $e = cheerio.load(episodesHtml);
+    // ── Episodes ──
+    const $e = cheerio.load(episodeRes.parse.text['*']);
     const episodes: EpisodeInsert[] = [];
     $e('table.wikitable tbody tr').each((_, row) => {
       const columns = $e(row).find('td');
@@ -192,6 +175,7 @@ export default async function getExternalData(seasonName: string) {
     });
 
     return {
+      season,
       castaways,
       tribes: tribeList,
       episodes,

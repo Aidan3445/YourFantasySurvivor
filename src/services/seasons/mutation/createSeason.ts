@@ -8,13 +8,15 @@ import { revalidateTag } from 'next/cache';
   * Create a new season
 * @param seasonName The season name to create
 * @param premiereDate The premiere date of the season
+* @param finaleDate The finale date of the season (optional)
 * @throws if the season cannot be created
 * @returns The created season ID
 * @returnObj `{ seasonId }`
 */
 export async function createSeasonLogic(
   seasonName: string,
-  premiereDate: string
+  premiereDate: string,
+  finaleDate?: string
 ) {
   // Transaction to create the season
   const newSeasonId = await db
@@ -22,6 +24,7 @@ export async function createSeasonLogic(
     .values({
       name: seasonName,
       premiereDate: premiereDate,
+      finaleDate: finaleDate ?? null,
     })
     .returning({ seasonId: seasonSchema.seasonId })
     .onConflictDoUpdate({
