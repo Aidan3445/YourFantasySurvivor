@@ -1,10 +1,10 @@
 import 'server-only';
 import { NextResponse } from 'next/server';
-import { withAuth } from '~/lib/apiMiddleware';
+import { withSystemAdminAuth } from '~/lib/apiMiddleware';
 import { sendPushToUser } from '~/services/notifications/push';
 
 export async function POST() {
-  return withAuth(async (userId) => {
+  return withSystemAdminAuth(async (userId) => {
     if (!userId) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
