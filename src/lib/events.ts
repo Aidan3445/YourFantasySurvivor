@@ -14,7 +14,9 @@ export const ScoringBaseEventNames = [
 export const BaseEventNames = [
   ...ScoringBaseEventNames,
   'noVoteExit',
-  'tribeUpdate', 'otherNotes'] as const;
+  'tribeUpdate',
+  'redemption',
+  'otherNotes'] as const;
 
 export const BaseEventFullName: Record<BaseEventName, string> = {
   advFound: 'Advantage Found',
@@ -32,6 +34,7 @@ export const BaseEventFullName: Record<BaseEventName, string> = {
   elim: 'Eliminated',
   noVoteExit: 'No Vote Exit',
   tribeUpdate: 'Tribe Update',
+  redemption: 'Second Chance',
   otherNotes: 'Other Notes'
 };
 
@@ -56,6 +59,7 @@ export const BaseEventLabelPrefixes: Record<BaseEventName, string> = {
   elim: '',
   noVoteExit: '',
   tribeUpdate: '',
+  redemption: '',
   otherNotes: ''
 } as const;
 
@@ -78,6 +82,7 @@ export const BaseEventLabels: Record<BaseEventName, readonly [string, ...string[
   elim: ['Voted Out', 'Blindside', 'Rock Draw'],
   noVoteExit: ['Med Evacuation', 'Quit', 'Removed'],
   tribeUpdate: ['Starting Tribes', 'Merge Tribe', 'Tribe Swap', 'New Tribes'],
+  redemption: ['Redemption', 'Second Chance', 'Outcasts', 'Edge of Extinction'],
   otherNotes: ['Other Notes']
 } as const;
 

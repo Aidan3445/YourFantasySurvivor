@@ -17,6 +17,10 @@ export type EnrichedCastaway = Castaway & {
     color: string;
   } | null;
   eliminatedEpisode: number | null;
+  redemption?: {
+    reentryEpisode: number;
+    secondEliminationEpisode: number | null;
+  }[];
 };
 
 export type CastawayInsert = {

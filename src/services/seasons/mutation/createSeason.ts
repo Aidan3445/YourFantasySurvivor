@@ -31,6 +31,7 @@ export async function createSeasonLogic(
       target: [seasonSchema.name],
       set: {
         premiereDate: premiereDate,
+        finaleDate: finaleDate ?? null,
       }
     })
     .then((res) => res[0]?.seasonId);
