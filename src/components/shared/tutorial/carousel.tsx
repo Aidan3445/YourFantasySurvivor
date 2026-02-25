@@ -12,6 +12,7 @@ import {
   HandMetal,
   MousePointerClick,
 } from 'lucide-react';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 // Each slide maps a custom icon (left) + lucide accent icon (badges/inline)
 const SLIDES = [
@@ -176,76 +177,79 @@ export default function TutorialCarousel({ onComplete, showCustomization = true 
           const SlideAccent = s.accentIcon;
           return (
             <CarouselItem key={i} className='pl-14 flex flex-col pt-4'>
-              <div className='flex flex-col items-center text-center gap-4 px-4 pb-4 min-h-72'>
-                {/* Icon cluster */}
-                <div className={cn(
-                  'relative flex items-center justify-center w-20 h-20 rounded-2xl border-2',
-                  s.bgColor, s.borderColor,
-                  'transition-all duration-300'
-                )}>
-                  <SlideIcon size={40} className={s.color} strokeWidth={s.iconStrokeWidth} />
+              <ScrollArea className='w-full max-h-[60vh]'>
+                <div className='flex flex-col items-center text-center gap-4 px-4 pb-4'>
+                  {/* Icon cluster */}
                   <div className={cn(
-                    'absolute -bottom-2 -right-2 flex items-center justify-center',
-                    'w-7 h-7 rounded-full border-2 bg-card',
-                    s.borderColor
+                    'relative flex items-center justify-center w-20 h-20 rounded-2xl border-2',
+                    s.bgColor, s.borderColor,
+                    'transition-all duration-300'
                   )}>
-                    <SlideAccent className={cn('w-3.5 h-3.5', s.stroke)} />
+                    <SlideIcon size={40} className={s.color} strokeWidth={s.iconStrokeWidth} />
+                    <div className={cn(
+                      'absolute -bottom-2 -right-2 flex items-center justify-center',
+                      'w-7 h-7 rounded-full border-2 bg-card',
+                      s.borderColor
+                    )}>
+                      <SlideAccent className={cn('w-3.5 h-3.5', s.stroke)} />
+                    </div>
                   </div>
-                </div>
 
-                {/* Tag badge */}
-                {s.tag && (
-                  <span className={cn(
-                    'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold uppercase tracking-wider border',
-                    s.badgeColor
-                  )}>
-                    {s.tag}
-                  </span>
-                )}
+                  {/* Tag badge */}
+                  {s.tag && (
+                    <span className={cn(
+                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-bold uppercase tracking-wider border',
+                      s.badgeColor
+                    )}>
+                      {s.tag}
+                    </span>
+                  )}
 
-                {/* Title */}
-                <div className='space-y-1'>
-                  <h3 className='text-xl font-black uppercase tracking-tight'>
-                    {s.title}
-                  </h3>
-                  <p className={cn('text-sm font-semibold', s.color)}>
-                    {s.subtitle}
-                  </p>
-                </div>
-
-                {/* Body */}
-                <p className='text-base text-muted-foreground leading-relaxed max-w-sm'>
-                  {s.body}
-                </p>
-
-                {/* Customizable callout */}
-                {showCustomization && s.customizable && (
-                  <div className={cn(
-                    'bg-accent/50 flex items-start gap-2.5 w-full rounded-lg border-2 border-dashed p-3 text-left',
-                    s.borderColor
-                  )}>
-                    <Settings className={cn('w-4 h-4 shrink-0 mt-0.5', s.stroke)} />
-                    <p className='text-sm text-muted-foreground leading-snug'>
-                      {s.customizable}
+                  {/* Title */}
+                  <div className='space-y-1 sticky top-0 bg-card w-full'>
+                    <h3 className='text-xl font-black uppercase tracking-tight'>
+                      {s.title}
+                    </h3>
+                    <p className={cn('text-sm font-semibold', s.color)}>
+                      {s.subtitle}
                     </p>
                   </div>
-                )}
 
-                {/* Optional detail chips */}
-                {s.detail && (
-                  <div className={cn(
-                    'w-full max-w-xs rounded-lg border-2 p-2 divide-y',
-                    s.borderColor, `divide-${s.borderColor.replace('border-', '')}`
-                  )}>
-                    {s.detail.map((d, j) => (
-                      <div key={j} className='flex items-center justify-between py-1.5 px-1'>
-                        <span className='text-sm text-muted-foreground'>{d.label}</span>
-                        <span className={cn('text-sm font-bold', s.color)}>{d.value}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                  {/* Body */}
+                  <p className='text-base text-muted-foreground leading-relaxed max-w-sm'>
+                    {s.body}
+                  </p>
+
+                  {/* Customizable callout */}
+                  {showCustomization && s.customizable && (
+                    <div className={cn(
+                      'bg-accent/50 flex items-start gap-2.5 w-full rounded-lg border-2 border-dashed p-3 text-left',
+                      s.borderColor
+                    )}>
+                      <Settings className={cn('w-4 h-4 shrink-0 mt-0.5', s.stroke)} />
+                      <p className='text-sm text-muted-foreground leading-snug'>
+                        {s.customizable}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Optional detail chips */}
+                  {s.detail && (
+                    <div className={cn(
+                      'w-full max-w-xs rounded-lg border-2 p-2 divide-y',
+                      s.borderColor, `divide-${s.borderColor.replace('border-', '')}`
+                    )}>
+                      {s.detail.map((d, j) => (
+                        <div key={j} className='flex items-center justify-between py-1.5 px-1'>
+                          <span className='text-sm text-muted-foreground'>{d.label}</span>
+                          <span className={cn('text-sm font-bold', s.color)}>{d.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <ScrollBar orientation='vertical' forceMount className='mt-24' />
+              </ScrollArea>
             </CarouselItem>
           );
         })}

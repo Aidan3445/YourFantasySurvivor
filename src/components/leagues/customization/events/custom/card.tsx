@@ -19,6 +19,7 @@ import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
 import updateCustomEventRule from '~/actions/updateCustomEventRule';
 import deleteCustomEventRule from '~/actions/deleteCustomEventRule';
 import { PointsIcon } from '~/components/icons/generated';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 interface LeagueEventCardProps {
   rule: CustomEventRule;
@@ -114,25 +115,30 @@ export default function LeagueEventCard({ rule, locked }: LeagueEventCardProps) 
                     Edit the event details or delete the event.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <LeagueEventFields isPrediction={isPrediction} />
-                <AlertDialogFooter className='grid grid-cols-2 gap-2'>
-                  <AlertDialogCancel variant='secondary' className='font-bold uppercase text-xs tracking-wider'>
-                    Cancel
-                  </AlertDialogCancel>
-                  {/* Not sure why the form action isn't working */}
-                  <Button
-                    type='submit'
-                    className='font-bold uppercase text-xs tracking-wider'
-                    onClick={() => {
-                      if (CustomEventRuleInsertZod.safeParse(reactForm.getValues()).success) {
-                        void handleSubmit();
-                      } else {
-                        void reactForm.trigger();
-                      }
-                    }}>
-                    Save Changes
-                  </Button>
-                </AlertDialogFooter>
+                <ScrollArea className='max-h-[60vh] w-full px-2'>
+                  <section className='flex flex-col gap-2'>
+                    <LeagueEventFields isPrediction={isPrediction} />
+                    <AlertDialogFooter className='grid grid-cols-2 gap-2'>
+                      <AlertDialogCancel variant='secondary' className='font-bold uppercase text-xs tracking-wider'>
+                        Cancel
+                      </AlertDialogCancel>
+                      {/* Not sure why the form action isn't working */}
+                      <Button
+                        type='submit'
+                        className='font-bold uppercase text-xs tracking-wider'
+                        onClick={() => {
+                          if (CustomEventRuleInsertZod.safeParse(reactForm.getValues()).success) {
+                            void handleSubmit();
+                          } else {
+                            void reactForm.trigger();
+                          }
+                        }}>
+                        Save Changes
+                      </Button>
+                    </AlertDialogFooter>
+                  </section>
+                  <ScrollBar orientation='vertical' forceMount />
+                </ScrollArea>
               </AlertDialogContent>
             </AlertDialog>
           </form>

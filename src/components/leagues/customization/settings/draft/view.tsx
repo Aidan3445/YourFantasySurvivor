@@ -18,6 +18,7 @@ import { type LeagueSettingsUpdate } from '~/types/leagues';
 import updateLeagueSettings from '~/actions/updateLeagueSettings';
 import { useQueryClient } from '@tanstack/react-query';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 const formSchema = z.object({
   draftDate: z.date().nullable(),
@@ -84,42 +85,47 @@ export default function SetDraftDate({ overrideHash }: SetDraftDateProps) {
               Schedule your draft or set it to manual start by the commissioner.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <form className='flex flex-col gap-4 justify-between h-full' action={() => handleSubmit()}>
-            <div className='space-y-4'>
-              <div className='bg-primary/5 border border-primary/20 rounded-lg p-4'>
-                <DraftDateField />
-              </div>
-              {reactForm.watch('draftDate') && (
-                <>
-                  <div className='flex items-center gap-3'>
-                    <div className='flex-1 h-px bg-border' />
-                    <span className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>OR</span>
-                    <div className='flex-1 h-px bg-border' />
+          <ScrollArea className='max-h-[60vh] w-full px-2'>
+            <section className='flex flex-col gap-2'>
+              <form className='flex flex-col gap-4 justify-between h-full' action={() => handleSubmit()}>
+                <div className='space-y-4'>
+                  <div className='bg-primary/5 border border-primary/20 rounded-lg p-4'>
+                    <DraftDateField />
                   </div>
+                  {reactForm.watch('draftDate') && (
+                    <>
+                      <div className='flex items-center gap-3'>
+                        <div className='flex-1 h-px bg-border' />
+                        <span className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>OR</span>
+                        <div className='flex-1 h-px bg-border' />
+                      </div>
+                      <Button
+                        type='button'
+                        variant='outline'
+                        className='w-full font-bold uppercase text-xs tracking-wider border-primary/30 hover:bg-primary/10'
+                        onClick={() => reactForm.setValue('draftDate', null)}>
+                        Switch to Manual Start
+                      </Button>
+                    </>
+                  )}
+                </div>
+                <AlertDialogFooter className='gap-3'>
+                  <AlertDialogCancel className='absolute top-4 right-4 h-auto w-auto p-2 bg-destructive/10 border-destructive/30 hover:bg-destructive/20'>
+                    <X className='w-4 h-4' />
+                  </AlertDialogCancel>
+                  <AlertDialogCancel className='font-bold uppercase text-xs tracking-wider'>
+                    Cancel
+                  </AlertDialogCancel>
                   <Button
-                    type='button'
-                    variant='outline'
-                    className='w-full font-bold uppercase text-xs tracking-wider border-primary/30 hover:bg-primary/10'
-                    onClick={() => reactForm.setValue('draftDate', null)}>
-                    Switch to Manual Start
+                    type='submit'
+                    className='font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'>
+                    Save Settings
                   </Button>
-                </>
-              )}
-            </div>
-            <AlertDialogFooter className='gap-3'>
-              <AlertDialogCancel className='absolute top-4 right-4 h-auto w-auto p-2 bg-destructive/10 border-destructive/30 hover:bg-destructive/20'>
-                <X className='w-4 h-4' />
-              </AlertDialogCancel>
-              <AlertDialogCancel className='font-bold uppercase text-xs tracking-wider'>
-                Cancel
-              </AlertDialogCancel>
-              <Button
-                type='submit'
-                className='font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'>
-                Save Settings
-              </Button>
-            </AlertDialogFooter>
-          </form>
+                </AlertDialogFooter>
+              </form>
+            </section>
+            <ScrollBar orientation='vertical' forceMount />
+          </ScrollArea>
         </AlertDialogContent>
       </AlertDialog>
     </Form>

@@ -18,6 +18,7 @@ import LeagueNameField from '~/components/leagues/actions/league/create/name';
 import { DraftDateField } from '~/components/leagues/customization/settings/draft/date';
 import { useQueryClient } from '@tanstack/react-query';
 import IsProtectedToggle from '~/components/leagues/customization/settings/league/isProtected';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 interface CreateLeagueFormProps {
   onSubmit?: () => void;
@@ -76,22 +77,29 @@ export default function CreateLeagueForm({ onSubmit }: CreateLeagueFormProps) {
             </div>
             <div className='w-8' />
           </span>
-          <CarouselContent className='-ml-14'>
+          <CarouselContent className='-ml-14 max-h-[60svh]'>
             <CarouselItem className='pl-14 flex flex-col pt-4'>
-              <LeagueNameField />
+              <ScrollArea className='min-h-[40svh]'>
+                <LeagueNameField />
+                <ScrollBar orientation='vertical' forceMount />
+              </ScrollArea>
               <NextButton
                 disabled={!LeagueNameZod.safeParse(reactForm.watch('leagueName')).success}
                 onClick={() => api?.scrollNext()} />
             </CarouselItem>
             <CarouselItem className='pl-14 flex flex-col gap-4 pt-4'>
-              <DraftDateField />
-              <IsProtectedToggle />
+              <ScrollArea className='min-h-[40svh]'>
+                <DraftDateField />
+                <IsProtectedToggle />
+                <ScrollBar orientation='vertical' forceMount />
+              </ScrollArea>
               <NextButton onClick={() => api?.scrollNext()} />
             </CarouselItem>
             <CarouselItem className='pl-14 flex flex-col pt-4'>
-              <div className='pr-4'>
+              <ScrollArea className='min-h-[40svh]'>
                 <LeagueMemberFields formPrefix='member' />
-              </div>
+                <ScrollBar orientation='vertical' forceMount />
+              </ScrollArea>
               <Button
                 className='m-4 mt-auto w-80 self-center font-bold uppercase text-xs tracking-wider shadow-lg hover:shadow-xl transition-all'
                 disabled={!reactForm.formState.isValid}

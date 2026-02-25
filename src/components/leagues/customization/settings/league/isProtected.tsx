@@ -9,7 +9,7 @@ export default function IsProtectedToggle() {
     <FormField
       name='isProtected'
       render={({ field }) => (
-        <FormItem className='w-full mx-2'>
+        <FormItem className='w-11/12 mx-2'>
           <div className='bg-primary/5 border border-primary/20 rounded-lg p-4'>
             <span className='flex gap-3 items-center justify-between'>
               <FormLabel className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>Protected League</FormLabel>

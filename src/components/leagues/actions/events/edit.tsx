@@ -23,6 +23,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import deleteBaseEvent from '~/actions/deleteBaseEvent';
 import deleteCustomEvent from '~/actions/deleteCustomEvent';
 import { useSysAdmin } from '~/hooks/user/useSysAdmin';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 interface EditEventProps {
   event: EnrichedEvent;
@@ -120,97 +121,100 @@ export default function EditEvent({ event }: EditEventProps) {
             <AlertDialogTitle>
               Edit {event.eventName}
             </AlertDialogTitle>
-            <AlertDialogDescription hidden>Edit the event details</AlertDialogDescription>
+            <AlertDialogDescription className='sr-only'>Edit the event details</AlertDialogDescription>
           </AlertDialogHeader>
-          <form className='flex flex-col gap-1 px-2 w-full' action={() => handleSubmit()}>
-            <FormField
-              name='label'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Event Label</FormLabel>
-                  <FormControl>
-                    <Input
-                      type='text'
-                      placeholder='Label'
-                      {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            <FormLabel>Reference</FormLabel>
-            <FormField
-              name='references'
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <MultiSelect
-                      options={combinedReferenceOptions}
-                      onValueChange={(value) =>
-                        reactForm.setValue('references', handleCombinedReferenceSelection(value))}
-                      defaultValue={getDefaultStringValues(field.value as EventReference[])}
-                      clear={eventClearer}
-                      placeholder={'Select References'} />
-                  </FormControl>
-                </FormItem>
-              )} />
-            <FormField
-              name='notes'
-              render={({ field }) => (
-                <FormItem className='w-full'>
-                  <FormLabel>Notes (line separated)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className='w-full'
-                      value={(field.value as string[])?.join('\n')}
-                      onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
-                      placeholder='Notes' />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )} />
-            <br />
-            <AlertDialogFooter className='flex w-full justify-between! flex-row-reverse!'>
-              <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
-                <X stroke='white' />
-              </AlertDialogCancel>
-              <span className='flex gap-1 items-baseline'>
-                <AlertDialogCancel variant='secondary'>
-                  Cancel
-                </AlertDialogCancel>
-                <Button type='submit'>
-                  Save
-                </Button>
-              </span>
-              <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
-                <AlertDialogTrigger asChild>
-                  <Button variant='destructive'>Delete Event</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className='w-min text-nowrap'>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Event</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete this event?
-                      <br />
-                      This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel variant='secondary'>
-                      Cancel
-                    </AlertDialogCancel>
-                    <form action={() => handleDelete()}>
-                      <Button variant='destructive' type='submit'>
-                        Delete
-                      </Button>
-                    </form>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            </AlertDialogFooter>
-          </form>
+          <ScrollArea className='max-h-[60vh] w-full px-2'>
+            <form className='flex flex-col gap-1 px-2 w-full' action={() => handleSubmit()}>
+              <FormField
+                name='label'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Label</FormLabel>
+                    <FormControl>
+                      <Input
+                        type='text'
+                        placeholder='Label'
+                        {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              <FormLabel>Reference</FormLabel>
+              <FormField
+                name='references'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <MultiSelect
+                        options={combinedReferenceOptions}
+                        onValueChange={(value) =>
+                          reactForm.setValue('references', handleCombinedReferenceSelection(value))}
+                        defaultValue={getDefaultStringValues(field.value as EventReference[])}
+                        clear={eventClearer}
+                        placeholder={'Select References'} />
+                    </FormControl>
+                  </FormItem>
+                )} />
+              <FormField
+                name='notes'
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>Notes (line separated)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        className='w-full'
+                        value={(field.value as string[])?.join('\n')}
+                        onChange={(e) => reactForm.setValue('notes', e.target.value.split('\n'))}
+                        placeholder='Notes' />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )} />
+              <br />
+              <AlertDialogFooter className='flex w-full justify-between! flex-row-reverse!'>
+                <span className='flex gap-1 items-baseline'>
+                  <AlertDialogCancel variant='secondary'>
+                    Cancel
+                  </AlertDialogCancel>
+                  <Button type='submit'>
+                    Save
+                  </Button>
+                </span>
+                <AlertDialog open={deleteModalOpen} onOpenChange={setDeleteModalOpen}>
+                  <AlertDialogTrigger asChild>
+                    <Button variant='destructive'>Delete Event</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent className='w-min text-nowrap'>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Event</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete this event?
+                        <br />
+                        This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel variant='secondary'>
+                        Cancel
+                      </AlertDialogCancel>
+                      <form action={() => handleDelete()}>
+                        <Button variant='destructive' type='submit'>
+                          Delete
+                        </Button>
+                      </form>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </AlertDialogFooter>
+            </form>
+            <ScrollBar orientation='vertical' forceMount />
+          </ScrollArea>
+          <AlertDialogCancel className='absolute top-1 right-1 h-min p-1'>
+            <X stroke='white' />
+          </AlertDialogCancel>
         </AlertDialogContent>
-      </AlertDialog >
-    </Form >
+      </AlertDialog>
+    </Form>
   );
 }
 
