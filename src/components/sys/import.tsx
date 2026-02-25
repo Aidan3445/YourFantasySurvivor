@@ -213,20 +213,21 @@ export default function Import() {
           {seasonId
             ? <span className='text-xs bg-green-500/20 text-green-500 px-2 py-1 rounded-full'>DB ID: {seasonId}</span>
             : <span className='text-xs bg-destructive/20 text-destructive px-2 py-1 rounded-full'>Not in DB</span>}
-          {tribeSwaps.length > 0 && (
-            <div className='flex gap-2 flex-wrap'>
-              {tribeSwaps.map((swap, i) => (
-                <span key={i} className={cn(
-                  'text-xs px-2 py-1 rounded-full',
-                  swap.episodeNumber > 0 ? 'bg-blue-500/20 text-blue-500' : 'bg-destructive/20 text-destructive',
-                )}>
-                  {swap.type === 'merge' ? 'Merge' : `Swap ${i + 1}`}
-                  {swap.episodeNumber > 0 ? ` → Ep ${swap.episodeNumber}` : ' → Episode unknown'}
-                  {' '}({swap.events.length} events)
-                </span>
-              ))}
-            </div>
-          )}
+        </div>
+      )}
+
+      {tribeSwaps.length > 0 && (
+        <div className='flex items-center space-x-4 bg-card rounded-lg p-4'>
+          {tribeSwaps.map((swap, i) => (
+            <span key={i} className={cn(
+              'text-xs px-2 py-1 rounded-full',
+              swap.episodeNumber > 0 ? 'bg-blue-500/20 text-blue-500' : 'bg-destructive/20 text-destructive',
+            )}>
+              {swap.type === 'merge' ? 'Merge' : `Swap ${i + 1}`}
+              {swap.episodeNumber > 0 ? ` → Ep ${swap.episodeNumber}` : ' → Episode unknown'}
+              {' '}({swap.events.length} events)
+            </span>
+          ))}
         </div>
       )}
 
@@ -278,7 +279,6 @@ export default function Import() {
               <p>age: {castaway.age}</p>
               <p>residence: {castaway.residence}</p>
               <p>occupation: {castaway.occupation}</p>
-              <p>imageUrl: {castaway.imageUrl}</p>
               <p>tribe: {castaway.tribe}</p>
               <p>previouslyOn: {castaway.previouslyOn?.join(', ') ?? 'N/A'}</p>
             </div>
@@ -390,23 +390,79 @@ function ImportEpisode({
               <X stroke='white' />
             </AlertDialogCancel>
             {dbEpisode && (
-              <div className='space-y-3'>
-                {parsedEvents.map((event, i) => (
-                  <ImportEventRow
-                    key={i}
-                    event={event}
-                    defaultEpisodeId={dbEpisode.episodeId}
-                    allDbEpisodes={allDbEpisodes}
-                    castaways={seasonData?.castaways ?? []}
-                    tribes={seasonData?.tribes ?? []}
-                    existingEvents={existingEvents}
-                    onImported={onImported} />
-                ))}
-              </div>
+              <ImportEventList
+                parsedEvents={parsedEvents}
+                episodeId={dbEpisode.episodeId}
+                allDbEpisodes={allDbEpisodes}
+                castaways={seasonData?.castaways ?? []}
+                tribes={seasonData?.tribes ?? []}
+                existingEvents={existingEvents}
+                onImported={onImported} />
             )}
           </AlertDialogContent>
         </AlertDialog>
       )}
+    </div>
+  );
+}
+
+// ── Event List with Add New ──
+
+interface ImportEventListProps {
+  parsedEvents: ParsedEvent[];
+  episodeId: number;
+  allDbEpisodes: Episode[];
+  castaways: EnrichedCastaway[];
+  tribes: Tribe[];
+  existingEvents: Record<number, EventWithReferences> | undefined;
+  onImported: () => Promise<void>;
+}
+
+function ImportEventList({
+  parsedEvents, episodeId, allDbEpisodes,
+  castaways, tribes, existingEvents, onImported,
+}: ImportEventListProps) {
+  const [manualEvents, setManualEvents] = useState<ParsedEvent[]>([]);
+
+  const addBlankEvent = () => {
+    setManualEvents(prev => [...prev, {
+      eventName: 'otherNotes',
+      label: null,
+      notes: [],
+      references: [],
+    }]);
+  };
+
+  return (
+    <div className='space-y-3'>
+      {parsedEvents.map((event, i) => (
+        <ImportEventRow
+          key={`parsed-${i}`}
+          event={event}
+          defaultEpisodeId={episodeId}
+          allDbEpisodes={allDbEpisodes}
+          castaways={castaways}
+          tribes={tribes}
+          existingEvents={existingEvents}
+          onImported={onImported} />
+      ))}
+      {manualEvents.map((event, i) => (
+        <ImportEventRow
+          key={`manual-${i}`}
+          event={event}
+          defaultEpisodeId={episodeId}
+          allDbEpisodes={allDbEpisodes}
+          castaways={castaways}
+          tribes={tribes}
+          existingEvents={existingEvents}
+          onImported={onImported} />
+      ))}
+      <Button
+        variant='outline'
+        className='w-full border-dashed'
+        onClick={addBlankEvent}>
+        + Add Event
+      </Button>
     </div>
   );
 }
