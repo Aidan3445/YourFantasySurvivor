@@ -4,7 +4,6 @@ import { type CurrentSelection, type LeagueMember } from '~/types/leagueMembers'
 import { type League } from '~/types/leagues';
 import ColorRow from '~/components/shared/colorRow';
 import { cn } from '~/lib/utils';
-import RecreateLeague from '~/components/leagues/actions/league/create/recreate';
 
 interface LeagueCardProps {
   league: League;
@@ -15,7 +14,7 @@ interface LeagueCardProps {
   className?: string;
 }
 
-export default function LeagueCard({ league, member, currentSelection, refresh, seasonName, className }: LeagueCardProps) {
+export default function LeagueCard({ league, member, currentSelection, seasonName, className }: LeagueCardProps) {
   return (
     <Link
       key={league.hash}
@@ -55,7 +54,6 @@ export default function LeagueCard({ league, member, currentSelection, refresh, 
             {member.displayName}
           </ColorRow>
         </div>
-        {refresh && <RecreateLeague hash={league.hash} />}
       </section>
     </Link>
   );

@@ -329,6 +329,9 @@ export default function ChangeCastaway() {
                   <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
                     Secondary Pick
                   </h2>
+                  <p className='text-sm text-muted-foreground'>
+                    (Choose weekly)
+                  </p>
                 </div>
                 <span className='w-full flex flex-col lg:flex-row justify-center gap-x-4 gap-y-1 items-center mt-auto'>
                   <FormField

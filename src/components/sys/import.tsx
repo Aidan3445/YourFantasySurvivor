@@ -14,6 +14,8 @@ import { type TribeInsert } from '~/types/tribes';
 import createEpisode from '~/actions/sys/createEpisode';
 import createTribe from '~/actions/sys/createTribe';
 import createCastaway from '~/actions/sys/createCastaway';
+import { type SeasonInsert } from '~/types/seasons';
+import createSeason from '~/actions/sys/createSeason';
 
 const formSchema = z.object({
   seasonName: z.string(),
@@ -27,15 +29,17 @@ export default function Import() {
     resolver: zodResolver(formSchema),
   });
 
+  const [season, setSeason] = useState<SeasonInsert | null>(null);
   const [castaways, setCastaways] = useState<CastawayInsert[]>([]);
   const [tribes, setTribes] = useState<TribeInsert[]>([]);
   const [episodes, setEpisodes] = useState<{ episodeNumber: number, title: string, airDate: string }[]>([]);
 
   const handleClick = async () => {
-    const { castaways, tribes, episodes } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
+    const { season, castaways, tribes, episodes } = (await fetch(`/api/sys?seasonName=${reactForm.getValues().seasonName}`, {
       method: 'GET',
     })
       .then(res => res.json())) as {
+        season: SeasonInsert;
         castaways: CastawayInsert[],
         tribes: TribeInsert[],
         episodes: { episodeNumber: number, title: string, airDate: string }[],
@@ -46,13 +50,19 @@ export default function Import() {
       return;
     }
 
+    setSeason(season);
     setCastaways(castaways);
     setTribes(tribes);
     setEpisodes(episodes);
   };
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!season) {
+      alert('No season data found');
+      return;
+    }
     try {
+      await createSeason(data.seasonName, season.premiereDate, season.finaleDate ?? undefined);
       await Promise.all(tribes.map(tribe => createTribe(data.seasonName, tribe)));
       await Promise.all(castaways.map(castaway => createCastaway(data.seasonName, castaway)));
 
@@ -78,15 +88,21 @@ export default function Import() {
                   <Input
                     type='text'
                     placeholder='Season Name'
-                    {...field}
-                  />
+                    {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )} />
-          <Button type='submit' disabled={castaways.length === 0}>Import Contestants</Button>
+          <Button type='submit' disabled={castaways.length === 0}>Import</Button>
         </form>
       </Form>
+      {season && (
+        <div className='flex items-center space-x-4 bg-card rounded-lg p-4'>
+          <h2 className='font-bold'>Season: {season.name}</h2>
+          <p>Premiere Date: {new Date(season.premiereDate).toDateString()}</p>
+          {season.finaleDate && <p>Finale Date: {new Date(season.finaleDate).toDateString()}</p>}
+        </div>
+      )}
       <span className='flex gap-4'>
         {tribes.map((tribe, index) => (
           <div key={index} className='flex items-center space-x-4 bg-card rounded-lg p-4'>
@@ -94,9 +110,11 @@ export default function Import() {
             <h2 className='font-bold'>{tribe.tribeName}</h2>
           </div>
         ))}
-        {episodes.map((episode, index) => (
-          <ImportEpisode key={index} {...episode} seasonName={reactForm.watch('seasonName')} />
-        ))}
+        <div className='overflow-x-scroll flex gap-4'>
+          {episodes.map((episode, index) => (
+            <ImportEpisode key={index} {...episode} seasonName={reactForm.watch('seasonName')} />
+          ))}
+        </div>
       </span>
       {castaways.map((castaway, index) => (
         <div key={index} className='flex items-center space-x-4 bg-card rounded-lg p-4'>

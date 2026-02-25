@@ -12,6 +12,8 @@ import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { usePendingLeagues } from '~/hooks/user/usePendingLeagues';
 import PendingLeagues from '~/components/leagues/grid/pendingLeagues';
 import Spacer from '~/components/shared/floatingActions/spacer';
+import RecreateLeagues from '~/components/leagues/grid/recreateLeagues/view';
+import { cn } from '~/lib/utils';
 
 export default function LeaguesPage() {
   const { data: leagues } = useLeagues();
@@ -28,6 +30,10 @@ export default function LeaguesPage() {
     currentLeagues: [],
     inactiveLeagues: []
   }, [leagues]);
+
+  const clonableLeagues = useMemo(() => leagues?.filter(l =>
+    l.league.status === 'Inactive' && l.member.role === 'Owner') ?? [],
+    [leagues]);
 
   return (
     <div>
@@ -59,8 +65,12 @@ export default function LeaguesPage() {
                 <h3 className='text-sm font-bold uppercase tracking-wider text-white'>Join League</h3>
               </section>
             </JoinLeagueModal>
-            {pendingLeagues && pendingLeagues.length > 0 && (
-              <PendingLeagues pendingLeagues={pendingLeagues} />
+            {clonableLeagues.length > 0 && <RecreateLeagues leagues={clonableLeagues} />}
+            {(pendingLeagues && pendingLeagues.length > 0) && (
+              <PendingLeagues
+                pendingLeagues={pendingLeagues}
+                className={cn(clonableLeagues.length > 0 && 'bg-secondary'
+                )} />
             )}
           </div>
         </SignedIn>
