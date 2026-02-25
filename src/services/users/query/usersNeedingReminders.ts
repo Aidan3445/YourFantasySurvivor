@@ -4,8 +4,8 @@ import { and, arrayOverlaps, eq, gt, or, exists, sql, isNotNull, not } from 'dri
 import { calculateKeyEpisodes, getActiveTimings, getAirStatus } from '~/lib/episodes';
 import { baseEventPredictionRulesSchema, baseEventPredictionSchema } from '~/server/db/schema/baseEvents';
 import { customEventPredictionSchema, customEventRuleSchema } from '~/server/db/schema/customEvents';
-import { leagueMemberSchema } from '~/server/db/schema/leagueMembers';
-import { leagueSchema } from '~/server/db/schema/leagues';
+import { leagueMemberSchema, secondaryPickSchema } from '~/server/db/schema/leagueMembers';
+import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { type ScoringBaseEventName, type PredictionTiming } from '~/types/events';
 import { type Episode } from '~/types/episodes';
 import { episodeSchema } from '~/server/db/schema/episodes';
@@ -58,17 +58,14 @@ export async function getUsersNeedingReminders(episode: Episode) {
     leagueStatus: 'Active',
     startWeek: null,
   });
-  if (activeTimings.length === 0) return [];
+  if (activeTimings.length === 0) return { predictionUsers: [], secondaryUsers: [], bothUsers: [] };
 
-  return await db
+  const predictionUsersReq = db
     .selectDistinct({
       userId: leagueMemberSchema.userId,
     })
     .from(leagueMemberSchema)
-    .innerJoin(
-      leagueSchema,
-      eq(leagueSchema.leagueId, leagueMemberSchema.leagueId),
-    )
+    .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
     .where(
       and(
         eq(leagueSchema.seasonId, episode.seasonId),
@@ -84,7 +81,45 @@ export async function getUsersNeedingReminders(episode: Episode) {
       ),
     )
     .then((res) => res.map((r) => r.userId));
-}
+
+  const secondaryUsersReq = db
+    .selectDistinct({
+      userId: leagueMemberSchema.userId,
+    })
+    .from(leagueMemberSchema)
+    .innerJoin(leagueSchema, eq(leagueSchema.leagueId, leagueMemberSchema.leagueId))
+    .innerJoin(leagueSettingsSchema, eq(leagueSettingsSchema.leagueId, leagueSchema.leagueId))
+    .where(
+      and(
+        eq(leagueSchema.seasonId, episode.seasonId),
+        eq(leagueSchema.status, 'Active'),
+        isNotNull(leagueMemberSchema.draftOrder),
+        eq(leagueSettingsSchema.secondaryPickEnabled, true),
+        not(
+          exists(
+            db
+              .select({ one: sql`1` })
+              .from(secondaryPickSchema)
+              .where(
+                and(
+                  eq(secondaryPickSchema.memberId, leagueMemberSchema.memberId),
+                  eq(secondaryPickSchema.episodeId, episode.episodeId),
+                )
+              )
+          )
+        ),
+      )
+    )
+    .then((res) => res.map((r) => r.userId));
+
+  let [predictionUsers, secondaryUsers] = await Promise.all([predictionUsersReq, secondaryUsersReq]);
+
+  const bothUsers = predictionUsers.filter((userId) => secondaryUsers.includes(userId));
+  predictionUsers = predictionUsers.filter((userId) => !bothUsers.includes(userId));
+  secondaryUsers = secondaryUsers.filter((userId) => !bothUsers.includes(userId));
+
+  return { predictionUsers, secondaryUsers, bothUsers };
+};
 
 
 // join helpers

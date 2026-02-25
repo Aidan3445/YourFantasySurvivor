@@ -11,6 +11,7 @@ import { getContrastingColor } from '@uiw/color-convert';
 import { usePendingMembers } from '~/hooks/leagues/usePendingMembers';
 import admitMember from '~/actions/admitMember';
 import { useQueryClient } from '@tanstack/react-query';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 interface ManagePendingMembersProps {
   hash: string;
@@ -65,42 +66,45 @@ export default function ManagePendingMembers({ hash, open }: ManagePendingMember
           <AlertDialogDescription className='text-base text-left'>
             Select which pending members to admit to the league:
           </AlertDialogDescription>
-          <form className='space-y-2' action={() => handleSubmit()}>
-            {pendingMembers?.members.map((member) => (
-              <ColorRow key={member.memberId} color={member.color}>
-                <input
-                  type='checkbox'
-                  id={`member-${member.memberId}`}
-                  className='h-4 w-4'
-                  onChange={(e) => {
-                    const newSelectedMembers = new Set(selectedMembers);
-                    if (e.target.checked) {
-                      newSelectedMembers.add(member.memberId);
-                    } else {
-                      newSelectedMembers.delete(member.memberId);
-                    }
-                    setSelectedMembers(newSelectedMembers);
-                  }}
-                />
-                <label
-                  htmlFor={`member-${member.memberId}`}
-                  className='text-sm'
-                  style={{ color: getContrastingColor(member.color) }}>
-                  {member.displayName} {member.memberId}
-                </label>
-              </ColorRow>
-            ))}
-            <div className='flex justify-end space-x-2'>
-              <Button
-                variant='outline'
-                onClick={() => setIsOpen(false)}>
-                Admit Later
-              </Button>
-              <Button type='submit' disabled={selectedMembers.size === 0}>
-                Admit Selected
-              </Button>
-            </div>
-          </form>
+          <ScrollArea className='max-h-[60svh]'>
+            <form className='space-y-2' action={() => handleSubmit()}>
+              {pendingMembers?.members.map((member) => (
+                <ColorRow key={member.memberId} color={member.color}>
+                  <input
+                    type='checkbox'
+                    id={`member-${member.memberId}`}
+                    className='h-4 w-4'
+                    onChange={(e) => {
+                      const newSelectedMembers = new Set(selectedMembers);
+                      if (e.target.checked) {
+                        newSelectedMembers.add(member.memberId);
+                      } else {
+                        newSelectedMembers.delete(member.memberId);
+                      }
+                      setSelectedMembers(newSelectedMembers);
+                    }}
+                  />
+                  <label
+                    htmlFor={`member-${member.memberId}`}
+                    className='text-sm'
+                    style={{ color: getContrastingColor(member.color) }}>
+                    {member.displayName} {member.memberId}
+                  </label>
+                </ColorRow>
+              ))}
+              <div className='flex justify-end space-x-2'>
+                <Button
+                  variant='outline'
+                  onClick={() => setIsOpen(false)}>
+                  Admit Later
+                </Button>
+                <Button type='submit' disabled={selectedMembers.size === 0}>
+                  Admit Selected
+                </Button>
+              </div>
+            </form>
+            <ScrollBar orientation='vertical' forceMount />
+          </ScrollArea>
         </AlertDialogContent>
       </AlertDialogPortal>
     </AlertDialog>

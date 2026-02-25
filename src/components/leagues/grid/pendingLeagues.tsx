@@ -4,25 +4,30 @@ import {
   AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from '~/components/common/alertDialog';
+import { Button } from '~/components/common/button';
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import { cn } from '~/lib/utils';
 import { type PublicLeague } from '~/types/leagues';
 
 interface PendingLeaguesProps {
   pendingLeagues: PublicLeague[];
+  className?: string;
 }
 
-export default function PendingLeagues({ pendingLeagues }: PendingLeaguesProps) {
+export default function PendingLeagues({ pendingLeagues, className }: PendingLeaguesProps) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <section className='flex gap-2 items-center px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all cursor-pointer'>
+        <Button className={cn(
+          'flex gap-2 items-center px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 shadow-lg hover:shadow-xl transition-all cursor-pointer',
+          className
+        )}>
           <Hourglass size={18} className='stroke-primary-foreground shrink-0' />
           <h3 className='text-sm font-bold uppercase tracking-wider text-primary-foreground'>
             Pending Leagues
           </h3>
-        </section>
+        </Button>
       </AlertDialogTrigger>
       <AlertDialogContent
         className='sm:w-160 w-96 flex flex-col animate-scale-in-fast'>

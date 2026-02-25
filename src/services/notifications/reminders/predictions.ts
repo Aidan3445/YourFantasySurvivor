@@ -64,10 +64,13 @@ export async function sendReminderNotifications(
   if (!await validateEpisode(episode)) return;
 
   // Get users in active leagues for this season
-  const users = await getUsersNeedingReminders(episode);
-  console.log(`Sending ${timing} reminders for episode ${episode.episodeId} to ${users.length} users`, users);
+  const { predictionUsers, secondaryUsers, bothUsers } = await getUsersNeedingReminders(episode);
+  console.log(`Sending ${timing} reminders for episode ${episode.episodeId} 
+to ${predictionUsers.length} prediction users 
+to ${secondaryUsers.length} secondary users
+and ${bothUsers.length} users needing both`);
 
-  const messages = {
+  const predictionMessages = {
     'midweek': {
       title: 'Predictions Reminder',
       body: `Don't forget to make your predictions for Episode ${episode.episodeNumber} - ${episode.title}!`,
@@ -82,11 +85,62 @@ export async function sendReminderNotifications(
     },
   };
 
-  await sendPushToUsers(
-    users,
-    { ...messages[timing], data: { type: 'reminder', episodeId: episode.episodeId, timing } },
-    'reminders',
-  );
+  const secondaryMessages = {
+    'midweek': {
+      title: 'Secondary Pick Reminder',
+      body: `Don't forget to make your secondary pick for Episode ${episode.episodeNumber} - ${episode.title}!`,
+    },
+    '8hr': {
+      title: 'Episode Tonight!',
+      body: `Episode ${episode.episodeNumber} - ${episode.title} airs in 8 hours. Make your secondary pick!`,
+    },
+    '15min': {
+      title: 'Last Chance!',
+      body: `Episode ${episode.episodeNumber} - ${episode.title} starts in 15 minutes. Lock in your secondary pick now!`,
+    },
+  };
+
+  const bothMessages = {
+    'midweek': {
+      title: 'Predictions Reminder',
+      body: `Don't forget to make your predictions and secondary pick for Episode ${episode.episodeNumber} - ${episode.title}!`,
+    },
+    '8hr': {
+      title: 'Episode Tonight!',
+      body: `Episode ${episode.episodeNumber} - ${episode.title} airs in 8 hours. Make your predictions and secondary pick!`,
+    },
+    '15min': {
+      title: 'Last Chance!',
+      body: `Episode ${episode.episodeNumber} - ${episode.title} starts in 15 minutes. Lock in your predictions and secondary pick now!`,
+    },
+  };
+
+  await Promise.all([
+    sendPushToUsers(
+      predictionUsers,
+      {
+        ...predictionMessages[timing],
+        data: { type: 'reminder', episodeId: episode.episodeId, timing }
+      },
+      'reminders',
+    ),
+    sendPushToUsers(
+      secondaryUsers,
+      {
+        ...secondaryMessages[timing],
+        data: { type: 'reminder_secondary', episodeId: episode.episodeId, timing }
+      },
+      'reminders',
+    ),
+    sendPushToUsers(
+      bothUsers,
+      {
+        ...bothMessages[timing],
+        data: { type: 'reminder_both', episodeId: episode.episodeId, timing }
+      },
+      'reminders',
+    )
+  ]);
 }
 
 /**
