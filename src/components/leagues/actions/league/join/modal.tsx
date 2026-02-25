@@ -47,20 +47,20 @@ export default function JoinLeagueModal({ children }: JoinLeagueAlertDialogProps
           </Button>
         )}
       </AlertDialogTrigger>
-      <AlertDialogContent className='border-primary/30 shadow-lg shadow-primary/20 animate-scale-in-fast'>
+      <AlertDialogContent className='sm:w-160 px-0 w-96 flex flex-col animate-scale-in-fast border-primary/30 shadow-lg shadow-primary/20'>
         <AlertDialogHeader>
-          <span className='flex items-center gap-3 mb-2'>
+          <span className='flex items-center gap-3 mb-2 px-4'>
             <span className='h-6 w-1 bg-primary rounded-full' />
             <AlertDialogTitle className='text-2xl font-black uppercase tracking-tight'>
               Join League
             </AlertDialogTitle>
           </span>
-          <AlertDialogDescription className='text-base'>
+          <AlertDialogDescription className='text-base px-4'>
             Enter your league code or paste an invitation link to join an existing league.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <div className='space-y-6 pt-4'>
+        <div className='space-y-2 p-4 pt-0'>
           <div className='space-y-3'>
             <Label htmlFor='league-code' className='text-sm font-bold uppercase tracking-wider text-muted-foreground'>
               League Code
