@@ -42,20 +42,14 @@ export default function SeasonsPage() {
 
   const updateParams = useCallback(
     (seasonId: number | null, tab: Tab) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams();
       if (seasonId !== null) {
         params.set('season', seasonId.toString());
-      } else {
-        params.delete('season');
       }
-      if (tab !== 'events') {
-        params.set('tab', tab);
-      } else {
-        params.delete('tab');
-      }
+      params.set('tab', tab);
       router.replace(`?${params.toString()}`, { scroll: false });
     },
-    [router, searchParams]
+    [router]
   );
 
   // Auto-select most recent season on mount (only if no query param)
@@ -70,12 +64,7 @@ export default function SeasonsPage() {
   const handleSeasonChange = (value: string) => {
     const id = Number(value);
     setSelectedSeasonId(id);
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete('episode');
-    if (id !== null) params.set('season', id.toString());
-    if (selectedTab !== 'events') params.set('tab', selectedTab);
-    else params.delete('tab');
-    router.replace(`?${params.toString()}`, { scroll: false });
+    updateParams(id, selectedTab);
   };
 
   const handleTabChange = (value: string) => {

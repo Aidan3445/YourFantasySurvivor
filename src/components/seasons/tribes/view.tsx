@@ -10,7 +10,7 @@ interface TimelineViewProps {
 }
 
 export default function TribesTimeline({ seasonData }: TimelineViewProps) {
-  const { episodes, castaways, tribes, tribesTimeline, keyEpisodes } = seasonData;
+  const { episodes, castaways, tribes, tribesTimeline, keyEpisodes, baseEvents } = seasonData;
 
   // Get all episode numbers from tribes timeline
   const episodeNumbers = useMemo(() => {
@@ -41,11 +41,13 @@ export default function TribesTimeline({ seasonData }: TimelineViewProps) {
   }, [episodeNumbers, tribesTimeline, castaways, tribes]);
 
   // Determine key episodes
-  const getKeyEpisodeLabel = (episodeNum: number): string | undefined => {
-    if (episodeNum === 1) return 'Premiere';
-    if (episodes?.find(e => e.episodeNumber === episodeNum)?.isFinale) return 'Finale';
-    if (keyEpisodes?.mergeEpisode?.episodeNumber === episodeNum) return 'Merge';
-    return undefined;
+  const getKeyEpisodeLabels = (episodeNum: number): string[] => {
+    const labels = [];
+    if (episodeNum === 1) labels.push('Premiere');
+    if (episodes?.find(e => e.episodeNumber === episodeNum)?.isFinale) labels.push('Finale');
+    if (keyEpisodes?.mergeEpisode?.episodeNumber === episodeNum) labels.push('Merge');
+    if (Object.values(baseEvents?.[episodeNum] ?? {}).some(e => e.eventName === 'redemption')) labels.push('Redemption');
+    return labels;
   };
 
   return (
@@ -62,7 +64,7 @@ export default function TribesTimeline({ seasonData }: TimelineViewProps) {
         <div className='flex flex-col gap-2'>
           {episodeData.map(({ episodeNumber, castawaysByTribe, tribes: episodeTribes }) => {
             const episode = episodes?.find(e => e.episodeNumber === episodeNumber);
-            const keyLabel = getKeyEpisodeLabel(episodeNumber);
+            const keyLabels = getKeyEpisodeLabels(episodeNumber);
 
             return (
               <EpisodeMarker
@@ -71,8 +73,8 @@ export default function TribesTimeline({ seasonData }: TimelineViewProps) {
                 episodeTitle={episode?.title}
                 tribes={episodeTribes}
                 castawaysByTribe={castawaysByTribe}
-                isKeyEpisode={!!keyLabel}
-                keyEpisodeLabel={keyLabel} />
+                isKeyEpisode={keyLabels.length > 0}
+                keyEpisodeLabels={keyLabels} />
             );
           })}
         </div>

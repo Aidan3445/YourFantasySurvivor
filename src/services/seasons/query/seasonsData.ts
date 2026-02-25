@@ -84,29 +84,24 @@ export async function getSeasonData(seasonId: number, season?: Season) {
       .map((epElims, idx) => epElims?.some(e => e.castawayId === castaway.castawayId) ? idx : -1)
       .filter(idx => idx >= 0);
 
-    // Find all redemption re-entry episodes (tribe timeline entries after an elimination)
-    const reentryEpisodes = Object.entries(tribesTimeline)
-      .filter(([epStr, tribeUpdates]) => {
-        const ep = Number(epStr);
-        // Check if this castaway appears in a tribe update AFTER being eliminated
-        const wasEliminated = elimEpisodes.some(elimEp => elimEp < ep);
-        if (!wasEliminated) return false;
-        return Object.values(tribeUpdates).some(ids => ids.includes(castaway.castawayId));
-      })
-      .map(([epStr]) => Number(epStr));
+    // Find redemption events from baseEvents that reference this castaway
+    const reentryEpisodes = Object.entries(baseEvents)
+      .flatMap(([epStr, events]) =>
+        Object.values(events)
+          .filter(e =>
+            e.eventName === 'redemption' &&
+            e.references.some(r => r.type === 'Castaway' && r.id === castaway.castawayId))
+          .map(() => Number(epStr)))
+      .sort((a, b) => a - b);
 
     // Build redemption history
     const redemption = reentryEpisodes.map(reentryEp => {
-      // Find the next elimination after this re-entry (if any)
       const nextElim = elimEpisodes.find(ep => ep > reentryEp) ?? null;
       return { reentryEpisode: reentryEp, secondEliminationEpisode: nextElim };
     });
 
-    // eliminatedEpisode = null if currently active after redemption, else last elimination
-    const lastElim = elimEpisodes.at(-1) ?? null;
-    const lastReentry = reentryEpisodes.at(-1) ?? null;
-    const isCurrentlyActive = lastReentry !== null && (lastElim === null || lastReentry > lastElim);
-    const eliminatedEpisode = isCurrentlyActive ? null : (lastElim ?? null);
+    // Currently active if last redemption is after last elimination
+    const eliminatedEpisode = elimEpisodes[0] ?? null;
 
     return {
       ...castaway,

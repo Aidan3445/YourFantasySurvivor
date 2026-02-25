@@ -18,7 +18,7 @@ interface EpisodeMarkerProps {
   tribes: Tribe[];
   castawaysByTribe: Record<number, EnrichedCastaway[]>;
   isKeyEpisode?: boolean;
-  keyEpisodeLabel?: string;
+  keyEpisodeLabels?: string[];
 }
 
 export default function EpisodeMarker({
@@ -27,12 +27,13 @@ export default function EpisodeMarker({
   tribes,
   castawaysByTribe,
   isKeyEpisode,
-  keyEpisodeLabel
+  keyEpisodeLabels
 }: EpisodeMarkerProps) {
-  const getBadgeColor = () => {
+  const getBadgeColor = (keyEpisodeLabel: string) => {
     if (keyEpisodeLabel === 'Premiere') return 'bg-green-500/20 text-green-600 border-green-500/40';
     if (keyEpisodeLabel === 'Finale') return 'bg-red-500/20 text-red-600 border-red-500/40';
     if (keyEpisodeLabel === 'Merge') return 'bg-blue-500/20 text-blue-600 border-blue-500/40';
+    if (keyEpisodeLabel === 'Redemption') return 'bg-black/20 text-black border-black/40';
     return 'bg-primary/20 text-primary border-primary/40';
   };
 
@@ -43,11 +44,13 @@ export default function EpisodeMarker({
           <div className='flex-1 text-left'>
             <div className='flex items-center gap-2 flex-wrap'>
               <span className='font-bold uppercase text-sm tracking-wider'>Episode {episodeNumber}</span>
-              {isKeyEpisode && keyEpisodeLabel && (
-                <Badge className={`${getBadgeColor()} border-2 font-black text-xs pointer-events-none`}>
-                  {keyEpisodeLabel}
+              {isKeyEpisode && keyEpisodeLabels?.map(label => (
+                <Badge
+                  key={label}
+                  className={`${getBadgeColor(label)} border-2 font-black text-xs pointer-events-none`}>
+                  {label}
                 </Badge>
-              )}
+              ))}
             </div>
             {episodeTitle && (
               <span className='text-sm text-muted-foreground font-medium'>{episodeTitle}</span>

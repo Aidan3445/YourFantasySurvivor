@@ -55,14 +55,15 @@ export default function CastawayRow({ place, castaway, points, tribeTimeline, al
             <span
               className={cn(
                 'text-base text-left md:text-lg font-bold transition-all hover:text-primary cursor-pointer',
-                castaway?.eliminatedEpisode && 'line-through opacity-40 hover:opacity-60'
+                castaway?.eliminatedEpisode && !castaway.redemption?.some((r) => r.secondEliminationEpisode === null) &&
+                'line-through opacity-40 hover:opacity-60'
               )}>
               {castaway?.fullName}
             </span>
           </CastawayPopover>
           <div className='ml-auto flex gap-1 items-center'>
             <TribeHistoryCircles tribeTimeline={tribeTimeline ?? []} />
-            <EliminationIndicator episode={castaway?.eliminatedEpisode} />
+            <EliminationIndicator episode={castaway?.eliminatedEpisode} redemption={castaway?.redemption} />
           </div>
         </div>
       </TableCell>

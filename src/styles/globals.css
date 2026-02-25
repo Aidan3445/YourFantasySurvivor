@@ -16,6 +16,7 @@
   --color-g2: #7d9277;
   --color-g3: #a9cf9f;
   --color-error: rgb(248, 113, 113, 0.6);
+  --color-positive: rgb(40, 165, 63, 1);
 
   --color-sidebar: hsl(var(--sidebar-background));
   --color-sidebar-foreground: hsl(var(--sidebar-foreground));

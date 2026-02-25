@@ -164,11 +164,15 @@ export function useEnrichEvents(
           { eventTribes: [] as number[], eventCastaways: [] as number[] }
         );
 
+        const skipTribeExpansion = event.eventName === 'redemption' || event.eventName === 'tribeUpdate';
+
         const referenceMap = eventTribes.map(tribeId => {
           const tribe = lookupMaps.tribesById.get(tribeId);
           if (!tribe) return null;
 
-          const tribeMembers = findTribeCastaways(tribesTimeline, eliminations ?? [], tribeId, event.episodeNumber);
+          const tribeMembers = skipTribeExpansion
+            ? eventCastaways
+            : findTribeCastaways(tribesTimeline, eliminations ?? [], tribeId, event.episodeNumber);
           const pairs = createCastawayMemberPairs(tribeMembers, tribe, event.episodeNumber);
 
           return { tribe, pairs } as EnrichedEvent['referenceMap'][number];

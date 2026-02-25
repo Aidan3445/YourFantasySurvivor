@@ -36,6 +36,9 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
       } else {
         params.delete('episode');
       }
+      if (params.get('tab') && params.get('tab') !== 'events') {
+        params.delete('tab');
+      }
       router.replace(`?${params.toString()}`, { scroll: false });
     },
     [router, searchParams]

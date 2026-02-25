@@ -13,7 +13,7 @@ import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import { type DraftDetails } from '~/types/leagues';
 import { usePredictionsMade } from '~/hooks/leagues/enrich/usePredictionsMade';
 import { type ScoringBaseEventName } from '~/types/events';
-import { useCastaways } from '~/hooks/seasons/useCastaways';
+import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 
 /**
   * Custom hook to get league action details
@@ -36,7 +36,10 @@ export function useLeagueActionDetails(overrideHash?: string) {
   );
 
   const tribeMembers = useEnrichedTribeMembers(league?.seasonId ?? null, nextEpisode);
-  const { data: castaways } = useCastaways(league?.seasonId ?? null);
+  const { data: seasonsData } = useSeasonsData(true, league?.seasonId);
+  const castaways = useMemo(() =>
+    seasonsData?.find(s => s.season.seasonId === league?.seasonId)?.castaways ?? [],
+    [seasonsData, league?.seasonId]);
 
   const { data: eliminations } = useEliminations(league?.seasonId ?? null);
 
@@ -53,6 +56,9 @@ export function useLeagueActionDetails(overrideHash?: string) {
     });
     return lookup;
   }, [eliminations]);
+
+  const redemptionLookup = useMemo(() =>
+    new Map(castaways?.map(c => [c.castawayId, c.redemption]) ?? []), [castaways]);
 
   const membersWithPicks = useMemo(() => {
     if (!nextEpisode || !tribeMembers || !leagueMembers || !selectionTimeline) {
@@ -132,11 +138,13 @@ export function useLeagueActionDetails(overrideHash?: string) {
         const latestSelection = Math.min(nextEpisode, castawaySelections.length - 1);
         const selection = selectionTimeline.castawayMembers[castaway.castawayId]?.[latestSelection];
         const eliminatedEpisode = eliminationLookup.get(castaway.castawayId) ?? null;
+        const redemptionHistory = redemptionLookup.get(castaway.castawayId);
 
         const castawayWithTribe: EnrichedCastaway = {
           ...castaway,
           tribe: { name: tribe.tribeName, color: tribe.tribeColor },
-          eliminatedEpisode
+          eliminatedEpisode,
+          ...(redemptionHistory ? { redemption: redemptionHistory } : {})
         };
 
         const member = selection ? leagueMembers.members.find(m => m.memberId === selection) ?? null : null;
@@ -154,7 +162,7 @@ export function useLeagueActionDetails(overrideHash?: string) {
     });
 
     return details;
-  }, [league, rules, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminationLookup]);
+  }, [league, rules, selectionTimeline, nextEpisode, tribeMembers, leagueMembers, eliminationLookup, redemptionLookup]);
 
   const [dialogOpen, setDialogOpen] = useState<boolean>();
 
