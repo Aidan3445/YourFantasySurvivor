@@ -75,21 +75,44 @@ export async function getSeasonData(seasonId: number, season?: Season) {
   const enrichedCastaways: EnrichedCastaway[] = castaways.map(castaway => {
     const startTribeIds = Object.entries(tribesTimeline[1] ?? {})
       .find(([_, castawayIds]) => castawayIds.includes(castaway.castawayId));
-
-    if (!startTribeIds) return { ...castaway, tribe: null, eliminatedEpisode: null };
-
-    const tribeId = Number(startTribeIds[0]);
-    const tribeMatch = tribes.find(t => t.tribeId === tribeId) ?? null;
+    const tribeId = startTribeIds ? Number(startTribeIds[0]) : null;
+    const tribeMatch = tribeId !== null ? tribes.find(t => t.tribeId === tribeId) ?? null : null;
     const tribe = tribeMatch ? { name: tribeMatch.tribeName, color: tribeMatch.tribeColor } : null;
 
-    const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
-      episodeElims?.some(elim => elim.castawayId === castaway.castawayId)
-    );
+    // Find all elimination episodes for this castaway
+    const elimEpisodes = eliminations
+      .map((epElims, idx) => epElims?.some(e => e.castawayId === castaway.castawayId) ? idx : -1)
+      .filter(idx => idx >= 0);
+
+    // Find all redemption re-entry episodes (tribe timeline entries after an elimination)
+    const reentryEpisodes = Object.entries(tribesTimeline)
+      .filter(([epStr, tribeUpdates]) => {
+        const ep = Number(epStr);
+        // Check if this castaway appears in a tribe update AFTER being eliminated
+        const wasEliminated = elimEpisodes.some(elimEp => elimEp < ep);
+        if (!wasEliminated) return false;
+        return Object.values(tribeUpdates).some(ids => ids.includes(castaway.castawayId));
+      })
+      .map(([epStr]) => Number(epStr));
+
+    // Build redemption history
+    const redemption = reentryEpisodes.map(reentryEp => {
+      // Find the next elimination after this re-entry (if any)
+      const nextElim = elimEpisodes.find(ep => ep > reentryEp) ?? null;
+      return { reentryEpisode: reentryEp, secondEliminationEpisode: nextElim };
+    });
+
+    // eliminatedEpisode = null if currently active after redemption, else last elimination
+    const lastElim = elimEpisodes.at(-1) ?? null;
+    const lastReentry = reentryEpisodes.at(-1) ?? null;
+    const isCurrentlyActive = lastReentry !== null && (lastElim === null || lastReentry > lastElim);
+    const eliminatedEpisode = isCurrentlyActive ? null : (lastElim ?? null);
 
     return {
       ...castaway,
       tribe,
-      eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex : null
+      eliminatedEpisode,
+      ...(redemption.length > 0 ? { redemption } : {}),
     };
   });
 

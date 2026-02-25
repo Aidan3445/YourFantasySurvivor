@@ -49,13 +49,9 @@ export function useEnrichEvents(
     const tribesById = new Map(tribes.map(tribe => [tribe.tribeId, tribe]));
     const castawaysById = new Map(castaways.map(castaway => [castaway.castawayId, castaway]));
     const membersById = new Map((leagueMembers ?? { members: [] }).members.map(member => [member.memberId, member]));
-    const eliminationEpisodes = new Map<number, number>();
-    eliminations.forEach((episodeElims, index) => {
-      episodeElims.forEach(elim => {
-        if (elim?.castawayId) {
-          eliminationEpisodes.set(elim.castawayId, index + 1);
-        }
-      });
+    const eliminationEpisodes = new Map<number, number | null>();
+    castaways.forEach(c => {
+      eliminationEpisodes.set(c.castawayId, c.eliminatedEpisode);
     });
 
     return {
