@@ -19,6 +19,7 @@ import { type CustomEventRuleInsert, CustomEventRuleInsertZod } from '~/types/le
 import { defaultNewCustomRule } from '~/lib/leagues';
 import createCustomEventRule from '~/actions/createCustomEventRule';
 import { useLeagueRules } from '~/hooks/leagues/useLeagueRules';
+import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 
 export default function CustomEvents() {
   const queryClient = useQueryClient();
@@ -117,22 +118,27 @@ export default function CustomEvents() {
                     Create a custom event to score in your league.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
-                <LeagueEventFields isPrediction={isPrediction} />
-                <AlertDialogFooter className='grid grid-cols-2 gap-2 items-end'>
-                  <AlertDialogCancel
-                    variant='secondary'
-                    className='font-bold uppercase text-xs tracking-wider'
-                    onClick={() => reactForm.reset()}>
-                    Cancel
-                  </AlertDialogCancel>
-                  <Button
-                    type='submit'
-                    className='font-bold uppercase text-xs tracking-wider'
-                    disabled={!reactForm.formState.isValid || (rules?.custom?.length ?? 0) >= 6}
-                    onClick={() => handleSubmit()}>
-                    Create Event
-                  </Button>
-                </AlertDialogFooter>
+                <ScrollArea className='max-h-[60vh] w-full px-2'>
+                  <section className='flex flex-col gap-2'>
+                    <LeagueEventFields isPrediction={isPrediction} />
+                    <AlertDialogFooter className='grid grid-cols-2 gap-2 items-end'>
+                      <AlertDialogCancel
+                        variant='secondary'
+                        className='font-bold uppercase text-xs tracking-wider'
+                        onClick={() => reactForm.reset()}>
+                        Cancel
+                      </AlertDialogCancel>
+                      <Button
+                        type='submit'
+                        className='font-bold uppercase text-xs tracking-wider'
+                        disabled={!reactForm.formState.isValid || (rules?.custom?.length ?? 0) >= 6}
+                        onClick={() => handleSubmit()}>
+                        Create Event
+                      </Button>
+                    </AlertDialogFooter>
+                  </section>
+                  <ScrollBar orientation='vertical' forceMount />
+                </ScrollArea>
               </AlertDialogContent>
             </form>
           </Form>
