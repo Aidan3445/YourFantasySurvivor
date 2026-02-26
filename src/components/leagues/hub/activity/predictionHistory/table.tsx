@@ -79,7 +79,7 @@ export default function PredctionTable({ predictions, className }: PredictionTab
                     <div className='flex text-nowrap gap-2 items-center font-medium'>
                       <TimingPopover timing={pred.timing} />
                       {BaseEventFullName[pred.eventName as BaseEventName] ?? pred.eventName}
-                      {pred.eventEpisodeNumber !== pred.predictionEpisodeNumber &&
+                      {pred.eventEpisodeNumber !== null && pred.eventEpisodeNumber !== pred.predictionEpisodeNumber &&
                         <Popover modal hover>
                           <PopoverTrigger className='bg-primary/30 rounded-md hover:bg-primary/40 transition-colors p-0.5 place-items-center text-primary text-xs font-semibold'>
                             ({pred.eventEpisodeNumber})
