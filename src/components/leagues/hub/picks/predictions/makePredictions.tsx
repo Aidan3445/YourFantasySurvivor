@@ -67,7 +67,7 @@ export default function MakePredictions() {
           <span className='h-4 md:h-6 w-1 bg-primary rounded-full' />
           <h2 className='md:text-xl font-black uppercase tracking-tight leading-none text-nowrap'>
             {keyEpisodes.previousEpisode?.airStatus === 'Airing'
-              ? 'Predictions are locked until the episode ends.'
+              ? 'Predictions are locked until the episode ends'
               : (`This Week's Prediction${predictionRuleCount > 1 ? 's' : ''}`)
             }
           </h2>
