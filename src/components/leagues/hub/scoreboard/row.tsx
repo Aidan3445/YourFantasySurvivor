@@ -3,15 +3,11 @@
 import { TableCell, TableRow } from '~/components/common/table';
 import ColorRow from '~/components/shared/colorRow';
 import { useIsMobile } from '~/hooks/ui/useMobile';
-import { cn, getTribeTimeline } from '~/lib/utils';
+import { cn } from '~/lib/utils';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { type EnrichedCastaway } from '~/types/castaways';
-import { useMemo } from 'react';
-import { useTribesTimeline } from '~/hooks/seasons/useTribesTimeline';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
-import { useTribes } from '~/hooks/seasons/useTribes';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
-import TribeHistoryCircles from '~/components/shared/castaways/tribeHistoryCircles';
 import EliminationIndicator from '~/components/shared/castaways/eliminationIndicator';
 import ShotInTheDarkPending from '~/components/leagues/hub/scoreboard/popover/shotInTheDarkPending';
 import SelectionHistory from '~/components/leagues/hub/scoreboard/popover/selectionHistory';
@@ -50,16 +46,8 @@ export default function MemberRow({
   shotInTheDarkStatus,
   isAiring
 }: MemberRowProps) {
-  const { data: tribesTimeline } = useTribesTimeline(castaway?.seasonId ?? null);
-  const { data: tribes } = useTribes(castaway?.seasonId ?? null);
   const { data: leagueSettings } = useLeagueSettings(overrideHash);
   const isMobile = useIsMobile();
-
-  const tribeTimeline = useMemo(() => getTribeTimeline(
-    castaway?.castawayId ?? -1,
-    tribesTimeline ?? {},
-    tribes ?? []
-  ), [castaway?.castawayId, tribesTimeline, tribes]);
 
   const isTopThree = place <= 3;
   return (
@@ -130,7 +118,6 @@ export default function MemberRow({
       ))}
       <TableCell className='w-0'>
         <div className='flex gap-1 items-center justify-end'>
-          <TribeHistoryCircles tribeTimeline={tribeTimeline ?? []} />
           <EliminationIndicator episode={castaway?.eliminatedEpisode} redemption={castaway?.redemption} />
           <SelectionHistory selectionList={selectionList} secondaryPickList={secondaryPickList} />
           {leagueSettings && leagueSettings.survivalCap > 0 && (
