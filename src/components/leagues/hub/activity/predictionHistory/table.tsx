@@ -21,9 +21,10 @@ import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
 
 interface PredictionTableProps {
   predictions: PredictionWithEvent[];
+  className?: string;
 }
 
-export default function PredctionTable({ predictions }: PredictionTableProps) {
+export default function PredctionTable({ predictions, className }: PredictionTableProps) {
   const { data: league } = useLeague();
   const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
   const { data: castaways } = useCastaways(league?.seasonId ?? null);
@@ -55,7 +56,8 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
   return (
     <ScrollArea className={cn(
       predictions.length >= 4 && 'max-h-44 **:data-radix-scroll-area-viewport:max-h-44',
-      'transform-gpu will-change-transform'
+      'transform-gpu will-change-transform',
+      className
     )}>
       <Table>
         <TableCaption className='sr-only'>Member Predictions</TableCaption>
@@ -77,7 +79,7 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
                     <div className='flex text-nowrap gap-2 items-center font-medium'>
                       <TimingPopover timing={pred.timing} />
                       {BaseEventFullName[pred.eventName as BaseEventName] ?? pred.eventName}
-                      {pred.eventEpisodeNumber !== pred.predictionEpisodeNumber &&
+                      {pred.eventEpisodeNumber !== null && pred.eventEpisodeNumber !== pred.predictionEpisodeNumber &&
                         <Popover modal hover>
                           <PopoverTrigger className='bg-primary/30 rounded-md hover:bg-primary/40 transition-colors p-0.5 place-items-center text-primary text-xs font-semibold'>
                             ({pred.eventEpisodeNumber})
