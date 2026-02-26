@@ -37,12 +37,12 @@ export default function ScorboardBody({
 
         // place is index + 1 - number of members above them with same score
         const numberSameScore = sortedCastaways.slice(0, index)
-          .filter(([_cid, s]) => (s.slice().pop() ?? 0) === (scores.slice().pop() ?? 0))
+          .filter(([_cid, s]) => (s.slice().pop() ?? 0) === totalPoints)
           .length;
         const place = index + 1 - numberSameScore;
 
-        const secondNumberSameScore = secondScores ? sortedCastaways.slice(0, index + castawaySplitIndex)
-          .filter(([_cid, s]) => (s.slice().pop() ?? 0) === (secondScores.slice().pop() ?? 0))
+        const secondNumberSameScore = secondTotalPoints ? sortedCastaways.slice(0, index + castawaySplitIndex)
+          .filter(([_cid, s]) => (s.slice().pop() ?? 0) === secondTotalPoints)
           .length : 0;
         const secondPlace = secondScores ? index + 1 + castawaySplitIndex - secondNumberSameScore : undefined;
 
