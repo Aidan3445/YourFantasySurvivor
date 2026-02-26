@@ -75,21 +75,39 @@ export async function getSeasonData(seasonId: number, season?: Season) {
   const enrichedCastaways: EnrichedCastaway[] = castaways.map(castaway => {
     const startTribeIds = Object.entries(tribesTimeline[1] ?? {})
       .find(([_, castawayIds]) => castawayIds.includes(castaway.castawayId));
-
-    if (!startTribeIds) return { ...castaway, tribe: null, eliminatedEpisode: null };
-
-    const tribeId = Number(startTribeIds[0]);
-    const tribeMatch = tribes.find(t => t.tribeId === tribeId) ?? null;
+    const tribeId = startTribeIds ? Number(startTribeIds[0]) : null;
+    const tribeMatch = tribeId !== null ? tribes.find(t => t.tribeId === tribeId) ?? null : null;
     const tribe = tribeMatch ? { name: tribeMatch.tribeName, color: tribeMatch.tribeColor } : null;
 
-    const eliminatedEpisodeIndex = eliminations.findIndex(episodeElims =>
-      episodeElims?.some(elim => elim.castawayId === castaway.castawayId)
-    );
+    // Find all elimination episodes for this castaway
+    const elimEpisodes = eliminations
+      .map((epElims, idx) => epElims?.some(e => e.castawayId === castaway.castawayId) ? idx : -1)
+      .filter(idx => idx >= 0);
+
+    // Find redemption events from baseEvents that reference this castaway
+    const reentryEpisodes = Object.entries(baseEvents)
+      .flatMap(([epStr, events]) =>
+        Object.values(events)
+          .filter(e =>
+            e.eventName === 'redemption' &&
+            e.references.some(r => r.type === 'Castaway' && r.id === castaway.castawayId))
+          .map(() => Number(epStr)))
+      .sort((a, b) => a - b);
+
+    // Build redemption history
+    const redemption = reentryEpisodes.map(reentryEp => {
+      const nextElim = elimEpisodes.find(ep => ep > reentryEp) ?? null;
+      return { reentryEpisode: reentryEp, secondEliminationEpisode: nextElim };
+    });
+
+    // Currently active if last redemption is after last elimination
+    const eliminatedEpisode = elimEpisodes[0] ?? null;
 
     return {
       ...castaway,
       tribe,
-      eliminatedEpisode: eliminatedEpisodeIndex >= 0 ? eliminatedEpisodeIndex : null
+      eliminatedEpisode,
+      ...(redemption.length > 0 ? { redemption } : {}),
     };
   });
 

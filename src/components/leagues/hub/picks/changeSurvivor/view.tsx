@@ -270,7 +270,9 @@ export default function ChangeCastaway() {
                           <SelectContent className='z-50'>
                             <SelectGroup>
                               {availableCastaways.map((castaway) => {
-                                return ((castaway.pickedBy ?? castaway.eliminatedEpisode)
+                                return ((castaway.pickedBy ??
+                                  (castaway.eliminatedEpisode && !castaway.redemption?.some((r) =>
+                                    r.secondEliminationEpisode === null)))
                                   ? (
                                     <SelectLabel
                                       key={castaway.castawayId}
@@ -349,7 +351,9 @@ export default function ChangeCastaway() {
                             <SelectContent className='z-50'>
                               <SelectGroup>
                                 {availableCastaways
-                                  .filter((castaway) => !castaway.eliminatedEpisode)
+                                  .filter((castaway) => !castaway.eliminatedEpisode
+                                    || castaway.redemption?.some((r) =>
+                                      r.secondEliminationEpisode === null))
                                   .map((castaway) => {
                                     // Check if castaway is locked out due to recent selection
                                     const lockoutInfo = castawayLockoutStatus.get(castaway.castawayId);
@@ -359,7 +363,10 @@ export default function ChangeCastaway() {
                                     const isOwnSurvivor = !secondaryPickSettings.canPickOwnSurvivor &&
                                       castaway.pickedBy?.memberId === leagueMembers?.loggedIn?.memberId;
 
-                                    if (isOwnSurvivor || castaway.eliminatedEpisode || isLockedOut) {
+                                    if (isOwnSurvivor
+                                      || (castaway.eliminatedEpisode
+                                        && !castaway.redemption?.some((r) => r.secondEliminationEpisode === null))
+                                      || isLockedOut) {
                                       // Build the disabled label text
                                       let disabledText = castaway.fullName;
                                       if (isOwnSurvivor) {

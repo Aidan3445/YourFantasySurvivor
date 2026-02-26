@@ -30,7 +30,8 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes, member 
     <div className='bg-primary/5 flex flex-col gap-2 border-2 border-primary/20 rounded-lg p-3 hover:border-primary/30 transition-all'>
       <ColorRow
         className='relative justify-start gap-2 px-2 py-2 h-16'
-        color={castaway.eliminatedEpisode ? '#AAAAAA' : castaway.tribe?.color}>
+        color={castaway.eliminatedEpisode && !castaway.redemption?.some((r) => r.secondEliminationEpisode === null)
+          ? '#AAAAAA' : castaway.tribe?.color}>
         <div className='leading-none flex items-center gap-2'>
           <Image
             src={castaway.imageUrl}
@@ -39,7 +40,9 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes, member 
             height={50}
             className={cn(
               'rounded-full border-2',
-              (!!member || !!castaway.eliminatedEpisode) && 'grayscale')} />
+              (!!member || (!!castaway.eliminatedEpisode
+                && !castaway.redemption?.some((r) => r.secondEliminationEpisode === null)))
+              && 'grayscale')} />
           <span className='font-bold'>
             {castaway.fullName}
           </span>
@@ -58,7 +61,7 @@ export default function CastawayCard({ castaway, tribesTimeline, tribes, member 
         ) : (
           <div className='ml-auto' />
         )}
-        <EliminationIndicator episode={castaway.eliminatedEpisode} />
+        <EliminationIndicator episode={castaway.eliminatedEpisode} redemption={castaway.redemption} />
       </ColorRow>
 
       <div className='space-y-1 text-sm'>

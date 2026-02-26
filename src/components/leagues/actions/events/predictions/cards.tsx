@@ -80,7 +80,8 @@ export default function PredictionCards({
       'Castaway' : 'Direct Castaway';
 
     castaways.forEach((castaway) => {
-      if (!devConfig && castaway.eliminatedEpisode) return;
+      if (!devConfig && castaway.eliminatedEpisode
+        && !castaway.redemption?.some((r) => r.secondEliminationEpisode === null)) return;
       const tribe = castaway.tribe;
       options[castawayKey][castaway.fullName] = {
         id: castaway.castawayId,

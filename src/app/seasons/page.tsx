@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSeasons } from '~/hooks/seasons/useSeasons';
 import { useSeasonsData } from '~/hooks/seasons/useSeasonsData';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
@@ -18,22 +19,61 @@ import {
 import { ScrollArea, ScrollBar } from '~/components/common/scrollArea';
 import Spacer from '~/components/shared/floatingActions/spacer';
 
+const VALID_TABS = ['events', 'castaways', 'tribes'] as const;
+type Tab = (typeof VALID_TABS)[number];
+
 export default function SeasonsPage() {
-  const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(null);
-  const [selectedTab, setSelectedTab] = useState('events');
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const paramSeason = searchParams.get('season');
+  const paramTab = searchParams.get('tab');
+
+  const [selectedSeasonId, setSelectedSeasonId] = useState<number | null>(
+    paramSeason ? Number(paramSeason) : null
+  );
+  const [selectedTab, setSelectedTab] = useState<Tab>(
+    paramTab && VALID_TABS.includes(paramTab as Tab) ? (paramTab as Tab) : 'events'
+  );
+
   const { data: seasons } = useSeasons(true);
   const { data: seasonData } = useSeasonsData(true, selectedSeasonId ?? undefined);
   const season = seasonData?.[0];
 
-  // Auto-select most recent season on mount
+  const updateParams = useCallback(
+    (seasonId: number | null, tab: Tab) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (seasonId !== null) {
+        params.set('season', seasonId.toString());
+      }
+      params.set('tab', tab);
+      router.replace(`?${params.toString()}`, { scroll: false });
+    }, [router, searchParams]
+  );
+
+  // Auto-select most recent season on mount (only if no query param)
   useEffect(() => {
     if (!selectedSeasonId && seasons && seasons.length > 0) {
-      setSelectedSeasonId(seasons[0]!.seasonId);
+      const id = seasons[0]!.seasonId;
+      setSelectedSeasonId(id);
+      updateParams(id, selectedTab);
     }
-  }, [seasons, selectedSeasonId]);
+  }, [seasons, selectedSeasonId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleSeasonChange = (value: string) => {
+    const id = Number(value);
+    setSelectedSeasonId(id);
+    updateParams(id, selectedTab);
+  };
+
+  const handleTabChange = (value: string) => {
+    const tab = value as Tab;
+    setSelectedTab(tab);
+    updateParams(selectedSeasonId, tab);
+  };
 
   return (
-    <Tabs className='w-full' value={selectedTab} onValueChange={setSelectedTab}>
+    <Tabs className='w-full' value={selectedTab} onValueChange={handleTabChange}>
       <div className='flex flex-col w-full justify-between bg-card shadow-lg shadow-primary/20'>
         <div className='px-4 py-4 flex flex-col items-center justify-center w-full'>
           <div className='text-center'>
@@ -50,7 +90,7 @@ export default function SeasonsPage() {
           {seasons && seasons.length > 0 && (
             <Select
               value={selectedSeasonId?.toString() ?? ''}
-              onValueChange={(value) => setSelectedSeasonId(Number(value))}>
+              onValueChange={handleSeasonChange}>
               <SelectTrigger className='max-w-lg mt-3 border-2 border-primary/20 hover:border-primary/40 bg-primary/5 font-medium'>
                 <SelectValue placeholder='Select a season' />
               </SelectTrigger>

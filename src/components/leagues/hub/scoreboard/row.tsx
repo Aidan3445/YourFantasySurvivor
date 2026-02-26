@@ -101,7 +101,8 @@ export default function MemberRow({
           <span
             className={cn(
               'text-base md:text-lg font-bold transition-all hover:text-primary cursor-pointer text-nowrap',
-              castaway?.eliminatedEpisode && 'line-through opacity-40 hover:opacity-60'
+              castaway?.eliminatedEpisode && !castaway?.redemption?.some(r => r.secondEliminationEpisode === null)
+              && 'line-through opacity-40 hover:opacity-60'
             )}>
             {isMobile ? castaway?.shortName : castaway?.fullName}
           </span>
@@ -113,7 +114,8 @@ export default function MemberRow({
             <span
               className={cn(
                 'text-base md:text-lg font-bold transition-all hover:text-primary cursor-pointer text-nowrap',
-                secondaryPick.eliminatedEpisode && 'line-through opacity-40 hover:opacity-60'
+                secondaryPick.eliminatedEpisode && !secondaryPick.redemption?.some(r => r.secondEliminationEpisode === null)
+                && 'line-through opacity-40 hover:opacity-60'
               )}>
               {isMobile ? secondaryPick.shortName : secondaryPick.fullName}
             </span>
@@ -127,7 +129,7 @@ export default function MemberRow({
       <TableCell className='w-0'>
         <div className='flex gap-1 items-center justify-end'>
           <TribeHistoryCircles tribeTimeline={tribeTimeline ?? []} />
-          <EliminationIndicator episode={castaway?.eliminatedEpisode} />
+          <EliminationIndicator episode={castaway?.eliminatedEpisode} redemption={castaway?.redemption} />
           <SelectionHistory selectionList={selectionList} secondaryPickList={secondaryPickList} />
           {leagueSettings && leagueSettings.survivalCap > 0 && (
             <SurvivalStreaks
