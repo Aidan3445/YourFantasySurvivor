@@ -29,7 +29,9 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
     shotInTheDarkStatus
   } = useLeagueData(overrideHash);
 
-  const episodeNum = keyEpisodes?.nextEpisode?.episodeNumber ?? Infinity;
+  const episodeNum = keyEpisodes?.previousEpisode?.airStatus === 'Airing'
+    ? keyEpisodes.previousEpisode.episodeNumber
+    : keyEpisodes?.nextEpisode?.episodeNumber ?? Infinity;
 
   return (
     <ScrollArea className={cn('bg-card gap-0 w-full', className)}>

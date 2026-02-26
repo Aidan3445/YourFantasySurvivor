@@ -86,8 +86,7 @@ export default function ScoreboardTable({ scoreData, someHidden, overrideBaseRul
           alt='Loading'
           width={100}
           height={100}
-          className='animate-loading-spin w-auto h-auto'
-        />
+          className='animate-loading-spin w-auto h-auto' />
       </div>
     );
   }
