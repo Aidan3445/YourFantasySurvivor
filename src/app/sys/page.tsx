@@ -11,7 +11,7 @@ export default async function SystemPage() {
   }
 
   return (
-    <main className='w-full p-4'>
+    <main className='w-full p-4 space-y-4 overflow-y-auto h-[95svh]'>
       <Import />
       <Button
         onClick={async () => {

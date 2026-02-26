@@ -8,6 +8,7 @@ import { episodeSchema } from '~/server/db/schema/episodes';
 import { tribeSchema } from '~/server/db/schema/tribes';
 import { type TribesTimeline } from '~/types/tribes';
 import { unstable_cache } from 'next/cache';
+import { inArray } from 'drizzle-orm';
 
 /**
   * Get the members of each tribe for each episode in a season
@@ -46,7 +47,7 @@ async function fetchTribesTimeline(seasonId: number) {
     .from(episodeSchema)
     .innerJoin(baseEventSchema, and(
       eq(episodeSchema.episodeId, baseEventSchema.episodeId),
-      eq(baseEventSchema.eventName, 'tribeUpdate')))
+      inArray(baseEventSchema.eventName, ['tribeUpdate', 'redemption'])))
     .innerJoin(tribeReference, and(
       eq(baseEventSchema.baseEventId, tribeReference.baseEventId),
       eq(tribeReference.referenceType, 'Tribe')))

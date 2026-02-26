@@ -183,7 +183,9 @@ export default function MakePredictions(props: MakePredictionsProps) {
               <SelectContent className='z-50'>
                 <SelectGroup>
                   {availableCastaways
-                    .filter((castaway) => !castaway.eliminatedEpisode)
+                    .filter((castaway) => !castaway.eliminatedEpisode ||
+                      castaway.redemption?.some((r) =>
+                        r.secondEliminationEpisode === null))
                     .map((castaway) => {
                       const lockoutInfo = castawayLockoutStatus.get(castaway.castawayId);
                       const isLockedOut = lockoutInfo?.isLockedOut ?? false;

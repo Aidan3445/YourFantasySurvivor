@@ -23,79 +23,193 @@ async function wikiGet(params: Record<string, string | number>) {
   };
 }
 
-// ── Episode detail parsing (debug) ──
+// ── Shared types ──
 
-function parseEpisodeDetails($e: cheerio.CheerioAPI) {
-  const allRows = $e('table.wikitable tbody tr').toArray();
-  const numCols = 9;
+export type ParsedEvent = {
+  eventName: string;
+  label: string | null;
+  notes: string[];
+  references: { type: 'Castaway' | 'Tribe'; name: string }[];
+};
 
-  // Build virtual grid resolving all rowspans/colspans
+export type ParsedEpisodeDetails = {
+  episodeNumber: number;
+  events: ParsedEvent[];
+};
+
+export type ParsedTribeSwap = {
+  type: 'swap' | 'merge';
+  episodeNumber: number; // best guess, 0 if unknown
+  events: ParsedEvent[];
+};
+
+// ── Virtual grid builder ──
+
+function buildVirtualGrid(
+  $: cheerio.CheerioAPI,
+  tableSelector: string,
+): { grid: (Element | null)[][]; totalCols: number } {
+  const allRows = $(tableSelector + ' tbody tr').toArray();
+
+  // Count total columns from first header row
+  let totalCols = 0;
+  $(allRows[0]).find('th').each((_, th) => {
+    totalCols += parseInt($(th).attr('colspan') ?? '1');
+  });
+  if (totalCols === 0) totalCols = 9; // fallback
+
   const grid: (Element | null)[][] = [];
-  const rowspanTracker: ({ el: Element; remaining: number } | null)[] =
-    new Array(numCols).fill(null) as ({ el: Element; remaining: number } | null)[];
+  const tracker: ({ el: Element; remaining: number } | null)[] =
+    new Array(totalCols).fill(null) as ({ el: Element; remaining: number } | null)[];
 
   for (const row of allRows) {
-    const tds = $e(row).find('td').toArray();
-    if (tds.length === 0) continue; // skip pure header rows
+    const tds = $(row).find('td').toArray();
+    if (tds.length === 0) continue;
+    // Skip notes rows
+    if (tds.length === 1 && parseInt($(tds[0]).attr('colspan') ?? '1') >= totalCols - 2) continue;
 
-    // Skip notes row (single cell spanning most/all columns)
-    if (tds.length === 1 && parseInt($e(tds[0]).attr('colspan') ?? '1') >= 8) continue;
-
-    const gridRow: (Element | null)[] = new Array(numCols).fill(null) as (Element | null)[];
+    const gridRow: (Element | null)[] = new Array(totalCols).fill(null) as (Element | null)[];
     let tdIdx = 0;
 
-    for (let col = 0; col < numCols; col++) {
-      const tracker = rowspanTracker[col];
-      if (tracker && tracker.remaining > 0) {
-        gridRow[col] = tracker.el;
-        tracker.remaining--;
-        if (tracker.remaining === 0) rowspanTracker[col] = null;
+    for (let col = 0; col < totalCols; col++) {
+      const t = tracker[col];
+      if (t && t.remaining > 0) {
+        gridRow[col] = t.el;
+        t.remaining--;
+        if (t.remaining === 0) tracker[col] = null;
         continue;
       }
-
       if (tdIdx >= tds.length) continue;
-
       const td = tds[tdIdx];
-      const colspan = parseInt($e(td).attr('colspan') ?? '1');
-      const rowspan = parseInt($e(td).attr('rowspan') ?? '1');
+      if (!td) { tdIdx++; continue; }
 
-      if (!td) continue;
+      const colspan = parseInt($(td).attr('colspan') ?? '1');
+      const rowspan = parseInt($(td).attr('rowspan') ?? '1');
 
       gridRow[col] = td;
-      if (rowspan > 1) {
-        rowspanTracker[col] = { el: td, remaining: rowspan - 1 };
-      }
+      if (rowspan > 1) tracker[col] = { el: td, remaining: rowspan - 1 };
 
       for (let c = 1; c < colspan; c++) {
-        if (col + c < numCols) {
+        if (col + c < totalCols) {
           gridRow[col + c] = td;
-          if (rowspan > 1) {
-            rowspanTracker[col + c] = { el: td, remaining: rowspan - 1 };
-          }
+          if (rowspan > 1) tracker[col + c] = { el: td, remaining: rowspan - 1 };
         }
       }
-
       col += colspan - 1;
       tdIdx++;
     }
-
     grid.push(gridRow);
   }
 
-  // Helpers
-  const cleanText = (el: Element | null) => {
-    if (!el) return '';
-    const clone = $e(el).clone();
-    clone.find('sup').remove();
-    clone.find('br').replaceWith(' ');
-    return clone.text().trim().replace(/\s+/g, ' ');
-  };
+  return { grid, totalCols };
+}
+
+function cleanTextFrom($: cheerio.CheerioAPI, el: Element | null): string {
+  if (!el) return '';
+  const clone = $(el).clone();
+  clone.find('sup').remove();
+  clone.find('br').replaceWith(' ');
+  return clone.text().trim().replace(/\s+/g, ' ');
+}
+
+// ── Tribe swap/merge parsing from castaway table ──
+
+function parseTribeSwaps(
+  $c: cheerio.CheerioAPI,
+  episodeDetails: ParsedEpisodeDetails[],
+): ParsedTribeSwap[] {
+  // Count tribe columns from header
+  let numTribeCols = 0;
+  $c('table.wikitable tbody tr').first().find('th').each((_, th) => {
+    const text = $c(th).text().trim().toLowerCase();
+    if (text.includes('tribe')) {
+      const colspan = parseInt($c(th).attr('colspan') ?? '1');
+      if (colspan > numTribeCols) numTribeCols = colspan;
+    }
+  });
+
+  if (numTribeCols <= 1) return []; // No swaps or merge
+
+  const { grid } = buildVirtualGrid($c, 'table.wikitable');
+  // Columns: 0=image, 1=name, 2=original tribe, 3...(2+numTribeCols-1)=swap/merge, then finish, votes
+  const results: ParsedTribeSwap[] = [];
+
+  for (let swapCol = 3; swapCol < 2 + numTribeCols; swapCol++) {
+    const isLastCol = swapCol === 2 + numTribeCols - 1;
+    const tribeAssignments: Record<string, string[]> = {};
+    let firstEliminatedShortName = '';
+
+    for (const row of grid) {
+      const cell = row[swapCol];
+      if (!cell) continue;
+
+      const style = $c(cell).attr('style') ?? '';
+      if (style.includes('#a6a6a6') || style.includes('border:none') ||
+        style.includes('border: none')) continue;
+
+      const tribeName = cleanTextFrom($c, cell);
+      if (!tribeName) continue;
+
+      const nameCell = row[1];
+      if (!nameCell) continue;
+      const fullName = $c(nameCell).find('b').text().trim();
+      if (!fullName) continue;
+
+      tribeAssignments[tribeName] ??= [];
+      tribeAssignments[tribeName].push(fullName);
+
+      if (!firstEliminatedShortName) {
+        firstEliminatedShortName = fullName.split(' ')[0] ?? '';
+      }
+    }
+
+    if (Object.keys(tribeAssignments).length === 0) continue;
+
+    // Find episode number by matching first eliminated player
+    let episodeNumber = 0;
+    if (firstEliminatedShortName) {
+      for (const ep of episodeDetails) {
+        const hasPlayer = ep.events.some(e =>
+          (e.eventName === 'elim' || e.eventName === 'noVoteExit') &&
+          e.references.some(r => r.name === firstEliminatedShortName));
+        if (hasPlayer) {
+          episodeNumber = ep.episodeNumber;
+          break;
+        }
+      }
+    }
+
+    const events: ParsedEvent[] = Object.entries(tribeAssignments).map(
+      ([tribeName, castawayNames]) => ({
+        eventName: 'tribeUpdate',
+        label: isLastCol ? 'Merge' : 'Tribe Swap',
+        notes: [],
+        references: [
+          { type: 'Tribe' as const, name: tribeName },
+          ...castawayNames.map(name => ({ type: 'Castaway' as const, name })),
+        ],
+      }));
+
+    results.push({ type: isLastCol ? 'merge' : 'swap', episodeNumber, events });
+  }
+
+  return results;
+}
+
+// ── Episode detail parsing ──
+
+function parseEpisodeDetails(
+  $e: cheerio.CheerioAPI,
+  tribeNames: Set<string>,
+): ParsedEpisodeDetails[] {
+  const { grid } = buildVirtualGrid($e, 'table.wikitable');
+
+  const cleanText = (el: Element | null) => cleanTextFrom($e, el);
 
   const parseChallenge = (el: Element | null) => {
     if (!el) return { winner: '', picked: [] as string[] };
     const text = cleanText(el);
     if (text.toLowerCase() === 'none') return { winner: 'None', picked: [] as string[] };
-
     const bracketMatch = /\[([^\]]+)\]/.exec(text);
     const picked = bracketMatch
       ? bracketMatch[1]?.split(',').map(s => s.trim())
@@ -113,9 +227,43 @@ function parseEpisodeDetails($e: cheerio.CheerioAPI) {
     return { name, vote };
   };
 
-  // Group rows by episode (rows sharing the same DOM element in col 0)
+  const isTribe = (name: string) => tribeNames.has(name);
+
+  const makeChallengeEvents = (
+    type: 'reward' | 'immunity' | 'combined',
+    winner: string,
+    picked: string[],
+  ): ParsedEvent[] => {
+    if (winner === 'None' || !winner) return [];
+    const events: ParsedEvent[] = [];
+    const label = type === 'combined' ? 'Immunity and Reward'
+      : type === 'reward' ? 'Reward' : 'Immunity';
+
+    if (isTribe(winner)) {
+      events.push({
+        eventName: 'tribe1st',
+        label,
+        notes: [],
+        references: [{ type: 'Tribe', name: winner }],
+      });
+    } else {
+      const winners = winner.split(',').map(w => w.trim()).filter(Boolean);
+      const eventName = type === 'reward' ? 'indivReward' : 'indivWin';
+      const notes: string[] = [];
+      if (picked.length > 0) notes.push(`Picked: ${picked.join(', ')}`);
+      events.push({
+        eventName,
+        label,
+        notes,
+        references: winners.map(w => ({ type: 'Castaway' as const, name: w })),
+      });
+    }
+    return events;
+  };
+
+  // Group rows by episode
   type EpisodeGroup = { rows: (Element | null)[][] };
-  const episodes: EpisodeGroup[] = [];
+  const episodeGroups: EpisodeGroup[] = [];
   let currentEp: EpisodeGroup | null = null;
   let currentEpEl: Element | null = null;
 
@@ -123,34 +271,29 @@ function parseEpisodeDetails($e: cheerio.CheerioAPI) {
     const epEl = gridRow[0];
     if (epEl !== currentEpEl) {
       currentEp = { rows: [gridRow] };
-      episodes.push(currentEp);
+      episodeGroups.push(currentEp);
       if (epEl) currentEpEl = epEl;
     } else {
       currentEp!.rows.push(gridRow);
     }
   }
 
-  // Print each episode (stop after Sole Survivor)
+  const results: ParsedEpisodeDetails[] = [];
   let seasonComplete = false;
-  for (const ep of episodes) {
-    if (seasonComplete) break;
 
+  for (const ep of episodeGroups) {
+    if (seasonComplete) break;
     const firstRow = ep.rows[0];
     if (!firstRow || firstRow.length < 3) continue;
     const epNum = cleanText(firstRow[0]!);
-    const title = cleanText(firstRow[1]!);
-    const airDate = cleanText(firstRow[2]!);
-
     if (!epNum || isNaN(parseInt(epNum))) continue;
 
-    // Skip recap episodes
     const firstRowText = ep.rows[0]!.map(el => cleanText(el)).join(' ').toLowerCase();
-    if (firstRowText.includes('recap')) {
-      console.log(`\n=== Episode ${epNum}: "${title}" (${airDate}) === [RECAP - SKIPPED]`);
-      continue;
-    }
+    if (firstRowText.includes('recap')) continue;
 
-    console.log(`\n=== Episode ${epNum}: "${title}" (${airDate}) ===`);
+    const episodeNumber = parseInt(epNum);
+    const events: ParsedEvent[] = [];
+    const finalists: { name: string; vote?: string; finish: string }[] = [];
 
     for (let i = 0; i < ep.rows.length; i++) {
       const row = ep.rows[i];
@@ -163,51 +306,74 @@ function parseEpisodeDetails($e: cheerio.CheerioAPI) {
       if (!rewardEl && !immunityEl && !eliminatedEl) continue;
       const rewardText = cleanText(rewardEl!);
 
-      // Jury Vote row
       if (rewardText.toLowerCase().includes('jury vote')) {
         const elim = parseElimination(eliminatedEl!);
         const finish = cleanText(finishEl!);
-        console.log(`  Jury Vote: ${elim.name} ${elim.vote ? `(${elim.vote})` : ''} - ${finish}`);
-        if (finish.includes('Sole Survivor')) seasonComplete = true;
+        finalists.push({ name: elim.name, vote: elim.vote, finish });
+
+        if (finish.includes('Sole Survivor')) {
+          // Emit single finalists event with all references
+          events.push({
+            eventName: 'finalists',
+            label: null,
+            notes: finalists.map(f => `${f.name}: ${f.finish}${f.vote ? ` (${f.vote})` : ''}`),
+            references: finalists.map(f => ({ type: 'Castaway' as const, name: f.name })),
+          });
+          events.push({
+            eventName: 'soleSurvivor',
+            label: null,
+            notes: elim.vote ? [elim.vote] : [],
+            references: [{ type: 'Castaway', name: elim.name }],
+          });
+          seasonComplete = true;
+        }
         continue;
       }
 
-      // Combined reward + immunity (same DOM element via colspan)
       const isCombined = rewardEl === immunityEl && rewardEl !== null;
-
-      // Only print challenge if it's a new cell (not carried from rowspan)
-      if (ep.rows.length < i) continue;
       const prevRewardEl = i > 0 ? ep.rows[i - 1]![3] : null;
       const prevImmunityEl = i > 0 ? ep.rows[i - 1]![4] : null;
 
       if (isCombined) {
         if (rewardEl !== prevRewardEl) {
-          const challenge = parseChallenge(rewardEl!);
-          console.log(`  Combined R+I: ${challenge.winner}${challenge.picked?.length ? ` [picked: ${challenge.picked.join(', ')}]` : ''}`);
+          const c = parseChallenge(rewardEl!);
+          events.push(...makeChallengeEvents('combined', c.winner, c.picked ?? []));
         }
       } else {
         if (rewardEl !== prevRewardEl) {
-          const reward = parseChallenge(rewardEl!);
-          console.log(`  Reward: ${reward.winner}${reward.picked?.length ? ` [picked: ${reward.picked.join(', ')}]` : ''}`);
+          const r = parseChallenge(rewardEl!);
+          events.push(...makeChallengeEvents('reward', r.winner, r.picked ?? []));
         }
         if (immunityEl !== prevImmunityEl) {
-          const immunity = parseChallenge(immunityEl!);
-          console.log(`  Immunity: ${immunity.winner}${immunity.picked?.length ? ` [picked: ${immunity.picked.join(', ')}]` : ''}`);
+          const im = parseChallenge(immunityEl!);
+          events.push(...makeChallengeEvents('immunity', im.winner, im.picked ?? []));
         }
       }
 
-      // Elimination (only if new cell)
       const prevElimEl = i > 0 ? ep.rows[i - 1]![5] : null;
       if (eliminatedEl !== prevElimEl) {
         const elim = parseElimination(eliminatedEl!);
         const finish = cleanText(finishEl!);
         if (elim.name) {
-          console.log(`  Eliminated: ${elim.name} ${elim.vote ? `(${elim.vote})` : ''} - ${finish}`);
+          const isNoVote = elim.vote?.toLowerCase() === 'no vote'
+            || finish.toLowerCase().includes('evacuated')
+            || finish.toLowerCase().includes('quit')
+            || finish.toLowerCase().includes('removed');
+          events.push({
+            eventName: isNoVote ? 'noVoteExit' : 'elim',
+            label: isNoVote ? finish : null,
+            notes: elim.vote && !isNoVote ? [elim.vote] : [],
+            references: [{ type: 'Castaway', name: elim.name }],
+          });
+          if (finish.includes('Sole Survivor')) seasonComplete = true;
         }
-        if (finish.includes('Sole Survivor')) seasonComplete = true;
       }
     }
+
+    results.push({ episodeNumber, events });
   }
+
+  return results;
 }
 
 // ── Main fetch function ──
@@ -253,7 +419,7 @@ export default async function getExternalData(seasonName: string) {
 
     if (castawaysSection === undefined || episodesSection === undefined) {
       console.error(`Could not find required sections for season ${seasonName}`);
-      return { season, castaways: [], tribes: [], episodes: [] };
+      return { season, castaways: [], tribes: [], episodes: [], episodeDetails: [], tribeSwaps: [] };
     }
 
     const [castawaysRes, episodeRes] = await Promise.all([
@@ -274,7 +440,6 @@ export default async function getExternalData(seasonName: string) {
     for (const columns of rows) {
       if (columns.length > 1) {
         const fullName: string = $c(columns[1]).find('b').text().trim();
-
         const details: string = $c(columns[1]).find('small').text().trim();
         const age = parseInt(details);
         const residenceStart = details.indexOf(' ') + 1;
@@ -293,7 +458,6 @@ export default async function getExternalData(seasonName: string) {
           });
           const $ca = cheerio.load(castawayPage.parse.text['*']);
           occupation = $ca('div[data-source=occupation] div').text().trim();
-
           const previousSeasons = rest.substring(residenceEnd).trim();
           previousSeasons.split(',').forEach(s => {
             const clean = s.replace('&', '').trim();
@@ -315,7 +479,7 @@ export default async function getExternalData(seasonName: string) {
 
         castaways.push({
           fullName,
-          shortName: fullName.split(' ')[0] ?? fullName,
+          shortName: fullName.split(' ')[0] ?? fullName, // disambiguated below
           age,
           residence: residence ?? 'Hometown N/A',
           occupation: occupation ?? 'Occupation N/A',
@@ -323,6 +487,18 @@ export default async function getExternalData(seasonName: string) {
           tribe: tribeName,
           previouslyOn,
         });
+      }
+    }
+
+    // Disambiguate duplicate short names (e.g. "Kim Powers" → "Kim P")
+    const shortNameCounts = new Map<string, number>();
+    for (const c of castaways) {
+      shortNameCounts.set(c.shortName, (shortNameCounts.get(c.shortName) ?? 0) + 1);
+    }
+    for (const c of castaways) {
+      if ((shortNameCounts.get(c.shortName) ?? 0) > 1) {
+        const lastInitial = c.fullName.split(' ')[1]?.[0];
+        if (lastInitial) c.shortName = `${c.shortName} ${lastInitial}`;
       }
     }
 
@@ -338,7 +514,6 @@ export default async function getExternalData(seasonName: string) {
         const episodeNumber = +$e(columns[0]).text().trim();
         const title = $e(columns[1]).text().trim();
         const dateStr = $e(columns[2]).text().trim();
-
         let airDate = setToNY8PM(dateStr);
         if (!airDate) {
           const prevEpisode = episodes[episodes.length - 1];
@@ -348,21 +523,36 @@ export default async function getExternalData(seasonName: string) {
             airDate = nextWeek;
           }
         }
-
-        if (airDate) {
-          episodes.push({ episodeNumber, title, airDate });
-        }
+        if (airDate) episodes.push({ episodeNumber, title, airDate });
       }
     });
 
-    // ── Episode details (debug print) ──
-    parseEpisodeDetails($e);
+    // ── Episode details with structured events ──
+    const tribeNameSet = new Set(Object.keys(tribes));
+    const episodeDetails = parseEpisodeDetails($e, tribeNameSet);
+
+    // ── Tribe swaps/merges ──
+    const tribeSwaps = parseTribeSwaps($c, episodeDetails);
+
+    // Filter recap episodes and renumber
+    const recapEpisode = episodes.find(ep =>
+      ep.title.includes('The First 2')
+      || ep.title.toLowerCase() === '"a closer look"'
+      || ep.title.toLowerCase() === '"amazon redux"'
+    )?.episodeNumber;
+    console.log(`Identified recap episode: ${recapEpisode}`);
 
     return {
       season,
       castaways,
       tribes: tribeList,
-      episodes,
+      episodes: episodes
+        .filter(ep => ep.episodeNumber !== recapEpisode)
+        .map(ep => ({ ...ep, episodeNumber: ep.episodeNumber > (recapEpisode ?? 100) ? ep.episodeNumber - 1 : ep.episodeNumber })),
+      episodeDetails: episodeDetails
+        .filter(ed => ed.episodeNumber !== recapEpisode)
+        .map(ed => ({ ...ed, episodeNumber: ed.episodeNumber > (recapEpisode ?? 100) ? ed.episodeNumber - 1 : ed.episodeNumber })),
+      tribeSwaps,
     };
   } catch (error) {
     console.error(`Error fetching data for season ${seasonName}:`, error);

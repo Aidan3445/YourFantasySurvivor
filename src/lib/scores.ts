@@ -243,6 +243,20 @@ export function compileScores(
   // after each episode the castaway survives, they earn a bonus point
   // then they earn two points for the next episode, then three, etc.
   // the bonus is capped at the survival cap set by the league
+
+  // Build per-episode elimination status accounting for redemptions
+  const currentlyEliminatedByEpisode: Set<number>[] = [new Set()];
+  for (let ep = 1; ep < eliminations.length + 1; ep++) {
+    currentlyEliminatedByEpisode[ep] = new Set(currentlyEliminatedByEpisode[ep - 1] ?? []);
+    // Redemptions/tribe updates restore castaways
+    const updates = tribesTimeline[ep];
+    if (updates) {
+      Object.values(updates).flat().forEach(id => currentlyEliminatedByEpisode[ep]!.delete(id));
+    }
+    // New eliminations
+    eliminations[ep]?.forEach(e => currentlyEliminatedByEpisode[ep]!.add(e.castawayId));
+  }
+
   const currentStreaks: Streaks = {};
   const streaks: Record<number, number[]> = {};
   Object.entries(selectionTimelines.memberCastaways).forEach(([memberId, castaways]) => {
@@ -258,13 +272,14 @@ export function compileScores(
     streaks[mid] = [streak];
 
     for (let episodeNumber = firstPickEpisode; episodeNumber < eliminations.length; episodeNumber++) {
-      // get the castaways who were eliminated at any point before this episode
-      const eliminated = eliminations.slice(0, episodeNumber + 1).flat();
       // get the castaways who were selected by this member at this episode
       const mcIndex = Math.min(episodeNumber, castaways.length - 1);
 
+      // get the castaways who were eliminated at any point before this episode 
+      // accounting for redemptions
+      const isEliminated = currentlyEliminatedByEpisode[episodeNumber]?.has(castaways[mcIndex]!) ?? false;
+
       // check conditions for streak reset
-      const isEliminated = eliminated.some((e) => e?.castawayId === castaways[mcIndex]);
       const voluntarySwitch = !preserveStreak && castaways[episodeNumber - 1] &&
         castaways[episodeNumber - 1] !== castaways[mcIndex];
 

@@ -57,13 +57,15 @@ export function useEnrichPredictions(
         }
       });
     });
+    const redemptionsByCastaway = new Map(castaways.map(c => [c.castawayId, c.redemption]));
 
     return {
       tribesById,
       castawaysById,
       membersById,
       eventsById,
-      eliminationEpisodes
+      eliminationEpisodes,
+      redemptionsByCastaway
     };
   }, [leagueData, tribes, castaways, events, eliminations, leagueMembers]);
 
@@ -161,11 +163,13 @@ export function useEnrichPredictions(
         if (!tribe) continue;
 
         const eliminatedEpisode = lookupMaps.eliminationEpisodes.get(castaway.castawayId) ?? null;
+        const redemptionHistory = lookupMaps.redemptionsByCastaway.get(castaway.castawayId);
 
         const castawayWithTribe: EnrichedCastaway = {
           ...castaway,
           tribe,
-          eliminatedEpisode
+          eliminatedEpisode,
+          redemption: redemptionHistory
         };
 
         entry.reference = {

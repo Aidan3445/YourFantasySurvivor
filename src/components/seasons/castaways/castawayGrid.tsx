@@ -94,8 +94,7 @@ export default function CastawayGrid({
                 selectionTimeline?.castawayMembers[castaway.castawayId]
                   ?.slice()
                   ?.pop() === m.memberId
-            )}
-          />
+            )} />
         ))}
       </div>
     </section>

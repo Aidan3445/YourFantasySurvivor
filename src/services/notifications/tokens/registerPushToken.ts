@@ -50,7 +50,7 @@ export default async function registerPushToken(
           reminders: true,
           leagueActivity: true,
           episodeUpdates: true,
-          liveScoring: false,
+          liveScoring: true,
         },
       });
   }

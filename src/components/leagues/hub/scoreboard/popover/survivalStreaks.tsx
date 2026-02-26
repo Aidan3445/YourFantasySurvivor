@@ -11,19 +11,30 @@ interface SurvivalStreaksProps {
   shotInTheDarkStatus?: { episodeNumber: number, status: 'pending' | 'saved' | 'wasted' } | null;
 }
 
-
 export default function SurvivalStreaks({
   currentStreak,
   castaway,
   shotInTheDarkStatus,
   survivalCap
 }: SurvivalStreaksProps) {
+  const finalElimination = (() => {
+    if (!castaway?.eliminatedEpisode) return null;
+    const redemptions = castaway.redemption ?? [];
+    if (!redemptions.length) return castaway.eliminatedEpisode;
+    // Sort by most recent reentry
+    const latest = [...redemptions].sort((a, b) => b.reentryEpisode - a.reentryEpisode)[0]!;
+    // If they re-entered but haven't been eliminated again, they're still in
+    return latest.secondEliminationEpisode ?? null;
+  })();
+
+  const isEliminated = finalElimination !== null;
+
   return (
     <Popover>
       <PopoverTrigger>
         <div className='ml-1 w-5 h-5 flex items-center justify-center text-sm font-bold text-muted-foreground hover:text-primary transition-colors cursor-pointer'>
-          {castaway?.eliminatedEpisode ? (
-            (shotInTheDarkStatus?.status === 'saved' && shotInTheDarkStatus.episodeNumber === castaway.eliminatedEpisode
+          {isEliminated ? (
+            (shotInTheDarkStatus?.status === 'saved' && shotInTheDarkStatus.episodeNumber === finalElimination
               ? (
                 <ShieldCheck className='w-5 h-5 stroke-green-600 hover:stroke-green-700 transition-colors' />
               ) : (
