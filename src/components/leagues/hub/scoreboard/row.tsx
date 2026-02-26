@@ -32,6 +32,7 @@ interface MemberRowProps {
   overrideHash?: string;
   doubleBelow?: boolean;
   shotInTheDarkStatus?: { episodeNumber: number, status: 'pending' | 'saved' | 'wasted' } | null;
+  isAiring?: boolean;
 }
 
 export default function MemberRow({
@@ -46,7 +47,8 @@ export default function MemberRow({
   color,
   doubleBelow,
   overrideHash,
-  shotInTheDarkStatus
+  shotInTheDarkStatus,
+  isAiring
 }: MemberRowProps) {
   const { data: tribesTimeline } = useTribesTimeline(castaway?.seasonId ?? null);
   const { data: tribes } = useTribes(castaway?.seasonId ?? null);
@@ -123,7 +125,7 @@ export default function MemberRow({
         </TableCell>
       ) : (
         <TableCell className='px-3 py-3 w-0 text-left text-muted-foreground italic'>
-          {secondaryPick === null ? 'Hidden' : 'Pending'}...
+          {secondaryPick === null ? 'Hidden' : isAiring ? 'No Pick' : 'Pending'}...
         </TableCell>
       ))}
       <TableCell className='w-0'>
