@@ -127,11 +127,63 @@ export default function PredictionHistory() {
     }
   });
 
-  if (stats.count.total === 0) return null;
+  if (stats.count.total === 0 || !Object.entries(predictionsWithEvents)[0]) return (
+    <Card className='w-full p-0 bg-card rounded-lg border-2 border-primary/20 shadow-lg shadow-primary/10'>
+      {/* Accent Elements */}
+      <div className='absolute top-0 right-0 w-40 h-40 bg-primary/10 rounded-full blur-3xl' />
+      <CardHeader>
+        <h1 className='text-3xl font-black uppercase tracking-wider'>Prediction History</h1>
+        <div className='flex flex-wrap justify-center items-center gap-4 text-sm font-medium mt-2 relative z-10'>
+          <div className='flex justify-center items-center gap-4'>
+            <p className='text-muted-foreground'>Accuracy:{' '}
+              <span className='text-foreground font-bold'>
+                {stats.count.correct}/{stats.count.total}
+              </span>
+            </p>
+            <p className='text-muted-foreground'>Points:{' '}
+              <span className='text-foreground font-bold'>
+                {stats.points.earned}/{stats.points.possible}
+              </span>
+            </p>
+          </div>
+          <Select
+            value={`${selectedMemberId}`}
+            onValueChange={value => {
+              setSelectedMemberId(+value);
+              setResetCarousel(true);
+            }}>
+            <SelectTrigger className='w-min'>
+              <SelectValue placeholder='Select Member' />
+            </SelectTrigger>
+            <SelectContent>
+              {leagueMembers?.members
+                .sort((a, b) => {
+                  if (a.loggedIn) return -1;
+                  if (b.loggedIn) return 1;
+                  return a.displayName.localeCompare(b.displayName);
+                })
+                .map(member => (
+                  <SelectItem key={member.memberId} value={`${member.memberId}`}>
+                    <ColorRow color={member.color} className='w-full'>
+                      {member.displayName}
+                    </ColorRow>
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </CardHeader>
+      <CardContent className='flex flex-col px-0 my-4 text-center overflow-hidden bg-accent/50 rounded-lg border-2 border-primary/20 overflow-x-clip p-0 mb-4 origin-top h-fit overflow-y-clip w-[90%] relative z-10 mx-auto'>
+        <h2 className='text-2xl font-bold uppercase tracking-wider bg-primary/10 py-2'>
+          No predictions made yet for this member.
+        </h2>
+      </CardContent>
+    </Card>
+  );
+
 
   if (stats.count.episodes.size === 1) {
-    const prediction = Object.entries(predictionsWithEvents)[0];
-    if (!prediction) return null;
+    const prediction = Object.entries(predictionsWithEvents)[0]!;
 
     const [episode, preds] = prediction;
     return (
