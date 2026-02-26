@@ -106,7 +106,8 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
                 color={member.color}
                 doubleBelow={!!maxRows && maxRows <= loggedInIndex && maxRows - 2 === index}
                 overrideHash={overrideHash}
-                shotInTheDarkStatus={shotInTheDarkStatus?.[member.memberId]} />
+                shotInTheDarkStatus={shotInTheDarkStatus?.[member.memberId]}
+                isAiring={keyEpisodes?.previousEpisode?.airStatus === 'Airing'} />
             );
           })}
         </TableBody>
