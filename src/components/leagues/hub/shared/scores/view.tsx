@@ -7,12 +7,14 @@ import { Carousel, CarouselContent, CarouselItem } from '~/components/common/car
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/common/tabs';
 import { useTabsCarousel } from '~/hooks/ui/useTabsCarousel';
 import { Card, CardContent, CardHeader } from '~/components/common/card';
+import { useIsMobile } from '~/hooks/ui/useMobile';
 
 interface ScoresProps {
   isActive?: boolean;
 }
 
 export default function Scores({ isActive = false }: ScoresProps) {
+  const isMobile = useIsMobile();
   const scoreTabs = ['podium', 'scoreboard', 'chart'] as const;
   type ScoreTab = typeof scoreTabs[number];
 
@@ -35,7 +37,7 @@ export default function Scores({ isActive = false }: ScoresProps) {
           </TabsList>
         </CardHeader>
         <CardContent className='p-0'>
-          <Carousel className='' setApi={setApi}>
+          <Carousel opts={{ watchDrag: !isMobile }} setApi={setApi}>
             <CarouselContent>
               {!isActive && (
                 <CarouselItem>
