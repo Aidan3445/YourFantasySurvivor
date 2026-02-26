@@ -42,14 +42,13 @@ export default function SeasonsPage() {
 
   const updateParams = useCallback(
     (seasonId: number | null, tab: Tab) => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(searchParams.toString());
       if (seasonId !== null) {
         params.set('season', seasonId.toString());
       }
       params.set('tab', tab);
       router.replace(`?${params.toString()}`, { scroll: false });
-    },
-    [router]
+    }, [router, searchParams]
   );
 
   // Auto-select most recent season on mount (only if no query param)

@@ -10,6 +10,7 @@ import EventRow from '~/components/shared/eventTimeline/table/row/eventRow';
 import { useMemo } from 'react';
 import { type LeagueMember } from '~/types/leagueMembers';
 import StreakRow from '~/components/shared/eventTimeline/table/row/streakRow';
+import { eventSortOrder } from '~/lib/events';
 
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
@@ -135,6 +136,7 @@ export default function EpisodeEventsTableBody({
       }
       {baseEvents
         .filter(event => !filteredEvents.some(fe => fe.eventId === event.eventId && fe.predOnly))
+        .sort((a, b) => eventSortOrder(a.eventName) - eventSortOrder(b.eventName))
         .map((event, index) => (
           <EventRow key={index} event={event} editCol={edit} noMembers={noMembers} noPoints={!leagueData} />
         ))}

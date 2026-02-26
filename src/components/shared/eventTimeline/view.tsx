@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import TimelineFilters from '~/components/shared/eventTimeline/filters';
 import EpisodeEvents from '~/components/shared/eventTimeline/table/view';
@@ -18,15 +18,14 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const paramEpisode = searchParams.get('episode');
-
   const [filterCastaway, setFilterCastaway] = useState<number[]>([]);
   const [filterTribe, setFilterTribe] = useState<number[]>([]);
   const [filterMember, setFilterMember] = useState<number[]>([]);
   const [filterEvent, setFilterEvent] = useState<string[]>([]);
-  const [selectedEpisode, setSelectedEpisode] = useState<number | undefined>(
-    paramEpisode ? Number(paramEpisode) : undefined
-  );
+  const selectedEpisode = useMemo(() => {
+    const ep = searchParams.get('episode');
+    return ep ? Number(ep) : undefined;
+  }, [searchParams]);
 
   const updateEpisodeParam = useCallback(
     (episode: number | undefined) => {
@@ -46,11 +45,8 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
 
   const handleEpisodeChange = useCallback(
     (episode: number | undefined) => {
-      setSelectedEpisode(episode);
       updateEpisodeParam(episode);
-    },
-    [updateEpisodeParam]
-  );
+    }, [updateEpisodeParam]);
 
   const seasonDataWithDates = useMemo(() => {
     if (seasonData.episodes?.[0]?.airDate instanceof Date) return seasonData;
@@ -68,28 +64,22 @@ export default function EventTimeline({ seasonData, leagueData, hideMemberFilter
     };
   }, [seasonData]);
 
-  // Auto-select episode when season changes (skip on mount if param exists)
-  const isInitialMount = useRef(true);
   useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      if (paramEpisode) return; // respect query param on first load
-    }
+    if (searchParams.get('episode')) return;
 
     const episodes = seasonDataWithDates.episodes;
     if (!episodes?.length) return;
 
     const now = new Date();
     const sorted = [...episodes].sort((a, b) => a.episodeNumber - b.episodeNumber);
+    const airedEpisodes = sorted.filter(ep => ep.airDate <= now);
 
-    // Find currently airing or most recently aired episode
-    const airedEpisodes = sorted.filter(ep => new Date(ep.airDate) <= now);
-    const episode = airedEpisodes.length > 0
-      ? airedEpisodes[airedEpisodes.length - 1]! // most recent aired
-      : sorted[0]!; // fallback to first episode
+    const episode = airedEpisodes.length
+      ? airedEpisodes[airedEpisodes.length - 1]
+      : sorted[0];
 
-    handleEpisodeChange(episode.episodeNumber);
-  }, [seasonDataWithDates.season.seasonId]); // eslint-disable-line react-hooks/exhaustive-deps
+    updateEpisodeParam(episode?.episodeNumber);
+  }, [seasonDataWithDates.season.seasonId, searchParams, seasonDataWithDates.episodes, updateEpisodeParam]);
 
   return (
     <Card className='w-[calc(100svw-2rem)] md:w-[calc(100svw-3.25rem-var(--sidebar-width))] pb-0 bg-card rounded-lg border-2 border-primary/20'>
