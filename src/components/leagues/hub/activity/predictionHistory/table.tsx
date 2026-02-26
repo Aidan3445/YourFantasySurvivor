@@ -21,9 +21,10 @@ import PointsCell from '~/components/shared/eventTimeline/table/row/pointsCell';
 
 interface PredictionTableProps {
   predictions: PredictionWithEvent[];
+  className?: string;
 }
 
-export default function PredctionTable({ predictions }: PredictionTableProps) {
+export default function PredctionTable({ predictions, className }: PredictionTableProps) {
   const { data: league } = useLeague();
   const { data: keyEpisodes } = useKeyEpisodes(league?.seasonId ?? null);
   const { data: castaways } = useCastaways(league?.seasonId ?? null);
@@ -55,7 +56,8 @@ export default function PredctionTable({ predictions }: PredictionTableProps) {
   return (
     <ScrollArea className={cn(
       predictions.length >= 4 && 'max-h-44 **:data-radix-scroll-area-viewport:max-h-44',
-      'transform-gpu will-change-transform'
+      'transform-gpu will-change-transform',
+      className
     )}>
       <Table>
         <TableCaption className='sr-only'>Member Predictions</TableCaption>
