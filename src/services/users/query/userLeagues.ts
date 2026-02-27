@@ -9,6 +9,7 @@ import { type CurrentSelection, type LeagueMember } from '~/types/leagueMembers'
 import { castawaySchema } from '~/server/db/schema/castaways';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
 import { EliminationEventNames } from '~/lib/events';
+import { episodeSchema } from '~/server/db/schema/episodes';
 
 /**
  * Get the leagues that you're a member of
@@ -37,9 +38,28 @@ export default async function getUserLeagues(userId: string) {
       currentSelection: {
         castawayId: castawaySchema.castawayId,
         fullName: castawaySchema.fullName,
-        isEliminated: sql<boolean>`
-          CASE WHEN ${baseEventSchema.baseEventId} IS NOT NULL 
-          THEN TRUE ELSE FALSE END`.as('isEliminated'),
+        isEliminated: sql<boolean>`(
+            SELECT COALESCE(
+              MAX(CASE WHEN ${baseEventSchema.eventName} IN (${sql.join(
+          EliminationEventNames.map(n => sql`${n}`), sql`, `
+        )}) THEN ${episodeSchema.episodeNumber} END),
+              0
+            ) > COALESCE(
+              MAX(CASE WHEN ${baseEventSchema.eventName} = 'redemption'
+                THEN ${episodeSchema.episodeNumber} END),
+              0
+            )
+            FROM ${baseEventSchema}
+            INNER JOIN ${baseEventReferenceSchema}
+              ON ${baseEventSchema.baseEventId} = ${baseEventReferenceSchema.baseEventId}
+            INNER JOIN ${episodeSchema}
+              ON ${baseEventSchema.episodeId} = ${episodeSchema.episodeId}
+            WHERE ${baseEventReferenceSchema.referenceId} = ${castawaySchema.castawayId}
+              AND ${baseEventReferenceSchema.referenceType} = 'Castaway'
+              AND ${baseEventSchema.eventName} IN (${sql.join(
+          [...EliminationEventNames, 'redemption'].map(n => sql`${n}`), sql`, `
+        )})
+        )`.as('isEliminated'),
       },
     })
     .from(leagueMemberSchema)
