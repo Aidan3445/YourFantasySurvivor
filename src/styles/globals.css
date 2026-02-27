@@ -319,6 +319,15 @@
   .shimmer-fast::before {
     @apply animate-shimmer-fast;
   }
+
+  .table-sticky-left {
+    @apply sticky left-0 pr-0 py-0;
+  }
+
+  .table-sticky-left > div {
+    @apply min-w-[30svw] md:min-w-auto border-r-2 border-r-secondary h-full;
+    @apply place-content-center text-inherit text-pretty md:text-nowrap pr-1;
+  }
 }
 
 /* Sidebar */

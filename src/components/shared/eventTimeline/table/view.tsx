@@ -7,7 +7,6 @@ import {
   TableBody,
   TableCaption,
   TableCell,
-  TableHead,
   TableHeader,
   TableRow,
 } from '~/components/common/table';
@@ -16,6 +15,7 @@ import { findTribeCastaways } from '~/lib/utils';
 import { type Prediction, type EventWithReferences } from '~/types/events';
 import { type SeasonsDataQuery } from '~/types/seasons';
 import type { LeagueData } from '~/components/shared/eventTimeline/filters';
+import HeaderRow from '~/components/shared/eventTimeline/table/row/headerRow';
 
 
 export interface EpisodeEventsProps {
@@ -262,35 +262,12 @@ export default function EpisodeEvents({
       <Table className='w-full'>
         <TableCaption className='sr-only'>Events from the previous episode</TableCaption>
         <TableHeader>
-          <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-white/80 px-4 gap-4 items-center text-nowrap'>
-            {edit && (
-              <TableHead className='w-0 font-bold uppercase text-xs tracking-wider'>
-                Edit
-              </TableHead>
-            )}
-            <TableHead className='font-bold uppercase text-xs tracking-wider w-0'>
-              Event
-            </TableHead>
-            {leagueData && (
-              <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>
-                Points
-              </TableHead>
-            )}
-            <TableHead className='font-bold uppercase text-xs tracking-wider'>
-              {noTribes ? null : 'Tribes'}
-            </TableHead>
-            <TableHead className='text-left font-bold uppercase text-xs tracking-wider'>
-              Castaways
-            </TableHead>
-            {!noMembers && (
-              <TableHead className='w-full font-bold uppercase text-xs tracking-wider'>
-                Members
-              </TableHead>
-            )}
-            <TableHead className='font-bold uppercase text-xs tracking-wider'>
-              Notes
-            </TableHead>
-          </TableRow>
+          <HeaderRow
+            label='Events'
+            edit={edit}
+            leagueData={!!leagueData}
+            noTribes={noTribes}
+            noMembers={noMembers} />
         </TableHeader>
         <TableBody>
           {episodes?.filter((episode) =>
@@ -322,6 +299,6 @@ export default function EpisodeEvents({
         </TableBody>
       </Table>
       <ScrollBar hidden orientation='horizontal' />
-    </ScrollArea>
+    </ScrollArea >
   );
 }

@@ -27,14 +27,16 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
   const event = prediction.event;
 
   return (
-    <TableRow className={className}>
+    <TableRow className={cn('group', className)}>
       {editCol && <TableCell className='w-0' />}
-      <TableCell className='text-nowrap text-start'>
-        {isBaseEvent &&
-          <p className='text-xs text-muted-foreground'>
-            {BaseEventFullName[event.eventName as BaseEventName]}
-          </p>}
-        {label}
+      <TableCell className='table-sticky-left text-start transition-colors bg-card group-hover:bg-muted'>
+        <div>
+          {isBaseEvent &&
+            <p className='text-xs text-muted-foreground'>
+              {BaseEventFullName[event.eventName as BaseEventName]}
+            </p>}
+          {label}
+        </div>
       </TableCell>
       <PointsCell points={prediction.points} />
       <TableCell className='text-center' style={{ height: 'inherit' }}>
