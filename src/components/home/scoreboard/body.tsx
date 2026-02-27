@@ -35,20 +35,31 @@ export default function ScorboardBody({
             : [];
         }
 
+        // place is index + 1 - number of members above them with same score
+        const numberSameScore = sortedCastaways.slice(0, index)
+          .filter(([_cid, s]) => (s.slice().pop() ?? 0) === totalPoints)
+          .length;
+        const place = index + 1 - numberSameScore;
+
+        const secondNumberSameScore = secondTotalPoints ? sortedCastaways.slice(0, index + castawaySplitIndex)
+          .filter(([_cid, s]) => (s.slice().pop() ?? 0) === secondTotalPoints)
+          .length : 0;
+        const secondPlace = secondScores ? index + 1 + castawaySplitIndex - secondNumberSameScore : undefined;
+
         return (
           <TableRow
             key={`${castawayId}-${secondCastawayId ?? 'empty'}`}
             className='border-b border-primary/10 hover:bg-primary/5 hover:border-primary/20 transition-all group'>
             <CastawayRow
               allZero={allZero}
-              place={index + 1}
+              place={place}
               castaway={castaway}
               points={totalPoints}
               tribeTimeline={tribeTimeline} />
-            {secondCastawayId && secondScores && (
+            {secondCastawayId && secondScores && secondPlace && (
               <CastawayRow
                 allZero={allZero}
-                place={index + 1 + castawaySplitIndex}
+                place={secondPlace}
                 castaway={secondCastaway}
                 points={secondTotalPoints}
                 tribeTimeline={secondTribeTimeline} />

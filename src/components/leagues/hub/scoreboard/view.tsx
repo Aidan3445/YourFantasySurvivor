@@ -84,10 +84,11 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
             } else if (!leagueRules?.secondaryPick?.publicPicks && loggedInIndex !== index) {
               secondaryPick = null;
             }
+            const points = scores.slice().pop() ?? 0;
 
             // place is index + 1 - number of members above them with same score
             const numberSameScore = sortedMemberScores.slice(0, index)
-              .filter(({ scores: s }) => (s.slice().pop() ?? 0) === (scores.slice().pop() ?? 0))
+              .filter(({ scores: s }) => (s.slice().pop() ?? 0) === points)
               .length;
             const place = index + 1 - numberSameScore;
 
@@ -102,7 +103,7 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
                 secondaryPick={secondaryPick}
                 secondaryPickList={selectionTimeline?.secondaryPicks?.[member.memberId]?.map(
                   (id) => castaways?.find((c) => c.castawayId === id) ?? null) ?? []}
-                points={scores.slice().pop() ?? 0}
+                points={points}
                 color={member.color}
                 doubleBelow={!!maxRows && maxRows <= loggedInIndex && maxRows - 2 === index}
                 overrideHash={overrideHash}

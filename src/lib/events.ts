@@ -16,7 +16,8 @@ export const BaseEventNames = [
   'noVoteExit',
   'tribeUpdate',
   'redemption',
-  'otherNotes'] as const;
+  'otherNotes'
+] as const;
 
 export const BaseEventFullName: Record<BaseEventName, string> = {
   advFound: 'Advantage Found',
