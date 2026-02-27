@@ -11,6 +11,7 @@ import { useMemo } from 'react';
 import { type LeagueMember } from '~/types/leagueMembers';
 import StreakRow from '~/components/shared/eventTimeline/table/row/streakRow';
 import { eventSortOrder } from '~/lib/events';
+import HeaderRow from '~/components/shared/eventTimeline/table/row/headerRow';
 
 interface EpisodeEventsTableBodyProps extends EpisodeEventsProps {
   seasonId: number;
@@ -106,12 +107,16 @@ export default function EpisodeEventsTableBody({
       {index > 0 &&
         <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-white/80 px-4 gap-4 items-center text-nowrap'>
           {edit && (
-            <TableHead className='w-0 font-bold uppercase text-xs tracking-wider'>
-              Edit
+            <TableHead className='sticky left-0 bg-white w-0 font-bold uppercase text-xs tracking-wider'>
+              <div className='sm:border-r-none border-r-2 border-r-secondary h-full place-content-center'>
+                Edit
+              </div>
             </TableHead>
           )}
-          <TableHead className='font-bold uppercase text-xs tracking-wider w-0'>
-            Event
+          <TableHead className='sticky left-0 font-bold uppercase text-xs tracking-wider w-0 bg-white pr-0'>
+            <div className='max-w sm:border-r-none border-r-2 border-r-secondary h-full place-content-center'>
+              Event
+            </div>
           </TableHead>
           {leagueData && (
             <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>
@@ -140,23 +145,27 @@ export default function EpisodeEventsTableBody({
         .map((event, index) => (
           <EventRow key={index} event={event} editCol={edit} noMembers={noMembers} noPoints={!leagueData} />
         ))}
-      {customEvents.length > 0 &&
-        <TableRow className='bg-gray-100 hover:bg-gray-200'>
-          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center font-bold uppercases tracking-wider'>
-            Custom Events
-          </TableCell>
-        </TableRow>}
+      {customEvents.length > 0 && (
+        <HeaderRow
+          label='Custom Events'
+          leagueData={!!leagueData}
+          edit={edit}
+          noTribes={noTribes}
+          noMembers={noMembers} />
+      )}
       {customEvents
         .filter(event => !filteredEvents.some(fe => fe.eventId === event.eventId && fe.predOnly))
         .map((event, index) => (
           <EventRow key={index} event={event} editCol={edit} noMembers={noMembers} />
         ))}
-      {enrichedPredictions.length + enrichedMockPredictions.length > 0 &&
-        <TableRow className='bg-gray-100 hover:bg-gray-200'>
-          <TableCell colSpan={7} className='text-xs text-muted-foreground text-center font-bold uppercases tracking-wider'>
-            Predictions
-          </TableCell>
-        </TableRow>}
+      {enrichedPredictions.length + enrichedMockPredictions.length > 0 && (
+        <HeaderRow
+          label='Predictions'
+          leagueData={!!leagueData}
+          edit={edit}
+          noTribes={noTribes}
+          noMembers={noMembers} />
+      )}
       {enrichedMockPredictions.map((mock, index) =>
         <PredictionRow key={index} className='bg-yellow-500' prediction={mock} editCol={edit} noMembers={noMembers} />
       )}
@@ -176,11 +185,13 @@ export default function EpisodeEventsTableBody({
       )}
       {!edit && Object.keys(streakGroups).length > 0 && (
         <>
-          <TableRow className='bg-gray-100 hover:bg-gray-200'>
-            <TableCell colSpan={7} className='text-xs text-muted-foreground text-center font-bold uppercases tracking-wider'>
-              Survival Streaks
-            </TableCell>
-          </TableRow>
+          <HeaderRow
+            label='Survival Streaks'
+            leagueData={!!leagueData}
+            edit={edit}
+            noTribes={noTribes}
+            noMembers={noMembers}
+            labelOnly />
           {Object.entries(streakGroups)
             .sort(([a], [b]) => Number(b) - Number(a))
             .map(([streakPointValue, members]) => (

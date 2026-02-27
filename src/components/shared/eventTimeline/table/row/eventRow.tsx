@@ -30,7 +30,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
   const label = useEventLabel(event.eventName, isBaseEvent, event.label);
 
   return (
-    <TableRow className={className}>
+    <TableRow className={cn('group', className)}>
       {edit ? (
         isMock ?
           <TableCell className='w-0' /> :
@@ -38,13 +38,15 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
             <EditEvent event={event} />
           </TableCell>) :
         null}
-      <TableCell className='text-nowrap text-start'>
-        {isBaseEvent && (
-          <p className='text-xs text-muted-foreground text-nowrap'>
-            {BaseEventFullName[event.eventName as BaseEventName]}
-          </p>
-        )}
-        {label}
+      <TableCell className='table-sticky-left text-start transition-colors bg-card group-hover:bg-muted'>
+        <div>
+          {isBaseEvent && (
+            <p className='text-pretty text-xs text-muted-foreground'>
+              {BaseEventFullName[event.eventName as BaseEventName]}
+            </p>
+          )}
+          {label}
+        </div>
       </TableCell>
       {!noPoints && (
         <PointsCell points={event.points} />

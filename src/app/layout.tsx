@@ -11,6 +11,7 @@ import QueryClientContextProvider from '~/context/reactQueryContext';
 import FloatingActionsWidget from '~/components/shared/floatingActions/widget';
 import { RebrandNotice } from '~/components/sys/rebrand';
 import { TestFlightInvite } from '~/components/sys/testflightInvite';
+import { LateLeagueTip } from '~/components/sys/lateLeagueTip';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -58,6 +59,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
                 <Suspense fallback={null}>
                   <TestFlightInvite />
                   <RebrandNotice />
+                  <LateLeagueTip />
                 </Suspense>
               </SidebarProvider>
             </body>

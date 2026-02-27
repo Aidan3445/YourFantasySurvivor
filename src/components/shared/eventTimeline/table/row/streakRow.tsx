@@ -26,7 +26,7 @@ export default function StreakRow({
 }: StreakRowProps) {
   return (
     <TableRow>
-      <TableCell className='text-nowrap text-start sr-only'>Streak Bonus</TableCell>
+      <TableCell className='table-sticky-left hidden lg:table-cell' />
       <PointsCell points={Number(streakPointValue)} />
       <TableCell colSpan={4}>
         <div className='flex flex-wrap gap-2'>
@@ -82,6 +82,7 @@ export default function StreakRow({
           })}
         </div>
       </TableCell>
+      <TableCell />
     </TableRow>
 
   );

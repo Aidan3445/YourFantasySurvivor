@@ -12,13 +12,19 @@ import CreateLeagueForm from '~/components/leagues/actions/league/create/view';
 interface CreateLeagueModalProps {
   children: ReactNode;
   className?: string;
+  onClose?: () => void;
 }
 
-export default function CreateLeagueModal({ children, className }: CreateLeagueModalProps) {
+export default function CreateLeagueModal({ children, className, onClose }: CreateLeagueModalProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (!open && onClose) onClose();
+  };
+
   return (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+    <AlertDialog open={isOpen} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger className={className} asChild>
         {children}
       </AlertDialogTrigger>
