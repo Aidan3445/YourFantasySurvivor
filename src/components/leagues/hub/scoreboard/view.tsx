@@ -96,6 +96,7 @@ export default function Scoreboard({ overrideHash, maxRows, className }: Scorebo
               <MemberRow
                 key={index}
                 place={place}
+                index={index}
                 member={member}
                 currentStreak={currentStreaks?.[member.memberId] ?? 0}
                 castaway={castaway}

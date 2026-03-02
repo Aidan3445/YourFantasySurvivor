@@ -53,6 +53,7 @@ export default function ScorboardBody({
             <CastawayRow
               allZero={allZero}
               place={place}
+              index={index}
               castaway={castaway}
               points={totalPoints}
               tribeTimeline={tribeTimeline} />
@@ -60,6 +61,7 @@ export default function ScorboardBody({
               <CastawayRow
                 allZero={allZero}
                 place={secondPlace}
+                index={index * 2 + 1}
                 castaway={secondCastaway}
                 points={secondTotalPoints}
                 tribeTimeline={secondTribeTimeline} />
