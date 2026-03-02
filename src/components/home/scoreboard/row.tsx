@@ -13,13 +13,14 @@ import { rankBadgeColor } from '~/lib/scores';
 
 interface CastawayRowProps {
   place: number;
+  index: number;
   castaway?: EnrichedCastaway;
   points?: number;
   tribeTimeline?: { episode: number; tribe: Tribe; }[];
   allZero?: boolean;
 }
 
-export default function CastawayRow({ place, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
+export default function CastawayRow({ place, index, castaway, points, tribeTimeline, allZero }: CastawayRowProps) {
   const isTopThree = place <= 3 && !allZero;
 
   return (
@@ -30,7 +31,8 @@ export default function CastawayRow({ place, castaway, points, tribeTimeline, al
             <div className='relative'>
               <PlaceIcon
                 size={32}
-                className={rankBadgeColor(place)} />
+                className={rankBadgeColor(place)}
+                style={{ transform: `rotate(${index * 115}deg)` }} />
               <div className={cn(
                 'absolute top-1/2 transform -translate-y-1/2',
                 'flex items-center justify-center w-7.5 h-8 font-black rounded-full text-base tracking-tight',

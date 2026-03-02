@@ -17,6 +17,7 @@ import { rankBadgeColor } from '~/lib/scores';
 
 interface MemberRowProps {
   place: number;
+  index: number;
   member: LeagueMember;
   currentStreak?: number;
   castaway?: EnrichedCastaway;
@@ -33,6 +34,7 @@ interface MemberRowProps {
 
 export default function MemberRow({
   place,
+  index,
   member,
   currentStreak,
   castaway,
@@ -56,7 +58,8 @@ export default function MemberRow({
         <div className='relative'>
           <PlaceIcon
             size={32}
-            className={rankBadgeColor(place)} />
+            className={rankBadgeColor(place)}
+            style={{ transform: `rotate(${index * 115}deg)` }} />
           <div className={cn(
             'absolute top-1/2 transform -translate-y-1/2',
             'flex items-center justify-center w-7.5 h-8 font-black rounded-full text-base tracking-tight',
