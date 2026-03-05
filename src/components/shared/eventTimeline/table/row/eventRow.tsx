@@ -45,7 +45,11 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
               {BaseEventFullName[event.eventName as BaseEventName]}
             </p>
           )}
-          {label}
+          {label.split('#/').map((part, index) => (
+            <p key={index} className='leading-tight text-pretty lg:text-nowrap'>
+              {part}
+            </p>
+          ))}
         </div>
       </TableCell>
       {!noPoints && (
@@ -65,9 +69,7 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
         </div>
       </TableCell>
       <TableCell className='text-right'>
-        <div className={cn(
-          'text-sm flex flex-col h-full gap-0.5 items-end',
-          event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.castaway)) && 'justify-center')}>
+        <div className={cn('text-sm flex flex-col h-full gap-0.5 items-end justify-center')}>
           {event.referenceMap?.map(({ pairs }) => (
             pairs.map(({ castaway }) =>
               <ColorRow

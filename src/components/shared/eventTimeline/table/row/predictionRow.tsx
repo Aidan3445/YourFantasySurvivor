@@ -35,17 +35,21 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
             <p className='text-xs text-muted-foreground'>
               {BaseEventFullName[event.eventName as BaseEventName]}
             </p>}
-          {label}
+          {label.split('#/').map((part, index) => (
+            <p key={index} className='leading-tight text-pretty lg:text-nowrap'>
+              {part}
+            </p>
+          ))}
         </div>
       </TableCell>
       <PointsCell points={prediction.points} />
       <TableCell className='text-center' style={{ height: 'inherit' }}>
-        <div className='h-full grid auto-rows-fr items-center'>
+        <div className='h-full flex flex-col gap-0.5 justify-center items-center'>
           {event.referenceMap.map(({ tribe }, index) => (
             tribe &&
             <ColorRow
               key={index}
-              className='leading-tight w-min'
+              className='leading-tight'
               color={tribe.tribeColor}>
               {tribe.tribeName}
             </ColorRow>
@@ -53,13 +57,9 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
         </div>
       </TableCell>
       <TableCell className='text-right'>
-        <div className={cn(
-          'text-sm flex flex-col h-full gap-0.5 items-end',
-          event.referenceMap.some(({ pairs }) => pairs.some(({ castaway }) =>
-            event.references.some(ref => ref.id === castaway.castawayId))) && 'justify-center')}>
-          {event.referenceMap.map(({ pairs }) => pairs.filter(({ castaway }) =>
-            event.references.some(ref => ref.id === castaway.castawayId))
-            .map(({ castaway }) =>
+        <div className={cn('text-sm flex flex-col h-full gap-0.5 items-end justify-center')}>
+          {event.referenceMap.filter(({ tribe }) => !tribe).map(({ pairs }) =>
+            pairs.map(({ castaway }) =>
               <ColorRow
                 key={castaway.castawayId}
                 className='leading-tight'

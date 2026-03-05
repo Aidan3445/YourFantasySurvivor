@@ -18,7 +18,7 @@ export default function ColorRow({ color, loggedIn, opaque, className, children 
         className
       )}
       style={{
-        backgroundColor: `${color ?? '#AAAAAA'}${opaque ? '80' : '20'}`,
+        backgroundColor: `${color ?? '#AAAAAA'}${opaque ? '80' : '40'}`,
         borderLeft: `0.25rem solid ${color ?? '#000000'}`,
       }}>
       {children}
