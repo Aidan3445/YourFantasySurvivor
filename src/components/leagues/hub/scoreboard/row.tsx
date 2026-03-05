@@ -52,6 +52,10 @@ export default function MemberRow({
   const isMobile = useIsMobile();
 
   const isTopThree = place <= 3;
+
+  const wholePoints = Math.floor(points);
+  const isHalfPoint = points - wholePoints > 0;
+
   return (
     <TableRow className={cn('hover:bg-primary/5 transition-colors', doubleBelow && 'border-double border-b-3')}>
       <TableCell className='px-3 py-3 w-0 text-left'>
@@ -72,7 +76,13 @@ export default function MemberRow({
       </TableCell>
       <TableCell>
         <div className='flex justify-center items-center pl-1'>
-          <h3 className='leading-none font-black text-lg tabular-nums text-primary'>{points}</h3>
+          <h3 className='leading-none font-black text-lg tabular-nums text-primary'>{Math.floor(points)}</h3>
+          {isHalfPoint &&
+            <div className='flex flex-col divide-y-2 divide-primary'>
+              <h2 className='leading-none font-black text-xs tabular-nums text-primary'>1</h2>
+              <h2 className='leading-none font-black text-xs tabular-nums text-primary'>2</h2>
+            </div>
+          }
           <PointsIcon className='inline w-4 h-4 fill-secondary -mt-0.5 mr-auto' />
         </div>
       </TableCell>
