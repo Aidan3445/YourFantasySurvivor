@@ -104,8 +104,9 @@ export function useEnrichPredictions(
         continue;
       }
 
-      const event = prediction.eventId ? lookupMaps.eventsById.get(prediction.eventId) : null;
-      if (!event) continue;
+      const eventRef = prediction.eventId ? lookupMaps.eventsById.get(prediction.eventId) : null;
+      if (!eventRef) continue;
+      const event = { ...eventRef };
 
       let existingPrediction = predictionGroups[prediction.eventName];
       if (!existingPrediction) {
@@ -137,6 +138,13 @@ export function useEnrichPredictions(
               existingRef.id === newRef.id &&
               existingRef.type === newRef.type))
         ];
+        existingPrediction.event.eventId = null;
+        if (!existingPrediction.event.label?.includes(event.label ?? '') && event.label) {
+          const newLabel = existingPrediction.event.label
+            ? `${existingPrediction.event.label}#/& ${event.label}`
+            : event.label;
+          existingPrediction.event.label = newLabel;
+        }
       }
 
       const member = lookupMaps.membersById.get(prediction.predictionMakerId);
@@ -203,4 +211,5 @@ export function useEnrichPredictions(
 
   return enrichedPredictions;
 }
+
 

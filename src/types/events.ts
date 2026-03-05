@@ -24,7 +24,7 @@ export type Event = {
   eventSource: EventSource;
   eventType: EventType;
   episodeNumber: number; // episode that the event occurred in
-  eventId: number;
+  eventId: number | null;
   eventName: string;
   label: string | null;
   notes: string[] | null;
