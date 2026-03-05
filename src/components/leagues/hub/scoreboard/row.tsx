@@ -76,7 +76,7 @@ export default function MemberRow({
       </TableCell>
       <TableCell>
         <div className='flex justify-center items-center pl-1'>
-          <h3 className='leading-none font-black text-lg tabular-nums text-primary'>{Math.floor(points)}</h3>
+          <h3 className='leading-none font-black text-lg tabular-nums text-primary'>{wholePoints}</h3>
           {isHalfPoint &&
             <div className='flex flex-col divide-y-2 divide-primary'>
               <h2 className='leading-none font-black text-xs tabular-nums text-primary'>1</h2>

@@ -55,9 +55,11 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
       <TableCell className='text-right'>
         <div className={cn(
           'text-sm flex flex-col h-full gap-0.5 items-end',
-          event.referenceMap.some((ref) => ref.pairs.some((pair) => pair.castaway)) && 'justify-center')}>
-          {event.referenceMap.map(({ pairs }) => (
-            pairs.map(({ castaway }) =>
+          event.referenceMap.some(({ pairs }) => pairs.some(({ castaway }) =>
+            event.references.some(ref => ref.id === castaway.castawayId))) && 'justify-center')}>
+          {event.referenceMap.map(({ pairs }) => pairs.filter(({ castaway }) =>
+            event.references.some(ref => ref.id === castaway.castawayId))
+            .map(({ castaway }) =>
               <ColorRow
                 key={castaway.castawayId}
                 className='leading-tight'
@@ -69,7 +71,7 @@ export default function PredictionRow({ className, prediction, editCol, defaultO
                 </CastawayPopover>
               </ColorRow>
             )
-          ))}
+          )}
         </div>
       </TableCell>
       {!noMembers && <TableCell colSpan={2} className='text-sm text-nowrap'>

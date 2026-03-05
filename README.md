@@ -1,4 +1,4 @@
-# [TrialByFire.com](https://trialbyfiresurvivor.com)
+# [TrialByFireSurvivor.com](https://trialbyfiresurvivor.com)
 #### The most customizable Fantasy Survivor league hosting service.
 
 ## Welcome to Trial by Fire!
