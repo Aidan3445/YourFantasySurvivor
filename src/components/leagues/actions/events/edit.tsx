@@ -62,6 +62,10 @@ export default function EditEvent({ event }: EditEventProps) {
   if (!userId && event.eventSource === 'Base') return null;
 
   const handleSubmit = reactForm.handleSubmit(async (data) => {
+    if (!event.eventId) {
+      alert('Missing event ID, something went wrong');
+      return;
+    }
     // determine if base or custom event
     const isBaseEvent = event.eventSource === 'Base';
     try {
@@ -86,6 +90,10 @@ export default function EditEvent({ event }: EditEventProps) {
   });
 
   const handleDelete = async () => {
+    if (!event.eventId) {
+      alert('Missing event ID, something went wrong');
+      return;
+    }
     // determine if base or custom event
     const isBaseEvent = event.eventSource === 'Base';
     try {
