@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { SidebarMenuButton, SidebarSeparator } from '~/components/common/sidebar';
+import { SidebarMenuButton } from '~/components/common/sidebar';
 import { Switch } from '~/components/common/switch';
 import SideNavLink from '~/components/nav/side/link';
 import DevEpisodeOverride from '~/components/nav/side/devEpisodeOverride';
@@ -34,7 +34,6 @@ export default function SysAdminNav({ userId, noRedirects }: SysAdminNavProps) {
 
   return (
     <>
-      <SidebarSeparator className='my-1' />
       <SideNavLink href='/sys' label='Data Import Page' />
       <SidebarMenuButton className='h-10!' asChild size='lg'>
         <div

@@ -37,7 +37,7 @@ export default function HeaderRow({ label, leagueData, edit, noMembers, noTribes
           {labelOnly ? null : 'Members'}
         </TableHead>
       )}
-      <TableHead className='font-bold uppercase text-xs tracking-wider'>
+      <TableHead className='font-bold uppercase text-xs tracking-wider text-right'>
         {labelOnly ? null : 'Notes'}
       </TableHead>
     </TableRow>

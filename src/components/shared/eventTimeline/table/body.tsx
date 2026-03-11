@@ -102,7 +102,7 @@ export default function EpisodeEventsTableBody({
   return (
     <>
       {enrichedMockEvents.map((mock, index) =>
-        <EventRow key={index} className='bg-yellow-500' event={mock} editCol={edit} isMock noMembers={noMembers} />
+        <EventRow key={index} className='bg-yellow-500' event={mock} editCol={edit} isMock noMembers={noMembers} noPoints={!leagueData} />
       )}
       {index > 0 &&
         <TableRow className='bg-white border-b-2 border-primary/20 hover:bg-white/80 px-4 gap-4 items-center text-nowrap'>
@@ -118,7 +118,7 @@ export default function EpisodeEventsTableBody({
               Event
             </div>
           </TableHead>
-          {leagueData && (
+          {leagueData && !edit && (
             <TableHead className='text-center font-bold uppercase text-xs tracking-wider'>
               Points
             </TableHead>
@@ -134,7 +134,7 @@ export default function EpisodeEventsTableBody({
               Members
             </TableHead>
           )}
-          <TableHead className='font-bold uppercase text-xs tracking-wider'>
+          <TableHead className='font-bold uppercase text-xs tracking-wider text-right'>
             Notes
           </TableHead>
         </TableRow>
