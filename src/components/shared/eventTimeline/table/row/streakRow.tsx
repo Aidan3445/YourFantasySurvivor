@@ -15,6 +15,7 @@ interface StreakRowProps {
   streaksMap: Record<number, Record<number, number>>; // memberId -> episodeNumber -> streakCount
   episodeNumber: number;
   shotInTheDarkStatus?: Record<number, { episodeNumber: number, status: 'pending' | 'saved' | 'wasted' } | null>;
+  noTribes?: boolean;
 }
 
 export default function StreakRow({
@@ -22,13 +23,13 @@ export default function StreakRow({
   members,
   streaksMap,
   episodeNumber,
-  shotInTheDarkStatus
+  shotInTheDarkStatus,
 }: StreakRowProps) {
   return (
     <TableRow>
       <TableCell className='table-sticky-left hidden lg:table-cell' />
       <PointsCell points={Number(streakPointValue)} />
-      <TableCell colSpan={4}>
+      <TableCell colSpan={3}>
         <div className='flex flex-wrap gap-2'>
           {members.map(member => {
             const shotStatus = shotInTheDarkStatus?.[member.memberId];
