@@ -16,14 +16,14 @@ export function HeroSection() {
       <CardContent className='relative z-10'>
         <div className='space-y-4'>
           {/* Hero Headline */}
-          <div>
+          <div className='w-fit mx-auto text-center'>
             <Image
               src='/LogoFull.png'
               alt='Trial by Fire Logo'
               width={350}
               height={100}
               className='mx-auto' />
-            <div className='flex items-center gap-2 mt-6 justify-center pr-56'>
+            <div className='flex items-center gap-2 mt-4'>
               <div className='h-1 w-16 bg-primary rounded-full' />
               <div className='h-1 w-8 bg-primary/50 rounded-full' />
               <div className='h-1 w-4 bg-primary/25 rounded-full' />
