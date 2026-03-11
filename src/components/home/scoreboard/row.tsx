@@ -32,7 +32,7 @@ export default function CastawayRow({ place, index, castaway, points, tribeTimel
               <PlaceIcon
                 size={32}
                 className={rankBadgeColor(place)}
-                style={{ transform: `rotate(${index * 115}deg)` }} />
+                style={{ transform: `rotate(${index * 105}deg)` }} />
               <div className={cn(
                 'absolute top-1/2 transform -translate-y-1/2',
                 'flex items-center justify-center w-7.5 h-8 font-black rounded-full text-base tracking-tight',
