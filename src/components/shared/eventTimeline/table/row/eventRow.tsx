@@ -38,7 +38,9 @@ export default function EventRow({ className, event, editCol: edit, isMock, noMe
             <EditEvent event={event} />
           </TableCell>) :
         null}
-      <TableCell className='table-sticky-left text-start transition-colors bg-card group-hover:bg-muted'>
+      <TableCell className={cn(
+        'table-sticky-left text-start transition-colors bg-card group-hover:bg-muted',
+        isMock && className)}>
         <div>
           {isBaseEvent && (
             <p className='text-pretty text-xs text-muted-foreground'>
