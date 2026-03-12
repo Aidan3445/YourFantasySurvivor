@@ -5,15 +5,20 @@ import { sendPushToUser } from '~/services/notifications/push';
 
 export async function POST() {
   return withSystemAdminAuth(async (userId) => {
+
+
     if (!userId) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
     }
 
+    const randomNum = Math.floor(Math.random() * 1000);
+
     try {
       await sendPushToUser(userId, {
         title: 'Test Notification',
-        body: 'If you see this, push notifications are working!',
+        body: `If you see this, push notifications are working! Random number: ${randomNum}`,
         data: { type: 'test' },
+        collapseId: 'test-notification',
       });
 
       return NextResponse.json({ message: 'Sent! Check your device.' }, { status: 200 });
