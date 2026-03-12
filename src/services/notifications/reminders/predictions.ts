@@ -172,7 +172,7 @@ export async function sendEpisodeStartingNotifications(episode: Episode) {
       data: { type: 'live_scoring_optin', episodeId: episode.episodeId },
       collapseId: `episode-${episode.episodeId}`,
     },
-    'liveScoring',
+    'episodeUpdates',
   );
 }
 
