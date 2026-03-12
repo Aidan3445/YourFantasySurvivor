@@ -83,7 +83,7 @@ export async function sendLiveScoringNotification(notification: LiveScoringNotif
       title,
       body,
       data: {
-        type: isPrediction ? 'live_prediction' : 'live_scoring_event',
+        type: isPrediction ? 'live_prediction' : 'live_event',
         seasonId: seasonId,
         leagueId,
         ...data,

@@ -14,7 +14,7 @@ import { EXPO_PUSH_URL } from '~/lib/qStash';
 export async function sendPushToUser(
   userId: string,
   message: PushMessage,
-  preferenceKey?: 'reminders' | 'leagueActivity' | 'episodeUpdates' | 'liveScoring',
+  preferenceKey?: 'reminders' | 'leagueActivity' | 'episodeUpdates',
 ) {
   const tokens = await db
     .select()
@@ -46,7 +46,7 @@ export async function sendPushToUser(
 export async function sendPushToUsers(
   userIds: string[],
   message: PushMessage,
-  preferenceKey?: 'reminders' | 'leagueActivity' | 'episodeUpdates' | 'liveScoring',
+  preferenceKey?: 'reminders' | 'leagueActivity' | 'episodeUpdates',
 ) {
   if (userIds.length === 0) return;
 

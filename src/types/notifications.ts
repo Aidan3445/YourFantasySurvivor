@@ -11,7 +11,6 @@ export type NotificationPreferences = {
   reminders: boolean;
   leagueActivity: boolean;
   episodeUpdates: boolean;
-  liveScoring: boolean;
 };
 
 export type PushMessage = {
