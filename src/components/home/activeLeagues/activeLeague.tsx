@@ -14,7 +14,7 @@ interface ActiveLeagueProps {
 
 export default function ActiveLeague({ league }: ActiveLeagueProps) {
   const statusConfig = {
-    Active: { label: 'LIVE', color: 'bg-green-500/20 text-green-600 stroke-green-600 border-green-500/40', icon: Trophy },
+    Active: { label: 'ACTIVE', color: 'bg-green-500/20 text-green-600 stroke-green-600 border-green-500/40', icon: Trophy },
     Draft: { label: 'DRAFT', color: 'bg-blue-500/20 text-blue-600 stroke-blue-600 border-blue-500/40', icon: Clock },
     Predraft: { label: 'UPCOMING', color: 'bg-yellow-500/20 text-yellow-600 stroke-yellow-600 border-yellow-500/40', icon: Clock },
     Inactive: { label: 'ENDED', color: 'bg-gray-500/20 text-gray-600 stroke-gray-600 border-gray-500/40', icon: Trophy },
@@ -31,7 +31,7 @@ export default function ActiveLeague({ league }: ActiveLeagueProps) {
         className='group block'>
         <div className='relative bg-primary/5 border-2 border-primary/20 rounded-lg p-4 hover:bg-primary/10 hover:border-primary/30 transition-all'>
           {/* Status Badge */}
-          <Badge className={cn('absolute top-0 right-0 flex items-center gap-1.5 rounded-md border-2 text-xs font-black tracking-wider pointer-events-none p-0', status.color)}>
+          <Badge className={cn('absolute top-0.5 right-0.5 flex items-center gap-1.5 rounded-md border-2 text-xs font-black tracking-wider pointer-events-none p-0', status.color)}>
             <StatusIcon className='w-3 h-3 stroke-inherit' />
             {status.label}
           </Badge>

@@ -18,7 +18,6 @@ export const pushTokens = createTable(
       reminders: boolean;
       leagueActivity: boolean;
       episodeUpdates: boolean;
-      liveScoring: boolean;
     }>()
   },
   (table) => [

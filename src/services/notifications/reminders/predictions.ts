@@ -120,7 +120,8 @@ and ${bothUsers.length} users needing both`);
       predictionUsers,
       {
         ...predictionMessages[timing],
-        data: { type: 'reminder', episodeId: episode.episodeId, timing }
+        data: { type: 'reminder', episodeId: episode.episodeId, timing },
+        collapseId: `prediction-reminder-${episode.episodeId}`,
       },
       'reminders',
     ),
@@ -128,7 +129,8 @@ and ${bothUsers.length} users needing both`);
       secondaryUsers,
       {
         ...secondaryMessages[timing],
-        data: { type: 'reminder_secondary', episodeId: episode.episodeId, timing }
+        data: { type: 'reminder_secondary', episodeId: episode.episodeId, timing },
+        collapseId: `prediction-reminder-${episode.episodeId}`,
       },
       'reminders',
     ),
@@ -136,7 +138,8 @@ and ${bothUsers.length} users needing both`);
       bothUsers,
       {
         ...bothMessages[timing],
-        data: { type: 'reminder_both', episodeId: episode.episodeId, timing }
+        data: { type: 'reminder_both', episodeId: episode.episodeId, timing },
+        collapseId: `prediction-reminder-${episode.episodeId}`,
       },
       'reminders',
     )
@@ -167,8 +170,9 @@ export async function sendEpisodeStartingNotifications(episode: Episode) {
       title: 'Episode Starting!',
       body: `Episode ${episode.episodeNumber} - ${episode.title} is starting. Tap to enable live scoring updates.`,
       data: { type: 'live_scoring_optin', episodeId: episode.episodeId },
+      collapseId: `episode-${episode.episodeId}`,
     },
-    'liveScoring',
+    'episodeUpdates',
   );
 }
 
@@ -196,6 +200,7 @@ export async function sendEpisodeFinishedNotifications(episode: Episode) {
       title: 'Episode Finished',
       body: 'Check your leagues to see what happened to the leaderboard!',
       data: { type: 'episode_finished', episodeId: episode.episodeId },
+      collapseId: `episode-${episode.episodeId}`,
     },
     'episodeUpdates',
   );

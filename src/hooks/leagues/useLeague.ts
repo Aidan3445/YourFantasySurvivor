@@ -7,7 +7,7 @@ import { type League } from '~/types/leagues';
   * Fetches league data based on the league hash from the URL parameters.
   * Adjusts stale time and fetch intervals based on the league status and episode airing status.
   * @param overrideHash Optional hash to override URL parameter.
-  * @returnObj `League & { isEpisodeAiring: boolean }`
+  * @returnObj `League`
   */
 export function useLeague(overrideHash?: string) {
   const params = useParams();
