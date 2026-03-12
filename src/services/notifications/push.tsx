@@ -82,8 +82,8 @@ async function sendPushMessages(tokens: string[], message: PushMessage) {
     body: message.body,
     sound: 'default',
     data: message.data,
+    ...(message.collapseId && { collapseId: message.collapseId }),
   }));
-
   // Expo recommends batches of 100
   const batches = chunk(messages, 100);
 

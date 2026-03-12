@@ -36,6 +36,7 @@ export async function sendDraftDateNotification(draft: ScheduledDraftData, withi
       title: 'Draft Update',
       body,
       data: { type: 'draft_date_changed', leagueHash: draft.leagueHash },
+      collapseId: `draft_${draft.leagueId}`,
     },
     'leagueActivity',
   );
@@ -86,6 +87,7 @@ export async function sendDraftReminderNotification(draft: ScheduledDraftData) {
       title: 'Draft in 1 Hour!',
       body: `The draft for ${draft.leagueName} starts in 1 hour!`,
       data: { type: 'draft_reminder_1hr', leagueHash: draft.leagueHash },
+      collapseId: `draft_${draft.leagueId}`,
     },
     'leagueActivity',
   );

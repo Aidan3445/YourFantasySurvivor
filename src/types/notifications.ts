@@ -18,6 +18,7 @@ export type PushMessage = {
   title: string;
   body: string;
   data?: Record<string, unknown>;
+  collapseId?: string;
 }
 
 export type ExpoPushMessage = {
@@ -26,6 +27,7 @@ export type ExpoPushMessage = {
   body: string;
   sound: 'default';
   data?: Record<string, unknown>;
+  collapseId?: string;
 }
 
 export type NotificationType =

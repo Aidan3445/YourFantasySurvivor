@@ -88,6 +88,7 @@ export async function sendLiveScoringNotification(notification: LiveScoringNotif
         leagueId,
         ...data,
       },
+      collapseId: `live-scoring-${episodeId}`,
     },
   );
 }
