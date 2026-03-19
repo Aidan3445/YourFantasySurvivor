@@ -313,13 +313,9 @@ export default function ChangeCastaway() {
                                                 className='w-20 justify-center leading-tight'
                                                 color={castaway.tribe.color}>
                                                 {castaway.tribe.name}
-                                              </ColorRow>}
-                                            {castaway.fullName}
-                                            {castaway.pickedBy?.loggedIn &&
-                                              <span className='text-xs text-muted-foreground'>
-                                                (Current Pick)
-                                              </span>
+                                              </ColorRow>
                                             }
+                                            {castaway.fullName}
                                           </span>
                                         </SelectItem>
                                       ))
@@ -362,7 +358,7 @@ export default function ChangeCastaway() {
                         <FormItem className='w-full'>
                           <FormControl>
                             <Select
-                              value={secondarySelected}
+                              value={secondarySelected ?? ''}
                               onValueChange={handleSelectionChange.bind(null, 'secondary')}>
                               <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
                                 <SelectValue placeholder='Select secondary pick' />
