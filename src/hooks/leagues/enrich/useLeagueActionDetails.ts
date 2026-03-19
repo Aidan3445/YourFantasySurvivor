@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { usePredictionTiming } from '~/hooks/leagues/usePredictionTiming';
 import { useSelectionTimeline } from '~/hooks/leagues/useSelectionTimeline';
 import { useLeagueMembers } from '~/hooks/leagues/useLeagueMembers';
-import { type Castaway, type EnrichedCastaway } from '~/types/castaways';
+import { type EnrichedCastaway } from '~/types/castaways';
 import { type LeagueMember } from '~/types/leagueMembers';
 import { useEliminations } from '~/hooks/seasons/useEliminations';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
@@ -73,44 +73,46 @@ export function useLeagueActionDetails(overrideHash?: string) {
         castawayFullName: string;
         castawayId: number;
       };
-      out: boolean
+      out: boolean;
     }[] = [];
 
     leagueMembers.members.forEach(member => {
       const selections = selectionTimeline.memberCastaways[member.memberId] ?? [];
-      const selectionId = selections[nextEpisode];
 
-      if (!selectionId) {
-        const lastSelectionId = selections.findLast(id => id !== null);
-        const lastCastaway = castaways?.find(c => c.castawayId === lastSelectionId);
-        picks.push({
-          member,
-          castawayFullName: lastCastaway ? lastCastaway.fullName : 'No Pick',
-          castawayId: lastCastaway ? lastCastaway.castawayId : -1,
-          out: true
-        });
-      }
+      // Use the selection at nextEpisode, or fall back to the last non-null selection
+      const selectionId = selections[nextEpisode]
+        ?? selections.findLast(id => id !== null)
+        ?? null;
 
       const castaway = castaways?.find(c => c.castawayId === selectionId);
 
-      let secondaryCastaway: Castaway | undefined = undefined;
+      // A member is "out" only if their castaway is eliminated and not still alive via redemption
+      const eliminatedEpisode = selectionId ? eliminationLookup.get(selectionId) : undefined;
+      const redemptionHistory = selectionId ? redemptionLookup.get(selectionId) : undefined;
+      const stillAliveViaRedemption = redemptionHistory?.some(r => r.secondEliminationEpisode === null);
+      const out = !!eliminatedEpisode && !stillAliveViaRedemption;
+
+      let secondary: { castawayFullName: string; castawayId: number } | undefined = undefined;
 
       if (settings?.secondaryPickEnabled) {
         const secondarySelections = selectionTimeline.secondaryPicks?.[member.memberId] ?? [];
-        const secondarySelectionId = secondarySelections[nextEpisode];
+        const secondarySelectionId = secondarySelections[nextEpisode] ?? null;
 
-        secondaryCastaway = castaways?.find(c => c.castawayId === secondarySelectionId);
+        const secondaryCastaway = castaways?.find(c => c.castawayId === secondarySelectionId);
+        if (secondaryCastaway) {
+          secondary = {
+            castawayFullName: secondaryCastaway.fullName,
+            castawayId: secondaryCastaway.castawayId,
+          };
+        }
       }
 
       picks.push({
         member,
-        castawayFullName: castaway ? castaway.fullName : 'No Pick',
-        castawayId: castaway ? castaway.castawayId : -1,
-        secondary: secondaryCastaway ? {
-          castawayFullName: secondaryCastaway.fullName,
-          castawayId: secondaryCastaway.castawayId
-        } : undefined,
-        out: false
+        castawayFullName: castaway?.fullName ?? 'No Pick',
+        castawayId: castaway?.castawayId ?? -1,
+        secondary,
+        out,
       });
     });
 
@@ -121,7 +123,9 @@ export function useLeagueActionDetails(overrideHash?: string) {
     leagueMembers,
     selectionTimeline,
     castaways,
-    settings?.secondaryPickEnabled
+    eliminationLookup,
+    redemptionLookup,
+    settings?.secondaryPickEnabled,
   ]);
 
   const actionDetails = useMemo(() => {
