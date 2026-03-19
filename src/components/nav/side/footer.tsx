@@ -4,7 +4,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
 import { SidebarMenuButton, SidebarMenu } from '~/components/common/sidebar';
 import { HelpCircle, LoaderCircle, LogIn } from 'lucide-react';
 import Link from 'next/link';
-import { type MouseEvent, useRef, useState } from 'react';
+import { type MouseEvent, useRef, useState, useEffect } from 'react';
 import TutorialModal from '~/components/shared/tutorial/modal';
 
 const APP_STORE_URL = 'https://apps.apple.com/app/id6759011635';
@@ -14,7 +14,8 @@ const BUY_ME_A_COFFEE_URL =
 export default function SideNavFooter() {
   const userButtonRef = useRef<HTMLDivElement>(null);
   const logInButtonRef = useRef<HTMLDivElement>(null);
-  const [cacheBuster] = useState(() => Date.now());
+  const [cacheBuster, setCacheBuster] = useState('');
+
   const handleMenuButtonClick = (ref: React.RefObject<HTMLDivElement>) => (e: MouseEvent) => {
     e.preventDefault();
     const userButtonTrigger = ref.current?.querySelector('button');
@@ -22,6 +23,12 @@ export default function SideNavFooter() {
       userButtonTrigger.click();
     }
   };
+
+  useEffect(() => {
+    // Set a cache buster to force reload the image and bypass any caching
+    setCacheBuster(`&t=${new Date().getTime()}`);
+  }, []);
+
   return (
     <SidebarMenu className='mt-2'>
       <TutorialModal>
@@ -39,7 +46,7 @@ export default function SideNavFooter() {
         <Link href='https://www.buymeacoffee.com/aidanweinberg' target='_blank' rel='noreferrer'>
           <img
             className='hover:scale-105 active:scale-[1.075] transition-all'
-            src={`${BUY_ME_A_COFFEE_URL}&t=${cacheBuster}`}
+            src={`${BUY_ME_A_COFFEE_URL}${cacheBuster}`}
             alt='Buy me a coffee'
             width={200}
             height={50} />

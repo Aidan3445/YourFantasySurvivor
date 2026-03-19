@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { db } from '~/server/db';
-import { and, eq, inArray, count, gte, gt, not } from 'drizzle-orm';
+import { and, eq, inArray, count, gt, not } from 'drizzle-orm';
 import { leagueSchema, leagueSettingsSchema } from '~/server/db/schema/leagues';
 import { leagueMemberSchema, secondaryPickSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { baseEventReferenceSchema, baseEventSchema } from '~/server/db/schema/baseEvents';
@@ -29,15 +29,17 @@ export default async function chooseCastawayLogic(
   }
 
   const result = await db.transaction(async (trx) => {
-    // Validate that we are not within the 48 hour priority window, with league members eliminated
     const now = new Date();
-    const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000).toISOString();
 
-    const eliminatedSelection = await trx
+    // Find all league members (excluding current user) whose castaway was eliminated
+    // within the priority window: airDate + runtime + 48h > now
+    const eliminatedSelections = await trx
       .select({
         memberId: selectionUpdateSchema.memberId,
         castawayId: selectionUpdateSchema.castawayId,
         episodeId: selectionUpdateSchema.episodeId,
+        airDate: episodeSchema.airDate,
+        runtime: episodeSchema.runtime,
       })
       .from(baseEventReferenceSchema)
       .innerJoin(baseEventSchema, and(
@@ -50,26 +52,60 @@ export default async function chooseCastawayLogic(
         eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId),
         eq(leagueMemberSchema.leagueId, auth.leagueId),
         not(eq(leagueMemberSchema.memberId, auth.memberId))
-      ))
-      .where(gte(episodeSchema.airDate, fortyEightHoursAgo));
+      ));
 
-    const allMadeNewSelection = await trx
+    // Filter to only those still within their priority window (airDate + runtime mins + 48h > now)
+    const stillInWindow = eliminatedSelections.filter(({ airDate, runtime }) => {
+      const windowEnd = new Date(airDate).getTime() + (runtime * 60 * 1000) + (48 * 60 * 60 * 1000);
+      return windowEnd > now.getTime();
+    });
+
+    // Check if current user is themselves in the priority list — if so, skip the block entirely
+    const currentUserEliminated = await trx
       .select({ memberId: selectionUpdateSchema.memberId })
-      .from(selectionUpdateSchema)
-      .where(and(
-        eq(selectionUpdateSchema.draft, false),
-        inArray(selectionUpdateSchema.memberId, eliminatedSelection.map(es => es.memberId)),
-        gt(selectionUpdateSchema.episodeId, eliminatedSelection[0]?.episodeId ?? 0)
+      .from(baseEventReferenceSchema)
+      .innerJoin(baseEventSchema, and(
+        eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
+        inArray(baseEventSchema.eventName, [...EliminationEventNames])
       ))
-      .then(res => res.length === eliminatedSelection.length);
+      .innerJoin(episodeSchema, eq(baseEventSchema.episodeId, episodeSchema.episodeId))
+      .innerJoin(selectionUpdateSchema, eq(selectionUpdateSchema.castawayId, baseEventReferenceSchema.referenceId))
+      .innerJoin(leagueMemberSchema, and(
+        eq(leagueMemberSchema.memberId, selectionUpdateSchema.memberId),
+        eq(leagueMemberSchema.leagueId, auth.leagueId),
+        eq(leagueMemberSchema.memberId, auth.memberId)
+      ))
+      .limit(1)
+      .then(res => res.length > 0);
 
-    if (eliminatedSelection.length > 0 && !allMadeNewSelection) {
-      console.error('A league member has a castaway eliminated within the last 48 hours and has not made a new selection', {
-        eliminatedSelection,
-        allMadeNewSelection,
-        auth
-      });
-      throw new Error('Cannot choose castaway at this time.');
+    if (stillInWindow.length > 0 && !currentUserEliminated) {
+      // Check per-member whether they've already made a new selection after their elimination episode
+      const membersMissingSelection = await Promise.all(
+        stillInWindow.map(async ({ memberId, episodeId }) => {
+          const hasPicked = await trx
+            .select({ memberId: selectionUpdateSchema.memberId })
+            .from(selectionUpdateSchema)
+            .where(and(
+              eq(selectionUpdateSchema.memberId, memberId),
+              eq(selectionUpdateSchema.draft, false),
+              gt(selectionUpdateSchema.episodeId, episodeId)
+            ))
+            .limit(1)
+            .then(res => res.length > 0);
+          return hasPicked ? null : memberId;
+        })
+      );
+
+      const anyMissingSelection = membersMissingSelection.some(id => id !== null);
+
+      if (anyMissingSelection) {
+        console.error('A league member has a castaway eliminated within the priority window and has not made a new selection', {
+          stillInWindow,
+          membersMissingSelection,
+          auth,
+        });
+        throw new Error('Cannot choose castaway at this time.');
+      }
     }
 
     // Get league and validate
@@ -187,7 +223,6 @@ export default async function chooseCastawayLogic(
         return { success: true, draftComplete: true };
       }
 
-      // Draft pick — no notification
       return { success: true };
     }
 
@@ -221,7 +256,6 @@ export default async function chooseCastawayLogic(
     };
   });
 
-  // Schedule notification outside transaction (active season only)
   if ('notify' in result && result.notify) {
     void scheduleSelectionChangeNotification(result.notify);
   }

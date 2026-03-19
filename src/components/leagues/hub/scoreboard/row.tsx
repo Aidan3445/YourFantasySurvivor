@@ -8,7 +8,6 @@ import { type LeagueMember } from '~/types/leagueMembers';
 import { type EnrichedCastaway } from '~/types/castaways';
 import { useLeagueSettings } from '~/hooks/leagues/useLeagueSettings';
 import CastawayPopover from '~/components/shared/castaways/castawayPopover';
-import EliminationIndicator from '~/components/shared/castaways/eliminationIndicator';
 import ShotInTheDarkPending from '~/components/leagues/hub/scoreboard/popover/shotInTheDarkPending';
 import SelectionHistory from '~/components/leagues/hub/scoreboard/popover/selectionHistory';
 import SurvivalStreaks from '~/components/leagues/hub/scoreboard/popover/survivalStreaks';
@@ -131,7 +130,6 @@ export default function MemberRow({
       ))}
       <TableCell className='w-0'>
         <div className='flex gap-1 items-center justify-end'>
-          <EliminationIndicator episode={castaway?.eliminatedEpisode} redemption={castaway?.redemption} />
           <SelectionHistory selectionList={selectionList} secondaryPickList={secondaryPickList} />
           {leagueSettings && leagueSettings.survivalCap > 0 && (
             <SurvivalStreaks
