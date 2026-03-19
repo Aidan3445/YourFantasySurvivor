@@ -200,9 +200,11 @@ export default function ChangeCastaway() {
   if (league?.status === 'Inactive') return null;
 
   const allCastawaysTaken = availableCastaways.every(castaway => castaway.pickedBy);
+  const loggedInMemberId = leagueMembers?.loggedIn?.memberId;
   const showPickPriorityNotice = !dialogOpen
     && keyEpisodes?.previousEpisode
     && pickPriority.length > 0
+    && !pickPriority.some(m => m.memberId === loggedInMemberId)
     && Date.now() - keyEpisodes.previousEpisode.airDate.getTime() < 1000 * 60 * 60 * 48;
 
   return (
@@ -247,11 +249,11 @@ export default function ChangeCastaway() {
                       Swap your Survivor Pick
                     </h2>
                   </div>
-                  {(currentSurvivorPick?.castawayId ?? 0) > 0 && (
+                  {currentSurvivorPick && (
                     <p className='text-sm text-muted-foreground mt-1 mb-2 ml-4'>
                       Current:{' '}
                       <span className='font-semibold text-foreground'>
-                        {currentSurvivorPick?.castawayFullName ?? 'Unknown'}
+                        {currentSurvivorPick.castawayFullName ?? 'Unknown'}
                       </span>
                     </p>
                   )}
