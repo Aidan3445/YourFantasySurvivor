@@ -45,8 +45,19 @@ export default function ChangeCastaway() {
     resolver: zodResolver(formSchema),
   });
   const [selected, setSelected] = useState('');
-  const [secondarySelected, setSecondarySelected] = useState('');
-  const [initialSecondaryPick, setInitialSecondaryPick] = useState<string>('');
+  const [secondarySelected, setSecondarySelected] = useState<string | undefined>(undefined);
+  const [initialSecondaryPick, setInitialSecondaryPick] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (leagueMembers?.loggedIn) {
+      const memberId = leagueMembers.loggedIn.memberId;
+      const currentPick = membersWithPicks.find(mwp => mwp.member.memberId === memberId && !mwp.out);
+      if (currentPick) {
+        setSelected(`${currentPick.castawayId}`);
+        reactForm.setValue('castawayId', currentPick.castawayId);
+      }
+    }
+  }, [leagueMembers, membersWithPicks, reactForm]);
 
   const secondaryPickSettings = rules?.secondaryPick;
 
@@ -149,21 +160,21 @@ export default function ChangeCastaway() {
     return lockoutMap;
   }, [secondaryPickSettings, leagueMembers, selectionTimeline, keyEpisodes]);
 
+  // Secondary init — search all picks regardless of out status
   useEffect(() => {
     if (!secondaryPickSettings?.enabled || !leagueMembers?.loggedIn || !membersWithPicks.length) return;
 
     const memberId = leagueMembers.loggedIn.memberId;
-    const currentPick = membersWithPicks
-      .find(mwp => mwp.member.memberId === memberId && !mwp.out);
+    const memberPick = membersWithPicks.find(mwp => mwp.member.memberId === memberId);
 
-    if (currentPick?.secondary) {
-      const secondaryId = `${currentPick.secondary.castawayId}`;
+    if (memberPick?.secondary) {
+      const secondaryId = `${memberPick.secondary.castawayId}`;
       setSecondarySelected(secondaryId);
       setInitialSecondaryPick(secondaryId);
-      reactForm.setValue('secondaryCastawayId', currentPick.secondary.castawayId);
+      reactForm.setValue('secondaryCastawayId', memberPick.secondary.castawayId);
     } else {
-      setSecondarySelected('');
-      setInitialSecondaryPick('');
+      setSecondarySelected(undefined);
+      setInitialSecondaryPick(undefined);
       reactForm.setValue('secondaryCastawayId', undefined);
     }
   }, [secondaryPickSettings, membersWithPicks, leagueMembers, reactForm]);
@@ -173,7 +184,7 @@ export default function ChangeCastaway() {
       setSelected(value);
       reactForm.setValue('castawayId', parseInt(value));
       if (value === secondarySelected) {
-        setSecondarySelected('');
+        setSecondarySelected(undefined);
         reactForm.setValue('secondaryCastawayId', undefined);
       }
     } else {
@@ -201,16 +212,20 @@ export default function ChangeCastaway() {
 
   const allCastawaysTaken = availableCastaways.every(castaway => castaway.pickedBy);
   const loggedInMemberId = leagueMembers?.loggedIn?.memberId;
+
+  const priorityTimeLeft = keyEpisodes?.previousEpisode
+    ? Math.floor(((1000 * 60 * 60 * 48 - (Date.now() - keyEpisodes.previousEpisode.airDate.getTime())) / 1000 / 60 / 60) + (keyEpisodes.previousEpisode.runtime / 60))
+    : -1;
+
   const showPickPriorityNotice = !dialogOpen
     && keyEpisodes?.previousEpisode
     && pickPriority.length > 0
     && !pickPriority.some(m => m.memberId === loggedInMemberId)
-    && Date.now() - keyEpisodes.previousEpisode.airDate.getTime() < 1000 * 60 * 60 * 48;
+    && priorityTimeLeft > 0;
 
   return (
     <Form {...reactForm}>
       <div className='flex flex-col gap-4 w-full'>
-        {/* Main picks card — swap form or unavailable notice + secondary + shot in the dark */}
         <Card className='w-full bg-card rounded-lg border-2 border-primary/20 p-4'>
           <form action={() => handleSubmit()}>
             <CardContent className='p-0 flex flex-col gap-4'>
@@ -228,13 +243,17 @@ export default function ChangeCastaway() {
                   <h1 className='text-xl font-bold uppercase tracking-wider'>Wait to Swap your Survivor Pick</h1>
                   <h3 className='text-sm text-muted-foreground'>
                     {'Recently Eliminated members have '}
-                    {Math.floor((1000 * 60 * 60 * 48 - (Date.now() - keyEpisodes.previousEpisode!.airDate.getTime())) / 1000 / 60 / 60)}
-                    {' hours left to pick first:'}
+                    {priorityTimeLeft > 0 && (
+                      priorityTimeLeft > 1
+                        ? `${priorityTimeLeft} hours`
+                        : 'less than 1 hour'
+                    )}
+                    {' left to pick first:'}
                   </h3>
                   {pickPriority.map((member) => (
-                    <span key={member.memberId} className='flex items-center gap-2'>
+                    <span key={member.memberId} className='flex justify-center items-center gap-2'>
                       <ColorRow
-                        className='justify-center leading-tight font-normal'
+                        className='justify-center leading-tight font-normal w-1/3 min-w-fit'
                         color={member.color}>
                         {member.displayName}
                       </ColorRow>
@@ -249,14 +268,6 @@ export default function ChangeCastaway() {
                       Swap your Survivor Pick
                     </h2>
                   </div>
-                  {currentSurvivorPick && (
-                    <p className='text-sm text-muted-foreground mt-1 mb-2 ml-4'>
-                      Current:{' '}
-                      <span className='font-semibold text-foreground'>
-                        {currentSurvivorPick.castawayFullName ?? 'Unknown'}
-                      </span>
-                    </p>
-                  )}
                   <span className='w-full flex flex-col lg:flex-row justify-center gap-x-4 gap-y-1 items-center mt-auto'>
                     <FormField
                       name='castawayId'
@@ -264,7 +275,6 @@ export default function ChangeCastaway() {
                         <FormItem className='w-full'>
                           <FormControl>
                             <Select
-                              defaultValue={selected}
                               value={selected}
                               onValueChange={handleSelectionChange.bind(null, 'survivor')}>
                               <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
@@ -272,10 +282,11 @@ export default function ChangeCastaway() {
                               </SelectTrigger>
                               <SelectContent className='z-50'>
                                 <SelectGroup>
-                                  {availableCastaways.map((castaway) => {
-                                    return ((castaway.pickedBy ??
-                                      (castaway.eliminatedEpisode && !castaway.redemption?.some((r) =>
-                                        r.secondEliminationEpisode === null)))
+                                  {availableCastaways.map((castaway) =>
+                                    currentSurvivorPick?.castawayId !== castaway.castawayId &&
+                                      (castaway.pickedBy ??
+                                        (castaway.eliminatedEpisode && !castaway.redemption?.some((r) =>
+                                          r.secondEliminationEpisode === null)))
                                       ? (
                                         <SelectLabel
                                           key={castaway.castawayId}
@@ -304,10 +315,15 @@ export default function ChangeCastaway() {
                                                 {castaway.tribe.name}
                                               </ColorRow>}
                                             {castaway.fullName}
+                                            {castaway.pickedBy?.loggedIn &&
+                                              <span className='text-xs text-muted-foreground'>
+                                                (Current Pick)
+                                              </span>
+                                            }
                                           </span>
                                         </SelectItem>
-                                      ));
-                                  })}
+                                      ))
+                                  }
                                 </SelectGroup>
                               </SelectContent>
                             </Select>
@@ -346,7 +362,6 @@ export default function ChangeCastaway() {
                         <FormItem className='w-full'>
                           <FormControl>
                             <Select
-                              key={secondarySelected || 'no-selection'}
                               value={secondarySelected}
                               onValueChange={handleSelectionChange.bind(null, 'secondary')}>
                               <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
@@ -377,7 +392,7 @@ export default function ChangeCastaway() {
                                           const episodesRemaining = lockoutInfo.episodesRemaining;
 
                                           if (episodesRemaining !== undefined && episodesRemaining > 0) {
-                                            disabledText += ` (Picked Ep ${episodePicked} - ${episodesRemaining} more ${episodesRemaining === 1 ? 'episode' : 'episodes'})`;
+                                            disabledText += ` (unavailable for ${episodesRemaining} more ${episodesRemaining === 1 ? 'episode' : 'episodes'})`;
                                           } else {
                                             disabledText += ` (Picked Ep ${episodePicked})`;
                                           }
