@@ -172,7 +172,9 @@ export default function ChangeCastaway() {
       setSecondarySelected(secondaryId);
       setInitialSecondaryPick(secondaryId);
       reactForm.setValue('secondaryCastawayId', memberPick.secondary.castawayId);
-    } else {
+    } else if (memberPick) {
+      // Only reset if we found the member but they have no secondary pick.
+      // Avoids clearing state during transient data gaps (e.g. refetch on tab switch).
       setSecondarySelected(undefined);
       setInitialSecondaryPick(undefined);
       reactForm.setValue('secondaryCastawayId', undefined);
@@ -202,6 +204,20 @@ export default function ChangeCastaway() {
     const memberId = leagueMembers.loggedIn.memberId;
     return membersWithPicks.find(mwp => mwp.member.memberId === memberId && !mwp.out) ?? null;
   }, [membersWithPicks, leagueMembers]);
+
+  const currentSecondaryPick = useMemo(() => {
+    if (!leagueMembers?.loggedIn) return null;
+    const memberId = leagueMembers.loggedIn.memberId;
+    return membersWithPicks.find(mwp => mwp.member.memberId === memberId)?.secondary ?? null;
+  }, [membersWithPicks, leagueMembers]);
+
+  // Fall back to data-derived picks when useEffect hasn't synced state yet
+  const selectedCastaway = availableCastaways.find(c => `${c.castawayId}` === selected)
+    ?? availableCastaways.find(c => c.castawayId === currentSurvivorPick?.castawayId)
+    ?? null;
+  const selectedSecondaryCastaway = availableCastaways.find(c => `${c.castawayId}` === secondarySelected)
+    ?? availableCastaways.find(c => c.castawayId === currentSecondaryPick?.castawayId)
+    ?? null;
 
   const markModalClosed = () => {
     setClosedDialog(true);
@@ -278,7 +294,20 @@ export default function ChangeCastaway() {
                               value={selected}
                               onValueChange={handleSelectionChange.bind(null, 'survivor')}>
                               <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
-                                <SelectValue placeholder='Select new survivor' />
+                                {selectedCastaway ? (
+                                  <span className='flex items-center justify-start gap-1 text-nowrap'>
+                                    {selectedCastaway.tribe &&
+                                      <ColorRow
+                                        className='w-20 justify-center leading-tight mr-1'
+                                        color={selectedCastaway.tribe.color}>
+                                        {selectedCastaway.tribe.name}
+                                      </ColorRow>
+                                    }
+                                    {selectedCastaway.fullName}
+                                  </span>
+                                ) : (
+                                  <SelectValue placeholder='Select new survivor' />
+                                )}
                               </SelectTrigger>
                               <SelectContent className='z-50'>
                                 <SelectGroup>
@@ -361,7 +390,20 @@ export default function ChangeCastaway() {
                               value={secondarySelected ?? ''}
                               onValueChange={handleSelectionChange.bind(null, 'secondary')}>
                               <SelectTrigger className='py-0 [&>span]:line-clamp-none'>
-                                <SelectValue placeholder='Select secondary pick' />
+                                {selectedSecondaryCastaway ? (
+                                  <span className='flex items-center justify-start gap-1 text-nowrap'>
+                                    {selectedSecondaryCastaway.tribe &&
+                                      <ColorRow
+                                        className='w-20 justify-center leading-tight mr-1'
+                                        color={selectedSecondaryCastaway.tribe.color}>
+                                        {selectedSecondaryCastaway.tribe.name}
+                                      </ColorRow>
+                                    }
+                                    {selectedSecondaryCastaway.fullName}
+                                  </span>
+                                ) : (
+                                  <SelectValue placeholder='Select secondary pick' />
+                                )}
                               </SelectTrigger>
                               <SelectContent className='z-50'>
                                 <SelectGroup>
