@@ -51,7 +51,7 @@ export default async function LeaguePage({ params }: LeaguePageProps) {
       </TabsList>
       <ScrollArea className='px-4 md:h-[calc(100svh-10.5rem)] h-[calc(100svh-9rem-var(--navbar-height))]'>
         <div className='pb-4 overflow-hidden'>
-          <TabsContent className='space-y-4' value='scores'>
+          <TabsContent className='space-y-4 data-[state=inactive]:hidden' value='scores' forceMount>
             <Scores isActive={isActive} />
             <ChangeCastaway />
             <Predictions />
