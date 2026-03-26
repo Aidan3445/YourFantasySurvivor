@@ -19,8 +19,13 @@ export default async function getEpisodes(
   seasonId: number,
   transactionOverride?: DBTransaction
 ) {
+  // Bypass cache when inside a transaction to ensure fresh airStatus
+  if (transactionOverride) {
+    return fetchEpisodes(seasonId, transactionOverride);
+  }
+
   return unstable_cache(
-    async (seasonId: number) => fetchEpisodes(seasonId, transactionOverride),
+    async (seasonId: number) => fetchEpisodes(seasonId),
     ['episodes', seasonId.toString()],
     {
       revalidate: 60, // 1 minute
