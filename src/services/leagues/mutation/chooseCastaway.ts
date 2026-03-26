@@ -44,7 +44,8 @@ export default async function chooseCastawayLogic(
       .from(baseEventReferenceSchema)
       .innerJoin(baseEventSchema, and(
         eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
-        inArray(baseEventSchema.eventName, [...EliminationEventNames])
+        inArray(baseEventSchema.eventName, [...EliminationEventNames]),
+        eq(baseEventReferenceSchema.referenceType, 'Castaway')
       ))
       .innerJoin(episodeSchema, eq(baseEventSchema.episodeId, episodeSchema.episodeId))
       .innerJoin(selectionUpdateSchema, eq(selectionUpdateSchema.castawayId, baseEventReferenceSchema.referenceId))
@@ -66,7 +67,8 @@ export default async function chooseCastawayLogic(
       .from(baseEventReferenceSchema)
       .innerJoin(baseEventSchema, and(
         eq(baseEventSchema.baseEventId, baseEventReferenceSchema.baseEventId),
-        inArray(baseEventSchema.eventName, [...EliminationEventNames])
+        inArray(baseEventSchema.eventName, [...EliminationEventNames]),
+        eq(baseEventReferenceSchema.referenceType, 'Castaway')
       ))
       .innerJoin(episodeSchema, eq(baseEventSchema.episodeId, episodeSchema.episodeId))
       .innerJoin(selectionUpdateSchema, eq(selectionUpdateSchema.castawayId, baseEventReferenceSchema.referenceId))
@@ -127,6 +129,7 @@ export default async function chooseCastawayLogic(
 
     // Get next episode
     const { nextEpisode } = await getKeyEpisodes(league.seasonId, trx);
+    console.log('[chooseCastaway] nextEpisode:', nextEpisode ? { episodeId: nextEpisode.episodeId, episodeNumber: nextEpisode.episodeNumber, airStatus: nextEpisode.airStatus, airDate: nextEpisode.airDate } : null);
     if (!nextEpisode) throw new Error('No upcoming episode found');
 
     // Check if castaway is eliminated
@@ -172,7 +175,8 @@ export default async function chooseCastawayLogic(
     }
 
     // Make the selection
-    await trx
+    console.log('[chooseCastaway] inserting selection:', { castawayId, memberId: auth.memberId, episodeId: nextEpisode.episodeId, draft: isDraft });
+    const insertResult = await trx
       .insert(selectionUpdateSchema)
       .values({
         castawayId,
@@ -184,6 +188,18 @@ export default async function chooseCastawayLogic(
         target: [selectionUpdateSchema.memberId, selectionUpdateSchema.episodeId],
         set: { castawayId },
       });
+    console.log('[chooseCastaway] insert result:', insertResult);
+
+    // Verify the row was written
+    const verifyRow = await trx
+      .select()
+      .from(selectionUpdateSchema)
+      .where(and(
+        eq(selectionUpdateSchema.memberId, auth.memberId),
+        eq(selectionUpdateSchema.episodeId, nextEpisode.episodeId)
+      ))
+      .limit(1);
+    console.log('[chooseCastaway] verify row after insert:', verifyRow);
 
     // Secondary pick must be cleared if they are the same as primary
     if (!league.canPickOwnSurvivor) {
@@ -256,7 +272,23 @@ export default async function chooseCastawayLogic(
     };
   });
 
+  console.log('[chooseCastaway] transaction committed, result:', JSON.stringify(result));
+
+  // Post-transaction verification: detect silent rollback
   if ('notify' in result && result.notify) {
+    const postTxnVerify = await db
+      .select()
+      .from(selectionUpdateSchema)
+      .where(and(
+        eq(selectionUpdateSchema.memberId, result.notify.memberId),
+        eq(selectionUpdateSchema.episodeId, result.notify.episodeId)
+      ))
+      .limit(1);
+    console.log('[chooseCastaway] POST-TXN verify:',
+      postTxnVerify.length > 0 ? 'ROW EXISTS ✓' : 'ROW MISSING — SILENT ROLLBACK DETECTED ✗',
+      { memberId: result.notify.memberId, episodeId: result.notify.episodeId }
+    );
+
     void scheduleSelectionChangeNotification(result.notify);
   }
 
