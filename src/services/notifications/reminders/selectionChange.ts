@@ -1,12 +1,13 @@
 import 'server-only';
 import { db } from '~/server/db';
-import { eq, and, isNotNull, ne } from 'drizzle-orm';
+import { eq, and, isNotNull, ne, lt, desc } from 'drizzle-orm';
 import { leagueMemberSchema, selectionUpdateSchema } from '~/server/db/schema/leagueMembers';
 import { sendPushToUsers } from '~/services/notifications/push';
 import { type ScheduledSelectionData } from '~/types/notifications';
 
 /**
- * Validate the selection still matches, then notify other league members
+ * Validate the selection still matches, then notify other league members.
+ * Skips notification if the member switched back to the same castaway they had the previous episode.
  */
 export async function sendSelectionChangeNotification(selection: ScheduledSelectionData) {
   // Validate current selection matches what was scheduled
@@ -23,6 +24,26 @@ export async function sendSelectionChangeNotification(selection: ScheduledSelect
     console.log(
       `Skipping selection notification - member ${selection.memberId} selection changed since scheduling`,
       { scheduled: selection.castawayId, current: current?.castawayId }
+    );
+    return;
+  }
+
+  // Check if this is just switching back to the castaway they had the previous episode
+  const previousSelection = await db
+    .select({ castawayId: selectionUpdateSchema.castawayId })
+    .from(selectionUpdateSchema)
+    .where(and(
+      eq(selectionUpdateSchema.memberId, selection.memberId),
+      lt(selectionUpdateSchema.episodeId, selection.episodeId),
+    ))
+    .orderBy(desc(selectionUpdateSchema.episodeId))
+    .limit(1)
+    .then((res) => res[0]);
+
+  if (previousSelection?.castawayId === selection.castawayId) {
+    console.log(
+      `Skipping selection notification - member ${selection.memberId} switched back to their previous castaway`,
+      { castawayId: selection.castawayId }
     );
     return;
   }
