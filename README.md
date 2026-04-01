@@ -1,3 +1,7 @@
+## This repo is deprecated, view the monorepo [here](https://github.com/Aidan3445/trial-by-fire)
+
+
+
 # [TrialByFireSurvivor.com](https://trialbyfiresurvivor.com)
 #### The most customizable Fantasy Survivor league hosting service.
 
